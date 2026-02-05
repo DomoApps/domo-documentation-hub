@@ -1,0 +1,2388 @@
+openapi: 3.1.0
+info:
+  title: "Documents"
+  description: "Domo Documents APIs"
+  version: "2.2.3354_master"
+servers:
+- url: "https://{subdomain}.domo.com"
+  variables:
+    subdomain:
+      description: The Domo instance subdomain.
+      default: subdomain
+tags:
+- name: Documents
+  description: Domo Documents APIs
+paths:
+  /api/files/v1/filesets:
+    post:
+      tags:
+      - Documents
+      summary: Create a new FileSet
+      description: Create a new FileSet to store files.
+      operationId: createFileSet
+      requestBody:
+        description: The request object containing the details for the new FileSet.
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateFileSetRequest"
+            examples:
+              Basic Request:
+                description: Basic create FileSet request.
+                value:
+                  name: Policies (2025)
+                  description: Location for all new and updated policies for FY2025
+                  aiEnabled: false
+                  connector: DOMO
+        required: true
+      responses:
+        "400":
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                type: object
+        "413":
+          description: Payload Too Large
+          content:
+            '*/*':
+              schema:
+                type: object
+        "409":
+          description: Conflict
+        "403":
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                type: string
+        "201":
+          description: FileSet created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FileSet"
+              examples:
+                FileSet Response:
+                  description: FileSet Response
+                  value:
+                    id: e49f188e-be98-451d-ba0f-ada1157bb656
+                    name: Policies (2025)
+                    description: Location for all new and updated policies for FY2025
+                    aiEnabled: false
+                    indexStatus: null
+                    connector: DOMO
+                    created: 2025-07-28T20:17:43.958479Z
+                    createdBy: 27
+                    updated: 2025-07-28T20:17:43.958479Z
+                    updatedBy: 27
+                    owner: "27"
+                    accountId: 0
+                    connectorContext: null
+                    permission: OWNER
+                    size: 0
+                    fileCount: 0
+      security:
+      - domo-developer-token: []
+  /api/files/v1/filesets/{fileSetId}:
+    get:
+      tags:
+      - Documents
+      summary: Get a FileSet by ID
+      description: Retrieve the details of a specific FileSet using its ID.
+      operationId: getFileSet
+      parameters:
+      - name: fileSetId
+        in: path
+        description: The ID of the FileSet to retrieve.
+        required: true
+        schema:
+          type: string
+      responses:
+        "400":
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                type: object
+        "413":
+          description: Payload Too Large
+          content:
+            '*/*':
+              schema:
+                type: object
+        "409":
+          description: Conflict
+        "403":
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: FileSet retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FileSet"
+              examples:
+                FileSet Response:
+                  description: FileSet Response
+                  value:
+                    id: e49f188e-be98-451d-ba0f-ada1157bb656
+                    name: Policies (2025)
+                    description: Location for all new and updated policies for FY2025
+                    aiEnabled: false
+                    indexStatus: null
+                    connector: DOMO
+                    created: 2025-07-28T20:17:43.958479Z
+                    createdBy: 27
+                    updated: 2025-07-28T20:17:43.958479Z
+                    updatedBy: 27
+                    owner: "27"
+                    accountId: 0
+                    connectorContext: null
+                    permission: OWNER
+                    size: 0
+                    fileCount: 0
+      security:
+      - domo-developer-token: []
+    post:
+      tags:
+      - Documents
+      summary: Update an existing FileSet
+      description: Update the details of an existing FileSet. Only fields that are
+        not null in the request will be updated.
+      operationId: updateFileSet
+      parameters:
+      - name: fileSetId
+        in: path
+        description: The ID of the FileSet to update.
+        required: true
+        schema:
+          type: string
+      requestBody:
+        description: |-
+          The request object containing the updated details for the FileSet.
+            Only fields that are not null in the request will be updated.
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateFileSetRequest"
+            examples:
+              Update FileSet Request:
+                description: Request to update an existing FileSet.
+                value:
+                  name: Policies (FY25)
+                  description: Repository for new policies created ONLY in FY2025
+        required: true
+      responses:
+        "400":
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                type: object
+        "413":
+          description: Payload Too Large
+          content:
+            '*/*':
+              schema:
+                type: object
+        "409":
+          description: Conflict
+        "403":
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: FileSet updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FileSet"
+              examples:
+                FileSet Response:
+                  description: FileSet Response
+                  value:
+                    id: e49f188e-be98-451d-ba0f-ada1157bb656
+                    name: Policies (FY25)
+                    description: Repository for new policies created ONLY in FY2025
+                    aiEnabled: false
+                    indexStatus: null
+                    connector: DOMO
+                    created: 2025-07-28T20:17:43.958479Z
+                    createdBy: 27
+                    updated: 2025-07-28T20:17:43.958479Z
+                    updatedBy: 27
+                    owner: "27"
+                    accountId: 0
+                    connectorContext: null
+                    permission: OWNER
+                    size: 0
+                    fileCount: 0
+      security:
+      - domo-developer-token: []
+    delete:
+      tags:
+      - Documents
+      summary: Delete a FileSet by ID
+      description: Delete a specific FileSet using its ID.
+      operationId: deleteFileSet
+      parameters:
+      - name: fileSetId
+        in: path
+        description: The ID of the FileSet to delete.
+        required: true
+        schema:
+          type: string
+      responses:
+        "400":
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                type: object
+        "413":
+          description: Payload Too Large
+          content:
+            '*/*':
+              schema:
+                type: object
+        "409":
+          description: Conflict
+        "403":
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                type: string
+        "204":
+          description: FileSet deleted successfully
+      security:
+      - domo-developer-token: []
+  /api/files/v1/filesets/{fileSetId}/query:
+    post:
+      tags:
+      - Documents
+      summary: Query FileSet for File Contents
+      description: Query a specific FileSet for file contents related to the query
+        criteria.
+      operationId: queryFileSet
+      parameters:
+      - name: fileSetId
+        in: path
+        description: The ID of the FileSet to query.
+        required: true
+        schema:
+          type: string
+      requestBody:
+        description: The request object containing query criteria.
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/QueryFileSetRequest"
+            examples:
+              Query FileSet Request:
+                description: Request to query a FileSet for file contents.
+                value:
+                  query: benefit
+                  pathPrefixFilter: sample/directory/path
+                  topK: 2
+        required: true
+      responses:
+        "400":
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                type: object
+        "413":
+          description: Payload Too Large
+          content:
+            '*/*':
+              schema:
+                type: object
+        "409":
+          description: Conflict
+        "403":
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: Query results retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/QueryFileSetResponse"
+              examples:
+                Query FileSet Response:
+                  description: Query FileSet Response
+                  value:
+                    matches:
+                    - content:
+                        text: |-
+                          # Paid Time Off (PTO) Policy
+
+                          ## Overview
+                          Our PTO policy is designed to provide...(924 characters omitted for brevity)
+                        type: TEXT
+                      metadata:
+                        fileId: 7150e608-c3a9-4b40-ac2d-eb182cc98c6f
+                        path: sample/directory/path/PaidTimeOffPolicy.pdf
+                      score: 0.41046342
+                    - content:
+                        uri: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgA...(4777\
+                          \ characters omitted for brevity)"
+                        type: IMAGE
+                      metadata:
+                        fileId: 7150e608-c3a9-4b40-ac2d-eb182cc98c6f
+                        path: sample/directory/path/PaidTimeOffPolicy.pdf
+                      score: 0.43281752
+      security:
+      - domo-developer-token: []
+  /api/files/v1/filesets/{fileSetId}/ownership:
+    post:
+      tags:
+      - Documents
+      summary: Update FileSet Owner
+      description: Update the owner of a specific FileSet.
+      operationId: updateOwnership
+      parameters:
+      - name: fileSetId
+        in: path
+        description: The ID of the FileSet for which to update the owner.
+        required: true
+        schema:
+          type: string
+      requestBody:
+        description: The request object containing the new owner information.
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/OwnershipUpdateRequest"
+            examples:
+              Ownership Update Request:
+                description: Request to update the owner of a FileSet.
+                value:
+                  userId: 109
+        required: true
+      responses:
+        "400":
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                type: object
+        "413":
+          description: Payload Too Large
+          content:
+            '*/*':
+              schema:
+                type: object
+        "409":
+          description: Conflict
+        "403":
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: Owner updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AccessResponse"
+              examples:
+                Ownership Update Response:
+                  description: Ownership Update Response
+                  value:
+                    fileSetId: e49f188e-be98-451d-ba0f-ada1157bb656
+                    fileSetAccess:
+                    - entityId: 109
+                      entityType: USER
+                      permission: OWNER
+                    - entityId: 27
+                      entityType: USER
+                      permission: OWNER
+      security:
+      - domo-developer-token: []
+  /api/files/v1/filesets/{fileSetId}/files:
+    post:
+      tags:
+      - Documents
+      summary: Create a new File or Directory
+      description: "Create a new File or Directory within a specified FileSet. If\
+        \ a file already exists at the specified path, it will attempt to overwrite\
+        \ it if the client has permission. If a Directory already exists at the specified\
+        \ path, it will return that Directory."
+      operationId: createFile
+      parameters:
+      - name: fileSetId
+        in: path
+        description: The ID of the FileSet in which to create the File.
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/FileUploadRequest"
+            examples:
+              File Upload Request:
+                description: Example request for creating a new File within a FileSet.
+                value: |
+                  {
+                      "file": (binary data of the file),
+                      "directoryPath": "sample/directory/path"
+                  }
+              Directory Creation Request:
+                description: Example request for creating a new Directory within a
+                  FileSet.
+                value:
+                  createFileRequest:
+                    directoryPath: sample/directory/path
+      responses:
+        "400":
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                type: object
+        "413":
+          description: Payload Too Large
+          content:
+            '*/*':
+              schema:
+                type: object
+        "409":
+          description: "Conflict: File already exists at the specified path and client\
+            \ does not have overwrite permissions."
+        "403":
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                type: string
+        "201":
+          description: File/Directory created successfully
+          content:
+            application/json:
+              schema:
+                anyOf:
+                - $ref: "#/components/schemas/File"
+                - $ref: "#/components/schemas/Directory"
+              examples:
+                File Created Response:
+                  description: File Created Response
+                  value:
+                    id: 7150e608-c3a9-4b40-ac2d-eb182cc98c6f
+                    path: sample/directory/path/PaidTimeOffPolicy.pdf
+                    name: PaidTimeOffPolicy.pdf
+                    fileType: DOCUMENT
+                    contentType: application/pdf
+                    size: 69502
+                    hash: ce0da94c741125c597cf3d54a3202cebdc16d7fe1074698219f724654595221c
+                    hashAlgorithm: SHA_256_HEX
+                    downloadUrl: ""
+                    created: 2025-07-28T21:47:39.814456Z
+                    createdBy: 27
+                    connectorKey: null
+                    indexStatus: null
+                    indexReason: null
+                Directory Created Response:
+                  description: Directory Created Response
+                  value:
+                    id: 22e1514a-354b-470f-bc32-c354812738f2
+                    path: sample/directory/path
+                    name: path
+                    size: null
+                    created: 2025-07-28T21:49:34.503181Z
+                    createdBy: 27
+                    fileType: DIRECTORY
+        "200":
+          description: Directory already created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Directory"
+              examples:
+                Directory Exists Response:
+                  description: Directory Exists Response
+                  value:
+                    id: 22e1514a-354b-470f-bc32-c354812738f2
+                    path: sample/directory/path
+                    name: path
+                    size: null
+                    created: 2025-07-28T21:49:34.503181Z
+                    createdBy: 27
+                    fileType: DIRECTORY
+      security:
+      - domo-developer-token: []
+  /api/files/v1/filesets/{fileSetId}/files/search:
+    post:
+      tags:
+      - Documents
+      summary: List Files and Directories for a FileSet
+      description: Retrieve a paginated list of Files within a specific FileSet based
+        on search criteria.
+      operationId: listFilesForFileset
+      parameters:
+      - name: fileSetId
+        in: path
+        description: The ID of the FileSet to search within.
+        required: true
+        schema:
+          type: string
+      - name: directoryPath
+        in: query
+        description: "The path to the directory within the FileSet, if applicable."
+        required: false
+        schema:
+          type: string
+      - name: immediateChildren
+        in: query
+        description: Whether to list only immediate children of the specified directory.
+        required: false
+        schema:
+          type: boolean
+          default: false
+      - name: limit
+        in: query
+        description: The maximum number of Files to return.
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 100
+      - name: next
+        in: query
+        description: The pagination token for the next set of results.
+        required: false
+        schema:
+          type: string
+      requestBody:
+        description: The search criteria for listing Files.
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SearchRequest"
+            examples:
+              Search Request:
+                description: Example search request for listing Files & Directories
+                  within a FileSet.
+                value:
+                  fieldSort:
+                  - field: created
+                    order: ASC
+                  filters:
+                  - field: name
+                    value:
+                    - paid
+                    not: false
+                    operator: LIKE
+                  dateFilters:
+                  - field: created
+                    start: 2025-05-12T23:30:00Z
+                    not: false
+                    end: null
+        required: true
+      responses:
+        "400":
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                type: object
+        "413":
+          description: Payload Too Large
+          content:
+            '*/*':
+              schema:
+                type: object
+        "409":
+          description: Conflict
+        "403":
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: Matching Files retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FilePage"
+              examples:
+                File & Directory Page Response:
+                  description: File & Directory Page Response
+                  value:
+                    files:
+                    - id: 7150e608-c3a9-4b40-ac2d-eb182cc98c6f
+                      path: sample/directory/path/PaidTimeOffPolicy.pdf
+                      name: PaidTimeOffPolicy.pdf
+                      fileType: DOCUMENT
+                      contentType: application/pdf
+                      size: 69502
+                      hash: ce0da94c741125c597cf3d54a3202cebdc16d7fe1074698219f724654595221c
+                      hashAlgorithm: SHA_256_HEX
+                      downloadUrl: ""
+                      created: 2025-07-28T21:47:39.814456Z
+                      createdBy: 27
+                      connectorKey: null
+                      indexStatus: null
+                      indexReason: null
+                    pageContext:
+                      next: eyJpZCI6ImJiZjU3MDVkLWU1ZjQtNGRkMy1hMTUyLTgzNzdhNTYwYzY0YiIsInBhdGgiOiJzYW1wbGUvZGlyZWN0b3J5L3BhdGgiLCJuYW1lIjoicGF0aCIsInNpemUiOm51bGwsImNyZWF0ZWQiOiIyMDI1LTA3LTI5VDE4OjA3OjI2Ljc2MzE5M1oifQ==
+      security:
+      - domo-developer-token: []
+  /api/files/v1/filesets/{fileSetId}/files/reindex:
+    post:
+      tags:
+      - Documents
+      summary: Reindex Files within a FileSet
+      description: Initiate another indexing attempt for specific files within a FileSet.
+      operationId: reindexFileSetFiles
+      parameters:
+      - name: fileSetId
+        in: path
+        description: The ID of the FileSet to reindex files within.
+        required: true
+        schema:
+          type: string
+      requestBody:
+        description: The request object containing reindexing criteria.
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ReindexFileSetFilesRequest"
+            examples:
+              Reindex FileSet Files Request:
+                description: Request to reindex specific files within a FileSet.
+                value:
+                  fileIds:
+                  - 7150e608-c3a9-4b40-ac2d-eb182cc98c6f
+                  - 22e1514a-354b-470f-bc32-c354812738f2
+        required: true
+      responses:
+        "400":
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                type: object
+        "413":
+          description: Payload Too Large
+          content:
+            '*/*':
+              schema:
+                type: object
+        "409":
+          description: Conflict
+        "403":
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                type: string
+        "202":
+          description: Reindexing initiated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ReindexFileSetFilesResponse"
+              examples:
+                Reindex FileSet Response:
+                  description: Reindex FileSet Response
+                  value:
+                    retriedFilesCount: 2
+      security:
+      - domo-developer-token: []
+  /api/files/v1/filesets/{fileSetId}/files/multipart:
+    post:
+      tags:
+      - Documents
+      summary: Initiate a split file upload.
+      description: Initiates a split file upload process for creating a new file within
+        a FileSet.
+      operationId: initiateSplitFileUpload
+      parameters:
+      - name: fileSetId
+        in: path
+        description: The ID of the FileSet in which to create the File.
+        required: true
+        schema:
+          type: string
+      requestBody:
+        description: The request object containing the details for the split file
+          upload.
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SplitFileUploadRequest"
+        required: true
+      responses:
+        "400":
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                type: object
+        "413":
+          description: Payload Too Large
+          content:
+            '*/*':
+              schema:
+                type: object
+        "409":
+          description: "Conflict: File already exists at the specified path."
+        "403":
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                type: string
+        "202":
+          description: Split file upload initiated successfully.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SplitFileUploadResponse"
+              examples:
+                Split File Upload Response:
+                  description: Split File Upload Response
+                  value:
+                    file:
+                      id: df5fd883-e5cb-4cbb-a158-0e9ff1d37097
+                      path: sample/directory/path/PaidTimeOffPolicy.pdf
+                      name: PaidTimeOffPolicy.pdf
+                      fileType: OTHER
+                      contentType: null
+                      size: null
+                      hash: null
+                      hashAlgorithm: SHA_256_HEX
+                      downloadUrl: null
+                      created: 2025-08-25T16:05:56.676114Z
+                      createdBy: 27
+                      connectorKey: null
+                      indexStatus: null
+                      indexReason: null
+                    status: CREATED
+        "422":
+          description: "Unprocessable Entity: Request for the split file could not\
+            \ be fulfilled."
+      security:
+      - domo-developer-token: []
+  /api/files/v1/filesets/{fileSetId}/files/multipart/{fileId}/part/{partNumber}:
+    post:
+      tags:
+      - Documents
+      summary: Submit a part of a file for upload.
+      description: Allows submitting a file in stages to create a new file within
+        a FileSet.
+      operationId: uploadSplitFilePart
+      parameters:
+      - name: fileSetId
+        in: path
+        description: The ID of the FileSet in which to the file is being uploaded.
+        required: true
+        schema:
+          type: string
+      - name: fileId
+        in: path
+        description: The ID of the file being uploaded in parts.
+        required: true
+        schema:
+          type: string
+      - name: partNumber
+        in: path
+        description: The part number of this file segment. Must be non-negative.
+        required: true
+        schema:
+          type: integer
+          format: int64
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/SplitFileUploadPartRequest"
+            examples:
+              Split File Upload Part Request:
+                description: Example request for uploading a part of a split file
+                  upload.
+                value: |
+                  {
+                      "part": (binary data of the file)
+                  }
+      responses:
+        "400":
+          description: Split file upload part did not match previous data segments.
+          content:
+            '*/*':
+              schema:
+                type: object
+        "413":
+          description: Payload Too Large
+          content:
+            '*/*':
+              schema:
+                type: object
+        "409":
+          description: Conflict
+        "403":
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                type: string
+        "202":
+          description: File part accepted for upload.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SplitFileUploadResponse"
+              examples:
+                Split File Part Upload Response:
+                  description: Split File Part Upload Response
+                  value:
+                    file:
+                      id: df5fd883-e5cb-4cbb-a158-0e9ff1d37097
+                      path: sample/directory/path/PaidTimeOffPolicy.pdf
+                      name: PaidTimeOffPolicy.pdf
+                      fileType: DOCUMENT
+                      contentType: application/pdf
+                      size: 69502
+                      hash: null
+                      hashAlgorithm: SHA_256_HEX
+                      downloadUrl: null
+                      created: 2025-08-25T16:05:56.676114Z
+                      createdBy: 27
+                      connectorKey: null
+                      indexStatus: null
+                      indexReason: null
+                    status: PROCESSING
+        "404":
+          description: An "initiate split file" request was not performed prior to
+            this request for the given file ID or has already been finalized or aborted.
+        "422":
+          description: "Unprocessable Entity: Request for the split file could not\
+            \ be fulfilled."
+      security:
+      - domo-developer-token: []
+  /api/files/v1/filesets/{fileSetId}/files/multipart/{fileId}/finalize:
+    post:
+      tags:
+      - Documents
+      summary: Finalize a split file upload.
+      description: Declares that all parts of a split file upload have been submitted
+        and the file can be assembled.
+      operationId: finalizeSplitFileUpload
+      parameters:
+      - name: fileSetId
+        in: path
+        description: The ID of the FileSet in which the file has been uploaded.
+        required: true
+        schema:
+          type: string
+      - name: fileId
+        in: path
+        description: The ID of the file whose parts have been uploaded.
+        required: true
+        schema:
+          type: string
+      responses:
+        "400":
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                type: object
+        "413":
+          description: Payload Too Large
+          content:
+            '*/*':
+              schema:
+                type: object
+        "409":
+          description: "Conflict: File already exists at the declared path."
+        "403":
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                type: string
+        "201":
+          description: Split file upload finalized successfully.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SplitFileUploadResponse"
+              examples:
+                Split File Upload Finalize Response:
+                  description: Split File Upload Finalize Response
+                  value:
+                    file:
+                      id: df5fd883-e5cb-4cbb-a158-0e9ff1d37097
+                      path: sample/directory/path/PaidTimeOffPolicy.pdf
+                      name: PaidTimeOffPolicy.pdf
+                      fileType: DOCUMENT
+                      contentType: application/pdf
+                      size: 69502
+                      hash: ce0da94c741125c597cf3d54a3202cebdc16d7fe1074698219f724654595221c
+                      hashAlgorithm: SHA_256_HEX
+                      downloadUrl: ""
+                      created: 2025-08-25T16:05:56.676114Z
+                      createdBy: 27
+                      connectorKey: null
+                      indexStatus: null
+                      indexReason: null
+                    status: SUCCESS
+        "404":
+          description: "An \"initiate split file\" request was not performed prior\
+            \ to this request for the given file ID and/or has not been uploaded any\
+            \ parts, or has already been finalized/aborted."
+        "422":
+          description: "Unprocessable Entity: Request for the split file could not\
+            \ be fulfilled."
+      security:
+      - domo-developer-token: []
+  /api/files/v1/filesets/{fileSetId}/files/multipart/{fileId}/abort:
+    post:
+      tags:
+      - Documents
+      summary: Abort a split file upload.
+      description: "Aborts an ongoing split file upload process, discarding all uploaded\
+        \ parts."
+      operationId: abortSplitFileUpload
+      parameters:
+      - name: fileSetId
+        in: path
+        description: The ID of the FileSet in which the file was being uploaded.
+        required: true
+        schema:
+          type: string
+      - name: fileId
+        in: path
+        description: The ID of the file whose upload is to be aborted.
+        required: true
+        schema:
+          type: string
+      responses:
+        "400":
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                type: object
+        "413":
+          description: Payload Too Large
+          content:
+            '*/*':
+              schema:
+                type: object
+        "409":
+          description: Conflict
+        "403":
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: Split file upload aborted successfully.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SplitFileUploadResponse"
+              examples:
+                Split File Upload Response:
+                  description: Split File Upload Response
+                  value:
+                    file:
+                      id: df5fd883-e5cb-4cbb-a158-0e9ff1d37097
+                      path: sample/directory/path/PaidTimeOffPolicy.pdf
+                      name: PaidTimeOffPolicy.pdf
+                      fileType: DOCUMENT
+                      contentType: application/pdf
+                      size: 69502
+                      hash: null
+                      hashAlgorithm: SHA_256_HEX
+                      downloadUrl: null
+                      created: 2025-08-25T16:05:56.676114Z
+                      createdBy: 27
+                      connectorKey: null
+                      indexStatus: null
+                      indexReason: null
+                    status: FAILED
+        "404":
+          description: An "initiate split file" request was not performed prior to
+            this request for the given file ID or has already been finalized or aborted.
+      security:
+      - domo-developer-token: []
+  /api/files/v1/filesets/{fileSetId}/access:
+    get:
+      tags:
+      - Documents
+      summary: Get FileSet Access Permissions
+      description: Retrieve the access permissions for a specific FileSet.
+      operationId: getAccess
+      parameters:
+      - name: fileSetId
+        in: path
+        description: The ID of the FileSet for which to retrieve access information.
+        required: true
+        schema:
+          type: string
+      responses:
+        "400":
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                type: object
+        "413":
+          description: Payload Too Large
+          content:
+            '*/*':
+              schema:
+                type: object
+        "409":
+          description: Conflict
+        "403":
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: Access permissions retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AccessResponse"
+              examples:
+                Access Response:
+                  description: Access Response
+                  value:
+                    fileSetId: e49f188e-be98-451d-ba0f-ada1157bb656
+                    fileSetAccess:
+                    - entityId: 27
+                      entityType: USER
+                      permission: OWNER
+      security:
+      - domo-developer-token: []
+    post:
+      tags:
+      - Documents
+      summary: Update FileSet Access Permissions
+      description: Update the relevant access permissions for a specific FileSet.
+      operationId: updateAccess
+      parameters:
+      - name: fileSetId
+        in: path
+        description: The ID of the FileSet for which to update access permissions.
+        required: true
+        schema:
+          type: string
+      requestBody:
+        description: The request object containing the relevant access permissions
+          to update.
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AccessUpdateRequest"
+            examples:
+              Update Access Request:
+                description: Request to update access permissions for a FileSet.
+                value:
+                  fileSetAccess:
+                  - entityId: 42
+                    entityType: GROUP
+                    permission: EDIT
+        required: true
+      responses:
+        "400":
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                type: object
+        "413":
+          description: Payload Too Large
+          content:
+            '*/*':
+              schema:
+                type: object
+        "409":
+          description: Conflict
+        "403":
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: Access permissions updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AccessResponse"
+              examples:
+                Access Response:
+                  description: Access Response
+                  value:
+                    fileSetId: e49f188e-be98-451d-ba0f-ada1157bb656
+                    fileSetAccess:
+                    - entityId: 42
+                      entityType: GROUP
+                      permission: EDIT
+                    - entityId: 27
+                      entityType: USER
+                      permission: OWNER
+      security:
+      - domo-developer-token: []
+  /api/files/v1/filesets/search:
+    post:
+      tags:
+      - Documents
+      summary: List FileSets
+      description: Retrieve a paginated list of FileSets based on search criteria.
+      operationId: listFileSets
+      parameters:
+      - name: limit
+        in: query
+        description: The maximum number of FileSets to return.
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 100
+      - name: offset
+        in: query
+        description: The offset for pagination.
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 0
+      requestBody:
+        description: The search criteria for listing FileSets.
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SearchRequest"
+            examples:
+              Search Request:
+                description: Example search request for listing FileSets.
+                value:
+                  fieldSort:
+                  - field: name
+                    order: ASC
+                  filters:
+                  - field: owner
+                    value:
+                    - 27
+                    not: false
+                    operator: EQUALS
+                  dateFilters:
+                  - field: created
+                    start: 2025-05-12T23:30:00Z
+                    not: false
+                    end: null
+        required: true
+      responses:
+        "400":
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                type: object
+        "413":
+          description: Payload Too Large
+          content:
+            '*/*':
+              schema:
+                type: object
+        "409":
+          description: Conflict
+        "403":
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: Matching FileSets retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FileSetPage"
+              examples:
+                FileSet Page Response:
+                  description: FileSet Page Response
+                  value:
+                    fileSets:
+                    - id: e49f188e-be98-451d-ba0f-ada1157bb656
+                      name: Policies (2025)
+                      description: Location for all new and updated policies for FY2025
+                      aiEnabled: false
+                      indexStatus: null
+                      connector: DOMO
+                      created: 2025-07-28T20:17:43.958479Z
+                      createdBy: 27
+                      updated: 2025-07-28T20:17:43.958479Z
+                      updatedBy: 27
+                      owner: "27"
+                      accountId: 0
+                      connectorContext: null
+                      permission: OWNER
+                      size: 0
+                      fileCount: 0
+                    pageContext:
+                      count: 1
+                      totalCount: 1
+                      offset: 0
+      security:
+      - domo-developer-token: []
+  /api/files/v1/filesets/{fileSetId}/stats:
+    get:
+      tags:
+      - Documents
+      summary: Get FileSet Statistics
+      description: Retrieve statistics for a specific FileSet.
+      operationId: getFileSetStats
+      parameters:
+      - name: fileSetId
+        in: path
+        description: The ID of the FileSet for which to retrieve statistics.
+        required: true
+        schema:
+          type: string
+      responses:
+        "400":
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                type: object
+        "413":
+          description: Payload Too Large
+          content:
+            '*/*':
+              schema:
+                type: object
+        "409":
+          description: Conflict
+        "403":
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: ResponseEntity containing the FileSet statistics.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FileSet"
+              examples:
+                FileSet Stats Response:
+                  description: FileSet Stats Response
+                  value:
+                    imageFileTypeCount: 113
+                    audioFileTypeCount: 17
+                    videoFileTypeCount: 4
+                    textFileTypeCount: 422
+                    documentFileTypeCount: 98
+                    otherFileTypeCount: 9
+                    notIndexedCount: 0
+                    indexQueuedCount: 0
+                    indexInProgressCount: 19
+                    indexCompleteCount: 623
+                    indexFailedCount: 0
+                    indexSkippedCount: 21
+      security:
+      - domo-developer-token: []
+  /api/files/v1/filesets/{fileSetId}/path:
+    get:
+      tags:
+      - Documents
+      summary: Get File or Directory by Path
+      description: Retrieve a File or Directory within a FileSet using its path.
+      operationId: getFileByPath
+      parameters:
+      - name: fileSetId
+        in: path
+        description: The ID of the FileSet.
+        required: true
+        schema:
+          type: string
+      - name: path
+        in: query
+        description: The path to the File or Directory within the FileSet.
+        required: true
+        schema:
+          type: string
+      responses:
+        "400":
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                type: object
+        "413":
+          description: Payload Too Large
+          content:
+            '*/*':
+              schema:
+                type: object
+        "409":
+          description: Conflict
+        "403":
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: File/Directory retrieved successfully
+          content:
+            application/json:
+              schema:
+                anyOf:
+                - $ref: "#/components/schemas/File"
+                - $ref: "#/components/schemas/Directory"
+              examples:
+                File Retrieved Response:
+                  description: File Retrieved Response
+                  value:
+                    id: 7150e608-c3a9-4b40-ac2d-eb182cc98c6f
+                    path: sample/directory/path/PaidTimeOffPolicy.pdf
+                    name: PaidTimeOffPolicy.pdf
+                    fileType: DOCUMENT
+                    contentType: application/pdf
+                    size: 69502
+                    hash: ce0da94c741125c597cf3d54a3202cebdc16d7fe1074698219f724654595221c
+                    hashAlgorithm: SHA_256_HEX
+                    downloadUrl: ""
+                    created: 2025-07-28T21:47:39.814456Z
+                    createdBy: 27
+                    connectorKey: null
+                    indexStatus: null
+                    indexReason: null
+                Directory Retrieved Response:
+                  description: Directory Retrieved Response
+                  value:
+                    id: 22e1514a-354b-470f-bc32-c354812738f2
+                    path: sample/directory/path
+                    name: path
+                    size: null
+                    created: 2025-07-28T21:49:34.503181Z
+                    createdBy: 27
+                    fileType: DIRECTORY
+      security:
+      - domo-developer-token: []
+    delete:
+      tags:
+      - Documents
+      summary: Delete File or Directory by Path
+      description: Delete a specific File or Directory within a FileSet using its
+        path.
+      operationId: deleteFileByPath
+      parameters:
+      - name: fileSetId
+        in: path
+        description: The ID of the FileSet containing the File.
+        required: true
+        schema:
+          type: string
+      - name: path
+        in: query
+        description: |-
+          The path to the File or Directory to delete.
+            If a Directory is specified, it and its children will be deleted.
+        required: true
+        schema:
+          type: string
+      responses:
+        "400":
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                type: object
+        "413":
+          description: Payload Too Large
+          content:
+            '*/*':
+              schema:
+                type: object
+        "409":
+          description: Conflict
+        "403":
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                type: string
+        "204":
+          description: File/Directory deleted successfully
+      security:
+      - domo-developer-token: []
+  /api/files/v1/filesets/{fileSetId}/path/download:
+    get:
+      tags:
+      - Documents
+      summary: Download a File by Path
+      description: Download the contents of a specific File within a FileSet using
+        its path. This will redirect to the file's download URL.
+      operationId: downloadByPath
+      parameters:
+      - name: fileSetId
+        in: path
+        description: The ID of the FileSet containing the File.
+        required: true
+        schema:
+          type: string
+      - name: path
+        in: query
+        description: The path of the File to download within the FileSet.
+        required: true
+        schema:
+          type: string
+      responses:
+        "400":
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                type: object
+        "413":
+          description: Payload Too Large
+          content:
+            '*/*':
+              schema:
+                type: object
+        "409":
+          description: Conflict
+        "403":
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: ResponseEntity with no content–the file will be downloaded
+            via a redirect.
+      security:
+      - domo-developer-token: []
+  /api/files/v1/filesets/{fileSetId}/files/{fileId}:
+    get:
+      tags:
+      - Documents
+      summary: Get a File or Directory by ID
+      description: Retrieve a specific File or Directory within a FileSet using its
+        ID.
+      operationId: getFile
+      parameters:
+      - name: fileSetId
+        in: path
+        description: The ID of the FileSet containing the File or Directory.
+        required: true
+        schema:
+          type: string
+      - name: fileId
+        in: path
+        description: The ID of the File or Directory to retrieve.
+        required: true
+        schema:
+          type: string
+      responses:
+        "400":
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                type: object
+        "413":
+          description: Payload Too Large
+          content:
+            '*/*':
+              schema:
+                type: object
+        "409":
+          description: Conflict
+        "403":
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: File/Directory retrieved successfully
+          content:
+            application/json:
+              schema:
+                anyOf:
+                - $ref: "#/components/schemas/File"
+                - $ref: "#/components/schemas/Directory"
+              examples:
+                File Retrieved Response:
+                  description: File Retrieved Response
+                  value:
+                    id: 7150e608-c3a9-4b40-ac2d-eb182cc98c6f
+                    path: sample/directory/path/PaidTimeOffPolicy.pdf
+                    name: PaidTimeOffPolicy.pdf
+                    fileType: DOCUMENT
+                    contentType: application/pdf
+                    size: 69502
+                    hash: ce0da94c741125c597cf3d54a3202cebdc16d7fe1074698219f724654595221c
+                    hashAlgorithm: SHA_256_HEX
+                    downloadUrl: ""
+                    created: 2025-07-28T21:47:39.814456Z
+                    createdBy: 27
+                    connectorKey: null
+                    indexStatus: null
+                    indexReason: null
+                Directory Retrieved Response:
+                  description: Directory Retrieved Response
+                  value:
+                    id: 22e1514a-354b-470f-bc32-c354812738f2
+                    path: sample/directory/path
+                    name: path
+                    size: null
+                    created: 2025-07-28T21:49:34.503181Z
+                    createdBy: 27
+                    fileType: DIRECTORY
+      security:
+      - domo-developer-token: []
+    delete:
+      tags:
+      - Documents
+      summary: Delete a File or Directory by ID
+      description: Delete a specific File or Directory within a FileSet using its
+        ID.
+      operationId: deleteFile
+      parameters:
+      - name: fileSetId
+        in: path
+        description: The ID of the FileSet containing the File.
+        required: true
+        schema:
+          type: string
+      - name: fileId
+        in: path
+        description: |-
+          The ID of the File or Directory to delete.
+            If a Directory is specified, it and its children will be deleted.
+        required: true
+        schema:
+          type: string
+      responses:
+        "400":
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                type: object
+        "413":
+          description: Payload Too Large
+          content:
+            '*/*':
+              schema:
+                type: object
+        "409":
+          description: Conflict
+        "403":
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                type: string
+        "204":
+          description: File/Directory deleted successfully
+      security:
+      - domo-developer-token: []
+  /api/files/v1/filesets/{fileSetId}/files/{fileId}/download:
+    get:
+      tags:
+      - Documents
+      summary: Download a File by ID
+      description: Download the contents of a specific File within a FileSet using
+        its ID. This will redirect to the file's download URL.
+      operationId: download
+      parameters:
+      - name: fileSetId
+        in: path
+        description: The ID of the FileSet containing the File.
+        required: true
+        schema:
+          type: string
+      - name: fileId
+        in: path
+        description: The ID of the File to download.
+        required: true
+        schema:
+          type: string
+      responses:
+        "400":
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                type: object
+        "413":
+          description: Payload Too Large
+          content:
+            '*/*':
+              schema:
+                type: object
+        "409":
+          description: Conflict
+        "403":
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                type: string
+        "302":
+          description: File download initiated successfully
+      security:
+      - domo-developer-token: []
+  /api/files/v1/filesets/{fileSetId}/files/{fileId}/content:
+    get:
+      tags:
+      - Documents
+      summary: Get File Content by ID
+      description: "Retrieve the content of a specific File within a FileSet using\
+        \ its ID. This endpoint requires a valid download token for authorization,\
+        \ which is generally obtained via a download endpoint and redirected here\
+        \ automatically."
+      operationId: getFileContent
+      parameters:
+      - name: fileSetId
+        in: path
+        description: The ID of the FileSet containing the File.
+        required: true
+        schema:
+          type: string
+      - name: fileId
+        in: path
+        description: The ID of the File to retrieve.
+        required: true
+        schema:
+          type: string
+      - name: token
+        in: query
+        description: The download token for authorization.
+        required: true
+        schema:
+          type: string
+      responses:
+        "400":
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                type: object
+        "413":
+          description: Payload Too Large
+          content:
+            '*/*':
+              schema:
+                type: object
+        "409":
+          description: Conflict
+        "403":
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: File content retrieved successfully
+          content:
+            application/octet-stream: {}
+      security:
+      - domo-developer-token: []
+components:
+  schemas:
+    CreateFileSetRequest:
+      type: object
+      description: |-
+        <p>
+             Represents a request to create a file set.
+         </p>
+      properties:
+        name:
+          type: string
+          description: The name for the file set.
+        description:
+          type: string
+          description: A description for the file set.
+        connector:
+          type: string
+          description: The connector that powers the file set.
+          enum:
+          - DOMO
+          - CONFLUENCE
+          - GITHUB
+          - GOOGLE_DRIVE
+          - S3
+          - SFTP
+          - UNKNOWN
+        aiEnabled:
+          type: boolean
+          description: Indicates whether AI features are enabled for the file set.
+      required:
+      - name
+    FileSet:
+      type: object
+      description: |-
+        <p>
+             Represents a file set, which is a collection of files.
+         </p>
+      properties:
+        id:
+          type: string
+          description: Unique identifier for the file set.
+        name:
+          type: string
+          description: "Name of the file set, determined by the client."
+        description:
+          type: string
+          description: "Optional description of the file set, determined by the client."
+        aiEnabled:
+          type: boolean
+          description: Flag indicating whether AI features are enabled for the file
+            set.
+        connector:
+          type: string
+          description: "The connector used to power the file set, which defines how\
+            \ files are ingested."
+          enum:
+          - DOMO
+          - CONFLUENCE
+          - GITHUB
+          - GOOGLE_DRIVE
+          - S3
+          - SFTP
+          - UNKNOWN
+        created:
+          type: string
+          format: date-time
+          description: Timestamp when the file set was created.
+        createdBy:
+          type: integer
+          format: int64
+          description: ID of the user who created the file set.
+        updated:
+          type: string
+          format: date-time
+          description: Timestamp when the file set was last updated.
+        updatedBy:
+          type: integer
+          format: int64
+          description: ID of the user who last updated the file set.
+        owner:
+          type: string
+          description: "ID of the user who owns the file set, which is typically the\
+            \ creator until ownership is transferred."
+        permission:
+          type: string
+          description: "The permission level of the current user to the file set,\
+            \ which determines access rights."
+          enum:
+          - OWNER
+          - EDIT
+          - READ
+          - NONE
+        size:
+          type: integer
+          format: int64
+          description: "The estimated total size of the files in the file set, in\
+            \ bytes."
+        fileCount:
+          type: integer
+          format: int64
+          description: The estimated total number of files in the file set.
+    UpdateFileSetRequest:
+      type: object
+      description: |-
+        <p>
+             Represents a request to update a file set.
+             At least one of the fields must be provided to update the file set.
+         </p>
+      properties:
+        name:
+          type: string
+          description: "The name with which to update the file set's name. If not\
+            \ provided, the name will remain unchanged."
+        description:
+          type: string
+          description: |-
+            Optional description with which to update the file set's description.
+              If not provided, the description will remain unchanged.
+        aiEnabled:
+          type: boolean
+          description: Optional flag to enable or disable AI features for the file
+            set.
+    QueryFileSetRequest:
+      type: object
+      description: |-
+        <p>
+          Used to query a file set for the top K results based on the provided query.
+         </p>
+      properties:
+        query:
+          type: string
+          description: The query string to match against file contents within the
+            file set.
+        topK:
+          type: integer
+          format: int32
+          description: |-
+            The number of top results to return based on the query match.
+              Defaults to 1.
+        pathPrefixFilter:
+          type: string
+          description: An optional prefix filter for the file paths to narrow down
+            the search results.
+      required:
+      - query
+    Content:
+      type: object
+      discriminator:
+        propertyName: type
+      properties:
+        type:
+          type: string
+          enum:
+          - TEXT
+          - IMAGE
+          - UNKNOWN
+    ContentMetadata:
+      type: object
+      description: |-
+        <p>
+             An object containing metadata for file contents or chunks of content.
+         </p>
+      properties:
+        fileId:
+          type: string
+          description: The unique identifier for the file associated with the content.
+        path:
+          type: string
+          description: The full path of the source file for the content.
+    ImageContent:
+      allOf:
+      - $ref: "#/components/schemas/Content"
+      - type: object
+        properties:
+          uri:
+            type: string
+            description: ""
+      description: |-
+        <p>
+             Portion of file content that is an image.
+         </p>
+    Match:
+      type: object
+      description: |-
+        <p>
+          Represents a content match with the associated metadata and score.
+         </p>
+      properties:
+        content:
+          description: The content that was matched.
+          oneOf:
+          - $ref: "#/components/schemas/ImageContent"
+          - $ref: "#/components/schemas/TextContent"
+        metadata:
+          $ref: "#/components/schemas/ContentMetadata"
+          description: Object containing metadata about the content that was matched.
+        score:
+          type: number
+          format: double
+          description: "The relevancy score of the match, a decimal number between\
+            \ 0 and 1."
+    QueryFileSetResponse:
+      type: object
+      description: |-
+        <p>
+          Response object containing a list of matches for a file set query.
+         </p>
+      properties:
+        matches:
+          type: array
+          description: A list of matching content found relating to files withing
+            the file set.
+          items:
+            $ref: "#/components/schemas/Match"
+    TextContent:
+      allOf:
+      - $ref: "#/components/schemas/Content"
+      - type: object
+        properties:
+          text:
+            type: string
+            description: ""
+      description: |-
+        <p>
+             Portion of file content that is text.
+         </p>
+    OwnershipUpdateRequest:
+      type: object
+      description: |-
+        <p>
+          Represents a request to transfer ownership of a file set.
+         <br>
+          Other users may be granted ownership level permissions, but only one user may be the sole owner of a file set.
+         </p>
+      properties:
+        userId:
+          type: integer
+          format: int64
+          description: The ID of the user that will assume ownership.
+      required:
+      - userId
+    AccessResponse:
+      type: object
+      description: |-
+        <p>
+          Response object containing the explicit access to a file set.
+         </p>
+      properties:
+        fileSetId:
+          type: string
+          description: The associated file set id.
+        fileSetAccess:
+          type: array
+          description: The access permissions for the file set.
+          items:
+            $ref: "#/components/schemas/FileSetAccess"
+    FileSetAccess:
+      type: object
+      description: |-
+        <p>
+          Represents the access to an index for a specific entity.
+         </p>
+      properties:
+        entityId:
+          type: integer
+          format: int64
+          description: The id of the entity.
+        entityType:
+          type: string
+          description: The type of the entity.
+          enum:
+          - USER
+          - GROUP
+        permission:
+          type: string
+          description: The level of permission the entity has to the index.
+          enum:
+          - OWNER
+          - EDIT
+          - READ
+          - NONE
+      required:
+      - entityId
+      - entityType
+      - permission
+    FileUploadRequest:
+      type: object
+      description: |-
+        <p>
+             Represents a request to upload a file or create a directory.
+         </p>
+      properties:
+        file:
+          type: string
+          format: binary
+          description: The file to be uploaded. Leave null if creating a directory.
+        directoryPath:
+          type: string
+          description: |-
+            The directory path of the uploaded file, or the path of the created directory if no file is provided.
+              Defaults to an empty string, i.e., the root directory, if not specified.
+              Note: An empty string is not valid when intentionally creating a directory.
+    File:
+      type: object
+      description: |-
+        <p>
+            The metadata for a file set file.
+         </p>
+      properties:
+        id:
+          type: string
+          description: Unique identifier for the file.
+        path:
+          type: string
+          description: "The full path of the file, including the file name."
+        name:
+          type: string
+          description: "The name of the file, without the full path."
+        fileType:
+          type: string
+          description: The type of the file's contents.
+          enum:
+          - AUDIO
+          - VIDEO
+          - IMAGE
+          - TEXT
+          - DOCUMENT
+          - DIRECTORY
+          - OTHER
+          - UNKNOWN
+        contentType:
+          type: string
+          description: "The MIME type of the file, such as \"image/png\" or \"application/pdf\"\
+            ."
+        size:
+          type: integer
+          description: The size of the file in bytes.
+        hash:
+          type: string
+          description: "The hash of the file's contents, used for integrity checks\
+            \ and deduplication."
+        hashAlgorithm:
+          type: string
+          description: The algorithm used to compute the hash of the file.
+          enum:
+          - SHA_1
+          - SHA_256_HEX
+          - MD5
+          - UNKNOWN
+        downloadUrl:
+          type: string
+          description: "A URL to download the file's contents, if available."
+        created:
+          type: string
+          format: date-time
+          description: The timestamp when the file was created.
+        createdBy:
+          type: integer
+          format: int64
+          description: The ID of the user who created the file.
+        connectorKey:
+          type: string
+          description: "The key of the connector that manages the file, used for identifying\
+            \ the source of the file."
+        indexStatus:
+          type: string
+          description: "The status of the file's indexing, indicating whether it has\
+            \ been processed for search and retrieval, if applicable."
+          enum:
+          - PENDING
+          - QUEUED
+          - IN_PROGRESS
+          - RAG_RECEIVED
+          - COMPLETED
+          - FAILED
+          - SKIPPED
+          - UNKNOWN
+        indexReason:
+          type: string
+          description: "The reason for the file's indexing status, providing context\
+            \ for why it may not have been indexed."
+    Directory:
+      type: object
+      description: |-
+        <p>
+             Metadata for a directory within a file set.
+         </p>
+      properties:
+        id:
+          type: string
+          description: ""
+        path:
+          type: string
+          description: ""
+        name:
+          type: string
+          description: ""
+        size:
+          type: integer
+          description: ""
+        created:
+          type: string
+          format: date-time
+          description: ""
+        createdBy:
+          type: integer
+          format: int64
+          description: ""
+        fileType:
+          type: string
+          enum:
+          - AUDIO
+          - VIDEO
+          - IMAGE
+          - TEXT
+          - DOCUMENT
+          - DIRECTORY
+          - OTHER
+          - UNKNOWN
+    DateFilter:
+      type: object
+      description: |-
+        <p>
+             Represents a filter for searching over date ranges.
+         </p>
+      properties:
+        field:
+          type: string
+          description: "The field to filter on, which should be a field representing\
+            \ a date."
+        start:
+          type: string
+          format: date-time
+          description: |-
+            The optional start of the date range, inclusive.
+              Cannot be null if end is not provided.
+        end:
+          type: string
+          format: date-time
+          description: |-
+            The optional end of the date range, inclusive.
+              Cannot be null if start is not provided.
+        not:
+          type: boolean
+          description: "If true, the filter will negate the condition (i.e., find\
+            \ records that do not match the date range)."
+      required:
+      - field
+    FieldSort:
+      type: object
+      description: |-
+        <p>
+             Represents a sort order for a specific field when listing entities.
+         </p>
+      properties:
+        field:
+          type: string
+          description: The field to sort by. This should be a field that is sortable.
+        order:
+          type: string
+          description: "The order in which to sort the field. If null, defaults to\
+            \ ascending order."
+          enum:
+          - ASC
+          - DESC
+      required:
+      - field
+    Filter:
+      type: object
+      description: |-
+        <p>
+             Represents a filter for searching over fields with specific values or conditions.
+         </p>
+      properties:
+        field:
+          type: string
+          description: "The field to filter on, which should be a field that is searchable."
+        value:
+          type: array
+          description: The list of a value or values to filter by. The quantity and
+            type of values depend on the operator used.
+          items: {}
+        not:
+          type: boolean
+          description: "If true, the filter will negate the condition (i.e., find\
+            \ records that do not match the specified values)."
+        operator:
+          type: string
+          description: "The operator to use for filtering (e.g., EQUALS, IN, etc.)."
+          enum:
+          - EQUALS
+          - GREATER_THAN
+          - GREATER_THAN_OR_EQUAL
+          - LESS_THAN
+          - LESS_THAN_OR_EQUAL
+          - IN
+          - IS_NULL
+          - LIKE
+      required:
+      - field
+      - operator
+    SearchRequest:
+      type: object
+      description: |-
+        <p>
+          Request object for searching with specific filters and sorting options.
+         </p>
+      properties:
+        fieldSort:
+          type: array
+          description: A list of field sort criteria to apply to the search.
+          items:
+            $ref: "#/components/schemas/FieldSort"
+        filters:
+          type: array
+          description: A list of filters to apply to the search.
+          items:
+            $ref: "#/components/schemas/Filter"
+        dateFilters:
+          type: array
+          description: A list of date filters to apply to the search.
+          items:
+            $ref: "#/components/schemas/DateFilter"
+    FilePage:
+      type: object
+      description: |-
+        <p>
+             A response for the paginated list of files.
+         </p>
+      properties:
+        files:
+          type: array
+          description: the list of files in the current page
+          items:
+            oneOf:
+            - $ref: "#/components/schemas/Directory"
+            - $ref: "#/components/schemas/File"
+        pageContext:
+          $ref: "#/components/schemas/PageCursorContext"
+          description: the context for pagination
+    PageCursorContext:
+      type: object
+      description: |-
+        <p>
+          Represents a page cursor context for paginated results.
+         </p>
+      properties:
+        next:
+          type: string
+          description: |-
+            Used to retrieve the next page of results.
+                 <code>next</code> will match the non-null value from the previous request when there are no more results, or null if there were no
+                 results to begin with.
+    ReindexFileSetFilesRequest:
+      type: object
+      description: |-
+        <p>
+             Request object for another indexing attempt for specific files within a file set.
+         </p>
+      properties:
+        fileIds:
+          type: array
+          description: The IDs of the files to be reindexed.
+          items:
+            type: string
+          uniqueItems: true
+      required:
+      - fileIds
+    ReindexFileSetFilesResponse:
+      type: object
+      description: |-
+        <p>
+          Response returned after attempting to reindex files within a file set.
+         </p>
+      properties:
+        retriedFilesCount:
+          type: integer
+          format: int32
+          description: The number of files that were retried for reindexing.
+    SplitFileUploadRequest:
+      type: object
+      description: |-
+        <p>
+             Represents a request to initiate a split file upload.
+         </p>
+      properties:
+        path:
+          type: string
+          description: The full path destination for the file once the upload is finalized.
+    SplitFileUploadResponse:
+      type: object
+      description: |-
+        <p>
+             Represents the response after initiating a split file upload.
+         </p>
+      properties:
+        file:
+          description: The file object containing the metadata known so far for the
+            file to be uploaded.
+          oneOf:
+          - $ref: "#/components/schemas/Directory"
+          - $ref: "#/components/schemas/File"
+        status:
+          type: string
+          description: The status of the upload process.
+          enum:
+          - CREATED
+          - PROCESSING
+          - SUCCESS
+          - FAILED
+          - UNKNOWN
+    SplitFileUploadPartRequest:
+      type: object
+      description: |-
+        <p>
+             Represents a request to upload a part of a file in a split file upload operation.
+         </p>
+      properties:
+        part:
+          type: string
+          format: binary
+          description: The full path destination for the file once the upload is complete.
+    AccessUpdateRequest:
+      type: object
+      description: |-
+        <p>
+          Request object for updating access permissions to a file set.
+         <br>
+          Only the permissions that are explicitly set in the request will be updated.
+         </p>
+      properties:
+        fileSetAccess:
+          type: array
+          description: The access permissions for the file set.
+          items:
+            $ref: "#/components/schemas/FileSetAccess"
+      required:
+      - fileSetAccess
+    FileSetPage:
+      type: object
+      description: |-
+        <p>
+             A response for the paginated list of FileSets.
+         </p>
+      properties:
+        fileSets:
+          type: array
+          description: the list of FileSets in the current page
+          items:
+            $ref: "#/components/schemas/FileSet"
+        pageContext:
+          $ref: "#/components/schemas/PageContext"
+          description: the context for pagination
+    PageContext:
+      type: object
+      properties:
+        count:
+          type: integer
+          format: int32
+        totalCount:
+          type: integer
+          format: int32
+        offset:
+          type: integer
+          format: int32
+      required:
+      - count
+      - offset
+      - totalCount
+  securitySchemes:
+    domo-developer-token:
+      type: apiKey
+      name: X-DOMO-Developer-Token
+      in: header

@@ -256,7 +256,7 @@ This endpoint appends a row of values to a specified dataset.
 **Endpoint**: `/api/data/v1/streams`
 
 **Description**:  
-Creates a new data stream using a connector and specifies configuration details.
+Creates a new data stream using a connector and specifies configuration details. Usually creates a new DataSet.
 
 **Parameters**:
 
@@ -264,13 +264,13 @@ Creates a new data stream using a connector and specifies configuration details.
 | -------------------- | ------ | -------- | -------------------------------------------------------- |
 | transport            | Object | Yes      | Connector transport details, including type and version. |
 | configuration        | Array  | Yes      | List of key-value pairs defining stream configurations.  |
-| account              | Object | Yes      | Account information (e.g., ID).                          |
-| updateMethod         | String | Yes      | Update method, e.g., `APPEND`.                           |
+| account              | Object | No       | Account information (e.g., ID). Can be omitted if no account is involved |
+| updateMethod         | String | No       | Default is `REPLACE` , e.g., `APPEND`.                    |
 | dataProvider         | Object | Yes      | Data provider details, including key.                    |
 | dataSource           | Object | Yes      | Dataset details, including name and description.         |
 | advancedScheduleJson | String | No       | Schedule details in JSON format.                         |
 
-**Example Request**:
+**Example Request 1**:
 
 ```json
 {
@@ -305,6 +305,35 @@ Creates a new data stream using a connector and specifies configuration details.
       "description": "config works?"
     },
     "advancedScheduleJson": "{\"type\": \"MANUAL\", \"timezone\": \"UTC\"}"
+  }
+}
+```
+
+**Example Request 2**:
+
+```json
+{
+  "method": "POST",
+  "url": "https://{domo_instance}.domo.com/api/data/v1/streams",
+  "headers": {
+    "Content-Type": "application/json"
+  },
+  "body": {
+    "transport": {
+      "type": "CONNECTOR",
+      "description": "com.domo.connector.sampledata",
+      "version": "1"
+    },
+    "configuration": [
+        { "category": "METADATA", "name": "connectorName", "type": "string", "value": "Adobe Analytics" },
+        { "category": "METADATA", "name": "connectorReport", "type": "string", "value": "Mobile Device Types" }
+    ],
+    "dataProvider": {
+      "key": "sample-data"
+    },
+    "dataSource": {
+      "name": "Some Sample Adobe Analytics Data",
+    }
   }
 }
 ```

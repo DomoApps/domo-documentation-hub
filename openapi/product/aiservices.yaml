@@ -8,7 +8,7 @@ servers:
     description: Domo Instance
     variables:
       instance:
-        default: 'api'
+        default: 'instance-name'
         description: 'Your specific Domo instance name (e.g., mycompany)'
 tags:
   - name: AI Services
@@ -27,15 +27,15 @@ components:
         message:
           type: string
           description: A human-readable error message.
-          
+
     PromptTemplate:
       type: object
       description: "A prompt template object. The 'template' string should contain placeholders."
       properties:
         template:
           type: string
-          example: "Respond to the following in ${language}: ${input}"
-          
+          example: 'Respond to the following in ${language}: ${input}'
+
     AIResponse:
       type: object
       description: Standard successful AI response.
@@ -44,17 +44,17 @@ components:
           type: string
         modelId:
           type: string
-          
+
     ModelParameters:
       type: object
       description: Custom parameters to inject into the prompt template.
       additionalProperties: true
       example:
-        language: "Japanese"
-        
+        language: 'Japanese'
+
     ModelConfiguration:
       type: object
-      description: "Additional model-specific configuration key-value pairs (e.g., temperature)."
+      description: 'Additional model-specific configuration key-value pairs (e.g., temperature).'
       additionalProperties: true
       example:
         temperature: 0.7
@@ -79,8 +79,8 @@ components:
           $ref: '#/components/schemas/ModelParameters'
         system:
           type: string
-          description: The system message to use for the Text Generation task. If not provided, the default system message will be used. If the model does not include built-in support for system prompts, this parameter may be included in the prompt template using the "${system}" placeholder. 
-          
+          description: The system message to use for the Text Generation task. If not provided, the default system message will be used. If the model does not include built-in support for system prompts, this parameter may be included in the prompt template using the "${system}" placeholder.
+
     #========= TEXT-TO-SQL SCHEMAS =========
     DataSourceColumn:
       type: object
@@ -93,7 +93,7 @@ components:
         description:
           type: string
           nullable: true
-          
+
     DataSourceSchema:
       type: object
       properties:
@@ -106,7 +106,7 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/DataSourceColumn'
-            
+
     TextToSQLRequest:
       type: object
       required: [input, dataSourceSchemas]
@@ -130,7 +130,7 @@ components:
         system:
           type: string
           description: The system message to use.
-          
+
     #========= TEXT SUMMARIZATION SCHEMAS =========
     OutputWordLength:
       type: object
@@ -142,7 +142,7 @@ components:
       example:
         min: 5
         max: 10
-        
+
     TextSummarizationRequest:
       type: object
       required: [input]
@@ -188,22 +188,22 @@ paths:
               Basic:
                 summary: Basic Example
                 value:
-                  input: "Why is the sky blue?"
+                  input: 'Why is the sky blue?'
               PromptTemplate:
                 summary: Prompt Template Example
                 value:
-                  input: "Why is the sky blue?"
+                  input: 'Why is the sky blue?'
                   promptTemplate:
-                    template: "Respond to the following in ${language}: ${input}"
+                    template: 'Respond to the following in ${language}: ${input}'
                   parameters:
-                    language: "Japanese"
-                  model: "domo.domo_ai.domogpt-chat-small-v1:anthropic"
+                    language: 'Japanese'
+                  model: 'domo.domo_ai.domogpt-chat-small-v1:anthropic'
               SystemMessage:
                 summary: System Message Example
                 value:
-                  input: "Why is the sky blue?"
-                  system: "Respond only in Japanese"
-                  model: "domo.domo_ai.domogpt-chat-small-v1:anthropic"
+                  input: 'Why is the sky blue?'
+                  system: 'Respond only in Japanese'
+                  model: 'domo.domo_ai.domogpt-chat-small-v1:anthropic'
       responses:
         '200':
           description: The generated text.
@@ -212,8 +212,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/AIResponse'
               example:
-                output: "The sky is blue because of Rayleigh scattering."
-                modelId: "domo.domo_ai.domogpt-chat-small-v1:anthropic"
+                output: 'The sky is blue because of Rayleigh scattering.'
+                modelId: 'domo.domo_ai.domogpt-chat-small-v1:anthropic'
         '401':
           description: Unauthorized
           content:
@@ -233,16 +233,16 @@ paths:
             schema:
               $ref: '#/components/schemas/TextToSQLRequest'
             example:
-              input: "What are my total sales by region?"
+              input: 'What are my total sales by region?'
               dataSourceSchemas:
-                - dataSourceName: "Store Sales"
-                  description: ""
+                - dataSourceName: 'Store Sales'
+                  description: ''
                   columns:
-                    - { type: "STRING", name: "product", description: "" }
-                    - { type: "LONG", name: "store", description: "" }
-                    - { type: "LONG", name: "amount", description: "" }
-                    - { type: "DATETIME", name: "timestamp", description: "" }
-                    - { type: "STRING", name: "region", description: "" }
+                    - { type: 'STRING', name: 'product', description: '' }
+                    - { type: 'LONG', name: 'store', description: '' }
+                    - { type: 'LONG', name: 'amount', description: '' }
+                    - { type: 'DATETIME', name: 'timestamp', description: '' }
+                    - { type: 'STRING', name: 'region', description: '' }
       responses:
         '200':
           description: The generated SQL query.
@@ -251,8 +251,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/AIResponse'
               example:
-                output: "SELECT region, SUM(amount) AS total_sales FROM `Store Sales` GROUP BY region"
-                modelId: "domo.domo_ai.domogpt-sql-v1:anthropic"
+                output: 'SELECT region, SUM(amount) AS total_sales FROM `Store Sales` GROUP BY region'
+                modelId: 'domo.domo_ai.domogpt-sql-v1:anthropic'
         '401':
           description: Unauthorized
           content:
@@ -275,16 +275,16 @@ paths:
               Basic:
                 summary: Basic Example
                 value:
-                  input: "San Francisco, officially the City and County of San Francisco, is a commercial, financial, and cultural center..."
+                  input: 'San Francisco, officially the City and County of San Francisco, is a commercial, financial, and cultural center...'
               Customized:
                 summary: Customized Example
                 value:
-                  input: "San Francisco, officially the City and County of San Francisco, is a commercial, financial, and cultural center..."
+                  input: 'San Francisco, officially the City and County of San Francisco, is a commercial, financial, and cultural center...'
                   outputWordLength:
                     min: 5
                     max: 10
-                  outputStyle: "PARAGRAPH"
-                  model: "domo.domo_ai.domogpt-summarize-v1:anthropic"
+                  outputStyle: 'PARAGRAPH'
+                  model: 'domo.domo_ai.domogpt-summarize-v1:anthropic'
       responses:
         '200':
           description: The generated text summary.
@@ -293,8 +293,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/AIResponse'
               example:
-                output: "Vibrant, densely populated commercial and cultural hub in Northern California."
-                modelId: "domo.domo_ai.domogpt-summarize-v1:anthropic"
+                output: 'Vibrant, densely populated commercial and cultural hub in Northern California.'
+                modelId: 'domo.domo_ai.domogpt-summarize-v1:anthropic'
         '401':
           description: Unauthorized
           content:

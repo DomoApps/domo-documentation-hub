@@ -13,7 +13,7 @@ servers:
     description: Domo Instance
     variables:
       instance:
-        default: 'api'
+        default: 'your-instance'
         description: 'Your specific Domo instance name (e.g., mycompany)'
 tags:
   - name: File
@@ -40,10 +40,10 @@ components:
       properties:
         status:
           type: string
-          example: "success"
+          example: 'success'
         message:
           type: string
-          example: "File deleted successfully."
+          example: 'File deleted successfully.'
 
     #========= FILE SCHEMAS =========
     FileMetadataBase: # Common fields in file responses (Search, Upload)
@@ -111,7 +111,8 @@ components:
             updatedBy: { type: integer }
             owner: { type: string } # Assuming owner ID
             accountId: { type: integer }
-            connectorContext: { $ref: '#/components/schemas/ConnectorContext', nullable: true }
+            connectorContext:
+              { $ref: '#/components/schemas/ConnectorContext', nullable: true }
             permission: { type: string }
             size: { type: integer, format: int64 }
             fileCount: { type: integer }
@@ -120,32 +121,63 @@ components:
       type: object
       required: [connector]
       properties:
-        connector: { type: string, description: "The connector key." }
-        relativePath: { type: string, nullable: true, description: "Relative path for the connector." }
+        connector: { type: string, description: 'The connector key.' }
+        relativePath:
+          {
+            type: string,
+            nullable: true,
+            description: 'Relative path for the connector.',
+          }
 
     CreateFileSetRequest:
       type: object
       required: [name]
       properties:
-        name: { type: string, description: "The name of the FileSet." }
-        accountId: { type: integer, nullable: true, description: "The account ID to associate." }
-        connectorContext: { $ref: '#/components/schemas/ConnectorContext', nullable: true }
-        description: { type: string, nullable: true, description: "Description for the FileSet." }
+        name: { type: string, description: 'The name of the FileSet.' }
+        accountId:
+          {
+            type: integer,
+            nullable: true,
+            description: 'The account ID to associate.',
+          }
+        connectorContext:
+          { $ref: '#/components/schemas/ConnectorContext', nullable: true }
+        description:
+          {
+            type: string,
+            nullable: true,
+            description: 'Description for the FileSet.',
+          }
 
     UpdateFileSetRequest:
       type: object
       properties:
-        name: { type: string, description: "The new name for the FileSet." }
-        description: { type: string, nullable: true, description: "The new description for the FileSet." }
+        name: { type: string, description: 'The new name for the FileSet.' }
+        description:
+          {
+            type: string,
+            nullable: true,
+            description: 'The new description for the FileSet.',
+          }
 
     #========= QUERY & SEARCH SCHEMAS =========
     QueryFilesRequest:
       type: object
       required: [query] # Changed from queryString based on example
       properties:
-        query: { type: string, description: "Text to search for in Files." }
-        directoryPath: { type: string, nullable: true, description: "Limit search to a specific directory." }
-        topK: { type: integer, nullable: true, description: "Maximum number of results to return." }
+        query: { type: string, description: 'Text to search for in Files.' }
+        directoryPath:
+          {
+            type: string,
+            nullable: true,
+            description: 'Limit search to a specific directory.',
+          }
+        topK:
+          {
+            type: integer,
+            nullable: true,
+            description: 'Maximum number of results to return.',
+          }
 
     QueryNode: # Node within a query match
       type: object
@@ -176,37 +208,79 @@ components:
     FieldSort:
       type: object
       properties:
-        field: { type: string, description: "Field name to sort by." }
-        order: { type: string, description: "Sort direction.", enum: [ASC, DESC] }
+        field: { type: string, description: 'Field name to sort by.' }
+        order:
+          { type: string, description: 'Sort direction.', enum: [ASC, DESC] }
 
     Filter:
       type: object
       properties:
-        field: { type: string, description: "Field name to filter on." }
-        value: { type: array, items: { type: string }, description: "Values to match against." }
+        field: { type: string, description: 'Field name to filter on.' }
+        value:
+          {
+            type: array,
+            items: { type: string },
+            description: 'Values to match against.',
+          }
         not: { type: boolean, default: false }
-        operator: { type: string, description: "Operation type: 'EQUALS', 'IN', 'LIKE', etc.", enum: [EQUALS, GREATER_THAN, LESS_THAN, LESS_THAN_OR_EQUAL, GREATER_THAN_OR_EQUAL, IN, IS_NULL, LIKE] }
+        operator:
+          {
+            type: string,
+            description: "Operation type: 'EQUALS', 'IN', 'LIKE', etc.",
+            enum:
+              [
+                EQUALS,
+                GREATER_THAN,
+                LESS_THAN,
+                LESS_THAN_OR_EQUAL,
+                GREATER_THAN_OR_EQUAL,
+                IN,
+                IS_NULL,
+                LIKE,
+              ],
+          }
 
     DateFilter:
       type: object
       properties:
-        field: { type: string, description: "Field name for date filter (e.g., 'created')." }
-        start: { type: string, format: date-time, description: "Start timestamp as ISO string." }
-        end: { type: string, format: date-time, description: "End timestamp as ISO string." }
+        field:
+          {
+            type: string,
+            description: "Field name for date filter (e.g., 'created').",
+          }
+        start:
+          {
+            type: string,
+            format: date-time,
+            description: 'Start timestamp as ISO string.',
+          }
+        end:
+          {
+            type: string,
+            format: date-time,
+            description: 'End timestamp as ISO string.',
+          }
         not: { type: boolean, default: false }
 
     SearchBody: # Reusable for File and FileSet search
       description: Body for search operations on Files or FileSets.
       type: object
       properties:
-        fieldSort: { type: array, items: { $ref: '#/components/schemas/FieldSort' } }
+        fieldSort:
+          { type: array, items: { $ref: '#/components/schemas/FieldSort' } }
         filters: { type: array, items: { $ref: '#/components/schemas/Filter' } }
-        dateFilters: { type: array, items: { $ref: '#/components/schemas/DateFilter' } }
+        dateFilters:
+          { type: array, items: { $ref: '#/components/schemas/DateFilter' } }
 
     PageContext:
       type: object
       properties:
-        next: { type: string, nullable: true, description: "Pagination token for fetching the next set of results." }
+        next:
+          {
+            type: string,
+            nullable: true,
+            description: 'Pagination token for fetching the next set of results.',
+          }
         # Adding fields from FileSet search response
         offset: { type: integer }
         limit: { type: integer }
@@ -215,13 +289,19 @@ components:
     SearchFilesResponse:
       type: object
       properties:
-        files: { type: array, items: { $ref: '#/components/schemas/FileMetadataFull' } } # Using Full based on example
+        files: {
+            type: array,
+            items: { $ref: '#/components/schemas/FileMetadataFull' },
+          } # Using Full based on example
         pageContext: { $ref: '#/components/schemas/PageContext' }
 
     SearchFileSetsResponse:
       type: object
       properties:
-        fileSets: { type: array, items: { $ref: '#/components/schemas/FileSetMetadataSearch' } } # Using Search variant based on example
+        fileSets: {
+            type: array,
+            items: { $ref: '#/components/schemas/FileSetMetadataSearch' },
+          } # Using Search variant based on example
         pageContext: { $ref: '#/components/schemas/PageContext' }
 
 security:
@@ -278,7 +358,12 @@ paths:
       tags:
         - FileSets API (BETA) (Product)
       parameters:
-        - { name: filesetId, in: path, required: true, schema: { type: string, format: uuid } }
+        - {
+            name: filesetId,
+            in: path,
+            required: true,
+            schema: { type: string, format: uuid },
+          }
       responses:
         '200':
           description: The FileSet metadata.
@@ -294,7 +379,12 @@ paths:
       tags:
         - FileSets API (BETA) (Product)
       parameters:
-        - { name: filesetId, in: path, required: true, schema: { type: string, format: uuid } }
+        - {
+            name: filesetId,
+            in: path,
+            required: true,
+            schema: { type: string, format: uuid },
+          }
       requestBody:
         required: true
         content:
@@ -314,7 +404,12 @@ paths:
       tags:
         - FileSets API (BETA) (Product)
       parameters:
-        - { name: filesetId, in: path, required: true, schema: { type: string, format: uuid } }
+        - {
+            name: filesetId,
+            in: path,
+            required: true,
+            schema: { type: string, format: uuid },
+          }
       responses:
         '200':
           description: Success message.
@@ -332,8 +427,19 @@ paths:
       tags:
         - FileSets API (BETA) (Product)
       parameters:
-        - { name: filesetId, in: path, required: true, schema: { type: string, format: uuid } }
-        - { name: path, in: query, required: true, schema: { type: string }, description: "The path to the File within the FileSet." }
+        - {
+            name: filesetId,
+            in: path,
+            required: true,
+            schema: { type: string, format: uuid },
+          }
+        - {
+            name: path,
+            in: query,
+            required: true,
+            schema: { type: string },
+            description: 'The path to the File within the FileSet.',
+          }
       responses:
         '200':
           description: Full file metadata.
@@ -348,8 +454,19 @@ paths:
       tags:
         - FileSets API (BETA) (Product)
       parameters:
-        - { name: filesetId, in: path, required: true, schema: { type: string, format: uuid } }
-        - { name: path, in: query, required: true, schema: { type: string }, description: "The path to the File within the FileSet." }
+        - {
+            name: filesetId,
+            in: path,
+            required: true,
+            schema: { type: string, format: uuid },
+          }
+        - {
+            name: path,
+            in: query,
+            required: true,
+            schema: { type: string },
+            description: 'The path to the File within the FileSet.',
+          }
       responses:
         '200':
           description: Success message.
@@ -366,7 +483,12 @@ paths:
       tags:
         - FileSets API (BETA) (Product)
       parameters:
-        - { name: filesetId, in: path, required: true, schema: { type: string, format: uuid } }
+        - {
+            name: filesetId,
+            in: path,
+            required: true,
+            schema: { type: string, format: uuid },
+          }
       requestBody:
         required: true
         content:
@@ -399,8 +521,18 @@ paths:
       tags:
         - FileSets API (BETA) (Product)
       parameters:
-        - { name: filesetId, in: path, required: true, schema: { type: string, format: uuid } }
-        - { name: fileId, in: path, required: true, schema: { type: string, format: uuid } }
+        - {
+            name: filesetId,
+            in: path,
+            required: true,
+            schema: { type: string, format: uuid },
+          }
+        - {
+            name: fileId,
+            in: path,
+            required: true,
+            schema: { type: string, format: uuid },
+          }
       responses:
         '200':
           description: Full file metadata.
@@ -415,8 +547,18 @@ paths:
       tags:
         - FileSets API (BETA) (Product)
       parameters:
-        - { name: filesetId, in: path, required: true, schema: { type: string, format: uuid } }
-        - { name: fileId, in: path, required: true, schema: { type: string, format: uuid } }
+        - {
+            name: filesetId,
+            in: path,
+            required: true,
+            schema: { type: string, format: uuid },
+          }
+        - {
+            name: fileId,
+            in: path,
+            required: true,
+            schema: { type: string, format: uuid },
+          }
       responses:
         '200':
           description: Success message.
@@ -433,8 +575,18 @@ paths:
       tags:
         - FileSets API (BETA) (Product)
       parameters:
-        - { name: filesetId, in: path, required: true, schema: { type: string, format: uuid } }
-        - { name: fileId, in: path, required: true, schema: { type: string, format: uuid } }
+        - {
+            name: filesetId,
+            in: path,
+            required: true,
+            schema: { type: string, format: uuid },
+          }
+        - {
+            name: fileId,
+            in: path,
+            required: true,
+            schema: { type: string, format: uuid },
+          }
       responses:
         '200':
           description: The file contents (binary/text stream).
@@ -451,7 +603,12 @@ paths:
       tags:
         - FileSets API (BETA) (Product)
       parameters:
-        - { name: filesetId, in: path, required: true, schema: { type: string, format: uuid } }
+        - {
+            name: filesetId,
+            in: path,
+            required: true,
+            schema: { type: string, format: uuid },
+          }
       requestBody:
         required: true
         content:
@@ -473,11 +630,25 @@ paths:
       tags:
         - FileSets API (BETA) (Product)
       parameters:
-        - { name: filesetId, in: path, required: true, schema: { type: string, format: uuid } }
+        - {
+            name: filesetId,
+            in: path,
+            required: true,
+            schema: { type: string, format: uuid },
+          }
         - { name: directoryPath, in: query, schema: { type: string } }
-        - { name: immediateChildren, in: query, schema: { type: boolean, default: false } }
+        - {
+            name: immediateChildren,
+            in: query,
+            schema: { type: boolean, default: false },
+          }
         - { name: limit, in: query, schema: { type: integer, default: 100 } }
-        - { name: next, in: query, schema: { type: string }, description: "Pagination token." }
+        - {
+            name: next,
+            in: query,
+            schema: { type: string },
+            description: 'Pagination token.',
+          }
       requestBody:
         required: true
         content:

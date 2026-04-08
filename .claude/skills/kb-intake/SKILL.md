@@ -69,7 +69,7 @@ When the conversation is complete, present a summary in this format:
 ---
 **Article Intake Summary**
 
-**Working title:** [suggested title]
+**Working title:** [suggested title — must be in the imperative mood, never the gerund; e.g., "Connect Data to Domo" not "Connecting Data to Domo"]
 
 **Target persona:** [who this is for, their role and context]
 

@@ -63,7 +63,7 @@ List the grants a user needs to complete the tasks in this article. If none are 
 
 
 
-## Accessing [Feature Name]
+## Access [Feature Name]
 
 Step-by-step instructions for navigating to the feature. Use numbered steps.
 
@@ -74,7 +74,7 @@ Step-by-step instructions for navigating to the feature. Use numbered steps.
 
 
 
-## Creating [Something]
+## Create [Something]
 
 Step-by-step instructions. Follow the CRUD order (Create, Review, Update, Delete) — only include sections that apply.
 
@@ -110,10 +110,13 @@ Frequently asked answer.
 
 ## Style Rules to Apply
 
+**Article structure**
+- Do not include a table of contents — written or linked — at the top of the article. Tables of contents are generated automatically from the article's headings when the page renders on the Knowledge Base site.
+
 **Voice and tense**
 - Write in present tense: "This opens the panel" not "This will open the panel."
 - Use active voice. Avoid passive voice unless who performs the action does not matter.
-- Use "select" not "click."
+- Use "select" not "click," except when specifying right-click, left-click, or double-click.
 - Contractions are acceptable unless you need to emphasize "not."
 - Spell out numbers less than 10.
 - Never use "utilize" — use "use."
@@ -122,6 +125,9 @@ Frequently asked answer.
 - Eliminate unnecessary words ("will," "you are able to," "that").
 - Avoid Latin expressions (i.e., e.g., etc.) — use "such as," "as in," or a list.
 - Use "allowlist" and "blocklist," never "whitelist" or "blacklist."
+- Write all headings (article titles, section headings, step headings) in the imperative mood — never the gerund. **Correct:** "Connect Data to Domo" **Incorrect:** "Connecting Data to Domo"
+- When describing a sequence of actions in a step, do not use "once" to denote a causal or dependent relationship — use "after" instead. **Correct:** "After you save the DataSet, select **Done**." **Incorrect:** "Once you save the DataSet, select **Done**."
+- Do not place spaces on either side of an em-dash. **Correct:** "AI tools—such as Claude—secure access" **Incorrect:** "AI tools — such as Claude — secure access"
 
 **Text emphasis**
 - **Bold** static UI elements (fields, menus, buttons, icons). For a series: **Admin** > **Security** > **Whitelist** (do not bold the >).

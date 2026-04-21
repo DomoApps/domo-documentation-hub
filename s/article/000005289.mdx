@@ -1,158 +1,147 @@
 ---
-title: "> Domo on Databricks (RECOMMENDED)"
+title: "Domo on Databricks"
 ---
 
-import {InlineImage} from "/snippets/InlineImage.mdx";
+With Cloud Integrations, you can power your Domo instance using Databricks. Use this guide to set up a Databricks integration for read-only and read/write access.
 
-### Intro
+After setup, you can use Databricks DataSets to create cards, configure alerts, and build Magic ETL DataFlows.
 
-With Cloud Amplifier, you can power your Domo instance using Databricks. This guide is written for users who are familiar with Databricks and describes how to register Databricks with Cloud Amplifier for read-only and read/write integrations.
+![Domo on Databricks overview page](/images/kb/databricks-kb-01.png)
 
-After completing the setup processes of your choice, you can use virtual tables that read from Databricks to create cards, configure alerts, and serve as inputs in Magic ETL DataFlows.
+---
 
-### Architectural Overview
+## Architectural Overview
 
-<Frame><img alt="databricks architectural overview.jpg" src="/images/kb/ka0Vq000000BENp-00N5w00000Ri7BU-0EMVq000002joPJ.jpg" style={{width: 900, height: 771}}/></Frame>
+The diagram below shows how Domo connects to Databricks through Cloud Integrations. Domo queries data live from your Databricks environment; no data is copied to Domo storage.
 
-### Prerequisites
+![databricks architectural overview.jpg](/images/kb/ka0Vq000000BENp-00N5w00000Ri7BU-0EMVq000002joPJ.jpg)
 
-Before configuring the Databricks connection, we strongly recommend that you complete the following:
+## Before You Begin
 
-* **(Recommended) Create a Databricks service account —**
-  We recommend creating a new Databricks account specifically for this integration. You can use any account with Read access in Databricks, but it is best practice to use a service account. This account must have read access to your default Databricks environment in order to create virtual Databricks tables in Domo.
-* **(Recommended) Create a Domo service account —**
-  We recommend creating a new Domo account specifically for this integration. The custom role for the account must have the Manage Cloud Accounts and Manage DataSet grants enabled. For more information about using OAuth with your Databricks-Cloud Amplifier connection, see [DataBricks using Personal Access Token](https://domo-support.domo.com/s/article/000005522?language=en_US).
+- (Recommended) Create a Databricks service account—Create a new Databricks account specifically for this integration. You can use any account with read access in Databricks, but best practice is a dedicated service account with read access to your default Databricks environment.
+- (Recommended) Create a Domo service account—Create a new Domo account specifically for this integration. Your account's custom role must include the **Manage Cloud Accounts** and **Manage DataSet** grants.
+- (Conditional) If you are migrating from a federated or connector-based integration, review [Migrate from Federated to Cloud Integrations](/s/article/000005675) before proceeding—Beast Mode formulas written in MySQL syntax may not be compatible with Spark SQL.
 
-For more information about roles and grants, see [Managing Custom Roles](/s/article/360043438973).
+For more information about roles and grants, see [Manage User Roles and Grants](/s/article/360043438973).
 
-### Read-Only Setup
+## Set Up Read-Only Access
 
-Follow these steps to configure read-only access to Databricks tables from within Domo via Cloud Amplifier.
+1. In the navigation menu, select **Data Warehouse** > **Connect Data** > **Cloud Integrations** > **Databricks**. The Databricks Cloud Integrations list opens.
 
-1. Log in to your Domo service account.
-2. Go to the <InlineImage src="/images/kb/ka0Vq000000BENp-00N5w00000Ri7BU-0EMVq000004mhMv.jpg" /> **Data Warehouse**.
-3. Select **<InlineImage src="/images/kb/ka0Vq000000BCKP-00N5w00000Ri7BU-0EM5w000005vNtv.png" />** **Add New Cloud Account**.
-   
-   The new integration modal displays.
-4. In the modal under
-   **Native integration**, select **Databricks** (If Databricks doesn't display, select **See More** to see all possible integrations.)
+   <Frame>![The Databricks Cloud Integrations list showing existing integrations and the Add new integration button.](/images/kb/databricks-kb-02.png)</Frame>
 
-   <Frame><img alt="choose databricks.jpg" src="/images/kb/ka0Vq000000BENp-00N5w00000Ri7BU-0EMVq0000053Y8j.jpg" style={{width: 749, height: 500}}/></Frame>
+2. Select **+ Add new integration**. The new integration form opens.
 
-5. Select
-   **+ Add New Integration**. If there are other existing integrations, this option displays at the bottom of the list.
+3. Enter a name and optional description in the **Integration name** and **Integration description** fields.
 
-   <Frame><img alt="add new integration.jpg" src="/images/kb/ka0Vq000000BENp-00N5w00000Ri7BU-0EM5w000006vuAS.jpg" style={{width: 750, height: 519}}/></Frame>
+   <Frame>![The new integration form with name, description, and service account fields.](/images/kb/databricks-kb-03.png)</Frame>
 
-6. Fill out the fields in the modal. You can move through the modal by selecting **Next** on each screen.
-   
-   1. Enter a name and optional description in the
-      **Integration name** and **Integration description** fields.
-   2. Create a personal access token in your Databricks account.
-      *Copy the token for your records—you cannot recover it after you leave the page.*
-   3. Paste the token into the
-      **Databricks personal access token** field in the integration modal.
-   4. Locate the Databricks connection URL in Databricks. (Navigate to
-      **SQL Warehouses** > \{ *warehouse name* } > **Connection details** in Databricks.)
-      
-      <Note>
-      **Note:** Do not include protocol identifiers with the URL. **jdbc:databricks://** is assumed, **jdbc:spark://** is not supported.
-      </Note>
+4. Under **Databricks service account**, select an existing account from the dropdown.
 
-   5. Copy the JDBC URL and paste it into the **Databricks connection URL** field in the integration modal.
+5. (Conditional) To create a new service account, fill in the connection details in the **New Databricks Service Account** modal:
+   - Enter a name for the account.
+   - Enter your Databricks server hostname and HTTP path.
+   - In the **Connect with** dropdown, select your authentication method:
+     - **Personal Access Token**—Create a personal access token in your Databricks account and paste it into the **Databricks personal access token** field.
 
-      <Frame><img alt="Screenshot 2024-10-10 at 10.45.07 AM.png" src="/images/kb/ka0Vq000000BENp-00N5w00000Ri7BU-0EMVq000003AnCE.jpg" style={{width: 750, height: 455}}/></Frame>
+       <Frame>![New Databricks Service Account modal with Personal Access Token selected.](/images/kb/databricks-kb-04.png)</Frame>
 
-7. Configure your data freshness settings. Learn about
-   [advanced scheduling](https://domo-support.domo.com/s/article/4412849158167?language=en_US#advanced_scheduling) for data freshness.
+       <Warning>
+         **Important:** Copy the token before leaving the page—Databricks does not display it again.
+       </Warning>
 
-Your configuration is now complete. You can optionally choose Databricks tables to connect to Domo by following the steps below.
+     - **M2M OAuth**—Enter your Databricks OAuth application's **Client ID** and **Client Secret** in the **Client ID** and **Client Secret** fields.
 
-# Add Databricks Tables to Domo
+       <Frame>![New Databricks Service Account modal with M2M OAuth selected, showing Client ID and Client Secret fields.](/images/kb/databricks-kb-06.png)</Frame>
 
-The following process is optional.
+   <Note>
+     **Note:** Do not include protocol identifiers in the connection URL. `jdbc:databricks://` is assumed; `jdbc:spark://` is not supported.
+   </Note>
 
-1. After setting up your read-only integration, select
-   **Choose Tables to Connect**.
+6. Select **Create integration**. On the success screen, select **Navigate to integration overview** to proceed.
 
-   <Frame><img alt="choose tables.jpg" src="/images/kb/ka0Vq000000BENp-00N5w00000Ri7BU-0EM5w000006vuAr.jpg" style={{width: 750, height: 520}}/></Frame>
+   <Frame>![Success screen confirming the integration was created.](/images/kb/databricks-kb-08.png)</Frame>
 
-2. Search for and select Databricks schemas and tables you want to use to create DataSets in Domo.
-3. Select
-   **Create DataSets**.
+## Add Databricks Tables to Domo
 
-   <Frame><img alt="schemas and tables.jpg" src="/images/kb/ka0Vq000000BENp-00N5w00000Ri7BU-0EM5w000006vuAw.jpg" style={{width: 748, height: 495}}/></Frame>
+After creating your integration, connect Databricks tables as DataSets in Domo. For step-by-step instructions, see [Connect tables in Cloud Integrations](/s/article/Connect-tables-in-Cloud-Integrations).
 
-You have successfully configured your read-only integration from Databricks to Cloud Amplifier.
+<Frame>![The Connect Tables interface with the schema browser on the left and the table list on the right.](/images/kb/databricks-kb-09.png)</Frame>
 
-### Write Setup
+## Configure OAuth
 
-Before taking the steps described in this section, complete the following prerequisites.
+(Optional) Configure OAuth to require users to sign in with their own Databricks credentials when they view cards or DataSets connected through that integration. OAuth does not currently apply to Magic ETL, write-back, or native transforms.
 
-# Prerequisites
+1. From the Databricks Cloud Integrations list, select the **wrench** icon on the integration you want to configure, then select **Settings**.
 
-* Enable Unity Catalog on your Databricks instance. Find enablement instructions
-  [here](https://docs.databricks.com/en/data-governance/unity-catalog/enable-workspaces.html#enable-your-workspace-for-unity-catalog) <InlineImage src="/images/kb/ka0Vq00000001FR-00N5w00000Ri7BU-0EMVq0000000XDh.jpg" />.
-* Obtain the following Databricks permissions for your Databricks user:
-  + Create storage credential
-  + Create catalog
-  + Create external location
+2. In the **Settings** panel, under **OAuth**, select **Set up OAuth**. The **Configure OAuth Settings** modal opens.
 
-# Convert a Read-Only Integration to Read-Write
+   <Frame>![Integration Settings panel showing the Set up OAuth and Set up write & transform options.](/images/kb/databricks-kb-13.png)</Frame>
 
-1. In your Domo instance, go to the
-   <InlineImage src="/images/kb/ka0Vq000000BENp-00N5w00000Ri7BU-0EMVq000004mhMv.jpg" /> **Data Warehouse** and select **Manage Cloud Connections** to open the integration modal.
-     
-   <Frame><img alt="manage cloud connections databricks.jpg" src="/images/kb/ka0Vq000000BENp-00N5w00000Ri7BU-0EMVq000004pxTZ.jpg" style={{width: 897, height: 366}}/></Frame>
+3. Select an existing configuration from the dropdown, or select **Add OAuth Config...** to create a new one.
 
-2. In the modal under
-   **Native** **integration**, select **See more** > **Databricks**.
-   
-   The list of existing Databricks integrations displays.
-3. Locate the existing read-only integration that you want to upgrade to a read-write integration. Hover over the integration row and select
-   <InlineImage src="/images/kb/ka0Vq000000BENp-00N5w00000Ri7BU-0EMVq000004riF7.jpg" /> **Options** (wrench icon) > **Configure Write Access**.
-     
-   Use **Next** to move through the modal as you complete the steps.
-     
-   <Frame><img alt="configure write access.jpg" src="/images/kb/ka0Vq000000BENp-00N5w00000Ri7BU-0EMVq000004rj9Z.jpg" style={{width: 800, height: 509}}/></Frame>
+4. (Conditional) To create a new configuration:
+   1. In Databricks, navigate to **Account Console** > **Settings** > **App connections** and add a new app connection for Domo. Enable a custom OAuth application for your Domo instance. For details, see the [Databricks OAuth documentation](https://docs.databricks.com/en/integrations/enable-disable-oauth.html).
+   2. Add the Domo redirect URLs shown in the modal to your Databricks OAuth app.
+   3. Back in Domo, enter the **OAuth configuration name**, your **Databricks account identifier**, **Client ID**, and **Client Secret**.
 
-4. In the modal, enter the Databricks write catalog name in the labeled field.
-     
-   <Frame><img alt="enter catalog name.jpg" src="/images/kb/ka0Vq000000BENp-00N5w00000Ri7BU-0EMVq0000050paj.jpg" style={{width: 798, height: 417}}/></Frame>
+   <Frame>![Configure OAuth Settings modal showing the configuration form fields.](/images/kb/databricks-kb-12.png)</Frame>
 
-5. Select
-   **Validate** to check the name of the catalog and load the list of schemas that belong to that catalog.
-     
-   <Frame><img alt="validate catalog.jpg" src="/images/kb/ka0Vq000000BENp-00N5w00000Ri7BU-0EMVq00000543Z8.jpg" style={{width: 800, height: 421}}/></Frame>
+5. Select **Save**.
 
-6. After validating the catalog, choose the schema from the
-   **Schema** dropdown.
-     
-   <Frame><img alt="choose schema.jpg" src="/images/kb/ka0Vq000000BENp-00N5w00000Ri7BU-0EMVq00000540Ze.jpg" style={{width: 800, height: 423}}/></Frame>
+## Set Up Write & Native Transform
 
-7. Follow the on-screen instructions to create a storage credential and enter it in the
-   **STORAGE\_AWS\_EXTERNAL\_ID** field.
-     
-   <Frame><img alt="new storage credential.jpg" src="/images/kb/ka0Vq000000BENp-00N5w00000Ri7BU-0EMVq0000050pvh.jpg" style={{width: 800, height: 420}}/></Frame>
+Enable write-back, native transforms, or both on an existing Databricks integration. You must complete the read-only setup before proceeding.
 
-8. Follow the on-screen instructions to create
-   **External Locations**.
-     
-   <Frame><img alt="create external locations.jpg" src="/images/kb/ka0Vq000000BENp-00N5w00000Ri7BU-0EMVq000004pr1a.jpg" style={{width: 801, height: 505}}/></Frame>
+1. From the Databricks Cloud Integrations list, select the **wrench** icon on the integration you want to configure, then select **Settings**.
 
-9. On the
-   **Finalize Write Integration** screen, confirm that you understand that Domo will be able to make changes to your Databricks environment.
-     
-   <Frame><img alt="finalize write integration.jpg" src="/images/kb/ka0Vq000000BENp-00N5w00000Ri7BU-0EMVq000004q4Jl.jpg" style={{width: 800, height: 512}}/></Frame>
+2. In the **Settings** panel, under **Write & native transform**, select **Set up write & transform**. The **Configure Write & Native Transform** modal opens.
 
-   A success message displays.
-10. Choose
-    **Return To Account List** to see your integration configured with read and write access.
-      
-    <Frame><img alt="read and write access.jpg" src="/images/kb/ka0Vq000000BENp-00N5w00000Ri7BU-0EMVq000004q4Zt.jpg" style={{width: 799, height: 506}}/></Frame>
+   <Frame>![Integration Settings panel showing the Set up write & transform option.](/images/kb/databricks-kb-13.png)</Frame>
 
-You can now use your write integration across Domo, including writing the output of a Magic ETL DataFlow back to Databricks.
+3. Under **What do you want to be able to do?**, select one or both capabilities:
+   - **Write to Databricks from connectors**—enables Domo to write data back to Databricks.
+   - **Execute Magic ETL transformations natively**—enables Magic ETL DataFlows to run transformations directly within your Databricks environment.
 
-### Databricks-sourced DataSets
+4. Under **Default write location**, select your target **Catalog** and **Schema** from the dropdowns. This is the Databricks location where Domo writes data during write-back operations and native transform executions.
 
-When Databricks-sourced DataSets are used in a DataFlow, the data is queried live from Databricks when the flow initiates. In addition, Databricks-sourced DataSets are checked for updates every 15 minutes based on the table's LAST\_ALTERED DateTime. If a table has been updated since it was last checked, DataFlows that use that table as a trigger initiate.
+   <Frame>![Configure Write & Native Transform modal with capability checkboxes and write location dropdowns.](/images/kb/databricks-kb-14.png)</Frame>
+
+5. Select **Save** to complete the setup.
+
+## Troubleshoot
+
+<AccordionGroup>
+
+<Accordion title="Authentication fails during setup">
+If authentication fails when configuring your integration:
+
+- Verify that your personal access token or M2M OAuth credentials (Client ID and Client Secret) are correct and have not expired.
+- Confirm that the Databricks service account has read access to your default Databricks environment.
+</Accordion>
+
+<Accordion title="Connection URL is rejected">
+If the Databricks connection URL is not accepted:
+
+- Confirm that you are not including a protocol identifier. `jdbc:databricks://` is assumed; `jdbc:spark://` is not supported.
+- Confirm you are using the correct server hostname and HTTP path from **SQL Warehouses** > *your warehouse name* > **Connection details** in Databricks.
+</Accordion>
+
+<Accordion title="Catalog or schema not found during write & native transform setup">
+If your catalog or schema does not appear in the dropdowns during write & native transform setup:
+
+- Confirm that the Databricks service account has the necessary permissions to access the target catalog and schema.
+- Try refreshing the integration settings and repeating the setup steps.
+</Accordion>
+
+<Accordion title="How do Databricks-sourced DataSets work?">
+When a DataFlow uses a Databricks-sourced DataSet, Domo queries the data live from Databricks when the DataFlow runs. Domo checks Databricks-sourced DataSets for updates every 15 minutes using the table's `LAST_ALTERED` timestamp. If Domo detects an update, it triggers any DataFlows that use that table.
+</Accordion>
+
+</AccordionGroup>
+
+## Next Steps
+
+- [Cloud Integrations overview](/s/article/4412849158167)—Learn how Cloud Integrations works and which integrations are supported.
+- [Magic ETL DataFlows](/s/article/360055259234)—Build and run DataFlows using your Databricks-sourced DataSets.
+- [Migrate from Federated to Cloud Integrations](/s/article/000005675)—Guidance for migrating existing integrations.

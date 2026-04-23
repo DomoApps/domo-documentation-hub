@@ -30,77 +30,14 @@ The new version becomes the default, but you can access earlier versions as need
 
 ---
 
-## Code Engine Library
+## The `codeengine` runtime library
 
-The Code Engine library provides methods for internal and external API calls. Import it with `require("codeengine")`.
+Inside a JavaScript Code Engine function, `require('codeengine')` exposes helpers for authenticated internal Domo API calls, secure access to credentials stored in Domo Accounts, and external HTTP.
 
-### codeengine.sendRequest
+See the full reference: [The `codeengine` Runtime Library](./concepts/the-codeengine-library).
 
-Make calls to internal Domo APIs. Example:
+## Related
 
-```js
-const codeengine = require('codeengine');
-
-function getDataSetMetadata(dataSetId) {
-  const url = `api/data/v3/datasources/${dataSetId}?part=core,permission,status,pdp,rowcolcount,certification,functions`;
-  return codeengine.sendRequest('get', url).catch(console.error);
-}
-```
-
-### codeengine.getAccount
-
-Retrieve account credentials for use in external API calls. Example:
-
-```js
-const codeengine = require('codeengine');
-
-async function accountExample(twilioAccount) {
-  const account = await codeengine.getAccount(twilioAccount.id);
-  const { accountSID, password } = account.properties;
-}
-```
-
-### codeengine.axios
-
-Make external HTTP requests. Example:
-
-```js
-const codeengine = require('codeengine');
-
-async function sendTwilioSms(to, from, body) {
-  const account = await codeengine
-    .getAccount('Twilio')
-    .then((a) => a.properties);
-  const url = `https://api.twilio.com/2010-04-01/Accounts/${account.SID}/Messages.json`;
-  const data = new URLSearchParams();
-  data.append('To', to);
-  data.append('From', from);
-  data.append('Body', body);
-  const requestOptions = {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8',
-      Authorization:
-        'Basic ' +
-        Buffer.from(`${account.SID}:${account.TOKEN}`).toString('base64'),
-    },
-    data,
-  };
-  try {
-    const response = await codeengine.axios(url, requestOptions);
-    const jsonResponse = await response.data;
-    if (response.ok) {
-      console.log('SMS sent successfully:', jsonResponse);
-      return jsonResponse;
-    } else {
-      console.error('Error sending SMS:', jsonResponse);
-      throw new Error(jsonResponse.message);
-    }
-  } catch (error) {
-    console.error('Error:', error);
-    throw error;
-  }
-}
-```
-
----
+- [Functions and Types](./concepts/functions-and-types) — declaring inputs and outputs.
+- [Code Editor](./code-editor-overview) — the in-app IDE for writing and testing functions.
+- [The `codeengine` Runtime Library](./concepts/the-codeengine-library) — `require('codeengine')` reference.

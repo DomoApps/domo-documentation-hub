@@ -3,60 +3,37 @@ title: JavaScript Libraries
 permalink: c887b1e09fb75-code-engine-java-script-libraries-reference
 ---
 
-Below is a comprehensive list of JavaScript libraries available for use in Code Engine.
+The Code Engine JavaScript runtime is Node-based. A curated set of libraries is available to functions via `require()`.
 
-| **Library**         | **Description**                                                                |
-| ------------------- | ------------------------------------------------------------------------------ |
-| `codeengine`        | Interfaces with the Code Engine system to manage workflows and data processes. |
-| `axios`             | A promise-based HTTP client for making external API requests.                  |
-| `googleAuthLibrary` | Handles Google authentication and authorization flows.                         |
+## The `codeengine` module
 
-## Functions in the `codeengine` library
-
-| **Function**                  | **Description**                                                             |
-| ----------------------------- | --------------------------------------------------------------------------- |
-| `getPersonDetails`            | Retrieves detailed information about a person from your system.             |
-| `getAccount`                  | Fetches account-related data, including access tokens and account settings. |
-| `getExecutionDetails`         | Provides details about workflow execution.                                  |
-| [`sendRequest`](#sendrequest) | Sends HTTP requests for interacting with internal Domo APIs.                |
-
-### sendRequest
-
-This function will send an authenticated API request to any of Domo's product APIs.
-
-#### Parameters
-
-| Property Name | Type   | Required | Description                                                |
-| ------------- | ------ | -------- | ---------------------------------------------------------- |
-| method        | String | Required | The HTTP method - can be 'GET', 'POST', 'PUT', or 'DELETE' |
-| url           | String | Required | The request url                                            |
-| body          | Object | Optional | The request body                                           |
-| headers       | Object | Optional | The request headers                                        |
-| contentType   | Object | Optional | The request contentType ('application/json' by default)    |
-
-#### Code Example
+Code Engine provides a built-in helper module for authenticated internal Domo API calls, secure Account credential access, and external HTTP requests:
 
 ```javascript
 const codeengine = require('codeengine');
-
-async function handleRequest(
-  method,
-  url,
-  body = null,
-  headers = null,
-  contentType = null,
-) {
-  try {
-    return await codeengine.sendRequest(
-      method,
-      url,
-      body,
-      headers,
-      contentType,
-    );
-  } catch (error) {
-    console.error(`Error with ${method} request to ${url}:`, error);
-    throw error;
-  }
-}
 ```
+
+See [The `codeengine` Runtime Library](./concepts/the-codeengine-library) for the full reference, including `sendRequest`, `getAccount`, `axios`, `getPersonDetails`, and `getExecutionDetails`.
+
+## Third-party libraries via `require()`
+
+The following third-party libraries are available to JavaScript Code Engine functions. The list is **as of 2026-04-23** — if you need a library not listed here, contact Domo Support.
+
+| Library | Purpose | Upstream docs |
+|---|---|---|
+| `axios` | Promise-based HTTP client. | [axios-http.com](https://axios-http.com) |
+| `google-auth-library` | Google OAuth / authentication flows. | [github.com/googleapis/google-auth-library-nodejs](https://github.com/googleapis/google-auth-library-nodejs) |
+
+<Note>
+**Note:** `codeengine.axios` (in the `codeengine` module) and the standalone `require('axios')` expose the same underlying library. Use `codeengine.axios` when you want the Code Engine helper conventions; use `require('axios')` when you want a direct handle for advanced configuration.
+</Note>
+
+## Requesting a new library
+
+Adding a library to the runtime allowlist is not a user-configurable action. If your function needs a library that is not available, contact Domo Support with your use case.
+
+## Related
+
+- [The `codeengine` Runtime Library](./concepts/the-codeengine-library) — method reference for the `codeengine` module.
+- [Python Packages](./python-packages) — the Python runtime's library surface.
+- [Creating Custom Packages](./creating-packages) — UI-level walkthrough.

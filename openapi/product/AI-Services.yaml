@@ -1,0 +1,2269 @@
+openapi: 3.1.0
+info: {title: AI Services, description: 'Domo AI Services provide a consistent API
+    to leverage Foundation Models to solve common problems such as natural language
+    SQL generation (text-to-SQL), Summarization, Classification, Tool Calling and
+    others.', version: '2.3.3639_master'}
+servers:
+- url: https://{subdomain}.domo.com
+  variables:
+    subdomain: {description: The Domo instance subdomain., default: subdomain}
+tags:
+- {name: AI Services - Classification, description: Domo AI Service Classification
+    APIs}
+- {name: AI Services - Data Extraction, description: Domo AI Service Data Extraction
+    APIs}
+- {name: AI Services - Embedding, description: Domo AI Service Embedding APIs}
+- {name: AI Services - Image, description: Domo AI Service Image APIs}
+- {name: AI Services - Messages, description: Domo AI Service Messages APIs}
+- {name: AI Services - Sentiment Analysis, description: Domo AI Service Sentiment
+    Analysis APIs}
+- {name: AI Services - Text, description: Domo AI Service Text APIs}
+paths:
+  /api/ai/v1/text/summarize:
+    post:
+      tags: [AI Services - Text]
+      summary: Text Summarization
+      description: Generate a summary based on the given text input.
+      operationId: summarize
+      requestBody:
+        description: Text Summarization AI request.
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/TextSummarizationRequest'}
+            examples:
+              Basic:
+                description: Basic Text Summarization request.
+                value: {input: 'San Francisco, officially the City and County of San
+                    Francisco, is a commercial, financial, and cultural center in
+                    Northern California. With a population of 808,437 residents as
+                    of 2022, San Francisco is the fourth most populous city in the
+                    U.S. state of California. The city covers a land area of 46.9
+                    square miles (121 square kilometers) at the end of the San Francisco
+                    Peninsula, making it the second-most densely populated large U.S.
+                    city after New York City and the fifth-most densely populated
+                    U.S. county, behind only four New York City boroughs. Among the
+                    92 U.S. cities proper with over 250,000 residents, San Francisco
+                    is ranked first by per capita income and sixth by aggregate income
+                    as of 2022.'}
+              Custom Response Length:
+                description: Text Summarization request with custom response length.
+                value:
+                  input: San Francisco, officially the City and County of San Francisco,
+                    is a commercial, financial, and cultural center in Northern California.
+                    With a population of 808,437 residents as of 2022, San Francisco
+                    is the fourth most populous city in the U.S. state of California.
+                    The city covers a land area of 46.9 square miles (121 square kilometers)
+                    at the end of the San Francisco Peninsula, making it the second-most
+                    densely populated large U.S. city after New York City and the
+                    fifth-most densely populated U.S. county, behind only four New
+                    York City boroughs. Among the 92 U.S. cities proper with over
+                    250,000 residents, San Francisco is ranked first by per capita
+                    income and sixth by aggregate income as of 2022.
+                  outputWordLength: {min: 5, max: 10}
+        required: true
+      responses:
+        '409': {description: Conflict}
+        '403':
+          description: Forbidden
+          content:
+            '*/*':
+              schema: {type: string}
+        '200':
+          description: TextAIResponse The generated summary and model token usage
+            information.
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/TextAIResponse'}
+              examples:
+                Text Summarization Response:
+                  description: Text Summarization Response
+                  value: {prompt: 'Write a 5 to 10 words summary of the following
+                      text. ```...``` CONCISE SUMMARY:', output: 'Vibrant, densely
+                      populated commercial and cultural hub in Northern California.',
+                    modelId: 'domo.domo_ai.domogpt-summarize-v1:anthropic'}
+      security:
+      - domo-developer-token: []
+  /api/ai/v1/text/sql:
+    post:
+      tags: [AI Services - Text]
+      summary: Text-to-SQL
+      description: Generate a SQL query based on the given text input and data source
+        schema.
+      operationId: textToSQL
+      requestBody:
+        description: Text to SQL AI Service request.
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/TextToSQLRequest'}
+            examples:
+              Basic:
+                description: Basic Text-to-SQL request.
+                value:
+                  input: What are my total sales by region?
+                  dataSourceSchemas:
+                  - dataSourceName: Store Sales
+                    columns:
+                    - {type: STRING, name: product}
+                    - {type: LONG, name: store}
+                    - {type: LONG, name: amount}
+                    - {type: DATETIME, name: timestamp}
+                    - {type: STRING, name: region}
+              Non-default model:
+                description: Text-to-SQL request with non-default model.
+                value:
+                  input: What are my total sales by region?
+                  model: 9f35cc70-47f0-46da-a3e9-92a76c574e41
+                  dataSourceSchemas:
+                  - dataSourceName: Store Sales
+                    columns:
+                    - {type: STRING, name: product}
+                    - {type: LONG, name: store}
+                    - {type: LONG, name: amount}
+                    - {type: DATETIME, name: timestamp}
+                    - {type: STRING, name: region}
+        required: true
+      responses:
+        '409': {description: Conflict}
+        '403':
+          description: Forbidden
+          content:
+            '*/*':
+              schema: {type: string}
+        '200':
+          description: TextAIResponse The generated SQL query and model token usage
+            information.
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/TextAIResponse'}
+              examples:
+                Text-to-SQL Response:
+                  description: Text-to-SQL Response
+                  value:
+                    prompt: |-
+                      # MYSQL
+                      [{"dataSourceName":"Store_Sales","columns":[{"name":"product","type":"STRING"},{"name":"store","type":"LONG"},{"name":"amount","type":"LONG"},{"name":"timestamp","type":"DATETIME"},{"name":"region","type":"STRING"}]}]
+                      # Generate a query to answer the following:
+                      # What are my total sales by region?
+                    output: SELECT region, SUM(amount) AS total_sales FROM `Store
+                      Sales` GROUP BY region
+                    modelId: domo.domo_ai.domogpt-medium-v1.2:anthropic
+      security:
+      - domo-developer-token: []
+  /api/ai/v1/text/generation:
+    post:
+      tags: [AI Services - Text]
+      summary: Text Generation
+      description: Generate text based on the given text input.
+      operationId: textGeneration
+      requestBody:
+        description: Text Generation AI Service request.
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/TextGenerationRequest'}
+            examples:
+              Basic:
+                description: Basic Text Generation request.
+                value: {input: 'Why is the sky blue?'}
+              Non-default Model:
+                description: Text Generation request with DomoGPT Chat Small v1 model
+                value: {input: 'Why is the sky blue?', model: 'domo.domo_ai.domogpt-small-v1:anthropic'}
+              Prompt Template:
+                description: Text Generation request with custom prompt template.
+                value:
+                  input: Why is the sky blue?
+                  promptTemplate: {template: 'Respond to the following in ${language}:
+                      ${input}'}
+                  parameters: {language: Japanese}
+        required: true
+      responses:
+        '409': {description: Conflict}
+        '403':
+          description: Forbidden
+          content:
+            '*/*':
+              schema: {type: string}
+        '200':
+          description: TextAIResponse The generated text and model token usage information.
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/TextAIResponse'}
+              examples:
+                Text Generation Response:
+                  description: Text Generation Response
+                  value: {prompt: 'Why is the sky blue?', output: The sky is blue
+                      because of Rayleigh scattering., modelId: 'domo.domo_ai.domogpt-small-v1:anthropic'}
+      security:
+      - domo-developer-token: []
+  /api/ai/v1/text/beastmode:
+    post:
+      tags: [AI Services - Text]
+      summary: Text-to-BeastMode
+      description: Generate a Beast Mode calculation based on the given text input
+        and data source schema.
+      operationId: textToBeastMode
+      requestBody:
+        description: Text to Beast Mode AI Service request.
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/TextToBeastModeRequest'}
+            examples:
+              Basic:
+                description: Basic Text-to-Beast-Mode request.
+                value:
+                  input: Count distinct products
+                  dataSourceSchema:
+                    dataSourceName: Store Sales
+                    columns:
+                    - {type: STRING, name: product}
+                    - {type: LONG, name: store}
+                    - {type: LONG, name: amount}
+                    - {type: DATETIME, name: timestamp}
+                    - {type: STRING, name: region}
+              Non-default model:
+                description: Text-to-Beast-Mode request with non-default model.
+                value:
+                  input: Count distinct products
+                  model: 9f35cc70-47f0-46da-a3e9-92a76c574e41
+                  dataSourceSchema:
+                    dataSourceName: Store Sales
+                    columns:
+                    - {type: STRING, name: product}
+                    - {type: LONG, name: store}
+                    - {type: LONG, name: amount}
+                    - {type: DATETIME, name: timestamp}
+                    - {type: STRING, name: region}
+        required: true
+      responses:
+        '409': {description: Conflict}
+        '403':
+          description: Forbidden
+          content:
+            '*/*':
+              schema: {type: string}
+        '200':
+          description: TextAIResponse The generated calculation and model token usage
+            information.
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/TextAIResponse'}
+              examples:
+                Text-to-Beast-Mode Response:
+                  description: Text-to-Beast-Mode Response
+                  value:
+                    prompt: |-
+                      # MYSQL
+                      # {"dataSourceName":"Store_Sales","columns":[{"name":"product","type":"STRING"},{"name":"store","type":"LONG"},{"name":"amount","type":"LONG"},{"name":"timestamp","type":"DATETIME"},{"name":"region","type":"STRING"}]}
+                      # Generate a query to answer the following:
+                      # Count distinct products
+                    output: COUNT(DISTINCT `product`)
+                    modelId: domo.domo_ai.domogpt-medium-v1.2:anthropic
+      security:
+      - domo-developer-token: []
+  /api/ai/v1/targeted-sentiment:
+    post:
+      tags: [AI Services - Sentiment Analysis]
+      summary: Targeted Sentiment Analysis - Beta
+      description: Analyze sentiment for specific topics.
+      operationId: messagesTargetedSentimentAnalysis
+      requestBody:
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/SentimentAnalysisRequest'}
+            examples:
+              Product Review - Multiple Topics:
+                description: Analyze sentiment for specific topics.
+                value:
+                  input:
+                  - {type: TEXT, text: 'The product quality is excellent and works
+                      perfectly. However, the shipping took longer than expected and
+                      customer service was slow to respond. Pricing is fair for what
+                      you get.'}
+                  topics:
+                  - {topic: product_quality, description: Quality and features of
+                      the product}
+                  - {topic: shipping, description: Shipping speed and delivery experience}
+                  - {topic: customer_service, description: Customer support experience}
+                  - {topic: pricing, description: Price and value for money}
+        required: true
+      responses:
+        '409': {description: Conflict}
+        '403':
+          description: Forbidden
+          content:
+            '*/*':
+              schema: {type: string}
+        '200':
+          description: Successful targeted sentiment analysis response.
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/TargetedSentimentResponse'}
+              examples:
+                Targeted Sentiment Analysis Response:
+                  description: Targeted Sentiment Analysis Response
+                  value:
+                    type: TARGETED
+                    topicSentiments: {shipping: negative, product_quality: positive,
+                      customer_service: negative, pricing: positive}
+                    model: domo.domo_ai.domogpt-medium-v2.1:anthropic
+                    isCustomerModel: false
+                    sessionId: 34c1b391-1302-4149-89ad-dd5c9a009e89
+                    requestId: d81674e9-984d-4ca3-b943-acf1fdbc95b4
+                    modelProviderUsage: null
+      security:
+      - domo-developer-token: []
+  /api/ai/v1/sentiment:
+    post:
+      tags: [AI Services - Sentiment Analysis]
+      summary: Sentiment Analysis - Beta
+      description: Analyze the overall sentiment of text (positive, negative, neutral,
+        or not applicable).
+      operationId: messagesSentimentAnalysis
+      requestBody:
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/SentimentAnalysisRequest'}
+            examples:
+              Product Review Sentiment:
+                description: Analyze overall sentiment of a text.
+                value:
+                  input:
+                  - {type: TEXT, text: This product is absolutely amazing! The quality
+                      exceeded my expectations and the customer service was outstanding.
+                      I'm very happy with my purchase.}
+        required: true
+      responses:
+        '409': {description: Conflict}
+        '403':
+          description: Forbidden
+          content:
+            '*/*':
+              schema: {type: string}
+        '200':
+          description: Successful sentiment analysis response.
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/SimpleSentimentResponse'}
+              examples:
+                Sentiment Analysis Response:
+                  description: Sentiment Analysis Response
+                  value: {type: DEFAULT, sentiment: positive, model: 'domo.domo_ai.domogpt-medium-v2.1:anthropic',
+                    isCustomerModel: false, sessionId: 34c1b391-1302-4149-89ad-dd5c9a009e89,
+                    requestId: 5e2d7a6b-af27-4cf2-9fe8-70cfb90d72c2, modelProviderUsage: null}
+      security:
+      - domo-developer-token: []
+  /api/ai/v1/messages/tools:
+    post:
+      tags: [AI Services - Messages]
+      summary: Tool Calling
+      description: Process a tool calling request.
+      operationId: toolCalling
+      requestBody:
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/ToolCallRequest'}
+            examples:
+              Initial Tool Call:
+                description: Initial tool call request
+                value:
+                  input:
+                  - role: USER
+                    content:
+                    - {type: TEXT, text: 'Do you have any blue coats available?'}
+                  tools:
+                  - name: get_product_recommendations
+                    description: Searches for products matching certain criteria in
+                      the database
+                    parameters:
+                      type: object
+                      properties:
+                        categories:
+                          description: categories that could be a match
+                          type: array
+                          items:
+                            type: string
+                            enum: [coats & jackets, accessories, tops, jeans & trousers,
+                              skirts & dresses, shoes]
+                        colors:
+                          description: colors that could be a match, empty array if
+                            N/A
+                          type: array
+                          items:
+                            type: string
+                            enum: [black, white, brown, red, blue, green, orange,
+                              yellow, pink, gold, silver]
+                        keywords:
+                          description: keywords that should be present in the item
+                            title or description
+                          type: array
+                          items: {type: string}
+                        price_range:
+                          type: object
+                          properties:
+                            min: {type: number, minimum: 100}
+                            max: {type: number, maximum: 200}
+                          required: [min, max]
+                          additionalProperties: false
+                        limit: {type: integer, description: 'The maximum number of
+                            products to return, use 5 by default if nothing is specified
+                            by the user', const: 100}
+                        today: {type: string, format: date-time, description: todays
+                            date}
+                        email: {type: string, format: email, description: confirmation
+                            email}
+                        phone: {type: string, description: user phone number}
+                        id: {type: string, format: uuid}
+                      required: [categories, colors, keywords, price_range, limit,
+                        today, id]
+                      additionalProperties: false
+                  - name: get_product_details
+                    description: Fetches more details about a product
+                    parameters:
+                      type: object
+                      properties:
+                        product_id: {type: string, description: The ID of the product
+                            to fetch details for}
+                      required: [product_id]
+                      additionalProperties: false
+                  - name: add_to_cart
+                    description: Add items to cart when the user has confirmed their
+                      interest.
+                    parameters:
+                      type: object
+                      properties:
+                        items:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              product_id: {type: string, description: ID of the product
+                                  to add to the cart}
+                              quantity: {type: integer, description: Quantity of the
+                                  product to add to the cart}
+                            required: [product_id, quantity]
+                            additionalProperties: false
+                      required: [items]
+                      additionalProperties: false
+                  toolChoice: {type: AUTO}
+              Tool Call Next Step Request:
+                description: Tool call after function execution
+                value:
+                  input:
+                  - role: USER
+                    content:
+                    - {type: TEXT, text: I'm looking for a blue coat.}
+                  - role: ASSISTANT
+                    content:
+                    - {type: TEXT, text: Certainly! I'd be happy to help you find
+                        a blue coat. I'll use the product recommendation tool to search
+                        for that.}
+                    - type: TOOL_USE_REQUEST
+                      toolInput:
+                        categories: [coats & jackets]
+                        colors: [blue]
+                        keywords: [coat]
+                        price_range: {min: 100.0, max: 200.0}
+                        limit: 5
+                        today: 2023-06-14T12:00:00Z
+                        id: 550e8400-e29b-41d4-a716-446655440000
+                      name: get_product_recommendations
+                      toolCallId: toolu_bdrk_01DZtT8tKDafT5P5Du9AuRAL
+                  - role: USER
+                    content:
+                    - type: TOOL_USE_RESULT
+                      content:
+                      - {type: TEXT, text: '{''productName'': ''Wool Blue Coat''}'}
+                      toolCallId: toolu_bdrk_01DZtT8tKDafT5P5Du9AuRAL
+                  tools:
+                  - name: get_product_recommendations
+                    description: Searches for products matching certain criteria in
+                      the database
+                    parameters:
+                      type: object
+                      properties:
+                        categories:
+                          description: categories that could be a match
+                          type: array
+                          items:
+                            type: string
+                            enum: [coats & jackets, accessories, tops, jeans & trousers,
+                              skirts & dresses, shoes]
+                        colors:
+                          description: colors that could be a match, empty array if
+                            N/A
+                          type: array
+                          items:
+                            type: string
+                            enum: [black, white, brown, red, blue, green, orange,
+                              yellow, pink, gold, silver]
+                        keywords:
+                          description: keywords that should be present in the item
+                            title or description
+                          type: array
+                          items: {type: string}
+                        price_range:
+                          type: object
+                          properties:
+                            min: {type: number, minimum: 100}
+                            max: {type: number, maximum: 200}
+                          required: [min, max]
+                          additionalProperties: false
+                        limit: {type: integer, description: 'The maximum number of
+                            products to return, use 5 by default if nothing is specified
+                            by the user', const: 100}
+                        today: {type: string, format: date-time, description: todays
+                            date}
+                        email: {type: string, format: email, description: confirmation
+                            email}
+                        phone: {type: string, description: user phone number}
+                        id: {type: string, format: uuid}
+                      required: [categories, colors, keywords, price_range, limit,
+                        today, id]
+                      additionalProperties: false
+                  - name: get_product_details
+                    description: Fetches more details about a product
+                    parameters:
+                      type: object
+                      properties:
+                        product_id: {type: string, description: The ID of the product
+                            to fetch details for}
+                      required: [product_id]
+                      additionalProperties: false
+                  - name: add_to_cart
+                    description: Add items to cart when the user has confirmed their
+                      interest.
+                    parameters:
+                      type: object
+                      properties:
+                        items:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              product_id: {type: string, description: ID of the product
+                                  to add to the cart}
+                              quantity: {type: integer, description: Quantity of the
+                                  product to add to the cart}
+                            required: [product_id, quantity]
+                            additionalProperties: false
+                      required: [items]
+                      additionalProperties: false
+                  toolChoice: {type: AUTO}
+        required: true
+      responses:
+        '409': {description: Conflict}
+        '403':
+          description: Forbidden
+          content:
+            '*/*':
+              schema: {type: string}
+        '200':
+          description: Successful tool calling response.
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/MessagesAIResponse'}
+              examples:
+                Tool Calling Response:
+                  description: Tool Calling Response
+                  value:
+                    content:
+                    - {type: TEXT, text: Certainly! I'd be happy to help you find
+                        a blue coat. I'll use the product recommendation tool to search
+                        for that.}
+                    - type: TOOL_USE_REQUEST
+                      toolInput:
+                        categories: [coats & jackets]
+                        colors: [blue]
+                        keywords: [coat]
+                        price_range: {min: 100.0, max: 200.0}
+                        limit: 5
+                        today: 2023-06-10T12:00:00Z
+                        id: 550e8400-e29b-41d4-a716-446655440000
+                      name: get_product_recommendations
+                      toolCallId: toolu_bdrk_01Tnc9RttRWSwvKHd5JA1sRk
+                    modelId: domo.domo_ai.domogpt-medium-v1.2:anthropic
+                    isCustomerModel: false
+                    sessionId: 526bb9ee-02d0-4717-a83d-946715b5fa82
+                    requestId: c765dc33-9f3e-4f23-84e5-cf7aa2cd3f63
+                    stopReason: TOOL_USE
+                Final Answer Response:
+                  description: Final Answer Response
+                  value:
+                    content:
+                    - {type: TEXT, text: 'Great! I''ve found a product that matches
+                        your request. The system has recommended a "Wool Blue Coat"
+                        for you. Would you like more details about this coat, or would
+                        you prefer to see more options?'}
+                    modelId: domo.domo_ai.domogpt-medium-v1.2:anthropic
+                    isCustomerModel: false
+                    sessionId: 9c8bf9c4-ef26-4726-818d-a9f57c2a5c46
+                    requestId: f0a1a239-4c2d-48f0-825b-28e657f1bb9c
+                    stopReason: END_TURN
+      security:
+      - domo-developer-token: []
+  /api/ai/v1/messages/chat:
+    post:
+      tags: [AI Services - Messages]
+      summary: Chat Messages
+      description: Process a chat messages request.
+      operationId: chatMessages
+      requestBody:
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/ChatMessagesAIRequest'}
+            examples:
+              Basic:
+                description: Basic Chat Messages request.
+                value:
+                  input:
+                  - role: USER
+                    content:
+                    - {type: TEXT, text: 'Why is the sky blue?'}
+        required: true
+      responses:
+        '409': {description: Conflict}
+        '403':
+          description: Forbidden
+          content:
+            '*/*':
+              schema: {type: string}
+        '200':
+          description: Successful chat messages response.
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/MessagesAIResponse'}
+              examples:
+                Chat Messages Response:
+                  description: Chat Messages Response
+                  value:
+                    content:
+                    - {type: TEXT, text: The sky appears blue due to a phenomenon
+                        called Rayleigh scattering.}
+                    modelId: domo.domo_ai.domogpt-medium-v1.2:anthropic
+                    isCustomerModel: false
+                    sessionId: e1f6a485-7fb6-4f71-b41c-37d6cb5f6bd3
+                    requestId: df2256fd-d133-4ea1-b958-295be09be7c1
+                    stopReason: END_TURN
+      security:
+      - domo-developer-token: []
+  /api/ai/v1/image/text:
+    post:
+      tags: [AI Services - Image]
+      summary: Image to Text
+      description: |-
+        Extract text from an image.
+         By default, all text detected in the image is included. The system and input prompt may be modified in order to describe, classify or extract specific information from the image.
+      operationId: imageToText
+      requestBody:
+        description: Image to text AI Service request.
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/ImageToTextRequest'}
+            examples:
+              Basic Request:
+                description: Basic Image-to-Text request.
+                value:
+                  image: {data: <base64 string>, type: base64, mediaType: image/png}
+              Full Request:
+                description: Complete Image-to-Text Request with optional parameters
+                  for configuring model, prompt, maxTokens and temperature.
+                value:
+                  input: Please describe this image in detail, focusing on the main
+                    subject and background elements.
+                  image: {data: <base64 string>, type: base64, mediaType: image/jpeg}
+                  sessionId: <session_id>
+                  model: domo.domo_ai.domogpt-medium-v1.2:anthropic
+                  system: You are a professional image analyst. Provide detailed,
+                    accurate descriptions of images.
+                  maxTokens: 500
+                  temperature: 0.7
+        required: true
+      responses:
+        '409': {description: Conflict}
+        '403':
+          description: Forbidden
+          content:
+            '*/*':
+              schema: {type: string}
+        '200':
+          description: TextAIResponse A <code>TextAIResponse</code> containing the
+            extracted or analyzed text from the image.
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/TextAIResponse'}
+              examples:
+                Image to Text Response:
+                  description: Image to Text Response
+                  value: {prompt: 'What do you see in this image?', output: This image
+                      shows a small red square on a white background. The square appears
+                      to be a simple geometric shape with clean edges., model: 'domo.domo_ai.domogpt-medium-v1.2:anthropic'}
+      security:
+      - domo-developer-token: []
+  /api/ai/v1/extract:
+    post:
+      tags: [AI Services - Data Extraction]
+      summary: Data Extraction - Beta
+      description: Extract structured data from unstructured text according to a provided
+        JSON schema.
+      operationId: messagesExtractData
+      requestBody:
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/ExtractDataRequest'}
+            examples:
+              Basic Contact Extraction:
+                description: Extract contact information from text using Messages
+                  API.
+                value:
+                  input:
+                  - {type: TEXT, text: 'Contact: Sarah Johnson, email sarah.j@company.com,
+                      phone (555) 123-4567'}
+                  outputStructure:
+                    name: {type: string, description: Full name}
+                    email: {type: string, description: Email address}
+                    phone: {type: string, description: Phone number}
+              Resume Extraction:
+                description: Extract structured data from a resume with nested fields
+                  using Messages API.
+                value:
+                  input:
+                  - type: TEXT
+                    text: |-
+                      John Smith
+                      Senior Software Engineer
+                      Email: john.smith@email.com | Phone: (555) 123-4567
+
+                      Experience:
+                      Tech Corp (2020-Present) - Led microservices architecture serving 5M+ users
+                      StartupXYZ (2016-2019) - Built RESTful APIs with Spring Boot
+
+                      Education: B.S. Computer Science, UC Berkeley, 2016
+                      Skills: Java, Python, AWS, Docker, Kubernetes
+                  outputStructure:
+                    name: {type: string, description: Full name}
+                    title: {type: string, description: Job title}
+                    email: {type: string, description: Email address}
+                    phone: {type: string, description: Phone number}
+                    experience:
+                      type: array
+                      description: Work history
+                      items:
+                        type: object
+                        properties:
+                          company: {type: string, description: Company name}
+                          years: {type: string, description: Years worked}
+                          role: {type: string, description: Job description}
+                    education: {type: string, description: Educational background}
+                    skills:
+                      type: array
+                      description: Technical skills
+                      items: {type: string}
+        required: true
+      responses:
+        '409': {description: Conflict}
+        '403':
+          description: Forbidden
+          content:
+            '*/*':
+              schema: {type: string}
+        '200':
+          description: Successful extract data response.
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/ExtractDataResponse'}
+              examples:
+                Extract Data Response:
+                  description: Extract Data Response
+                  value:
+                    output:
+                      name: John Smith
+                      title: Senior Software Engineer
+                      email: john.smith@email.com
+                      phone: (555) 123-4567
+                      experience:
+                      - {company: Tech Corp, years: 2020-Present, role: Led microservices
+                          architecture serving 5M+ users}
+                      - {company: StartupXYZ, years: 2016-2019, role: Built RESTful
+                          APIs with Spring Boot}
+                      education: B.S. Computer Science, UC Berkeley, 2016
+                      skills: [Java, Python, AWS, Docker, Kubernetes]
+                    model: domo.domo_ai.domogpt-medium-v2.1:anthropic
+                    isCustomerModel: false
+                    requestId: 613f0d20-661a-48c4-a495-60cae524e8f6
+      security:
+      - domo-developer-token: []
+  /api/ai/v1/embedding/text:
+    post:
+      tags: [AI Services - Embedding]
+      summary: Text Embeddings
+      description: Generate text embeddings based on the given text input.
+      operationId: embedText
+      requestBody:
+        description: Text Embedding AI Service request.
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/TextEmbeddingAIRequest'}
+            examples:
+              Basic Request:
+                description: Basic text embedding request.
+                value:
+                  input: [This is a sample text for generating embeddings.]
+              Specific Model Request:
+                description: Text embedding request with specific model.
+                value:
+                  input: [This is a sample text for generating embeddings.]
+                  model: domo.domo_ai.domo-embed-text-multilingual-v1:cohere
+        required: true
+      responses:
+        '409': {description: Conflict}
+        '403':
+          description: Forbidden
+          content:
+            '*/*':
+              schema: {type: string}
+        '200':
+          description: EmbeddingAIResponse The generated embeddings and model token
+            usage information.
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/EmbeddingAIResponse'}
+              examples:
+                Embedding Response:
+                  description: Embedding Response
+                  value:
+                    embeddings:
+                    - [0.1, 0.2, 0.3, 0.4, 0.5]
+                    modelId: domo.domo_ai.domo-embed-text-multilingual-v1:cohere
+      security:
+      - domo-developer-token: []
+  /api/ai/v1/embedding/image:
+    post:
+      tags: [AI Services - Embedding]
+      summary: Image Embeddings
+      description: Generate image embeddings based on the given image input.
+      operationId: embedImage
+      requestBody:
+        description: Image Embedding AI Service request.
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/ImageEmbeddingAIRequest'}
+            examples:
+              Basic Request:
+                description: Basic image embedding request.
+                value:
+                  image: {data: <base64 string>, type: base64, mediaType: image/png}
+              Specific Model Request:
+                description: Image embedding request with specific model.
+                value:
+                  image: {data: <base64 string>, type: base64, mediaType: image/png}
+                  model: domo.domo_ai.domo-embed-text-multilingual-v1:cohere
+        required: true
+      responses:
+        '409': {description: Conflict}
+        '403':
+          description: Forbidden
+          content:
+            '*/*':
+              schema: {type: string}
+        '200':
+          description: EmbeddingAIResponse The generated embeddings and model token
+            usage information.
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/EmbeddingAIResponse'}
+              examples:
+                Embedding Response:
+                  description: Embedding Response
+                  value:
+                    embeddings:
+                    - [0.1, 0.2, 0.3, 0.4, 0.5]
+                    modelId: domo.domo_ai.domo-embed-text-multilingual-v1:cohere
+      security:
+      - domo-developer-token: []
+  /api/ai/v1/classification:
+    post:
+      tags: [AI Services - Classification]
+      summary: Classification - Beta
+      description: Classify text into one or more predefined categories using LLM
+        structured outputs.
+      operationId: messagesClassification
+      requestBody:
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/ClassificationRequest'}
+            examples:
+              Support Ticket Priority (Single-Label):
+                description: Classify support ticket by priority level using single-label
+                  classification.
+                value:
+                  input:
+                  - {type: text, text: 'URGENT: Our production dashboard is down and
+                      we can''t access any of our KPI data. This is affecting our
+                      entire sales team and we need this resolved immediately!'}
+                  labels:
+                  - {label: critical, description: System outage or data loss affecting
+                      multiple users or business operations}
+                  - {label: high, description: Significant functionality issue affecting
+                      user productivity}
+                  - {label: medium, description: Feature not working as expected but
+                      workarounds available}
+                  - {label: low, description: 'Minor issue, cosmetic bug, or feature
+                      request'}
+                  classificationType: SINGLE_LABEL
+              Product Feedback (Multi-Label):
+                description: Classify product feedback into multiple categories.
+                value:
+                  input:
+                  - {type: text, text: 'The new filtering feature is great, but it
+                      would be even better if we could save filter presets and share
+                      them with our team. Also, the export functionality could use
+                      some performance improvements when dealing with large datasets.'}
+                  labels:
+                  - {label: feature_request, description: Request for new functionality
+                      or capabilities}
+                  - {label: enhancement, description: Suggestion to improve existing
+                      functionality}
+                  - {label: bug_report, description: Report of incorrect behavior
+                      or errors}
+                  - {label: performance, description: 'Feedback about speed, responsiveness,
+                      or resource usage'}
+                  - {label: usability, description: Feedback about user experience
+                      or ease of use}
+                  classificationType: MULTI_LABEL
+              With Specific Model:
+                description: Classification request with a specific model specified.
+                value:
+                  input:
+                  - {type: text, text: 'URGENT: Our production dashboard is down and
+                      we can''t access any of our KPI data. This is affecting our
+                      entire sales team and we need this resolved immediately!'}
+                  labels:
+                  - {label: critical, description: System outage or data loss affecting
+                      multiple users or business operations}
+                  - {label: high, description: Significant functionality issue affecting
+                      user productivity}
+                  - {label: medium, description: Feature not working as expected but
+                      workarounds available}
+                  - {label: low, description: 'Minor issue, cosmetic bug, or feature
+                      request'}
+                  classificationType: SINGLE_LABEL
+                  model: domo.domo_ai.domogpt-medium-v1.2:anthropic
+        required: true
+      responses:
+        '409': {description: Conflict}
+        '403':
+          description: Forbidden
+          content:
+            '*/*':
+              schema: {type: string}
+        '200':
+          description: Successful classification response.
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/ClassificationResponse'}
+              examples:
+                Classification Response:
+                  description: Classification Response
+                  value:
+                    output: [critical]
+                    classificationType: SINGLE_LABEL
+                    model: domo.domo_ai.domogpt-medium-v1.2:anthropic
+                    isCustomerModel: false
+                    sessionId: a1b2c3d4-e5f6-7890-abcd-ef1234567890
+                    requestId: f9e8d7c6-b5a4-3210-fedc-ba9876543210
+      security:
+      - domo-developer-token: []
+components:
+  schemas:
+    ChunkingConfiguration:
+      type: object
+      description: A configuration for chunking of textual information.
+      properties:
+        maxChunkSize:
+          type: integer
+          format: int32
+          description: |-
+            This parameter prevents the chunks from exceeding a specific size.
+                 It is a limit on the number of words that each chunk can include.
+        chunkOverlap:
+          type: integer
+          format: int32
+          description: |-
+            Dictates the overlap between consecutive chunks.
+                 It is the count of common characters between two adjacent chunks.
+        separators:
+          type: array
+          description: |-
+            It is a list of characters or Strings which can be used to start a new chunk when they appear in the original text.
+                 They are ordered from highest to lowest priority. Highest priority separator is used to split a new chunk first.
+                 If it is not present, we move to the next separator.
+          items: {type: string}
+        separatorType:
+          type: string
+          description: Type of separator being used.
+          enum: [text, html, json, markdown, python, javascript, java, go, cpp, latex,
+            rst, ruby, rust, proto, scala, sol, php, swift]
+        disallowIntermediateChunks:
+          type: boolean
+          description: |-
+            If set to true, only the original text will be chunked preventing further summarization of
+                 summaries if needed.
+    ParameterizedPromptTemplate:
+      type: object
+      description: |-
+        <p>
+         A prompt template string that contains placeholders for parameters that will be replaced with parameter values before the prompt
+         is submitted to the model.
+         </p>
+         <p>
+         <h3>Prompt Template Examples</h3>
+         <ul>
+             <li>"${input}"</li>
+             <li>"${system}\n${input}"</li>
+         </ul>
+      properties:
+        template: {type: string}
+    ReasoningConfig:
+      type: object
+      properties:
+        reasoningEffort:
+          type: string
+          enum: [NONE, LOW, MEDIUM, HIGH]
+    SizeBoundary:
+      type: object
+      properties:
+        min: {type: integer, format: int32}
+        max: {type: integer, format: int32}
+    TextSummarizationRequest:
+      type: object
+      description: |-
+        <p>
+         Text Summarization AI Service Request.
+         </p>
+
+         <h2>Prompt Templates</h2>
+         <p>
+         A prompt template is a string that contains placeholders for parameters that will be replaced with parameter values before the prompt
+         is submitted to the model.
+         </p>
+         <p>
+         A default prompt template is set for each model configured for the Text Summarization AI Service. Individual requests can override the
+         default template by including the <code>promptTemplate</code> parameter.
+         </p>
+         <h3>Prompt Template Parameters</h3>
+         <p>
+         The following request parameters are automatically injected into the prompt template if the associated placeholder is present:
+         <ul>
+          <li>input</li>
+          <li>system</li>
+         </ul>
+         </p>
+         <p>
+         Models with built-in support for system prompts and chat message history do not need to include <em>system</em> or
+         <em>chatContext</em> in the prompt template.
+         </p>
+         <p>
+         Additional parameters can be provided in the <code>parameters</code> map as key-value pairs.
+         </p>
+         <h3>Prompt Template Examples</h3>
+         <ul>
+             <li>"${input}"</li>
+             <li>"${system}\n${input}"</li>
+         </ul>
+      properties:
+        input: {type: string, description: Text information to be summarized.}
+        sessionId: {type: string, format: uuid, description: 'The AI session ID. If
+            provided, this request will be associated with the specified AI Session.'}
+        promptTemplate:
+          $ref: '#/components/schemas/ParameterizedPromptTemplate'
+          description: |-
+            The prompt template to use for the Text Summarization task. The default prompt template configured for the
+                                          model will be used if not provided.
+        parameters:
+          type: object
+          additionalProperties: {type: string}
+          description: Custom parameters to inject into the prompt template if an
+            associated placeholder is present.
+        model:
+          type: string
+          description: |-
+            The ID of the model to use for Text Summarization. The specified model must be configured for the Text
+                                          Summarization
+                                          AI Service by an Admin.
+        modelConfiguration:
+          type: object
+          additionalProperties: {}
+          description: Additional model-specific configuration parameter key-value
+            pairs. e.g. temperature, max_tokens, etc.
+        system:
+          type: string
+          description: |-
+            The system message to use for the Text Summarization task. If not provided, the default system message
+                                          will be used. If
+                                          the model does not include built-in support for system prompts, this parameter may be included in the prompt
+                                          template using the "${system}" placeholder.
+        chunkingConfiguration: {$ref: '#/components/schemas/ChunkingConfiguration',
+          description: Configuration for dividing long text into smaller parts or
+            chunks.}
+        outputStyle:
+          type: string
+          description: Determines the design, structuring and organization of the
+            summarization output.
+          enum: [bulleted, numbered, paragraph, unknown]
+        outputWordLength: {$ref: '#/components/schemas/SizeBoundary', description: 'Defines
+            a size boundary to limit the length of the output summary, based on number
+            of words.'}
+        temperature: {type: number, format: double, description: Controls randomness
+            in the model's output. Lower values make output more deterministic.}
+        maxTokens: {type: integer, format: int32, description: The maximum number
+            of tokens to generate in the response.}
+        reasoningConfig: {$ref: '#/components/schemas/ReasoningConfig', description: Configuration
+            for reasoning behavior and effort level.}
+      required: [input]
+    Choice:
+      type: object
+      description: A choice generated by a text AI model.
+      properties:
+        output: {type: string, description: The text model output.}
+    ModelProviderUsage:
+      type: object
+      properties:
+        inputTokens: {type: integer, format: int64}
+        outputTokens: {type: integer, format: int64}
+        totalTokens: {type: integer, format: int64}
+        reasoningTokens: {type: integer, format: int64}
+    TextAIResponse:
+      type: object
+      description: Response from a text AI Service.
+      properties:
+        prompt: {type: string, description: The formatted prompt that was used to
+            generate the response.}
+        choices:
+          type: array
+          deprecated: true
+          description: The list of choices generated by the model.
+          items: {$ref: '#/components/schemas/Choice'}
+        modelId: {type: string, description: The id of the model used to generate
+            the response.}
+        sessionId: {type: string, format: uuid, description: The id of the AI Session
+            associated with this request.}
+        output: {type: string, description: The output of the model.}
+        modelProviderUsage: {$ref: '#/components/schemas/ModelProviderUsage', description: The
+            token usage from the model provider.}
+    AIDataSourceSchema:
+      type: object
+      description: The schema and additional metadata for a Data Source.
+      properties:
+        dataSourceId: {type: string, description: The unique identifier for the data
+            source.}
+        dataSourceName: {type: string, description: The name of the data source.}
+        description: {type: string, description: A description of the data source.}
+        columns:
+          type: array
+          description: The columns in the data source.
+          items:
+            oneOf:
+            - {$ref: '#/components/schemas/AISchemaColumn'}
+            - {$ref: '#/components/schemas/AISchemaCalculation'}
+    AISchemaCalculation:
+      allOf:
+      - {$ref: '#/components/schemas/AISchemaColumn'}
+      - type: object
+        properties:
+          templateId: {type: integer, format: int64, description: The function template
+              ID.}
+          formula: {type: string, description: The formula for the calculation.}
+          aggregatable: {type: boolean, description: Whether the calculation is able
+              to be aggregated.}
+          legacyId: {type: string, description: The function template legacy ID.}
+      description: Data source column metadata for a calculation.
+      required: [name, type]
+    AISchemaColumn:
+      type: object
+      description: Data source column metadata.
+      properties:
+        name: {type: string, description: The name of the column., minLength: 1}
+        type: {type: string, description: The type of data in the column., minLength: 1}
+        displayName: {type: string, description: The column display name.}
+        description: {type: string, description: The column description.}
+        validValues:
+          type: array
+          deprecated: true
+          description: Possible values for the column if only certain values are allowed.
+          items: {deprecated: true}
+          uniqueItems: true
+        defaultValue: {description: The default value for the column.}
+        synonyms:
+          type: array
+          description: Synonyms for the column name.
+          items: {type: string}
+          uniqueItems: true
+        classification: {type: string, description: The classification for the data
+            in the column.}
+        defaultAggregation: {type: string, description: The default aggregation for
+            the column.}
+      required: [name, type]
+    TextToSQLRequest:
+      type: object
+      description: |-
+        <p>
+         Text-to-SQL AI Service Request.
+         </p>
+
+         <h2>Prompt Templates</h2>
+         <p>
+         A prompt template is a string that contains placeholders for parameters that will be replaced with parameter values before the prompt
+         is submitted to the model.
+         </p>
+         <p>
+         A default prompt template is set for each model configured for the Text-to-SQL AI Service. Individual requests can override the
+         default template by including the <code>promptTemplate</code> parameter.
+         </p>
+         <h3>Prompt Template Parameters</h3>
+         <p>
+         The following request parameters are automatically injected into the prompt template if the associated placeholder is present:
+         <ul>
+          <li>input</li>
+          <li>system</li>
+          <li>dataSourceSchemas</li>
+          <li>dialect</li>
+          <li>commentToken</li>
+          <li>escapeChar</li>
+         </ul>
+         </p>
+         <p>
+         Models with built-in support for system prompts and chat message history do not need to include <em>system</em> or
+         <em>chatContext</em> in the prompt template.
+         </p>
+         <p>
+         Additional parameters can be provided in the <code>parameters</code> map as key-value pairs.
+         </p>
+         <h3>Prompt Template Examples</h3>
+         <ul>
+             <li>"${input}"</li>
+             <li>"${system}\n${input}"</li>
+         </ul>
+      properties:
+        input: {type: string, description: The input text.}
+        sessionId: {type: string, format: uuid, description: 'The AI session ID. If
+            provided, this request will be associated with the specified AI Session.'}
+        dataSourceSchemas:
+          type: array
+          description: The data source schemas and metadata to be included in the
+            Text-to-SQL task prompt to generate SQL.
+          items: {$ref: '#/components/schemas/AIDataSourceSchema'}
+        promptTemplate:
+          $ref: '#/components/schemas/ParameterizedPromptTemplate'
+          description: |-
+            The prompt template to use for the Text-to-SQL task. The default prompt template will be used if not
+                 provided.
+        parameters:
+          type: object
+          additionalProperties: {type: string}
+          description: Custom parameters to inject into the prompt template if an
+            associated placeholder is present.
+        model:
+          type: string
+          description: |-
+            The ID of the model to use for Text-to-SQL. The specified model must be configured for the Text-to-SQL
+                 AI Service by an Admin.
+        modelConfiguration:
+          type: object
+          additionalProperties: {}
+          description: Additional model-specific configuration parameter key-value
+            pairs. e.g. temperature, max_tokens, etc.
+        dialect: {type: string, description: The SQL dialect to use in the Text-to-SQL
+            task prompt. Defaults to MYSQL.}
+        commentToken: {type: string, description: The comment token to use in the
+            Text-to-SQL task prompt. Defaults to "#".}
+        escapeChar: {type: string, description: The escape character to use in the
+            Text-to-SQL task prompt. Defaults to "`".}
+        system:
+          type: string
+          description: |-
+            The system message to use for the Text-to-SQL task. If not provided, the default system will be used. If
+                 the model does not include built-in support for system prompts, this parameter may be included in the prompt
+                 template using the "${system}" placeholder.
+        domoSupported: {type: boolean, description: Whether the generated SQL should
+            be compatible with Domo's query engine. Defaults to true.}
+        sqlRequestOptions:
+          type: array
+          description: Optional SQL request options to control the behavior of the
+            Text-to-SQL AI Service.
+          items:
+            type: string
+            enum: [EXPAND_SELECT_STAR, USE_DATA_SOURCE_ID_AS_TABLE_NAME, UNION_TO_UNION_ALL,
+              DISALLOW_COMMON_TABLE_EXPRESSIONS, DISALLOW_JOINS, DISALLOW_SUBQUERIES,
+              DISALLOW_UNIONS, VALIDATE_REFERENCES, VALIDATE_AGGREGATIONS, VALIDATE_FUNCTIONS]
+          uniqueItems: true
+        temperature: {type: number, format: double, description: Controls randomness
+            in the model's output. Lower values make output more deterministic., maximum: 2,
+          minimum: 0}
+        maxTokens: {type: integer, format: int32, description: The maximum number
+            of tokens to generate in the response.}
+        reasoningConfig: {$ref: '#/components/schemas/ReasoningConfig', description: Configuration
+            for reasoning behavior and effort level.}
+      required: [input]
+    ArrayFunctionParameter:
+      allOf:
+      - {$ref: '#/components/schemas/FunctionParameterObject'}
+      - type: object
+        properties:
+          description: {type: string}
+          title: {type: string}
+          items:
+            oneOf:
+            - {$ref: '#/components/schemas/ArrayFunctionParameter'}
+            - {$ref: '#/components/schemas/BooleanFunctionParameter'}
+            - {$ref: '#/components/schemas/IntegerFunctionParameter'}
+            - {$ref: '#/components/schemas/LogicalOperatorFunctionParameter'}
+            - {$ref: '#/components/schemas/NullFunctionParameter'}
+            - {$ref: '#/components/schemas/NumberFunctionParameter'}
+            - {$ref: '#/components/schemas/ObjectFunctionParameter'}
+            - {$ref: '#/components/schemas/StringFunctionParameter'}
+          enum:
+            type: array
+            items:
+              type: array
+              items: {}
+            uniqueItems: true
+          minItems: {type: integer, format: int32}
+          maxItems: {type: integer, format: int32}
+          uniqueItems: {type: boolean}
+          const:
+            type: array
+            items: {}
+      required: [description, type]
+    BooleanFunctionParameter:
+      allOf:
+      - {$ref: '#/components/schemas/FunctionParameterObject'}
+      - type: object
+        properties:
+          description: {type: string}
+          title: {type: string}
+          const: {type: boolean}
+          enum:
+            type: array
+            items: {type: boolean}
+            uniqueItems: true
+      required: [description, type]
+    FunctionParameterObject:
+      type: object
+      properties:
+        type:
+          type: string
+          enum: [object, array, string, number, integer, boolean, 'null', unknown,
+            oneOf, allOf, anyOf]
+        const: {}
+        enum:
+          type: array
+          items: {}
+          uniqueItems: true
+      required: [type]
+    IntegerFunctionParameter:
+      allOf:
+      - {$ref: '#/components/schemas/FunctionParameterObject'}
+      - type: object
+        properties:
+          description: {type: string}
+          title: {type: string}
+          multipleOf: {type: integer, format: int32}
+          minimum: {type: integer, format: int32}
+          exclusiveMinimum: {type: integer, format: int32}
+          maximum: {type: integer, format: int32}
+          exclusiveMaximum: {type: integer, format: int32}
+          enum:
+            type: array
+            items: {type: integer, format: int32}
+            uniqueItems: true
+          const: {type: integer, format: int32}
+      required: [description, type]
+    JsonResponseFormat:
+      allOf:
+      - {$ref: '#/components/schemas/ResponseFormat'}
+      - type: object
+        properties:
+          schema: {$ref: '#/components/schemas/ObjectFunctionParameter', description: The
+              JSON Schema to which the model response should adhere.}
+      description: |-
+        JSON response format provides schema information to the model for use cases where structured output is desired.
+         The schema object follows the <a href="https://json-schema.org/specification">JSON Schema</a> specification.
+    LogicalOperatorFunctionParameter:
+      allOf:
+      - {$ref: '#/components/schemas/FunctionParameterObject'}
+      - type: object
+        properties:
+          description: {type: string}
+          title: {type: string}
+          oneOf:
+            type: array
+            items:
+              oneOf:
+              - {$ref: '#/components/schemas/ArrayFunctionParameter'}
+              - {$ref: '#/components/schemas/BooleanFunctionParameter'}
+              - {$ref: '#/components/schemas/IntegerFunctionParameter'}
+              - {$ref: '#/components/schemas/LogicalOperatorFunctionParameter'}
+              - {$ref: '#/components/schemas/NullFunctionParameter'}
+              - {$ref: '#/components/schemas/NumberFunctionParameter'}
+              - {$ref: '#/components/schemas/ObjectFunctionParameter'}
+              - {$ref: '#/components/schemas/StringFunctionParameter'}
+          allOf:
+            type: array
+            items:
+              oneOf:
+              - {$ref: '#/components/schemas/ArrayFunctionParameter'}
+              - {$ref: '#/components/schemas/BooleanFunctionParameter'}
+              - {$ref: '#/components/schemas/IntegerFunctionParameter'}
+              - {$ref: '#/components/schemas/LogicalOperatorFunctionParameter'}
+              - {$ref: '#/components/schemas/NullFunctionParameter'}
+              - {$ref: '#/components/schemas/NumberFunctionParameter'}
+              - {$ref: '#/components/schemas/ObjectFunctionParameter'}
+              - {$ref: '#/components/schemas/StringFunctionParameter'}
+          anyOf:
+            type: array
+            items:
+              oneOf:
+              - {$ref: '#/components/schemas/ArrayFunctionParameter'}
+              - {$ref: '#/components/schemas/BooleanFunctionParameter'}
+              - {$ref: '#/components/schemas/IntegerFunctionParameter'}
+              - {$ref: '#/components/schemas/LogicalOperatorFunctionParameter'}
+              - {$ref: '#/components/schemas/NullFunctionParameter'}
+              - {$ref: '#/components/schemas/NumberFunctionParameter'}
+              - {$ref: '#/components/schemas/ObjectFunctionParameter'}
+              - {$ref: '#/components/schemas/StringFunctionParameter'}
+      required: [description, type]
+    NullFunctionParameter:
+      allOf:
+      - {$ref: '#/components/schemas/FunctionParameterObject'}
+      - type: object
+        properties:
+          description: {type: string}
+          title: {type: string}
+      required: [description, type]
+    NumberFunctionParameter:
+      allOf:
+      - {$ref: '#/components/schemas/FunctionParameterObject'}
+      - type: object
+        properties:
+          description: {type: string}
+          title: {type: string}
+          multipleOf: {type: number, format: double}
+          minimum: {type: number, format: double}
+          exclusiveMinimum: {type: number, format: double}
+          maximum: {type: number, format: double}
+          exclusiveMaximum: {type: number, format: double}
+          enum:
+            type: array
+            items: {type: number, format: double}
+            uniqueItems: true
+          const: {type: number, format: double}
+      required: [description, type]
+    ObjectFunctionParameter:
+      allOf:
+      - {$ref: '#/components/schemas/FunctionParameterObject'}
+      - type: object
+        properties:
+          description: {type: string}
+          title: {type: string}
+          additionalProperties: {type: boolean}
+          required:
+            type: array
+            items: {type: string}
+          enum:
+            type: array
+            items:
+              type: object
+              additionalProperties: {}
+            uniqueItems: true
+          properties:
+            type: object
+            additionalProperties:
+              oneOf:
+              - {$ref: '#/components/schemas/ArrayFunctionParameter'}
+              - {$ref: '#/components/schemas/BooleanFunctionParameter'}
+              - {$ref: '#/components/schemas/IntegerFunctionParameter'}
+              - {$ref: '#/components/schemas/LogicalOperatorFunctionParameter'}
+              - {$ref: '#/components/schemas/NullFunctionParameter'}
+              - {$ref: '#/components/schemas/NumberFunctionParameter'}
+              - {$ref: '#/components/schemas/ObjectFunctionParameter'}
+              - {$ref: '#/components/schemas/StringFunctionParameter'}
+          minProperties: {type: integer, format: int32}
+          maxProperties: {type: integer, format: int32}
+          const:
+            type: object
+            additionalProperties: {}
+      required: [properties, type]
+    ResponseFormat:
+      discriminator: {propertyName: type}
+      properties:
+        type: {type: string}
+      required: [type]
+    StringFunctionParameter:
+      allOf:
+      - {$ref: '#/components/schemas/FunctionParameterObject'}
+      - type: object
+        properties:
+          description: {type: string}
+          title: {type: string}
+          minLength: {type: integer, format: int32}
+          maxLength: {type: integer, format: int32}
+          pattern: {type: string}
+          enum:
+            type: array
+            items: {type: string}
+            uniqueItems: true
+          format: {type: string}
+          const: {type: string}
+      required: [description, type]
+    TextGenerationRequest:
+      type: object
+      description: |-
+        <p>
+         Text Generation AI Service Request.
+         </p>
+
+         <h2>Prompt Templates</h2>
+         <p>
+         A prompt template is a string that contains placeholders for parameters that will be replaced with parameter values before the prompt
+         is submitted to the model.
+         </p>
+         <p>
+         A default prompt template is set for each model configured for the Text Generation AI Service. Individual requests can override the
+         default template by including the <code>promptTemplate</code> parameter.
+         </p>
+         <h3>Prompt Template Parameters</h3>
+         <p>
+         The following request parameters are automatically injected into the prompt template if the associated placeholder is present:
+         <ul>
+          <li>input</li>
+          <li>system</li>
+         </ul>
+         </p>
+         <p>
+         Models with built-in support for system prompts and chat message history do not need to include <em>system</em> or
+         <em>chatContext</em> in the prompt template.
+         </p>
+         <p>
+         Additional parameters can be provided in the <code>parameters</code> map as key-value pairs.
+         </p>
+         <h3>Prompt Template Examples</h3>
+         <ul>
+             <li>"${input}"</li>
+             <li>"${system}\n${input}"</li>
+         </ul>
+      properties:
+        input: {type: string, description: The input text.}
+        sessionId: {type: string, format: uuid, description: 'The AI session ID. If
+            provided, this request will be associated with the specified AI Session.'}
+        promptTemplate:
+          $ref: '#/components/schemas/ParameterizedPromptTemplate'
+          description: |-
+            The prompt template to use for the Text Generation task. The default prompt template will be used if not
+                                       provided.
+        parameters:
+          type: object
+          additionalProperties: {type: string}
+          description: Custom parameters to inject into the prompt template if an
+            associated placeholder is present.
+        model:
+          type: string
+          description: |-
+            The ID of the model to use for Text Generation. The specified model must be configured for the Text Generation
+                                       AI Service by an Admin.
+        modelConfiguration:
+          type: object
+          additionalProperties: {}
+          description: Additional model-specific configuration parameter key-value
+            pairs. e.g. temperature, max_tokens, etc.
+        system:
+          type: string
+          description: |-
+            The system message to use for the Text Generation task. If not provided, the default system message will be
+                                       used. If the model does not include built-in support for system prompts, this parameter may be included in the
+                                       prompt template using the "${system}" placeholder.
+        temperature: {type: number, format: double, description: Controls randomness
+            in the model's output. Lower values make output more deterministic.}
+        maxTokens: {type: integer, format: int32, description: The maximum number
+            of tokens to generate in the response.}
+        responseFormat:
+          description: Model response format specification for structured outputs.
+          oneOf:
+          - {$ref: '#/components/schemas/JsonResponseFormat'}
+        reasoningConfig: {$ref: '#/components/schemas/ReasoningConfig', description: Configuration
+            for reasoning behavior and effort level.}
+      required: [input]
+    TextToBeastModeRequest:
+      type: object
+      description: |-
+        <p>
+         Text-to-Beast-Mode AI Service Request.
+         </p>
+
+         <h2>Prompt Templates</h2>
+         <p>
+         A prompt template is a string that contains placeholders for parameters that will be replaced with parameter values before the prompt
+         is submitted to the model.
+         </p>
+         <p>
+         A default prompt template is set for each model configured for the Text-to-Beast-Mode AI Service. Individual requests can override the
+         default template by including the <code>promptTemplate</code> parameter.
+         </p>
+         <h3>Prompt Template Parameters</h3>
+         <p>
+         The following request parameters are automatically injected into the prompt template if the associated placeholder is present:
+         <ul>
+          <li>input</li>
+          <li>system</li>
+          <li>dataSourceSchema</li>
+         </ul>
+         </p>
+         <p>
+         Models with built-in support for system prompts and chat message history do not need to include <em>system</em> or
+         <em>chatContext</em> in the prompt template.
+         </p>
+         <p>
+         Additional parameters can be provided in the <code>parameters</code> map as key-value pairs.
+         </p>
+         <h3>Prompt Template Examples</h3>
+         <ul>
+             <li>"${input}"</li>
+             <li>"${system}\n${input}"</li>
+         </ul>
+      properties:
+        input: {type: string, description: The input text.}
+        sessionId: {type: string, format: uuid, description: 'The AI session ID. If
+            provided, this request will be associated with the specified AI Session.'}
+        dataSourceSchema:
+          $ref: '#/components/schemas/AIDataSourceSchema'
+          description: |-
+            The data source schema and metadata to be included in the Text-to-Beast-Mode task prompt to generate a SQL
+                 Calculation.
+        promptTemplate:
+          $ref: '#/components/schemas/ParameterizedPromptTemplate'
+          description: |-
+            The prompt template to use for the Text-to-Beast-Mode task. The default prompt template will be used if not
+                 provided.
+        parameters:
+          type: object
+          additionalProperties: {type: string}
+          description: Custom parameters to inject into the prompt template if an
+            associated placeholder is present.
+        model:
+          type: string
+          description: |-
+            The ID of the model to use for Text-to-Beast-Mode. The specified model must be configured for the
+                 Text-to-Beast-Mode
+                 AI Service by an Admin.
+        modelConfiguration:
+          type: object
+          additionalProperties: {}
+          description: Additional model-specific configuration parameter key-value
+            pairs. e.g. temperature, max_tokens, etc.
+        system:
+          type: string
+          description: |-
+            The system message to use for the Text-to-SQL task. If not provided, the default system will be used. If
+                 the model does not include built-in support for system prompts, this parameter may be included in the prompt
+                 template using the "${system}" placeholder.
+        temperature: {type: number, format: double, description: Controls randomness
+            in the model's output. Lower values make output more deterministic.}
+        maxTokens: {type: integer, format: int32, description: The maximum number
+            of tokens to generate in the response.}
+        disableValidation: {type: boolean, description: Whether to disable validation
+            of the generated Beast Mode calculation.}
+        reasoningConfig: {$ref: '#/components/schemas/ReasoningConfig', description: Configuration
+            for reasoning behavior and effort level.}
+      required: [input]
+    Document:
+      type: object
+      description: Document data and metadata.
+      properties:
+        data: {type: string, description: the base64-encoded document data}
+        type: {type: string, description: the document type e.g. "base64"}
+        mediaType: {type: string, description: the media type of the document e.g.
+            "application/pdf"}
+        name: {type: string, description: the name of the document}
+    DocumentMessageContent:
+      allOf:
+      - {$ref: '#/components/schemas/MessageContent'}
+      - type: object
+        properties:
+          document: {$ref: '#/components/schemas/Document', description: the document
+              data and metadata}
+      description: Document-based message content.
+    Image:
+      type: object
+      description: Image data and metadata.
+      properties:
+        data: {type: string, description: the base64 encoded image data}
+        type: {type: string, description: the image type e.g. "base64"}
+        mediaType: {type: string, description: the media type of the image e.g. "image/png"}
+    ImageMessageContent:
+      allOf:
+      - {$ref: '#/components/schemas/MessageContent'}
+      - type: object
+        properties:
+          image: {$ref: '#/components/schemas/Image', description: the image data
+              and metadata}
+      description: Image-based message content.
+    MessageContent:
+      description: Base interface for multi-modal message content
+      discriminator: {propertyName: type}
+      properties:
+        type: {type: string}
+      required: [type]
+    ReasoningMessageContent:
+      allOf:
+      - {$ref: '#/components/schemas/MessageContent'}
+      - type: object
+        properties:
+          text: {type: string, description: the reasoning/thinking text generated
+              by the model}
+          signature: {type: string, description: optional signature for the reasoning
+              content}
+      description: |-
+        Reasoning (thinking) message content.
+         Contains the model's internal reasoning process when extended thinking is enabled.
+    SentimentAnalysisRequest:
+      type: object
+      description: |-
+        Request for sentiment analysis using the Messages API.
+
+         <p>Supports two modes:</p>
+         <ul>
+           <li><b>Simple sentiment</b>: When topics is null/empty, analyzes overall sentiment</li>
+           <li><b>Targeted sentiment</b>: When topics provided, analyzes sentiment for each topic</li>
+         </ul>
+
+         <p>Validation happens primarily in AIValidator, not in this constructor.</p>
+      properties:
+        input:
+          type: array
+          description: The input message content to analyze (text, images, documents,
+            etc.)
+          items:
+            oneOf:
+            - {$ref: '#/components/schemas/TextMessageContent'}
+            - {$ref: '#/components/schemas/ImageMessageContent'}
+            - {$ref: '#/components/schemas/DocumentMessageContent'}
+        topics:
+          type: array
+          description: Optional list of topics for targeted sentiment analysis. When
+            provided, sentiment is analyzed for each topic individually. When omitted
+            or empty, overall sentiment of the content is analyzed. Topic names must
+            start with a letter and contain only letters, numbers, and underscores
+            (e.g., 'customer_service', 'productQuality').
+          items: {$ref: '#/components/schemas/SentimentTopic'}
+          maxLength: 50
+        instructions: {type: string, description: Optional instructions for sentiment
+            analysis behavior}
+        model: {type: string, description: 'The ID of the model to use (optional,
+            uses default if not specified)'}
+        modelConfiguration:
+          type: object
+          additionalProperties: {}
+          description: Additional model parameters (temperature, max_tokens, etc.)
+        sessionId: {type: string, format: uuid, description: AI session ID for associating
+            with existing session}
+        reasoningConfig: {$ref: '#/components/schemas/ReasoningConfig', description: Configuration
+            for reasoning behavior}
+        targetedSentiment: {type: boolean, description: Returns true if this is a
+            targeted sentiment request (has topics).}
+        simpleSentiment: {type: boolean, description: Returns true if this is a simple
+            sentiment request (no topics).}
+      required: [input]
+    SentimentTopic:
+      type: object
+      properties:
+        topic: {type: string, description: 'The topic name to analyze sentiment for.
+            Must start with a letter and contain only letters, numbers, and underscores.',
+          maxLength: 100, minLength: 1, pattern: '^[a-zA-Z][a-zA-Z0-9_]*$'}
+        description: {type: string, description: Optional description providing context
+            about the topic to help the model identify it in the content, maxLength: 500}
+      required: [topic]
+    TextMessageContent:
+      allOf:
+      - {$ref: '#/components/schemas/MessageContent'}
+      - type: object
+        properties:
+          text: {type: string, description: the text content of the message}
+      description: Text-based message content.
+    ToolUseRequestMessageContent:
+      allOf:
+      - {$ref: '#/components/schemas/MessageContent'}
+      - type: object
+        properties:
+          toolInput:
+            type: object
+            additionalProperties: {}
+            description: the input parameters for the tool
+          name: {type: string, description: the name of the tool to execute}
+          toolCallId: {type: string, description: unique identifier for this tool
+              call}
+      description: Tool use request message content.
+      required: [name, toolCallId, toolInput]
+    ToolUseResultMessageContent:
+      allOf:
+      - {$ref: '#/components/schemas/MessageContent'}
+      - type: object
+        properties:
+          toolCallId: {type: string, description: unique identifier for the tool call
+              this result corresponds to}
+          content:
+            type: array
+            description: the result content from the tool execution
+            items:
+              description: The result content from the tool execution
+              oneOf:
+              - {$ref: '#/components/schemas/TextMessageContent'}
+      - type: object
+        properties:
+          toolCallId: {type: string, description: unique identifier for the tool call
+              this result corresponds to}
+          content:
+            type: array
+            description: the result content from the tool execution
+            items:
+              description: The result content from the tool execution
+              oneOf:
+              - {$ref: '#/components/schemas/DocumentMessageContent'}
+              - {$ref: '#/components/schemas/ImageMessageContent'}
+              - {$ref: '#/components/schemas/ReasoningMessageContent'}
+              - {$ref: '#/components/schemas/TextMessageContent'}
+              - {$ref: '#/components/schemas/ToolUseRequestMessageContent'}
+              - {$ref: '#/components/schemas/ToolUseResultMessageContent'}
+              - {$ref: '#/components/schemas/TextMessageContent'}
+      description: Tool use result message content.
+      required: [toolCallId]
+    TargetedSentimentResponse:
+      type: object
+      description: Response for targeted sentiment analysis containing sentiment per
+        topic.
+      properties:
+        topicSentiments:
+          type: object
+          additionalProperties:
+            type: string
+            enum: [positive, negative, neutral, not_applicable]
+          description: Map of topic to sentiment (includes NOT_APPLICABLE for unmentioned
+            topics)
+        model: {type: string, description: The ID of the model used}
+        isCustomerModel: {type: boolean, description: Whether the model is a customer
+            model}
+        sessionId: {type: string, format: uuid, description: The AI session ID}
+        requestId: {type: string, format: uuid, description: The request ID}
+        modelProviderUsage: {$ref: '#/components/schemas/ModelProviderUsage', description: Token
+            usage information}
+    SimpleSentimentResponse:
+      type: object
+      description: Response for simple sentiment analysis containing overall sentiment.
+      properties:
+        sentiment:
+          type: string
+          description: The overall sentiment (POSITIVE, NEGATIVE, NEUTRAL, or NOT_APPLICABLE)
+          enum: [positive, negative, neutral, not_applicable]
+        model: {type: string, description: The ID of the model used}
+        isCustomerModel: {type: boolean, description: Whether the model is a customer
+            model}
+        sessionId: {type: string, format: uuid, description: The AI session ID}
+        requestId: {type: string, format: uuid, description: The request ID}
+        modelProviderUsage: {$ref: '#/components/schemas/ModelProviderUsage', description: Token
+            usage information}
+    FunctionBlueprint:
+      type: object
+      properties:
+        name: {type: string}
+        description: {type: string}
+        parameters: {$ref: '#/components/schemas/ObjectFunctionParameter'}
+    Message:
+      type: object
+      description: An individual message in a Messages API request or response.
+      properties:
+        content:
+          type: array
+          description: the list of content items that make up this message
+          items:
+            oneOf:
+            - {$ref: '#/components/schemas/DocumentMessageContent'}
+            - {$ref: '#/components/schemas/ImageMessageContent'}
+            - {$ref: '#/components/schemas/ReasoningMessageContent'}
+            - {$ref: '#/components/schemas/TextMessageContent'}
+            - {$ref: '#/components/schemas/ToolUseRequestMessageContent'}
+            - {$ref: '#/components/schemas/ToolUseResultMessageContent'}
+        role:
+          type: string
+          description: the role of the message sender
+          enum: [USER, ASSISTANT]
+      required: [content]
+    ToolCallRequest:
+      type: object
+      description: Request for making tool calls using AI.
+      properties:
+        input:
+          type: array
+          description: The list of input messages to be processed by the AI.
+          items: {$ref: '#/components/schemas/Message'}
+        sessionId: {type: string, format: uuid, description: The unique identifier
+            for the AI session associated with this request.}
+        system:
+          type: array
+          description: System-level messages or configurations to guide the AI's response.
+          items: {$ref: '#/components/schemas/TextMessageContent'}
+        model: {type: string, description: The identifier of the AI model to be used
+            for generating a response.}
+        modelConfiguration:
+          type: object
+          additionalProperties: {}
+          description: Specific parameters or settings that configure the AI model
+            behavior.
+        temperature: {type: number, format: double, description: A parameter for controlling
+            the randomness of the model's output.}
+        maxTokens: {type: integer, format: int32, description: The maximum number
+            of tokens to generate in the response.}
+        tools:
+          type: array
+          description: The list of tools the model can call.
+          items: {$ref: '#/components/schemas/FunctionBlueprint'}
+        toolChoice: {$ref: '#/components/schemas/ToolChoice', description: How the
+            model should use the provided tools.}
+        validateSchema: {type: boolean, description: A flag to determine whether to
+            validate the AI response against the provided schema.}
+        reasoningConfig: {$ref: '#/components/schemas/ReasoningConfig', description: Configuration
+            for reasoning behavior and effort level.}
+    ToolChoice:
+      type: object
+      properties:
+        type:
+          type: string
+          enum: [AUTO, ANY, TOOL, UNKNOWN]
+        name: {type: string}
+        allowParallelToolCalls: {type: boolean}
+    MessagesAIResponse:
+      type: object
+      description: Response from a Messages API.
+      properties:
+        content:
+          type: array
+          description: The list of content generated by the model.
+          items:
+            oneOf:
+            - {$ref: '#/components/schemas/TextMessageContent'}
+            - {$ref: '#/components/schemas/ImageMessageContent'}
+            - {$ref: '#/components/schemas/DocumentMessageContent'}
+            - {$ref: '#/components/schemas/ToolUseRequestMessageContent'}
+            - {$ref: '#/components/schemas/ReasoningMessageContent'}
+        modelId: {type: string, description: The id of the model used to generate
+            the response.}
+        sessionId: {type: string, format: uuid, description: The id of the AI Session
+            associated with this request.}
+        stopReason:
+          type: string
+          description: The reason that the model stopped.
+          enum: [TOOL_USE, MAX_TOKENS, STOP_SEQUENCE, END_TURN, CONTENT_FILTERED,
+            SAFETY, UNKNOWN]
+        modelProviderUsage: {$ref: '#/components/schemas/ModelProviderUsage', description: The
+            token usage from the model provider.}
+    ChatMessagesAIRequest:
+      type: object
+      description: Request for interacting with the chat message AI service.
+      properties:
+        input:
+          type: array
+          description: The list of input messages to be processed by the AI.
+          items: {$ref: '#/components/schemas/Message'}
+        sessionId: {type: string, format: uuid, description: The unique identifier
+            for the AI session associated with this request.}
+        system:
+          type: array
+          description: System-level messages or configurations to guide the AI's response.
+          items: {$ref: '#/components/schemas/TextMessageContent'}
+        model: {type: string, description: The identifier of the AI model to be used
+            for generating a response.}
+        modelConfiguration:
+          type: object
+          additionalProperties: {}
+          description: Specific parameters or settings that configure the AI model
+            behavior.
+        temperature: {type: number, format: double, description: A parameter for controlling
+            the randomness of the model's output.}
+        maxTokens: {type: integer, format: int32, description: The maximum number
+            of tokens to generate in the response.}
+        responseFormat:
+          description: Model response format specification for structured outputs.
+          oneOf:
+          - {$ref: '#/components/schemas/JsonResponseFormat'}
+        reasoningConfig: {$ref: '#/components/schemas/ReasoningConfig', description: Configuration
+            for reasoning behavior and effort level.}
+    ImageToTextRequest:
+      type: object
+      description: |-
+        <p>
+         Image to Text AI Service Request.
+         </p>
+
+         <h2>Prompt Templates</h2>
+         <p>
+         A prompt template is a string that contains placeholders for parameters that will be replaced with parameter values before the prompt
+         is submitted to the model.
+         </p>
+         <p>
+         A default prompt template is set for each model configured for the Image to Text AI Service. Individual requests can override the
+         default template by including the <code>promptTemplate</code> parameter.
+         </p>
+         <h3>Prompt Template Parameters</h3>
+         <p>
+         The following request parameters are automatically injected into the prompt template if the associated placeholder is present:
+         <ul>
+          <li>input</li>
+          <li>system</li>
+         </ul>
+         </p>
+         <p>
+         Models with built-in support for system prompts and chat message history do not need to include <em>system</em> or
+         <em>chatContext</em> in the prompt template.
+         </p>
+         <p>
+         Additional parameters can be provided in the <code>parameters</code> map as key-value pairs.
+         </p>
+         <h3>Prompt Template Examples</h3>
+         <ul>
+             <li>"${input}"</li>
+             <li>"${system}\n${input}"</li>
+         </ul>
+      properties:
+        input: {type: string, description: The input text prompt for analyzing the
+            image.}
+        image: {$ref: '#/components/schemas/Image', description: The image to analyze
+            and extract text from.}
+        sessionId: {type: string, format: uuid, description: 'The AI session ID. If
+            provided, this request will be associated with the specified AI Session.'}
+        model:
+          type: string
+          description: |-
+            The ID of the model to use for Image to Text processing. The specified model must be configured for the Image to Text
+                                       AI Service by an Admin.
+        system:
+          type: string
+          description: |-
+            The system message to use for the Image to Text task. If not provided, the default system message will be
+                                       used. If the model does not include built-in support for system prompts, this parameter may be included in the
+                                       prompt template using the "${system}" placeholder.
+        modelConfiguration:
+          type: object
+          additionalProperties: {}
+          description: Additional model-specific configuration parameter key-value
+            pairs. e.g. temperature, max_tokens, etc.
+        promptTemplate:
+          $ref: '#/components/schemas/ParameterizedPromptTemplate'
+          description: |-
+            The prompt template to use for the Image to Text task. The default prompt template will be used if not
+                                       provided.
+        parameters:
+          type: object
+          additionalProperties: {type: string}
+          description: Custom parameters to inject into the prompt template if an
+            associated placeholder is present.
+        maxTokens: {type: integer, format: int32, description: The maximum number
+            of tokens to generate in the response.}
+        temperature: {type: number, format: double, description: Controls randomness
+            in the model's output. Lower values make output more deterministic.}
+        responseFormat:
+          description: Model response format specification for structured outputs.
+          oneOf:
+          - {$ref: '#/components/schemas/JsonResponseFormat'}
+        reasoningConfig: {$ref: '#/components/schemas/ReasoningConfig', description: Configuration
+            for reasoning behavior and effort level.}
+      required: [input]
+    ExtractDataRequest:
+      type: object
+      description: |-
+        Request for extracting structured data from unstructured text using the Messages API.
+
+         <p>The ExtractData service uses LLM structured outputs to extract data
+         conforming to a provided JSON schema from message content input.</p>
+      properties:
+        input:
+          type: array
+          description: The input message content to extract data from (text, images,
+            documents, etc.)
+          items:
+            oneOf:
+            - {$ref: '#/components/schemas/TextMessageContent'}
+            - {$ref: '#/components/schemas/ImageMessageContent'}
+            - {$ref: '#/components/schemas/DocumentMessageContent'}
+        outputStructure:
+          type: object
+          additionalProperties:
+            oneOf:
+            - {$ref: '#/components/schemas/ArrayFunctionParameter'}
+            - {$ref: '#/components/schemas/BooleanFunctionParameter'}
+            - {$ref: '#/components/schemas/IntegerFunctionParameter'}
+            - {$ref: '#/components/schemas/LogicalOperatorFunctionParameter'}
+            - {$ref: '#/components/schemas/NullFunctionParameter'}
+            - {$ref: '#/components/schemas/NumberFunctionParameter'}
+            - {$ref: '#/components/schemas/ObjectFunctionParameter'}
+            - {$ref: '#/components/schemas/StringFunctionParameter'}
+          description: Map of field names to their FunctionParameter definitions.
+            All fields are treated as required.
+        instructions: {type: string, description: Optional instructions for extraction
+            behavior}
+        model: {type: string, description: 'The ID of the model to use (optional,
+            uses default if not specified)'}
+        modelConfiguration:
+          type: object
+          additionalProperties: {}
+          description: Additional model parameters (temperature, max_tokens, etc.)
+        sessionId: {type: string, format: uuid, description: AI session ID for associating
+            with existing session}
+        reasoningConfig: {$ref: '#/components/schemas/ReasoningConfig', description: Configuration
+            for reasoning behavior}
+      required: [input, outputStructure]
+    ExtractDataResponse:
+      type: object
+      description: |-
+        Response containing extracted structured data.
+
+         <p>The output field contains a Map representation of the extracted data
+         matching the schema provided in the request.</p>
+      properties:
+        output:
+          type: object
+          additionalProperties: {}
+          description: The extracted structured data as a Map
+        model: {type: string, description: The model ID used for extraction}
+        requestId: {type: string, format: uuid, description: The request identifier}
+        isCustomerModel: {type: boolean, description: Whether a customer-provided
+            model was used}
+        modelProviderUsage: {$ref: '#/components/schemas/ModelProviderUsage'}
+      required: [output]
+    TextEmbeddingAIRequest:
+      type: object
+      description: |-
+        <p>
+         Text Embedding AI Service Request.
+         </p>
+      properties:
+        input:
+          type: array
+          description: The input text to embed.
+          items: {type: string}
+        model:
+          type: string
+          description: |-
+            The ID of the model to use for Text Embedding. The specified model must be configured for the Text Embedding AI Service by
+                          an Admin.
+        dimensions: {type: integer, format: int32}
+        modelConfiguration:
+          type: object
+          additionalProperties: {}
+          description: Additional model-specific configuration parameter key-value
+            pairs.
+        requestId: {type: string, format: uuid}
+    EmbeddingAIResponse:
+      type: object
+      properties:
+        embeddings:
+          type: array
+          items:
+            type: array
+            items: {type: number, format: double}
+        modelId: {type: string}
+        modelProviderUsage: {$ref: '#/components/schemas/ModelProviderUsage'}
+    ImageEmbeddingAIRequest:
+      type: object
+      description: |-
+        <p>
+         Text Embedding AI Service Request.
+         </p>
+      properties:
+        input:
+          type: array
+          description: The input images to embed.
+          items: {$ref: '#/components/schemas/Image'}
+        model:
+          type: string
+          description: |-
+            The ID of the model to use for Image Embedding. The specified model must be configured for the Image Embedding AI Service by
+                          an Admin.
+        dimensions: {type: integer, format: int32}
+        modelConfiguration:
+          type: object
+          additionalProperties: {}
+          description: Additional model-specific configuration parameter key-value
+            pairs.
+        requestId: {type: string, format: uuid}
+    ClassificationLabel:
+      type: object
+      description: Represents a classification label with an optional description
+        to guide the LLM.
+      properties:
+        label: {type: string, description: 'The classification label value (required,
+            1-100 characters).', minLength: 1}
+        description: {type: string, description: Optional description to help the
+            LLM understand when to use this label (max 500 characters).}
+      required: [label]
+    ClassificationRequest:
+      type: object
+      description: |-
+        Request for classifying content into predefined categories using the Messages API.
+
+         <p>The Classification service uses LLM structured outputs to reliably classify content
+         into one or more predefined categories. The service dynamically generates JSON
+         schemas based on the provided labels to ensure type-safe responses.</p>
+      properties:
+        input:
+          type: array
+          description: The input message content to classify (text, images, documents,
+            etc.)
+          items:
+            oneOf:
+            - {$ref: '#/components/schemas/TextMessageContent'}
+            - {$ref: '#/components/schemas/ImageMessageContent'}
+            - {$ref: '#/components/schemas/DocumentMessageContent'}
+        labels:
+          type: array
+          description: The list of possible classification labels with optional descriptions
+            (2-50 labels required)
+          items: {$ref: '#/components/schemas/ClassificationLabel'}
+        classificationType:
+          type: string
+          description: 'The type of classification: SINGLE_LABEL or MULTI_LABEL'
+          enum: [SINGLE_LABEL, MULTI_LABEL]
+        instructions: {type: string, description: Optional instructions for classification
+            behavior}
+        model: {type: string, description: 'The ID of the model to use (optional,
+            uses default if not specified)'}
+        modelConfiguration:
+          type: object
+          additionalProperties: {}
+          description: Additional model parameters (temperature, max_tokens, etc.)
+        sessionId: {type: string, format: uuid, description: AI session ID for associating
+            with existing session}
+        reasoningConfig: {$ref: '#/components/schemas/ReasoningConfig', description: Configuration
+            for reasoning behavior}
+      required: [classificationType, input, labels]
+    ClassificationResponse:
+      type: object
+      description: |-
+        Response for text classification.
+         Supports both single-label and multi-label classifications uniformly.
+         All classification responses return a list of labels via the output() method.
+      properties:
+        output:
+          type: array
+          description: The classification output - a list of selected labels.
+          items: {type: string}
+        classificationType:
+          type: string
+          description: The type of classification (SINGLE_LABEL or MULTI_LABEL).
+          enum: [SINGLE_LABEL, MULTI_LABEL]
+        model: {type: string, description: The ID of the model used for classification.}
+        isCustomerModel: {type: boolean, description: Whether the model is a customer
+            model (vs Domo provided).}
+        sessionId: {type: string, format: uuid, description: The AI session ID associated
+            with this response.}
+        requestId: {type: string, format: uuid, description: The request ID associated
+            with this response.}
+        modelProviderUsage: {$ref: '#/components/schemas/ModelProviderUsage', description: The
+            token usage from the model provider.}
+  securitySchemes:
+    domo-developer-token: {type: apiKey, name: X-DOMO-Developer-Token, in: header}

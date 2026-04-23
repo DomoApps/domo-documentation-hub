@@ -1,0 +1,127 @@
+---
+title: Functions and Types
+description: How Code Engine functions declare inputs and outputs — the type system, lists, nullability, nested objects, account aliasing, and type-failure debugging.
+---
+
+A Code Engine function is an exported function inside a package version. You declare its inputs and outputs explicitly in the Code Engine UI; those declarations are stored in the package manifest alongside your code. Every parameter and the return value must have a named type before Code Engine lets you save the function.
+
+Explicit typing serves three purposes: it makes the function saveable in Code Engine, it lets Workflows map their own variables to function parameters by type, and it lets Custom Apps wire the function through the `packageMapping` alias block in the app manifest. Without complete type declarations, none of those integration points can resolve the function correctly.
+
+## Type system
+
+Code Engine uses the types defined in `TypeEnumV2` and `WorkflowDataType` (see DomoWeb `codeEngine/models/enums.ts`). The following types are available when declaring inputs and outputs in the UI.
+
+| Type | Description | Example input |
+|---|---|---|
+| `text` | UTF-8 string. | `"hello"` |
+| `number` | Integer. | `42` |
+| `decimal` | Decimal/float. | `3.14` |
+| `boolean` | True/false. | `true` |
+| `date` | ISO date (no time). | `"2026-04-23"` |
+| `dateTime` | ISO date + time. | `"2026-04-23T12:00:00Z"` |
+| `time` | Time of day. | `"14:30:00"` |
+| `duration` | ISO 8601 duration. | `"PT1H30M"` |
+| `object` | Structured object. Define `children` to constrain shape, or leave open. | `{ "foo": 1 }` |
+| `person` | A Domo user. Pass the user's ID as a string. Resolve details via `codeengine.getPersonDetails`. | `"481303514"` |
+| `dataset` | A Domo dataset. Pass the dataset ID as a string. | `"abc-123-def"` |
+| `group` | A Domo group. Pass the group's ID as a string. | `"42"` |
+| `account` | A Domo Account. Feature-gated on `ACCOUNT_ENTITY`. | See Account aliasing below. |
+| `file`, `directory` | FileSet entities. Feature-gated on FileSet. | See FileSet docs. |
+
+The underlying enum also defines `JSON` and `STRING_BUILDER`, but the Code Engine UI excludes both from the type picker. You cannot select them when declaring inputs or outputs, and you should not rely on them being present in tooling that reads the manifest.
+
+## Lists and nullability
+
+Any type can carry two optional modifiers. Setting `isList: true` declares the parameter as an ordered array of that type. Setting `nullable: true` permits `null` as a valid value in addition to the declared type. Both modifiers can be combined — a nullable list of nullable objects is a valid declaration, and Code Engine stores and validates each modifier independently.
+
+## Nested objects
+
+When you declare a parameter as `type: object`, you can populate a `children` array with additional `Variable` definitions to constrain exactly which fields the object must contain and what type each field must be. If you leave `children` empty or `null`, Code Engine accepts any object shape for that parameter.
+
+The following JSON snippet shows what a constrained object declaration looks like in the manifest:
+
+```json
+{
+  "name": "result",
+  "type": "object",
+  "children": [
+    { "name": "name",  "type": "text" },
+    { "name": "count", "type": "number" }
+  ]
+}
+```
+
+Callers must supply both `name` (a string) and `count` (an integer) when passing a value to this parameter. Any extra fields are ignored; missing required children cause a type failure at execution time.
+
+## Account aliasing
+
+When a function needs credentials stored in a Domo Account — for example, an API key for a third-party service — the package version stores an `accountAliasConfiguration` entry in the manifest. That entry maps the real account ID to a short alias string (source: `AccountAliasConfiguration` in DomoWeb `codeEngine/models/interfaces.ts:68`).
+
+Inside the function, call `codeengine.getAccount(alias)` with the alias string to retrieve the credentials at runtime. The alias insulates your code from the underlying account ID, so the same function code works across environments where different accounts are configured.
+
+For the full list of runtime helpers including `getAccount`, see [The `codeengine` Runtime Library](./the-codeengine-library).
+
+## Writing a function
+
+The example below shows the same logic in both runtimes. The function accepts a `person` ID, a list of text tags, and a boolean flag, and it returns an object with two typed children.
+
+<CodeGroup>
+
+```javascript JavaScript
+// Input declarations (configured in the Code Engine UI):
+//   userId:  person
+//   tags:    list<text>
+//   active:  boolean
+// Output: object { name: text, tagCount: number }
+
+const codeengine = require('codeengine');
+
+async function summarize(userId, tags, active) {
+  const person = await codeengine.getPersonDetails(userId);
+  return {
+    name: person.displayName,
+    tagCount: active ? tags.length : 0,
+  };
+}
+```
+
+```python Python
+# Input declarations (same as JavaScript):
+#   userId:  person
+#   tags:    list<text>
+#   active:  boolean
+# Output: object { name: text, tagCount: number }
+
+# Note: this example uses a Python-side `codeengine` module that mirrors
+# the JavaScript helpers. At the time of writing, the Python surface for
+# codeengine helpers is UNVERIFIED — see `python-packages.mdx` for what
+# the Python runtime is known to provide.
+
+def summarize(userId, tags, active):
+    # If a Python-side codeengine.get_person_details is unavailable,
+    # skip the person lookup and return `userId` directly.
+    return {
+        'name': userId,
+        'tagCount': len(tags) if active else 0,
+    }
+```
+
+</CodeGroup>
+
+**Python caveat:** The Python runtime is confirmed to execute your function code, but the availability of `codeengine` helper methods — such as a `get_person_details` equivalent — has not been verified against the runtime source at the time of writing. Before relying on Python-side `codeengine` helpers in production, confirm which methods are available in your environment. See `python-packages.mdx` for the known Python runtime surface.
+
+## Debugging type failures
+
+When a function execution completes, Code Engine reports one of three relevant statuses (source: `ExecutionStatus` in DomoWeb `codeEngine/models/enums.ts:41`):
+
+- **`SUCCESS`** — The function returned a value whose type matches the declared output. The result is available for downstream steps.
+- **`FAILED`** — The function threw an error or crashed mid-execution. Check `stderr.log` and `errorInformation.errorMessages` for the exception details.
+- **`RESULT_TYPE_FAILURE`** — The function returned a value, but its type does not match the output declaration. Check `errorInformation.expectedType`, `actualType`, `expectedIsList`, and `actualIsList` to see exactly where the mismatch occurred (source: `FunctionExecution.errorInformation` in DomoWeb `codeEngine/models/interfaces.ts:230`).
+
+<Tip>**Tip:** Always branch on `status`, not on HTTP status. A function-level failure returns HTTP 200 with a non-`SUCCESS` status. Checking only for a non-2xx response will cause your caller to silently treat failed executions as successful.</Tip>
+
+## Related
+
+- [Packages and Versions](./packages-and-versions) — the version-level container for functions.
+- [The `codeengine` Runtime Library](./the-codeengine-library) — `getPersonDetails`, `getAccount`, etc.
+- [Calling Code Engine from a Custom App](../calling/from-a-custom-app) — how aliases match your manifest's `packageMapping` types.

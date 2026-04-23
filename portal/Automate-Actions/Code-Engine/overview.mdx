@@ -3,11 +3,29 @@ title: Overview
 permalink: 1sirxqzlsb4sk-code-engine
 ---
 
-Domo Code Engine is a Domo-native runtime environment that executes JavaScript or Python code. It allows you to write, test, and distribute functions for use in Workflows and other Domo Apps. Code Engine provides a library of general packages for common integrations and services, and you can also create custom functions for automated services in your instance.
+Domo Code Engine is Domo's managed serverless runtime for JavaScript and Python functions. You write functions in the Code Engine UI, version and release them, and call them from Workflows, Custom Apps, Bricks, or external systems.
+
+A Code Engine function is a self-contained unit of server-side code with typed inputs and a typed output. Because Code Engine runs the code inside Domo, functions inherit the caller's Domo session for internal API calls and have controlled access to stored Accounts for external integrations. This makes Code Engine well-suited for automation that needs to act on Domo data, orchestrate external systems, or bridge the two.
 
 ![Picture1.jpg](/images/dev/stoplight.io/images/Picture1.jpg)
 
----
+## Key concepts at a glance
+
+- [**Packages and versions**](./concepts/packages-and-versions) — Code is grouped into packages; each package has a working version and any number of released versions. Only released versions are callable externally.
+- [**Functions and types**](./concepts/functions-and-types) — Functions declare typed inputs and outputs. Types cover primitives plus native Domo entities (`person`, `dataset`, `group`, `account`).
+- [**Permissions and sharing**](./concepts/permissions-and-sharing) — Two-layer model: instance grants + per-package ACLs. Workflows and Custom Apps execute under a virtual user, which must have `EXECUTE` on the package.
+- [**The `codeengine` runtime library**](./concepts/the-codeengine-library) — Built-in module (`require('codeengine')` in JavaScript) for authenticated internal API calls, stored-account access, and external HTTP.
+
+## How to call Code Engine
+
+How you call Code Engine depends on where your code lives.
+
+| You're calling from… | Use this guide |
+|---|---|
+| A Custom App (App Studio card, dashboard tile, Pro-code app) | [From a Custom App](./calling/from-a-custom-app) |
+| A Workflow | [From a Workflow](./calling/from-a-workflow) |
+| A Brick | [From a Brick](./calling/from-a-brick) |
+| Outside Domo (server-to-server, CI) | [From Outside Domo](./calling/from-outside-domo) |
 
 ## Required Grants
 
@@ -16,9 +34,7 @@ To use Code Engine, users need specific grants:
 - **Manage Code Engine Packages**: Perform any action on any Code Engine package (for admins/managers).
 - **Create Code Engine Packages**: Create new Code Engine packages (for developers).
 
-> **Note:** Contact your Domo account team to enable these grants. Users must also have permission to specific packages to interact with them.
-
----
+<Note>**Note:** Contact your Domo account team to enable these grants. Users must also have permission to specific packages to interact with them. See [Permissions and Sharing](./concepts/permissions-and-sharing) for the full model.</Note>
 
 ## Accessing Code Engine
 
@@ -27,9 +43,7 @@ To use Code Engine, users need specific grants:
 
 The Code Engine home page displays a list of all available packages based on your permissions.
 
----
-
-## Home Page & Repository List
+## Home page
 
 The home page features a repository list of all Code Engine packages you can access. Each row represents a package with columns for:
 
@@ -41,6 +55,14 @@ The home page features a repository list of all Code Engine packages you can acc
 
 Click a row to open the package in the code editor.
 
-## Additional Resources
+## Next steps
+
+- [Creating custom packages](./creating-packages) — UI steps for creating a package and versions.
+- [Code Editor](./code-editor-overview) — in-app IDE for writing and testing functions.
+- [JavaScript libraries](./javascript-libraries) / [Python packages](./python-packages) — runtime-library reference.
+- [Common use cases](./common-use-cases) — patterns that show up often.
+- [Limitations and troubleshooting](./limitations-and-troubleshooting) — compute, runtime, and dependency limits.
+
+## Additional resources
 
 - [Domo Support](https://domo-support.domo.com/)

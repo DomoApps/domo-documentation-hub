@@ -1,0 +1,82 @@
+---
+title: Permissions and Sharing
+description: How Code Engine permissions work — instance grants, package ACLs, UI labels vs. API values, and the virtual-user model for Workflow and App callers.
+---
+
+Code Engine enforces permissions at two independent layers. The first layer — **instance-level grants** — controls what a user can do with Code Engine at all: whether they can create packages, manage any package, or have no elevated access. The second layer — **per-package ACLs** — controls what a user can do with a specific package: view it, edit its code, call its functions, or share access with others.
+
+Both layers must grant access for an action to succeed. A user who holds the instance grant for creating packages still cannot execute a function on a package they have not been shared to. Likewise, a user who has been shared with `EXECUTE` on a package cannot create or edit that package unless they also hold the appropriate instance grant. Think of the two layers as a logical AND: pass both or fail the action.
+
+---
+
+## Layer 1: Instance grants
+
+Instance grants are administered through Domo admin settings and apply instance-wide. There are two grants relevant to Code Engine:
+
+- **Manage Code Engine Packages** — The admin grant. A user with this grant can perform any action on any Code Engine package in the instance, regardless of per-package ACLs.
+- **Create Code Engine Packages** — The developer grant. A user with this grant can create new packages. They do not automatically receive elevated access to packages created by others.
+
+<Note>**Note:** Contact your Domo account team to enable these grants for the first time in an instance. Once enabled, your Domo administrator controls which users or groups are assigned each grant.</Note>
+
+---
+
+## Layer 2: Package permissions
+
+Each package has its own access control list (ACL). When you share a package with a user or group, you assign one of the permission levels below. These are stored as API values internally; the Code Engine UI displays the corresponding labels (source: `accessLevelToPermissionsMap` in DomoWeb `codeEngine/models/constants.ts:63`).
+
+| API value | UI label | What it allows |
+|---|---|---|
+| `OWNER` | Owner | Full control — including transferring ownership and deleting the package. |
+| `WRITE` | Can edit | Create/edit versions, rename, add or remove functions. |
+| `READ` | Can share | View code, view versions, forward access to others. (Labeled "Can share" in the UI — effectively read-with-share.) |
+| `EXECUTE` | Can execute | Call released versions via Run Function. No read access to code. |
+| `NONE` | No access | Package is not visible. |
+
+The API uses the values in the first column (`OWNER`, `WRITE`, `READ`, `EXECUTE`, `NONE`) in all request and response bodies. The Code Engine UI displays only the middle-column labels. If you are sharing through the UI and checking access through the API — or vice versa — remember that "Can share" in the UI is `READ` in the API and "Can execute" is `EXECUTE`. This mapping trips up many people who switch between the two surfaces.
+
+---
+
+## Sharing with users and groups
+
+Code Engine exposes two API paths for managing package permissions (full endpoint contract: [Code Engine API — Product APIs Reference](/portal/API-Reference/Product-APIs/Code-Engine)):
+
+- **`POST /api/codeengine/v2/packages/{packageId}/share`** — Incremental share. Grants new permissions to a user or group without touching any existing ACL entries. Use this when you want to add access without accidentally revoking what you have already shared.
+
+  ```json
+  // Share to users
+  { "permissions": ["EXECUTE"], "userIds": [481303514] }
+
+  // Share to a group
+  { "permissions": ["VIEW", "EXECUTE"], "groupIds": [42] }
+  ```
+
+- **`POST /api/codeengine/v2/packages/{packageId}/permissions`** — Replace permissions. Sets the full permission set for the package, overwriting anything previously granted. Use this when you need a clean slate — for example, when rotating ownership or auditing access.
+
+A share request body must include **either** `userIds` or `groupIds`, not both in the same request (source: `shareFunctionPackage` in DomoWeb `codeEngine/api/function.api.ts:171`). If you need to share to both a user and a group, send two separate requests.
+
+---
+
+## The virtual-user model
+
+When Code Engine is invoked from a Workflow or a Custom App, the effective caller is typically a **virtual user** — the Workflow's service account or the app's virtual user — not the human who triggered the action. The permission check at execution time is evaluated against that virtual user's ACL, not the ACL of the person who built or tested the Workflow.
+
+For an invocation to succeed, **the virtual user must have `EXECUTE` on the target package**. Sharing the package only with the human developer is not sufficient for production runs: that access satisfies the UI test (which runs as you) but not the Workflow execution (which runs as the virtual user).
+
+<Warning>**Warning:** If a Workflow succeeds from your user account in testing but fails with a permission error in production, the most likely cause is that the Workflow's virtual user was not shared to the package. Admin access on your account does not propagate to the virtual user.</Warning>
+
+---
+
+## Common pitfalls
+
+- **Admin sees the package and can execute it in the UI, but Workflow runs fail with `403`** — The Workflow's virtual user was not shared to the package. Share `EXECUTE` to the virtual user or to the group it belongs to.
+- **A function tests successfully in the Code Engine UI but fails from a Workflow** — Same root cause as above. The UI test runs as your user account; the Workflow runs as the virtual user. Both execution paths look identical in testing unless you explicitly test as the virtual user.
+- **An external REST call returns `403` with a valid token** — The token is valid, but the user who owns the token lacks `EXECUTE` on the package. Check the user's package ACL, not the token's scope. Token validity and package access are independent checks.
+- **Sharing as "Can share" (UI) and expecting the grantee to be able to edit the package** — "Can share" maps to `READ` in the API, not `WRITE`. If you intend to give someone edit access, use "Can edit" (`WRITE`) instead.
+
+---
+
+## Related
+
+- [Packages and Versions](./packages-and-versions) — the object that ACLs attach to.
+- [Calling Code Engine from a Workflow](../calling/from-a-workflow) — how virtual-user permissions apply at call time.
+- [Code Engine API — Product APIs Reference](/portal/API-Reference/Product-APIs/Code-Engine) — the full share/permissions endpoint contract.

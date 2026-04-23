@@ -1,0 +1,153 @@
+---
+title: The `codeengine` Runtime Library
+description: Reference for the built-in `codeengine` module available inside Code Engine functions — sendRequest, getAccount, axios, getPersonDetails, getExecutionDetails.
+---
+
+Inside a Code Engine JavaScript function, `require('codeengine')` loads a Domo-provided helper module that handles three recurring needs: authenticated internal Domo API calls, secure access to credentials stored in Domo Accounts, and external HTTP requests. The module also exposes helpers for resolving `person`-typed inputs and introspecting prior executions.
+
+The module is only available in the JavaScript runtime. Python packages do not have access to `require('codeengine')`; a Python-side equivalent may exist and is marked UNVERIFIED at the end of this page.
+
+## Choosing the right method
+
+| You want to… | Use |
+|---|---|
+| Call a Domo internal API (e.g. `/api/data/v3/datasources/{id}`) as the current user | [`codeengine.sendRequest`](#sendrequest) |
+| Call an external API using credentials stored in a Domo Account | [`codeengine.getAccount`](#getaccount) + [`codeengine.axios`](#axios) |
+| Call an external API with no Domo-managed credentials | [`codeengine.axios`](#axios) |
+| Resolve a `person`-typed input to a user record | [`codeengine.getPersonDetails`](#getpersondetails) |
+| Introspect a prior Code Engine execution | [`codeengine.getExecutionDetails`](#getexecutiondetails) |
+
+## sendRequest
+
+**Signature:** `codeengine.sendRequest(method, url, body?, headers?, contentType?) → Promise`
+
+| Param | Type | Required | Description |
+|---|---|---|---|
+| `method` | string | yes | HTTP method — `GET`, `POST`, `PUT`, or `DELETE`. |
+| `url` | string | yes | The request URL. Domo-internal paths are relative to the instance (e.g. `api/data/v3/datasources/{id}`). |
+| `body` | object | no | Request body. Omit for `GET`. |
+| `headers` | object | no | Additional request headers. |
+| `contentType` | string | no | `application/json` by default. |
+
+```javascript
+const codeengine = require('codeengine');
+
+function getDataSetMetadata(dataSetId) {
+  const url = `api/data/v3/datasources/${dataSetId}?part=core,permission,status,pdp,rowcolcount,certification,functions`;
+  return codeengine.sendRequest('get', url).catch(console.error);
+}
+```
+
+`sendRequest` inherits the function caller's authentication — Workflow virtual user, Custom App virtual user, or developer-token owner, depending on how the function was invoked.
+
+## getAccount
+
+**Signature:** `codeengine.getAccount(accountIdOrAlias) → Promise<Account>`
+
+| Param | Type | Required | Description |
+|---|---|---|---|
+| `accountIdOrAlias` | string | yes | Either the numeric account ID or the alias defined in the package's `accountAliasConfiguration`. |
+
+Returns an `Account` object whose `properties` field contains the credential key/value pairs (keys are data-provider-specific — see your Account's Data Connector documentation).
+
+```javascript
+const codeengine = require('codeengine');
+
+async function sendTwilioSms(to, from, body) {
+  const account = await codeengine.getAccount('Twilio');
+  const { accountSID, authToken } = account.properties;
+  // ...use accountSID and authToken to call Twilio...
+}
+```
+
+<Warning>**Warning:** Never log account properties or include them in a function's return value. They contain secrets that will be visible to anyone who can read the execution's `stdout.log` or `result`.</Warning>
+
+## axios
+
+**Signature:** `codeengine.axios(url, options?) → Promise<Response>`. Backed by the [Axios](https://axios-http.com) library.
+
+Use it for external HTTP requests. For full request/response options, refer to the Axios documentation.
+
+```javascript
+const codeengine = require('codeengine');
+
+async function sendTwilioSms(to, from, body) {
+  const account = await codeengine
+    .getAccount('Twilio')
+    .then((a) => a.properties);
+  const url = `https://api.twilio.com/2010-04-01/Accounts/${account.SID}/Messages.json`;
+  const data = new URLSearchParams();
+  data.append('To', to);
+  data.append('From', from);
+  data.append('Body', body);
+  const requestOptions = {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8',
+      Authorization:
+        'Basic ' +
+        Buffer.from(`${account.SID}:${account.TOKEN}`).toString('base64'),
+    },
+    data,
+  };
+  try {
+    const response = await codeengine.axios(url, requestOptions);
+    const jsonResponse = await response.data;
+    if (response.ok) {
+      console.log('SMS sent successfully:', jsonResponse);
+      return jsonResponse;
+    } else {
+      console.error('Error sending SMS:', jsonResponse);
+      throw new Error(jsonResponse.message);
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    throw error;
+  }
+}
+```
+
+## getPersonDetails
+
+**Signature:** `codeengine.getPersonDetails(userId) → Promise<Person>`
+
+Resolves a Domo user ID (the string value passed as a `person`-typed input) to a person record with `id`, `displayName`, `email`, and standard user metadata.
+
+```javascript
+const codeengine = require('codeengine');
+
+async function greetUser(userId) {
+  const person = await codeengine.getPersonDetails(userId);
+  return `Hello, ${person.displayName}`;
+}
+```
+
+## getExecutionDetails
+
+**Signature:** `codeengine.getExecutionDetails(executionId) → Promise<FunctionExecution>`
+
+Fetches the full execution record for a prior Code Engine run by its ID. Useful when a function needs to chain off the result of another function's execution — for example, a monitoring function that inspects `stdout`, `stderr`, `result`, or `errorInformation` from a recent run.
+
+```javascript
+const codeengine = require('codeengine');
+
+async function auditRecentRun(executionId) {
+  const execution = await codeengine.getExecutionDetails(executionId);
+  if (execution.status !== 'SUCCESS') {
+    console.error('Prior run failed:', execution.errorInformation?.errorMessages);
+  }
+  return execution.result;
+}
+```
+
+## Python equivalents
+
+A Python-side `codeengine` module may be available, mirroring some or all of the JavaScript helpers. At the time of writing, the Python surface for `codeengine` helpers is **UNVERIFIED** against runtime source. If your function is in Python and you need to call a Domo internal API, access a stored Domo Account, or make external HTTP requests, consult [Python Packages](../python-packages) for the current known runtime surface, or contact Domo Support if your use case requires a helper that is not documented there.
+
+Do not fabricate Python method names; this page will be updated once the Python surface has been verified against runtime source.
+
+## Related
+
+- [Functions and Types](./functions-and-types) — the type system for function inputs and outputs (including `person` and `account` types that pair with methods here).
+- [Creating Custom Packages](../creating-packages) — the UI-level walkthrough for writing functions that use this library.
+- [Python Packages](../python-packages) — what the Python runtime provides.

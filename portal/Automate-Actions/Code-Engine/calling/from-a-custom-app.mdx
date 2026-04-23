@@ -1,0 +1,170 @@
+---
+title: Calling Code Engine From a Custom App
+description: How to invoke a Code Engine function from inside a Domo Custom App iframe using the ryuu.js / domo.js SDK and manifest packageMapping.
+---
+
+From inside a Custom App iframe, you invoke Code Engine functions using the `ryuu.js` / `domo.js` SDK's `domo.codeEngine(alias, input)` method. The call goes through a session-authenticated bridge, so no developer token is needed — and no token should ever live in client-side code.
+
+## When to use
+
+Use this approach when your code runs inside a Domo Custom App iframe: an App Studio card, a dashboard tile, a Pro-code app, or a Brick that hosts a Custom App. If your code runs on a server outside Domo, use the [external REST path](./from-outside-domo) instead.
+
+## Prerequisites
+
+- An app registered with a `proxyId` for local development. See [Manifest Guide](/portal/Apps/App-Framework/Guides/manifest#getting-a-proxyid-advanced).
+- The `ryuu.js` SDK installed: `npm install ryuu.js` (or the equivalent package name your app uses — verify against your app's existing dependencies).
+- A Code Engine package with at least one released version. Working versions are not wire-able.
+- The package, version, and function you intend to call. You do **not** use these values in the runtime call (the SDK uses an alias instead) — but you need them to wire the app.
+
+## Step 1: Map the function in manifest.json
+
+Add a `packageMapping` block to your `manifest.json`. The alias you define here is what your app code uses at runtime — it decouples your app from the underlying package ID, version, or function name. If the Code Engine package changes, you only update the wiring, not your source code.
+
+The Code Engine UI generates a starter `packageMapping` block for you. Look for **Copy app wiring** on a released version in the Code Engine package editor.
+
+```json
+{
+  "name": "My App",
+  "version": "1.0.0",
+  "packageMapping": [
+    {
+      "alias": "awesomeFunction",
+      "parameters": [
+        {
+          "alias": "number1AppInput",
+          "type": "number",
+          "nullable": false,
+          "isList": false,
+          "children": null
+        },
+        {
+          "alias": "number2AppInput",
+          "type": "number",
+          "nullable": false,
+          "isList": false,
+          "children": null
+        }
+      ],
+      "output": {
+        "alias": "sumAppOutput",
+        "type": "number",
+        "children": null
+      }
+    }
+  ]
+}
+```
+
+Each entry in `packageMapping` has the following properties:
+
+- `alias` (string) — the alias your app code uses to reference this function.
+- `parameters` (array) — the input parameters the function accepts. Each parameter has:
+  - `alias` (string) — the key your app passes in the `input` object.
+  - `type` (string) — the parameter type. Valid values: `boolean`, `date`, `dateTime`, `decimal`, `duration`, `number`, `object`, `person`, `dataset`, `group`, `text`, `time`.
+  - `nullable` (boolean) — whether the parameter accepts `null`.
+  - `isList` (boolean) — whether the parameter is a list.
+  - `children` (package mapping object) — for `object` types, defines nested properties.
+- `output` — describes the return value, with its own `alias`, `type`, and optional `children`.
+
+For the full semantics of each type, see [Functions and Types](../concepts/functions-and-types).
+
+## Step 2: Wire the package in the wiring screen
+
+After deploying your app, open the wiring screen by editing an existing app card or creating a new one. The wiring screen reads the `packageMapping` from your published manifest and presents each alias as a slot to fill.
+
+![Select function from packageMapping](/images/dev/stoplight.io/images/Screenshot-2024-02-13-at-2.30.40-PM.png)
+
+Choose which function alias you want to wire. The options that appear correspond to the entries in your `packageMapping` array.
+
+![Click Select Package](/images/dev/stoplight.io/images/Screenshot-2024-02-13-at-2.31.16-PM.png)
+
+Click **Select Package** to open the package picker modal.
+
+![Choose package and function](/images/dev/stoplight.io/images/Screenshot-2024-02-13-at-2.34.02-PM.png)
+
+Choose your package, select a released version, pick the function, and map each of your alias parameters to the corresponding real function input. When you are done, click **Save and Finish**.
+
+## Step 3: Call the function from your app
+
+Import `domo` from `ryuu.js` and call `domo.codeEngine(alias, input)`. The first argument is the alias string you defined in `packageMapping`; the second is an object whose keys match the `alias` strings in `packageMapping.parameters`.
+
+```javascript
+import domo from 'ryuu.js';
+
+const sum = await domo.codeEngine('awesomeFunction', {
+  number1AppInput: 5,
+  number2AppInput: 10,
+});
+
+console.log(sum); // 15
+```
+
+In TypeScript, pass the expected return type as a generic to get type-safe output:
+
+```typescript
+const sum = await domo.codeEngine<number>('awesomeFunction', {
+  number1AppInput: 5,
+  number2AppInput: 10,
+});
+```
+
+## Full example
+
+The following minimal React component wires everything together. One button triggers the call; the result is stored in local state and rendered below the button.
+
+```jsx
+import { useState } from 'react';
+import domo from 'ryuu.js';
+
+export function Adder() {
+  const [result, setResult] = useState<number | null>(null);
+
+  const handleClick = async () => {
+    const sum = await domo.codeEngine<number>('awesomeFunction', {
+      number1AppInput: 5,
+      number2AppInput: 10,
+    });
+    setResult(sum);
+  };
+
+  return (
+    <>
+      <button onClick={handleClick}>Run</button>
+      {result !== null && <p>Result: {result}</p>}
+    </>
+  );
+}
+```
+
+The matching `packageMapping` block for `manifest.json` is shown in [Step 1](#step-1-map-the-function-in-manifestjson).
+
+## Input and output shape
+
+The keys of the `input` object you pass to `domo.codeEngine(alias, input)` must match the `alias` strings in `packageMapping.parameters`, **not** the real underlying parameter names the Code Engine function declares. The server re-maps your aliases to the actual parameter names on the way in — your app code never needs to know the real names.
+
+The response returns the aliased output. A primitive output (number, string, boolean) comes back as a primitive value. An object output comes back shaped according to your `output.alias` and its `children` definition.
+
+## What the server does
+
+`domo.codeEngine(alias, input)` issues `POST /domo/codeengine/v2/packages/{alias}` through the app's iframe transport. The ryuu-server endpoint (`NebulaResource`) resolves the alias against your app instance's `packageMapping`, re-maps parameter keys from your aliases to the real function parameter names, executes the function as the app's virtual user, and re-aliases the output before returning it to the SDK.
+
+<Note>
+**Note:** A deprecated `POST /domo/codeengine/v2/packages/{alias}/complex` endpoint wraps the aliased output with an `executionId`. Deprecated 2023-06-27; not exposed by the SDK. If you are reading legacy code that uses it, migrate to `domo.codeEngine(alias, input)`.
+</Note>
+
+<Note>
+**Note:** The `/domo/...` endpoints require an authenticated iframe session. They are not reachable from outside Domo. External callers must use the [external REST path](./from-outside-domo).
+</Note>
+
+## Troubleshooting
+
+- **Inputs not reaching the function** — the keys in your `input` object do not match the `alias` strings in `packageMapping.parameters`. Keys are aliases, not parameter names.
+- **Output appears wrapped as `{ aliasName: value }`** — that is the intended aliased response shape. Read the value at your alias key, or change the function to return a primitive if you want a bare value.
+- **Calls return 404 or 401** — the app is not wired to a package in the wiring screen, or you updated `manifest.json` but have not republished the app.
+- **Trying to pass a developer token from the iframe** — don't. Session auth is automatic inside the iframe; any token embedded in client JS is exposed to every viewer of the dashboard.
+
+## Related
+
+- [Functions and Types](../concepts/functions-and-types) — the type system for `packageMapping` parameters.
+- [Calling Code Engine from Outside Domo](./from-outside-domo) — for server-to-server callers.
+- [App Framework Manifest](/portal/Apps/App-Framework/Guides/manifest) — the broader manifest reference.

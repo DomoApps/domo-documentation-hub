@@ -1,0 +1,81 @@
+---
+title: Calling Code Engine From a Workflow
+description: How to run a Code Engine function as a step in a Domo Workflow — action configuration, virtual-user permissions, and version pinning.
+---
+
+Workflows can invoke Code Engine functions as drag-and-drop action steps. This is the declarative path: a Workflow builder picks the package, version, and function, maps Workflow variables to function inputs, and wires the function output to a downstream variable. No calling code is written by hand.
+
+## When to use
+
+Use this approach when you need server-side code as part of a Workflow orchestration: transforming data between steps, calling an external API that Workflows' built-in actions don't cover, or running logic that branches the Workflow's flow. If you need a real-time response inside a UI component, use [calling from a Custom App](./from-a-custom-app) instead.
+
+## Prerequisites
+
+- A Code Engine package with at least one released version. Working versions cannot be selected in a Workflow step.
+- The **virtual user** that executes the Workflow has `EXECUTE` permission on the target package. This is the Workflow's service account or virtual user, **not** the human who built the Workflow. See [Permissions and Sharing](../concepts/permissions-and-sharing#the-virtual-user-model).
+- A Workflow in which you can add a Code Engine action step.
+
+## Step-by-step
+
+1. Open the Workflow in the Workflows editor.
+2. Add a **Code Engine** action step at the point in the flow where you want the function to run.
+3. Pick the **package**, then the **released version**, then the **function**.
+4. Map Workflow variables to each function input. The types must match the function's declared input types (see [Functions and Types](../concepts/functions-and-types)).
+5. Map the function's output to a Workflow variable so later steps can reference it.
+6. Save and publish the Workflow.
+
+## Full example
+
+**Scenario:** An App Studio button triggers a Workflow that refreshes a dataset and then notifies a channel.
+
+1. The button passes a `datasetId` string to the Workflow as a trigger variable.
+2. The Workflow's first step is a Code Engine action calling `refreshDataset(datasetId)` — a function that kicks off the dataset's index refresh and returns a boolean `ok` indicating whether the refresh job enqueued successfully.
+3. A conditional step branches on the `ok` output:
+   - If `true`, a later step calls a notification function that posts "Dataset refreshed" to a channel.
+   - If `false`, a later step calls a notification function that posts "Refresh failed" plus the error context.
+
+**Inputs for `refreshDataset`:**
+
+| Input | Type | Mapped from |
+|---|---|---|
+| `datasetId` | `text` | Workflow trigger variable `datasetId` |
+
+**Outputs for `refreshDataset`:**
+
+| Output | Type | Mapped to |
+|---|---|---|
+| `ok` | `boolean` | Workflow variable `refreshOk` |
+
+## Input and output shape
+
+Inputs are mapped per-parameter in the step configuration. Types must match the function's declared input types exactly; a type mismatch fails at configuration time, not run time.
+
+Each Code Engine function returns exactly one output value. If you need to pass multiple values to later steps, declare an `object` output with `children` for the individual fields (see [Functions and Types](../concepts/functions-and-types#nested-objects)).
+
+## What the server does
+
+When the Workflow reaches a Code Engine step, the Workflow engine sends a request to Code Engine via the internal job-handler path. The function executes as the Workflow's **virtual user**; that virtual user's ACL on the package is the permission check that gates execution. The function runs to completion or is terminated when it hits the 5-minute runtime cap (see [Limitations and Troubleshooting](../limitations-and-troubleshooting)). The output is written back into the Workflow variable store so subsequent steps can read it.
+
+<Note>
+**Note:** **Version pinning.** When you select a version in the step configuration, the Workflow pins that specific version string. Releasing a newer version of the same package does **not** auto-upgrade existing Workflow steps — you have to edit the step and explicitly pick the new version. This prevents surprise breakage but catches teams out the first time.
+</Note>
+
+## Common triggers
+
+- **App Studio button** — user-initiated from a dashboard, passes context from the UI directly into the Workflow as trigger variables.
+- **Schedule** — cron-like, runs the Workflow at a fixed time without any human action.
+- **Webhook** — an external system posts to a Domo-provided URL to start the Workflow, passing a payload as trigger variables.
+- **Brick event** — a Brick publishes an event that fires the Workflow, useful for coordinating logic across multiple Bricks.
+
+## Troubleshooting
+
+- **`403` or permission denied** — The Workflow's virtual user was not shared `EXECUTE` on the package. Sharing to the Workflow's owner is not enough; share to the virtual user or its group.
+- **Workflow step fails but the Code Engine execution shows `SUCCESS`** — A type mismatch between the function's output and the Workflow variable it's mapped to. Open the step configuration and verify the output mapping.
+- **Recently released version not selectable in the step picker** — The version must be released, not just saved. Either release it through the Code Engine UI or via `POST /packages/{id}/versions/{version}/release`.
+- **Long-running function times out** — Code Engine enforces a 5-minute runtime cap. Split the work into smaller functions, or move heavier data processing to Domo's Jupyter workspace (schedule a Jupyter notebook as a dataflow and trigger it from the Workflow).
+
+## Related
+
+- [Permissions and Sharing](../concepts/permissions-and-sharing) — especially the virtual-user model.
+- [Functions and Types](../concepts/functions-and-types) — input/output typing.
+- [Limitations and Troubleshooting](../limitations-and-troubleshooting) — compute and runtime limits.

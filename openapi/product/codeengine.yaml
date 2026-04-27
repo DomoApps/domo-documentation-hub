@@ -3,7 +3,7 @@ info:
   title: Code Engine API (External)
   version: v2
   description: |
-    This API reference is useful if you are wanting to use your Code Engine functions 
+    This API reference is useful if you are wanting to use your Code Engine functions
     *outside* of your Domo instance.
 servers:
   - url: 'https://{instance}.domo.com'
@@ -39,7 +39,7 @@ components:
             getLogs:
               type: boolean
               description: Whether to include execution logs in the response.
-              
+
     #========= RESPONSE SCHEMAS =========
     LogOutput:
       type: object
@@ -48,7 +48,7 @@ components:
           type: array
           items: {}
           description: "An array of log entries (type 'any')."
-          
+
     ErrorInformation:
       type: object
       properties:
@@ -68,7 +68,7 @@ components:
           type: array
           items:
             type: string
-            
+
     RunFunctionResponse:
       type: object
       properties:
@@ -103,13 +103,181 @@ components:
           $ref: '#/components/schemas/LogOutput'
         errorInformation:
           $ref: '#/components/schemas/ErrorInformation'
-          
+
     ErrorResponse:
       type: object
       properties:
         message:
           type: string
           description: A human-readable error message.
+
+    # ========= SHARED SCHEMAS =========
+    Variable:
+      type: object
+      required: [name, type, isList]
+      properties:
+        name: { type: string }
+        displayName: { type: string, nullable: true }
+        type:
+          type: string
+          enum: [text, number, decimal, boolean, date, dateTime, time, duration, object, person, dataset, group, account, file, directory]
+          description: The Code Engine type. See the Functions and Types concept page for semantics.
+        isList: { type: boolean, default: false }
+        nullable: { type: boolean, default: false }
+        children:
+          type: array
+          items: { $ref: '#/components/schemas/Variable' }
+          nullable: true
+          description: For `object` type, the nested property definitions.
+        defaultValues:
+          nullable: true
+          description: Optional default value.
+        entitySubType: { type: string, nullable: true }
+    Function:
+      type: object
+      required: [name]
+      properties:
+        name: { type: string }
+        displayName: { type: string, nullable: true }
+        description: { type: string, nullable: true }
+        isPrivate: { type: boolean, default: false }
+        inputs:
+          type: array
+          items: { $ref: '#/components/schemas/Variable' }
+        output:
+          allOf:
+            - $ref: '#/components/schemas/Variable'
+          nullable: true
+        hasReturn: { type: boolean }
+        example: { type: string, nullable: true }
+    Version:
+      type: object
+      required: [version, packageId]
+      properties:
+        id: { type: string }
+        packageId: { type: string }
+        version:
+          type: string
+          description: Semantic version string. Must match [a-zA-Z0-9\-]+.
+        description: { type: string, nullable: true }
+        code: { type: string, description: Function source code (Python or JavaScript). }
+        functions:
+          type: array
+          items: { $ref: '#/components/schemas/Function' }
+        accountAliasConfiguration:
+          type: array
+          items:
+            type: object
+            properties:
+              accountId: { type: string }
+              alias: { type: string }
+        releasedOn: { type: string, format: date-time, nullable: true }
+        updatedOn: { type: string, format: date-time, nullable: true }
+        createdBy: { type: string, nullable: true }
+    FunctionPackage:
+      type: object
+      required: [id, name, language]
+      properties:
+        id: { type: string }
+        name: { type: string }
+        description: { type: string, nullable: true }
+        language:
+          type: string
+          enum: [JavaScript, Python]
+        environment:
+          type: string
+          enum: [LAMBDA]
+          description: |
+            The runtime environment. Customer-visible packages use `LAMBDA`.
+            Additional internal environments (`ARRAKIS`, `DOMOACTION`, `MODELENDPOINT`, `PYTILE`) exist
+            but are not user-selectable.
+        thumbnail: { type: string, nullable: true }
+        owner: { type: string, nullable: true }
+        availability:
+          type: string
+          enum: [GLOBAL, PRIVATE]
+        versions:
+          type: array
+          items: { $ref: '#/components/schemas/Version' }
+        deployedVersion: { $ref: '#/components/schemas/Version' }
+        workingVersion: { $ref: '#/components/schemas/Version' }
+        createdOn: { type: string, format: date-time, nullable: true }
+        updatedOn: { type: string, format: date-time, nullable: true }
+        releasedOn: { type: string, format: date-time, nullable: true }
+    ExecutionStatus:
+      type: string
+      enum: [SUCCESS, FAILED, RESULT_TYPE_FAILURE, RUNNING, OUTPUT_UNDEFINED, UNDEFINED]
+      description: |
+        - `SUCCESS`: function returned a value matching the declared output type.
+        - `FAILED`: function threw or errored mid-execution.
+        - `RESULT_TYPE_FAILURE`: function returned a value whose type does not match the declared output.
+        - `RUNNING`: execution has not yet completed (valid for polled responses only).
+        - `OUTPUT_UNDEFINED`: function did not return a value.
+        - `UNDEFINED`: execution status could not be determined.
+    FunctionExecution:
+      type: object
+      properties:
+        executionId: { type: string }
+        packageId: { type: string }
+        version: { type: string }
+        functionName: { type: string }
+        status: { $ref: '#/components/schemas/ExecutionStatus' }
+        settings:
+          type: object
+          properties:
+            getLogs: { type: boolean }
+        startedOn: { type: string, format: date-time }
+        startedBy: { type: string }
+        completedOn: { type: string, format: date-time, nullable: true }
+        result:
+          nullable: true
+          description: The function's return value (type varies per function).
+        stdout:
+          $ref: '#/components/schemas/LogOutput'
+        stderr:
+          $ref: '#/components/schemas/LogOutput'
+        errorInformation:
+          $ref: '#/components/schemas/ErrorInformation'
+    ShareRequest:
+      type: object
+      required: [permissions]
+      properties:
+        permissions:
+          type: array
+          items:
+            type: string
+            enum: [OWNER, WRITE, READ, EXECUTE, NONE]
+          minItems: 1
+        userIds:
+          type: array
+          items: { type: integer }
+          description: Mutually exclusive with groupIds.
+        groupIds:
+          type: array
+          items: { type: integer }
+          description: Mutually exclusive with userIds.
+    GroupedEntityPermissions:
+      type: object
+      description: Permissions grouped by entity type (users, groups).
+      properties:
+        users:
+          type: array
+          items:
+            type: object
+            properties:
+              id: { type: integer }
+              permissions:
+                type: array
+                items: { type: string, enum: [OWNER, WRITE, READ, EXECUTE, NONE] }
+        groups:
+          type: array
+          items:
+            type: object
+            properties:
+              id: { type: integer }
+              permissions:
+                type: array
+                items: { type: string, enum: [OWNER, WRITE, READ, EXECUTE, NONE] }
 
 security:
   - developerToken: []
@@ -169,3 +337,208 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+
+  /api/codeengine/v2/packages/{packageId}/executions/{executionId}:
+    get:
+      tags: [Code Engine]
+      summary: Get execution by ID
+      description: |
+        Re-fetch a prior execution by its ID. Useful after async Workflow steps where you
+        captured the executionId but need to poll the final result.
+      operationId: getCodeEngineExecution
+      security:
+        - developerToken: []
+      parameters:
+        - in: path
+          name: packageId
+          required: true
+          schema: { type: string, format: uuid }
+        - in: path
+          name: executionId
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: Execution detail.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/FunctionExecution' }
+        '403': { description: Caller lacks EXECUTE permission on this package. }
+        '404': { description: Execution not found (wrong packageId, wrong executionId, or execution expired). }
+
+  /api/codeengine/v2/packages/{packageId}:
+    get:
+      tags: [Code Engine]
+      summary: Get package
+      description: |
+        Retrieve a package's metadata. Pass `?parts=versions` to include the full version history.
+      operationId: getCodeEnginePackage
+      security:
+        - developerToken: []
+      parameters:
+        - in: path
+          name: packageId
+          required: true
+          schema: { type: string, format: uuid }
+        - in: query
+          name: parts
+          required: false
+          schema: { type: string, enum: [versions] }
+          description: Include additional related data. Currently supports `versions`.
+      responses:
+        '200':
+          description: Package metadata.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/FunctionPackage' }
+        '403': { description: Caller lacks VIEW permission on this package. }
+        '404': { description: Package not found. }
+
+  /api/codeengine/v2/packages/{packageId}/versions/{version}:
+    get:
+      tags: [Code Engine]
+      summary: Get version
+      description: |
+        Retrieve a specific version of a package. Pass `?parts=functions,code,privateFunctions`
+        to include the function list, source code, and private-function definitions.
+      operationId: getCodeEngineVersion
+      security:
+        - developerToken: []
+      parameters:
+        - in: path
+          name: packageId
+          required: true
+          schema: { type: string, format: uuid }
+        - in: path
+          name: version
+          required: true
+          schema: { type: string }
+          description: Semantic version string (e.g. `1.0.1`). Must be a released version.
+        - in: query
+          name: parts
+          required: false
+          schema: { type: string }
+          description: Comma-separated list. Accepts `functions`, `code`, `privateFunctions`.
+      responses:
+        '200':
+          description: Version detail.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Version' }
+        '403': { description: Caller lacks VIEW permission on this package. }
+        '404': { description: Version not found (or not yet released). }
+
+  /api/codeengine/v2/packages/{packageId}/versions/{version}/release:
+    post:
+      tags: [Code Engine]
+      summary: Release a version
+      description: |
+        Promote a working version to a released version. Only released versions are callable
+        by external consumers via Run Function.
+      operationId: releaseCodeEngineVersion
+      security:
+        - developerToken: []
+      parameters:
+        - in: path
+          name: packageId
+          required: true
+          schema: { type: string, format: uuid }
+        - in: path
+          name: version
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: Updated package with the newly released version.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/FunctionPackage' }
+        '403': { description: Caller lacks EDIT permission on this package. }
+        '404': { description: Package or version not found. }
+        '409': { description: Version is already released. }
+
+  /api/codeengine/v2/packages/{packageId}/share:
+    post:
+      tags: [Code Engine]
+      summary: Share package (incremental)
+      description: |
+        Grant one or more permissions to a user or group. To set the full permission set at once,
+        use `POST /packages/{packageId}/permissions` instead.
+      operationId: shareCodeEnginePackage
+      security:
+        - developerToken: []
+      parameters:
+        - in: path
+          name: packageId
+          required: true
+          schema: { type: string, format: uuid }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ShareRequest' }
+            examples:
+              shareWithUser:
+                summary: Grant EXECUTE to a user
+                value:
+                  permissions: [EXECUTE]
+                  userIds: [481303514]
+              shareWithGroup:
+                summary: Grant VIEW + EXECUTE to a group
+                value:
+                  permissions: [VIEW, EXECUTE]
+                  groupIds: [123]
+      responses:
+        '200': { description: Share applied. }
+        '400': { description: Invalid body (e.g. both userIds and groupIds). }
+        '403': { description: Caller lacks OWNER or EDIT permission on this package. }
+        '404': { description: Package not found. }
+
+  /api/codeengine/v2/packages/{packageId}/permissions:
+    get:
+      tags: [Code Engine]
+      summary: Get permissions
+      description: Read the full permission set for a package.
+      operationId: getCodeEnginePermissions
+      security:
+        - developerToken: []
+      parameters:
+        - in: path
+          name: packageId
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          description: Grouped permissions.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/GroupedEntityPermissions' }
+        '403': { description: Caller lacks VIEW permission. }
+        '404': { description: Package not found. }
+    post:
+      tags: [Code Engine]
+      summary: Set permissions
+      description: |
+        Replace the full permission set for a package. To add incrementally without replacing the
+        existing set, use `POST /packages/{packageId}/share`.
+      operationId: setCodeEnginePermissions
+      security:
+        - developerToken: []
+      parameters:
+        - in: path
+          name: packageId
+          required: true
+          schema: { type: string, format: uuid }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/GroupedEntityPermissions' }
+      responses:
+        '200':
+          description: Updated permissions.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/GroupedEntityPermissions' }
+        '403': { description: Caller lacks OWNER permission. }
+        '404': { description: Package not found. }

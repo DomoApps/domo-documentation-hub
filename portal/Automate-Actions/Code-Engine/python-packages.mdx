@@ -3,76 +3,46 @@ title: Python Packages
 permalink: cf888b03e570a-code-engine-python-packages-reference
 ---
 
-Below is a comprehensive list of Python packages available for use in Code Engine. For generic help with Python, consult the [Python Standard Library Documentation](https://docs.python.org/3/library/).
+The Code Engine Python runtime is CPython 3.x. The full Python standard library is available to functions; a curated set of third-party packages is also provided.
 
-| **Package**  | **Description**                                                   |
-| ------------ | ----------------------------------------------------------------- |
-| aifc         | Reads and writes AIFF and AIFF-C audio files.                     |
-| antigravity  | Easter egg module for fun and humor.                              |
-| argparse     | Command-line argument parsing.                                    |
-| array        | Efficient arrays of numeric values.                               |
-| asynchat     | Support for asynchronous command/response protocols.              |
-| asyncio      | Asynchronous I/O framework for concurrency.                       |
-| asyncore     | Base classes for asynchronous socket service clients and servers. |
-| audioop      | Manipulates raw audio data.                                       |
-| base64       | Encoding and decoding of Base64 and other encodings.              |
-| binascii     | Converts binary data to ASCII.                                    |
-| binhex       | Encodes and decodes binhex files.                                 |
-| bisect       | Array bisection algorithms.                                       |
-| boto3        | AWS SDK for Python.                                               |
-| botocore     | Core components of AWS SDK.                                       |
-| builtins     | Access to Python’s built-in objects.                              |
-| bz2          | Supports reading and writing bzip2-compressed files.              |
-| calendar     | Functions for working with calendars.                             |
-| certifi      | Provides Mozilla’s CA bundle for SSL verification.                |
-| cgi          | Tools for creating Common Gateway Interface scripts.              |
-| cgitb        | Provides detailed traceback reports.                              |
-| chunk        | Reads IFF chunks.                                                 |
-| cmath        | Mathematical functions for complex numbers.                       |
-| cmd          | Framework for writing line-oriented command interpreters.         |
-| code         | Tools for implementing read-eval-print loops.                     |
-| codecs       | Codec registry and base classes for encoding and decoding data.   |
-| collections  | Specialized container datatypes.                                  |
-| concurrent   | Manages threads, processes, and tasks.                            |
-| configparser | Parses configuration files.                                       |
-| contextlib   | Utilities for with-statement contexts.                            |
-| copy         | Shallow and deep copy operations.                                 |
-| csv          | Reads and writes CSV files.                                       |
-| ctypes       | Foreign function interface for calling C code.                    |
-| datetime     | Classes for manipulating dates and times.                         |
-| decimal      | Fixed-point and floating-point arithmetic.                        |
-| difflib      | Helpers for computing differences between objects.                |
-| dis          | Disassembles Python bytecode.                                     |
-| distutils    | Tools for distributing Python modules.                            |
-| email        | Library for managing email messages.                              |
-| enum         | Implementation of enumerations.                                   |
-| errno        | Standard error codes.                                             |
-| functools    | High-order functions and callable operations.                     |
-| gzip         | Reads and writes gzip files.                                      |
-| hashlib      | Secure hash and message digest algorithms.                        |
-| heapq        | Implements a heap queue algorithm.                                |
-| http         | HTTP protocol client and server classes.                          |
-| itertools    | Tools for efficient looping.                                      |
-| json         | Parses and serializes JSON data.                                  |
-| logging      | Logs messages for debugging and monitoring.                       |
-| lzma         | Reads and writes LZMA-compressed files.                           |
-| math         | Mathematical functions for real numbers.                          |
-| numpy        | Support for multidimensional arrays and numerical computing.      |
-| os           | Miscellaneous operating system interfaces.                        |
-| pandas       | Data analysis and manipulation library.                           |
-| pathlib      | Object-oriented filesystem paths.                                 |
-| pickle       | Serializes and deserializes Python objects.                       |
-| random       | Generates random numbers and sequences.                           |
-| re           | Regular expression matching and manipulation.                     |
-| requests     | Simplifies HTTP requests for APIs and web interactions.           |
-| socket       | Interfaces for network communication.                             |
-| sqlite3      | Interface for SQLite databases.                                   |
-| statistics   | Statistical functions like mean and variance.                     |
-| subprocess   | Runs and interacts with system processes.                         |
-| threading    | Thread-based parallelism.                                         |
-| time         | Time access and conversions.                                      |
-| urllib       | URL handling modules.                                             |
-| uuid         | Creates universally unique identifiers.                           |
-| xml          | XML parsing and generation tools.                                 |
-| zipfile      | Reads and writes ZIP files.                                       |
-| zlib         | Compression and decompression using the zlib library.             |
+## The `codeengine` module
+
+A Python-side `codeengine` helper module may be available, mirroring some or all of the JavaScript helpers (`sendRequest`, `getAccount`, `axios` / `requests`-equivalent, etc.). At the time of writing, the Python surface for `codeengine` helpers is **unverified against runtime source** — use the standard library and the third-party packages listed below until the Python module surface has been confirmed. See [The `codeengine` Runtime Library](./concepts/the-codeengine-library#python-equivalents) for the current status.
+
+## Python standard library
+
+The full Python 3 standard library is available in Code Engine functions. Refer to the [Python Standard Library Documentation](https://docs.python.org/3/library/) for module-by-module reference.
+
+Common stdlib modules that Code Engine users often reach for:
+
+- `json` — parse and serialize JSON.
+- `datetime` — date and time manipulation.
+- `os`, `sys` — environment and interpreter access.
+- `re` — regular expressions.
+- `hashlib` — secure hashes.
+- `urllib` — URL handling (prefer the third-party `requests` library for HTTP calls).
+- `uuid` — generate unique identifiers.
+- `sqlite3` — SQLite database access.
+
+## Third-party packages
+
+The following third-party packages are pre-installed in the Python runtime. The list is **as of 2026-04-23** — if you need a package not listed here, contact Domo Support.
+
+| Package | Purpose | Upstream docs |
+|---|---|---|
+| `boto3` | AWS SDK for Python. | [boto3.amazonaws.com](https://boto3.amazonaws.com/v1/documentation/api/latest/index.html) |
+| `botocore` | Low-level core for the AWS SDK. | [botocore.amazonaws.com](https://botocore.amazonaws.com/) |
+| `certifi` | Mozilla CA root certificate bundle. | [pypi.org/project/certifi](https://pypi.org/project/certifi/) |
+| `numpy` | Numerical arrays and linear algebra. | [numpy.org](https://numpy.org) |
+| `pandas` | Data analysis and data frames. | [pandas.pydata.org](https://pandas.pydata.org) |
+| `requests` | HTTP client for external APIs. | [requests.readthedocs.io](https://requests.readthedocs.io) |
+
+## Requesting a new package
+
+Adding a package to the runtime is not a user-configurable action. If your function needs a package that is not available, contact Domo Support with your use case.
+
+## Related
+
+- [JavaScript Libraries](./javascript-libraries) — the JavaScript runtime's library surface.
+- [The `codeengine` Runtime Library](./concepts/the-codeengine-library) — the JavaScript helper module reference (Python equivalents noted as UNVERIFIED there).
+- [Creating Custom Packages](./creating-packages) — UI-level walkthrough.

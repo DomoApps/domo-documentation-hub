@@ -3,78 +3,123 @@ title: Code Engine API
 permalink: fbhbpt1mt4gog-code-engine-api
 ---
 
-This API reference is useful if you are wanting to use your Code Engine functions **outside** of your Domo instance.
+The Code Engine API lets external systems invoke Code Engine functions, introspect packages, release versions, and manage permissions using a Domo Product API developer token.
 
 <Note>
-Calling From _Inside_ Domo
+**Inside Domo?** If you're building on Domo (a Custom App, a Workflow, a Brick), you usually do **not** want this API. Use one of the in-Domo calling paths instead — they handle auth for you and don't require a developer token:
 
-To call the Code Engine API from _inside_ your Domo instance, you can use
+- [From a Custom App](/portal/Automate-Actions/Code-Engine/calling/from-a-custom-app) — `ryuu.js` / `domo.codeEngine(alias, input)`
+- [From a Workflow](/portal/Automate-Actions/Code-Engine/calling/from-a-workflow) — Code Engine action step
+- [From a Brick](/portal/Automate-Actions/Code-Engine/calling/from-a-brick)
 
-- [a Pro-code app](/portal/Apps/App-Framework/Guides/hitting-code-engine-from-an-app)
-- [a Workflow](/s/article/000005331?language=en_US#create_workflow_from_template)
-  - You can call that Workflow using [a button in an App Studio app](/s/article/000005295?language=en_US#add_a_button).
+This API is for **server-to-server** callers outside Domo.
 </Note>
 
-Each function in Code Engine is a serverless function that can be run on demand. You can pass in input variables and get back a result. You can also choose to get logs from the function execution.
+## Authentication
 
-If you are unfamiliar, you'll need to familiarize yourself with [how to authenticate against Product APIs](/portal/API-Reference/overview#product-apis).
+All endpoints require an `X-DOMO-Developer-Token` header. See [Product API authentication](/portal/API-Reference/overview#product-apis) for token issuance, scopes, and rotation.
 
-## Run Function
+**Base URL:** `https://{instance}.domo.com`
 
-**Method**: `POST`  
-**Endpoint**: `/api/codeengine/v2/packages/{{packageId}}/versions/{{version}}/functions/{{functionName}}`
+## Quickstart
 
-**Example**:
+The most common operation — run a released function and read its result:
 
-```json
-{
-  "method": "POST",
-  "url": "https://{instance}.domo.com/api/codeengine/v2/packages/756f0b19-5125-44f6-b541-058980ff6a94/versions/1.0.1/functions/getExecutionDetails",
-  "headers": {
-    "X-DOMO-Developer-Token": "",
-    "Content-Type": "application/json"
-  },
-  "body": {
-    "inputVariables": {
-        "paramName": any // these should match your function input parameters
-    },
-    "settings": { "getLogs": boolean }
-  }
-}
+```bash
+curl -X POST \
+  "https://{instance}.domo.com/api/codeengine/v2/packages/{packageId}/versions/{version}/functions/{functionName}" \
+  -H "X-DOMO-Developer-Token: $DOMO_DEV_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"inputVariables": {"paramName": "value"}, "settings": {"getLogs": true}}'
 ```
 
-**Response**:
+For Node.js and Python quickstarts, see [Calling Code Engine from outside Domo](/portal/Automate-Actions/Code-Engine/calling/from-outside-domo).
 
-```json
-  HTTP/1.1 200 OK
-  Content-Type: application/json;charset=UTF-8
-{
-    "executionId": string,
-    "packageId": string,
-    "version": string,
-    "functionName": string,
-    "status": string,
-    "settings": {
-        "getLogs": boolean
-    },
-    "startedOn": Date,
-    "startedBy": string,
-    "completedOn": Date,
-    "result": any,
-    "stdout": {
-        "log": any[]
-    },
-    "stderr": {
-        "log": any[]
-    },
-    "errorInformation": {
-        "result": any,
-        "expectedType": string,
-        "actualType": string,
-        "expectedIsList": boolean,
-        "actualIsList": boolean,
-        "expectedAllowNull": boolean,
-        "errorMessages": string[]
-    }
-}
-```
+## Endpoints
+
+Endpoints are grouped by purpose. Each endpoint has a dedicated reference page rendered from the OpenAPI spec (see the sidebar under this page).
+
+### Execute
+
+- `POST /api/codeengine/v2/packages/{packageId}/versions/{version}/functions/{functionName}` — **Run Function**. Primary endpoint: invoke a released function with input variables.
+- `GET /api/codeengine/v2/packages/{packageId}/executions/{executionId}` — **Get Execution**. Re-fetch a prior execution by ID.
+
+### Introspect (read-only)
+
+- `GET /api/codeengine/v2/packages/{packageId}` — **Get Package**. Retrieve package metadata; pass `?parts=versions` to include version history.
+- `GET /api/codeengine/v2/packages/{packageId}/versions/{version}` — **Get Version**. Retrieve a specific version; pass `?parts=functions,code,privateFunctions` to include function signatures and source code.
+
+### Lifecycle
+
+- `POST /api/codeengine/v2/packages/{packageId}/versions/{version}/release` — **Release Version**. Promote a working version to a released version (required before external callers can Run Function).
+
+### Permissions
+
+- `GET /api/codeengine/v2/packages/{packageId}/permissions` — **Get Permissions**. Read the full permission set.
+- `POST /api/codeengine/v2/packages/{packageId}/permissions` — **Set Permissions**. Replace the full permission set.
+- `POST /api/codeengine/v2/packages/{packageId}/share` — **Share (incremental)**. Grant permissions to one user or group without replacing the full set.
+
+## Execution response shape
+
+Every Run Function and Get Execution response returns a `FunctionExecution` object:
+
+| Field | Type | Notes |
+|---|---|---|
+| `executionId` | string | Unique ID for this execution. Use with Get Execution to re-fetch. |
+| `packageId`, `version`, `functionName` | string | Identify what was executed. |
+| `status` | enum | `SUCCESS` / `FAILED` / `RESULT_TYPE_FAILURE` / `RUNNING` / `OUTPUT_UNDEFINED`. See below. |
+| `settings.getLogs` | boolean | Whether logs were requested. |
+| `startedOn`, `completedOn` | date-time | Timings. |
+| `startedBy` | string | The user identity the function executed as. |
+| `result` | any | The function's return value. Type depends on the function's declared output. |
+| `stdout.log` | array | Captured `console.log` / `print` output (only if `getLogs: true`). |
+| `stderr.log` | array | Captured error output. |
+| `errorInformation` | object | Populated on `FAILED` and `RESULT_TYPE_FAILURE`. Contains `errorMessages`, `expectedType`, `actualType`, `expectedIsList`, `actualIsList`, `expectedAllowNull`. |
+
+### Status values
+
+- `SUCCESS` — function returned a value matching its declared output type.
+- `FAILED` — function threw or errored during execution. Check `errorInformation.errorMessages` and `stderr.log`.
+- `RESULT_TYPE_FAILURE` — function returned a value whose type doesn't match the declaration. Check `errorInformation.expectedType` vs. `actualType`.
+- `RUNNING` — execution not yet complete (only seen via Get Execution while in-flight).
+- `OUTPUT_UNDEFINED` — function returned no value.
+
+<Tip>**Tip:** Always branch on `status`, not on HTTP status. A function-level failure returns HTTP 200 with a non-`SUCCESS` status.</Tip>
+
+## Permission values
+
+Share and permissions endpoints use these values (source: `accessLevelToPermissionsMap` in the Code Engine UI):
+
+| API value | UI label | What it allows |
+|---|---|---|
+| `OWNER` | Owner | Full control. |
+| `WRITE` | Can edit | Create/edit versions, rename, add or remove functions. |
+| `READ` | Can share | View code + versions, share forward. |
+| `EXECUTE` | Can execute | Call released versions only. |
+| `NONE` | No access | Package not visible. |
+
+## Operations not in this reference
+
+These endpoints exist on the Code Engine service but are intentionally not documented as a public contract — they are owned by the Code Engine UI and their payload shapes are not a stable contract for external consumers:
+
+- `POST /api/codeengine/v2/packages` — create package
+- `PUT /api/codeengine/v2/packages/{id}` — update package properties
+- `DELETE /api/codeengine/v2/packages/{id}` — delete package
+- `DELETE /api/codeengine/v2/packages/{id}/versions/{version}` — delete a version
+
+If you need automation around package authoring, [contact Domo Support](https://domo-support.domo.com/).
+
+## Troubleshooting
+
+- **`404` on Run Function** — version not released (only released versions are externally callable), or `functionName` is wrong. Verify both in the Code Engine UI.
+- **`200 OK` with `status: "FAILED"`** — function-level error. Always branch on `status`, not HTTP status.
+- **`200 OK` with `status: "RESULT_TYPE_FAILURE"`** — function returned the wrong type. Check `errorInformation.expectedType` vs. `actualType`.
+- **`403`** — token lacks Code Engine execute scope, or the token's owning user doesn't have `EXECUTE` on the package. See [Permissions and Sharing](/portal/Automate-Actions/Code-Engine/concepts/permissions-and-sharing).
+- **`401`** — token missing, expired, or revoked.
+
+## See also
+
+- [Calling Code Engine from outside Domo](/portal/Automate-Actions/Code-Engine/calling/from-outside-domo) — full onboarding with Node.js and Python snippets.
+- [Packages and Versions](/portal/Automate-Actions/Code-Engine/concepts/packages-and-versions) — the object model.
+- [Functions and Types](/portal/Automate-Actions/Code-Engine/concepts/functions-and-types) — input/output type system.
+- [Permissions and Sharing](/portal/Automate-Actions/Code-Engine/concepts/permissions-and-sharing) — permission model.

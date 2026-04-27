@@ -3,55 +3,53 @@ title: Code Engine API
 permalink: p48phjy7wwtw8-code-engine-api
 ---
 
-Code Engine is a Domo-native runtime environment that can execute JavaScript or Python code. In Code Engine, you can write, test, and distribute functions usable by Workflows and other Apps by Domo.
+The App Framework Code Engine API lets a Custom App invoke a Code Engine function over an alias, using the app's authenticated iframe session. It is the companion API to the `ryuu.js` / `domo.js` SDK's `domo.codeEngine(alias, input)` method.
 
-Domo provides a library of global packages and their related functions for common integrations and services that anyone can use in their Domo instance. You can also create your own functions with custom code to perform automated services in your instance.
+<Note>
+**Building an app?** For the task-oriented walkthrough (manifest `packageMapping`, wiring screen, troubleshooting), see [Calling Code Engine From a Custom App](/portal/Automate-Actions/Code-Engine/calling/from-a-custom-app). This page is the endpoint reference; the calling guide is where most app developers should start.
+</Note>
 
-You can learn more about [setting up Code Engine functions in Domo's Knowledge Base](/s/article/000005173?language=en_US).
+## Authentication
 
-If you haven't leveraged Code Engine functions from within Apps before, checkout [the guide on hitting Code Engine from an App](/portal/Apps/App-Framework/Guides/hitting-code-engine-from-an-app), which details how to configure your `manifest.json` file and wire up Code Engine packages to your app.
+Endpoints under `/domo/codeengine/v2/...` use the Custom App's authenticated iframe session. The SDK (`ryuu.js` / `domo.js`) transparently handles the session token — you do not (and should not) embed a developer token in client-side code.
 
-### Run Code Engine Function
+These endpoints are only reachable from inside a Domo iframe. For server-to-server calls from outside Domo, use the [Product API Code Engine reference](/portal/API-Reference/Product-APIs/Code-Engine) with a developer token instead.
 
----
+**Base URL:** `https://{instance}.domo.com`
 
-Runs a Code Engine function and returns output of that function.
+## Quickstart
 
-**Code Example**
+The SDK handles the call for you:
 
-```js
-const startFunction = (functionAlias, inputParameters = {}) => {
-  domo
-    .post(`/domo/codeengine/v2/packages/${functionAlias}`, inputParameters)
-    .then((data) => {
-      console.log(data);
-    })
-    .catch((err) => {
-      console.log(err);
-    });
-};
+```javascript
+import domo from 'ryuu.js';
+
+const sum = await domo.codeEngine('awesomeFunction', {
+  number1AppInput: 5,
+  number2AppInput: 10,
+});
 ```
 
-**Arguments**
+`awesomeFunction` is the alias you declared in your app's `manifest.json` `packageMapping` array. The SDK issues `POST /domo/codeengine/v2/packages/{alias}` under the hood; the server resolves the alias, executes the function as the app's virtual user, and returns the aliased output.
 
-| Property Name | Type   | Required | Description                                               |
-| ------------- | ------ | -------- | --------------------------------------------------------- |
-| functionAlias | String | Required | The name given to the Code Engine package in the manifest |
+For the full manifest + wiring walkthrough, see [Calling Code Engine From a Custom App](/portal/Automate-Actions/Code-Engine/calling/from-a-custom-app).
 
-**HTTP Request**
+## Endpoints
 
-```text
-POST /domo/codeengine/v2/packages/{functionAlias}
-```
+- `POST /domo/codeengine/v2/packages/{alias}` — **Run by alias**. Primary endpoint. Body is an object of aliased input parameters; response is the aliased output value (primitive or object).
+- `POST /domo/codeengine/v2/packages/{alias}/complex` — **Run by alias (complex response) — deprecated 2023-06-27.** Wraps the aliased output in an execution envelope with an `executionId`. The SDK does not expose this variant. If you are reading legacy app code that uses it, migrate to the primary endpoint.
 
-**Request Body**
+Per-endpoint contracts are rendered from [`openapi/framework/codeengine.yaml`](https://github.com/DomoApps/domo-documentation-hub/blob/main/openapi/framework/codeengine.yaml) — see the sibling nav entries under this page for the full request/response details.
 
-The request body accepts an object containing the input parameters required to run the code engine function. These parameters are also defined in the `manifest.json` file and properties in the object should correspond to the `alias` of the parameter.
+## Alias mapping
 
-```json
-{"parameter1": parameter1, "parameter2": parameter2}
-```
+The `alias` in the path is **not** the real package ID or function name. It is the string you defined in the app's `manifest.json` under `packageMapping[].alias`. The server looks up the alias against the app instance's wired package, remaps aliased parameter keys to the underlying function's parameter names, and remaps the output back to your `output.alias` before returning.
 
-**HTTP Response**
+This indirection is what lets an app use its own naming without coupling to a specific Code Engine package ID or version. It also means the input keys you send must match `packageMapping[].parameters[].alias` — they are not the underlying parameter names.
 
-Returns the result of the Code Engine function. This result is defined in the [Code Engine function and function configuration](/s/article/000005173?language=en_US#function_configuration) "Output" tab. This output should also be defined in the `output` property of the `packageMapping` object in the manifest file.
+## Related
+
+- [Calling Code Engine From a Custom App](/portal/Automate-Actions/Code-Engine/calling/from-a-custom-app) — task-oriented guide covering manifest, wiring, and troubleshooting.
+- [Product API Code Engine reference](/portal/API-Reference/Product-APIs/Code-Engine) — for server-to-server callers outside Domo.
+- [Functions and Types](/portal/Automate-Actions/Code-Engine/concepts/functions-and-types) — the type system used in `packageMapping` parameters.
+- [Permissions and Sharing](/portal/Automate-Actions/Code-Engine/concepts/permissions-and-sharing) — the virtual-user permission model that applies to app-initiated calls.

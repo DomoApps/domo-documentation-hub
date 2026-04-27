@@ -1,0 +1,38 @@
+---
+title: Calling Code Engine From a Brick
+description: Two patterns for invoking Code Engine from a Brick — triggering a Workflow (preferred, declarative) or calling via a Custom App iframe host.
+---
+
+A Brick can reach Code Engine in one of two ways. Neither pattern is Brick-specific — both reuse the existing Workflow and Custom App integration paths.
+
+## When to use
+
+A Brick on a dashboard, story, or card needs to trigger server-side code in Code Engine — for example, to refresh a dataset, call an external system, or compute a value that then drives the Brick's display.
+
+## Pattern 1: Brick → Workflow → Code Engine (preferred)
+
+The Brick emits an event that starts a Workflow; the Workflow has a Code Engine action step.
+
+This is the declarative path. The Brick doesn't run any integration code; the Workflow handles the invocation, permission check, and result propagation. Non-developers can configure or change the Workflow without touching Brick code.
+
+For the Workflow side, see [Calling Code Engine From a Workflow](./from-a-workflow).
+
+## Pattern 2: Brick as Custom App → ryuu.js → Code Engine
+
+If the Brick hosts a Custom App iframe, the app inside the iframe calls Code Engine via the `domo.codeEngine(alias, input)` SDK method — the same path any Custom App uses.
+
+Use this pattern when the Brick needs a real-time, user-initiated call with results rendered immediately back into the Brick UI.
+
+For the Custom App side, see [Calling Code Engine From a Custom App](./from-a-custom-app).
+
+## Picking between them
+
+| Pattern | Best for |
+|---|---|
+| Brick → Workflow → Code Engine | Declarative business logic, orchestration with multiple steps, non-developer configurability. |
+| Brick as Custom App → ryuu.js | Real-time, user-initiated calls with results rendered immediately in the Brick. |
+
+## Related
+
+- [Calling Code Engine From a Workflow](./from-a-workflow) — the declarative path.
+- [Calling Code Engine From a Custom App](./from-a-custom-app) — the `domo.codeEngine(alias, input)` path.

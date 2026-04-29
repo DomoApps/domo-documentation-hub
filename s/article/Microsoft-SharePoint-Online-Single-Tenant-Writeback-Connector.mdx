@@ -1,0 +1,185 @@
+---
+title: "Sharepoint Online Writeback Connector"
+---
+
+## Intro
+
+Microsoft SharePoint Online enables organizations to create and manage custom team-focused and project-focused sites for collaboration. Use Domo's SharePoint Online Writeback connector to push data from a Domo DataSet to Sharepoint. To learn more about the SharePoint API, visit their page ([https://msdn.microsoft.com/en-us/lib.../jj860569.aspx](https://msdn.microsoft.com/en-us/library/office/jj860569.aspx "https://msdn.microsoft.com/en-us/library/office/jj860569.aspx") ).
+
+You configure your Domo-Sharepoint connection in the Data Center. This topic discusses the fields and menus that are specific to the Sharepoint Online Writeback connector user interface. General information for adding DataSets, setting update schedules, and editing DataSet information is discussed in [Adding a DataSet Using a Data Connector](https://domo-support.domo.com/s/article/360042926274?language=en_US "Adding a DataSet Using a Data Connector").
+
+<Note>
+**Note:** The owner of a writeback dataset must also be an owner or co-owner of the input dataset.
+</Note>
+
+## Prerequisites
+
+To configure this connector, you must have the following:
+
+* An installed Microsoft Azure app
+* The Client ID and Client Secret associated with your Domo Developer account
+* The Secret ID and Value associated with your Microsoft Azure app
+
+#### To obtain your Domo Client ID and Client Secret:
+
+1. Log into the [Domo developer account](https://developer.domo.com/login "https://developer.domo.com/login").
+2. In the top right corner under **My Account** click **New Client**.
+3. Enter the application name and description.
+4. Provide the application scope by selecting the checkboxes for **Data** and **User**.
+5. Click **Create**. Once you have created a client, you can manage the client by clicking on **Manage Client**.
+6. Your **Value** will appear in the **Manage Client** section.
+
+#### To obtain your SharePoint Secret ID:
+
+1. Go to [https://portal.azure.com](https://portal.azure.com/ "https://portal.azure.com").
+2. Select **Azure Active Directory > App registrations**.
+3. Find and click on your web app.
+4. The "application ID" is your **Secret ID**.
+
+#### To obtain your SharePoint Value:
+
+1. Go to [https://portal.azure.com](https://portal.azure.com/ "https://portal.azure.com").
+2. Select **Azure Active Directory > App registrations**.
+3. Find and click on your web app.
+4. Open **Certificates and secrets**.
+5. Click **+New secret**.
+6. Provide the value description and the expiry period for your secret. Click **Add**.
+7. Your new value will appear. Copy it and paste in your Domo connector SharePoint client secret field.
+
+### Creating an Azure App for Enterprise OAuth
+
+To create a Microsoft Azure app, do the following:
+
+1. Log into [https://portal.azure.com](https://portal.azure.com/ "https://portal.azure.com").
+
+2. Click on **App registrations**.
+
+   <Frame><img alt="Register an Application" src="/images/kb/ka0Vq0000000ITB-00N5w00000Ri7BU-0EMVq000000DUI1.jpg" style={{width: 729, height: 514}}/></Frame>
+
+3. Click **New registration**.
+
+4. Enter the application name and select the supported account type as below. Enter the Redirect URI for Web as - **https://oauth.domo.com/api/data/v1/oauth/providers/sharepointonlinewriteback/exchange**.
+
+5. Click **Register**.
+
+6. The **Application ID** that appears here is the **SharePoint** **Client ID** you will enter in the **Credentials** pane in Domo. O nce the application is registered, assign the required API permissions for your application.
+
+7. Now, click **API Permissions**.
+
+8. Click **+Add Permissions** button and select the permissions as required.
+
+   <Frame><img alt="Configured Permissions" src="/images/kb/ka0Vq0000000ITB-00N5w00000Ri7BU-0EMVq000000DUJd.jpg" style={{width: 732, height: 304}}/></Frame>
+
+9. After adding the permissions, the configured permissions will be listed as below.
+
+   <Frame><img alt="Configured Permissions" src="/images/kb/ka0Vq0000000ITB-00N5w00000Ri7BU-0EMVq000000DUJd.jpg" style={{width: 693, height: 288}}/></Frame>
+
+10. Select **Certificates & Secrets** under Manage. Certificates can be used as secrets to prove the application’s identity when requesting a token. Also, can be referred to as public keys.
+  
+11. Select the + **New client secret** button.
+
+12. Enter a value in Description, select a suitable option for Expires and click **Add**.
+
+<Warning>
+**Important:** Ensure to copy the client secret Value (not the Secret ID) before leaving the page. It's not displayed again after you leave this page.
+</Warning>
+
+<Frame><img alt="Secret_Value_selection.png" src="/images/kb/ka05w00000123QC-00N5w00000Ri7BU-0EM5w000005vO9g.png"/></Frame>
+
+## Configuring the Connection
+
+This section enumerates the options in the **Credentials** and **Details** panes in the SharePoint Online Connector page. The components of the other panes in this page, **Scheduling** and **Name & Describe Your DataSet**, are universal across most connector types and are discussed in greater length in [Adding a DataSet Using a Data Connector](https://domo-support.domo.com/s/article/360042926274?language=en_US "Adding a DataSet Using a Data Connector").
+
+## Credentials Pane
+
+This pane contains fields for entering credentials to connect to your Sharepoint Online account. The following table describes what is needed for each field:
+
+<table border="1" cellpadding="1" cellspacing="1" data-aura-rendered-by="33:201;a"><thead><tr><th colspan="1" rowspan="1"><p><span class="s1"> Field </span></p></th><th colspan="1" rowspan="1"><p><span class="s1"> Description </span></p></th></tr></thead><tbody><tr><td colspan="1" rowspan="1"><p> Sharepoint Secret ID </p></td><td colspan="1" rowspan="1"><p> Enter your Sharepoint secret ID. </p></td></tr><tr><td colspan="1" rowspan="1"><p> Sharepoint Value </p></td><td colspan="1" rowspan="1"><p> Enter your Sharepoint value. </p></td></tr><tr><td colspan="1" rowspan="1"><p> Domo Secret ID </p></td><td colspan="1" rowspan="1"><p> Enter your Domo secret ID. </p></td></tr><tr><td colspan="1" rowspan="1"><p> Domo Value </p></td><td colspan="1" rowspan="1"><p> Enter your Domo value. </p></td></tr></tbody></table>
+
+Once you have entered valid credentials, you can use the same account any time you go to create a new Sharepoint Online Writeback DataSet. You can manage connector accounts in the **Accounts** tab in the Data Center. For more information about this tab, see [Managing User Accounts for Connectors](https://domo-support.domo.com/s/article/360042926054?language=en_US "Managing User Accounts for Connectors").
+
+## Details Pane
+
+This pane contains options for configuring your connection.
+
+<table border="1" cellpadding="1" cellspacing="1" data-aura-rendered-by="33:201;a"><thead><tr><th colspan="1" rowspan="1"><p> Menu </p></th><th colspan="1" rowspan="1"><p> Description </p></th></tr></thead><tbody><tr><td colspan="1" rowspan="1"><p> Input DataSet ID </p></td><td colspan="1" rowspan="1"><p> Enter the DataSet ID (GUID) for the DataSet you want to copy to Sharepoint Online. You can find the ID by opening the details view for the DataSet in the Data Center and looking at the portion of the URL following <span class="mt-font-courier-new"> datasources/ </span>. For example, in the URL <a href="https://mycompany.domo.com/datasources/845305d8-da3d-4107-a9d6-13ef3f86d4a4/details/overview" rel="noopener" target="_blank"> https://mycompany.domo.com/datasources/845305d8-da3d-4107-a9d6-13ef3f86d4a4/details/overview </a>, the DataSet ID is <span class="mt-font-courier-new"> 845305d8-da3d-4107-a9d6-13ef3f86d4a4 </span>. </p></td></tr><tr><td colspan="1" rowspan="1"><p> Select Filename </p></td><td colspan="1" rowspan="1"><p> Select how you want to choose the file where data will be copied. </p><ul><li><p><b><b><b><b> Use Input DataSet GUID </b></b></b></b>. The filename will be the number you entered for <b><b><b><b> Input DataSet ID </b></b></b></b>. </p></li><li><p><b><b><b><b> Use Input DataSet Name </b></b></b></b>. The filename will be the same as that of the input DataSet. </p></li><li><p><b><b><b><b> Enter File Name </b></b></b></b>. You will give the file a custom name in the <b><b><b><b> File Name </b></b></b></b> field. </p></li></ul></td></tr><tr><td colspan="1" rowspan="1"><p> Filename </p></td><td colspan="1" rowspan="1"><p> Entered the desired output filename. </p></td></tr><tr><td colspan="1" rowspan="1"> How would you like to select the Site? </td><td colspan="1" rowspan="1"> Choose the appropriate method to select a site. </td></tr><tr><td colspan="1" rowspan="1"> Sites Discovery </td><td colspan="1" rowspan="1"> Select the site that you would like to use. </td></tr><tr><td colspan="1" rowspan="1"> Sites Search </td><td colspan="1" rowspan="1"> Search the selected site. </td></tr><tr><td colspan="1" rowspan="1"> Select how would you like to choose the folder to store the file? </td><td colspan="1" rowspan="1"> Select how you want to choose the folder to store the file. </td></tr><tr><td colspan="1" rowspan="1"> Where to store the file? </td><td colspan="1" rowspan="1"> Select the name of the folder in which the file should be saved. Select <b> Root </b> if the file needs to be stored at the root level of selected site. </td></tr><tr><td colspan="1" rowspan="1"> Folder Path </td><td colspan="1" rowspan="1"> Enter the folder path separated by the delimeter where you want to store the file. </td></tr><tr><td colspan="1" rowspan="1"><p> Site and Group Site ID </p></td><td colspan="1" rowspan="1"><p> Select the Sharepoint site in which you want to send your data. </p></td></tr><tr><td colspan="1" rowspan="1"><p> Where to Store the File? </p></td><td colspan="1" rowspan="1"><p> Select the Sharepoint folder in which you want to store the DataSet data. Select <b> Root </b> if you want the file to be stored at the root level of the selected site. </p></td></tr><tr><td colspan="1" rowspan="1"><p> Select Mode </p></td><td colspan="1" rowspan="1"><p> Select what should happen when a file with the same name is discovered, either <b> Rename </b> or <b> Replace </b>. If you choose <b> Rename </b>, if the filename already exists, it will be renamed by appending a number, e.g. <span class="mt-font-courier-new"> filename 1 </span>, <span class="mt-font-courier-new"> filename 2 </span>, etc. </p></td></tr></tbody></table>
+
+## FAQs
+
+<AccordionGroup>
+<Accordion title="What kind of credentials do I need to power up this connector?">
+
+You need Domo developer account credentials (client id and client secret) and SharePoint credentials (client id and client secret).
+
+</Accordion>
+
+<Accordion title="Where can I find my Domo client id and client secret?">
+
+To create a new client:
+
+- Login to your [Domo developer account](https://developer.domo.com/login).  
+- In the top right corner under **My Account**, click **New Client**.  
+- Enter the application name and description.  
+- Provide the application scope by selecting the checkboxes for **Data** and **User**.  
+- Click **Create**.
+
+Once you have created a client, you can manage it by clicking on **Manage Client**.  
+
+</Accordion>
+
+<Accordion title="Where can I find my SharePoint client id and client secret?">
+
+- To obtain the SharePoint client id:  
+- Login to the Azure Portal (https://portal.azure.com).  
+- Navigate to **Azure Active Directory > App registrations**.  
+- Click on your **Web App > Application ID**.  
+- The application ID is your client id.  
+
+To obtain the client secret:  
+
+- Login to the Azure Portal (https://portal.azure.com).    
+- Navigate to **Azure Active Directory > App registrations**.  
+- Click on **Web App > Settings > Keys > Create New Key**.
+
+Copy the key value. Note: the key value is generated only once. You will not be able to retrieve it again.  
+
+</Accordion>
+
+<Accordion title="How often can the data be updated?">
+
+As often as needed.
+
+</Accordion>
+
+<Accordion title="Are there any API limits that I need to be aware of?">
+
+No.
+
+</Accordion>
+
+<Accordion title="Can I use the same SharePoint Online Writeback account to create multiple datasets?">
+
+Yes.
+
+</Accordion>
+
+<Accordion title="Why can't I connect to my SharePoint database? Do I need to whitelist any IP addresses?">
+
+Before you can connect to a SharePoint database in Domo, you must whitelist a number of IP addresses on your database server on the port you want to connect to.  
+For the full list of IP addresses, see **Whitelisting IP Addresses**.
+
+</Accordion>
+
+<Accordion title="How do I find the Input Dataset ID?">
+
+Your Domo input dataset id is in the URL of the dataset you are exporting data from.  
+For example:  
+
+`https://customer.domo.com/datasources/aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee/details/settings`
+
+</Accordion>
+</AccordionGroup>
+
+## Other Panes
+
+For information about the remaining sections of the connector interface, including how to configure scheduling, retry, and update options, see [Adding a DataSet Using a Data Connector](https://domo-support.domo.com/s/article/360042926274?language=en_US "Adding a DataSet Using a Data Connector").

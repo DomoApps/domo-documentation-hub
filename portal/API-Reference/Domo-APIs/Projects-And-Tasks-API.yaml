@@ -713,7 +713,7 @@ paths:
         <Warning>
         **This is destructive and cannot be reversed**.
         </Warning>
-  '/v1/projects/{PROJECT_ID}/tasks?offset={OFFSET}&limit={LIMIT}':
+  '/v1/projects/{PROJECT_ID}/tasks':
     parameters:
       - schema:
           type: string
@@ -723,14 +723,14 @@ paths:
         description: The ID of the project
       - schema:
           type: integer
-        name: OFFSET
-        in: path
-        description: The maximum amount of results to return (defaults to 10 with a maximum of 50)
+        name: offset
+        in: query
+        description: The number of records to offset from the beginning of the result list (defaults to 0)
       - schema:
           type: integer
-        name: LIMIT
-        in: path
-        description: he number of records to offset from the beginning of the result list (defaults to 0)
+        name: limit
+        in: query
+        description: The maximum amount of results to return (defaults to 10 with a maximum of 50)
     get:
       summary: Retrieve all project tasks
       tags: []
@@ -884,7 +884,7 @@ paths:
                       archived: false
       operationId: ''
       description: Retrieves all tasks from a given project id.
-  '/v1/projects/{PROJECT_ID}/lists/{LIST_ID}/tasks?offset={OFFSET}&limit={LIMIT}':
+  '/v1/projects/{PROJECT_ID}/lists/{LIST_ID}/tasks':
     parameters:
       - schema:
           type: string
@@ -900,14 +900,14 @@ paths:
         description: The ID of the list
       - schema:
           type: integer
-        name: OFFSET
-        in: path
-        description: The maximum amount of results to return (defaults to 10 with a maximum of 50)
+        name: offset
+        in: query
+        description: The number of records to offset from the beginning of the result list (defaults to 0)
       - schema:
           type: integer
-        name: LIMIT
-        in: path
-        description: The number of records to offset from the beginning of the result list (defaults to 0)
+        name: limit
+        in: query
+        description: The maximum amount of results to return (defaults to 10 with a maximum of 50)
     get:
       summary: Retrieve all List tasks
       tags: []
@@ -1035,6 +1035,170 @@ paths:
                       archived: false
       operationId: ''
       description: Retrieves all tasks from a given project id and list id.
+    put:
+      summary: Create a task
+      operationId: ''
+      responses:
+        '200':
+          description: Returns the task object.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  projectId:
+                    type: string
+                  projectListId:
+                    type: string
+                  taskName:
+                    type: string
+                  createdDate:
+                    type: string
+                  updatedDate:
+                    type: string
+                  priority:
+                    type: integer
+                  createdBy:
+                    type: integer
+                  ownedBy:
+                    type: integer
+                  contributors:
+                    type: array
+                    items:
+                      type: integer
+                  attachmentCount:
+                    type: integer
+                  tags:
+                    type: array
+                    items:
+                      type: object
+                      properties: {}
+                  archived:
+                    type: boolean
+                x-examples:
+                  Example 1:
+                    id: '5'
+                    projectId: '2'
+                    projectListId: '4'
+                    taskName: Business Plan Review
+                    createdDate: '2018-08-01T08:00:00Z'
+                    updatedDate: '2018-08-01T08:00:00Z'
+                    priority: 3
+                    createdBy: 27
+                    ownedBy: 27
+                    contributors:
+                      - 27
+                    attachmentCount: 0
+                    tags: []
+                    archived: false
+              examples:
+                Example 1:
+                  value:
+                    id: '5'
+                    projectId: '2'
+                    projectListId: '4'
+                    taskName: Business Plan Review
+                    createdDate: '2018-08-01T08:00:00Z'
+                    updatedDate: '2018-08-01T08:00:00Z'
+                    priority: 3
+                    createdBy: 27
+                    ownedBy: 27
+                    contributors:
+                      - 27
+                    attachmentCount: 0
+                    tags: []
+                    archived: false
+      description: Add a task to a project list.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                projectId:
+                  type: string
+                projectListId:
+                  type: string
+                taskName:
+                  type: string
+                priority:
+                  type: integer
+                contributors:
+                  type: array
+                  items:
+                    type: integer
+                tags:
+                  type: array
+                  items:
+                    type: object
+                    properties: {}
+                archived:
+                  type: boolean
+              x-examples:
+                Example 1:
+                  id: '3'
+                  projectId: '2'
+                  projectListId: '4'
+                  taskName: Business Plan Review
+                  priority: 3
+                  contributors:
+                    - 27
+                  tags: []
+                  archived: false
+            examples:
+              Example 1:
+                value:
+                  id: '3'
+                  projectId: '2'
+                  projectListId: '4'
+                  taskName: Business Plan Review
+                  priority: 3
+                  contributors:
+                    - 27
+                  tags: []
+                  archived: false
+        description: The request body accepts a task object.
+      parameters:
+        - schema:
+            type: string
+          in: query
+          name: taskName
+          description: The name of the task
+          required: true
+        - schema:
+            type: string
+          in: query
+          name: description
+          description: An optional description of the task
+        - schema:
+            type: string
+          in: query
+          name: dueDate
+          description: The date the task is expected to be completed
+        - schema:
+            type: integer
+          in: query
+          name: priority
+          description: Priority of task within a list. Setting this property will impact the index of other tasks in the list to maintain sequential order. If not provided the priority will default to 1 and the index of all the other tasks in the list will shift.
+        - schema:
+            type: integer
+          in: query
+          name: ownedBy
+          description: The ID of the Domo user that owns the task
+        - schema:
+            type: integer
+          in: query
+          name: contributors
+          description: An array of user IDs that are assigned as contributors to the task
+        - schema:
+            type: string
+          in: query
+          name: tags
+          description: An array of tags that have been assigned to the task
   '/v1/projects/{PROJECT_ID}/lists/{LIST_ID}/tasks/{TASK_ID}':
     parameters:
       - schema:
@@ -1295,184 +1459,6 @@ paths:
                   tags: []
                   archived: false
         description: The request body accepts a task object.
-  '/v1/projects/{PROJECT_ID}/lists/{LIST_ID}/tasks':
-    parameters:
-      - schema:
-          type: string
-        name: PROJECT_ID
-        in: path
-        required: true
-        description: The ID of the project that the task belongs to
-      - schema:
-          type: string
-        name: LIST_ID
-        in: path
-        required: true
-        description: The ID of the list within a project that the task belongs to
-    put:
-      summary: Create a task
-      operationId: ''
-      responses:
-        '200':
-          description: Returns the task object.
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  id:
-                    type: string
-                  projectId:
-                    type: string
-                  projectListId:
-                    type: string
-                  taskName:
-                    type: string
-                  createdDate:
-                    type: string
-                  updatedDate:
-                    type: string
-                  priority:
-                    type: integer
-                  createdBy:
-                    type: integer
-                  ownedBy:
-                    type: integer
-                  contributors:
-                    type: array
-                    items:
-                      type: integer
-                  attachmentCount:
-                    type: integer
-                  tags:
-                    type: array
-                    items:
-                      type: object
-                      properties: {}
-                  archived:
-                    type: boolean
-                x-examples:
-                  Example 1:
-                    id: '5'
-                    projectId: '2'
-                    projectListId: '4'
-                    taskName: Business Plan Review
-                    createdDate: '2018-08-01T08:00:00Z'
-                    updatedDate: '2018-08-01T08:00:00Z'
-                    priority: 3
-                    createdBy: 27
-                    ownedBy: 27
-                    contributors:
-                      - 27
-                    attachmentCount: 0
-                    tags: []
-                    archived: false
-              examples:
-                Example 1:
-                  value:
-                    id: '5'
-                    projectId: '2'
-                    projectListId: '4'
-                    taskName: Business Plan Review
-                    createdDate: '2018-08-01T08:00:00Z'
-                    updatedDate: '2018-08-01T08:00:00Z'
-                    priority: 3
-                    createdBy: 27
-                    ownedBy: 27
-                    contributors:
-                      - 27
-                    attachmentCount: 0
-                    tags: []
-                    archived: false
-      description: Add a task to a project list.
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                id:
-                  type: string
-                projectId:
-                  type: string
-                projectListId:
-                  type: string
-                taskName:
-                  type: string
-                priority:
-                  type: integer
-                contributors:
-                  type: array
-                  items:
-                    type: integer
-                tags:
-                  type: array
-                  items:
-                    type: object
-                    properties: {}
-                archived:
-                  type: boolean
-              x-examples:
-                Example 1:
-                  id: '3'
-                  projectId: '2'
-                  projectListId: '4'
-                  taskName: Business Plan Review
-                  priority: 3
-                  contributors:
-                    - 27
-                  tags: []
-                  archived: false
-            examples:
-              Example 1:
-                value:
-                  id: '3'
-                  projectId: '2'
-                  projectListId: '4'
-                  taskName: Business Plan Review
-                  priority: 3
-                  contributors:
-                    - 27
-                  tags: []
-                  archived: false
-        description: The request body accepts a task object.
-      parameters:
-        - schema:
-            type: string
-          in: query
-          name: taskName
-          description: The name of the task
-          required: true
-        - schema:
-            type: string
-          in: query
-          name: description
-          description: An optional description of the task
-        - schema:
-            type: string
-          in: query
-          name: dueDate
-          description: The date the task is expected to be completed
-        - schema:
-            type: integer
-          in: query
-          name: priority
-          description: Priority of task within a list. Setting this property will impact the index of other tasks in the list to maintain sequential order. If not provided the priority will default to 1 and the index of all the other tasks in the list will shift.
-        - schema:
-            type: integer
-          in: query
-          name: ownedBy
-          description: The ID of the Domo user that owns the task
-        - schema:
-            type: integer
-          in: query
-          name: contributors
-          description: An array of user IDs that are assigned as contributors to the task
-        - schema:
-            type: string
-          in: query
-          name: tags
-          description: An array of tags that have been assigned to the task
   '/v1/projects/{PROJECT_ID}/lists/{LIST_ID}/tasks/{TASK_ID}/attachments':
     parameters:
       - schema:

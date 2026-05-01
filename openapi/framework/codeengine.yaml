@@ -9,6 +9,10 @@ info:
 servers:
   - url: 'https://{instance}.domo.com'
     description: Domo API
+    variables:
+      instance:
+        default: instance
+        description: Your Domo instance subdomain.
 tags:
   - name: Code Engine
     description: Operations for running Code Engine functions.
@@ -25,7 +29,7 @@ components:
       description: Object containing the input parameters required to run the code engine function. Properties should correspond to the 'alias' of the parameter in the manifest.
       additionalProperties: true
       example:
-        parameter1: "some value"
+        parameter1: 'some value'
         parameter2: 12345
     CodeEngineOutput:
       type: object
@@ -44,8 +48,9 @@ paths:
     post:
       summary: Run Code Engine Function
       description: Runs a Code Engine function and returns output of that function.
-      tags: 
-        - Code Engine API
+      operationId: runCodeEngineFunction
+      tags:
+        - Code Engine
       parameters:
         - name: functionAlias
           in: path
@@ -89,7 +94,7 @@ paths:
     post:
       tags: [Code Engine]
       deprecated: true
-      summary: "Run by alias (complex response) — DEPRECATED 2023-06-27"
+      summary: 'Run by alias (complex response) — DEPRECATED 2023-06-27'
       description: |
         **Deprecated.** Wraps the aliased output in an execution envelope with `executionId`.
         The `ryuu.js` / `domo.js` SDK does not expose this endpoint. Use `POST /domo/codeengine/v2/packages/{alias}` instead.
@@ -108,3 +113,21 @@ paths:
             schema: { type: object, additionalProperties: true }
       responses:
         '200': { description: Execution envelope with aliased output. }
+        '400':
+          description: Bad Request (e.g., invalid input parameters)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Not Found (e.g., alias does not exist)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'

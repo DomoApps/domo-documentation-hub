@@ -1,14 +1,13 @@
 ---
 title: FileSets API
 tag: "Beta"
-permalink: b939448cde9d5-file-sets-api-beta
+permalink: b939448cde9d5-file-sets-api
 ---
 
 <Note>
-  **Note:** This feature is in beta. Beta Program participants can have this
-  feature enabled [here](https://embed.domo.com/embed/pages/DQ8Ek). To join the
-  Beta Program, fill out [this form](https://embed.domo.com/embed/pages/K8GMx).
-  For questions and feedback on beta features, email
+  **Note:** This feature is in beta. Beta Program participants can enable
+  features [here](https://embed.domo.com/embed/pages/DQ8Ek). To join the Beta
+  Program, fill out [this form](https://embed.domo.com/embed/pages/K8GMx). For beta questions or feedback, email
   [beta.admin@domo.com](mailto:beta.admin@domo.com).
 </Note>
 
@@ -34,12 +33,12 @@ This API reference documents the endpoints for managing FileSets and Files in Do
 
 ```js
 fetch(
-  'https://{instance}.domo.com/api/files/v1/filesets/{filesetId}/path?path={filePath}',
+  "https://{instance}.domo.com/api/files/v1/filesets/{filesetId}/path?path={filePath}",
   {
-    method: 'GET',
+    method: "GET",
     headers: {
-      'X-DOMO-Developer-Token': '<your-token-here>',
-      'Content-Type': 'application/json',
+      "X-DOMO-Developer-Token": "<your-token-here>",
+      "Content-Type": "application/json",
     },
   },
 )
@@ -106,12 +105,12 @@ with httpx.Client() as client:
 
 ```js
 fetch(
-  'https://{instance}.domo.com/api/files/v1/filesets/{filesetId}/files/{fileId}',
+  "https://{instance}.domo.com/api/files/v1/filesets/{filesetId}/files/{fileId}",
   {
-    method: 'GET',
+    method: "GET",
     headers: {
-      'X-DOMO-Developer-Token': '<your-token-here>',
-      'Content-Type': 'application/json',
+      "X-DOMO-Developer-Token": "<your-token-here>",
+      "Content-Type": "application/json",
     },
   },
 )
@@ -178,12 +177,12 @@ with httpx.Client() as client:
 
 ```js
 fetch(
-  'https://{instance}.domo.com/api/files/v1/filesets/{filesetId}/files/{fileId}/download',
+  "https://{instance}.domo.com/api/files/v1/filesets/{filesetId}/files/{fileId}/download",
   {
-    method: 'GET',
+    method: "GET",
     headers: {
-      'X-DOMO-Developer-Token': '<your-token-here>',
-      'Content-Type': 'application/json',
+      "X-DOMO-Developer-Token": "<your-token-here>",
+      "Content-Type": "application/json",
     },
   },
 )
@@ -191,9 +190,9 @@ fetch(
   .then((blob) => {
     // Example: create a download link
     const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
+    const a = document.createElement("a");
     a.href = url;
-    a.download = 'filename.ext'; // Set desired file name
+    a.download = "filename.ext"; // Set desired file name
     document.body.appendChild(a);
     a.click();
     a.remove();
@@ -257,14 +256,14 @@ with httpx.Client() as client:
 ```js
 // Example: Search for text in documents, limited to 5 results
 fetch(`https://{instance}.domo.com/api/files/v1/filesets/${filesetId}/query`, {
-  method: 'POST',
+  method: "POST",
   headers: {
-    'X-DOMO-Developer-Token': '<your-token-here>',
-    'Content-Type': 'application/json',
+    "X-DOMO-Developer-Token": "<your-token-here>",
+    "Content-Type": "application/json",
   },
   body: JSON.stringify({
-    query: 'quarterly sales data', // Text to search for in files
-    directoryPath: 'reports/quarterly', // Optional: Limit search to specific directory
+    query: "quarterly sales data", // Text to search for in files
+    directoryPath: "reports/quarterly", // Optional: Limit search to specific directory
     topK: 5, // Optional: Maximum number of results to return
   }),
 })
@@ -361,21 +360,21 @@ with httpx.Client() as client:
 ```js
 // Prepare the file and metadata for upload
 const formdata = new FormData();
-formdata.append('file', fileInput.files[0], 'rules.txt');
-formdata.append('createFileRequest', JSON.stringify({ directoryPath: '' }));
+formdata.append("file", fileInput.files[0], "rules.txt");
+formdata.append("createFileRequest", JSON.stringify({ directoryPath: "" }));
 
 const requestOptions = {
-  method: 'POST',
+  method: "POST",
   headers: {
-    'X-DOMO-Developer-Token': '<your-token-here>',
+    "X-DOMO-Developer-Token": "<your-token-here>",
     // Note: Do not set Content-Type header; browser will set it automatically for FormData
   },
   body: formdata,
-  redirect: 'follow',
+  redirect: "follow",
 };
 
 fetch(
-  'https://{instance}.domo.com/api/files/v1/filesets/{filesetId}/files',
+  "https://{instance}.domo.com/api/files/v1/filesets/{filesetId}/files",
   requestOptions,
 )
   .then((response) => response.json())
@@ -480,10 +479,10 @@ with open('rules.txt', 'rb') as file_obj:
 fetch(
   `https://{instance}.domo.com/api/files/v1/filesets/${filesetId}/files/search`,
   {
-    method: 'POST',
+    method: "POST",
     headers: {
-      'X-DOMO-Developer-Token': '<your-token-here>',
-      'Content-Type': 'application/json',
+      "X-DOMO-Developer-Token": "<your-token-here>",
+      "Content-Type": "application/json",
     },
     body: JSON.stringify({}),
   },
@@ -496,32 +495,32 @@ fetch(
 fetch(
   `https://{instance}.domo.com/api/files/v1/filesets/${filesetId}/files/search?directoryPath=reports&limit=20`,
   {
-    method: 'POST',
+    method: "POST",
     headers: {
-      'X-DOMO-Developer-Token': '<your-token-here>',
-      'Content-Type': 'application/json',
+      "X-DOMO-Developer-Token": "<your-token-here>",
+      "Content-Type": "application/json",
     },
     body: JSON.stringify({
       // Sort by file name in ascending order
       fieldSort: [
         {
-          field: 'name',
-          order: 'ASC',
+          field: "name",
+          order: "ASC",
         },
       ],
       // Filter files by name
       filters: [
         {
-          field: 'name',
-          value: ['.pdf'],
-          operator: 'LIKE',
+          field: "name",
+          value: [".pdf"],
+          operator: "LIKE",
           not: false,
         },
       ],
       // Filter files created in past 30 days
       dateFilters: [
         {
-          field: 'created',
+          field: "created",
           start: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(), // 30 days ago as ISO string
           end: new Date().toISOString(), // Current time as ISO string
         },
@@ -654,12 +653,12 @@ with httpx.Client() as client:
 
 ```js
 fetch(
-  'https://{instance}.domo.com/api/files/v1/filesets/{filesetId}/path?path=rules.txt',
+  "https://{instance}.domo.com/api/files/v1/filesets/{filesetId}/path?path=rules.txt",
   {
-    method: 'DELETE',
+    method: "DELETE",
     headers: {
-      'X-DOMO-Developer-Token': '<your-token-here>',
-      'Content-Type': 'application/json',
+      "X-DOMO-Developer-Token": "<your-token-here>",
+      "Content-Type": "application/json",
     },
   },
 )
@@ -714,12 +713,12 @@ with httpx.Client() as client:
 
 ```js
 fetch(
-  'https://{instance}.domo.com/api/files/v1/filesets/{filesetId}/files/{fileId}',
+  "https://{instance}.domo.com/api/files/v1/filesets/{filesetId}/files/{fileId}",
   {
-    method: 'DELETE',
+    method: "DELETE",
     headers: {
-      'X-DOMO-Developer-Token': '<your-token-here>',
-      'Content-Type': 'application/json',
+      "X-DOMO-Developer-Token": "<your-token-here>",
+      "Content-Type": "application/json",
     },
   },
 )
@@ -814,12 +813,12 @@ with httpx.Client() as client:
 ```js
 // Example 1: List all FileSets (empty search)
 fetch(
-  'https://{instance}.domo.com/api/files/v1/filesets/search?limit=50&offset=0',
+  "https://{instance}.domo.com/api/files/v1/filesets/search?limit=50&offset=0",
   {
-    method: 'POST',
+    method: "POST",
     headers: {
-      'X-DOMO-Developer-Token': '<your-token-here>',
-      'Content-Type': 'application/json',
+      "X-DOMO-Developer-Token": "<your-token-here>",
+      "Content-Type": "application/json",
     },
     body: JSON.stringify({}),
   },
@@ -829,35 +828,35 @@ fetch(
   .catch((error) => console.error(`Error: ${error}`));
 
 // Example 2: Advanced search with filters and sorting
-fetch('https://{instance}.domo.com/api/files/v1/filesets/search', {
-  method: 'POST',
+fetch("https://{instance}.domo.com/api/files/v1/filesets/search", {
+  method: "POST",
   headers: {
-    'X-DOMO-Developer-Token': '<your-token-here>',
-    'Content-Type': 'application/json',
+    "X-DOMO-Developer-Token": "<your-token-here>",
+    "Content-Type": "application/json",
   },
   body: JSON.stringify({
     // Sort by name in ascending order
     fieldSort: [
       {
-        field: 'name',
-        order: 'ASC',
+        field: "name",
+        order: "ASC",
       },
     ],
     // Filter FileSet by name containing "Marketing"
     filters: [
       {
-        field: 'name',
-        value: ['Marketing'],
-        operator: 'LIKE',
+        field: "name",
+        value: ["Marketing"],
+        operator: "LIKE",
         not: false,
       },
     ],
     // Filter FileSet created between two dates
     dateFilters: [
       {
-        field: 'created',
-        start: new Date('2024-06-01').toISOString(), // June 1, 2024 as ISO string
-        end: new Date('2024-06-30').toISOString(), // June 30, 2024 as ISO string
+        field: "created",
+        start: new Date("2024-06-01").toISOString(), // June 1, 2024 as ISO string
+        end: new Date("2024-06-30").toISOString(), // June 30, 2024 as ISO string
       },
     ],
   }),
@@ -1016,15 +1015,15 @@ with httpx.Client() as client:
 <Tab title="Javascript">
 
 ```js
-fetch('https://{instance}.domo.com/api/files/v1/filesets', {
-  method: 'POST',
+fetch("https://{instance}.domo.com/api/files/v1/filesets", {
+  method: "POST",
   headers: {
-    'X-DOMO-Developer-Token': '<your-token-here>',
-    'Content-Type': 'application/json',
+    "X-DOMO-Developer-Token": "<your-token-here>",
+    "Content-Type": "application/json",
   },
   body: JSON.stringify({
-    name: 'Sample FileSet',
-    description: 'A sample FileSet for demonstration purposes.',
+    name: "Sample FileSet",
+    description: "A sample FileSet for demonstration purposes.",
     // accountId: 12345, // Optional
     // connectorContext: { connector: 'S3', relativePath: 'bucket/path' }, // Optional
   }),
@@ -1087,11 +1086,11 @@ with httpx.Client() as client:
 <Tab title="Javascript">
 
 ```js
-fetch('https://{instance}.domo.com/api/files/v1/filesets/{filesetId}', {
-  method: 'GET',
+fetch("https://{instance}.domo.com/api/files/v1/filesets/{filesetId}", {
+  method: "GET",
   headers: {
-    'X-DOMO-Developer-Token': '<your-token-here>',
-    'Content-Type': 'application/json',
+    "X-DOMO-Developer-Token": "<your-token-here>",
+    "Content-Type": "application/json",
   },
 })
   .then((response) => response.json())
@@ -1151,15 +1150,15 @@ with httpx.Client() as client:
 <Tab title="Javascript">
 
 ```js
-fetch('https://{instance}.domo.com/api/files/v1/filesets/{filesetId}', {
-  method: 'POST',
+fetch("https://{instance}.domo.com/api/files/v1/filesets/{filesetId}", {
+  method: "POST",
   headers: {
-    'X-DOMO-Developer-Token': '<your-token-here>',
-    'Content-Type': 'application/json',
+    "X-DOMO-Developer-Token": "<your-token-here>",
+    "Content-Type": "application/json",
   },
   body: JSON.stringify({
-    name: 'Updated FileSet Name', // Optional: New name for the FileSet
-    description: 'Updated description.', // Optional: New description
+    name: "Updated FileSet Name", // Optional: New name for the FileSet
+    description: "Updated description.", // Optional: New description
   }),
 })
   .then((response) => response.json())
@@ -1218,11 +1217,11 @@ with httpx.Client() as client:
 <Tab title="Javascript">
 
 ```js
-fetch('https://{instance}.domo.com/api/files/v1/filesets/{filesetId}', {
-  method: 'DELETE',
+fetch("https://{instance}.domo.com/api/files/v1/filesets/{filesetId}", {
+  method: "DELETE",
   headers: {
-    'X-DOMO-Developer-Token': '<your-token-here>',
-    'Content-Type': 'application/json',
+    "X-DOMO-Developer-Token": "<your-token-here>",
+    "Content-Type": "application/json",
   },
 })
   .then((response) => response.json())

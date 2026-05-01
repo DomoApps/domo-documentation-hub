@@ -1,15 +1,14 @@
 ---
 title: "FileSets API"
 tag: "Beta"
-permalink: "b939448cde9d5-file-sets-api-beta"
+permalink: "b939448cde9d5-file-sets-api"
 sidebarTitle: "Overview"
 ---
 
 <Note>
-  **Note:** This feature is in beta. Beta Program participants can have this
-  feature enabled [here](https://embed.domo.com/embed/pages/DQ8Ek). To join the
-  Beta Program, fill out [this form](https://embed.domo.com/embed/pages/K8GMx).
-  For questions and feedback on beta features, email
+  **Note:** This feature is in beta. Beta Program participants can enable
+  features [here](https://embed.domo.com/embed/pages/DQ8Ek). To join the Beta
+  Program, fill out [this form](https://embed.domo.com/embed/pages/K8GMx). For beta questions or feedback, email
   [beta.admin@domo.com](mailto:beta.admin@domo.com).
 </Note>
 
@@ -32,11 +31,11 @@ This API reference documents the endpoints for managing FileSets and Files in Do
 
 **Path Parameters:**
 
-* `filesetId` (String, required): The ID of the FileSet.
+- `filesetId` (String, required): The ID of the FileSet.
 
 **Query Parameters:**
 
-* `path` (String, required): The path to the File within the FileSet.
+- `path` (String, required): The path to the File within the FileSet.
 
 <CodeGroup>
 ```js Javascript
@@ -67,6 +66,7 @@ with httpx.Client() as client:
     response = client.get(url, headers=headers)
     print(response.json())
 ```
+
 </CodeGroup>
 
 **Response:**
@@ -90,7 +90,6 @@ with httpx.Client() as client:
 }
 ```
 
-
 ---
 
 ## Get File by Id
@@ -108,8 +107,8 @@ with httpx.Client() as client:
 
 **Path Parameters:**
 
-* `filesetId` (String, required): The ID of the FileSet.
-* `fileId` (String, required): The ID of the file.
+- `filesetId` (String, required): The ID of the FileSet.
+- `fileId` (String, required): The ID of the file.
 
 <CodeGroup>
 ```js Javascript
@@ -140,6 +139,7 @@ with httpx.Client() as client:
     response = client.get(url, headers=headers)
     print(response.json())
 ```
+
 </CodeGroup>
 
 **Response:**
@@ -163,7 +163,6 @@ with httpx.Client() as client:
 }
 ```
 
-
 ---
 
 ## Download File by Id
@@ -181,8 +180,8 @@ with httpx.Client() as client:
 
 **Path Parameters:**
 
-* `filesetId` (String, required): The ID of the FileSet.
-* `fileId` (String, required): The ID of the file.
+- `filesetId` (String, required): The ID of the FileSet.
+- `fileId` (String, required): The ID of the file.
 
 <CodeGroup>
 ```js Javascript
@@ -225,11 +224,12 @@ with httpx.Client() as client:
         f.write(response.content)
     print('File downloaded as filename.ext')
 ```
+
 </CodeGroup>
 
 **Response:**
 
-* Returns the FileSet contents as a download (binary/text stream).
+- Returns the FileSet contents as a download (binary/text stream).
 
 ---
 
@@ -250,17 +250,17 @@ with httpx.Client() as client:
 
 **Path Parameters:**
 
-| Parameter | Type | Required | Description |
-| --- | --- | --- | --- |
-| filesetId | String | Yes | The ID of the FileSet |
+| Parameter | Type   | Required | Description           |
+| --------- | ------ | -------- | --------------------- |
+| filesetId | String | Yes      | The ID of the FileSet |
 
 **Request Body Parameters:**
 
-| Parameter | Type | Required | Description |
-| --- | --- | --- | --- |
-| query | String | Yes | Text to search for in Files |
-| directoryPath | String | No | Limit search to a specific directory |
-| topK | Integer | No | Maximum number of results to return |
+| Parameter     | Type    | Required | Description                          |
+| ------------- | ------- | -------- | ------------------------------------ |
+| query         | String  | Yes      | Text to search for in Files          |
+| directoryPath | String  | No       | Limit search to a specific directory |
+| topK          | Integer | No       | Maximum number of results to return  |
 
 <CodeGroup>
 ```js Javascript
@@ -309,6 +309,7 @@ with httpx.Client() as client:
     for match in result['matches']:
         print(f"- {match['node']['name']} (Score: {match['score']})")
 ```
+
 </CodeGroup>
 
 **Response:**
@@ -348,7 +349,6 @@ with httpx.Client() as client:
 }
 ```
 
-
 ---
 
 ## Upload File
@@ -366,7 +366,7 @@ with httpx.Client() as client:
 
 **Path Parameters:**
 
-* `filesetId` (String, required): The ID of the FileSet.
+- `filesetId` (String, required): The ID of the FileSet.
 
 <CodeGroup>
 ```javascript
@@ -375,25 +375,24 @@ const formdata = new FormData();
 formdata.append('file', fileInput.files[0], 'rules.txt');
 formdata.append('createFileRequest', JSON.stringify({ directoryPath: '' }));
 
-
 const requestOptions = {
-  method: 'POST',
-  headers: {
-    'X-DOMO-Developer-Token': '<your-token-here>',
-    // Note: Do not set Content-Type header; browser will set it automatically for FormData
-  },
-  body: formdata,
-  redirect: 'follow',
+method: 'POST',
+headers: {
+'X-DOMO-Developer-Token': '<your-token-here>',
+// Note: Do not set Content-Type header; browser will set it automatically for FormData
+},
+body: formdata,
+redirect: 'follow',
 };
 
-
 fetch('https://{instance}.domo.com/api/files/v1/filesets/{filesetId}/files',
-  requestOptions,
+requestOptions,
 )
-  .then((response) => response.json())
-  .then((result) => console.log(result))
-  .catch((error) => console.error(`Error: ${error}`));
-```
+.then((response) => response.json())
+.then((result) => console.log(result))
+.catch((error) => console.error(`Error: ${error}`));
+
+````
 
 ```python Python
 import httpx
@@ -411,7 +410,8 @@ with open('rules.txt', 'rb') as file_obj:
     with httpx.Client() as client:
         response = client.post(url, headers=headers, files=files)
         print(response.json())
-```
+````
+
 </CodeGroup>
 
 **Response:**
@@ -428,7 +428,6 @@ with open('rules.txt', 'rb') as file_obj:
   "createdBy": 111111111
 }
 ```
-
 
 ---
 
@@ -449,42 +448,42 @@ with open('rules.txt', 'rb') as file_obj:
 
 **Path Parameters:**
 
-| Parameter | Type | Required | Description |
-| --- | --- | --- | --- |
-| filesetId | String | Yes | The ID of the FileSet |
+| Parameter | Type   | Required | Description           |
+| --------- | ------ | -------- | --------------------- |
+| filesetId | String | Yes      | The ID of the FileSet |
 
 **Query Parameters:**
 
-| Parameter | Type | Required | Default | Description |
-| --- | --- | --- | --- | --- |
-| directoryPath | String | No | null | Filter Files by specific directory path |
-| immediateChildren | Boolean | No | false | If true, returns only immediate children of directory |
-| limit | Integer | No | 100 | Maximum number of results |
-| next | String | No | null | Pagination token for fetching next set of results |
+| Parameter         | Type    | Required | Default | Description                                           |
+| ----------------- | ------- | -------- | ------- | ----------------------------------------------------- |
+| directoryPath     | String  | No       | null    | Filter Files by specific directory path               |
+| immediateChildren | Boolean | No       | false   | If true, returns only immediate children of directory |
+| limit             | Integer | No       | 100     | Maximum number of results                             |
+| next              | String  | No       | null    | Pagination token for fetching next set of results     |
 
 **Request Body Parameters:**
 
-| Parameter | Type | Required | Description |
-| --- | --- | --- | --- |
-| fieldSort | Array | No | Sort options for results. Array of FieldSort Objects. |
-| filters | Array | No | Filter criteria for the search. Array of Filter Objects. |
-| dateFilters | Array | No | Date-based filter criteria. Array of DateFilter Objects. |
+| Parameter   | Type  | Required | Description                                              |
+| ----------- | ----- | -------- | -------------------------------------------------------- |
+| fieldSort   | Array | No       | Sort options for results. Array of FieldSort Objects.    |
+| filters     | Array | No       | Filter criteria for the search. Array of Filter Objects. |
+| dateFilters | Array | No       | Date-based filter criteria. Array of DateFilter Objects. |
 
 **FieldSort Object Properties:**
 
-| Property | Type | Description |
-| --- | --- | --- |
-| field | String | Field name to sort by |
-| order | String | Sort direction: 'ASC' or 'DESC' |
+| Property | Type   | Description                     |
+| -------- | ------ | ------------------------------- |
+| field    | String | Field name to sort by           |
+| order    | String | Sort direction: 'ASC' or 'DESC' |
 
 **DateFilter Object Properties:**
 
-| Property | Type | Description |
-| --- | --- | --- |
-| field | String | Field name for date filter (e.g., 'created') |
-| start | String | Start timestamp as ISO string |
-| end | String | End timestamp as ISO string |
-| not | Boolean | If true, inverts the date filter match |
+| Property | Type    | Description                                  |
+| -------- | ------- | -------------------------------------------- |
+| field    | String  | Field name for date filter (e.g., 'created') |
+| start    | String  | Start timestamp as ISO string                |
+| end      | String  | End timestamp as ISO string                  |
+| not      | Boolean | If true, inverts the date filter match       |
 
 <Note>
 
@@ -508,47 +507,47 @@ fetch(`https://{instance}.domo.com/api/files/v1/filesets/${filesetId}/files/sear
   .then((result) => console.log(result.files))
   .catch((error) => console.error(`Error: ${error}`));
 
-
 // Example 2: Advanced search with directory path and filters
 fetch(`https://{instance}.domo.com/api/files/v1/filesets/${filesetId}/files/search?directoryPath=reports&limit=20`,
-  {
-    method: 'POST',
-    headers: {
-      'X-DOMO-Developer-Token': '<your-token-here>',
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      // Sort by file name in ascending order
-      fieldSort: [
-        {
-          field: 'name',
-          order: 'ASC',
-        },
-      ],
-      // Filter files by name
-      filters: [
-        {
-          field: 'name',
-          value: ['.pdf'],
-          operator: 'LIKE',
-          not: false,
-        },
-      ],
-      // Filter files created in past 30 days
-      dateFilters: [
-        {
-          field: 'created',
-          start: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(), // 30 days ago as ISO string
-          end: new Date().toISOString(), // Current time as ISO string
-        },
-      ],
-    }),
-  },
+{
+method: 'POST',
+headers: {
+'X-DOMO-Developer-Token': '<your-token-here>',
+'Content-Type': 'application/json',
+},
+body: JSON.stringify({
+// Sort by file name in ascending order
+fieldSort: [
+{
+field: 'name',
+order: 'ASC',
+},
+],
+// Filter files by name
+filters: [
+{
+field: 'name',
+value: ['.pdf'],
+operator: 'LIKE',
+not: false,
+},
+],
+// Filter files created in past 30 days
+dateFilters: [
+{
+field: 'created',
+start: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(), // 30 days ago as ISO string
+end: new Date().toISOString(), // Current time as ISO string
+},
+],
+}),
+},
 )
-  .then((response) => response.json())
-  .then((result) => console.log(result.files))
-  .catch((error) => console.error(`Error: ${error}`));
-```
+.then((response) => response.json())
+.then((result) => console.log(result.files))
+.catch((error) => console.error(`Error: ${error}`));
+
+````
 
 ```python Python
 import httpx
@@ -604,7 +603,8 @@ data = {
 with httpx.Client() as client:
     response = client.post(url, headers=headers, json=data)
     print(response.json())
-```
+````
+
 </CodeGroup>
 
 **Response:**
@@ -645,7 +645,6 @@ with httpx.Client() as client:
 }
 ```
 
-
 ---
 
 ## Delete Files by Path
@@ -663,11 +662,11 @@ with httpx.Client() as client:
 
 **Path Parameters:**
 
-* `filesetId` (String, required): The ID of the FileSet.
+- `filesetId` (String, required): The ID of the FileSet.
 
 **Query Parameters:**
 
-* `path` (String, required): The path to the File within the FileSet.
+- `path` (String, required): The path to the File within the FileSet.
 
 <CodeGroup>
 ```js Javascript
@@ -698,6 +697,7 @@ with httpx.Client() as client:
     response = client.delete(url, headers=headers)
     print(response.json())
 ```
+
 </CodeGroup>
 
 **Response:**
@@ -708,7 +708,6 @@ with httpx.Client() as client:
   "message": "File deleted successfully."
 }
 ```
-
 
 ---
 
@@ -727,8 +726,8 @@ with httpx.Client() as client:
 
 **Path Parameters:**
 
-* `filesetId` (String, required): The ID of the FileSet.
-* `fileId` (String, required): The ID of the File.
+- `filesetId` (String, required): The ID of the FileSet.
+- `fileId` (String, required): The ID of the File.
 
 <CodeGroup>
 ```js Javascript
@@ -759,6 +758,7 @@ with httpx.Client() as client:
     response = client.delete(url, headers=headers)
     print(response.json())
 ```
+
 </CodeGroup>
 
 **Response:**
@@ -769,7 +769,6 @@ with httpx.Client() as client:
   "message": "File deleted successfully."
 }
 ```
-
 
 ---
 
@@ -790,43 +789,43 @@ with httpx.Client() as client:
 
 **Query Parameters:**
 
-| Parameter | Type | Required | Default | Description |
-| --- | --- | --- | --- | --- |
-| limit | Integer | No | 100 | Maximum number of results to return |
-| offset | Integer | No | 0 | Pagination offset |
+| Parameter | Type    | Required | Default | Description                         |
+| --------- | ------- | -------- | ------- | ----------------------------------- |
+| limit     | Integer | No       | 100     | Maximum number of results to return |
+| offset    | Integer | No       | 0       | Pagination offset                   |
 
 **Request Body Parameters:**
 
-| Parameter | Type | Required | Description |
-| --- | --- | --- | --- |
-| fieldSort | Array | No | Sort options for results. Array of FieldSort Objects. |
-| filters | Array | No | Filter criteria for the search. Array of Filter Objects. |
-| dateFilters | Array | No | Date-based filter criteria. Array of DateFilter Objects. |
+| Parameter   | Type  | Required | Description                                              |
+| ----------- | ----- | -------- | -------------------------------------------------------- |
+| fieldSort   | Array | No       | Sort options for results. Array of FieldSort Objects.    |
+| filters     | Array | No       | Filter criteria for the search. Array of Filter Objects. |
+| dateFilters | Array | No       | Date-based filter criteria. Array of DateFilter Objects. |
 
 **Filter Object Properties:**
 
-| Property | Type | Description |
-| --- | --- | --- |
-| field | String | Field name to filter on (e.g., 'name', 'description') |
-| value | Array | Values to match against |
-| not | Boolean | If true, inverts the filter match |
-| operator | String | Operation type: 'EQUALS', 'GREATER_THAN', 'LESS_THAN', 'LESS_THAN_OR_EQUAL', 'GREATER_THAN_OR_EQUAL', 'IN', 'IS_NULL', 'LIKE' |
+| Property | Type    | Description                                                                                                                   |
+| -------- | ------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| field    | String  | Field name to filter on (e.g., 'name', 'description')                                                                         |
+| value    | Array   | Values to match against                                                                                                       |
+| not      | Boolean | If true, inverts the filter match                                                                                             |
+| operator | String  | Operation type: 'EQUALS', 'GREATER_THAN', 'LESS_THAN', 'LESS_THAN_OR_EQUAL', 'GREATER_THAN_OR_EQUAL', 'IN', 'IS_NULL', 'LIKE' |
 
 **FieldSort Object Properties:**
 
-| Property | Type | Description |
-| --- | --- | --- |
-| field | String | Field name to sort by |
-| order | String | Sort direction: 'ASC' or 'DESC' |
+| Property | Type   | Description                     |
+| -------- | ------ | ------------------------------- |
+| field    | String | Field name to sort by           |
+| order    | String | Sort direction: 'ASC' or 'DESC' |
 
 **DateFilter Object Properties:**
 
-| Property | Type | Description |
-| --- | --- | --- |
-| field | String | Field name for date filter (e.g., 'created') |
-| start | String | Start timestamp as ISO string |
-| end | String | End timestamp as ISO string |
-| not | Boolean | If true, inverts the date filter match |
+| Property | Type    | Description                                  |
+| -------- | ------- | -------------------------------------------- |
+| field    | String  | Field name for date filter (e.g., 'created') |
+| start    | String  | Start timestamp as ISO string                |
+| end      | String  | End timestamp as ISO string                  |
+| not      | Boolean | If true, inverts the date filter match       |
 
 <Note>
 
@@ -851,45 +850,45 @@ fetch('https://{instance}.domo.com/api/files/v1/filesets/search?limit=50&offset=
   .then((result) => console.log(result.fileSets))
   .catch((error) => console.error(`Error: ${error}`));
 
-
 // Example 2: Advanced search with filters and sorting
 fetch('https://{instance}.domo.com/api/files/v1/filesets/search', {
-  method: 'POST',
-  headers: {
-    'X-DOMO-Developer-Token': '<your-token-here>',
-    'Content-Type': 'application/json',
-  },
-  body: JSON.stringify({
-    // Sort by name in ascending order
-    fieldSort: [
-      {
-        field: 'name',
-        order: 'ASC',
-      },
-    ],
-    // Filter FileSet by name containing "Marketing"
-    filters: [
-      {
-        field: 'name',
-        value: ['Marketing'],
-        operator: 'LIKE',
-        not: false,
-      },
-    ],
-    // Filter FileSet created between two dates
-    dateFilters: [
-      {
-        field: 'created',
-        start: new Date('2024-06-01').toISOString(), // June 1, 2024 as ISO string
-        end: new Date('2024-06-30').toISOString(), // June 30, 2024 as ISO string
-      },
-    ],
-  }),
+method: 'POST',
+headers: {
+'X-DOMO-Developer-Token': '<your-token-here>',
+'Content-Type': 'application/json',
+},
+body: JSON.stringify({
+// Sort by name in ascending order
+fieldSort: [
+{
+field: 'name',
+order: 'ASC',
+},
+],
+// Filter FileSet by name containing "Marketing"
+filters: [
+{
+field: 'name',
+value: ['Marketing'],
+operator: 'LIKE',
+not: false,
+},
+],
+// Filter FileSet created between two dates
+dateFilters: [
+{
+field: 'created',
+start: new Date('2024-06-01').toISOString(), // June 1, 2024 as ISO string
+end: new Date('2024-06-30').toISOString(), // June 30, 2024 as ISO string
+},
+],
+}),
 })
-  .then((response) => response.json())
-  .then((result) => console.log(result.fileSets))
-  .catch((error) => console.error(`Error: ${error}`));
-```
+.then((response) => response.json())
+.then((result) => console.log(result.fileSets))
+.catch((error) => console.error(`Error: ${error}`));
+
+````
 
 ```python Python
 import httpx
@@ -939,7 +938,8 @@ data = {
 with httpx.Client() as client:
     response = client.post(url, headers=headers, json=data)
     print(response.json())
-```
+````
+
 </CodeGroup>
 
 **Response:**
@@ -985,7 +985,6 @@ with httpx.Client() as client:
     print(response.json())
 ```
 
-
 **Response:**
 
 ```json
@@ -1010,7 +1009,6 @@ with httpx.Client() as client:
 }
 ```
 
-
 ---
 
 ## Create FileSet
@@ -1028,19 +1026,19 @@ with httpx.Client() as client:
 
 **Request Body Parameters:**
 
-| Parameter | Type | Required | Description |
-| --- | --- | --- | --- |
-| name | String | Yes | The name of the FileSet |
-| accountId | Integer | No | The account ID to associate (nullable) |
-| connectorContext | Object | No | Connector context for the FileSet (nullable). ConnectorContext Object. |
-| description | String | No | Description for the FileSet |
+| Parameter        | Type    | Required | Description                                                            |
+| ---------------- | ------- | -------- | ---------------------------------------------------------------------- |
+| name             | String  | Yes      | The name of the FileSet                                                |
+| accountId        | Integer | No       | The account ID to associate (nullable)                                 |
+| connectorContext | Object  | No       | Connector context for the FileSet (nullable). ConnectorContext Object. |
+| description      | String  | No       | Description for the FileSet                                            |
 
 **ConnectorContext Object Properties:**
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| connector | String | Yes | The connector key |
-| relativePath | String | No | Relative path for the connector (nullable) |
+| Property     | Type   | Required | Description                                |
+| ------------ | ------ | -------- | ------------------------------------------ |
+| connector    | String | Yes      | The connector key                          |
+| relativePath | String | No       | Relative path for the connector (nullable) |
 
 <CodeGroup>
 ```js Javascript
@@ -1081,6 +1079,7 @@ with httpx.Client() as client:
     response = client.post(url, headers=headers, json=data)
     print(response.json())
 ```
+
 </CodeGroup>
 
 **Response:**
@@ -1094,7 +1093,6 @@ with httpx.Client() as client:
   "createdBy": 111111111
 }
 ```
-
 
 ---
 
@@ -1113,7 +1111,7 @@ with httpx.Client() as client:
 
 **Path Parameters:**
 
-* `filesetId` (String, required): The ID of the FileSet.
+- `filesetId` (String, required): The ID of the FileSet.
 
 <CodeGroup>
 ```js Javascript
@@ -1142,6 +1140,7 @@ with httpx.Client() as client:
     response = client.get(url, headers=headers)
     print(response.json())
 ```
+
 </CodeGroup>
 
 **Response:**
@@ -1155,7 +1154,6 @@ with httpx.Client() as client:
   "createdBy": 111111111
 }
 ```
-
 
 ## Update FileSet by Id
 
@@ -1172,14 +1170,14 @@ with httpx.Client() as client:
 
 **Path Parameters:**
 
-* `filesetId` (String, required): The ID of the FileSet.
+- `filesetId` (String, required): The ID of the FileSet.
 
 **Request Body Parameters:**
 
-| Parameter | Type | Required | Description |
-| --- | --- | --- | --- |
-| name | String | No | The new name for the FileSet |
-| description | String | No | The new description for FileSet |
+| Parameter   | Type   | Required | Description                     |
+| ----------- | ------ | -------- | ------------------------------- |
+| name        | String | No       | The new name for the FileSet    |
+| description | String | No       | The new description for FileSet |
 
 <CodeGroup>
 ```js Javascript
@@ -1216,6 +1214,7 @@ with httpx.Client() as client:
     response = client.post(url, headers=headers, json=data)
     print(response.json())
 ```
+
 </CodeGroup>
 
 **Response:**
@@ -1229,7 +1228,6 @@ with httpx.Client() as client:
   "createdBy": 111111111
 }
 ```
-
 
 ---
 
@@ -1248,7 +1246,7 @@ with httpx.Client() as client:
 
 **Path Parameters:**
 
-* `filesetId` (String, required): The ID of the FileSet.
+- `filesetId` (String, required): The ID of the FileSet.
 
 <CodeGroup>
 ```js Javascript
@@ -1277,6 +1275,7 @@ with httpx.Client() as client:
     response = client.delete(url, headers=headers)
     print(response.json())
 ```
+
 </CodeGroup>
 
 **Response:**

@@ -68,4 +68,5 @@ Use `New-Article-Template.mdx` as the starting point for new KB articles.
 |new-kb-article|Drafting a new KB article following Domo's style guide and template. This skill calls the kb-intake skill|
 |add-to-nav|Adding a page to docs.json navigation or moving an existing page to a different location in docs.json|
 |update-kb-article|Any update to an existing KB article: renames, content edits, image swaps, content removal, file path updates, cross-file changes, step/process edits, navigation moves, merges, or splits|
+|mintlify-design|Mintlify component/page-design expert: choosing components, composing custom layouts, building rich pages, "is there a component for X" questions, or authoring reusable snippets in `/snippets/`|
 |fix-ja-formatting|Fixing structural formatting issues in queued Japanese articles: inline image placement, Frame vs. InlineImage mismatches, callout wrapping, and redundant blank lines|

@@ -348,13 +348,18 @@ v3 reframes `working-directory` to mean the **source** directory. The new `publi
 
 If you don't run a build (flat ProCode app), no change is needed — defaults still publish from the repo root.
 
+### Also fixed in v3
+
+- **Each deploy no longer creates a new design.** v2 invoked `domo publish --build-dir <dir>`, which made ryuu read the manifest from the *caller's* CWD (your repo root, where `public/manifest.json` typically has no `id`). Result: a brand-new app on every run, even though your build output had the right `id`. v3 chdirs into `publish-dir` first and runs plain `domo publish`, so ryuu reads the manifest your build actually emitted. Tools like `da apply-manifest` that write the resolved id into the build output Just Work now.
+- **`./build/build` resolution bug** (the v2 `working-directory` + `--build-dir` interaction) is gone.
+
 ## Troubleshooting
 
 | Symptom | Likely cause | Fix |
 |---|---|---|
 | `Manifest not found` | `publish-dir` doesn't contain `manifest.json` after build | Ensure your build copies `manifest.json` into the publish output (e.g. via Vite's `public/` folder). Verify locally: `ls $(your-build-dir)/manifest.json` |
 | `Authentication failed` | Bad / expired token, or wrong instance URL | Regenerate the token in Domo admin. Ensure `domo-instance` includes the `https://` scheme. |
-| Each deploy creates a new app | Missing `id` in `manifest.json` | After first publish, copy `id` from `build/manifest.json` into your source `public/manifest.json`. |
+| Each deploy creates a new app | `manifest.json` inside `publish-dir` has no `id`, or its `id` doesn't exist on the target instance | After the first publish, ensure the `id` from `<publish-dir>/manifest.json` is what subsequent runs publish. If you use `da apply-manifest` for per-env overrides, confirm `manifestOverrides.json` has the right `id` for that env. v3 reads the manifest from the build output, so anything written there at build time is what ryuu sees. |
 | Repo files leak into the published app | Using v2 without an isolated `working-directory`, or upgraded to v3 but didn't set `publish-dir` | Set `publish-dir` to your build output folder. |
 | `sh: 1: da: not found` (or other CLI not on PATH in CI) | The CLI is installed globally locally but not in CI's clean install | Add the CLI as a `devDependency` (e.g. `@domoinc/da`) so `npm ci` puts it in `node_modules/.bin`. |
 | AppDB calls fail at runtime | Missing `proxyId` in `manifest.json` | After first publish with `collections`, copy `proxyId` from `build/manifest.json`. |
@@ -382,9 +387,11 @@ domo login -i your-instance.domo.com -t $DOMO_ACCESS_TOKEN
 # Run lint, test, build, etc.
 npm run build
 
-# Publish your app from the build output
-domo publish --build-dir ./build
+# Publish from inside the build output (NOT `domo publish --build-dir ./build`)
+cd build && domo publish
 ```
+
+> **Why `cd` instead of `--build-dir`**: ryuu reads `manifest.json` *before* applying its own `--build-dir` chdir, so it would resolve the manifest against the caller's CWD (often `public/manifest.json` with no `id`) — causing a brand-new design to be created on every run. Chdir-ing yourself first lets ryuu's manifest lookup land directly on the resolved file your build emitted.
 
 **Example for GitLab CI:**
 
@@ -396,7 +403,7 @@ deploy:
     - npm install -g ryuu
     - domo login -i your-instance.domo.com -t $DOMO_ACCESS_TOKEN
     - npm run build
-    - domo publish --build-dir ./build
+    - cd build && domo publish
   only:
     - main
 ```

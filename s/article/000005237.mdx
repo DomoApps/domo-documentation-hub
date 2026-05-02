@@ -1,76 +1,46 @@
 ---
-title: "Domo on Google BigQuery"
+title: "Connect Domo to Google BigQuery"
 ---
 
-## Introduction
+## Intro
 
-Domo's Cloud Integrations connects to Google BigQuery so you can query and visualize BigQuery data directly in Domo without moving or duplicating it.
+This article explains how to connect Domo to Google BigQuery using Cloud Integrations, enable writeback to BigQuery, configure native transform, and set up OAuth authentication.
 
-Cloud Integrations setup consists of two parts:
-
-- **Read-only:** Enables virtual tables that read from BigQuery for creating cards, alerts, or inputs in Magic ETL DataFlows.
-- **Write-back:** Adds the ability to write data back to BigQuery.
-
-<Note>
-  **Note:** You can start with Read-only and configure Write-back later.
-</Note>
-
-## Architectural Overview
-
-The following diagram illustrates the Cloud Integrations–BigQuery integration.
-
-<Frame>
-  <img
-    alt="BigQuery architecture diagram.png"
-    src="/images/kb/ka0Vq000000BER3-00N5w00000Ri7BU-0EMVq000003Db3G.jpg"
-  />
-</Frame>
+<Note>**Note:** Cloud Integrations setup consists of two parts: read-only, which enables virtual tables that read from BigQuery for creating cards, alerts, or inputs in Magic ETL DataFlows; and writeback, which adds the ability to write data back to BigQuery. You can start with read-only and configure writeback later.</Note>
 
 ---
 
 ## Prerequisites
 
-Complete these steps before setting up the BigQuery integration:
+Complete these steps before setting up the BigQuery integration.
 
-1. **Create a Domo Service Account (Recommended)**
-   - You can use any Domo account, but creating a dedicated account is best practice.
-   - Assign the following roles:
-     - Manage Cloud Accounts
-     - Manage DataSet
-   - See [Managing User Roles and Grants](/s/article/360043438973).
+**Create a Domo service account (recommended).** You can use any Domo account, but creating a dedicated account is best practice. Assign the following roles:
 
-2. **Create a Service Account in Google Cloud Console**
-   - Choose one of the following authentication mechanisms:
-     - **Option 1: Key File**
-       - Create a BigQuery service account.
-       - Grant the required roles and permissions (see [Roles and Permissions](#roles-and-permissions) below).
-       - Add a key to the service account.
-       - Download the JSON key file for authentication.
-     - **Option 2: Workload Identity Federation (WIF)**
-       - Open a Domo support ticket to request BigQuery integration using WIF. Specify the provider type: AWS or OIDC.
-       - Domo will provide:
-         - For AWS: Account ID
-         - For OIDC: Issuer URL and Allowed Audiences
-       - Create a Workload Identity Pool in Google Cloud IAM.
-       - Add a provider using the details from Domo Support.
-       - Update the mapping to point `assertion.sub` to `google.subject`.
-       - Create a BigQuery service account.
-       - Grant the required roles and permissions, including Workload Identity User (see [Roles and Permissions](#roles-and-permissions) below).
-       - Download the JSON configuration file from the Connected Service Accounts panel. When exporting the configuration, use the audience provided by Domo Support.
+- Manage Cloud Accounts
+- Manage DataSet
+
+For more information, see [Managing User Roles and Grants](/s/article/360043438973).
+
+**Create a service account in Google Cloud Console.** Choose one of the following authentication methods:
+
+- **Option 1 —** Key file. Create a BigQuery service account, grant the required roles and permissions (see [Roles and Permissions](#roles-and-permissions) below), add a key to the service account, and download the JSON key file for authentication.
+- **Option 2 —** Workload Identity Federation (WIF). Open a Domo support ticket to request BigQuery integration using WIF, specifying the provider type (AWS or OIDC). Domo provides an Account ID for AWS or an Issuer URL and Allowed Audiences for OIDC. Create a Workload Identity Pool in Google Cloud IAM, add a provider using the details from Domo Support, and update the mapping to point `assertion.sub` to `google.subject`. Create a BigQuery service account, grant the required roles and permissions, including Workload Identity User (see [Roles and Permissions](#roles-and-permissions) below), and download the JSON configuration file from the Connected Service Accounts panel. When exporting the configuration, use the audience provided by Domo Support.
 
 ### Roles and Permissions
 
-The BigQuery service account must have the following roles:
+The BigQuery service account must have the following roles.
 
-- **Read-only integration:**
-  - Roles:
-    - BigQuery Data Viewer
-  - No additional permissions are required for read-only access.
-- **Write-back and native transform:**
-  - Roles:
+**Read-only integration**
+
+- Roles: BigQuery Data Viewer
+- No additional permissions are required for read-only access.
+
+**Writeback and native transform**
+
+- Roles:
     - BigQuery Job User
     - Service Account Token Creator (only if using WIF)
-  - Additional Permissions:
+- Additional permissions:
     - `bigquery.datasets.create`
     - `bigquery.datasets.delete`
     - `bigquery.datasets.get`
@@ -86,222 +56,254 @@ The BigQuery service account must have the following roles:
     - `bigquery.jobs.get`
     - `bigquery.jobs.update`
 
-<Note>
-  **Note:** Domo only deletes BigQuery tables and datasets it creates for
-  temporary staging. Domo does not remove objects it did not create or objects
-  intended to be permanent.
-</Note>
+<Note>**Note:** Domo only deletes BigQuery tables and datasets it creates for temporary staging. Domo does not remove objects it did not create or objects intended to be permanent.</Note>
 
----
 
-## Access BigQuery Integrations
+## Review the Architectural Overview
 
-To open the **Domo on BigQuery** page:
+The following diagram illustrates the Cloud Integrations–BigQuery integration.
 
-1. Navigate to **Data Warehouse**.
+<Frame>
+  <img
+    alt="BigQuery architecture diagram"
+    src="/images/kb/ka0Vq000000BER3-00N5w00000Ri7BU-0EMVq000003Db3G.jpg"
+  />
+</Frame>
+
+
+## Open the Domo on BigQuery Page
+
+1. In the navigation header, select **Data Warehouse**.
+
 2. Select **Connect Data** > **BigQuery**.
-   The **Domo on BigQuery** page appears.
+The **Domo on BigQuery** page appears.
 
-![Domo on BigQuery page](/images/kb/bigquery-cloud-integrations-01.png)
+<Frame>
+  ![Domo on BigQuery page](/images/kb/bigquery-cloud-integrations-01.png)
+</Frame>
 
 3. Select **Connect BigQuery** to create a new integration, or select **Manage Integrations** to modify existing integrations.
-   If you selected **Manage Integrations**, a list of your integrations appears.
+If you selected **Manage Integrations**, a list of your integrations appears.
 
-![BigQuery cloud integrations list](/images/kb/bigquery-cloud-integrations-02.png)
+<Frame>
+  ![BigQuery cloud integrations list](/images/kb/bigquery-cloud-integrations-02.png)
+</Frame>
 
-4. Select the wrench icon next to an integration to view available options. The options shown depend on your access level.
+4. Select the wrench icon next to an integration to view available options.
+The options shown depend on your access level. From the integration overview, you can create a new integration, update an existing one, or configure writeback, native transform, and OAuth.
 
-From the integration overview, you can create a new integration, update an existing one, or configure write-back, native transform, and OAuth.
-
----
 
 ## Create a BigQuery Integration
 
-1. Enter a name to identify this BigQuery integration in Domo. It doesn't need to match anything in BigQuery and can be changed later.
-2. (Optional) Enter a short description to help others understand the purpose of this integration. This description is visible only in the integration details.
-3. Select an existing service account from **BigQuery Service Account**, or select **Add Account** to create a new one. To create a service account, see [Create a BigQuery Account](#create-a-bigquery-account).
+Begin on the **Domo on BigQuery** page (see [Open the Domo on BigQuery Page](#open-the-domo-on-bigquery-page)).
 
-   This account authenticates with BigQuery and determines access to tables.
+1. Enter a name to identify this BigQuery integration in Domo.
+The name does not need to match anything in BigQuery and can be changed later.
 
-   <Warning>
-     **Important:** Changing the service account later may require remapping
-     DataSets or Magic ETL DataFlows if access permissions differ.
-   </Warning>
+2. (Optional) Enter a short description to help others understand the purpose of this integration.
+This description is visible only in the integration details.
 
-![BigQuery integration setup form](/images/kb/bigquery-cloud-integrations-03.png)
+3. Select an existing service account from **BigQuery Service Account**, or select **Add Account** to create a new one.
+This account authenticates with BigQuery and determines access to tables. To create a service account, see [Create a BigQuery Account](#create-a-bigquery-account).
+
+   <Warning>**Important:** Changing the service account later may require remapping DataSets or Magic ETL DataFlows if access permissions differ.</Warning>
+
+<Frame>
+  ![BigQuery integration setup form](/images/kb/bigquery-cloud-integrations-03.png)
+</Frame>
 
 4. Select your **BigQuery Region**.
 
 5. Select **Save Integration**.
+A confirmation screen appears when the integration is created successfully.
 
-When the integration is created successfully, a confirmation screen appears. Select **Proceed to Integration Overview** to open the integration.
+6. Select **Proceed to Integration Overview**.
+The integration opens.
 
-![Integration created successfully](/images/kb/bigquery-cloud-integrations-13.png)
+<Frame>
+  ![Integration created successfully](/images/kb/bigquery-cloud-integrations-13.png)
+</Frame>
 
----
 
 ## Create a BigQuery Account
 
 Every BigQuery integration in Domo requires an authenticated BigQuery service account. Once created, a single service account can be reused across multiple integrations.
 
-To create a BigQuery service account in Domo:
+Begin in the BigQuery service account creation flow in Domo. Choose one of the following authentication methods.
 
-**Select Your Authentication Method.** Choose one of the following methods for your BigQuery account:
+<Frame>
+  ![Authentication method selection](/images/kb/bigquery-cloud-integrations-08.png)
+</Frame>
 
-![Authentication method selection](/images/kb/bigquery-cloud-integrations-08.png)
+### Option 1: Use a BigQuery Service Account Key File
 
-### Option 1: BigQuery Service Account Key File
+1. Enter a name to identify the BigQuery service account in Domo.
+The name can be changed later.
 
-1. Enter a name to identify the BigQuery service account in Domo. This name can be changed later.
-
-   <Note>
-     **Tip:** Use a clear, distinct name to differentiate between multiple
-     service accounts and integrations.
-   </Note>
+   <Tip>**Tip:** Use a clear, distinct name to differentiate between multiple service accounts and integrations.</Tip>
 
 2. Upload the JSON key file you downloaded from the Google Cloud Console.
 
-![Key file upload form](/images/kb/bigquery-cloud-integrations-12.png)
+<Frame>
+  ![Key file upload form](/images/kb/bigquery-cloud-integrations-12.png)
+</Frame>
 
-### Option 2: Workload Identity Federation (WIF)
+### Option 2: Use Workload Identity Federation (WIF)
 
-1. Enter a name to identify the BigQuery service account in Domo. This name can be changed later.
+1. Enter a name to identify the BigQuery service account in Domo.
+The name can be changed later.
 
 2. Enter the **Project ID** where you created your service account.
 
 3. Upload the JSON configuration file you downloaded from the Google Cloud Console.
 
-![WIF configuration file upload form](/images/kb/bigquery-cloud-integrations-09.png)
+<Frame>
+  ![WIF configuration file upload form](/images/kb/bigquery-cloud-integrations-09.png)
+</Frame>
 
----
 
-## Enable BigQuery Write-back
+## Enable BigQuery Writeback
 
-Write-back allows Domo to create and update tables in your BigQuery instance using the associated service account. Enable it when you want to use BigQuery as an output for Magic ETL DataFlows.
+Writeback allows Domo to create and update tables in your BigQuery instance using the associated service account. Enable it when you want to use BigQuery as an output for Magic ETL DataFlows.
 
-<Note>
-  **Note:** If you only need to read BigQuery data, skip this section.
-</Note>
+<Note>**Note:** If you only need to read BigQuery data, skip this section.</Note>
 
-Even when write-back is enabled, access must be explicitly granted to individuals or groups. Basic access does not automatically include write-back privileges.
+Even when writeback is enabled, access must be explicitly granted to individuals or groups. Basic access does not automatically include writeback privileges. You can manage access levels on the **Accounts** page by selecting **Account Sharing** next to the relevant BigQuery service account.
 
-You can manage access levels on the **Accounts** page by selecting **Account Sharing** next to the relevant BigQuery service account.
+To configure writeback, begin on the integration's **Settings** page.
 
-To configure write-back, navigate to the integration's **Settings** page: go to **Data Warehouse > Connect Data > BigQuery**, select **Manage Integrations**, then select the wrench icon next to your integration. In the **Write** section, select **Set up write**.
+1. Navigate to **Data Warehouse** > **Connect Data** > **BigQuery**, select **Manage Integrations**, then select the wrench icon next to your integration.
+The **Settings** page appears.
 
-![Integration Settings page](/images/kb/bigquery-cloud-integrations-21.png)
+<Frame>
+  ![Integration Settings page](/images/kb/bigquery-cloud-integrations-21.png)
+</Frame>
 
-1. Select the BigQuery project to use for writing data from Domo.
+2. In the **Write** section, select **Set up write**.
+The **Configure Write Access** dialog appears.
 
-2. Select the default dataset for data output.
+3. Select the BigQuery project to use for writing data from Domo.
 
-![Configure Write Access dialog](/images/kb/bigquery-cloud-integrations-22.png)
+4. Select the default dataset for data output.
 
-3. Select the authorization checkbox to confirm that Domo is authorized to create, modify, and delete objects in BigQuery using the service account. Select **Save & Enable Write**.
+<Frame>
+  ![Configure Write Access dialog](/images/kb/bigquery-cloud-integrations-22.png)
+</Frame>
 
-![Finalize Write Integration dialog](/images/kb/bigquery-cloud-integrations-25.png)
+5. Select the authorization checkbox to confirm that Domo is authorized to create, modify, and delete objects in BigQuery using the service account.
 
-After setup, the **Write** section on the Settings page displays the configured project and dataset with a green checkmark.
+6. Select **Save & Enable Write**.
+The **Write** section on the **Settings** page displays the configured project and dataset with a green checkmark.
 
-![Settings page with write-back enabled](/images/kb/bigquery-cloud-integrations-26.png)
+<Frame>
+  ![Finalize Write Integration dialog](/images/kb/bigquery-cloud-integrations-25.png)
+</Frame>
 
----
+<Frame>
+  ![Settings page with writeback enabled](/images/kb/bigquery-cloud-integrations-26.png)
+</Frame>
+
 
 ## Enable Native Transform
 
-Native transform is optional; without it, Domo uses its own compute resources to read and write BigQuery data. When enabled for an integration, anyone who shares that integration can choose BigQuery compute for individual Magic ETL DataFlows. This is a per-pipeline selection, not a global setting.
+Native transform is optional. Without it, Domo uses its own compute resources to read and write BigQuery data. When enabled for an integration, anyone who shares that integration can choose BigQuery compute for individual Magic ETL DataFlows. This is a per-pipeline selection, not a global setting.
 
-<Note>
-  **Note:** The project and dataset values for native transform are shared with
-  the write-back configuration. Changing them in one place changes both.
-</Note>
+<Note>**Note:** The project and dataset values for native transform are shared with the writeback configuration. Changing them in one place changes both.</Note>
 
-To configure native transform, navigate to the integration's **Settings** page (see [Enable BigQuery Write-back](#enable-bigquery-write-back) for navigation steps). In the **Native transform** section, select **Set up native transform**.
+To configure native transform, begin on the integration's **Settings** page (see [Enable BigQuery Writeback](#enable-bigquery-writeback) for navigation steps).
 
-1. Select the BigQuery project for native transform.
+1. In the **Native transform** section, select **Set up native transform**.
+The **Configure Native Transform** dialog appears.
 
-2. Select the default BigQuery dataset.
+2. Select the BigQuery project for native transform.
 
-![Configure Native Transform dialog](/images/kb/bigquery-cloud-integrations-27.png)
+3. Select the default BigQuery dataset.
 
-3. Select the authorization checkbox to confirm that Domo is authorized to create, alter, update, and delete objects in your BigQuery environment. Select **Save & Enable Native Transform**.
+<Frame>
+  ![Configure Native Transform dialog](/images/kb/bigquery-cloud-integrations-27.png)
+</Frame>
 
-![Finalize Native Transform dialog](/images/kb/bigquery-cloud-integrations-28.png)
+4. Select the authorization checkbox to confirm that Domo is authorized to create, alter, update, and delete objects in your BigQuery environment.
 
-After setup, the **Native transform** section on the Settings page displays the configured project and dataset with a green checkmark.
+5. Select **Save & Enable Native Transform**.
+The **Native transform** section on the **Settings** page displays the configured project and dataset with a green checkmark.
 
-![Settings page with write-back and native transform enabled](/images/kb/bigquery-cloud-integrations-29.png)
+<Frame>
+  ![Finalize Native Transform dialog](/images/kb/bigquery-cloud-integrations-28.png)
+</Frame>
 
----
+<Frame>
+  ![Settings page with writeback and native transform enabled](/images/kb/bigquery-cloud-integrations-29.png)
+</Frame>
+
 
 ## Configure OAuth
 
-When OAuth is enabled for a cloud integration, all DataSets connected through that integration use OAuth authentication.
+When OAuth is enabled for a cloud integration, all DataSets connected through that integration use OAuth authentication. When you view a card or preview a DataSet built with an OAuth-enabled integration, Domo prompts you to enter your Google Cloud Platform (GCP) credentials. Domo then queries BigQuery data in the context of your account, rather than the BigQuery service account.
 
-When you view a card or preview a DataSet built with an OAuth-enabled integration, Domo prompts you to enter your Google Cloud Platform (GCP) credentials. Domo then queries BigQuery data in the context of your account, rather than the BigQuery service account.
+<Note>**Note:** Currently, Domo enforces OAuth for reading data from BigQuery. This applies to individuals viewing connected DataSets and derived assets such as cards and dashboards. OAuth does not apply to Magic ETL, writeback, or native transforms. These operations use the BigQuery service account instead of an individual GCP account.</Note>
 
-<Note>
-  Currently, Domo enforces OAuth for reading data from BigQuery. This applies to individuals viewing connected DataSets and derived assets such as cards and Dashboards.
+OAuth configuration is optional. Even without OAuth, Domo can connect to BigQuery to read data, use BigQuery compute, and write data back to BigQuery (if writeback is enabled).
 
-OAuth does not apply to Magic ETL, write-back, or native transforms. These operations use the BigQuery service account instead of an individual GCP account.
+To configure OAuth, begin on the integration's **Settings** page (see [Enable BigQuery Writeback](#enable-bigquery-writeback) for navigation steps).
 
-</Note>
+1. In the **OAuth** section, select **Set up OAuth**.
+The **Configure OAuth Settings** dialog appears.
 
-OAuth configuration is optional. Even without OAuth, Domo can:
+2. Select an existing configuration from the **BigQuery OAuth Configuration** dropdown, or select **Add OAuth Config...** to create a new one.
 
-- Connect to BigQuery to read data
-- Use BigQuery compute
-- Write data back to BigQuery (if write-back is enabled)
+   <Frame>
+     ![Configure OAuth Settings — select configuration](/images/kb/bigquery-cloud-integrations-18.png)
+   </Frame>
 
-To configure OAuth, navigate to the integration's **Settings** page (see [Enable BigQuery Write-back](#enable-bigquery-write-back) for navigation steps). In the **OAuth** section, select **Set up OAuth**.
+3. (Conditional) For new configurations only, enter an **OAuth Configuration Name** and the **Default billing project ID**.
+This is the GCP project whose billing account will be charged for query usage.
 
-1. In the **Configure OAuth Settings** dialog, select an existing configuration from the **BigQuery OAuth Configuration** dropdown, or select **Add OAuth Config...** to create a new one.
+   <Note>**Note:** Enter the Project ID exactly as it appears in GCP, including case sensitivity.</Note>
 
-   ![Configure OAuth Settings — select configuration](/images/kb/bigquery-cloud-integrations-18.png)
+   <Frame>
+     ![Configure OAuth Settings — add new configuration](/images/kb/bigquery-cloud-integrations-19.png)
+   </Frame>
 
-2. (New configurations only) Enter an **OAuth Configuration Name** and the **Default billing project ID**. This is the GCP project whose billing account will be charged for query usage.
+4. Select **Connect**.
+A Google sign-in window appears.
 
-   <Note>
-     **Note:** Enter the Project ID exactly as it appears in GCP, including case
-     sensitivity.
-   </Note>
+   <Frame>
+     ![Google sign-in](/images/kb/bigquery-cloud-integrations-20.png)
+   </Frame>
 
-   ![Configure OAuth Settings — add new configuration](/images/kb/bigquery-cloud-integrations-19.png)
+5. Select your GCP account and sign in.
 
-3. Select **Connect**. A Google sign-in window appears.
+6. Select **Save** to apply the OAuth configuration.
 
-   ![Google sign-in](/images/kb/bigquery-cloud-integrations-20.png)
 
-4. Select your GCP account and sign in.
-
-5. Select **Save** to apply the OAuth configuration.
-
----
-
-## Advanced Features
-
-### Query Metadata
+## Review Query Metadata
 
 Domo provides additional metadata fields for queries executed through BigQuery integrations. These fields help you track and audit query context. They are visible in BigQuery's job history under the job labels.
 
-**Metadata Fields Available:**
+The following metadata fields are available:
 
-- `application` → `"ice"` (Domo's internal identifier for Cloud Integrations)
-- `customer` → Customer name
-- `connection` → BigQuery integration name
-- `dataset` → BigQuery integration dataset name
-- `data_source_id` → DataSource ID
-- `card_id` → DataSource card ID
+| Field            | Value                                                              |
+| ---------------- | ------------------------------------------------------------------ |
+| `application`    | `"ice"` (Domo's internal identifier for Cloud Integrations)        |
+| `customer`       | Customer name                                                      |
+| `connection`     | BigQuery integration name                                          |
+| `dataset`        | BigQuery integration dataset name                                  |
+| `data_source_id` | DataSource ID                                                      |
+| `card_id`        | DataSource card ID                                                 |
 
----
 
-## Next Steps
+## Connect Tables to DataSets
 
-After setting up your BigQuery integration, you can connect BigQuery tables to Domo DataSets using the **Connect Tables** section in the integration overview. For more information, see [Connecting Tables to Domo](s/article/Connect-Tables-in-Cloud-Integrations).
+After setting up your BigQuery integration, you can connect BigQuery tables to Domo DataSets using the **Connect Tables** section in the integration overview. Learn more about [connecting tables to Domo](/s/article/Connect-Tables-in-Cloud-Integrations).
 
----
 
 ## FAQ
 
-**Can I use spaces in table names?**
+<AccordionGroup>
+
+<Accordion title="Can I use spaces in table names?">
 No, spaces are not allowed in table names.
+</Accordion>
+
+</AccordionGroup>

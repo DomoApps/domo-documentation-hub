@@ -55,26 +55,28 @@ Follow this structure:
 ```
 Hello everyone!
 
-We're excited to announce that version <X.Y.Z> of the Domo Documentation Hub is now available! <one-sentence framing of the release's overall theme>
+We're excited to announce that version <X.Y.Z> of the Domo Documentation Hub is now available! <one-sentence framing of the release's overall theme> You can view these changes in our knowledge base at www.domo.com/docs.
 
+---
 
-🌟 What's New
+**🌟 What's New**
 
-<emoji> <Theme Title>
+**<emoji> <Theme Title>**
 <1–3 sentences describing the change and its value.>
 Thanks to <Contributor> for <brief reason>.
 
 <repeat for each theme>
 
+---
 
-🙏 Thank You
+**🙏 Thank You**
 
 A heartfelt thank you to everyone who contributed to this release. <one warm closing sentence>
 
 If you have questions or feedback, please reach out — we're always happy to help!
 ```
 
-Keep tone warm and appreciative. Use bullets (`  •`) for sub-lists inside a theme when listing many discrete items.
+Keep tone warm and appreciative. Use bullets (`  •`) for sub-lists inside a theme when listing many discrete items. All section headers — including "🌟 What's New", each theme title, and "🙏 Thank You" — must be **bolded** using `**...**`.
 
 ### 5. Confirm
 

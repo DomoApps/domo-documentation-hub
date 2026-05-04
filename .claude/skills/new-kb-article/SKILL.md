@@ -45,6 +45,18 @@ Create a new MDX file in `s/article/` using the filename format `Article-Title-H
 
 Follow the structure from `New-Article-Template.mdx` and apply all style rules from `Domo-KB-Style-Guide.mdx` exactly.
 
+### Apply the beta convention (if applicable)
+
+Use the release-status answer from Step 2 to decide which beta treatment, if any, to apply. The full convention lives in `Domo-KB-Style-Guide.mdx` › **Beta Features** — read it before writing.
+
+- **Entire article is beta:** add `tag: "Beta"` to the frontmatter and place the standard beta Note immediately after the frontmatter, above the Intro. Do not append `(Beta)` to the title.
+- **Only certain sections are beta:** append `<Badge className="text-primary bg-primary/10 font-bold">Beta</Badge>` to each beta section's heading. Place the standard beta Note under the **first** beta section only — do not repeat it for subsequent beta sections in the same article. Do not append `(Beta)` to any heading.
+- **Entire article is GA:** no beta tag, badge, or Note.
+
+The `className` on the Badge is required and must be exactly `text-primary bg-primary/10 font-bold` — it matches the sidebar `tag` styling.
+
+The standard beta Note must be used verbatim — do not paraphrase or change the links. Copy it from the style guide.
+
 ---
 
 ## Output

@@ -21,12 +21,12 @@ No.
 Here are some common reasons why you might have received an Invalid Query error as a result of improper practices in setting up a Beast Mode:
 
 * Column names need to be surrounded by back tics: `` `column` ``. Users commonly use single quote marks instead of the back tic, and this creates the error.
-* A string value needs to be surrounded by single quotes: `‘text’`.
+* A string value needs to be surrounded by single quotes: `'text'`.
 * A case statement always needs to have a `CASE`, `WHEN`, `THEN`, and an `END.` Here is an example of a basic case statement:
     <br/><br/>
-  `` CASE WHEN `column1` = ‘good’ THEN ‘Yes’ ELSE ‘No’ `` `END`
+  `` CASE WHEN `column1` = 'good' THEN 'Yes' ELSE 'No' `` `END`
     <br/><br/>
-  The `ELSE` portion is optional; if there is no `ELSE` then the value will be `NULL` if it doesn’t match the first portion.
+  The `ELSE` portion is optional; if there is no `ELSE` then the value will be `NULL` if it doesn't match the first portion.
 
 If you have additional questions about how to implement functions properly in Beast Mode, review this article: [Beast Mode Functions Reference Guide](/s/article/360043429933 "Beast Mode Functions Reference Guide")
 
@@ -87,11 +87,11 @@ For this situation, the Best Mode would look like this:
 ```
 CASE
 
-WHEN `opportunity_type` = ‘upsell’ AND `opportunity_won` = ‘true’ THEN ‘Yes’
+WHEN `opportunity_type` = 'upsell' AND `opportunity_won` = 'true' THEN 'Yes'
 
-WHEN `opportunity_type` = ‘upsell’ AND `opportunity_paused` = ‘true’ THEN ‘Yes’
+WHEN `opportunity_type` = 'upsell' AND `opportunity_paused` = 'true' THEN 'Yes'
 
-ELSE ‘No’
+ELSE 'No'
 
 END
 ```
@@ -105,11 +105,11 @@ The Beast Mode you would create to this could be named “Opty Closed within 10 
 ```
 CASE
 
-WHEN DATEDIFF(`Opportunity_Closed_Date`,`Opportunity_Open_Date`) <= 10 THEN ‘Yes’
+WHEN DATEDIFF(`Opportunity_Closed_Date`,`Opportunity_Open_Date`) <= 10 THEN 'Yes'
 
-WHEN DATEDIFF(`Opportunity_Closed_Date`,`Opportunity_Open_Date`) > 10 THEN ‘No’
+WHEN DATEDIFF(`Opportunity_Closed_Date`,`Opportunity_Open_Date`) > 10 THEN 'No'
 
-ELSE ‘Outlier’
+ELSE 'Outlier'
 
 END
 ```
@@ -127,9 +127,9 @@ The Beast Mode to do this would look like this:
 ```
 CASE
 
-WHEN `Country` = ‘United States’ THEN ‘Yes’
+WHEN `Country` = 'United States' THEN 'Yes'
 
-ELSE ‘No’
+ELSE 'No'
 
 END
 ```
@@ -145,15 +145,15 @@ No, but you can insert a data label into your chart that contains the percent of
 
 **Why can't I put Beast Mode calculations in the Filter field?**
 
-The filter in the Analyzer is based on row-level filtering on the DataSet level, so it doesn’t filter on aggregates. To fix this, you can use the Magic ETL or SQL DataFlow tools to group and aggregate the columns for card and filtering usage. For more information about these tools, see [Prepare](/s/topic/0TO5w000000ZamzGAC "Prepare").
+The filter in the Analyzer is based on row-level filtering on the DataSet level, so it doesn't filter on aggregates. To fix this, you can use the Magic ETL or SQL DataFlow tools to group and aggregate the columns for card and filtering usage. For more information about these tools, see [Prepare](/s/topic/0TO5w000000ZamzGAC "Prepare").
 
 **Can I create a rolling average calculation using Beast Mode?**
 
 You cannot create a rolling average calculation using Beast Mode, but you can create a card that displays a quarterly average. Or you can create a DataFlow that will calculate this.
 
-**Why Beast Mode Can’t Do This:**
+**Why Beast Mode Can't Do This:**
 
-A Beast Mode function is calculated on either a single record or group of records, depending on how the data on the card is being grouped. Because of that, the calculation doesn't have a way of referencing other records. For example, if you’re looking for an average for April, you can't create a calculation that looks back at other records that come before April and have it sum these for you.
+A Beast Mode function is calculated on either a single record or group of records, depending on how the data on the card is being grouped. Because of that, the calculation doesn't have a way of referencing other records. For example, if you're looking for an average for April, you can't create a calculation that looks back at other records that come before April and have it sum these for you.
 
 **Alternative 1: Show a quarterly average on a card.**
 
@@ -201,9 +201,9 @@ TABLE t1
 
 This transform assumes that the date field contains a date representing the month, e.g. "2015-01-01" for January.
 
-In the above calculation, you’re doing the following:
+In the above calculation, you're doing the following:
 
-1. Using a subquery to retrieve the sum of the last 3 months’ worth of values,
+1. Using a subquery to retrieve the sum of the last 3 months' worth of values,
 2. Dividing them by the number of records it found in that range, and
 3. Calling the field the "Rolling\_Average" field.
 
@@ -218,7 +218,7 @@ When using a `CASE` statement to create a calculation, you may want to aggregate
 ```
 CASE
 
- WHEN `Column_1` = 'Value_1’
+ WHEN `Column_1` = 'Value_1'
 
  THEN SUM(`Column_1`)
 
@@ -230,7 +230,7 @@ Instead, you need to “wrap” the entire statement in a SUM function for it to
 ```
 SUM(CASE
 
- WHEN `Column_1` = 'Value_1’
+ WHEN `Column_1` = 'Value_1'
 
  THEN SUM(`Column_1`)
 
@@ -246,7 +246,7 @@ The solution to adjusting a common CASE statement calculation into a field with 
 ```
 SUM(CASE
 
- WHEN `Column_1` = 'Value_1’
+ WHEN `Column_1` = 'Value_1'
 
  THEN SUM(`Column_1`)
 
@@ -257,40 +257,40 @@ For more information about summary numbers, see [Configuring Your Chart Summary 
 
 **How do I aggregate an existing column using Beast Mode?**
 
-Sometimes users think that the only way to aggregate a column of data is by using a Beast Mode calculation. A better way is to use tools within Domo’s Analyzer to create aggregations of a value being used on the x-axis, y-axis, or series of the card in question. For more information, see [Aggregating your data](/s/article/360043428713 "Applying DataSet Columns to Your Chart").
+Sometimes users think that the only way to aggregate a column of data is by using a Beast Mode calculation. A better way is to use tools within Domo's Analyzer to create aggregations of a value being used on the x-axis, y-axis, or series of the card in question. For more information, see [Aggregating your data](/s/article/360043428713 "Applying DataSet Columns to Your Chart").
 
 **How do I sort month names chronologically on the x-axis?**
 
-Say you want to display full month names on the x-axis of a card instead of the Domo default view of “Year – Abbreviated Month” (for example, 2015 – Jan), but when you apply the month name field to the card, the months are out of order and won’t sort. The month names sort alphabetically instead of chronologically because the month name column is a "string" data type. You can fix this by assigning a numeric value to each month name and then using that as the sort.
+Say you want to display full month names on the x-axis of a card instead of the Domo default view of “Year – Abbreviated Month” (for example, 2015 – Jan), but when you apply the month name field to the card, the months are out of order and won't sort. The month names sort alphabetically instead of chronologically because the month name column is a "string" data type. You can fix this by assigning a numeric value to each month name and then using that as the sort.
 
 The Beast Mode to do this would look like this:
 
 ```
 CASE
 
-WHEN `MonthName` = ‘January’ THEN 1
+WHEN `MonthName` = 'January' THEN 1
 
-WHEN `MonthName` = ‘February’ THEN 2
+WHEN `MonthName` = 'February' THEN 2
 
-WHEN `MonthName` = ‘March’ THEN 3
+WHEN `MonthName` = 'March' THEN 3
 
-WHEN `MonthName` = ‘April’ THEN 4
+WHEN `MonthName` = 'April' THEN 4
 
-WHEN `MonthName` = ‘May’ THEN 5
+WHEN `MonthName` = 'May' THEN 5
 
-WHEN `MonthName` = ‘June’ THEN 6
+WHEN `MonthName` = 'June' THEN 6
 
-WHEN `MonthName` = ‘July’ THEN 7
+WHEN `MonthName` = 'July' THEN 7
 
-WHEN `MonthName` = ‘August’ THEN 8
+WHEN `MonthName` = 'August' THEN 8
 
-WHEN `MonthName` = ‘September’ THEN 9
+WHEN `MonthName` = 'September' THEN 9
 
-WHEN `MonthName` = ‘October’ THEN 10
+WHEN `MonthName` = 'October' THEN 10
 
-WHEN `MonthName` = ‘November’ THEN 11
+WHEN `MonthName` = 'November' THEN 11
 
-WHEN `MonthName` = ‘December’ THEN 12
+WHEN `MonthName` = 'December' THEN 12
 
 END
 ```
@@ -299,9 +299,9 @@ For more information about sorting data in a chart, see [Sorting the Data in You
 
 **How do I format dates on the x-axis for year-over-year comparisons?**
 
-Say you want to do a Year-over-Year comparison in a card, but you aren’t sure where to begin. Perhaps the x-axis is showing multiple years instead of one, so a comparison is not possible. Or perhaps you are getting the error “No Data Exists” when applying the year-over-year comparison series.
+Say you want to do a Year-over-Year comparison in a card, but you aren't sure where to begin. Perhaps the x-axis is showing multiple years instead of one, so a comparison is not possible. Or perhaps you are getting the error “No Data Exists” when applying the year-over-year comparison series.
 
-To do a year-over-year comparison, you’ll need to create the three following Beast Mode calculations:
+To do a year-over-year comparison, you'll need to create the three following Beast Mode calculations:
 
 1. A calculation named "Months" that formats the dates on the x-axis so it shows just the month and not the year:
      
@@ -318,10 +318,10 @@ To do a year-over-year comparison, you’ll need to create the three following B
 
 Say you want to use dates in your card, but the date column you want to use is being read as a “string” data type, which is causing the date values in the column to be non-sorted and non-sortable in the card. You can change the data type of a column containing dates from a string value to a date value using a Beast Mode calculation, as follows:
 
-`` STR_TO_DATE(`DateColumn`,’%d/%m/%Y’) ``
+`` STR_TO_DATE(`DateColumn`,'%d/%m/%Y') ``
 
 <Note>
-  **Note:** Be sure only date values, such as 1/1/2016, are used as values in the column. Otherwise, the calculation won’t work.
+  **Note:** Be sure only date values, such as 1/1/2016, are used as values in the column. Otherwise, the calculation won't work.
 
 </Note>
 
@@ -333,7 +333,7 @@ Say you want to view the date values in a specific format instead of the standar
 
 You can change the display of date values so you only see the day and month, using the DATE\_FORMAT() function to reformat the date values:
 
-`` DATE_FORMAT(`DateColumn`,’%d-%m’) ``
+`` DATE_FORMAT(`DateColumn`,'%d-%m') ``
 
 You can also format dates in using **Chart Properties**. For more information, see [Changing the Date Format in Your Chart](/s/article/360043429633 "Changing the Date Format in Your Chart").
 
@@ -341,7 +341,7 @@ You can also format dates in using **Chart Properties**. For more information, s
 
 You can adjust your company time zone in the Admin Settings, as described here: [Setting Your Company Time Zone](/s/article/360042934394 "Setting Your Company Time Zone").
 
-Sometimes, though, you’ll need to use a Beast Mode when time zones don’t match up between DataSets.
+Sometimes, though, you'll need to use a Beast Mode when time zones don't match up between DataSets.
 
 Say the dates in the date column in a card are based on EST, but your company is based on PST, and you want to see the data based on PST instead of EST. You can shift the dates values to another time zone by adding or subtracting time from the date values depending on what time zone you are switching it to. The functions that add and subtract time are `DATE_ADD()` and `DATE_SUB()`. For example, switching the date values from EST to PST would require you to subtract 3 hours, and can be done with the Beast Mode calculation like the one below:
 
@@ -373,11 +373,11 @@ END
 
 When using a CASE statement to create a calculation, you may want to aggregate the results of this CASE statement. Unfortunately, many users make the mistake of using a SUM function inside of the CASE statement, like the following:
 
-`` CASE WHEN `Column_1` = 'Value_1’ THEN SUM(`Column_1`) END ``
+`` CASE WHEN `Column_1` = 'Value_1' THEN SUM(`Column_1`) END ``
 
 Instead, you need to “wrap” the entire statement in a SUM function for it to execute properly:
 
-`` SUM(CASE WHEN `Column_1` = 'Value_1’ THEN SUM(`Column_1`) END) ``
+`` SUM(CASE WHEN `Column_1` = 'Value_1' THEN SUM(`Column_1`) END) ``
 
 **I've added a shared calculation but it only seems to show up in new cards. Is there a way to use it in existing cards?**
 
@@ -389,7 +389,7 @@ This issue is most commonly caused by multiple users editing the same card at th
 
 This problem can most easily be solved by e
 
-ither coordinating with other users to make sure you’re not overwriting each others' changes, or by editing at a time when others are not as likely to also be making edits.
+ither coordinating with other users to make sure you're not overwriting each others' changes, or by editing at a time when others are not as likely to also be making edits.
 
 This issue also occurs when you attempt to create Beast Mode calculations on a card in a drill path. Because drill path cards are not actual cards, Beast Mode calculations created in a drill path will not be saved. In order to ensure the calculations are saved, they must be created in the top layer of the card and have the **Share Calculation on DataSet** checkbox checked. For more information about drill path, see [Adding Drill Path to Your Chart](/s/article/360042924094 "Adding Drill Path to Your Chart")
 

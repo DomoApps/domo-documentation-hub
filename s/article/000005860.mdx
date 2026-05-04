@@ -13,7 +13,7 @@ The Meta Select tile's operations include, but are not limited to:
 * Changing data types
 * Calculating new columns
 
-Most of the tile's required configuration comes from one of its two input tables, called the Configuration Input. The Meta Select tile interacts with its Configuration Input in precisely the same way as the Add Formula tile operates. The Add Formula tile has the shape of a table with two "columns"—the name and the formula—and each “row” is a column to be added. The rows of data in the Configuration Input are treated as descriptions of columns to calculate from the Meta Select tile’s other input table, the Data Input.
+Most of the tile's required configuration comes from one of its two input tables, called the Configuration Input. The Meta Select tile interacts with its Configuration Input in precisely the same way as the Add Formula tile operates. The Add Formula tile has the shape of a table with two "columns"—the name and the formula—and each “row” is a column to be added. The rows of data in the Configuration Input are treated as descriptions of columns to calculate from the Meta Select tile's other input table, the Data Input.
 
 <Frame><img alt="" src="/images/kb/ka0Vq000000Dwsb-00N5w00000Ri7BU-0EMVq000007ZwWX.jpg" style={{width: 851, height: 237}}/></Frame>
 This article provides four examples of how to use the Meta Select tile, including in conjunction with the Get Schema tile. You can follow along with the examples in Magic ETL, referring to the provided graphs frequently and looking at the intermediate result tables of all the tiles.
@@ -25,10 +25,10 @@ In each example, code blocks and images display the DataFlow and the tile config
 
 ### Example 1: Do Nothing With the Meta Select Tile
 
-The first example of Meta Select’s capabilities will demonstrate it doing nothing at all. Rather, we will use the Get Schema tile to select every column from our original input unchanged.
+The first example of Meta Select's capabilities will demonstrate it doing nothing at all. Rather, we will use the Get Schema tile to select every column from our original input unchanged.
 
 <Frame><img alt="" src="/images/kb/ka0Vq000000Dwsb-00N5w00000Ri7BU-0EMVq000007ZtTp.jpg" style={{width: 401, height: 255}}/></Frame>
-The Get Schema tile exists primarily to support the Meta Select tile, but it does have other applications. The Get Schema tile accepts one input and uses it to create a table that describes that input’s columns or schema.
+The Get Schema tile exists primarily to support the Meta Select tile, but it does have other applications. The Get Schema tile accepts one input and uses it to create a table that describes that input's columns or schema.
 
 <Note>
   **Note:** For MySQL users, the Get Schema tile is comparable to querying `INFORMATION_SCHEMA`.
@@ -55,7 +55,7 @@ The Meta Select tile's Configuration Input requires two columns: one column cont
 <Frame><img alt="" src="/images/kb/ka0Vq000000Dwsb-00N5w00000Ri7BU-0EMVq000007Zwhp.jpg" style={{width: 700, height: 179}}/></Frame>
 You can see the relationship between the tiles this way: the Get Schema tile produces a “meta” table describing its input, and the Meta Select tile applies the same sort of “meta” table to its Data Input.
 
-In the next example, we’ll modify the Get Schema tile's results before connecting it to the Meta Select tile.
+In the next example, we'll modify the Get Schema tile's results before connecting it to the Meta Select tile.
 
 ### Example 2: Rename, Remove, and Change Type
 
@@ -92,11 +92,11 @@ To change the data type, use this one:
 `` CASE WHEN STR_ENDS_WITH(`name`, 'Date' ) THEN 'DATE' ELSE `type` END ``
 
 <Note>
-  **Note:** Keep in mind that columns restated in an Add Formula tile are restated before the evaluation of subsequent formulas in the same tile. This is why we are looking for `‘Date’` instead of `‘_date’`.
+  **Note:** Keep in mind that columns restated in an Add Formula tile are restated before the evaluation of subsequent formulas in the same tile. This is why we are looking for `'Date'` instead of `'_date'`.
 </Note>
 
 <Frame><img alt="" src="/images/kb/ka0Vq000000Dwsb-00N5w00000Ri7BU-0EMVq000007ZxPN.jpg" style={{width: 701, height: 190}}/></Frame>
-To complete our third goal—removing the columns whose names began with `‘odbc_0’` —we’ll use a Filter Rows tile. (After using the Add Formula tile, the name begins with only `0`.)
+To complete our third goal—removing the columns whose names began with `'odbc_0'` —we'll use a Filter Rows tile. (After using the Add Formula tile, the name begins with only `0`.)
 
 Placing the Filter Rows tile after the Add Formula tile and before the Meta Select tile, the Filter Rows tile has just one expression condition:
 
@@ -140,7 +140,7 @@ You can name these columns anything, but in this tutorial, we use the names `nam
 
 In the last example, we modified the `name` and `type` columns and filtered out some rows from the Configuration Input, which caused the Meta Select tile to rename, cast, and drop columns from its Data Input. In this example, we will be modifying the `expr` column.
 
-The `expr` column determines the contents of the columns, so modifying it will cause the Meta Select tile to modify the contents of the Data Input’s columns.
+The `expr` column determines the contents of the columns, so modifying it will cause the Meta Select tile to modify the contents of the Data Input's columns.
 
 # The Expression Type
 
@@ -164,7 +164,7 @@ NULLIF (`odbc\_first\_name`, '')
   **Tip:** "Formula" and "expression" are interchangeable terms, but we use "formula" when referring to something evaluated in the Add Formula tile and "expression" when referring to a column or value of type `EXPRESSION` to be evaluated later by the Meta Select tile.
 </Tip>
 
-With this knowledge, we’re ready to proceed with the example itself.
+With this knowledge, we're ready to proceed with the example itself.
 
 # Zero Every Null With the Meta Select Tile
 
@@ -175,7 +175,7 @@ For our purposes, these nulls are unwanted and disruptive, and we would rather r
   <Frame><img alt="" src="/images/kb/ka0Vq000000Dwsb-00N5w00000Ri7BU-0EMVq000007b31L.jpg" style={{width: 697, height: 200}}/></Frame>
   <Frame><img alt="" src="/images/kb/ka0Vq000000Dwsb-00N5w00000Ri7BU-0EMVq000007b9rV.jpg" style={{width: 500, height: 226}}/></Frame>
 
-This graph is identical to the graph from Example #2, except that we don’t need the Filter Rows tile. The only tile we need to change is the Add Formula tile, which will consist of just one formula, which restates the `expr` column:
+This graph is identical to the graph from Example #2, except that we don't need the Filter Rows tile. The only tile we need to change is the Add Formula tile, which will consist of just one formula, which restates the `expr` column:
 
 `` CASE `type` ``
   
@@ -223,7 +223,7 @@ The first two branches are combined with an Append Rows tile to produce the comp
 <Frame><img alt="" src="/images/kb/ka0Vq000000Dwsb-00N5w00000Ri7BU-0EMVq000007bJsT.jpg" style={{width: 450, height: 239}}/></Frame>
 Let's focus on the second branch, which begins with the Remove Duplicates tile. The purpose of the Remove Duplicates tile here is to reduce the input data to one row per unique value of `country\_code`. We configure the Remove Duplicates to use `country\_code` alone as the unique key.
 
-Next, we need to generate our three Configuration Input columns, using names that will match those from the Get Schema tile: `name`, `expr`, and `type`. We’ll use an Add Formula tile with the following formula for `name`:
+Next, we need to generate our three Configuration Input columns, using names that will match those from the Get Schema tile: `name`, `expr`, and `type`. We'll use an Add Formula tile with the following formula for `name`:
 
 `` CONCAT ('country_code_', `country_code`) ``
 
@@ -237,14 +237,14 @@ And for `type`:
 `'BOOLEAN'`
 
 <Frame><img alt="" src="/images/kb/ka0Vq000000Dwsb-00N5w00000Ri7BU-0EMVq000007bHsI.jpg" style={{width: 700, height: 197}}/></Frame>
-The formulas for `name` and `type` don’t contain anything we haven’t seen before, but `expr` involves a new function: `EXPR_VALUE()`. Consider the result table at this point in the graph (Add Formula). Note how the reference to `country\_code` from the template has remained unchanged; the result expression still references that column on the left side of the equals.
+The formulas for `name` and `type` don't contain anything we haven't seen before, but `expr` involves a new function: `EXPR_VALUE()`. Consider the result table at this point in the graph (Add Formula). Note how the reference to `country\_code` from the template has remained unchanged; the result expression still references that column on the left side of the equals.
   
 However, the *placeholder* has been populated with the value of `country\_code` in the Add Formula tile's input. `EXPR_VALUE()` is another function that produces an expression, like `EXPRESS()`.
 
 It takes only one argument, which is evaluated immediately. This result is then converted into an expression *literal*. A literal is another fundamental type of expression, like a column reference. A literal is an expression that always evaluates to the same value. All of these expressions are literals: `'US'`, `0`, `1.5`, and `NULL`.
 
 <Frame><img alt="" src="/images/kb/ka0Vq000000Dwsb-00N5w00000Ri7BU-0EMVq000007bK0X.jpg" style={{width: 750, height: 144}}/></Frame>
-It doesn’t matter how the Append Rows tile is configured, but “Only include shared columns” might make the most sense (since this will reduce the table down to just the three columns that matter: `name`, `expr`, and `type`). As always, preview the whole flow and probe the output at every tile to ensure you understand what is happening at every stage.
+It doesn't matter how the Append Rows tile is configured, but “Only include shared columns” might make the most sense (since this will reduce the table down to just the three columns that matter: `name`, `expr`, and `type`). As always, preview the whole flow and probe the output at every tile to ensure you understand what is happening at every stage.
 
 ### Other Functions for Working With Expressions
 

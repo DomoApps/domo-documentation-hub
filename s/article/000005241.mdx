@@ -2,8 +2,6 @@
 title: "SCIM (System for Cross-domain Identity Management) in Domo"
 ---
 
-
-
 ## Intro
 
 The System for Cross-domain Identity Management (SCIM) is a standard that defines API endpoints that systems can use to manage identity. With an SSO integration, Domo receives information about new or updated users only when they log into Domo. However, with SCIM, you can configure your identity provider (IdP) to create and/or update users and groups in Domo when those users and groups are created and modified in your IdP.
@@ -50,9 +48,9 @@ Learn how to add these grants to a [custom role](/s/article/360043438973).
 
 ## Synchronize Directory Groups
 
-Domo directory groups (groups defined in the IdP and created and managed in Domo via SSO or SCIM integration) can be created, managed, and deleted via SSO and SCIM. The SCIM APIs only function on directory groups. This means that groups created via SCIM are always directory groups, and the Get Group endpoint only returns information about directory groups. [Learn more](/s/article/360042934294#group_types) about directory groups and other group types in Domo.
+Domo directory groups (groups defined in the IdP and created and managed in Domo via SSO or SCIM integration) can be created, managed, and deleted via SSO and SCIM. The SCIM APIs only function on directory groups. This means that groups created via SCIM are always directory groups, and the Get Group endpoint only returns information about directory groups. [Learn more](/s/article/360042934294#group-types) about directory groups and other group types in Domo.
 
-Domo's SCIM integration functions in the context of the Domo user who owns the Domo Access Token used by the SCIM integration. (See our recommendations for the SCIM Integration User [above](#required_grants).) To allow Domo directory groups to be managed via SCIM, the Domo SCIM Integration User must be designated in Groups Settings as the user permitted to manage directory groups.
+Domo's SCIM integration functions in the context of the Domo user who owns the Domo Access Token used by the SCIM integration. (See our recommendations for the SCIM Integration User [above](#configure-required-grants).) To allow Domo directory groups to be managed via SCIM, the Domo SCIM Integration User must be designated in Groups Settings as the user permitted to manage directory groups.
 
 Follow these steps to designate the SCIM Integration User in Group Settings:
 
@@ -276,7 +274,7 @@ These schemas and their elements are mapped to various Domo user and group attri
 | **Group** | `urn:ietf:params:scim:schemas:core:2.0:User` | `groups / {value, display}`<br/>Where **value** is the ID of the group in Domo and **display** is the group name as defined in the IdP. | |
 | **Organization** | `urn:ietf:params:scim:schemas:extension:enterprise:2.0:User` | `organization` | |
 | **Manager** | `urn:ietf:params:scim:schemas:extension:enterprise:2.0:User` | `manager {value, display}`<br/>*Complex of value (Domo user ID) and display (optional, manager name, ignored by Domo).* | |
-| **All custom attributes**<Tip>**Tip:** Learn more about [Domo custom attributes](/s/article/000005164#create_a_custom_attribute).</Tip> | `urn:ietf:params:scim:schemas:extension:custom:2.0:User` | `customAttributes [{key, values}]`<br/>*Array of complex of key (the attribute key as defined in Domo) and values (the user attribute values). Values must be provided as a list of strings, regardless of the data type of the attribute or whether the attribute is single-valued or a list.* | Custom attributes must be defined in Domo before they can be populated via SCIM, and the key in the SCIM must match the attribute key in Domo exactly (case-sensitive). |
+| **All custom attributes**<Tip>**Tip:** Learn more about [Domo custom attributes](/s/article/000005164#create-a-custom-attribute).</Tip> | `urn:ietf:params:scim:schemas:extension:custom:2.0:User` | `customAttributes [{key, values}]`<br/>*Array of complex of key (the attribute key as defined in Domo) and values (the user attribute values). Values must be provided as a list of strings, regardless of the data type of the attribute or whether the attribute is single-valued or a list.* | Custom attributes must be defined in Domo before they can be populated via SCIM, and the key in the SCIM must match the attribute key in Domo exactly (case-sensitive). |
 
 ### Map Group Attributes
 

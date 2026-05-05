@@ -2,8 +2,7 @@
 title: "Use the Meta Select and Get Schema Tiles"
 ---
 
-
-### Intro
+## Intro
 
 Meta Select is a powerful tile inside Magic ETL that can perform any function of the Select Columns, Alter Columns, and Add Formula tiles without repetitive configuration. It can also adapt to schema changes over time without needing to be reconfigured.
 
@@ -20,10 +19,9 @@ This article provides four examples of how to use the Meta Select tile, includin
 
 In each example, code blocks and images display the DataFlow and the tile configuration. Unless otherwise mentioned, all Meta Select tiles are configured to use the columns `name`, `expr`, and `type` from their Configuration Input, and all Get Schema tiles are configured with those same column names.
 
-
 ---
 
-### Example 1: Do Nothing With the Meta Select Tile
+## Example 1: Do Nothing With the Meta Select Tile
 
 The first example of Meta Select's capabilities will demonstrate it doing nothing at all. Rather, we will use the Get Schema tile to select every column from our original input unchanged.
 
@@ -46,7 +44,7 @@ In this example, the output of the Get Schema tile becomes the Configuration Inp
 Here, the Get Schema tile's output is unchanged, which causes the Meta Select tile to produce an output table identical to its Data Input. In the rest of the examples, we will add tiles that modify the Get Schema tile's output, which will change the output for the Meta Select tile.
 
 <Frame><img alt="" src="/images/kb/ka0Vq000000Dwsb-00N5w00000Ri7BU-0EMVq000007ZubB.jpg" style={{width: 702, height: 111}}/></Frame>
-# How the Meta Select Tile Interprets Its Configuration Input
+### How the Meta Select Tile Interprets Its Configuration Input
 
 This example focuses on how the Meta Select tile interprets its Configuration Input, which in this case is the output table of the Get Schema tile.
 
@@ -57,7 +55,7 @@ You can see the relationship between the tiles this way: the Get Schema tile pro
 
 In the next example, we'll modify the Get Schema tile's results before connecting it to the Meta Select tile.
 
-### Example 2: Rename, Remove, and Change Type
+## Example 2: Rename, Remove, and Change Type
 
 For our next example, let's examine the following table.
 
@@ -102,7 +100,7 @@ Placing the Filter Rows tile after the Add Formula tile and before the Meta Sele
 
 `` NOT STR_STARTS_WITH(`name`, '0' ) ``
 
-Let's preview the DataSet, take a look at the result of the Filter Rows tile, and compare it with the result of the Get Schema tile, [above](#get_schema_output).
+Let's preview the DataSet, take a look at the result of the Filter Rows tile, and compare it with the result of the Get Schema tile, above.
 
 We have successfully completed our three goals:
 
@@ -115,7 +113,7 @@ Now that we have our configuration table, we can connect both our original input
 
 As you configure the Meta Selec tile, make sure that **Filter Rows** is selected as the Configuration Input while the input data tile is the Data Input. To see the results, run a preview of the DataFlow.
 
-### Example 3: Work With Expression
+## Example 3: Work With Expression
 
 As you can see from the last example, configuring the Meta Select tile involves little work with the tile itself. The work happens upstream as we build the Configuration Input table.
 
@@ -142,7 +140,7 @@ In the last example, we modified the `name` and `type` columns and filtered out 
 
 The `expr` column determines the contents of the columns, so modifying it will cause the Meta Select tile to modify the contents of the Data Input's columns.
 
-# The Expression Type
+### The Expression Type
 
 Unlike the `name` and `type` columns, the `expr` column is not a `STRING` type, but an `EXPRESSION`.
 
@@ -166,7 +164,7 @@ NULLIF (`odbc\_first\_name`, '')
 
 With this knowledge, we're ready to proceed with the example itself.
 
-# Zero Every Null With the Meta Select Tile
+### Zero Every Null With the Meta Select Tile
 
 Here we have an input data table with a variety of numeric columns (integers, floating point numbers, and decimals); all of them contain nulls.
 
@@ -197,7 +195,7 @@ This formula has four different strategies for generating an expression, and it 
 
 We strongly recommend running a preview of the DataFlow to review the results, paying particular attention to the outputs of both the Add Formula and Meta Select tiles.
 
-### Example 4: One-Hot Encoding
+## Example 4: One-Hot Encoding
 
 This final example goes beyond modifying and reducing the output of a Get Schema tile to produce the Meta Select tile's Configuration Input. This time, we generate additional Configuration Input rows and union them to the Get Schema tile in order to add a variable number of calculated columns to the final result.
 
@@ -246,7 +244,7 @@ It takes only one argument, which is evaluated immediately. This result is then 
 <Frame><img alt="" src="/images/kb/ka0Vq000000Dwsb-00N5w00000Ri7BU-0EMVq000007bK0X.jpg" style={{width: 750, height: 144}}/></Frame>
 It doesn't matter how the Append Rows tile is configured, but “Only include shared columns” might make the most sense (since this will reduce the table down to just the three columns that matter: `name`, `expr`, and `type`). As always, preview the whole flow and probe the output at every tile to ensure you understand what is happening at every stage.
 
-### Other Functions for Working With Expressions
+## Other Functions for Working With Expressions
 
 Here are a few more functions for working with expressions that were not covered in any of these examples:
 
@@ -259,6 +257,6 @@ Here are a few more functions for working with expressions that were not covered
      **Ask the Community:** The Domo [Community Forums](https://community-forums.domo.com/main) <img src="/images/kb/ka0Vq000000Dwsb-00N5w00000Ri7BU-0EMVq000007bJR3.jpg" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/> are a great resource for asking questions and sharing ideas with Domo employees and fellow Domo users about the Meta Select and Get Schema tiles.
    </Tip>
 
-### Known Limitations of the Meta Select Tile
+## Known Limitations of the Meta Select Tile
 
 Aggregate functions and window functions are not supported.

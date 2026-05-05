@@ -2,7 +2,7 @@
 title: "Scheduler | Implementation Guide"
 ---
 
-### Intro
+## Intro
 
 Thank you for your interest in the Scheduler app! This guide will help you prepare and connect your data to the app. The main purpose of the Scheduler app is to allow for a broad variety of scheduling use cases, as opposed to other offerings in the market which are targeted towards very specific business needs. Follow the steps below to prepare your data for the app and how to set up the app in the Admin set-up section. The app will need to be connected to DataSets output by the Scheduler, as well as the [Form Builder](/s/article/360043438373) app.
 
@@ -10,7 +10,7 @@ Thank you for your interest in the Scheduler app! This guide will help you prepa
 
 ---
 
-### ExternalAppointments DataSet
+## ExternalAppointments DataSet
 
 The **ExternalAppointments** DataSet, output by the Scheduler app, is a list of end-users that should be allowed to use the app to book a follow-up appointment using their customer ID. This DataSet is not utilized for initial appointments, but even if a Scheduler only offers initial appointments this DataSet mapping should still be configured. The **ExternalAppointments** DataSet includes the following column IDs:
 
@@ -30,7 +30,7 @@ These will be used later on to map the DataSet to your Scheduler app.
 For follow-up appointments, the customerId field is validated against the list of customer IDs in the mapped DataSet. If a customer ID is entered but is not loaded in the **ExternalAppointments** DataSet, then the end-user will not be able to proceed to the next step.
 
 <Frame><img alt="customerID.png" src="/images/kb/ka0Vq0000004Yvx-00N5w00000Ri7BU-0EM5w000005vOJD.png"/></Frame>
-### MaskedCustomerInfo DataSet
+## MaskedCustomerInfo DataSet
 
 This DataSet is a companion to the **ExternalAppointments** DataSet and will return the masked first and last name of the customer Id entered into the Scheduler. The **MaskedCustomerInfo** DataSet is taken from the **ExternalAppointments** DataSet and then put into a Beast Mode to mask the first and last name, an example of this Beast Mode will be shown below. The **MaskedCustomerInfo** DataSet should include the following column IDs:
 
@@ -53,7 +53,7 @@ CONCAT(left(`firstName`, 1), left(REGEXP\_REPLACE(`firstName`,'.','\*'),LENGTH(`
 
 CONCAT(left(`lastName`, 1), left(REGEXP\_REPLACE(`lastName`,'.','\*'),LENGTH(`lastName`)-1))
 
-### InviteCodes DataSet
+## InviteCodes DataSet
 
 This DataSet maps the invite codes, which allows only invited end-users to schedule their appointments. This applies to initial appointments only and is enabled through the Admin set-up.
 
@@ -67,13 +67,13 @@ The **InviteCodes** DataSet includes the following column:
 
 This will be used later on to map the DataSet to your Scheduler app.
 
-### Wire Your Data to the App
+## Wire Your Data to the App
 
 After the data is ready for the app, you can now deploy the app from the Appstore and connect your data. If you have access to the app asset, deploy the asset from the Asset Library to the desired page in Domo. If the app has been deployed for you with sample data, navigate to the app, click on the wrench icon in the top right corner of the app, and select **Edit Card**.
 
 On the **Edit Card** screen, that you will get to from one of the two methods explained above, you can re-name the app at the top of the screen. Scroll down below the app and you should see a series of tabs that represent each of the DataSets the app needs in order to run. The first tab **EXPORTCOLUMNS** will come from your output Form Builder DataSet, be sure to match up all of the correct column IDs from the DataSet. Repeat this same step for the **EXPORTFILTERS**, **EXPORTSFORMS**, **EXPORTGROUPS**, **EXPORTITEMS**, **EXPORTSECTIONS**, **EXPORTSUBMITTEDUSERS**, and **EXPORTTAGS** tabs, being sure to match up all of the correct columns IDs from the DataSets. The following DataSets will be output from the Scheduler and mapped to the app: **ExternalAppointments**, **MaskedCustomerInfo**, and **InviteCodes**. Each of these should have corresponding tabs in the **Edit Card** screen, while setting these up be sure to match up all of the correct column IDs from the DataSets. Scroll up to the top and click **Save & Finish** and your app should now be ready to set up.
 
-### Embed the Scheduler App
+## Embed the Scheduler App
 
 Follow these steps to set up the Scheduler app in embed:
 
@@ -88,7 +88,7 @@ Follow these steps to set up the Scheduler app in embed:
 3. Log in as the **Embed User**.
 4. Enable the Domo Everywhere link on the asset using the **Embed User**.
 
-### Domo Groups and Permissions
+## Domo Groups and Permissions
 
 A list of groups and the permissions needed will be outlined below. Each of these groups will need to be added to your Domo instance.
 
@@ -113,9 +113,9 @@ A list of groups and the permissions needed will be outlined below. Each of thes
   + **Only** the **Embed User** should be in this group.
   + Share the Schedulers that need public embed links with this group.
 
-### Admin Set-up
+## Admin Set-up
 
-# List-View
+### List-View
 
 The Admin portion of the app can be accessed by selecting the **Admin** option from the landing screen. The default Admin view is the **Manage Schedule** or list-view, the **New Item** button will take you back to the landing page, while the **Admin Settings** button will take you to the app set-up.
 
@@ -124,17 +124,17 @@ The list-view has four options: today, this week, this month, or past. Your appo
 Delete appointments by selecting the 'trashcan' icon next to a line-item. Appointments can be re-scheduled by going through the formal scheduling process from the app landing screen.
 
 <Frame><img alt="listview.png" src="/images/kb/ka0Vq0000004Yvx-00N5w00000Ri7BU-0EM5w000005vOJ2.png"/></Frame>
-### Admin Settings
+## Admin Settings
 
 The Admin Settings screen has nine different set-up options: **Set up Workflow**, **Edit Locations**, **Edit Services**, **Edit Resources**, **Edit Availability**, **Edit Inventories**, **Add Questionnaire**, **Customize Confirmation**, and **Customize Settings**. Each of the options provides you with the ability to have complete control over the way your Scheduler app functions and looks to end-users.
 
 <Frame><img alt="adminsettings.png" src="/images/kb/ka0Vq0000004Yvx-00N5w00000Ri7BU-0EM5w000005vOJ8.png"/></Frame>
-# Set up Workflow
+### Set up Workflow
 
 Control the order that your Location, Service, and Resource appears in the app by dragging and dropping each item as you want desire. Hide options by selecting or un-selecting the checkbox next to each title. Choose to include a Form Builder questionnaire in your workflow, if desired. The **show any** slider, when turned on, will show end-users all of the available options included (i.e., all locations will be shown). Limit who has access to the Scheduler by checking the **Invitations required for appointment scheduling**; this will only allow users who have a unique ID, generated by the app, to schedule an appointment.
 
 <Frame><img alt="setupworkflow.png" src="/images/kb/ka0Vq0000004Yvx-00N5w00000Ri7BU-0EM5w000005vOIy.png"/></Frame>
-# Edit Locations
+### Edit Locations
 
 Add new locations to your Scheduler by selecting the 'Add New Location' button from the upper right-corner of the screen. Locations include the name of the location, address, associated resources, and associated resources. Locations are required to have both a resource and service, incomplete items will be marked with a red incomplete tag and will not be visible to users in the app.
 
@@ -148,21 +148,21 @@ Note that a location will be hidden in the Scheduler app once all of its associa
 Admins also have the ability to preview the availability by location. Select the 'eye' icon in the expanded location view. The calendar view will be shown as well the max # of appointments.
 
 <Frame><img alt="availability.png" src="/images/kb/ka0Vq0000004Yvx-00N5w00000Ri7BU-0EM5w000005vOJ6.png"/></Frame>
-# Edit Services
+### Edit Services
 
 Add new services to your Scheduler by selecting the **Add New Service** button from the upper right-corner of the screen. Services include the service name, description of the service, estimated service duration, booking type, inventory, inventory usage, associated resources, and associated locations. The estimated service duration is how long the service will take for each appointment (i.e., 1.5 equals 1 hour and 30 minutes). The booking type can be set as either an initial or follow-up appointment, follow-up appointments are only available if the user has already completed/scheduled their initial appointment. If you are setting the service up as a follow-up, three additional options will be shown: follow-up at least, follow-up at most, and follow-up parent services. Follow-up at least is the follow-up appointment must be scheduled **this** number of days after the initial; follow-up at most is the max number of days that a follow-up appointment can be scheduled after the initial. The follow-up parent services are the associated services that can be scheduled according to the selected initial service. The inventory is the associated inventory set in the **Edit Inventories** screen. The inventory usage is how many items from the inventory the service requires per booking. Services are required to have both a resource and location, incomplete items will be marked with a red incomplete tag and will not be visible to users in the app.
 
 Edit existing services by selecting the down arrow on a line-item and delete services by selecting the trash icon. If changes are made in the **Edit Services** screen, a save and reset button will appear at the bottom of the page prompting you to either reset or save your changes. Hide services that you do not want to appear for users by selecting the **hide** checkbox on each line-item.
 
 <Frame><img alt="editservices.png" src="/images/kb/ka05w00000123UA-00N5w00000Ri7BU-0EM5w000005vOJi.png"/></Frame>
-# Edit Resources
+### Edit Resources
 
 Add new resources to your Scheduler by selecting the **Add New Resource** button from the upper right-corner of the screen. Resources include the resource name, description of the resource, double booking, associated locations, and associated services. Double-booking is the max concurrent number of bookings allowed for the resource. Resources are required to have both a location and service, incomplete items will be marked with a red incomplete tag and will not be visible to users in the app.
 
 Edit existing resources by selecting the down arrow on a line-item and delete resources by selecting the trash icon. If changes are made in the **Edit Locations** screen, a save and reset button will appear at the bottom of the page prompting you to either reset or save your changes. Hide resources that you do not want to appear for users by selecting the 'hide' checkbox on each line-item.
 
 <Frame><img alt="editresources.png" src="/images/kb/ka05w00000123UA-00N5w00000Ri7BU-0EM5w000005vOJZ.png"/></Frame>
-# Edit Availability
+### Edit Availability
 
 Add company availability to the Scheduler through default or custom schedules. Default schedules will apply to all users who are not added to custom schedules. Custom schedules will override default schedules and will only apply to users added to it. Add a new schedule by selecting the 'Add Schedule' button from the upper-right corner of the screen and choose to either add a new default or custom schedule.
 
@@ -182,17 +182,17 @@ Blackout periods define whether days before or after certain dates are excluded 
 Custom schedules are set up almost exactly the same way as default schedules, but any added custom schedules will override existing default schedules in the Scheduler. The **Schedule Resources** field is available for custom schedules; this is where you can add and restrict resources that will be included. Add users to the schedule by searching for their name and then selecting their name from the search results.
 
 <Frame><img alt="customschedule.png" src="/images/kb/ka0Vq0000004Yvx-00N5w00000Ri7BU-0EM5w000005vOJG.png"/></Frame>
-# Edit Inventories
+### Edit Inventories
 
 Add new inventories to your Scheduler by selecting the **Add Inventory** button from the upper-right corner of the screen. Inventories include the inventory name, inventory description, the current inventory (based on the number of users scheduled with that inventory item and added inventory amount), and the modify inventory amount which allows you to add or remove from the current inventory. Inventories can be edited at any time and deleted by selecting the trash icon from the line-item. Services can also be associated with inventories; select the '+' button next to Services and add the service and the amount per location.
 
 <Frame><img alt="editinventory.png" src="/images/kb/ka0Vq0000004Yvx-00N5w00000Ri7BU-0EM5w000005vOJL.png"/></Frame>
-# Edit Languages
+### Edit Languages
 
 Additional languages can be enabled in the 'Edit Languages' screen. The currently available language options include English, Spanish, Haitian Creole, and Japanese. One language can be set as the default, using the single-select button, and multiple languages can be enabled in the app. Select a language and begin translating the fields to the associated text fields in the app. The areas that will need to be translated include Buttons, InviteLabels, FollowUpLabels, InformationLabels, DateTimeLabels, ConfirmationLabels, BookingErrors, Titles, and Descriptions. Once a text field has been updated, the language you have made the change will show a warning indicator letting admin users know that a field(s) have been changed. The other enabled languages will also show the number of fields that were changed, in case they need to be updated according to your changes.
 
 <Frame><img alt="languages.png" src="/images/kb/ka0Vq0000004Yvx-00N5w00000Ri7BU-0EM5w000005vOJF.png"/></Frame>
-# Add Questionnaire
+### Add Questionnaire
 
 New questionnaires can be added by selecting the **Add a New Form Builder DataSet** button on the screen; from here you'll be able to select an output DataSet from your Form Builder app that contains the questionnaire you want included in the app.
 
@@ -200,18 +200,18 @@ New questionnaires can be added by selecting the **Add a New Form Builder DataSe
 Once you've selected a DataSet, you'll be able to preview what the questionnaire will look like to end-users in the Scheduler app.
 
 <Frame><img alt="datasetfb.png" src="/images/kb/ka0Vq0000004Yvx-00N5w00000Ri7BU-0EM5w000005vOJ0.png"/></Frame>
-# Customize Settings
+### Customize Settings
 
 Customize the way the app appears to end-users in the Scheduler app including adding a logo, customizing the color palette, and editing the app name.
 
 Upload a new logo to be displayed in the app by selecting the 'Upload' button in the Add/Edit Logo section. Customize the color palette by selecting a primary and secondary color and primary and secondary font color; you'll see a preview of the colors. Add or edit the app name that's displayed throughout the app as well.
 
 <Frame><img alt="settings.png" src="/images/kb/ka0Vq0000004Yvx-00N5w00000Ri7BU-0EM5w000005vOJC.png"/></Frame>
-### Other Settings
+## Other Settings
 
 Enable the address auto-complete functionality in the Scheduler in the 'Other Settings' tab. In order for this to be enabled, you will need to have a Mapbox token. Copy and paste your token into the text box, this feature will allow users to show suggestions when entering their address and allow them to select an option to autocomplete the additional address fields.
 
 <Frame><img alt="other.png" src="/images/kb/ka0Vq0000004Yvx-00N5w00000Ri7BU-0EM5w000005vOJ4.png"/></Frame>
-### Use the App
+## Use the App
 
 Once you've gone through the Admin set-up, you should now be able to allow end-users to schedule appointments either in Domo or using private embed.

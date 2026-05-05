@@ -2,7 +2,7 @@
 title: "Time Zone Formatting"
 ---
 
-### Intro
+## Intro
 
 There are two types of time zones in Domo: personal and company. Anyone can define their personal time zone in Domo to determine when they receive alerts, notifications, and scheduled reports. Admin-level users can define a company time zone for the entire instance to standardize how visualizations display.
 
@@ -17,11 +17,11 @@ There are two types of time zones in Domo: personal and company. Anyone can defi
 
 ---
 
-### Personal Time Zone
+## Personal Time Zone
 
 You can define your personal time zone in the user settings to manage when notifications, alerts, and scheduled reports are delivered.
 
-# Define Your Personal Time Zone
+### Define Your Personal Time Zone
 
 Follow these steps to define your personal time zone:
 
@@ -53,21 +53,21 @@ Follow these steps to define your personal time zone:
 
      <Frame>![confirm change.jpg](/images/kb/0EMVq000000tfgr.jpg)</Frame>
 
-<Note>**Note:** Updating your personal time zone doesn't offset any DATETIME data you are viewing in Domo to display in your personal time zone. Only the [company time zone](#company_time_zone) offsets any DATETIME data. Learn more about [DATETIME considerations around Domo](#datetime_considerations).</Note>
+<Note>**Note:** Updating your personal time zone doesn't offset any DATETIME data you are viewing in Domo to display in your personal time zone. Only the [company time zone](#company-time-zone) offsets any DATETIME data. Learn more about [DATETIME considerations around Domo](#datetime-considerations-around-domo).</Note>
 
-### Company Time Zone
+## Company Time Zone
 
-The company time zone is the default for the entire instance. By default, the company time zone is UTC. You do not have to define a company time zone. If all your Domo data is in the same time zone, you don't need to set a company time zone. There are additional considerations to be aware of around defining a company time zone versus not defining one. See a list of them [below](#defined_versus_undefined).
+The company time zone is the default for the entire instance. By default, the company time zone is UTC. You do not have to define a company time zone. If all your Domo data is in the same time zone, you don't need to set a company time zone. There are additional considerations to be aware of around defining a company time zone versus not defining one. See a list of them [below](#defined-company-time-zone-vs-undefined-company-time-zone).
 
 <Warning>**Important:** If all of your data in Domo is in the same time zone, you do NOT need to set the time zone.</Warning>
 
-# Required Grant
+### Required Grant
 
 To set the company time zone, you must be an Admin or have a custom role with the following grant enabled:
 
 **(Admin-level) Manage All Company Settings** **—** This grant permits the user to manage company metadata, authentication rules, security, publishing, and more.
 
-# Defined Company Time Zone vs. Undefined Company Time Zone
+### Defined Company Time Zone vs. Undefined Company Time Zone
 
 You aren't required to define a company time zone, but there are some considerations to be aware of.
 
@@ -94,11 +94,11 @@ For example, if you're in New York City in July and your date displays in UTC, t
   
 In the same scenario in December, the date changes at 7:00 PM because UTC is 5 hours ahead of EST.
 
-See more [DATETIME considerations](#datetime_considerations) below.
+See more [DATETIME considerations](#datetime-considerations-around-domo) below.
 
-# Define the Company Time Zone
+### Define the Company Time Zone
 
-Admins and others with the [required grant](#required_grant) can define the company time zone by following these steps:
+Admins and others with the [required grant](#required-grant) can define the company time zone by following these steps:
 
 1. Navigate to the Admin Settings.
 2. Under **Company settings**, select **Company overview**.
@@ -109,13 +109,11 @@ Admins and others with the [required grant](#required_grant) can define the comp
 
    <Frame>![save time zone.jpg](/images/kb/0EM5w000006v0YH.jpg)</Frame>
 
-### DATETIME Considerations Around Domo
+## DATETIME Considerations Around Domo
 
 <Tip>**Tip:** Watch [how data time zones are stored vs displayed](https://www.youtube.com/watch?v=joU8h2vEqh4) in Domo and why it matters.</Tip>
 
-
-
-# Connecting Data
+### Connecting Data
 
 Since Domo expects that all input DATETIME values are in UTC, note the following:
 
@@ -132,7 +130,7 @@ Since Domo expects that all input DATETIME values are in UTC, note the following
   
 <Note>**Note:** If a DATETIME column is brought into Domo as a string data type rather than a DATETIME, it is not converted based on the time zone settings.</Note>
 
-# DataFlows and Transforms
+### DataFlows and Transforms
 
 DataFlows operate on the raw data values stored in the database, not on converted values. You receive different calculated results when grouping values with a DATETIME field in a DataFlow (raw values) compared to doing the same grouping on a card with the converted values.
 
@@ -207,13 +205,13 @@ Runtimes displayed in the **History** tab for DataSets and DataFlows always disp
 
 <Frame>![runtime format.jpg](/images/kb/0EMVq000000tuET.jpg)</Frame>
 
-# Code Engine
+### Code Engine
 
 The Code Engine editor assumes UTC while running.
 
 <Frame>![image (4).png](/images/kb/0EMVq00000136OT.jpg)</Frame>
 
-# Workbench
+### Workbench
 
 DATETIME values are not converted to UTC during Workbench uploads unless a Shift Date Timezone transform is applied to the DataSet job. See [Setting the Timezone for a Workbench 5 Job](/s/article/360042932854).
 
@@ -226,22 +224,22 @@ DATETIME values are not converted to UTC during Workbench uploads unless a Shift
 <AccordionGroup>
 
 <Accordion title="Why do my cards show data at the wrong hour/day?">
-This may be due to a conflict between your input data and your company time zone. Learn about the [company time zone](#company_time_zone) above.
+This may be due to a conflict between your input data and your company time zone. Learn about the [company time zone](#company-time-zone) above.
 
-You can also learn how Domo handles [DATETIME data](#datetime_data_in_domo).
+You can also learn how Domo handles [DATETIME data](#datetime-considerations-around-domo).
 </Accordion>
 
 <Accordion title="I scheduled my DataSet to update at a particular time. Why does the update history show it running at a different time?">
 When you schedule an update for a DataSet, the schedule is based on UTC. However, the time displayed in the update history is the actual update time based on your defined company time zone. If you see a conflict between the scheduled time and the displayed time, verify that the job is scheduled correctly using UTC.
 
-If Daylight Saving Time is an issue, you may have to update your connector schedule twice yearly to account for the change. See [Adjust Calculations for Daylight Saving Time](#adjust_calculations_for_daylight_saving_time).
+If Daylight Saving Time is an issue, you may have to update your connector schedule twice yearly to account for the change. See [Adjust Calculations for Daylight Saving Time](#adjust-calculations-for-daylight-saving-time).
 </Accordion>
 
 <Accordion title="Why are the times not what I expect in my timestamps in my DataSets?">
 There are two likely causes for this:
-* The most common cause is that your company time zone isn't defined properly. Learn how to [define your company time zone](#define_company_time_zone)[#define_company_time_zone](#define_company_time_zone) above.
+* The most common cause is that your company time zone isn't defined properly. Learn how to [define your company time zone](#define-the-company-time-zone) above.
 
-* The other common cause is that your DataSet was scheduled to upload in a time zone other than UTC and your system is shifting the timestamp to align with your defined [company time zone](#company_time_zone). This means Domo assumes your data is coming in as UTC, even though it isn't.
+* The other common cause is that your DataSet was scheduled to upload in a time zone other than UTC and your system is shifting the timestamp to align with your defined [company time zone](#company-time-zone). This means Domo assumes your data is coming in as UTC, even though it isn't.
 
 To solve this, you can either adjust your DataSet/connector upload schedule or create a calculation or DataFlow to resolve the conflict between the time zones.
 </Accordion>

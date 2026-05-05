@@ -22,7 +22,7 @@ All Magic ETL DataFlows require at least one input tile and an Output DataSet ti
 
 **Output DataSet tile —** An Output DataSet tile is required at the end of the DataFlow to power Domo cards and apps.
 
-This article describes how to configure the [Input DataSet](#add_an_input_dataset), [Output DataSet](#add_an_output_dataset), [Writeback](#writeback_tile), and [Query DataSet](#query_dataset) tiles. Learn more about the [SQL tile](/s/article/360044876874).
+This article describes how to configure the [Input DataSet](#add-an-input-dataset-to-a-dataflow), [Output DataSet](#output-dataset-tile), [Writeback](#writeback-tile), and [Query DataSet](#query-dataset-tile) tiles. Learn more about the [SQL tile](/s/article/360044876874).
 
 <Tip>**Tip:** Learn to [create a Magic ETL DataFlow](/s/article/360055259234).</Tip>
 
@@ -186,7 +186,7 @@ Follow these steps to configure the Query DataSet tile:
 
    
 <Note>**Note:** This query must be a select query only, and cannot use CTE (common table expressions).</Note>
-4. Configure the `Query Partition Key`. The recommended process for determining this for Databricks tables appears [below](#configure_partition_key_recommended).
+4. Configure the `Query Partition Key`. The recommended process for determining this for Databricks tables appears [below](#choose-the-partition-key-recommended-process-for-databricks).
 
    
 <Warning>**Warning:** The `partition key` column should not contain NULL values; these will be ignored. You should only choose a column with exclusively non-NULL values as the partition key.</Warning>
@@ -291,7 +291,7 @@ When choosing the partition key, the more evenly distributed the row count per c
     `FROM ranked_counts`  
     `WHERE cumulative_row_count < max_rows;`
 
-   Replace `max_rows` with the value calculated in step 4, [above](#step_four). Then execute the preceding query to obtain an integer result: `max_column_values`.
+   Replace `max_rows` with the value calculated in step 4, above. Then execute the preceding query to obtain an integer result: `max_column_values`.
 8. If you decide to use this candidate column as the partition key, use the results from steps 6 and 7 to calculate the minimum value for the number of loads required to ensure that the largest load remains below 4GB, as follows, rounding up:  
      
    `“# loads” >= distinct_count / max_column_values`  

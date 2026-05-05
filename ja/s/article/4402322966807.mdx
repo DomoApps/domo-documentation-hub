@@ -6,7 +6,7 @@ title: "> Domo on Snowflake（推奨）"
 
 Cloud Amplifierを使用すると、Snowflake内のエンタープライズデータアセットを使用するためのアクセス権をDomoに付与できます。SnowflakeとCloud Amplifierの統合により、データは組織のガバナンス構造とデータ構造内でSnowflakeに残り、Snowflakeはデータアクセスとクエリ処理を制御します。Cloud Amplifierでは、Domoのデータエクスペリエンス機能の包括的なポートフォリオにアクセスして、データからより多くの価値を引き出すことができます。
 
-このガイドでは、Snowflakeに精通しているユーザー向けに、読み取り/書き込み機能の設定や[OAuthの設定方法](#oauth_configuration)など、SnowflakeをCloud Amplifierに登録する方法を説明します。
+このガイドでは、Snowflakeに精通しているユーザー向けに、読み取り/書き込み機能の設定や[OAuthの設定方法](#oauth)など、SnowflakeをCloud Amplifierに登録する方法を説明します。
 
 <Note>**注記：**Magic ETLはSnowflakeとCloud Amplifierの統合を活用するため、ユーザーはSnowflake内のデータを簡単に変換することができます。Snowflake上のMagic ETLについては、[こちら](/s/article/000005455)を参照してください。</Note>
 
@@ -88,7 +88,7 @@ Snowflake接続を設定する前に、以下の手順を完了することを�
    - **［デフォルトの権限を使用］ —** デフォルトでは、ユーザーがSnowflakeに接続すると、初期の権限が割り当てられます。デフォルトの権限が指定されていない場合、システムはデフォルトでパブリック権限になり、何にもアクセスできません。
    - **［権限を指定］ —** 新規ユーザーに、パブリック権限ではなくデフォルトの権限を選択できます。
    - **［二次的な権限を使用］ —** これはSnowflakeがサポートする機能です。設定すると、Snowflakeは、自身に付与されている権限でテーブルにアクセスできるユーザーがいるかどうかを自動的に判断します。SnowflakeユーザーがSnowflakeで複数の権限を持ち、各権限が複数のテーブルにアクセスできる場合、そのユーザーは頻繁に権限を切り替える必要があります。二次的な権限機能は、複数の権限を切り替えることなくテーブルにアクセスできるようにすることでこれを防止します。このオプションでは、クエリ時にユーザーがSnowflakeの権限を選択することはできません。DomoがSnowflakeにクエリを実行する必要がある場合は、代わりにすべてのユーザーに特定の権限を定義できます。
-8. **［OAuthを設定］**で、OAuthでユーザーを個別に認証できるようにスイッチを切り替えます。後述の「[DomoのOAuthを設定する](#configure_oauth_in_domo)」を参照してください。
+8. **［OAuthを設定］**で、OAuthでユーザーを個別に認証できるようにスイッチを切り替えます。後述の「[DomoのOAuthを設定する](#domooauth)」を参照してください。
 9. データの読み込みとクエリに使用するSnowflakeウェアハウスを選択します。
 
    <Frame>![load and query.png](/images/kb/ja/0EM5w000005wyYi.jpg)</Frame>
@@ -186,7 +186,7 @@ Snowflakeは、セキュリティ強化のためにキーペア認証をサポ�
    <Frame>![select snowflake.jpg](/images/kb/ja/0EMVq000002Y3vB.jpg)</Frame>
 5. 既存の統合にマウスポインターを合わせ、<img alt="" src="/images/kb/ja/0EMVq000005vp69.jpg" style={{width: 30, height: 29, display: 'inline', verticalAlign: 'start', margin: '0'}}/>
 
-   **［オプション］**>**［アカウントを編集］**を選択するか、[新しい統合を作成します](#read_only_setup)。
+   **［オプション］**>**［アカウントを編集］**を選択するか、新しい統合を作成します。
 6. 統合モーダルの**［Snowflakeアカウントを編集］**で**［キーペア］**のラジオボタンを選択します。モーダルには、キーペア認証に関するSnowflakeのドキュメントを確認するオプションが用意されています。  
      
 
@@ -204,7 +204,7 @@ Snowflakeは、セキュリティ強化のためにキーペア認証をサポ�
 
 SnowflakeのOAuthを有効にすることができます。これには、SnowflakeとCloud Amplifierの統合のすべてのユーザーがSnowflakeで認証を受け、許可されたSnowflakeデータのみにアクセスできるようにする必要があります。
 
-SnowflakeのOAuthを設定するには、まずSnowflakeで設定を完了し、次にDomoで設定を完了する必要があります。その後、[Okta SSOと統合](#configure_okta_for_sso)することを選択できます。
+SnowflakeのOAuthを設定するには、まずSnowflakeで設定を完了し、次にDomoで設定を完了する必要があります。その後、[Okta SSOと統合](#oktasso)することを選択できます。
 
 ## SnowflakeのOAuthを設定する
 
@@ -243,7 +243,7 @@ Snowflake OAuthセキュリティ統合の設定から始めます。
 
 ## DomoのOAuthを設定する
 
-1. 上記の[読み取り専用設定](#read_only_setup)の手順1～8を実行してから、ここに戻ります。
+1. 上記の読み取り専用設定の手順1～8を実行してから、ここに戻ります。
 2. スイッチを切り替えてOAuthを有効にすると、以下のフィールドが表示されます。
    - **［Snowflakeのアカウント識別子］ —** このフィールドが既に入力されている場合は、変更しないでください。
    - **［SnowflakeクライアントID］ —** Snowflakeから取得したクライアントIDを貼り付けます。
@@ -282,7 +282,7 @@ SnowflakeとCloud Amplifierの接続がData Warehouse内に表示されるよう
 
 ## Oktaを設定してSSOでアクセスする
 
-以下のOkta SSOの手順に従う前に、[OAuthの設定](#oauth_configuration)を完了する必要があります。
+以下のOkta SSOの手順に従う前に、[OAuthの設定](#oauth)を完了する必要があります。
 
 1. Oktaの管理者ダッシュボードに移動します。  
      

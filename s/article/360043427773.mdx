@@ -2,7 +2,7 @@
 title: "Old Magic ETL Tiles: Scripting"
 ---
 
-### Intro
+## Intro
 
 <Note>
   **Note:** This article is for the old Magic ETL. For information on the new Magic ETL, see [Magic ETL](/s/topic/0TO5w000000ZanvGAC).
@@ -20,14 +20,14 @@ Scripting tiles are a powerful tool within Domo's Magic ETL feature. They allow 
 
 ---
 
-### General Information for All Scripting Tiles
+## General Information for All Scripting Tiles
 
 This section provides information pertinent to all scripting tiles in Magic ETL. For information on specific tiles, click on any of the following links to jump to the section for that tile:
 
 * Python Package API Reference
 * R Package API Reference
 
-# Take A Tour
+### Take A Tour
 
 All scripting tiles have the same look. The only difference between them is the supported language.
 
@@ -51,7 +51,7 @@ In the **Console** tab, you can see the standard out (stdout ) and standard erro
 In the **Preview** tab, you can see the results of running your script. This tab also does not appear until after a preview is run. It will then appear as an option in the tile editor panel toolbar.
 
 <Frame><img alt="scripting_actions_preview.png" src="/images/kb/ka0Vq0000000yCH-00N5w00000Ri7BU-0EM5w000005vNji.png"/></Frame>
-# Get Data In and Out of the Scripting Tile
+### Get Data In and Out of the Scripting Tile
 
 Domo provides a basic API for importing data (read) from the Domo ecosystem into your script and then for exporting your results out (writing) of the script and back into the Domo ecosystem. The API is different for each scripting language and tries to follow the semantics of the language.
 
@@ -77,7 +77,7 @@ The next step in writing a script is getting access to the data. Each language w
 
 The last step in writing a script is returning the results to the Domo ecosystem. Each language has its own semantic version of a Domo "write" method. This is also included in the initial code template. There is no other way of injecting a code snippet for this, however. Provide the name of the variable that is storing the results of your script to this "write" method. **There can only be one export per script.**
 
-# Populate the Resulting Schema
+### Populate the Resulting Schema
 
 There are three ways to tell the tile what schema your script produces. These methods can be mixed and matched as necessary to get the proper result. You perform all of these in the **Schema** tab of the tile.
 
@@ -124,7 +124,7 @@ After you populate the schema, the tile knows what the results of your script lo
 
 The columns listed in the **Schema** tab will be passed to the next tile in the DataFlow.
 
-### Configuration Steps
+## Configuration Steps
 
 If you have not done so already, check out the Take a Tour section of this article to become familiar with the different features of the scripting tile.
 
@@ -169,15 +169,15 @@ If you have not done so already, check out the Take a Tour section of this artic
 
 Congratulations! You have created a DataFlow that utilizes a Scripting tile. This has been a very basic configuration that only uses a single Input DataSet tile, a single Scripting tile, and a single Output DataSet tile. Don't forget that you can still use all of the classic DataFlow tiles to manipulate the data before and after your Scripting tile.
 
-### API Reference
+## API Reference
 
 domomagic is the simple API provided to both the Magic ETL "Python Action" and "R Action" authors, allowing them to load and unload data to and from the Python and R contexts.
 
-# Python Module API Reference
+### Python Module API Reference
 
 <table class="mt-responsive-table" data-aura-rendered-by="33:209;a"><thead><tr><th colspan="1" rowspan="1"><p> Method Signature </p></th><th colspan="1" rowspan="1"><p> Parameters </p></th><th colspan="1" rowspan="1"><p> Returns </p></th></tr></thead><tbody><tr><td colspan="1" rowspan="1"><p><span class="mt-font-courier-new"> read_dataframe(input_name=None) </span></p></td><td colspan="1" rowspan="1"><p><em> input_name: </em> Name of the Magic ETL input tile. Not required if only one input is available. </p></td><td colspan="1" rowspan="1"><p> A Pandas DataFrame representing the tiles input. </p></td></tr><tr><td colspan="1" rowspan="1"><p><span class="mt-font-courier-new"> write_dataframe(dataframe) </span></p></td><td colspan="1" rowspan="1"><p><em> dataframe: </em> Pandas DataFrame that will be used as the output for the Magic ETL tile. </p></td><td colspan="1" rowspan="1"> N/A </td></tr><tr><td colspan="1" rowspan="1"><span class="mt-font-courier-new"> read_array(column_name,input_name=None) </span></td><td colspan="1" rowspan="1"><em> column_name </em>: Name of the column. <br/><br/><em> input_name: </em> Name of the Magic ETL input tile. Not required if only one input is available. </td><td colspan="1" rowspan="1"> A single column from the input as a NumPy array. </td></tr><tr><td colspan="1" rowspan="1"><span class="mt-font-courier-new"> read_array_dict(input_name=None) </span></td><td colspan="1" rowspan="1"><em> input_name: </em> Name of the Magic ETL input tile. Not required if only one input is available. </td><td colspan="1" rowspan="1"> The input as an OrderedDict of column names mapping to NumPy arrays. <a id="r_package_api_reference" target="_blank"></a></td></tr><tr><td colspan="1" rowspan="1"><span class="mt-font-courier-new"> write_array_dict(array_dict) </span></td><td colspan="1" rowspan="1"><em> array_dict </em>: The dictionary of column names mapping to NumPy arrays as output to the Magic ETL context. The arrays must be of equal length. </td><td colspan="1" rowspan="1"> N/A </td></tr></tbody></table>
 
-# R Package API Reference
+### R Package API Reference
 
 <table class="mt-responsive-table" data-aura-rendered-by="33:209;a"><thead><tr><th colspan="1" rowspan="1"><p> Method Signature </p></th><th colspan="1" rowspan="1"><p> Parameters </p></th><th colspan="1" rowspan="1"><p> Returns </p></th></tr><tr><td colspan="1" rowspan="1"><p><span class="mt-font-courier-new"> read.dataframe(<a href="http://input.name" rel="noopener" target="_blank"> input.name </a> =NULL, see below) </span></p></td><td colspan="1" rowspan="1"><p><span class="mt-font-courier-new"><a href="http://input.name" rel="noopener" target="_blank"> input.name </a></span><em>: </em> Name of the Magic ETL input tile. Optional if only one input is available. </p></td><td colspan="1" rowspan="1"><p> The tiles input data.frame. </p></td></tr><tr><td colspan="1" rowspan="1"><p><span class="mt-font-courier-new"> write.dataframe(table) </span></p></td><td colspan="1" rowspan="1"><p><span class="mt-font-courier-new"> table </span><em>: </em> Exports a data.frame or matrix as the output for a Magic ETL tile. </p></td><td colspan="1" rowspan="1"><p> N/A </p></td></tr></thead></table>
 
@@ -185,7 +185,7 @@ The R Package read.dataframe function also supports the following parameters tha
 
 <table class="mt-responsive-table" data-aura-rendered-by="33:209;a"><thead><tr><th colspan="1" rowspan="1"><p> Parameter </p></th><th colspan="1" rowspan="1"><p> Description </p></th></tr></thead><tbody><tr><td colspan="1" rowspan="1"><p><span class="mt-font-courier-new"> colClasses </span></p></td><td colspan="1" rowspan="1"><p> A named character vector of classes to be assigned to the named columns. </p></td></tr><tr><td colspan="1" rowspan="1"><p><span class="mt-font-courier-new"> stringsAsFactors </span></p></td><td colspan="1" rowspan="1"><p> Logical value determining whether or not string columns will be read as factors. Defaults to false, and is overridden by colClasses. </p></td></tr><tr><td colspan="1" rowspan="1"><p><span class="mt-font-courier-new"> integersAsNumerics </span></p></td><td colspan="1" rowspan="1"><p> Logical value determining whether integers should be read as numerics (floating point numbers). Defaults to true, and is overridden by colClasses. </p></td></tr><tr><td colspan="1" rowspan="1"><p><span class="mt-font-courier-new"> allVerbatimExcept </span></p></td><td colspan="1" rowspan="1"><p> Character vector of column names which should be read according to default behavior. All other columns will be read in verbatim as strings and written out with their original types. Useful when translation to and from the R context is causing loss of precision or errors and the column is not necessary for the calculation being performed. <a id="troubleshooting" target="_blank"></a></p></td></tr><tr><td colspan="1" rowspan="1"><p><span class="mt-font-courier-new"> allIgnoredExcept </span></p></td><td colspan="1" rowspan="1"><p> Character vector of column names which will be read. All other columns will be ignored. </p></td></tr></tbody></table>
 
-### Troubleshooting
+## Troubleshooting
 
 * If your tile is not marked as configured after writing the script, make sure you have provided a resulting schema. See the
   Populating The Resulting Schema section of this article for more info.

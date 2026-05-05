@@ -2,7 +2,7 @@
 title: "> Domo on Google BigQuery（推奨）"
 ---
 
-### はじめに
+## はじめに
 
 Cloud Amplifierでは、Google BigQueryを使用してDomoインスタンスを稼働させることができます。このガイドでは、BigQueryに精通しているユーザー向けに、読み取り/書き込み機能の設定やOAuthの設定方法など、BigQueryをCloud Amplifierに登録する方法を説明します。
 
@@ -28,11 +28,11 @@ Cloud Amplifierでは、Google BigQueryを使用してDomoインスタンスを�
 
 ---
 
-### 構造的な概要
+## 構造的な概要
 
 <Frame><img alt="BigQuery architecture diagram.png" src="/images/kb/ka0Vq000000BER3-00N5w00000Ri7BU-0EMVq000003Db3G.jpg"/></Frame>
 
-### 必要条件
+## 必要条件
 
 Cloud Amplifier—BigQuery接続を設定する前に、次の手順を完了することを強く推奨します。
 
@@ -41,7 +41,7 @@ Cloud Amplifier—BigQuery接続を設定する前に、次の手順を完了す
 
   権限と許可の詳細については、「 [カスタマイズされた権限を管理する](/ja/s/article/360043438973) 」を参照してください。
 
-### 読み取り設定
+## 読み取り設定
 
 Cloud Amplifierを使用してDomo内からBigQueryテーブルへの読み取りアクセス権を設定するには、次の手順に従います。
 
@@ -79,13 +79,13 @@ Cloud Amplifierを使用してDomo内からBigQueryテーブルへの読み取�
 
 BigQueryからCloud Amplifierへの読み取り専用統合の設定が完了しました。
 
-### 書き込み設定
+## 書き込み設定
 
 BigQueryの書き込み設定を行うには、Domoに接続できる既存のBigQuery DataSetが必要です。この図はプロセスの一般的なフローを示しています。BigQuery管理者はBigQueryプロジェクトとBigQuery DataSetを作成し、「 [クラウドアカウントを管理](/ja/s/article/4412849158167) 」の許可を使用して必要なIDとプロビジョニング地域をDomoユーザーに提供します。その後、Domoユーザーは、提供された情報を使用してBigQueryの書き込み設定を行います。次のタスクでは、BigQueryでDataSetを準備し、Cloud Amplifierを使用してBigQueryの書き込み設定を行う方法について説明します。
 
 <Frame><img alt="Screenshot 2024-02-13 at 2.07.54 PM.png" src="/images/kb/ka0Vq000000BER3-00N5w00000Ri7BU-0EMVq000000LlGr.jpg" style={{width: 500, height: 485}}/></Frame>
 
-# Google BigQueryでDataSetを準備する
+### Google BigQueryでDataSetを準備する
 
 1. Google BigQueryで、既存のスタジオプロジェクトを選択するか、新しいスタジオプロジェクトを作成します。プロジェクトにアクセスしたり、プロジェクトを作成したりする方法については、[BigQueryのドキュメント](https://cloud.google.com/bigquery/docs) <img src="/images/kb/ka0Vq00000001FR-00N5w00000Ri7BU-0EMVq0000000XDh.jpg" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/> を参照してください。
 2. プロジェクトで、Domoのテーブルを書き込む新しいDataSetを追加します。この例では、BigQueryのDataSet IDとして「data\_from\_domo」を使用します。
@@ -101,7 +101,7 @@ BigQueryの書き込み設定を行うには、Domoに接続できる既存のBi
    * DataSet ID
    * データの場所（プロビジョニング地域）
 
-# DomoでBigQueryの書き込みアクセスを設定する
+### DomoでBigQueryの書き込みアクセスを設定する
 
 1. Domoナビゲーションヘッダーで **［データ］** を選択してData Centerを開きます。
 2. Data Warehouseページが表示されない場合は、左レールの <img src="/images/kb/ka0Vq000000BCNd-00N5w00000Ri7BU-0EMVq000000uR3y.jpg" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/> **［Data Warehouse］** を選択して、Data Warehouseを開きます。
@@ -144,11 +144,11 @@ BigQueryの統合をDomoの出力として使用できるようになりまし�
 
 <Frame><img alt="data from domo in magic.jpg" src="/images/kb/ka0Vq000000BER3-00N5w00000Ri7BU-0EMVq000000LooD.jpg" style={{width: 900, height: 449}}/></Frame>
 
-### BigQueryから供給されたDataSetをDataFlowで使用する
+## BigQueryから供給されたDataSetをDataFlowで使用する
 
 BigQueryから供給されたDataSetをDataFlowで使用すると、フローの開始時にBigQueryがそのデータをライブでクエリします。また、BigQueryから供給されたDataSetは、テーブルの LAST\_ALTERED の日時にもとづいて15分ごとに更新がチェックされます。 LAST\_ALTERED フィールドにデータが更新されたことが示されている場合は、このテーブルを入力として使用するDataFlowがトリガーされ、実行が開始されます。
 
-### BigQuery OAuthを設定する
+## BigQuery OAuthを設定する
 
 BigQuery-Cloud AmplifierのOAuthオプションを使用すると、BigQueryで既に確立されているガバナンスと権限を再利用できます。OAuthがクラウドの統合用に設定されている場合、その統合を使用して確立されるすべてのDataSetでOAuthが使用されるようになりました。
 
@@ -161,14 +161,14 @@ OAuth設定によらない統合を使用してDataSetを設定した場合、Bi
 
 </Warning>
 
-# 必要条件
+### 必要条件
 
 DomoでOAuthとのBigQueryの統合を設定するには、以下が必要です。
 
 * BigQueryアカウントのプロジェクト
 * 有効なBigQueryサービスアカウントキーファイル
 
-# ユーザーごとのOAuthを使用してBigQueryの統合を設定する
+### ユーザーごとのOAuthを使用してBigQueryの統合を設定する
 
 1. Domo Data Warehouseに移動し、**追加** ノードを選択します。
 

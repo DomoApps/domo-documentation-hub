@@ -2,7 +2,7 @@
 title: "Magic ETL Tiles: Scripting"
 ---
 
-### Intro
+## Intro
 
 There are two available scripting tiles in Magic ETL: Python Script and R Script.
 
@@ -22,7 +22,7 @@ There are two available scripting tiles in Magic ETL: Python Script and R Script
 
 ---
 
-### General Information
+## General Information
 
 This section provides information about all scripting tiles in Magic ETL. For information about specific tiles, use one of the following links to jump to the API reference for that tile:
 
@@ -31,7 +31,7 @@ This section provides information about all scripting tiles in Magic ETL. For in
 
 Scripting tiles are a powerful tool within Magic ETL. They allow you to write custom R or Python algorithms and implement them directly into DataFlows. Use them to create complex data science analyses that run every time your data updates.
 
-# Take a Tour
+### Take a Tour
 
 All scripting tiles have the same look. The only difference between them is the supported language.
 
@@ -55,7 +55,7 @@ In the **Console** tab, you can see the standard out (`stdout` ) and standard er
 In the **Preview** tab, you can see the results of running your script. This tab also does not appear until after a preview is run. It will then appear as an option in the tile editor panel toolbar.
 
 <Frame><img alt="scripting_actions_preview.png" src="/images/kb/ka0Vq0000000yCH-00N5w00000Ri7BU-0EM5w000005vNji.png"/></Frame>
-# Get Data In and Out of the Scripting Tile
+### Get Data In and Out of the Scripting Tile
 
 Domo provides a basic API for importing data (read) from the Domo ecosystem into your script and then for exporting your results out (writing) of the script and back into the Domo ecosystem. The API is different for each scripting language and tries to follow the semantics of the language.
 
@@ -82,7 +82,7 @@ The next step in writing a script is getting access to the data. Each language w
 
 The last step in writing a script is returning the results to the Domo ecosystem. Each language has its own semantic version of a Domo "write" method. This is also included in the initial code template. There is no other way of injecting a code snippet for this, however. Provide the name of the variable that is storing the results of your script to this "write" method. **There can only be one export per script.**
 
-# Populate the Resulting Schema
+### Populate the Resulting Schema
 
 There are three ways to tell the tile what schema your script produces. These methods can be mixed and matched as necessary to get the proper result. You perform all of these in the **Schema** tab of the tile.
 
@@ -134,7 +134,7 @@ After you populate the schema, the tile knows what the results of your script lo
 
 The columns listed in the **Schema** tab will be passed to the next tile in the DataFlow.
 
-### Configuration Steps
+## Configuration Steps
 
 If you have not done so already, check out the [Take a Tour](#take-a-tour) section of this article to become familiar with the different features of the Scripting Tile.
 
@@ -182,16 +182,16 @@ If you have not done so already, check out the [Take a Tour](#take-a-tour) secti
 
 Congratulations! You have created a DataFlow that utilizes a Scripting Tile. This is a basic configuration that only uses a single Input DataSet tile, a single Scripting tile, and a single Output DataSet tile. Don't forget that you can still use all of the classic DataFlow tiles to manipulate the data before and after your Scripting tile.
 
-### API Reference
+## API Reference
 
 domomagic is the simple API provided to both the Magic ETL Python Tile and R Tile authors, allowing them to load and unload data to and from the Python and R contexts.
 
-# Python Script Tile Module API Reference
+### Python Script Tile Module API Reference
 
 <Frame><img alt="Python_Script.png" src="/images/kb/ka0Vq0000000yCH-00N5w00000Ri7BU-0EM5w000005vNjW.png" style={{width: 104, height: 100}}/></Frame>
 <table class="mt-responsive-table" data-aura-rendered-by="33:209;a"><thead><tr><th colspan="1" rowspan="1"><p> Method Signature </p></th><th colspan="1" rowspan="1"><p> Parameters </p></th><th colspan="1" rowspan="1"><p> Returns </p></th></tr></thead><tbody><tr><td colspan="1" rowspan="1"><p><code> read_dataframe(input_name=None) </code></p></td><td colspan="1" rowspan="1"><p><em> input_name: </em> Name of the Magic ETL input tile. Not required if only one input is available. </p></td><td colspan="1" rowspan="1"><p> A Pandas DataFrame representing the tiles input. </p></td></tr><tr><td colspan="1" rowspan="1"><p><code> write_dataframe(dataframe) </code></p></td><td colspan="1" rowspan="1"><p><em> dataframe: </em> Pandas DataFrame that will be used as the output for the Magic ETL tile. </p></td><td colspan="1" rowspan="1"> N/A </td></tr><tr><td colspan="1" rowspan="1"><code> read_array(column_name,input_name=None) </code></td><td colspan="1" rowspan="1"><em> column_name </em>: Name of the column. <br/><br/><em> input_name: </em> Name of the Magic ETL input tile. Not required if only one input is available. </td><td colspan="1" rowspan="1"> A single column from the input as a NumPy array. </td></tr><tr><td colspan="1" rowspan="1"><code> read_array_dict(input_name=None) </code></td><td colspan="1" rowspan="1"><em> input_name: </em> Name of the Magic ETL input tile. Not required if only one input is available. </td><td colspan="1" rowspan="1"> The input as an OrderedDict of column names mapping to NumPy arrays. <a id="r_api_reference" target="_blank"></a></td></tr><tr><td colspan="1" rowspan="1"><code> write_array_dict(array_dict) </code></td><td colspan="1" rowspan="1"><em> array_dict </em>: The dictionary of column names mapping to NumPy arrays as output to the Magic ETL context. The arrays must be of equal length. </td><td colspan="1" rowspan="1"> N/A </td></tr></tbody></table>
 
-# R Script Tile Package API Reference
+### R Script Tile Package API Reference
 
 <Frame><img alt="R_Script.png" src="/images/kb/ka0Vq0000000yCH-00N5w00000Ri7BU-0EM5m000005vNjD.png" style={{width: 100, height: 113}}/></Frame>
 <table border="1" cellpadding="1" cellspacing="1" data-aura-rendered-by="33:209;a"><thead><tr><th colspan="1" rowspan="1"><p> Method Signature </p></th><th colspan="1" rowspan="1"><p> Parameters </p></th><th colspan="1" rowspan="1"><p> Returns </p></th></tr></thead><tbody><tr><td colspan="1" rowspan="1"><p><code> read.dataframe(input.name =NULL, see below) </code></p></td><td colspan="1" rowspan="1"><p><code> input.name </code><em>: </em> Name of the Magic ETL input tile. Optional if only one input is available. </p></td><td colspan="1" rowspan="1"><p> The tiles input data.frame. </p></td></tr><tr><td colspan="1" rowspan="1"><p><code> write.dataframe(table) </code></p></td><td colspan="1" rowspan="1"><p><code> table </code><em>: </em> Exports a data.frame or matrix as the output for a Magic ETL tile. </p></td><td colspan="1" rowspan="1"><p> N/A </p></td></tr></tbody></table>
@@ -204,7 +204,7 @@ The R Package `read.dataframe` function also supports the following parameters t
 
 In Magic ETL's Python and R scripting environment, you can use two special directories to store and share data between scripting tiles in a DataFlow—the Project Directory and the /tmp Directory. These directories simplify the experience of working with complex data processing tasks.
 
-### Project Directory
+## Project Directory
 
 The Project Directory is a shared space for all scripting tiles within a DataFlow, and its contents persist between executions. This means that you can store things like statistical models in the Project Directory and continue working on them across multiple executions. The Project Directory is located at /home/domo/project, but you can simply refer to it as `project` in your script. Any changes you make to the Project Directory are only saved after successful executions. Changes from preview or failed executions are discarded.
 
@@ -230,7 +230,7 @@ Possible use cases for the project directory include the following:
    <Frame><img alt="read intermediate results.png" src="/images/kb/ka0Vq0000000yCH-00N5w00000Ri7BU-0EM5w000006ub6F.jpg" style={{width: 790, height: 437}}/></Frame>
 4. Save the final results or updated models to the Project Directory, if needed, and use the Output DataSet tile to store the final results.
 
-### /tmp Directory
+## /tmp Directory
 
 The /tmp directory is a shared space for all scripting tiles within a DataFlow. If you create a file in the /tmp Directory in one scripting tile, you can access it from another scripting tile within the same DataFlow. Unlike the Project Directory, the contents of the /tmp Directory are temporary and are deleted between executions of the DataFlow.
 
@@ -256,7 +256,7 @@ Set Up a /tmp Directory
    <Frame><img alt="tmp second tile.png" src="/images/kb/ka0Vq0000000yCH-00N5w00000Ri7BU-0EM5w000006ub6y.jpg"/></Frame>
 4. Continue processing the data as needed, and use the Output DataSet tile to save the final results.
 
-### Troubleshooting
+## Troubleshooting
 
 * If your tile is not marked as configured after writing the script, make sure you have provided a resulting schema. See
   [Populate the Resulting Schema](#populate-the-resulting-schema) above to learn more.

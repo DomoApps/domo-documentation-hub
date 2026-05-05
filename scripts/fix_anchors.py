@@ -76,7 +76,7 @@ LOCALIZED_PREFIXES = frozenset({"fr", "ja", "de", "es"})
 
 # (relative_path, old_anchor) pairs whose LOW-confidence matches were manually
 # reviewed and found to be WRONG. These are skipped even with --include-low.
-LOW_MANUAL_SKIP: frozenset[tuple[str, str]] = frozenset({
+MANUAL_SKIP: frozenset[tuple[str, str]] = frozenset({
     # English — wrong section matched
     ("s/article/000005080.mdx",       "switching_asset"),            # "switch" ≠ "update"
     ("s/article/000005146.mdx",       "install_excel_ppt_word_web"), # web ≠ Mac
@@ -113,6 +113,23 @@ LOW_MANUAL_SKIP: frozenset[tuple[str, str]] = frozenset({
     ("ja/s/article/000005543.mdx",    "import_from_existing_app"),
     ("ja/s/article/000005544.mdx",    "using_generate_text"),
     ("ja/s/article/000005544.mdx",    "using_summariz_text"),
+    # Japanese — MED 0.50 wrong cross-article matches (app sections → appのホーム)
+    ("ja/s/article/000005295.mdx",    "app_editor"),                 # editor ≠ Apps Home
+    ("ja/s/article/000005539.mdx",    "view_app"),                   # view ≠ Apps Home
+    ("ja/s/article/000005543.mdx",    "app_configuration"),          # config ≠ Apps Home
+    ("ja/s/article/000005567.mdx",    "create_app"),                 # create ≠ Apps Home
+    ("ja/s/article/000005567.mdx",    "view_app"),                   # view ≠ Apps Home
+    # Japanese — LOW confidence wrong cross-article matches (cross-language vocab mismatch)
+    ("ja/s/article/000005543.mdx",    "create_an_app"),              # → app-studio access, should be #appを作成する
+    ("ja/s/article/000005543.mdx",    "edit_an_app"),                # → app-studio access, should be #appを編集する
+    ("ja/s/article/000005784.mdx",    "export_embedded_app_content"),# → app-studio access, wrong section
+    ("ja/s/article/000005829.mdx",    "create_an_app"),              # → app-studio access, wrong section
+    ("ja/s/article/000005698.mdx",    "snowflake_key-pair_authentication"), # key-pair auth ≠ supplied dataset
+    ("ja/s/article/000005502.mdx",    "prepare_data_for_automl"),    # prepare data ≠ enable/access automl
+    ("ja/s/article/360045259294.mdx", "launch_an_automl_job"),       # launch job ≠ enable/access automl
+    ("ja/s/article/000005851.mdx",    "ai_readiness"),               # AI readiness ≠ AI Models DataSet
+    ("ja/s/article/000005851.mdx",    "ai_readiness_details"),       # same
+    ("ja/s/article/360055259234.mdx", "rank_and_window_tile"),       # rank+window tile ≠ Dense Rank only
 })
 
 
@@ -307,6 +324,16 @@ def process_file(
                 header_cache[article_id] = []
         return header_cache[article_id]
 
+    def get_localized_cross_headers(article_id: str, locale: str) -> list[tuple[str, str]]:
+        cache_key = f'{locale}:{article_id}'
+        if cache_key not in header_cache:
+            target = repo_root / locale / 's' / 'article' / f'{article_id}.mdx'
+            if target.exists():
+                header_cache[cache_key] = load_headers(target)
+            else:
+                header_cache[cache_key] = get_cross_headers(article_id)
+        return header_cache[cache_key]
+
     # ── Helper: resolve an anchor to its new value ────────────────────────────
     def resolve(
         old_anchor: str,
@@ -368,8 +395,8 @@ def process_file(
                 )
             return None  # leave anchor unchanged
 
-        # Manually reviewed bad LOW matches: skip even with --include-low
-        if label == 'LOW' and (rel_path, old_anchor) in LOW_MANUAL_SKIP:
+        # Manually reviewed bad matches: skip regardless of confidence level
+        if (rel_path, old_anchor) in MANUAL_SKIP:
             key = (article_id, old_anchor)
             if key not in logged_issues:
                 logged_issues.add(key)
@@ -380,7 +407,7 @@ def process_file(
                     )
                 else:
                     log.append(
-                        f'  [LOW{loc_flag} MSKIP {conf:.2f}] #{old_anchor}'
+                        f'  [{label}{loc_flag} MSKIP {conf:.2f}] #{old_anchor}'
                         f' → #{new_anch}  ("{header_txt}") — skipped (manual review: wrong match)'
                     )
             return _STRIP if strip_unresolved else None
@@ -400,11 +427,12 @@ def process_file(
         return '_' in anchor
 
     # ── Regex components ──────────────────────────────────────────────────────
-    SF   = r'https?://domo-support\.domo\.com/s/article/'
-    QS   = r'(?:\?[^#\s"\'>\n]*)?'          # optional ?query_string
-    ID   = r'([A-Za-z0-9_\-\.]+)'           # article ID / slug
-    ANCH = r'([A-Za-z][A-Za-z0-9_\-]*)'    # anchor fragment (letters/digits/underscores/hyphens)
-    TITL = r'(?:\s+"[^"]*")?'               # optional Markdown link title attribute
+    SF      = r'https?://domo-support\.domo\.com/s/article/'
+    QS      = r'(?:\?[^#\s"\'>\n]*)?'       # optional ?query_string (handles ?qs#, ?#, etc.)
+    ID      = r'([A-Za-z0-9_\-\.]+)'        # article ID / slug
+    ANCH    = r'([A-Za-z][A-Za-z0-9_\-]*)' # anchor fragment (letters/digits/underscores/hyphens)
+    TITL    = r'(?:\s+(?:"[^"]*"|\'[^\']*\'))?' # optional link title: "title" or 'title'
+    LOC_CAP = r'(ja|de|es|fr)'              # capturing locale prefix
     # Link text: plain text or one level of nested brackets (e.g. for image alts)
     LT   = r'((?:[^\[\]]|\[[^\[\]]*\])*)'
 
@@ -413,21 +441,29 @@ def process_file(
     P_SF_MD = re.compile(
         r'\[' + LT + r'\]\(' + SF + ID + QS + r'#' + ANCH + TITL + r'\)'
     )
-    # 2. Root-relative in Markdown: [text](/s/article/ID#anchor)
+    # 2. Root-relative in Markdown: [text](/s/article/ID?qs#anchor "title")
     P_REL_MD = re.compile(
-        r'\[' + LT + r'\]\(/s/article/' + ID + r'#' + ANCH + r'\)'
+        r'\[' + LT + r'\]\(/s/article/' + ID + QS + r'#' + ANCH + TITL + r'\)'
     )
-    # 3. Bare anchor in Markdown: [text](#anchor)
+    # 2b. Locale-prefixed root-relative in Markdown: [text](/ja/s/article/ID?qs#anchor "title")
+    P_LOC_MD = re.compile(
+        r'\[' + LT + r'\]\(/' + LOC_CAP + r'/s/article/' + ID + QS + r'#' + ANCH + TITL + r'\)'
+    )
+    # 3. Bare anchor in Markdown: [text](#anchor "title")
     P_BARE_MD = re.compile(
-        r'\[' + LT + r'\]\(#' + ANCH + r'\)'
+        r'\[' + LT + r'\]\(#' + ANCH + TITL + r'\)'
     )
     # 4. Salesforce URL in HTML href attribute
     P_SF_HREF = re.compile(
         r'(href=["\'])' + SF + ID + QS + r'#' + ANCH + r'(["\'])'
     )
-    # 5. Root-relative in HTML href
+    # 5. Root-relative in HTML href: href="/s/article/ID?qs#anchor"
     P_REL_HREF = re.compile(
-        r'(href=["\'])/s/article/' + ID + r'#' + ANCH + r'(["\'])'
+        r'(href=["\'])/s/article/' + ID + QS + r'#' + ANCH + r'(["\'])'
+    )
+    # 5b. Locale-prefixed root-relative in HTML href: href="/ja/s/article/ID?qs#anchor"
+    P_LOC_HREF = re.compile(
+        r'(href=["\"])/' + LOC_CAP + r'/s/article/' + ID + QS + r'#' + ANCH + r'(["\'])'
     )
     # 6. Bare anchor in HTML href
     P_BARE_HREF = re.compile(
@@ -469,6 +505,20 @@ def process_file(
             return f'[{link_text}](#{new_anch})'
         return f'[{link_text}](/s/article/{article_id}#{new_anch})'
 
+    def sub_loc_md(m: re.Match) -> str:
+        link_text  = m.group(1)
+        locale     = m.group(2)
+        article_id = m.group(3)
+        old_anchor = m.group(4)
+        if not needs_fixing(old_anchor):
+            return m.group(0)
+        headers = get_localized_cross_headers(article_id, locale)
+        resolved = resolve(old_anchor, article_id, headers, False)
+        if resolved == _STRIP:
+            return f'[{link_text}](/{locale}/s/article/{article_id})'
+        new_anch = resolved or old_anchor
+        return f'[{link_text}](/{locale}/s/article/{article_id}#{new_anch})'
+
     def sub_bare_md(m: re.Match) -> str:
         link_text  = m.group(1)
         old_anchor = m.group(2)
@@ -478,7 +528,7 @@ def process_file(
         if resolved == _STRIP:
             return link_text  # bare anchors are always same-article → plain text
         new_anch = resolved or old_anchor
-        return f'[{link_text}](#{new_anch})'
+        return f'[{link_text}](#{new_anch})'  # title attribute stripped from output
 
     def sub_sf_href(m: re.Match) -> str:
         q_open     = m.group(1)
@@ -519,6 +569,21 @@ def process_file(
             return f'{q_open}#{new_anch}{q_close}'
         return f'{q_open}/s/article/{article_id}#{new_anch}{q_close}'
 
+    def sub_loc_href(m: re.Match) -> str:
+        q_open     = m.group(1)
+        locale     = m.group(2)
+        article_id = m.group(3)
+        old_anchor = m.group(4)
+        q_close    = m.group(5)
+        if not needs_fixing(old_anchor):
+            return m.group(0)
+        headers = get_localized_cross_headers(article_id, locale)
+        resolved = resolve(old_anchor, article_id, headers, False)
+        if resolved == _STRIP:
+            return f'{q_open}/{locale}/s/article/{article_id}{q_close}'
+        new_anch = resolved or old_anchor
+        return f'{q_open}/{locale}/s/article/{article_id}#{new_anch}{q_close}'
+
     def sub_bare_href(m: re.Match) -> str:
         q_open     = m.group(1)
         old_anchor = m.group(2)
@@ -535,9 +600,11 @@ def process_file(
     # resolve() is called inside each callback; include_low is captured via closure.
     text = original
     text = P_SF_MD.sub(sub_sf_md, text)
+    text = P_LOC_MD.sub(sub_loc_md, text)
     text = P_REL_MD.sub(sub_rel_md, text)
     text = P_BARE_MD.sub(sub_bare_md, text)
     text = P_SF_HREF.sub(sub_sf_href, text)
+    text = P_LOC_HREF.sub(sub_loc_href, text)
     text = P_REL_HREF.sub(sub_rel_href, text)
     text = P_BARE_HREF.sub(sub_bare_href, text)
 

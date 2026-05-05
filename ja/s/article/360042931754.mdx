@@ -4,72 +4,78 @@ title: "PostgreSQL SSHコネクター"
 
 ## はじめに
 
-PostgreSQLは、広く使用されているオープンソースのリレーショナルデータベース管理システムです。DomoのPostgreSQL SSHコネクターを使用すると、PostgreSQLデータベースからSSHトンネル経由でデータをロードし、カスタマイズされたレポートを作成することができます。取得するデータの指定は、SQLクエリの入力で行います。PostgreSQL APIに関する詳細は、PostgreSQLのウェブサイト（ [https://www.postgresql.org/docs/](https://www.postgresql.org/docs/ "https://www.postgresql.org/docs/") ）を参照してください。
+PostgreSQLは、広く使用されているオープンソースのリレーショナルデータベース管理システムです。DomoのPostgreSQL SSHコネクターを使用すると、PostgreSQLデータベースからSSHトンネル経由でデータをロードし、カスタマイズされたレポートを作成することができます。取得するデータの指定は、SQLクエリの入力で行います。PostgreSQL APIに関する詳細は、PostgreSQLのウェブサイト（[https://www.postgresql.org/docs/](https://www.postgresql.org/docs/)）を参照してください。
 
-PostgreSQL SSHコネクターは「データベース」コネクターです。つまり、クエリを使ってデータベースからデータを取得します。Data Centerでは、ウィンドウ上部のツールバーで **［データベース］** をクリックすることで、このコネクターやほかのデータベースコネクターのページにアクセスできます。
+PostgreSQL SSHコネクターは「データベース」コネクターです。つまり、クエリを使ってデータベースからデータを取得します。Data Centerでは、ウィンドウ上部のツールバーで**［データベース］**をクリックすることで、このコネクターやほかのデータベースコネクターのページにアクセスできます。
 
-PostgreSQLデータベースには、 Data Center から接続します。このトピックでは、PostgreSQL SSHコネクターユーザーインターフェースに固有のフィールドとメニューについて説明します。DataSetの追加や更新スケジュールの設定、DataSet情報の編集に関する一般的な情報は、「 [コネクターを使用してDataSetを追加する](/ja/s/article/360042926274 "コネクターを使用してDataSetを追加する") 」を参照してください。
+PostgreSQLデータベースには、Data Centerから接続します。このトピックでは、PostgreSQL SSHコネクターユーザーインターフェースに固有のフィールドとメニューについて説明します。DataSetの追加や更新スケジュールの設定、DataSet情報の編集に関する一般的な情報は、「[コネクターを使用してDataSetを追加する](/s/article/360042926274)」を参照してください。
 
-<Note>
-**注記：** ネットワークの構造によっては、IT管理者が、データコネクターでデータを取得するためのIPアドレスをホワイトリストに登録する必要があります。詳細については、IT管理者にお問い合わせください。
+<Note>**注記：**ネットワークの構造によっては、IT管理者が、データコネクターでデータを取得するためのIPアドレスをホワイトリストに登録する必要があります。詳細については、IT管理者にお問い合わせください。</Note>
 
-</Note>
-
-| | |
-|:---|:---|
-| **主な使用事例** | このコネクターは、データベース内の情報をDomoに取り込むのに適しています。 |
-| **主なメトリクス** | 該当なし |
-| **社内における主な権限** | <ul><li>IT</li><li>プロジェクト管理</li></ul> |
-| **平均導入時間** | 10時間以内 |
-| **使いやすさ（1～10の段階。1が「最も使いやすい」）** | 9 |
+|                                |                                        |
+| ------------------------------ | -------------------------------------- |
+| **主な使用事例**                     | このコネクターは、データベース内の情報をDomoに取り込むのに適しています。 |
+| **主なメトリクス**                    | 該当なし                                   |
+| **社内における主な権限**                 | - IT - プロジェクト管理                        |
+| **平均導入時間**                     | 10時間以内                                 |
+| **使いやすさ（1～10の段階。1が「最も使いやすい」）** | 9                                      |
 
 ## ベストプラクティス
 
-* 読み取り専用クエリのみを使用します。
-* 「Append」ではなく「Replace」を使用します。
+- 読み取り専用クエリのみを使用します。
+- 「Append」ではなく「Replace」を使用します。
 
 ## 必要条件
 
 PostgreSQLデータベースにSSHトンネル経由で接続しDataSetを作成するには、以下が必要です。
 
-* PostgreSQLデータベースのログインに使用するユーザー名とパスワード
-* PostgreSQLデータベースの名前
-* PostgreSQLデータベースのポート番号
-* PostgreSQLデータベースサーバーのホスト名またはIPアドレス
-* SSHトンネルの接続先であるUNIXサーバー
-* UNIXアカウントのユーザー名とパスワード
-* SSHのポート番号
-* SSH秘密鍵（DESまたはRSAのいずれか）
+- PostgreSQLデータベースのログインに使用するユーザー名とパスワード
+- PostgreSQLデータベースの名前
+- PostgreSQLデータベースのポート番号
+- PostgreSQLデータベースサーバーのホスト名またはIPアドレス
+- SSHトンネルの接続先であるUNIXサーバー
+- UNIXアカウントのユーザー名とパスワード
+- SSHのポート番号
+- SSH秘密鍵（DESまたはRSAのいずれか）
 
-PostgreSQLデータベースに接続する前に、データベースサーバーの接続ポートでIPアドレスをいくつかホワイトリストに登録する必要があります。IPアドレスの詳細なリストについては、「 [コネクターのIPアドレスをホワイトリストに登録する](/ja/s/article/360043630093 "コネクターのIPアドレスをホワイトリストに登録する") 」を参照してください。
+PostgreSQLデータベースに接続する前に、データベースサーバーの接続ポートでIPアドレスをいくつかホワイトリストに登録する必要があります。IPアドレスの詳細なリストについては、「[コネクターのIPアドレスをホワイトリストに登録する](/s/article/360043630093)」を参照してください。
 
 <Note>
-注記： **Domoはssh-keygenを使用して生成されるSSHキーをサポートしていません。SSHキーは、OpenSSLが生成するRSAキーである必要があります。**
-
+**注記:** **Domoはssh-keygenを使用して生成されるSSHキーをサポートしていません。SSHキーは、OpenSSLが生成するRSAキーである必要があります。**
 </Note>
 
-## PostgreSQLデータベースに接続する
+## **PostgreSQLデータベースに接続する**
 
-**このセクションでは、PostgreSQL SSHコネクターページの **［認証情報］** および **［詳細］** ペインのオプションについて説明します。このページ内のほかのペインに含まれるコンポーネントである **［スケジュール設定］** や **［DataSetに名前を付け、説明を入力］** に関しては、ほとんどのタイプのコネクターで共通しています。詳細については「 [コネクターを使用してDataSetを追加する](/ja/s/article/360042926274 "コネクターを使用してDataSetを追加する") 」を参照してください。**
+**このセクションでは、PostgreSQL SSHコネクターページの**［認証情報］**および**［詳細］**ペインのオプションについて説明します。このページ内のほかのペインに含まれるコンポーネントである**［スケジュール設定］**や**［DataSetに名前を付け、説明を入力］**に関しては、ほとんどのタイプのコネクターで共通しています。詳細については「[コネクターを使用してDataSetを追加する](/s/article/360042926274)」を参照してください。**
 
-### ［認証情報］ペイン
+### **［認証情報］ペイン**
 
 **このペインには、データベースとSSHサーバーに接続する認証情報の入力フィールドが含まれています。下表では、各フィールドに必要な内容を説明しています：**
 
-<table border="1" cellpadding="1" cellspacing="1" data-aura-rendered-by="33:199;a"><thead><tr><th colspan="1" rowspan="1"><b></b><p><b> フィールド </b></p><b></b></th><th colspan="1" rowspan="1"><b></b><p><b> 説明 </b></p><b></b></th></tr></thead><tbody><tr><td colspan="1" rowspan="1"><b></b><p><b> SSH Server Hostname </b></p><b></b></td><td colspan="1" rowspan="1"><b></b><p><b> SSHトンネルの接続先であるUNIXサーバーのホスト名を入力します。 </b></p><b></b></td></tr><tr><td colspan="1" rowspan="1"><b></b><p><b> SSH Username </b></p><b></b></td><td colspan="1" rowspan="1"><b></b><p><b> UNIXアカウントのSSHユーザー名を入力します。 </b></p><b></b></td></tr><tr><td colspan="1" rowspan="1"><b></b><p><b> SSH Password </b></p><b></b></td><td colspan="1" rowspan="1"><b></b><p><b> UNIXアカウントのSSHパスワードを入力します。 </b></p><b></b></td></tr><tr><td colspan="1" rowspan="1"><b></b><p><b> SSH Port </b></p><b></b></td><td colspan="1" rowspan="1"><b></b><p><b> UNIXアカウントのポート番号を入力します。 </b></p><b></b></td></tr><tr><td colspan="1" rowspan="1"><b></b><p><b> Database Hostname </b></p><b></b></td><td colspan="1" rowspan="1"><b></b><p><b> PostgreSQLデータベースのホスト名を入力します。例： <span class="mt-font-courier-new"><a href="http://db.company.com" rel="noopener" target="_blank"> db.company.com </a></span></b></p><b></b></td></tr><tr><td colspan="1" rowspan="1"><b></b><p><b> SSH Private Key </b></p><b></b></td><td colspan="1" rowspan="1"><b></b><p><b> SSH秘密キー（DESまたはRSAのいずれか）を入力します。 </b></p><b></b></td></tr><tr><td colspan="1" rowspan="1"><b></b><p><b> Database Name </b></p><b></b></td><td colspan="1" rowspan="1"><b></b><p><b> PostgreSQLデータベース名を入力します。 </b></p><b></b></td></tr><tr><td colspan="1" rowspan="1"><b></b><p><b> Database Username </b></p><b></b></td><td colspan="1" rowspan="1"><b></b><p><b> PostgreSQLユーザー名を入力します。 </b></p><b></b></td></tr><tr><td colspan="1" rowspan="1"><b></b><p><b> Database Password </b></p><b></b></td><td colspan="1" rowspan="1"><b></b><p><b> PostgreSQLパスワードを入力します。 </b></p><b></b></td></tr><tr><td colspan="1" rowspan="1"><b></b><p><b> Database Port </b></p><b></b></td><td colspan="1" rowspan="1"><b></b><p><b> PostgreSQLデータベースのポート番号を入力します。 </b></p><b></b></td></tr></tbody></table>
+| **フィールド**               | **説明**                                           |
+| ----------------------- | ------------------------------------------------ |
+| **SSH Server Hostname** | **SSHトンネルの接続先であるUNIXサーバーのホスト名を入力します。**           |
+| **SSH Username**        | **UNIXアカウントのSSHユーザー名を入力します。**                    |
+| **SSH Password**        | **UNIXアカウントのSSHパスワードを入力します。**                    |
+| **SSH Port**            | **UNIXアカウントのポート番号を入力します。**                       |
+| **Database Hostname**   | **PostgreSQLデータベースのホスト名を入力します。例：db.company.com** |
+| **SSH Private Key**     | **SSH秘密キー（DESまたはRSAのいずれか）を入力します。**               |
+| **Database Name**       | **PostgreSQLデータベース名を入力します。**                     |
+| **Database Username**   | **PostgreSQLユーザー名を入力します。**                       |
+| **Database Password**   | **PostgreSQLパスワードを入力します。**                       |
+| **Database Port**       | **PostgreSQLデータベースのポート番号を入力します。**                |
 
-**有効な認証情報を一度入力しておくと、随時同じアカウントを使用して新しいPostgreSQL SSH DataSetを作成することができます。コネクターのアカウントは Data Center の **［アカウント］** タブで管理できます。このタブの詳細については、「 [コネクターのユーザーアカウントを管理する](/ja/s/article/360042926054 "コネクターのユーザーアカウントを管理する") 」を参照してください。**
+**有効な認証情報を一度入力しておくと、随時同じアカウントを使用して新しいPostgreSQL SSH DataSetを作成することができます。コネクターのアカウントはData Centerの**［アカウント］**タブで管理できます。このタブの詳細については、「[コネクターのユーザーアカウントを管理する](/s/article/360042926054)」を参照してください。**
 
-### ［詳細］ペイン
+### **［詳細］ペイン**
 
 **このペインでは、SQLクエリを作成して、データベースからデータを取得します。**
 
-<table border="1" cellpadding="1" cellspacing="1" data-aura-rendered-by="33:199;a"><thead><tr><th colspan="1" rowspan="1"><b></b><p><b> メニュー </b></p><b></b></th><th colspan="1" rowspan="1"><b></b><p><b> 説明 </b></p><b></b></th></tr></thead><tbody><tr><td colspan="1" rowspan="1"><b></b><p><b> SQL Query </b></p><b></b></td><td colspan="1" rowspan="1"><b></b><p><b> 必要なデータを選択するためのSQL（構造化照会言語）クエリを入力します。例： </b></p><b></b><p><b><span class="mt-font-courier-new"> select * from Employee </span></b></p><b></b></td></tr></tbody></table>
+| **メニュー**      | **説明**                                                                  |
+| ------------- | ----------------------------------------------------------------------- |
+| **SQL Query** | **必要なデータを選択するためのSQL（構造化照会言語）クエリを入力します。例：**  **select \* from Employee** |
 
-## トラブルシューティング
+## **トラブルシューティング**
 
-* **適切なIPアドレスがホワイトリストに登録されたことを確認します（IPアドレスのリストについては、「
-  必要条件 」 を参照してください）。**
-* **フェッチサイズの縮小を試みるか、空白のままにします。**
-
-
+- **適切なIPアドレスがホワイトリストに登録されたことを確認します（IPアドレスのリストについては、「必要条件」 を参照してください）。**
+- **フェッチサイズの縮小を試みるか、空白のままにします。**

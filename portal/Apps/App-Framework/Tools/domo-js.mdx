@@ -1,36 +1,48 @@
 ---
-title: Domo.js (Ryuu.js)
+title: domo.js (ryuu.js)
 permalink: e947d87e17547-ryuu-js
 ---
 
+**Version:** [v4](/portal/Apps/App-Framework/Tools/domo-js-v4) | [v5](/portal/Apps/App-Framework/Tools/domo-js-v5) | **v6 (latest)**
+
 > A powerful JavaScript SDK for building custom applications within the Domo platform
 
-[![npm version](https://img.shields.io/npm/v/ryuu.js.svg)](https://www.npmjs.com/package/ryuu.js)
+[![npm version](https://img.shields.io/badge/npm-v6.0.0-blue?logo=npm)](https://www.npmjs.com/package/ryuu.js/v/6.0.0)
 [![TypeScript](https://img.shields.io/badge/TypeScript-Ready-blue.svg)](https://www.typescriptlang.org/)
 
-domo.js (published as `ryuu.js`, developed as `domo.js`) is a comprehensive JavaScript library that enables developers to build interactive custom applications within the Domo platform. It provides seamless communication between your custom app and the Domo environment, supporting data fetching, real-time events, filters, variables, and cross-platform mobile integration.
+domo.js (published as `ryuu.js`) is the official JavaScript SDK for building Custom Apps inside the Domo platform. Apps run inside iframes — domo.js handles authenticated HTTP requests, secure messaging with the parent window, mobile WebView bridges, and provides high-level helpers for Data, AppDB, Code Engine, Workflows, and AI services.
+
+**Zero runtime dependencies. ~28KB UMD bundle. TypeScript included.**
+
+## What's New in v6
+
+| Feature | Description |
+| --- | --- |
+| `domo.intercept()` | Register request middleware — logging, retries, custom headers |
+| Structured errors | `DomoHttpError`, `DomoAuthError`, `DomoConnectionError`, `DomoValidationError`, `DomoTimeoutError` |
+| `RequestOptions.schema` | Runtime response validation with a custom parse function |
+| `domo.debug` | Category-based debug logging, persisted via `localStorage` |
+| Service namespaces | `domo.data`, `domo.appdb`, `domo.ai`, `domo.workflow`, `domo.codeEngine` |
+| Optimized bundle | Reduced bundle size, zero runtime dependencies |
+
+For a full list of breaking changes, see [Migration from v5](#migration-from-v5).
+
+---
 
 ## Quick Start
 
 Get started with ryuu.js in just a few lines:
 
 ```javascript
-import Domo from 'ryuu.js';
+import domo from 'ryuu.js';
 
-// Fetch data from a dataset
-const data = await Domo.get('/data/v1/sales');
-console.log(data); // Array of objects with your data
+// Query a dataset by its manifest alias
+const rows = await domo.data.query('sales');
 
-// Listen for dataset updates
-Domo.onDataUpdated((alias) => {
-  console.log(`Dataset ${alias} was updated!`);
-  // Refresh your visualization
-});
-
-// Listen for filter changes
-Domo.onFiltersUpdated((filters) => {
+// React to page filter changes
+domo.onFiltersUpdated((filters) => {
   console.log('Filters changed:', filters);
-  // Apply filters to your data
+  loadData();
 });
 ```
 
@@ -38,20 +50,36 @@ Domo.onFiltersUpdated((filters) => {
 
 ## Features
 
-- **HTTP API Access** - Authenticated requests to Domo datasets, datastores, and APIs
-- **Real-time Events** - Listen for dataset updates, filter changes, and variable updates
-- **Filter Management** - Get and set page-level filters programmatically
-- **Variable Management** - Access and update page variables
-- **Custom App Data** - Send custom data between apps on the same page
-- **Navigation** - Programmatically navigate within Domo
-- **Mobile Support** - Full iOS and Android compatibility
-- **TypeScript Ready** - Complete type definitions included
-- **Zero Dependencies** - Minimal bundle size with no runtime dependencies
-- **Extensible** - Override or extend functionality via `extend()` method
+- **Data API** — Query datasets with typed options (fields, filters, aggregations, date graining, beast modes)
+- **AppDB** — Full CRUD, MongoDB-style queries, bulk operations, partial updates, collection management
+- **Code Engine** — Run Code Engine functions by manifest alias
+- **Workflows** — Start and monitor Domo Workflows
+- **AI Services** — Text generation and text-to-SQL via Domo's AI Service Layer
+- **HTTP API Access** — Authenticated requests to Domo datasets, datastores, and APIs
+- **Real-time Events** — Listen for dataset updates, filter changes, and variable updates
+- **Filter Management** — Get and set page-level filters programmatically
+- **Variable Management** — Access and update page variables
+- **Custom App Data** — Send custom data between apps on the same page
+- **Typed Environment** — `domo.env` with userId, userName, host, platform, enriched from the environment API
+- **Navigation** — Programmatically navigate within Domo
+- **Mobile Support** — Full iOS and Android compatibility
+- **TypeScript Ready** — Complete type definitions with typed callbacks and generics
+- **Zero Dependencies** — ~28KB UMD bundle with no runtime dependencies
+- **Extensible** — `extend()` propagates overrides to all services (data, appdb, ai, etc.)
+- **Structured Errors** — Typed error classes (`DomoHttpError`, `DomoAuthError`, `DomoConnectionError`, `DomoValidationError`) with `instanceof` support
+- **Schema Validation** — Optional runtime response validation via `{ schema: { parse } }` (works with zod, valibot, etc.)
+- **Request Interceptors** — Middleware pattern via `domo.intercept()` for logging, retry, caching
+- **Debug Mode** — `domo.debug.enable()` for category-based logging of HTTP, messages, filters, variables
 
 ---
 
 ## Installation
+
+**Requirements:**
+
+- Node.js 16+ (for local development with the Domo CLI)
+- Modern browsers: Chrome 80+, Firefox 75+, Safari 13+, Edge 80+
+- Zero runtime dependencies — no `npm install` required inside your app bundle
 
 ### NPM
 
@@ -63,54 +91,67 @@ Then import in your application:
 
 ```javascript
 // ES modules
-import Domo from 'ryuu.js';
+import domo from 'ryuu.js';
 
 // CommonJS
-const Domo = require('ryuu.js').default;
+const domo = require('ryuu.js').default;
 ```
 
 ### CDN / Script Tag
 
+Load the library directly from a CDN. The bundle exposes a global `domo` object:
+
 ```html
 <script src="https://unpkg.com/ryuu.js"></script>
 <script>
-  // Domo is available globally
-  Domo.get('/data/v1/sales').then(data => &#123;
-    console.log(data);
-  &#125;);
+  domo.data.query('sales').then(rows => console.log(rows));
 </script>
 ```
 
+When using the Domo CLI, `domo init` scaffolds a local `domo.js` file you can reference with `<script src="domo.js"></script>` instead.
+
 ### TypeScript
 
-TypeScript definitions are included automatically:
+Type definitions are included automatically:
 
 ```typescript
-import Domo, { Filter, Variable, RequestOptions } from 'ryuu.js';
+import domo, {
+  Filter, Variable, RequestOptions,
+  DomoHttpError, DomoAuthError, DomoValidationError
+} from 'ryuu.js';
 ```
 
 ---
 
 ## Core Concepts
 
-### Communication Architecture
+### Architecture
 
-Your custom app runs in an iframe within the Domo platform. ryuu.js establishes a bidirectional communication channel using:
+Your Custom App runs in an `<iframe>` inside a Domo page. domo.js establishes communication between your app and the parent Domo window using two channels:
 
-- **MessageChannel API** - Primary communication mechanism for desktop/web
-- **webkit.messageHandlers** - iOS native integration
-- **Global objects** - Android/Flutter integration
+- **MessageChannel (inbound)** — The SDK creates a `MessageChannel` and transfers `port2` to the parent on subscribe. The parent sends filter updates, variable changes, and acks through `port2`; your app receives them on `port1`.
+- **`window.parent.postMessage` (outbound)** — Outbound messages (filter requests, variable requests, navigate) always use `window.parent.postMessage` so the parent can verify `event.origin` for security.
 
-### Request-Reply Pattern
-
-Async operations (like updating filters) use an **ASK-ACK-REPLY** pattern:
-
-1. **ASK** - Your app sends a request with a unique ID
-2. **ACK** - Parent acknowledges receipt (optional callback)
-3. **REPLY** - Parent sends response when operation completes (optional callback)
+`Domo` is a **static class** — you never call `new Domo()`. All methods are called directly on the class:
 
 ```javascript
-Domo.requestFiltersUpdate(
+// Correct
+const rows = await domo.data.query('sales');
+
+// Wrong — do not instantiate
+const instance = new Domo();
+```
+
+### ASK-ACK-REPLY Pattern
+
+Async operations like updating filters and variables use a request-tracking pattern:
+
+1. **ASK** — Your app sends a request with a unique ID
+2. **ACK** — Parent acknowledges receipt (optional callback)
+3. **REPLY** — Parent sends the response when the operation completes (optional callback)
+
+```javascript
+domo.requestFiltersUpdate(
   filters,
   true,
   () => console.log('Request acknowledged'),
@@ -118,264 +159,519 @@ Domo.requestFiltersUpdate(
 );
 ```
 
+### Token Injection
+
+A single `MutationObserver` watches `document.documentElement` with `subtree: true`. For every DOM node added at any depth, it automatically injects the Domo session token (`ryuu_sid`) into relative `href` and `src` attributes. Token is fetched once per batch — you don't need to manage auth manually.
+
 ### Environment Context
 
-Access information about the current user and environment via `Domo.env`:
+`domo.env` provides typed access to the current user, instance, and page context. Properties are populated immediately from iframe query parameters, then enriched in the background from `GET /domo/environment/v1` (which provides authoritative server-side values like `host`):
 
 ```javascript
-console.log(Domo.env.userId); // Current user ID
-console.log(Domo.env.customer); // Customer name
-console.log(Domo.env.pageId); // Current page ID
-console.log(Domo.env.locale); // Locale (e.g., 'en-US')
-console.log(Domo.env.platform); // Platform (e.g., 'desktop', 'mobile')
+// Available immediately
+console.log(domo.env.userId);    // e.g. "123456789"
+console.log(domo.env.userName);  // e.g. "Jane Smith"
+console.log(domo.env.userEmail); // e.g. "jane.smith@example.com"
+console.log(domo.env.customer);  // e.g. "acme"
+console.log(domo.env.locale);    // e.g. "en-US"
+console.log(domo.env.platform);  // "desktop" | "mobile"
+console.log(domo.env.pageId);    // e.g. "987654321"
+
+// Available after environment API loads
+console.log(domo.env.host);      // e.g. "acme.domo.com"
+console.log(domo.env.loaded);    // true
 ```
 
-**Security Note:** Environment properties come from URL parameters and can be spoofed. Always verify with the API for secure operations:
+The `loaded` property indicates whether the environment API has finished loading. If it fails (e.g. running locally), query params serve as the fallback.
+
+<Warning>
+Environment properties come from URL parameters and can be spoofed. For secure user identification, always verify with the API:
 
 ```javascript
-const authenticatedUser = await Domo.get('/domo/environment/v1/');
+const verified = await domo.get('/domo/environment/v1/');
+```
+</Warning>
+
+---
+
+## Error Handling
+
+v6 replaces generic errors with a structured hierarchy. Import only what you need:
+
+```javascript
+import {
+  DomoHttpError,
+  DomoAuthError,
+  DomoConnectionError,
+  DomoValidationError,
+  DomoTimeoutError
+} from 'ryuu.js';
+```
+
+| Class | Thrown When | Key Properties |
+| --- | --- | --- |
+| `DomoHttpError` | Non-2xx HTTP response | `status`, `statusText`, `body`, `headers` |
+| `DomoAuthError` | 401 or 403 response | Extends `DomoHttpError` |
+| `DomoConnectionError` | Network failure (fetch rejects) | — |
+| `DomoValidationError` | Invalid input or schema parse failure | `errors[]` |
+| `DomoTimeoutError` | Request or message timeout | `url` |
+
+<Note>
+Always check `DomoAuthError` before `DomoHttpError` in your catch block — `DomoAuthError` extends `DomoHttpError`, so an `instanceof DomoHttpError` check will also match auth errors.
+</Note>
+
+**Recommended catch pattern:**
+
+```javascript
+try {
+  const data = await domo.get('/data/v1/sales');
+  console.log('Data loaded:', data);
+} catch (err) {
+  if (err instanceof DomoAuthError) {
+    // 401 or 403 — session expired or no permission
+    console.error('Auth failed:', err.status);
+    showLoginPrompt();
+  } else if (err instanceof DomoHttpError) {
+    // Any other non-2xx response
+    console.error('HTTP error:', err.status, err.statusText);
+    console.error('Response body:', err.body);
+  } else if (err instanceof DomoConnectionError) {
+    // Network failure — no response at all
+    console.error('Network error:', err.message);
+    showOfflineMessage();
+  } else if (err instanceof DomoTimeoutError) {
+    console.error('Timed out:', err.url);
+  } else if (err instanceof DomoValidationError) {
+    console.error('Validation errors:', err.errors);
+  } else {
+    throw err;
+  }
+}
+```
+
+### Validation Errors
+
+When you pass malformed data to filters or variables, ryuu.js throws a `DomoValidationError` and logs the expected data model to `console.error`:
+
+```javascript
+import { DomoValidationError } from 'ryuu.js';
+
+try {
+  domo.requestFiltersUpdate([{ bad: 'data' }]);
+} catch (err) {
+  if (err instanceof DomoValidationError) {
+    console.error(err.message); // "All filters must be valid Filter objects."
+    console.error(err.errors);  // Array of the invalid items
+    // console.error also shows the expected object shape automatically
+  }
+}
 ```
 
 ---
 
 ## API Reference
 
-### HTTP Methods
+### Service Namespaces
 
-All HTTP methods return Promises and support multiple data formats.
+v6 introduces high-level service namespaces that handle URL construction and request formatting for you.
 
-#### `Domo.get(url, options?)`
+---
 
-Fetch data from a Domo dataset or API endpoint.
+#### `domo.data`
+
+Query datasets connected to your app via their [`manifest.json`](/portal/Apps/App-Framework/Guides/manifest) alias. Each dataset must be mapped in `manifest.json` under `datasources` before it can be queried by alias.
+
+##### `domo.data.query(alias, options?)`
+
+Query a dataset by its manifest alias. Supports all Data API query operators.
 
 **Parameters:**
 
-- `url` (string) - API endpoint URL
-- `options` (object, optional) - Request options
+- `alias` (string, required) — Dataset alias from `manifest.json`
+- `options` (object, optional)
 
-**Returns:** `Promise<ResponseBody>`
+**Supported options:** `fields`, `filter`, `avg`, `count`, `max`, `min`, `sum`, `unique`, `groupBy`, `dateGrain`, `calendar`, `orderBy`, `limit`, `offset`, `useBeastMode`, `format`
 
-**Basic Usage:**
-
-```javascript
-// Returns array of objects by default
-const data = await Domo.get('/data/v1/sales');
-console.log(data); // [{ id: 1, amount: 100, ... }, ...]
-```
-
-**Format Options:**
+**Returns:** `Promise<any>`
 
 ```javascript
+// Simple query
+const rows = await domo.data.query('sales');
+
+// Filtering, aggregation, and pagination
+const totals = await domo.data.query('sales', {
+  fields: ['region', 'amount'],
+  filter: 'amount > 100',
+  sum: ['amount'],
+  groupBy: ['region'],
+  orderBy: 'amount descending',
+  limit: 50,
+});
+
+// Date graining
+const monthly = await domo.data.query('sales', {
+  dateGrain: 'orderDate by month',
+  sum: ['amount'],
+  calendar: 'fiscal',
+});
+
+// Beast modes
+const bm = await domo.data.query('sales', {
+  useBeastMode: true,
+  fields: ['myBeastMode', 'reps'],
+  sum: ['myBeastMode'],
+  groupBy: ['reps'],
+});
+
 // CSV format
-const csv = await Domo.get('/data/v1/sales', { format: 'csv' });
-
-// Array of arrays with metadata
-const arrayData = await Domo.get('/data/v1/sales', {
-  format: 'array-of-arrays',
-});
-console.log(arrayData.columns); // ['id', 'amount', 'date']
-console.log(arrayData.rows); // [[1, 100, '2024-01-01'], ...]
-
-// Excel format (returns Blob)
-const excel = await Domo.get('/data/v1/sales', { format: 'excel' });
+const csv = await domo.data.query('sales', { format: 'csv' });
 ```
 
-**Supported Formats:**
+---
 
-- `'array-of-objects'` (default) - Returns `ObjectResponseBody[]`
-- `'array-of-arrays'` - Returns `ArrayResponseBody` with metadata
-- `'csv'` - Returns CSV string
-- `'excel'` - Returns Excel Blob
-- `'plain'` - Returns plain text string
+##### `domo.data.sql(alias, sql)`
 
-**Query Parameters:**
+Run a SQL query against an aliased dataset.
+
+**Parameters:**
+
+- `alias` (string, required) — Dataset alias from `manifest.json`
+- `sql` (string, required) — SQL query string. The table name is the dataset alias.
+
+**Returns:** `Promise<any>`
+
+<Note>
+`data.sql` uses a POST request with `Content-Type: text/plain`. Keep this in mind if you're using interceptors that inspect the request method. The SQL API does not support page filters or JOINs.
+</Note>
 
 ```javascript
-const data = await Domo.get('/data/v1/sales', {
-  query: {
-    limit: 100,
-    offset: 0,
-    fields: 'id,amount,date',
-  },
-});
+const result = await domo.data.sql(
+  'sales',
+  'SELECT region, SUM(amount) as total FROM sales GROUP BY region'
+);
 ```
 
-**Best Practice:** Always filter and paginate large datasets to avoid slow responses:
+---
+
+#### `domo.appdb`
+
+Persistent document storage scoped to your Custom App. Each document lives in a **collection** and has a `content` field plus system-managed metadata.
+
+<Note>
+`appdb.create` and `appdb.update` automatically wrap your document in `{ content: ... }` if you pass a plain object — you don't need to wrap it yourself.
+</Note>
+
+##### Document CRUD
 
 ```javascript
-const data = await Domo.get('/data/v1/sales', {
-  query: {
-    limit: 1000,
-    offset: 0,
-    filter: 'date > "2024-01-01"',
-  },
+const docs    = await domo.appdb.list('Users');
+const doc     = await domo.appdb.get('Users', docId);
+const created = await domo.appdb.create('Users', { username: 'Bill' }); // auto-wraps in { content: ... }
+await domo.appdb.update('Users', docId, { username: 'Ted' });
+await domo.appdb.remove('Users', docId);
+```
+
+---
+
+##### Query with MongoDB syntax
+
+```javascript
+// Simple filter
+const docs = await domo.appdb.query('Users', { 'content.region': 'West' });
+
+// With aggregations
+const results = await domo.appdb.query('campaigns', {}, {
+  groupby: 'content.campaignName, content.month',
+  count: 'documentCount',
+  sum: 'content.clicks sumClicks',
+  orderby: 'sumClicks descending',
 });
 ```
 
 ---
 
-#### `Domo.getAll(urls, options?)`
-
-Fetch multiple datasets or endpoints in parallel.
-
-**Parameters:**
-
-- `urls` (string[]) - Array of API endpoint URLs
-- `options` (object, optional) - Request options applied to all requests
-
-**Returns:** `Promise<ResponseBody[]>`
-
-**Example:**
+##### Partial update (MongoDB operators)
 
 ```javascript
-const [sales, inventory, customers] = await Domo.getAll([
-  '/data/v1/sales',
-  '/data/v1/inventory',
-  '/data/v1/customers',
+await domo.appdb.partialUpdate('Users',
+  { 'content.username': 'Bill' },
+  { '$set': { 'content.band': 'Wyld Stallyns' } }
+);
+```
+
+---
+
+##### Bulk operations
+
+```javascript
+await domo.appdb.bulkCreate('Users', [{ username: 'Bill' }, { username: 'Ted' }]);
+await domo.appdb.bulkUpsert('Users', [
+  { id: 'existing-id', username: 'Bill', band: 'Wyld Stallyns' },
+  { username: 'Rufus' },
 ]);
-
-console.log(sales); // First dataset
-console.log(inventory); // Second dataset
-console.log(customers); // Third dataset
+await domo.appdb.bulkDelete('Users', ['id-1', 'id-2', 'id-3']);
 ```
 
-**With Options:**
+---
+
+##### Collection management & export
 
 ```javascript
-const results = await Domo.getAll(['/data/v1/sales', '/data/v1/inventory'], {
-  format: 'csv',
+await domo.appdb.listCollections();
+await domo.appdb.createCollection({
+  name: 'Users',
+  schema: { columns: [{ name: 'username', type: 'STRING' }] },
+  syncEnabled: true,
 });
-// All results will be CSV strings
+await domo.appdb.export(); // manually trigger sync to Domo DataSets
 ```
 
 ---
 
-#### `Domo.post(url, body?, options?)`
+#### `domo.ai`
 
-Send a POST request to create data.
+Generate text and convert natural language to SQL using Domo's AI services.
+
+##### `domo.ai.generateText(prompt, options?)`
+
+Generate text using Domo's LLM integration.
 
 **Parameters:**
 
-- `url` (string) - API endpoint URL
-- `body` (object | string, optional) - Request body
-- `options` (object, optional) - Request options
+- `prompt` (string, required) — The input prompt
+- `options` (object, optional) — Model configuration
 
-**Returns:** `Promise<ResponseBody>`
-
-**Example:**
+**Returns:** `Promise<string>`
 
 ```javascript
-// Create a document in Domo DataStore
-const result = await Domo.post(
-  '/domo/datastores/v1/collections/users/documents/',
-  {
-    name: 'John Doe',
-    email: 'john@example.com',
-    role: 'Admin',
-  },
-);
-
-console.log(result); // Created document with ID
+const res = await domo.ai.generateText('Tell me a joke about data');
+console.log(res.choices[0].output);
 ```
 
 ---
 
-#### `Domo.put(url, body?, options?)`
+##### `domo.ai.textToSQL(question, options?)`
 
-Send a PUT request to update data.
+Convert a natural language question into a SQL query.
 
 **Parameters:**
 
-- `url` (string) - API endpoint URL
-- `body` (object | string, optional) - Request body
-- `options` (object, optional) - Request options
+- `question` (string, required) — Natural language question
+- `options` (object, optional)
+  - `dataSourceSchemas` (array) — Dataset schema hints to improve SQL accuracy
 
-**Returns:** `Promise<ResponseBody>`
-
-**Example:**
+**Returns:** `Promise<{ choices: { output: string }[] }>`
 
 ```javascript
-// Update an existing document
-const result = await Domo.put(
-  '/domo/datastores/v1/collections/users/documents/abc123',
-  {
-    name: 'Jane Doe',
-    role: 'Manager',
-  },
-);
+const sql = await domo.ai.textToSQL('Show total sales by region', {
+  dataSourceSchemas: [{
+    dataSourceName: 'Sales',
+    columns: [
+      { name: 'Region', type: 'string' },
+      { name: 'Amount', type: 'number' }
+    ]
+  }]
+});
+console.log(sql.choices[0].output); // "SELECT Region, SUM(Amount) ..."
+
+// Use the generated SQL
+const rows = await domo.data.sql('sales', sql.choices[0].output);
+```
+
+<Note>
+AI services consume AI credits. See your Domo instance rate card for details.
+</Note>
+
+---
+
+#### `domo.workflow`
+
+Trigger and monitor Domo Workflow automations.
+
+##### `domo.workflow.start(alias, input?)`
+
+Trigger a workflow by its alias.
+
+**Parameters:**
+
+- `alias` (string, required) — Workflow alias defined in your app
+- `input` (object, optional) — Input data to pass to the workflow
+
+**Returns:** `Promise<{ id: string }>` — The workflow instance
+
+```javascript
+const instance = await domo.workflow.start('approval-flow', {
+  submittedBy: 'jane.smith@example.com',
+  amount: 5000
+});
+
+console.log('Instance ID:', instance.id);
 ```
 
 ---
 
-#### `Domo.delete(url, options?)`
+##### `domo.workflow.getInstance(alias, instanceId)`
 
-Send a DELETE request to remove data.
+Get the current status of a running workflow instance.
 
 **Parameters:**
 
-- `url` (string) - API endpoint URL
-- `options` (object, optional) - Request options
+- `alias` (string, required) — Workflow alias
+- `instanceId` (string, required) — Instance ID returned by `workflow.start()`
 
-**Returns:** `Promise<ResponseBody>`
-
-**Example:**
+**Returns:** `Promise<{ state: string, ... }>`
 
 ```javascript
-// Delete a document
-await Domo.delete('/domo/datastores/v1/collections/users/documents/abc123');
+const status = await domo.workflow.getInstance('approval-flow', instance.id);
+console.log(status.status); // 'IN_PROGRESS' | 'COMPLETED' | 'CANCELED' | 'FAILED' | null
 ```
+
+<Note>
+Requires a `workflowMapping` entry in your `manifest.json` mapping the alias to a Domo Workflow.
+</Note>
 
 ---
 
-#### `Domo.domoHttp(method, url, options?, body?)`
+#### `domo.codeEngine(alias, input?)`
 
-Low-level HTTP method for full control over requests. All other HTTP methods use this internally.
+Invoke a Code Engine function by alias.
 
 **Parameters:**
 
-- `method` (RequestMethods) - HTTP method
-- `url` (string) - API endpoint URL
-- `options` (object, optional) - Request options
-- `body` (object | string, optional) - Request body
+- `alias` (string, required) — Function alias from your app manifest
+- `input` (object, optional) — Input parameters
 
-**Returns:** `Promise<ResponseBody>`
-
-**Example:**
+**Returns:** `Promise<any>` — The function's return value
 
 ```javascript
-import { RequestMethods } from 'ryuu.js';
-
-const result = await Domo.domoHttp(
-  RequestMethods.PATCH,
-  '/custom/endpoint',
-  { format: 'array-of-objects' },
-  { data: 'custom body' },
-);
+const result = await domo.codeEngine('calculate-forecast', {
+  region: 'West',
+  months: 3
+});
 ```
+
+<Note>
+Requires a `packageMapping` entry in your `manifest.json` mapping the alias to a Code Engine function.
+</Note>
 
 ---
 
 ### Event Listeners
 
-Event listeners enable real-time reactivity to changes in the Domo platform. All listener methods return an **unsubscribe function**.
+All listener methods return an **unsubscribe function**. Call it to stop listening.
 
-#### `Domo.onDataUpdated(callback)`
+---
 
-Listen for dataset update events.
+#### `domo.onFiltersUpdated(callback)`
+
+Listen for page-level filter changes.
 
 **Parameters:**
 
-- `callback` (function) - Called when a dataset is updated
-  - Receives: `datasetAlias` (string) - Alias of the updated dataset
+- `callback` — `(filters: Filter[]) => void`
 
-**Returns:** `function` - Unsubscribe function
+**Returns:** `function` — Unsubscribe function
 
-**Example:**
+<Warning>
+Registering `onFiltersUpdated` sends `requestFiltersUpdate(null)` on first call, which **clears all filters on the parent page**. If you need to read current filters without clearing them, see the [Filters guide](#filters-in-depth) below.
+</Warning>
 
 ```javascript
-const unsubscribe = Domo.onDataUpdated((datasetAlias) => {
-  console.log(`Dataset ${datasetAlias} was updated`);
-  // Reload data for this dataset
+const unsubscribe = domo.onFiltersUpdated((filters) => {
+  console.log('Filters updated:', filters);
+
+  // Find a specific filter
+  const regionFilter = filters.find(f => f.column === 'Region');
+  if (regionFilter) {
+    console.log('Region filter:', regionFilter.values);
+    applyRegionFilter(regionFilter.values);
+  }
+});
+
+// Stop listening
+unsubscribe();
+```
+
+**Filter object structure:**
+
+```javascript
+{
+  column: 'Region',              // Column name being filtered
+  operator: 'IN',                // Filter operator
+  values: ['West', 'East'],      // Filter values (always strings on the wire)
+  dataType: 'STRING',            // STRING | NUMERIC | DATE | DATETIME
+  dataSourceId: '46d91556-...',  // Source dataset ID (optional)
+  label: 'Region'                // Display label (optional)
+}
+```
+
+**Supported operators:**
+
+**String operators:**
+
+- `"IN"` — Value is in list
+- `"NOT_IN"` — Value is not in list
+- `"CONTAINS"` — Value contains string
+- `"NOT_CONTAINS"` — Value doesn't contain string
+- `"STARTS_WITH"` — Value starts with string
+- `"NOT_STARTS_WITH"` — Value doesn't start with string
+- `"ENDS_WITH"` — Value ends with string
+- `"NOT_ENDS_WITH"` — Value doesn't end with string
+
+**Numeric / Date operators:**
+
+- `"EQUALS"` — Equals value
+- `"NOT_EQUALS"` — Not equals value
+- `"GREATER_THAN"` — Greater than value
+- `"GREAT_THAN_EQUALS_TO"` — Greater than or equals value
+- `"LESS_THAN"` — Less than value
+- `"LESS_THAN_EQUALS_TO"` — Less than or equals value
+- `"BETWEEN"` — Between two values
+
+---
+
+#### `domo.onVariablesUpdated(callback)`
+
+Listen for page variable changes.
+
+**Parameters:**
+
+- `callback` — `(variables: Variable[]) => void`
+
+**Returns:** `function` — Unsubscribe function
+
+```javascript
+domo.onVariablesUpdated((variables) => {
+  const yearVar = variables.find(v => v.name === 'selectedYear');
+  if (yearVar) loadData(yearVar.value);
+});
+```
+
+**Variable object structure:**
+
+```javascript
+{
+  name: 'selectedYear',   // Variable name
+  value: 2024,            // Current value
+  functionId: '123'       // Optional: Domo function ID
+}
+```
+
+---
+
+#### `domo.onDataUpdated(callback)`
+
+Listen for dataset update events. Called when a dataset connected to your app is refreshed.
+
+**Parameters:**
+
+- `callback` — `(alias: string) => void`
+
+**Returns:** `function` — Unsubscribe function
+
+```javascript
+const unsubscribe = domo.onDataUpdated((alias) => {
+  console.log(`Dataset "${alias}" was updated`);
   loadData();
 });
 
@@ -387,477 +683,402 @@ unsubscribe();
 
 ---
 
-#### `Domo.onFiltersUpdated(callback)`
+#### `domo.onAppDataUpdated(callback)`
 
-Listen for page filter changes.
-
-**Parameters:**
-
-- `callback` (function) - Called when filters change
-  - Receives: `filters` (Filter[]) - Array of filter objects
-
-**Returns:** `function` - Unsubscribe function
-
-**Example:**
-
-```javascript
-Domo.onFiltersUpdated((filters) => {
-  console.log('Filters updated:', filters);
-
-  // Find specific filter
-  const categoryFilter = filters.find((f) => f.column === 'category');
-
-  if (categoryFilter) {
-    console.log('Category filter:', categoryFilter.values);
-    // Apply filter to your visualization
-    applyFilters(categoryFilter.values);
-  }
-});
-```
-
-**Filter Object Structure:**
-
-```javascript
-{
-  column: "category",              // Column name being filtered
-  operator: "IN",                  // Filter operator
-  values: ["ALERT", "WARNING"],    // Array of filter values
-  dataType: "STRING",              // Data type: STRING, NUMERIC, DATE, DATETIME
-  dataSourceId: "46d91556-...",    // Source dataset ID (optional)
-  label: "category"                // Display label (optional)
-}
-```
-
-**Supported Operators:**
-
-**String Operators:**
-
-- `"IN"` - Value is in list
-- `"NOT_IN"` - Value is not in list
-- `"CONTAINS"` - Value contains string
-- `"NOT_CONTAINS"` - Value doesn't contain string
-- `"STARTS_WITH"` - Value starts with string
-- `"NOT_STARTS_WITH"` - Value doesn't start with string
-- `"ENDS_WITH"` - Value ends with string
-- `"NOT_ENDS_WITH"` - Value doesn't end with string
-
-**Numeric/Date Operators:**
-
-- `"EQUALS"` - Equals value
-- `"NOT_EQUALS"` - Not equals value
-- `"GREATER_THAN"` - Greater than value
-- `"GREAT_THAN_EQUALS_TO"` - Greater than or equals value
-- `"LESS_THAN"` - Less than value
-- `"LESS_THAN_EQUALS_TO"` - Less than or equals value
-- `"BETWEEN"` - Between two values
-
----
-
-#### `Domo.onVariablesUpdated(callback)`
-
-Listen for page variable changes.
+Listen for custom data sent by other apps on the same Domo page.
 
 **Parameters:**
 
-- `callback` (function) - Called when variables change
-  - Receives: `variables` (object) - Variables object with IDs as keys
+- `callback` — `(data: any) => void`
 
-**Returns:** `function` - Unsubscribe function
-
-**Example:**
+**Returns:** `function` — Unsubscribe function
 
 ```javascript
-Domo.onVariablesUpdated((variables) => {
-  console.log('Variables updated:', variables);
-
-  // Access specific variable by ID
-  const themeVariable = variables['391'];
-  if (themeVariable) {
-    const theme = themeVariable.parsedExpression.value;
-    setTheme(theme);
-  }
-});
-```
-
-**Variables Object Structure:**
-
-```javascript
-{
-  "391": {
-    "parsedExpression": {
-      "exprType": "NUMERIC_VALUE",
-      "value": "9"
-    }
-  },
-  "392": {
-    "parsedExpression": {
-      "exprType": "STRING_VALUE",
-      "value": "dark"
-    }
-  }
-}
-```
-
-**Note:** Variable IDs (like "391") are defined by Domo. Inspect the variables object in your app to find the correct IDs.
-
----
-
-#### `Domo.onAppDataUpdated(callback)`
-
-Listen for custom app data updates.
-
-**Parameters:**
-
-- `callback` (function) - Called when app data is received
-  - Receives: `data` (any) - Custom data object
-
-**Returns:** `function` - Unsubscribe function
-
-**Example:**
-
-```javascript
-Domo.onAppDataUpdated((data) => {
-  console.log('Received app data:', data);
-
-  // Handle custom data from other apps
+domo.onAppDataUpdated((data) => {
   if (data.action === 'highlight') {
     highlightRow(data.rowId);
   }
 });
 ```
 
-**Use Case:** Enable communication between multiple custom apps on the same Domo page.
+**Use Case:** Enable communication between multiple Custom Apps on the same Domo page.
 
 ---
 
 ### Emitters
 
-Emitters send messages to the parent Domo platform to trigger actions or update state.
+#### `domo.requestFiltersUpdate(filters, pageStateUpdate?, onAck?, onReply?)`
 
-#### `Domo.requestFiltersUpdate(filters, pageStateUpdate?, onAck?, onReply?)`
-
-Update page-level filters programmatically.
+Push filter changes to the parent Domo page.
 
 **Parameters:**
 
-- `filters` (Filter[]) - Array of filter objects
-- `pageStateUpdate` (boolean, optional) - Optional boolean indicating if the page state should be updated by the filter. When false, on the card level filter state will be updated. (default: true)
-- `onAck` (function, optional) - Called when request is acknowledged
-- `onReply` (function, optional) - Called when request completes
-  - Receives: `response` (any) - Response data
+- `filters` (Filter[] | null, required) — Filters to apply. Pass `null` to clear all filters.
+- `pageStateUpdate` (boolean, optional) — If `false`, only the card-level filter state is updated (default: `true`)
+- `onAck` (function, optional) — Called when request is acknowledged
+- `onReply` (function, optional) — Called when request completes
 
-**Returns:** `string` - Request ID for tracking
-
-**Example:**
+**Returns:** `string` — Request ID
 
 ```javascript
-// Basic usage
-Domo.requestFiltersUpdate([
-  {
-    column: 'category',
-    operator: 'IN',
-    values: ['ALERT', 'WARNING'],
-    dataType: 'STRING',
-  },
-  {
-    column: 'amount',
-    operator: 'GREATER_THAN',
-    values: [1000],
-    dataType: 'NUMERIC',
-  },
+// Apply filters
+domo.requestFiltersUpdate([
+  { column: 'Region', operator: 'IN', values: ['West'], dataType: 'STRING' }
 ]);
+
+// Clear all filters
+domo.requestFiltersUpdate(null);
 ```
 
-**With Callbacks:**
-
-```javascript
-const requestId = Domo.requestFiltersUpdate(
-  filters,
-  true,
-  () => console.log('Filter update acknowledged'),
-  (response) => console.log('Filter update completed:', response),
-);
-
-console.log('Request ID:', requestId);
-```
-
-**Filter Requirements:**
-
-All filter objects must include:
-
-- `column` (string, required) - Column name to filter on
-- `operator` (string, required) - Filter operator (see supported operators above)
-- `values` (array, required) - Values to filter by
-- `dataType` (string, required) - Data type: `"STRING"`, `"NUMERIC"`, `"DATE"`, or `"DATETIME"`
+<Warning>
+Passing `null` clears every filter on the parent page for all apps. This is also what `onFiltersUpdated` triggers automatically on first registration.
+</Warning>
 
 ---
 
-#### `Domo.requestVariablesUpdate(variables, onAck?, onReply?)`
+#### `domo.requestVariablesUpdate(variables, onAck?, onReply?)`
 
-Update page variables programmatically.
+Push variable changes to the parent Domo page.
 
 **Parameters:**
 
-- `variables` (Variable[]) - Array of variable objects
-- `onAck` (function, optional) - Called when request is acknowledged
-- `onReply` (function, optional) - Called when request completes
+- `variables` (Variable[], required)
+- `onAck` (function, optional)
+- `onReply` (function, optional)
 
-**Returns:** `string` - Request ID for tracking
-
-**Example:**
+**Returns:** `string` — Request ID
 
 ```javascript
-Domo.requestVariablesUpdate([
-  {
-    functionId: 123,
-    value: 100,
-  },
-  {
-    functionId: 124,
-    value: 'dark',
-  },
+domo.requestVariablesUpdate([
+  { name: 'selectedYear', value: 2024 }
 ]);
-```
-
-**Variable Object Structure:**
-
-```javascript
-{
-  functionId: number,  // Variable function ID from Domo
-  value: any          // New value for the variable
-}
 ```
 
 ---
 
-#### `Domo.requestAppDataUpdate(data, onAck?, onReply?)`
+#### `domo.requestAppDataUpdate(data, onAck?, onReply?)`
 
-Send custom app data to other apps on the same page.
-
-**Parameters:**
-
-- `data` (any) - Custom data object
-- `onAck` (function, optional) - Called when request is acknowledged
-- `onReply` (function, optional) - Called when request completes
-
-**Returns:** `void`
-
-**Example:**
+Send custom data to other apps on the same Domo page.
 
 ```javascript
-// Send custom data
-Domo.requestAppDataUpdate({
+domo.requestAppDataUpdate({
   action: 'highlight',
-  rowId: 123,
-  timestamp: Date.now(),
+  rowId: 123
 });
 ```
 
-**Use Case:** Coordinate interactions between multiple custom apps on the same Domo page.
+---
+
+### HTTP Methods
+
+All HTTP methods return Promises and support multiple data formats. All methods throw structured errors — see [Error Handling](#error-handling).
+
+The auth header `X-DOMO-Ryuu-Session` is injected automatically.
+
+---
+
+#### `domo.get(url, options?)`
+
+Fetch data from a Domo dataset or API endpoint.
+
+**Parameters:**
+
+- `url` (string) — API endpoint URL
+- `options` (object, optional) — Request options
+
+**Returns:** `Promise<ResponseBody>`
+
+**Basic Usage:**
+
+```javascript
+// Returns array of objects by default
+const data = await domo.get('/data/v1/sales');
+console.log(data); // [{ id: 1, amount: 100, ... }, ...]
+```
+
+**Format Options:**
+
+```javascript
+// CSV format
+const csv = await domo.get('/data/v1/sales', { format: 'csv' });
+
+// Array of arrays with column metadata
+const arrayData = await domo.get('/data/v1/sales', { format: 'array-of-arrays' });
+console.log(arrayData.columns); // ['id', 'amount', 'date']
+console.log(arrayData.rows);    // [[1, 100, '2024-01-01'], ...]
+
+// Excel format (returns Blob)
+const excel = await domo.get('/data/v1/sales', { format: 'excel' });
+```
+
+**Supported formats:**
+
+- `'array-of-objects'` (default) — `Record<string, any>[]`
+- `'array-of-arrays'` — `ArrayResponseBody` with `.columns` and `.rows`
+- `'csv'` — CSV string
+- `'excel'` — Blob
+- `'plain'` — Plain text string
+
+**Query Parameters:**
+
+```javascript
+const data = await domo.get('/data/v1/sales', {
+  query: {
+    limit: 100,
+    offset: 0,
+    fields: 'id,amount,date',
+  },
+});
+```
+
+**Best Practice:** Always filter and paginate large datasets to avoid slow responses:
+
+```javascript
+const data = await domo.get('/data/v1/sales', {
+  query: { limit: 1000, offset: 0, filter: 'date > "2024-01-01"' },
+});
+```
+
+---
+
+#### `domo.getAll(urls, options?)`
+
+Fetch multiple endpoints in parallel and return results as an array.
+
+```javascript
+const [sales, inventory, customers] = await domo.getAll([
+  '/data/v1/sales',
+  '/data/v1/inventory',
+  '/data/v1/customers',
+]);
+
+console.log(sales);     // First dataset
+console.log(inventory); // Second dataset
+console.log(customers); // Third dataset
+```
+
+**With Options:**
+
+```javascript
+const results = await domo.getAll(['/data/v1/sales', '/data/v1/inventory'], {
+  format: 'csv',
+});
+// All results will be CSV strings
+```
+
+---
+
+#### `domo.post(url, body?, options?)`
+
+```javascript
+const result = await domo.post(
+  '/domo/datastores/v1/collections/notes/documents/',
+  { text: 'hello', pinned: false }
+);
+```
+
+---
+
+#### `domo.put(url, body?, options?)`
+
+```javascript
+await domo.put(
+  '/domo/datastores/v1/collections/notes/documents/abc123',
+  { text: 'updated' }
+);
+```
+
+---
+
+#### `domo.delete(url, options?)`
+
+```javascript
+await domo.delete('/domo/datastores/v1/collections/notes/documents/abc123');
+```
+
+---
+
+#### `domo.domoHttp(method, url, options?, body?)`
+
+Low-level method used internally by all other HTTP helpers. Use this for HTTP methods not covered above (e.g. PATCH).
+
+```javascript
+import { RequestMethods } from 'ryuu.js';
+
+const result = await domo.domoHttp(
+  RequestMethods.PATCH,
+  '/custom/endpoint',
+  {},
+  { field: 'value' }
+);
+```
+
+---
+
+### Request Interceptors
+
+`domo.intercept()` registers middleware that wraps every HTTP request. Interceptors follow an **onion model** — each interceptor receives the request and a `next` function to call the next layer.
+
+<Note>
+Interceptors wrap the `fetch` call — headers and auth tokens are already set when your interceptor runs.
+</Note>
+
+#### `domo.intercept(fn)`
+
+**Parameters:**
+
+- `fn` — `(request: Request, next: (request: Request) => Promise<Response>) => Promise<Response>`
+
+**Returns:** `() => void` — Call to remove the interceptor
+
+The `config` object passed to each interceptor has `{ method, url, headers, body }`. Headers and auth tokens are already set when interceptors run.
+
+```javascript
+// Logging
+const removeLogger = domo.intercept(async (config, next) => {
+  console.log(`[${config.method}] ${config.url}`);
+  const start = Date.now();
+  const response = await next(config);
+  console.log(`[${config.method}] ${config.url} - ${Date.now() - start}ms`);
+  return response;
+});
+
+// Add custom headers
+domo.intercept((config, next) => {
+  config.headers['X-Custom'] = 'value';
+  return next(config);
+});
+
+// Short-circuit with a cached response
+domo.intercept((config, next) => {
+  if (cache.has(config.url)) return Promise.resolve(cache.get(config.url));
+  return next(config);
+});
+
+// Remove an interceptor
+removeLogger();
+```
+
+**Multiple interceptors** are applied in registration order (first registered = outermost):
+
+```
+outerMiddleware → innerMiddleware → fetch → innerMiddleware → outerMiddleware
+```
+
+---
+
+### Schema Validation
+
+Pass a `schema` option to any HTTP request to validate or transform the response at runtime. If `parse` throws, domo.js wraps it as `DomoValidationError`.
+
+```javascript
+const rows = await domo.get('/data/v1/sales', {
+  schema: {
+    parse: (raw) => {
+      if (!Array.isArray(raw)) throw new Error('Expected array');
+      return raw.map(r => ({ region: r.Region, revenue: Number(r.Revenue) }));
+    }
+  }
+});
+```
+
+Works with any validation library:
+
+```javascript
+import { z } from 'zod';
+
+const Schema = z.array(z.object({ region: z.string(), revenue: z.number() }));
+
+const rows = await domo.get('/data/v1/sales', {
+  schema: { parse: (raw) => Schema.parse(raw) }
+});
+```
 
 ---
 
 ### Navigation
 
-#### `Domo.navigate(url, isNewWindow?)`
+#### `domo.navigate(url, isNewWindow?)`
 
-Navigate to a different page within Domo.
+Navigate the parent Domo page from inside your app iframe.
 
 **Parameters:**
 
-- `url` (string) - Domo page URL or route
-- `isNewWindow` (boolean, optional) - Open in new tab/window (default: false)
-
-**Example:**
+- `url` (string, required) — Domo page URL or route
+- `isNewWindow` (boolean, optional) — Open in new tab (default: `false`)
 
 ```javascript
-// Navigate to a profile page
-Domo.navigate('/profile/3234');
+// Navigate in same window
+domo.navigate('/page/123456789');
 
 // Open in new tab
-Domo.navigate('/page/123456789', true);
+domo.navigate('/page/123456789', true);
 ```
 
-**Important Notes:**
-
-- Use `Domo.navigate()` instead of HTML links to change the page hosting the custom app
-- For mobile web platforms, routes are automatically prefixed with `/m#` (e.g., `/m#/profile/3234`)
-- External links are restricted to whitelisted domains (configure in Admin > Network Security > Custom Apps authorized domains)
-
----
-
-### Environment
-
-#### `Domo.env`
-
-Access environment information about the current context.
-
-**Type:** `QueryParams` (object)
-
-**Available Properties:**
-
-```javascript
-Domo.env.pageId; // Current page ID
-Domo.env.userId; // Current user ID
-Domo.env.customer; // Customer name
-Domo.env.locale; // Locale (e.g., 'en-US')
-Domo.env.environment; // Environment (e.g., 'dev3', 'prod')
-Domo.env.platform; // Platform (e.g., 'desktop', 'mobile')
-```
-
-**Example:**
-
-```javascript
-console.log(`User ${Domo.env.userId} on ${Domo.env.platform}`);
-
-// Conditional logic based on platform
-if (Domo.env.platform === 'mobile') {
-  renderMobileLayout();
-} else {
-  renderDesktopLayout();
-}
-```
-
-**Security Warning:** These properties come from URL query parameters and can be spoofed. For secure user identification, always verify with the API:
-
-```javascript
-const authenticatedUser = await Domo.get('/domo/environment/v1/');
-console.log('Verified user:', authenticatedUser);
-```
+<Note>
+For mobile web platforms, routes are automatically prefixed with `/m#`. External links are restricted to whitelisted domains — configure in **Admin > Network Security > Custom Apps authorized domains**.
+</Note>
 
 ---
 
 ### Utilities
 
-#### `Domo.extend(overrides)`
+#### `domo.extend(overrides)`
 
-Extend or override static methods and properties of the Domo class.
-
-**Parameters:**
-
-- `overrides` (object) - Object with methods/properties to override
-
-**Returns:** `void`
-
-**Example:**
+Override static methods or properties of the Domo class. Also updates the shared transport so overrides propagate to all service namespaces (`data`, `appdb`, `ai`, etc.).
 
 ```javascript
-import Domo, { get as originalGet } from 'ryuu.js';
+import domo, { get as originalGet } from 'ryuu.js';
 
-// Add logging to all GET requests
-Domo.extend({
+domo.extend({
   get: async function (url, options) {
-    console.log(`[API] Fetching: ${url}`);
-    const startTime = Date.now();
-
-    try {
-      const result = await originalGet.call(this, url, options);
-      console.log(`[API] Success: ${url} (${Date.now() - startTime}ms)`);
-      return result;
-    } catch (error) {
-      console.error(`[API] Error: ${url} (${Date.now() - startTime}ms)`, error);
-      throw error;
-    }
-  },
+    console.log(`[fetch] ${url}`);
+    return originalGet.call(this, url, options);
+  }
 });
-
-// Now all Domo.get() calls include logging
-const data = await Domo.get('/data/v1/sales');
-```
-
-**Use Cases:**
-
-- Add logging to all requests
-- Implement retry logic
-- Add caching layer
-- Mock responses for testing
-- Add custom error handling
-
----
-
-#### `Domo.getRequests()`
-
-Get all tracked requests (ASK-ACK-REPLY pattern).
-
-**Returns:** `AskReplyMap` - Object with request IDs as keys
-
-**Example:**
-
-```javascript
-const requestId = Domo.requestFiltersUpdate(filters);
-
-// Check request status
-const requests = Domo.getRequests();
-console.log(requests[requestId]);
-// {
-//   request: { status: 'SENT', timestamp: 1234567890 },
-//   response: { status: 'SUCCESS', timestamp: 1234567900, data: {...} }
-// }
 ```
 
 ---
 
-#### `Domo.getRequest(id)`
+#### `domo.getRequests()` / `domo.getRequest(id)`
 
-Get a specific tracked request by ID.
-
-**Parameters:**
-
-- `id` (string) - Request ID
-
-**Returns:** Request object or `undefined`
-
-**Example:**
+Inspect the ASK-ACK-REPLY request lifecycle for tracked requests (filter updates, variable updates, etc.).
 
 ```javascript
-const requestId = Domo.requestFiltersUpdate(filters);
-const request = Domo.getRequest(requestId);
-console.log(request.request.status); // 'PENDING', 'SENT'
+const requestId = domo.requestFiltersUpdate(filters);
+
+const request = domo.getRequest(requestId);
+console.log(request.request.status); // 'PENDING' | 'SENT'
+
+const all = domo.getRequests();
 ```
-
----
-
-#### `Domo.__util`
-
-Internal utilities exposed for advanced use cases.
-
-**Available Utilities:**
-
-```javascript
-Domo.__util.isSuccess(statusCode); // Check if HTTP status is success
-Domo.__util.isVerifiedOrigin(origin); // Verify origin is trusted Domo domain
-Domo.__util.getQueryParams(); // Get current query parameters
-Domo.__util.setFormatHeaders(format, headers); // Set Accept headers
-Domo.__util.generateUniqueId(); // Generate unique request ID
-Domo.__util.isIOS(); // Check if running on iOS
-```
-
-**Note:** These are internal utilities and may change between versions. Use at your own risk.
 
 ---
 
 ## TypeScript Support
 
-ryuu.js includes comprehensive TypeScript definitions for a better development experience.
-
-### Importing Types
+All types are exported from `ryuu.js`:
 
 ```typescript
-import Domo, {
+import domo, {
   // Interfaces
   Filter,
   Variable,
   RequestOptions,
-  ObjectResponseBody,
-  ArrayResponseBody,
-  QueryParams,
+
+  // Error classes
+  DomoHttpError,
+  DomoAuthError,
+  DomoConnectionError,
+  DomoValidationError,
+  DomoTimeoutError,
 
   // Enums
   DataFormats,
   DomoDataTypes,
   RequestMethods,
 
-  // Type Guards
+  // Type guards
   isFilter,
   isFilterArray,
   isVariable,
@@ -865,357 +1086,211 @@ import Domo, {
 } from 'ryuu.js';
 ```
 
-### Typed Requests
+**Typed requests:**
 
 ```typescript
-// Type-safe request options
-const options: RequestOptions<'array-of-objects'> = {
+const options: RequestOptions = {
   format: 'array-of-objects',
-  query: { limit: 100 },
+  query: { limit: 100 }
 };
 
-// Return type is automatically inferred
-const data: ObjectResponseBody[] = await Domo.get('/data/v1/sales', options);
-
-// Format-specific types
-const csv: string = await Domo.get('/data/v1/sales', { format: 'csv' });
-const arrays: ArrayResponseBody = await Domo.get('/data/v1/sales', {
-  format: 'array-of-arrays',
-});
-const excel: Blob = await Domo.get('/data/v1/sales', { format: 'excel' });
+const data = await domo.get('/data/v1/sales', options);
 ```
 
-### Typed Filters
+**Typed filters:**
 
 ```typescript
 const filters: Filter[] = [
-  {
-    column: 'category',
-    operator: 'IN',
-    values: ['ALERT', 'WARNING'],
-    dataType: 'STRING',
-  },
-  {
-    column: 'amount',
-    operator: 'GREATER_THAN',
-    values: [1000],
-    dataType: 'NUMERIC',
-  },
+  { column: 'Region', operator: 'IN', values: ['West'], dataType: 'STRING' },
+  { column: 'Revenue', operator: 'GREATER_THAN', values: ['1000'], dataType: 'NUMERIC' }
 ];
 
-Domo.requestFiltersUpdate(filters);
+domo.requestFiltersUpdate(filters);
 ```
 
-### Typed Variables
+**Custom data types:**
 
 ```typescript
-const variables: Variable[] = [
-  { functionId: 123, value: 100 },
-  { functionId: 124, value: 'dark' },
-];
-
-Domo.requestVariablesUpdate(variables);
-```
-
-### Custom Types
-
-```typescript
-// Define your data shape
 interface SalesRecord {
-  id: number;
-  amount: number;
+  region: string;
+  revenue: number;
   date: string;
-  category: string;
 }
 
-// Type-safe data access
-const sales = (await Domo.get('/data/v1/sales')) as SalesRecord[];
-
-sales.forEach((record) => {
-  console.log(`Sale ${record.id}: $${record.amount}`);
-});
+const rows = (await domo.data.query('sales')) as SalesRecord[];
 ```
 
 ---
 
 ## Mobile Platform Support
 
-ryuu.js provides full support for iOS and Android mobile platforms through platform-specific APIs.
+domo.js detects the platform and routes messages through the appropriate bridge automatically. No configuration needed.
 
-### iOS Integration
+| Platform | Bridge used |
+| --- | --- |
+| Desktop / Web | MessageChannel + `window.parent.postMessage` |
+| iOS | `webkit.messageHandlers` (`domofilter`, `domovariable`) |
+| Android / Flutter | Global objects (`window.domofilter`, `window.domovariable`) |
 
-On iOS, ryuu.js uses **webkit.messageHandlers** for native communication:
-
-```javascript
-// Automatically handled by ryuu.js
-Domo.requestFiltersUpdate(filters);
-// Internally uses: webkit.messageHandlers.domofilter.postMessage()
-
-Domo.requestVariablesUpdate(variables);
-// Internally uses: webkit.messageHandlers.domovariable.postMessage()
-```
-
-### Android/Flutter Integration
-
-On Android, ryuu.js uses global objects injected by the native app:
+**Platform detection:**
 
 ```javascript
-// Automatically handled by ryuu.js
-Domo.requestVariablesUpdate(variables);
-// Internally uses: window.domovariable.postMessage()
-
-Domo.requestFiltersUpdate(filters);
-// Internally uses: window.domofilter.postMessage()
-```
-
-### Platform Detection
-
-ryuu.js automatically detects the platform and uses the appropriate communication method:
-
-```javascript
-// Check if running on mobile
-if (Domo.env.platform === 'mobile') {
-  // Mobile-specific logic
-  renderMobileView();
+if (domo.env.platform === 'mobile') {
+  renderMobileLayout();
 } else {
-  // Desktop-specific logic
-  renderDesktopView();
-}
-
-// Internal iOS detection (exposed via __util)
-if (Domo.__util.isIOS()) {
-  // iOS-specific logic
+  renderDesktopLayout();
 }
 ```
 
-### Mobile Considerations
+**Mobile considerations:**
 
-1. **Navigation:** Routes are automatically prefixed with `/m#` on mobile web
-2. **Touch Events:** Consider touch-friendly UI for mobile apps
-3. **Performance:** Mobile devices may have limited resources - optimize data fetching
-4. **Testing:** Test on actual devices or simulators for best results
-
----
-
-## Error Handling
-
-All HTTP methods return Promises. Use `try/catch` with async/await for error handling.
-
-### Basic Error Handling
-
-```javascript
-try {
-  const data = await Domo.get('/data/v1/sales');
-  console.log('Data loaded:', data);
-} catch (error) {
-  console.error('Failed to load data:', error);
-}
-```
-
-### Error Object Structure
-
-Error objects include comprehensive information:
-
-```javascript
-try {
-  const data = await Domo.get('/data/v1/nonexistent');
-} catch (error) {
-  console.error('Status:', error.status); // 404
-  console.error('Status Text:', error.statusText); // 'Not Found'
-  console.error('Message:', error.message); // Error description
-  console.error('Body:', error.body); // Response body
-  console.error('Headers:', error.headers); // Response headers
-}
-```
-
-### Handling Specific Error Types
-
-```javascript
-try {
-  const data = await Domo.get('/data/v1/sales');
-} catch (error) {
-  if (error.status === 404) {
-    console.error('Dataset not found');
-    showError('The requested dataset does not exist');
-  } else if (error.status === 403) {
-    console.error('Access denied');
-    showError('You do not have permission to access this dataset');
-  } else if (error.status === 401) {
-    console.error('Authentication failed');
-    showError('Your session has expired. Please refresh the page.');
-  } else if (error.status >= 500) {
-    console.error('Server error');
-    showError('A server error occurred. Please try again later.');
-  } else {
-    console.error('Unexpected error:', error);
-    showError('An unexpected error occurred');
-  }
-}
-```
-
-### Retry Logic
-
-Implement retry logic for transient errors:
-
-```javascript
-async function fetchWithRetry(url, options, maxRetries = 3) {
-  for (let i = 0; i < maxRetries; i++) {
-    try {
-      return await Domo.get(url, options);
-    } catch (error) {
-      if (i === maxRetries - 1) throw error;
-
-      // Only retry on server errors
-      if (error.status >= 500) {
-        console.log(`Retry ${i + 1}/${maxRetries}...`);
-        await new Promise((resolve) => setTimeout(resolve, 1000 * (i + 1)));
-      } else {
-        throw error;
-      }
-    }
-  }
-}
-
-// Usage
-try {
-  const data = await fetchWithRetry('/data/v1/sales');
-} catch (error) {
-  console.error('Failed after retries:', error);
-}
-```
+- Navigation routes are automatically prefixed with `/m#` on mobile web
+- Test on actual devices or simulators — not just browser DevTools mobile emulation
+- Optimize data fetching: mobile devices have limited memory and CPU
 
 ---
 
 ## Advanced Usage
 
-### Custom Fetch Implementation
+### Debug Mode
 
-Provide your own fetch implementation for testing or custom behavior:
+Enable category-based logging to inspect HTTP requests, messages, filters, and variables:
 
 ```javascript
-// Mock fetch for testing
-const mockFetch = async (url, options) => {
-  return {
-    ok: true,
-    status: 200,
-    headers: new Headers(),
-    json: async () => [{ id: 1, name: 'Test' }],
-  };
-};
+// Enable all categories
+domo.debug.enable();
 
-const data = await Domo.get('/data/v1/sales', {
-  fetchImpl: mockFetch,
-});
+// Enable specific categories
+domo.debug.enable('http');
+domo.debug.enable('messages');
+domo.debug.enable(['http', 'filters']);
+
+// Disable
+domo.debug.disable();
 ```
 
-### Caching Layer
-
-Add a caching layer using `extend()`:
+You can also enable debug mode without code changes — useful for debugging a live app:
 
 ```javascript
-const cache = new Map();
-
-Domo.extend({
-  get: async function (url, options) {
-    // Check cache
-    const cacheKey = `${url}:${JSON.stringify(options)}`;
-    if (cache.has(cacheKey)) {
-      console.log('Cache hit:', url);
-      return cache.get(cacheKey);
-    }
-
-    // Fetch and cache
-    const result = await originalGet.call(this, url, options);
-    cache.set(cacheKey, result);
-
-    return result;
-  },
-});
+localStorage.__domo_debug__ = '["all"]';
+// Refresh the page — debug logging is now active
 ```
 
-### Request Interceptors
+**Debug categories:**
 
-Add interceptors for all requests:
+| Category | What it logs |
+| --- | --- |
+| `http` | Every request: method, URL, headers, response status and body |
+| `messages` | All MessageChannel and postMessage traffic (inbound and outbound) |
+| `filters` | Filter update events and subscriptions |
+| `variables` | Variable update events and subscriptions |
+| `all` | Everything above |
+
+**Example output:**
+
+```
+[domo:http] GET /data/v1/sales
+[domo:http] 200 OK /data/v1/sales
+[domo:messages] received filtersUpdated { event: 'filtersUpdated', filters: [...] }
+[domo:filters] filtersUpdated [{ column: 'region', ... }]
+```
+
+---
+
+### Retry Logic
+
+Implement retry logic for transient server errors using interceptors or a wrapper function:
 
 ```javascript
-import Domo, { domoHttp as originalDomoHttp } from 'ryuu.js';
-
-Domo.extend({
-  domoHttp: async function (method, url, options, body) {
-    // Before request
-    console.log(`[${method}] ${url}`);
-    const startTime = Date.now();
-
-    // Add custom headers
-    options = {
-      ...options,
-      headers: {
-        ...options?.headers,
-        'X-Custom-Header': 'value',
-      },
-    };
-
+async function fetchWithRetry(url, options, maxRetries = 3) {
+  for (let i = 0; i < maxRetries; i++) {
     try {
-      // Make request
-      const result = await originalDomoHttp.call(
-        this,
-        method,
-        url,
-        options,
-        body,
-      );
-
-      // After successful request
-      console.log(`[${method}] ${url} - Success (${Date.now() - startTime}ms)`);
-      return result;
-    } catch (error) {
-      // After failed request
-      console.error(
-        `[${method}] ${url} - Error (${Date.now() - startTime}ms)`,
-        error,
-      );
-      throw error;
+      return await domo.get(url, options);
+    } catch (err) {
+      if (i === maxRetries - 1) throw err;
+      if (err instanceof DomoHttpError && err.status >= 500) {
+        console.log(`Retry ${i + 1}/${maxRetries}...`);
+        await new Promise(resolve => setTimeout(resolve, 1000 * (i + 1)));
+      } else {
+        throw err;
+      }
     }
-  },
+  }
+}
+
+const data = await fetchWithRetry('/data/v1/sales');
+```
+
+---
+
+### Custom Fetch
+
+Provide your own `fetch` implementation for testing, mocking, or custom network behavior:
+
+```javascript
+const data = await domo.get('/data/v1/sales', {
+  fetch: myCustomFetch,
 });
 ```
+
+---
 
 ### Type Guards
 
-Use type guards to validate runtime data:
+Use type guards to validate runtime data before passing it to the SDK:
 
 ```javascript
-import { isFilter, isFilterArray, guardAgainstInvalidFilters } from 'ryuu.js';
+import { isFilter, isFilterArray, guardAgainstInvalidFilters, DomoValidationError } from 'ryuu.js';
 
-// Validate individual filter
+// Check a single value
 if (isFilter(data)) {
-  // TypeScript knows data is a Filter
-  console.log(data.column);
+  console.log(data.column); // TypeScript knows data is a Filter
 }
 
-// Validate array of filters
-if (isFilterArray(data)) {
-  // TypeScript knows data is Filter[]
-  data.forEach((filter) => console.log(filter.column));
-}
-
-// Throw error if invalid
+// Validate an array — throws DomoValidationError if invalid
 try {
   guardAgainstInvalidFilters(data);
-  // Data is valid, proceed
-} catch (error) {
-  console.error('Invalid filters:', error.message);
+} catch (err) {
+  if (err instanceof DomoValidationError) {
+    console.error(err.errors); // The invalid items
+  }
 }
 ```
 
 ---
 
-## Complete Example
+## Filters In Depth
 
-Here's a comprehensive example showing a real-world custom app:
+### First-registration behavior
+
+`onFiltersUpdated` clears all parent filters on first registration by sending `requestFiltersUpdate(null)`. All subsequent listeners call `connect(true)` which skips this. If you need to subscribe without clearing:
 
 ```javascript
-import Domo from 'ryuu.js';
+// Pattern: subscribe to variables instead, or use onDataUpdated to detect
+// data-refresh events that happen after filter application
+domo.onDataUpdated((alias) => {
+  // Triggered after parent applies filters — re-fetch here
+  loadData();
+});
+```
+
+### Wire format
+
+The filter event name on the wire is `"filter"` (not `"filtersUpdated"`). Desktop and mobile use different field names which domo.js normalizes for you:
+
+| Field | Desktop | Mobile |
+| --- | --- | --- |
+| Column | `columnName` | `column` |
+| Operator | `operator` | `operand` |
+
+---
+
+## Complete Example
+
+A real-world Custom App wiring together data, filters, variables, and navigation:
+
+```javascript
+import domo from 'ryuu.js';
 
 class SalesDashboard {
   constructor() {
@@ -1225,333 +1300,163 @@ class SalesDashboard {
   }
 
   async initialize() {
-    // Set up event listeners
     this.setupEventListeners();
-
-    // Load initial data
     await this.loadData();
-
-    // Render dashboard
     this.render();
   }
 
   setupEventListeners() {
-    // Listen for dataset updates
-    Domo.onDataUpdated((datasetAlias) => {
-      console.log(`Dataset ${datasetAlias} updated`);
+    domo.onDataUpdated((alias) => {
+      console.log(`Dataset ${alias} updated`);
       this.loadData();
     });
 
-    // Listen for filter changes
-    Domo.onFiltersUpdated((filters) => {
-      console.log('Filters updated:', filters);
+    domo.onFiltersUpdated((filters) => {
       this.filters = filters;
       this.applyFilters();
     });
 
-    // Listen for variable changes
-    Domo.onVariablesUpdated((variables) => {
-      console.log('Variables updated:', variables);
+    domo.onVariablesUpdated((variables) => {
       this.updateTheme(variables);
-    });
-
-    // Set up UI event handlers
-    document.getElementById('refreshBtn').addEventListener('click', () => {
-      this.loadData();
-    });
-
-    document.getElementById('exportBtn').addEventListener('click', () => {
-      this.exportData();
     });
 
     document.getElementById('filterBtn').addEventListener('click', () => {
       this.updateFilters();
     });
+
+    document.getElementById('exportBtn').addEventListener('click', () => {
+      this.exportData();
+    });
   }
 
   async loadData() {
     try {
-      // Load multiple datasets in parallel
-      const [sales, customers, products] = await Domo.getAll([
+      const [sales, customers, products] = await domo.getAll([
         '/data/v1/sales',
         '/data/v1/customers',
         '/data/v1/products',
       ]);
-
-      this.data = {
-        sales,
-        customers,
-        products,
-      };
-
+      this.data = { sales, customers, products };
       this.render();
-    } catch (error) {
-      console.error('Failed to load data:', error);
+    } catch (err) {
+      console.error('Failed to load data:', err);
       this.showError('Unable to load dashboard data');
     }
   }
 
   applyFilters() {
-    // Find category filter
-    const categoryFilter = this.filters.find((f) => f.column === 'category');
-
-    if (categoryFilter && categoryFilter.values.length > 0) {
-      // Filter local data
-      const filteredSales = this.data.sales.filter((sale) =>
-        categoryFilter.values.includes(sale.category),
-      );
-
-      this.renderSales(filteredSales);
-    } else {
-      this.renderSales(this.data.sales);
-    }
+    const categoryFilter = this.filters.find(f => f.column === 'category');
+    const filtered = categoryFilter
+      ? this.data.sales.filter(s => categoryFilter.values.includes(s.category))
+      : this.data.sales;
+    this.renderSales(filtered);
   }
 
   updateFilters() {
-    // Get selected categories from UI
-    const selectedCategories = Array.from(
-      document.querySelectorAll('.category-checkbox:checked'),
-    ).map((cb) => cb.value);
+    const selected = Array.from(
+      document.querySelectorAll('.category-checkbox:checked')
+    ).map(cb => cb.value);
 
-    // Update page filters
-    Domo.requestFiltersUpdate(
-      [
-        {
-          column: 'category',
-          operator: 'IN',
-          values: selectedCategories,
-          dataType: 'STRING',
-        },
-      ],
-      true,
-      () => console.log('Filter update acknowledged'),
-      (response) => console.log('Filter update completed:', response),
-    );
+    domo.requestFiltersUpdate([{
+      column: 'category',
+      operator: 'IN',
+      values: selected,
+      dataType: 'STRING',
+    }]);
   }
 
   async exportData() {
-    try {
-      // Export as CSV
-      const csv = await Domo.get('/data/v1/sales', { format: 'csv' });
-
-      // Download file
-      const blob = new Blob([csv], { type: 'text/csv' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `sales-export-${Date.now()}.csv`;
-      a.click();
-      URL.revokeObjectURL(url);
-
-      console.log('Export successful');
-    } catch (error) {
-      console.error('Export failed:', error);
-      this.showError('Failed to export data');
-    }
-  }
-
-  updateTheme(variables) {
-    // Check for theme variable (example ID: 391)
-    const themeVar = variables['391'];
-
-    if (themeVar) {
-      const theme = themeVar.parsedExpression.value;
-      document.body.className = `theme-${theme}`;
-    }
-  }
-
-  render() {
-    if (!this.data.sales) return;
-
-    // Render sales chart
-    this.renderSales(this.data.sales);
-
-    // Render customer stats
-    this.renderCustomerStats(this.data.customers);
-
-    // Render product list
-    this.renderProducts(this.data.products);
-  }
-
-  renderSales(sales) {
-    const salesContainer = document.getElementById('salesChart');
-
-    // Calculate totals
-    const total = sales.reduce((sum, sale) => sum + sale.amount, 0);
-    const count = sales.length;
-    const average = total / count;
-
-    salesContainer.innerHTML = `
-      <div class="stats">
-        <div class="stat">
-          <h3>Total Sales</h3>
-          <p>$${total.toLocaleString()}</p>
-        </div>
-        <div class="stat">
-          <h3>Number of Sales</h3>
-          <p>${count.toLocaleString()}</p>
-        </div>
-        <div class="stat">
-          <h3>Average Sale</h3>
-          <p>$${average.toFixed(2)}</p>
-        </div>
-      </div>
-    `;
-
-    // Render chart (using your charting library)
-    // this.renderChart(sales);
-  }
-
-  renderCustomerStats(customers) {
-    const customerContainer = document.getElementById('customerStats');
-
-    customerContainer.innerHTML = `
-      <h3>Total Customers: ${customers.length}</h3>
-      <ul>
-        ${customers
-          .slice(0, 10)
-          .map(
-            (c) => `
-          <li>${c.name} - ${c.email}</li>
-        `,
-          )
-          .join('')}
-      </ul>
-    `;
-  }
-
-  renderProducts(products) {
-    const productContainer = document.getElementById('productList');
-
-    productContainer.innerHTML = `
-      <table>
-        <thead>
-          <tr>
-            <th>Product</th>
-            <th>Price</th>
-            <th>Stock</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${products
-            .map(
-              (p) => `
-            <tr>
-              <td>${p.name}</td>
-              <td>$${p.price}</td>
-              <td>${p.stock}</td>
-            </tr>
-          `,
-            )
-            .join('')}
-        </tbody>
-      </table>
-    `;
-  }
-
-  showError(message) {
-    const errorContainer = document.getElementById('error');
-    errorContainer.textContent = message;
-    errorContainer.style.display = 'block';
-
-    setTimeout(() => {
-      errorContainer.style.display = 'none';
-    }, 5000);
+    const csv = await domo.get('/data/v1/sales', { format: 'csv' });
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'sales-export.csv';
+    a.click();
   }
 }
 
-// Initialize app
 new SalesDashboard();
 ```
 
 ---
 
-## Migration Guide
+## Migration from v5
 
-### Deprecated Methods
+### Error handling
 
-The following methods have been renamed for consistency. Old methods still work but are deprecated and will be removed in a future version.
+**v5** — errors were thrown as generic `Error` objects or plain response objects.
 
-| Deprecated Method      | New Method                    | Description                 |
-| ---------------------- | ----------------------------- | --------------------------- |
-| `Domo.onDataUpdate`    | `Domo.onDataUpdated`          | Listen for dataset changes  |
-| `Domo.onFiltersUpdate` | `Domo.onFiltersUpdated`       | Listen for filter changes   |
-| `Domo.onAppData`       | `Domo.onAppDataUpdated`       | Listen for app data changes |
-| `Domo.filterContainer` | `Domo.requestFiltersUpdate`   | Set page filters            |
-| `Domo.sendVariables`   | `Domo.requestVariablesUpdate` | Update page variables       |
-| `Domo.sendAppData`     | `Domo.requestAppDataUpdate`   | Send custom app data        |
-
-### Migration Steps
-
-1. **Find and Replace:**
+**v6** — errors are typed classes. Update your catch blocks:
 
 ```javascript
-// Old
-Domo.onDataUpdate((alias) => { ... });
-Domo.onFiltersUpdate((filters) => { ... });
-Domo.onAppData((data) => { ... });
-Domo.filterContainer(filters);
-Domo.sendVariables(variables);
-Domo.sendAppData(data);
+// Before (v5)
+try {
+  await domo.get('/data/v1/sales');
+} catch (err) {
+  if (err.status === 401) { /* ... */ }
+}
 
-// New
-Domo.onDataUpdated((alias) => { ... });
-Domo.onFiltersUpdated((filters) => { ... });
-Domo.onAppDataUpdated((data) => { ... });
-Domo.requestFiltersUpdate(filters);
-Domo.requestVariablesUpdate(variables);
-Domo.requestAppDataUpdate(data);
+// After (v6)
+import { DomoAuthError, DomoHttpError } from 'ryuu.js';
+
+try {
+  await domo.get('/data/v1/sales');
+} catch (err) {
+  if (err instanceof DomoAuthError) { /* ... */ }
+  else if (err instanceof DomoHttpError) { /* ... */ }
+}
 ```
 
-2. **Update Dependencies:**
+### Service namespaces (new in v6)
 
-```bash
-npm update ryuu.js
+v6 adds high-level service namespaces. You can still use the low-level HTTP methods — the namespaces are additive:
+
+```javascript
+// v5 — direct HTTP
+const rows = await domo.get('/data/v1/sales');
+
+// v6 — service namespace (recommended)
+const rows = await domo.data.query('sales');
 ```
 
-3. **Test Thoroughly:**
+### Debug logging
 
-After migration, test all functionality to ensure everything works correctly.
+**v5** — no built-in debug mode.
+
+**v6** — use `domo.debug.enable()`:
+
+```javascript
+domo.debug.enable('http'); // logs all HTTP traffic
+```
+
+### Interceptors (new in v6)
+
+```javascript
+// v5 — override via extend()
+domo.extend({ get: async (url, opts) => { /* custom logic */ } });
+
+// v6 — use intercept() for middleware (preferred)
+domo.intercept(async (req, next) => {
+  return next(req);
+});
+```
+
+### Unchanged
+
+- All low-level HTTP methods: `domo.get`, `domo.post`, `domo.put`, `domo.delete`, `domo.getAll`
+- Event listener APIs: `onFiltersUpdated`, `onVariablesUpdated`, `onDataUpdated`, `onAppDataUpdated`
+- Emitter APIs: `requestFiltersUpdate`, `requestVariablesUpdate`, `requestAppDataUpdate`
+- `domo.navigate()`
+- `domo.extend()`
+- `domo.env` shape
+- Static class design — no instantiation
+- npm package name (`ryuu.js`) and global (`Domo`)
 
 ---
 
-## Contributing
+## Getting Help
 
-Contributions are welcome! Please follow these guidelines:
-
-1. **Fork the repository**
-2. **Create a feature branch:** `git checkout -b feature/my-feature`
-3. **Make your changes**
-4. **Add tests** for new functionality
-5. **Run tests:** `npm test`
-6. **Build:** `npm run build`
-7. **Commit:** `git commit -m "Add my feature"`
-8. **Push:** `git push origin feature/my-feature`
-9. **Open a Pull Request**
-
-### Development Setup
-
-```bash
-# Clone repository
-git clone https://github.com/your-org/domo.js.git
-cd domo.js
-
-# Install dependencies
-npm install
-
-# Run tests
-npm test
-
-# Run tests with coverage
-npm run coverage
-
-# Build
-npm run build
-
-# Start demo server
-npm run demo
-```
-
----
-
-**Made with ❤️ by the Domo team**
+- **GitHub Issues** — [github.com/DomoApps/domo.js/issues](https://github.com/DomoApps/domo.js/issues): report bugs, request features, or browse known issues
+- **Domo Community** — [dojo.domo.com](https://dojo.domo.com): community forums, guides, and answers from other Domo developers
+- **Related docs** — [Domo Apps CLI](/portal/Apps/App-Framework/Tools/domo-CLI) | [manifest.json reference](/portal/Apps/App-Framework/Guides/manifest) | [App Framework overview](/portal/Apps/App-Framework)

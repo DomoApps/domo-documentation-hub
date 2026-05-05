@@ -2,363 +2,294 @@
 title: "ルーティング、作成、マッピング"
 ---
 
-import {InlineImage} from "/snippets/InlineImage.mdx";
+## はじめに
 
-### はじめに
-
-Domo Everywhereの利用を開始するには、公開インスタンスとすべてのサブスクライブインスタンスの間の接続を確立する必要があります。公開インスタンスのDomo管理者は、Domo Everywhereページからサブスクライブインスタンスへの接続を作成して維持します。この設定の詳細については、後述の「 [Domo Everywhereにアクセスする](#access_domo_everywhere) 」を参照してください。
+Domo Everywhereの利用を開始するには、公開インスタンスとすべてのサブスクライブインスタンスの間の接続を確立する必要があります。公開インスタンスのDomo管理者は、Domo Everywhereページからサブスクライブインスタンスへの接続を作成して維持します。この設定の詳細については、後述の「[Domo Everywhereにアクセスする](#domo-everywhere)」を参照してください。
 
 <Tip>
-  **定義：** 管理者は、サブスクライブインスタンス内にいる各ユーザーの認証も設定します。これはルーティングと呼ばれます。
-
+**定義：**管理者は、サブスクライブインスタンス内にいる各ユーザーの認証も設定します。これはルーティングと呼ばれます。
 </Tip>
 
-ルーティングが設定された後、Domo管理者は公開インスタンス内に各サブスクライブインスタンスを作成し、ログイン時に適切なサブスクライブインスタンスにマップされるように各ユーザーに [主要な属性](#define_key_attribute) を提供する必要があります。管理者が主要な属性を提供すると、Domoは自動的にマッピングを終了します。これで管理者は、公開インスタンス内からマッピングの詳細を表示できるようになります。
+ルーティングが設定された後、Domo管理者は公開インスタンス内に各サブスクライブインスタンスを作成し、ログイン時に適切なサブスクライブインスタンスにマップされるように各ユーザーに主要な属性を提供する必要があります。管理者が主要な属性を提供すると、Domoは自動的にマッピングを終了します。これで管理者は、公開インスタンス内からマッピングの詳細を表示できるようになります。
 
-<Frame><img alt="Domo_Everywhere_Graphic.png" src="/images/kb/ka0Vq0000000m6H-00N5w00000Ri7BU-0EM5w000005vXn1.png" style={{width: 742, height: 454}}/></Frame>
----
-
-* [必要条件](#prerequisites)
-* [Domo Everywhereにアクセスする](#access_domo_everywhere)
-* [ルーティング](#routing)
-  + [認証方法を選択する](#choose_authentication_method)
-  + [エンベッドアクセスを許可する](#grant_embed_access)
-  + [ルーティング証明書をダウンロード/アップロードする](#download_routing_certificate)
-  + [エンベッドURLを貼り付ける](#paste_embed_url)
-* [サブスクライバーインスタンス設定](#subscriber_instance_setup)
-
-  + [主要な属性を定義する](#define_key_attribute)
-  + [サブスクライバーインスタンスを作成する](#create_subscriber_instance)
-  + [サブスクライバーインスタンスを削除する](#remove_subscriber_organization)
-* [マッピング](#mapping)
-* [トラブルシューティング](#troubleshooting)
-* [よくある質問](#faq)
+<Frame>![Domo_Everywhere_Graphic.png](/images/kb/ja/0EM5w000005vXn1.png)</Frame>
 
 ---
 
-### 必要条件
+## 必要条件
 
 ルーティング、作成、マッピングの前に以下を実行します。
 
-* Domo Everywhere製品を購入します。
-* 公開インスタンスをDomoで設定します。
-* 以下の表でインスタンスの認証方法を見つけ、必要な情報を取得します。
-  
-<Note>
-  **注記：** サードパーティシステムでユーザーのID認証に使用する主要な属性をホストしている場合は、OIDCまたはSAMLを選択します。
+- Domo Everywhere製品を購入します。
+- 公開インスタンスをDomoで設定します。
+- 以下の表でインスタンスの認証方法を見つけ、必要な情報を取得します。
 
-</Note>
+<Note>  **注記：**サードパーティシステムでユーザーのID認証に使用する主要な属性をホストしている場合は、OIDCまたはSAMLを選択します。</Note>
 
-<table border="1" cellpadding="1" cellspacing="1" data-aura-rendered-by="33:206;a"><thead><tr><th colspan="1" rowspan="1"><p> 認証方法 </p></th><th colspan="1" rowspan="1"><p> 説明 </p></th></tr></thead><tbody><tr><td colspan="1" rowspan="1"><p> JWTシークレット </p></td><td colspan="1" rowspan="1"><p> この方法は最も簡単に実装できます。お使いのシステムでユーザーのID認証に使用する主要な属性をホストしている場合は、JWTシークレットを選択します。追加 情報は必要ありません。UIの指示に従って、シークレットを生成します。 </p><div class="mdx-embed"><Warning><p><b> 重要： </b> シークレットは1対多の関係です。 <b> ［シークレットを生成］ </b> を1回選択したら、それをコピーして必要な場所に貼り付けます。ページから離れると、そのシークレットを復元することはできません。新しいシークレットを生成すると、既存のすべてのシークレットが無効になります。 </p></Warning></div></td></tr><tr><td colspan="1" rowspan="1"><p> JWTパブリックキー </p></td><td colspan="1" rowspan="1"><p> 組織がこの方法を使用している場合、パブリックキーはITマネージャーから入手できます。 </p></td></tr><tr><td colspan="1" rowspan="1"><p> オープンID接続（OIDC） </p></td><td colspan="1" rowspan="1"><p> 以下の情報が必要です。 </p><ul><li> クライアントID </li><li> クライアントシークレット </li><li> 認証URL </li><li> トークンエンドポイント </li><li> 交換エンドポイント </li><li> ユーザー情報のエンドポイント </li></ul></td></tr><tr><td colspan="1" rowspan="1"><p> SAML（SSO） </p></td><td colspan="1" rowspan="1"><p> 以下の情報が必要です。 </p><ul><li> エンティティーID </li><li> ログインエンドポイントURL </li><li> ログアウトエンドポイントURL <a id="access_domo_everywhere" target="_blank"></a></li></ul></td></tr></tbody></table>
+| 認証方法 | 説明  |
+| ---- | --- |
+| JWTシークレット | この方法は最も簡単に実装できます。お使いのシステムでユーザーのID認証に使用する主要な属性をホストしている場合は、JWTシークレットを選択します。追加情報は必要ありません。UIの指示に従って、シークレットを生成します。  <Warning>**重要：**シークレットは1対多の関係です。**［シークレットを生成］**を1回選択したら、それをコピーして必要な場所に貼り付けます。ページから離れると、そのシークレットを復元することはできません。新しいシークレットを生成すると、既存のすべてのシークレットが無効になります。</Warning> |
+| JWTパブリックキー | 組織がこの方法を使用している場合、パブリックキーはITマネージャーから入手できます。 |
+| オープンID接続（OIDC） | 以下の情報が必要です。   - クライアントID - クライアントシークレット - 認証URL - トークンエンドポイント - 交換エンドポイント - ユーザー情報のエンドポイント |
+| SAML（SSO） | 以下の情報が必要です。   - エンティティーID - ログインエンドポイントURL - ログアウトエンドポイントURL |
 
-  [このページのトップへ](#intro)
+## Domo Everywhereにアクセスする
 
-  ### Domo Everywhereにアクセスする
+Domoナビゲーションヘッダーで、**［その他］**>**［管理者］**を選択して、管理者設定を開きます。
 
-  Domoナビゲーションヘッダーで、 **［その他］** > **［管理者］** を選択して、管理者設定を開きます。
+**Domo Everywhere**でタスクを完了するために必要なセクションに進みます。
 
-  **Domo Everywhere** でタスクを完了するために必要なセクションに進みます。
+<Frame>![Screenshot 2024-03-26 at 9.18.07 AM.png](/images/kb/ja/0EMVq000000b6kn.jpg)</Frame>
 
-  <Frame><img alt="Screenshot 2024-03-26 at 9.18.07 AM.png" src="/images/kb/ka0Vq0000000m6H-00N5w00000Ri7BU-0EMVq000000b6kn.jpg" style={{width: 301, height: 248}}/></Frame>
-  ### ルーティング
+## ルーティング
 
-  [必要条件](#prerequisites) を満たした後、ルーティングを設定するには、以下のタスクを実行します。
+[必要条件](#prerequisites)を満たした後、ルーティングを設定するには、以下のタスクを実行します。
 
-  #### 認証方法を選択する
+### 認証方法を選択する
 
-  1. [Domo Everywhereにアクセス](#access_domo_everywhere)
-  し、 **［エンベッド］** セクションに移動します。
+1. [Domo Everywhereにアクセス](#domo-everywhere)し、**［エンベッド］**セクションに移動します。  
+     
 
-  <Frame><img alt="Domo Everywhere - Embed.png" src="/images/kb/ka0Vq0000000m6H-00N5w00000Ri7BU-0EMVq000000WGRS.jpg" style={{width: 300, height: 290}}/></Frame>
-  2. **［エンベッド］**
-  セクションで、 **［ルーティング］** タブに移動します。
-  3. メニューから認証方法を選択します。
+   <Frame>![Domo Everywhere - Embed.png](/images/kb/ja/0EMVq000000WGRS.jpg)</Frame>
+2. **［エンベッド］**セクションで、**［ルーティング］**タブに移動します。
+3. メニューから認証方法を選択します。  
+     
 
-  <Frame><img alt="authentication_method_menu.png" src="/images/kb/ka0Vq0000000m6H-00N5w00000Ri7BU-0EM5w000005vXn3.png" style={{width: 300, height: 282}}/></Frame>
-  4. 認証方法の情報を入力します。
+   <Frame>![authentication_method_menu.png](/images/kb/ja/0EM5w000005vXn3.png)</Frame>
+4. 認証方法の情報を入力します。
 
-  <Warning>
+<Warning>**重要：**繰り返しになりますが、JWTシークレットを使用している場合は、生成した後に必ずシークレットをコピーして保存してください。ページから離れた後に、そのシークレットを復元することはできません。新しいシークレットを生成すると、既存のすべてのシークレットが無効になります。</Warning>
 
-  **重要：** 繰り返しになりますが、JWTシークレットを使用している場合は、生成した後に必ずシークレットをコピーして保存してください。ページから離れた後に、そのシークレットを復元することはできません。新しいシークレットを生成すると、既存のすべてのシークレットが無効になります。
+## エンベッドアクセスを許可する
 
-  </Warning>
+<Note>**注記：**このセキュリティ機能はオプションです。**エンベッドURL**機能により、Domoのエンベッドコンテンツを表示できるドメインの事前承認リストを作成することができます。エンベッドコードを使用しても、許可リストにないドメインではコンテンツを表示できません。</Note>
 
-  [このページのトップへ](#intro)
+この機能は、**［ルーティング］**タブの**［Domo Everywhere］**>**［エンベッド］**にあります。
 
-  # エンベッドアクセスを許可する
-
-  <Note>
-
-  **注記：** このセキュリティ機能はオプションです。 **エンベッドURL** 機能により、Domoのエンベッドコンテンツを表示できるドメインの事前承認リストを作成することができます。エンベッドコードを使用しても、許可リストにないドメインではコンテンツを表示できません。
-
-</Note>
-
-この機能は、 **［ルーティング］** タブの **［Domo Everywhere］** > **［エンベッド］** にあります。
-
-許可リストに追加するサイトのURLを **［エンベッドURL］** の **［ドメイン名］** フィールドに入力し、 **［追加］** を選択します。
-  
+許可リストに追加するサイトのURLを**［エンベッドURL］**の**［ドメイン名］**フィールドに入力し、**［追加］**を選択します。  
 追加するURLごとにこの手順を繰り返します。
 
-<Frame><img alt="embed url.png" src="/images/kb/ka0Vq0000000m6H-00N5w00000Ri7BU-0EMVq000000b7NV.jpg" style={{width: 502, height: 193}}/></Frame>
-許可リストのURLが **［ドメイン名］** フィールドの下に表示されます。
+<Frame>![embed url.png](/images/kb/ja/0EMVq000000b7NV.jpg)</Frame>
 
-<Frame><img alt="allowlist.jpg" src="/images/kb/ka0Vq0000000m6H-00N5w00000Ri7BU-0EMVq000000b7Tx.jpg" style={{width: 500, height: 192}}/></Frame>
-[このページのトップへ](#intro)
+許可リストのURLが**［ドメイン名］**フィールドの下に表示されます。
 
-# ルーティング証明書をダウンロードする
+<Frame>![allowlist.jpg](/images/kb/ja/0EMVq000000b7Tx.jpg)</Frame>
+
+## ルーティング証明書をダウンロードする
 
 このセキュリティ機能はオプションです。ウェブサイトまたはポータルで、Domoとウェブサイト間の証明書暗号化が必要な場合は、ここから証明書をダウンロードできます。
 
-証明書をダウンロードするには、 **［ルーティング証明書］** フィールドの右側にある <InlineImage src="/images/kb/ja/ka0Vq000000LmzJ-00N5w00000Ri7BU-0EM5w000005vXn4.png" /> **［ダウンロード］** を選択します。
+証明書をダウンロードするには、**［ルーティング証明書］**フィールドの右側にある<img src="/images/kb/ja/0EM5w000005vXn4.png" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/> **［ダウンロード］**を選択します。
 
-<Frame><img alt="download certificate.jpg" src="/images/kb/ka0Vq0000000m6H-00N5w00000Ri7BU-0EMVq000000b7k5.jpg" style={{width: 499, height: 131}}/></Frame>
+<Frame>![download certificate.jpg](/images/kb/ja/0EMVq000000b7k5.jpg)</Frame>
+
 これで証明書を認証プロバイダーにアップロードできるようになりました。
 
-#### サブスクライブインスタンスにルーティング証明書をアップロードする
+## サブスクライブインスタンスにルーティング証明書をアップロードする
 
 ルーティング証明書をダウンロードしたら、以下の手順でサブスクライバーのDomo環境にアップロードできます。
 
 1. 証明書をアップロードするDomo環境を読み込みます。
-2. [Domo Everywhereにアクセス](#access_domo_everywhere) し、 **［エンベッド］** を選択します。
-3. **［ルーティング］** タブに移動します。
-4. **［認証方法］** メニューで **［SAML（SSO）］** を選択します。
-5. **［編集］** を選択します。
+2. [Domo Everywhereにアクセス](#domo-everywhere)し、**［エンベッド］**を選択します。
+3. **［ルーティング］**タブに移動します。
+4. **［認証方法］**メニューで**［SAML（SSO）］**を選択します。
+5. **［編集］**を選択します。  
+   **［SAML（SSO）を編集する］**ダイアログが表示されます。  
      
-   **［SAML（SSO）を編集する］** ダイアログが表示されます。
+
+   <Frame>![domo everywhere - embed edit.png](/images/kb/ja/0EMVq000000WIEj.jpg)</Frame>
+
      
-   <Columns>
-     <Frame><img alt="domo everywhere - embed edit.png" src="/images/kb/ka0Vq0000000m6H-00N5w00000Ri7BU-0EMVq000000WIEj.jpg" style={{width: 664, height: 366}}/></Frame>
-     <Frame><img alt="edit_saml_dialog.png" src="/images/kb/ka0Vq0000000m6H-00N5w00000Ri7BU-0EM5w000005vXmo.png" style={{width: 350, height: 307}}/></Frame>
-   </Columns>
-6. **［証明書］** フィールドにルーティング証明書を入力します。
-7. **［保存］** を選択します。
+     
 
-[このページのトップへ](#intro)
+   <Frame>![edit_saml_dialog.png](/images/kb/ja/0EM5w000005vXmo.png)</Frame>
+6. **［証明書］**フィールドにルーティング証明書を入力します。
+7. **［保存］**を選択します。
 
-# エンベッドURLを貼り付ける
+## エンベッドURLを貼り付ける
 
 認証方法を選択し、すべてのセキュリティ機能を設定したら、エンベッドURLを表示できます。
 
-1. <InlineImage src="/images/kb/ja/ka0Vq000000LmzJ-00N5w00000Ri7BU-0EM5w000005vXmu.png" /> **［コピー］** を選択して **［アイデンティティブローカー向けエンベッドURL］** フィールドのアドレスをコピーします。
+1. <img src="/images/kb/ja/0EM5w000005vXmu.png" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/>
 
-2. アドレスをホストサイトまたはソフトウェアに貼り付けて、マップされたアカウントにユーザーをリダイレクトします。
+   **［コピー］**を選択して**［アイデンティティブローカー向けエンベッドURL］**フィールドのアドレスをコピーします。
+2. アドレスをホストサイトまたはソフトウェアに貼り付けて、マップされたアカウントにユーザーをリダイレクトします。  
      
-   <Frame><img alt="Screen_Shot_2022-07-11_at_2.56.19_PM.png" src="/images/kb/ka0Vq0000000m6H-00N5w00000Ri7BU-0EM5w000005vXmk.png" style={{width: 502, height: 161}}/></Frame>
-   <Note>
-     **注記：** URLのフォーマットがhttps:// *domain*. [identity.domo.com](http://identity.domo.com) として表示されない場合は、アカウントチームにお問い合わせください。
 
-   </Note>
+   <Frame>![Screen_Shot_2022-07-11_at_2.56.19_PM.png](/images/kb/ja/0EM5w000005vXmk.png)</Frame>
 
-[このページのトップへ](#intro)
+<Note>**注記：**URLのフォーマットがhttps://*domain*.identity.domo.comとして表示されない場合は、アカウントチームにお問い合わせください。</Note>
 
-### サブスクライバーインスタンス設定
+## サブスクライバーインスタンス設定
 
-ルーティングを設定したら、次は公開されたコンテンツを受信するサブスクライバー組織を追加します。Domo管理者
+ルーティングを設定したら、次は公開されたコンテンツを受信するサブスクライバー組織を追加します。Domo管理者は、ニーズとワークフローに応じて、任意の数のサブスクライブインスタンスを作成、更新、削除できます。
 
-は、ニーズとワークフローに応じて、任意の数のサブスクライブインスタンスを作成、更新、削除できます。
+初めてサブスクライバーインスタンスを作成する前には、主要な属性を定義する必要があります。Domoでは、主要な属性を使用してユーザーをインスタンスにマップします。主要な属性を決定しやすくするために、アイデンティティープロバイダー（IdP）から送られてくるユーザーのDomoプロファイルのフィールドを考慮してください。一般的な例は「カスタマーID」や「パートナーID」などです。**［主要な属性］**フィールドの名前を好みの値に変更することを推奨します。
 
-初めてサブスクライバーインスタンスを作成する前には、主要な属性を定義する必要があります。Domoでは、主要な属性を使用してユーザーをインスタンスにマップします。主要な属性を決定しやすくするために、アイデンティティープロバイダー（IdP）から送られてくるユーザーのDomoプロファイルのフィールドを考慮してください。一般的な例は「カスタマーID」や「パートナーID」などです。 **［主要な属性］** フィールドの名前を好みの値に変更することを推奨します。
+主要な属性を一度定義すれば、次のセクションをスキップして「サブスクライバーインスタンスを作成する」から開始することができます。
 
-主要な属性を一度定義すれば、次のセクションをスキップして「 [サブスクライバーインスタンスを作成する](#create_subscriber_instance) 」から開始することができます。
+## 主要な属性を定義する
 
-[このページのトップへ](#intro)
-
-# 主要な属性を定義する
-
-1. **Domo Everywhere** 内で **［エンベッド］** セクションに移動します。
-2. **［エンベッド］** で、 **［マッピング］** タブに移動します。
+1. **Domo Everywhere**内で**［エンベッド］**セクションに移動します。
+2. **［エンベッド］**で、**［マッピング］**タブに移動します。  
+   ［マッピング］タブの上部に、**［主要な属性］**フィールドが表示されます。
+3. **［編集］**を選択してフィールドを編集し、主要な属性に名前を付けます。  
+   **［主要な属性を編集］**モーダルが表示されます。  
      
-   ［マッピング］タブの上部に、 **［主要な属性］** フィールドが表示されます。
-3. **［編集］** を選択してフィールドを編集し、主要な属性に名前を付けます。
+
+   <Frame>![edit_key_attribute.png](/images/kb/ja/0EM5w000005vXmz.png)</Frame>
+
      
-   **［主要な属性を編集］** モーダルが表示されます。
      
-   <Frame><img alt="edit_key_attribute.png" src="/images/kb/ka0Vq0000000m6H-00N5w00000Ri7BU-0EM5w000005vXmz.png" style={{width: 876, height: 179}}/></Frame>
-   顧客を特定する値に組織が使用するものが何であるかを問わず、主要な属性に名前を付けることができます。この例ではcustomerIDを使用しています。
+   顧客を特定する値に組織が使用するものが何であるかを問わず、主要な属性に名前を付けることができます。この例ではcustomerIDを使用しています。  
      
-   <Frame><img alt="edit_key_attribute_modal.png" src="/images/kb/ka0Vq0000000m6H-00N5w00000Ri7BU-0EM5w000005vXmt.png" style={{width: 492, height: 213}}/></Frame>
-4. 主要な属性の名前を入力したら、 ****［保存］**** を選択します。
+   **<Frame>![edit_key_attribute_modal.png](/images/kb/ja/0EM5w000005vXmt.png)</Frame>**
+4. 主要な属性の名前を入力したら、 ****［保存］****を選択します。
 
 主要な属性が表示されるDomo Everywhere全体に、あなたの主要な属性が表示されるようになりました。
 
-[このページのトップへ](#intro)
+## サブスクライバーインスタンスを作成する
 
-# サブスクライバーインスタンスを作成する
+主要な属性が定義されている場合は、以下の手順に従い、サブスクライバーインスタンスを作成します。
 
-[主要な属性](#define_key_attribute) が定義されている場合は、以下の手順に従い、サブスクライバーインスタンスを作成します。
-
-1. [Domo Everywhereにアクセス](#access_domo_everywhere) し、 **［インスタンス管理］** セクションに移動します。
+1. [Domo Everywhereにアクセス](#domo-everywhere)し、**［インスタンス管理］**セクションに移動します。  
+   Domo Everywhereの**［インスタンス］**セクションが表示されます。  
      
-   Domo Everywhereの **［インスタンス］** セクションが表示されます。
-     
-   <Frame><img alt="domo everywhere - instance management.png" src="/images/kb/ka0Vq0000000m6H-00N5w00000Ri7BU-0EMVq000000WI6g.jpg" style={{width: 300, height: 283}}/></Frame>
-2. **［+新規インスタンス］** を選択します。
-     
-   **新規インスタンス作成** モーダルが表示されます。
-     
-   <Frame><img alt="instance management.jpg" src="/images/kb/ka0Vq0000000m6H-00N5w00000Ri7BU-0EMVq000000b8Hx.jpg" style={{width: 800, height: 260}}/></Frame>
-3. モーダルで、 **［インスタンス名］** を入力します。 組織がすべてのエンドカスタマーアカウントを検証するために一貫して使用するサービスアカウントと一致するインスタンス名を入力することを推奨します *。*
 
-5. **サービスアカウントのメール** を入力します。
+   <Frame>![domo everywhere - instance management.png](/images/kb/ja/0EMVq000000WI6g.jpg)</Frame>
+2. **［+新規インスタンス］**を選択します。  
+   **新規インスタンス作成**モーダルが表示されます。  
+     
 
-6. 主要な属性の値を入力します。これはモーダルでは
-**［マッピング］** タブで設定したように表示されます。この例では、主要な属性はcustomerIDとして設定されています。
+   <Frame>![instance management.jpg](/images/kb/ja/0EMVq000000b8Hx.jpg)</Frame>
+3. モーダルで、**［インスタンス名］**を入力します。組織がすべてのエンドカスタマーアカウントを検証するために一貫して使用するサービスアカウントと一致するインスタンス名を入力することを推奨します*。*
 
-<Frame><img alt="Screenshot 2024-03-15 at 11.28.00 AM.png" src="/images/kb/ka0Vq0000000m6H-00N5w00000Ri7BU-0EMVq000000WIzV.jpg" style={{width: 467, height: 391}}/></Frame>
+5.**サービスアカウントのメール**を入力します。
+
+6. 主要な属性の値を入力します。これはモーダルでは**［マッピング］**タブで設定したように表示されます。この例では、主要な属性はcustomerIDとして設定されています。
+
+<Frame>![Screenshot 2024-03-15 at 11.28.00 AM.png](/images/kb/ja/0EMVq000000WIzV.jpg)</Frame>
+
 5. （オプション）デフォルトのグループと共有する場合は、上記のボックスをチェックします。
 
-6. **［保存］** を選択します。
+6. **［保存］**を選択します。
 
 重複した顧客名が送信されていないかが確認されるため、保存には数秒かかる場合があります。
 
-# サブスクライバーインスタンスを削除する
+## サブスクライバーインスタンスを削除する
 
-<Warning>
-  **重要：** サブスクライバーインスタンスは、すべてのパブリケーションのサブスクライブを解除してから削除する必要があります。
+<Warning>**重要：**サブスクライバーインスタンスは、すべてのパブリケーションのサブスクライブを解除してから削除する必要があります。</Warning>
 
-</Warning>
-
-1. ナビゲーションヘッダーから、 **［その他］** > **［管理者］** に移動します。
-     
+1. ナビゲーションヘッダーから、**［その他］**>**［管理者］**に移動します。  
    管理者設定が表示されます。
-2. **［Domo Everywhere］** メニューで、 **［パブリケーション］** を選択します。
-     
-   **［パブリケーション］** ページが表示されます。
+2. **［Domo Everywhere］**メニューで、**［パブリケーション］**を選択します。  
+   **［パブリケーション］**ページが表示されます。
 
-   <Columns>
-     <Frame><img alt="domo everywhere - publications.png" src="/images/kb/ka0Vq0000000m6H-00N5w00000Ri7BU-0EMVq000000WJE1.jpg" style={{width: 394, height: 385}}/></Frame>
-     <Frame><img alt="Screenshot 2024-03-26 at 1.59.17 PM.png" src="/images/kb/ka0Vq0000000m6H-00N5w00000Ri7BU-0EMVq000000bMXp.jpg" style={{width: 902, height: 441}}/></Frame>
-   </Columns>
-3. **［サブスクライバー］** タブを開きます。
-     
+   <Frame>![domo everywhere - publications.png](/images/kb/ja/0EMVq000000WJE1.jpg)</Frame>
+
+   <Frame>![Screenshot 2024-03-26 at 1.59.17 PM.png](/images/kb/ja/0EMVq000000bMXp.jpg)</Frame>
+3. **［サブスクライバー］**タブを開きます。  
    各サブスクライバーインスタンスが行として表示されます。
 
-   <Frame><img alt="Screenshot 2024-03-26 at 2.03.43 PM.png" src="/images/kb/ka0Vq0000000m6H-00N5w00000Ri7BU-0EMVq000000bLYY.jpg" style={{width: 916, height: 481}}/></Frame>
-4. 削除するサブスクライバーの
-   <InlineImage src="/images/kb/ja/ka0Vq000000LmzJ-00N5w00000Ri7BU-0EM5w000006uRF0.jpg" /> **［詳細］** を選択します。
-     
+   <Frame>![Screenshot 2024-03-26 at 2.03.43 PM.png](/images/kb/ja/0EMVq000000bLYY.jpg)</Frame>
+4. 削除するサブスクライバーの<img src="/images/kb/ja/0EM5w000006uRF0.jpg" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/> **［詳細］**を選択します。  
    編集オプションと削除オプションが表示されます。
 
-   <Columns>
-     <Frame><img alt="more menu.jpg" src="/images/kb/ka0Vq0000000m6H-00N5w00000Ri7BU-0EM5w000006uRF5.jpg" style={{width: 846, height: 143}}/></Frame>
-     <Frame><img alt="Screenshot 2023-04-11 at 11.54.23 AM.png" src="/images/kb/ka0Vq0000000m6H-00N5w00000Ri7BU-0EM5w000006uRFF.jpg" style={{width: 212, height: 171}}/></Frame>
-   </Columns>
-5. <InlineImage src="/images/kb/ja/ka0Vq000000LmzJ-00N5w00000Ri7BU-0EM5w000006uRFK.jpg" /> **［サブスクライバーを削除］** を選択します。
+   <Frame>![more menu.jpg](/images/kb/ja/0EM5w000006uRF5.jpg)</Frame>
+
+   <Frame>![Screenshot 2023-04-11 at 11.54.23 AM.png](/images/kb/ja/0EM5w000006uRFF.jpg)</Frame>
+5. <img src="/images/kb/ja/0EM5w000006uRFK.jpg" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/>
+
+   **［サブスクライバーを削除］**を選択します。
 
    サブスクライバーがDomoから完全に削除され、そのサブスクライバーのDomo環境へのアクセス権が取り消されることを理解していることを確認するダイアログが表示されます。
 
-   <Frame><img alt="delete subscriber dialog.jpg" src="/images/kb/ka0Vq0000000m6H-00N5w00000Ri7BU-0EM5w000006uRFZ.jpg" style={{width: 471, height: 272}}/></Frame>
-6. **［削除］** を選択してサブスクライバーを削除するか、 **［キャンセル］** を選択して操作をキャンセルします。
+   <Frame>![delete subscriber dialog.jpg](/images/kb/ja/0EM5w000006uRFZ.jpg)</Frame>
+6. **［削除］**を選択してサブスクライバーを削除するか、**［キャンセル］**を選択して操作をキャンセルします。
 
-[このページのトップへ](#intro)
+## マッピング
 
-### マッピング
+インスタンスを作成したら、マッピングの主要な属性を設定します。ユーザーはマッピング表の左側の**属性値**に従ってマップされます。各ユーザーがホストポータルにサインインすると、Domoはマッピング表の右側に記載されている**子インスタンスのURL**にiframeをリダイレクトします。
 
-インスタンスを作成したら、マッピングの
+<Frame>![mapping_table.png](/images/kb/ja/0EM5w000005vXmn.png)</Frame>
 
-主要な属性を設定します。ユーザーはマッピング表の左側の **属性値** に従ってマップされます。各ユーザーがホストポータルにサインインすると、Domoはマッピング表の右側に記載されている **子インスタンスのURL** にiframeをリダイレクトします。
-
-<Frame><img alt="mapping_table.png" src="/images/kb/ka0Vq0000000m6H-00N5w00000Ri7BU-0EM5w000005vXmn.png" style={{width: 609, height: 160}}/></Frame>
 サブスクライバーインスタンスをマップするには、以下の手順に従います。
 
-1. ナビゲーションヘッダーから、
-**［その他］** > **［管理者］** に移動します。
+1. ナビゲーションヘッダーから、**［その他］**>**［管理者］**に移動します。
 
-2. **［Domo Everywhere］** メニューで、 **［エンベッド］** を選択します。
+2. **［Domo Everywhere］**メニューで、**［エンベッド］**を選択します。
 
-3. **［マッピング］** タブに移動します。
+3. **［マッピング］**タブに移動します。
 
-4. **［+マッピングを追加］** を選択します。
+4. **［+マッピングを追加］**を選択します。
 
-<Frame><img src="/images/kb/ka0Vq0000000m6H-00N5w00000Ri7BU-0EM5w000005vXmy.png" /></Frame>
-**［マッピングを追加］** ダイアログが表示されます。
+<Frame>![Screen_Shot_2022-07-11_at_4.11.43_PM.png](/images/kb/ja/0EM5w000005vXmy.png)</Frame>
 
-<Frame><img alt="add_mapping_dialog.png" src="/images/kb/ka0Vq0000000m6H-00N5w00000Ri7BU-0EM5w000005vXmq.png" style={{width: 530, height: 285}}/></Frame>
-5. ダイアログで、ユーザーの
-**［属性値］** と **［子インスタンスのURL］** に入力します。
+**［マッピングを追加］**ダイアログが表示されます。
 
-6. **［保存］** を選択します。
-  
+<Frame>![add_mapping_dialog.png](/images/kb/ja/0EM5w000005vXmq.png)</Frame>
+
+5. ダイアログで、ユーザーの**［属性値］**と**［子インスタンスのURL］**に入力します。
+
+6. **［保存］**を選択します。  
 ダイアログが閉じられます。
 
 ユーザーが正しいサブスクライブインスタンスにマップされるようになりました。
 
-[このページのトップへ](#intro)
+## 主要な属性名を変更する
 
-# 主要な属性名を変更する
+1. Domo Everywhere内で**［エンベッド］**セクションに移動します。
 
-1. Domo Everywhere内で
-**［エンベッド］** セクションに移動します。
+2.**［マッピング］**タブに移動します。
 
-2. **［マッピング］** タブに移動します。
+3. 代わりに使用する値を**［主要な属性］**フィールドに入力します。
 
-3. 代わりに使用する値を
-**［主要な属性］** フィールドに入力します。
+## トラブルシューティング
 
-### トラブルシューティング
+**&#123;"status":400,"statusReason":"Bad Request","message":"No value in attribute..."&#125;**
 
-**\{"status":400,"statusReason":"Bad Request","message":"No value in attribute..."}**
+これは通常、主要な属性名をデフォルトから変更したときに、ホストページが新しい名前を監視するように調整されていない場合に発生します。デフォルトでは常に「keyAttribute」が検索されます。これは、データとユーザープロフィールのフィールドに変更することを推奨します。一般的な例には、「カスタマーID」や「パートナーID」などがあります。
 
-これは通常、 主要な属性名をデフォルトから変更したときに、ホストページが新しい名前を監視するように調整されていない場合に発生します。デフォルトでは常に「keyAttribute」が検索されます。
+<Frame>![ce6d562b-07ce-4ccc-bd99-6d5684843c34.png](/images/kb/ja/0EM5w000005vXml.png)</Frame>
 
-これは、データとユーザープロフィールのフィールドに変更することを推奨します。一般的な例には、「カスタマーID」や「パートナーID」などがあります。
-
-<Frame><img alt="ce6d562b-07ce-4ccc-bd99-6d5684843c34.png" src="/images/kb/ka0Vq0000000m6H-00N5w00000Ri7BU-0EM5w000005vXml.png" style={{width: 653, height: 156}}/></Frame>
-[このページのトップへ](#intro)
-
-**\{"status":500,"statusReason":"Internal Server Error"...\}**
+**&#123;"status":500,"statusReason":"Internal Server Error" ...&#125;**  
   
 これは通常、あなたまたは自動化プロセスがサブスクライバーインスタンスのDomo環境のSSO設定にcert.pemを正常にアップロードできなかった場合に発生します。ルーティング証明書は通常、公開された設定によって自動的にアップロードされます。
 
-<Frame><img alt="cert_to_download_callout.png" src="/images/kb/ka0Vq0000000m6H-00N5w00000Ri7BU-0EM5w000005vXmm.png" style={{width: 795, height: 701}}/></Frame>
+<Frame>![cert_to_download_callout.png](/images/kb/ja/0EM5w000005vXmm.png)</Frame>
+
+  
+  
+  
 このプロセスが正常に終了しなかった場合、またはDomo Everywhere管理者によって作成されていない既存のインスタンスを統合する場合、SSO証明書を手動で公開組織からダウンロードしてサブスクライバーインスタンスにアップロードすることもできます。
 
-この方法の詳細は、上記の「 [ルーティング証明書をダウンロードする](#download_routing_certificate) 」を参照してください。
+この方法の詳細は、上記の「ルーティング証明書をダウンロードする」を参照してください。
 
-**「Browser cannot open page in embedded iframe」**
+**「Browser cannot open page in embedded iframe」**  
   
-これは通常、 **no-iframe-embedding** 機能スイッチが有効になっている場合に発生します。スイッチの無効化は通常、 親から子に公開される設定の一部として、ほかのブランドキットやサブスクライバーの機能スイッチとともに自動的に行われます。
-  
-［open site in new window］をクリックし、前述の証明書がアップロードされている場合、子は直接アクセスするか、上記の［open site in new window］ボタンをクリックすると読み込まれます。
-  
+これは通常、**no-iframe-embedding**機能スイッチが有効になっている場合に発生します。スイッチの無効化は通常、親から子に公開される設定の一部として、ほかのブランドキットやサブスクライバーの機能スイッチとともに自動的に行われます。  
+［open site in new window］をクリックし、前述の証明書がアップロードされている場合、子は直接アクセスするか、上記の［open site in new window］ボタンをクリックすると読み込まれます。  
 その公開された設定が失敗したか、子が既存のインスタンスである場合は、Domoの担当者に連絡して「no-iframe-embedding」を有効にすることができます。これにより、エンベッドされたiframeにも子環境が確実に読み込まれるようになります。
 
-[このページのトップへ](#intro)
-
-### よくある質問
+## よくある質問
 
 <AccordionGroup>
+
 <Accordion title="顧客は、ユーザーに適用する特定のテンプレートを設定しています。そのテンプレートが常に使用されるようにするにはどうしたらよいですか？">
-
-  
-このバージョンでは、すべてのサブスクライブインスタンスが同じ「embedded end customer account」機能スイッチテンプレートを使用する必要があります。このテンプレートを使用することで、Domoプラットフォームのヘッダーとフッターが非表示になり、Domoのブランディングが削除され、自動サブスクリプション機能が有効になります。ただし、ほかに独自のニーズがある場合は、CSM/AEにご連絡いただければ、テンプレート変更を調整することができます。
-  
+このバージョンでは、すべてのサブスクライブインスタンスが同じ「embedded end customer account」機能スイッチテンプレートを使用する必要があります。このテンプレートを使用することで、Domoプラットフォームのヘッダーとフッターが非表示になり、Domoのブランディングが削除され、自動サブスクリプション機能が有効になります。ただし、ほかに独自のニーズがある場合は、CSM/AEにご連絡いただければ、テンプレート変更を調整することができます。  
 カスタムテンプレートは、そのパブリッシャーのサブスクライバーインスタンスの作成に自動的に使用されます。
-
-
 </Accordion>
+
 <Accordion title="サブスクライバーを複数作成する必要があります。一括作成オプションはありますか？">
-
-  
 一括作成は現在利用できません。
-
-
 </Accordion>
+
 <Accordion title="APIを使用してプログラムでインスタンスの一括作成を自動化することはできますか？">
-
-  
 これは現在利用できません。
-
-
 </Accordion>
+
 <Accordion title="ユーザーがカスタマーポータルにログインすると、Domoに新しいユーザーが作成され、「管理者」のデフォルトのセキュリティ権限が設定されます。権限が選択されていないときにデフォルトでサブスクライバーが管理者にならないように、この設定を変更することはできますか？">
-
-
 はい、各インスタンスのインスタンスレベルでデフォルトの権限を設定できます。任意の標準権限またはカスタマイズされた権限に設定できます。
-
-[このページのトップへ](#intro)
-
-日本語
-
 </Accordion>
+
 </AccordionGroup>

@@ -2,15 +2,15 @@
 """
 Detect changed YAML files in source repository.
 
-This script:
-1. Compares source YAML files with destination YAML files
-2. Checks file modification times
-3. Outputs list of files that need syncing
-4. Creates summary of changes
+Compares source YAMLs against destination YAMLs by SHA-256 content hash
+(mtimes are unreliable after a fresh actions/checkout). Writes
+changed_files.txt with source paths of files needing sync, plus
+GitHub Actions outputs `changed_files` and `summary`.
 """
 
 import os
 import sys
+import hashlib
 import argparse
 from pathlib import Path
 from typing import List, Dict, Tuple
@@ -27,15 +27,18 @@ def find_yaml_files(source_dir: str) -> List[str]:
     return [str(f) for f in yaml_files]
 
 
+def file_sha256(path: str) -> str:
+    h = hashlib.sha256()
+    with open(path, "rb") as f:
+        for chunk in iter(lambda: f.read(65536), b""):
+            h.update(chunk)
+    return h.hexdigest()
+
+
 def detect_changes(
     source_dir: str, dest_dir: str, force: bool = False
 ) -> Tuple[List[str], Dict[str, List[str]]]:
-    """
-    Detect which YAML files need syncing
-
-    Returns:
-        Tuple of (changed_files, summary_dict)
-    """
+    """Detect which YAML files need syncing."""
     changed_files = []
     summary = {"new_files": [], "modified_files": [], "unchanged_files": []}
 
@@ -53,7 +56,6 @@ def detect_changes(
 
     for yaml_file in yaml_files:
         yaml_filename = os.path.basename(yaml_file)
-        # Case-insensitive match: find actual destination filename
         dest_actual = dest_files_lower.get(yaml_filename.lower())
         if dest_actual:
             dest_file_path = os.path.join(dest_dir, dest_actual)
@@ -72,11 +74,16 @@ def detect_changes(
             summary["modified_files"].append(yaml_filename)
             continue
 
-        source_mtime = os.path.getmtime(yaml_file)
-        dest_mtime = os.path.getmtime(dest_file_path)
+        src_hash = file_sha256(yaml_file)
+        dest_hash = file_sha256(dest_file_path)
 
-        if source_mtime > dest_mtime:
-            print(f"MODIFIED: {yaml_filename} (source newer than destination)")
+        # Also treat a case-only filename change as a modification so sync
+        # runs and normalizes the destination filename.
+        case_changed = dest_actual is not None and dest_actual != yaml_filename
+
+        if src_hash != dest_hash or case_changed:
+            reason = "content differs" if src_hash != dest_hash else "case rename"
+            print(f"MODIFIED: {yaml_filename} ({reason})")
             changed_files.append(yaml_file)
             summary["modified_files"].append(yaml_filename)
         else:
@@ -87,7 +94,6 @@ def detect_changes(
 
 
 def create_summary_markdown(summary: Dict[str, List[str]]) -> str:
-    """Create markdown summary of changes"""
     lines = []
 
     total_changes = len(summary["new_files"]) + len(summary["modified_files"])
@@ -130,12 +136,10 @@ def main():
 
     changed_files, summary = detect_changes(args.source, args.dest, force=force)
 
-    # Write changed files list
     with open("changed_files.txt", "w") as f:
         for file_path in changed_files:
             f.write(f"{file_path}\n")
 
-    # Write outputs for GitHub Actions
     changed_files_str = "\n".join(changed_files)
     output_file = os.environ.get("GITHUB_OUTPUT", "/dev/stdout")
     with open(output_file, "a") as f:
@@ -148,8 +152,6 @@ def main():
     print(f"\n{'='*60}")
     print(f"Detection complete: {len(changed_files)} files to sync")
     print(f"{'='*60}")
-
-    sys.exit(0 if changed_files else 1)
 
 
 if __name__ == "__main__":

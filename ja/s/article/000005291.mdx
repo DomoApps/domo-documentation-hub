@@ -2,25 +2,25 @@
 title: "Jupyterワークスペースでモデルを作成する"
 ---
 
-### はじめに
+## はじめに
 
 この記事では、JupyterワークスペースでAI/MLモデルを構築する方法について説明します。モデルはDomoモデル管理インターフェースにもアップロードされ、リアルタイムまたはバッチ推論のために展開できます。
 
 ---
 
-* [データをトレーニングする](#training_data)
+* データをトレーニングする
   + [ハイパーパラメーター](#hyperparameters)
-  + [モデルトレーニング](#model_training)
+  + モデルトレーニング
   + [検証](#validation)
-* [モデルスキーマ](#model_schema)
+* モデルスキーマ
 * [メトリクス](#metrics)
-* [モデルタスク](#model_task)
-* [カーネルのスナップショット](#kernel_snapshots)
-* [モデルを作成する](#create_the_model)
+* モデルタスク
+* カーネルのスナップショット
+* モデルを作成する
 
 ---
 
-### データをトレーニングする
+## データをトレーニングする
 
 次の例では、シンプルにするために、モデルのトレーニングに機械学習を使用していません。代わりに、色付きの図形のリストを使用して、図形を青と青以外に分類するシンプルなアルゴリズムを定義しています。
 
@@ -34,7 +34,7 @@ data = [[`Circle`, `Red`], [`Square`, `Blue`], ['Oval`, `Green`], [`Rectangle`, 
 
 <table border="1" data-aura-rendered-by="33:204;a"><thead><tr><th colspan="1" rowspan="1"></th><th colspan="1" rowspan="1"> 図形 </th><th colspan="1" rowspan="1"> 色 </th><th colspan="1" rowspan="1"> 青 </th></tr></thead><tbody><tr><td colspan="1" rowspan="1"> 0 </td><td colspan="1" rowspan="1"> 円 </td><td colspan="1" rowspan="1"> 赤 </td><td colspan="1" rowspan="1"> 0 </td></tr><tr><td colspan="1" rowspan="1"> 1 </td><td colspan="1" rowspan="1"> 正方形 </td><td colspan="1" rowspan="1"> 青 </td><td colspan="1" rowspan="1"> 1 </td></tr><tr><td colspan="1" rowspan="1"> 2 </td><td colspan="1" rowspan="1"> 楕円形 </td><td colspan="1" rowspan="1"> 緑 <a id="hyperparameters" target="_blank"></a></td><td colspan="1" rowspan="1"> 0 </td></tr><tr><td colspan="1" rowspan="1"> 3 </td><td colspan="1" rowspan="1"> 長方形 </td><td colspan="1" rowspan="1"> オレンジ </td><td colspan="1" rowspan="1"> 0 </td></tr><tr><td colspan="1" rowspan="1"> 4 </td><td colspan="1" rowspan="1"> 長方形 </td><td colspan="1" rowspan="1"> ピンク </td><td colspan="1" rowspan="1"> 0 </td></tr></tbody></table>
 
-### ハイパーパラメーター
+## ハイパーパラメーター
 
 モデルのトレーニングに機械学習を使用する場合、トレーニングプロセスを設定するためにパラメーターが必要です。パラメーターは今回の例では使用しませんが、参考のために以下に示します。
 
@@ -42,7 +42,7 @@ data = [[`Circle`, `Red`], [`Square`, `Blue`], ['Oval`, `Green`], [`Rectangle`, 
 hyperparameters = { "alpha": "2.35e-05", "lambda": "0.25" }
 ```
 
-### モデルトレーニング
+## モデルトレーニング
 
 この時点で、通常は機械学習ライブラリを使用して、トレーニング用DataSetに合うようにモデルをトレーニングします。参考のために、以下にそのモデルを示します。
 
@@ -54,9 +54,7 @@ import pandas as pd from io import StringIO def invoke(data, content_type_header
 
 このモデルをDataFlowで使用した場合、このinvoke関数はデータをCSV文字列として受け取り、CSV文字列として返します。
 
-[このページのトップへ](#intro)
-
-### 検証
+## 検証
 
 モデルを確実に読み取って展開するには、 invoke 関数を使用してテストを行うことを推奨します。この例では、シンプルにするために、トレーニング用DataSetに対してテストを行います。
 
@@ -66,15 +64,13 @@ import pandas as pd from io import StringIO def invoke(data, content_type_header
 # Write training dataset as csv without headers or index column train_csv = train_x.to_csv(header=False, index=False) # Execute invoke function from model.py import model predicted_y = model.invoke(train_csv, `text/csv`, `text/csv`) print(predicted_y)
 ```
 
-# 応答
+### 応答
 
 ```
 0 1 0 0 0
 ```
 
-[このページのトップへ](#intro)
-
-### モデルスキーマ
+## モデルスキーマ
 
 各モデルは、入力タイプと出力タイプを定義し、オプションでCSVまたはJSONタイプのスキーマを定義します。
 
@@ -82,7 +78,7 @@ CSVModelIOConfiguration、JSONModelIOConfiguration()
 
 例えば、入力としてCSVを受け入れ、出力としてCSVを返すモデルにできます。CSVスキーマを手動で作成するだけでなく、DataFrameを使用している場合は、DataFrameからCSVスキーマを作成することもできます。その方がよりシンプルです。
 
-### メトリクス
+## メトリクス
 
 トレーニングおよび検証中に、モデルのパフォーマンスを測定するためのメトリクスを定義できます。参照用にメトリクスの例を以下に示します。
 
@@ -92,9 +88,7 @@ CSVModelIOConfiguration、JSONModelIOConfiguration()
 from domojupyter.ai import Metric from datetime import datetime metrics = { "accuracy": 1.0, "recall": 1.0, "precision": 1.0 } now = datetime.now() domo_metrics = {k: Metric(k, v, None, now) for (k,v) in metrics.items()}
 ```
 
-[このページのトップへ](#intro)
-
-### モデルタスク
+## モデルタスク
 
 Domoでは、どのタスクを実行するようモデルをトレーニングするかを例えば以下で指定することができます。
 
@@ -108,7 +102,7 @@ Domoでは、どのタスクを実行するようモデルをトレーニング�
 from domojupyter.ai import ModelTask, ModelTaskType from domojupyter.ai import CSVModelIOConfiguration # Infer the input column names and types from our training dataset input_config = CSVModelIOConfiguration(data_frame=train_x) # Infer the output column names and types from our training label dataset output_config = CSVModelIOConfiguration(data_frame=train_y) task = ModelTask(ModelTaskType.CLASSIFICATION, input_config=input_config, output_config=output_config)
 ```
 
-### カーネルのスナップショット
+## カーネルのスナップショット
 
 Domo Jupyterワークスペースでは、サードパーティのライブラリをインストールして環境をカスタマイズできます。カスタマイズされたJupyter環境とモデルホスティング環境が一致するように、Jupyterカーネルを実行しているconda環境のスナップショットが作成されます。
 
@@ -116,9 +110,7 @@ Domo Jupyterワークスペースでは、サードパーティのライブラ�
 
 新しいスナップショットの作成には数分かかる場合があります。
 
-[このページのトップへ](#intro)
-
-### モデルを作成する
+## モデルを作成する
 
 パフォーマンスをほかのモデルと比較できるDomoモデル管理インターフェースにモデルをアップロードします。準備ができたら、Magic ETLでエンドポイントまたはDataFlowタイルとして展開できます。
 
@@ -133,7 +125,5 @@ Domo Jupyterワークスペースでは、サードパーティのライブラ�
 ```
 from domojupyter.ai import ModelTrainingInformation import domojupyter.ai.model as ml model_name = `Blue Classification` entrypoint = `model.py` extra_files = [] training = ModelTrainingInformation(metrics=domo_metrics, hyperparameters=hyperparameters, algorithm="Custom") tasks = [task] ml.create_model(model_name, entrypoint, extra_files, training=training, tasks=tasks)
 ```
-
-[このページのトップへ](#intro)
 
 日本語

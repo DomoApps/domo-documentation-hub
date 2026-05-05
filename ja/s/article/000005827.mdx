@@ -2,9 +2,7 @@
 title: "Domo SSO"
 ---
 
-import {InlineImage} from "/snippets/InlineImage.mdx";
-
-### はじめに
+## はじめに
 
 Domoは、Security Assertion Markup Language 2.0（SAML）とOpenID Connect（OIDC）の2つのプロトコルを使用したシングルサインオン（SSO）をサポートしています。 SAMLとOIDCの両方を同時に動作させることができます。
 
@@ -13,241 +11,241 @@ Domoは、Security Assertion Markup Language 2.0（SAML）とOpenID Connect（OI
 設定によっては、SSOでDomoユーザーを自動プロビジョニングし、ユーザー権限、属性、グループメンバーシップを割り当てることもできます。
 
 <Tip>
-  **SCIM：** SSOに加え、DomoではSCIMを介したユーザーやグループの管理もサポートしています。詳細については [こちら](/s/article/000005241) を参照してください。
-
+**SCIM：**SSOに加え、DomoではSCIMを介したユーザーやグループの管理もサポートしています。詳細については[こちら](/s/article/000005241)を参照してください。
 </Tip>
 
 ---
 
-* [必要な許可](#required_grants)
-* [SSOの構成の設定にアクセスする](#access_sso_settings)
-* [SAMLとOIDCの比較：プロトコルを選択する](#choose_a_protocol)
-* [IdPを設定する](#configure_idp)
-* [SAMLを使用してSSOを設定する](#configure_sso_with_saml)
-  + [メタデータのアップロードまたは手動入力](#saml_metadata_or_manual)
-  + [IdPからの情報](#info_from_idp)
-  + [IdPが必要とする情報](#information_for_idp_saml)
-  + [追加設定](#additional_settings_saml)
-  + [設定を保存する](#save_configuration_saml)
-* [OIDCを使用してSSOを設定する](#configure_sso_oidc)
-  + [IdPからの情報](#info_from_idp_oidc)
-  + [既知の設定で設定する](#well_known_config)
-  + [手動で設定する](#configure_oidc_manually)
-  + [IdPが必要とする情報](#info_for_idp_oidc)
-  + [追加設定](#additional_settings_oidc)
-  + [設定を保存する](#save_config_oidc)
-* [SSOの設定を行う](#configure_sso_settings)
-* [SSOを有効にしてデフォルトを設定する](#enable_sso_defaults)
-* [ユーザー権限、属性、グループメンバーシップを設定する](#set_role_attributes_membership)
-* [直接ログインリスト](#direct_sign_on)
+## 必要な許可
 
----
+SSOを設定するには、「管理者」のシステム権限か、「全てのカンパニー設定を管理」の許可が有効になっているカスタマイズされた権限が必要です。システム権限の詳細については[こちら](/s/article/360043438953)、カスタマイズされた権限の詳細については[こちら](/s/article/360043438973)を参照してください。
 
-### 必要な許可
+## SSOの構成の設定にアクセスする
 
-SSOを設定するには、「管理者」のシステム権限か、「全てのカンパニー設定を管理」の許可が有効になっているカスタマイズされた権限が必要です。システム権限の詳細については [こちら](/s/article/360043438953) 、カスタマイズされた権限の詳細については [こちら](/s/article/360043438973) を参照してください。
+Domo SSOの設定は、**［管理者］**>**［認証］**>**［シングルサインオン（SSO）］**に移動すると見つかります。
 
-### SSOの構成の設定にアクセスする
-
-Domo SSOの設定は、 **［管理者］** > **［認証］** > **［シングルサインオン（SSO）］** に移動すると見つかります。
-
-### SAMLとOIDCの比較：プロトコルを選択する
+## SAMLとOIDCの比較：プロトコルを選択する
 
 DomoはSAMLとOIDCの両方をサポートしています。どちらを使用するかの選択は、いくつかの考慮事項によって決まります。ほかのすべての条件が同じであれば、OIDCはより新しい標準であり、優れた選択となります。Domoの設定、管理、機能については、次の違いを考慮してください。
 
-* 特にお使いのIdPに既知の設定が用意されている場合は、OIDCの方が簡単に設定できる場合があります。
-* SAMLでは証明書の交換と管理が必要です。これにより、オーバーヘッドが発生します。
+- 特にお使いのIdPに既知の設定が用意されている場合は、OIDCの方が簡単に設定できる場合があります。
+- SAMLでは証明書の交換と管理が必要です。これにより、オーバーヘッドが発生します。
 
 さらに、次のような問いも考えられます。
 
-* どちらを使用するべきか、所属する組織によって指示されていますか？
-* あなたのチームは、どちらか一方に詳しいですか？
+- どちらを使用するべきか、所属する組織によって指示されていますか？
+- あなたのチームは、どちらか一方に詳しいですか？
 
-<Note>
-  **SAMLとOIDCを同時に使用する：** SAMLとOIDCの両方を同時に使用するケースがあります。例えば、社員があるIdPを使用し、契約業者が別のIdPを使用する場合があります。この場合は、一方のIdPにSAMLを使用し、もう一方のIdPにOIDCを使用して統合できます。
+**SAMLとOIDCを同時に使用する：**SAMLとOIDCの両方を同時に使用するケースがあります。例えば、社員があるIdPを使用し、契約業者が別のIdPを使用する場合があります。この場合は、一方のIdPにSAMLを使用し、もう一方のIdPにOIDCを使用して統合できます。
 
-  Domoにログインする際のデフォルトとして一方のプロトコルを使用し、エンベッドされたコンテンツにアクセスする際のデフォルトとしてもう一方のプロトコルを使用することもできます。
+Domoにログインする際のデフォルトとして一方のプロトコルを使用し、エンベッドされたコンテンツにアクセスする際のデフォルトとしてもう一方のプロトコルを使用することもできます。
 
-</Note>
+## IdPを設定する
 
-[このページのトップへ](#intro)
+SAML SSO統合およびOIDC SSO統合のIdP側の設定方法については、お使いのIdPのマニュアルを参照してください。Domoから情報を求められる場合があります。この情報は、SSO設定のユーザーインターフェースや、後述の[SAML](#samlとoidcの比較プロトコルを選択する)および[OIDC](#samlとoidcの比較プロトコルを選択する)向けのこの情報の説明に記載されています。
 
-### IdPを設定する
+## SAMLを使用してSSOを設定する
 
-SAML SSO統合およびOIDC SSO統合のIdP側の設定方法については、お使いのIdPのマニュアルを参照してください。Domoから情報を求められる場合があります。この情報は、SSO設定のユーザーインターフェースや、後述の [SAML](#information_for_idp_saml) および [OIDC](#info_for_idp_oidc) 向けのこの情報の説明に記載されています。
+[IdPを設定](#idp)したら、[上記](#ssoの構成の設定にアクセスする)の説明に従ってDomo SSOの設定にアクセスします。
 
-### SAMLを使用してSSOを設定する
-
-[IdPを設定](#configure_idp) したら、 [上記](#access_sso_settings) の説明に従ってDomo SSOの設定にアクセスします。
-
-* 以前にSAML SSOが設定されていない場合は、SAML項目の **［設定］** を選択します。次に、 **［メタデータをアップロード］** か **［手動で入力］** を選択します。各オプションの詳細については、 [後述のセクション](#saml_metadata_or_manual) を参照してください。
+- 以前にSAML SSOが設定されていない場合は、SAML項目の**［設定］**を選択します。次に、**［メタデータをアップロード］**か**［手動で入力］**を選択します。各オプションの詳細については、[後述のセクション](#samlとoidcの比較プロトコルを選択する)を参照してください。  
     
-  <Frame><img alt="" src="/images/kb/ka0Vq000000G1xp-00N5w00000Ri7BU-0EMVq000006yMBt.jpg" style={{width: 400, height: 247}}/></Frame>
-* 以前にSAMLが設定されている場合は、
-  <InlineImage src="/images/kb/ja/ka0Vq000000KNbe-00N5w00000Ri7BU-0EMVq000006vBxm.jpg" /> **詳細** （縦の三点リーダー）> **［編集］** または **［メタデータをアップロード］** を選択すると、設定を編集できます。
-    
+
+  <Frame>![Screenshot](/images/kb/ja/0EMVq000006yMBt.jpg)</Frame>
+- 以前にSAMLが設定されている場合は、<img src="/images/kb/ja/0EMVq000006vBxm.jpg" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/> **詳細**（縦の三点リーダー）>**［編集］**または**［メタデータをアップロード］**を選択すると、設定を編集できます。  
   メタデータをアップロードすると、以前に設定した値が上書きされることに注意してください。
 
-# メタデータのアップロードまたは手動入力
+## メタデータのアップロードまたは手動入力
 
-* IdPからメタデータをアップロードするには、設定メニューで
-  <InlineImage src="/images/kb/ja/ka0Vq000000KNbe-00N5w00000Ri7BU-0EMVq000006vBxm-1.jpg" /> **詳細** （縦の三点リーダー）> **［メタデータをアップロード］** を選択します。
+- IdPからメタデータをアップロードするには、設定メニューで<img src="/images/kb/ja/0EMVq000006vBxm.jpg" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/> **詳細**（縦の三点リーダー）>**［メタデータをアップロード］**を選択します。  
     
-  <Frame><img alt="" src="/images/kb/ka0Vq000000G1xp-00N5w00000Ri7BU-0EMVq000006yCpH.jpg" style={{width: 200, height: 137}}/></Frame>
-  表示されるモーダルで、IdPのメタデータURLを入力し、 **［アップロード］** を選択します。
+
+  <Frame>![Screenshot](/images/kb/ja/0EMVq000006yCpH.jpg)</Frame>
+
     
-  <Frame><img alt="" src="/images/kb/ka0Vq000000G1xp-00N5w00000Ri7BU-0EMVq000006v2ss.jpg" style={{width: 500, height: 214}}/></Frame>
-  完全なSAML設定画面が表示されます。メタデータURLをアップロードすると、 **［IdPからの情報］** セクションの設定値が自動的に設定され、 *以前に設定したすべての値が上書きされます。*
+    
+  表示されるモーダルで、IdPのメタデータURLを入力し、**［アップロード］**を選択します。  
+    
 
-* IdPでメタデータURLが提供されていない場合や、メタデータURLを使用しない場合は、設定メニューの **［手動で入力］** を選択します。このオプションを使用する場合は、必要な情報を手動で入力する必要があります。
+  <Frame>![Screenshot](/images/kb/ja/0EMVq000006v2ss.jpg)</Frame>
 
-# IdPからの情報
+    
+    
+  完全なSAML設定画面が表示されます。メタデータURLをアップロードすると、**［IdPからの情報］**セクションの設定値が自動的に設定され、*以前に設定したすべての値が上書きされます。*
+
+- IdPでメタデータURLが提供されていない場合や、メタデータURLを使用しない場合は、設定メニューの**［手動で入力］**を選択します。このオプションを使用する場合は、必要な情報を手動で入力する必要があります。
+
+## IdPからの情報
 
 Domo SSO統合をSAML経由で設定する場合は、DomoとIdPの統合方法を定義するための重要な情報を提供する必要があります。
 
-<Note>
-  **注記：** IdPから [メタデータをアップロード](#saml_metadata_or_manual) した場合、これらのフィールドにはすでに値が入力されているため、確認のみが必要です。
-
-</Note>
+<Note>**注記：**IdPから[メタデータをアップロード](#samlとoidcの比較プロトコルを選択する)した場合、これらのフィールドにはすでに値が入力されているため、確認のみが必要です。</Note>
 
 これらの値はIdPで定義されており、お使いのIdPでは異なる用語が使用されている場合があります。以下に記載する各フィールドに関する説明は、情報の目的を理解し、IdPでの名称がどのようなものであれ、IdPで情報を見つけるのに役立てていただくことを目的としています。
 
-<table border="1" cellpadding="1" cellspacing="1"><thead><tr><th colspan="1" rowspan="1"><p> フィールド </p></th><th colspan="1" rowspan="1"><p> 説明 </p></th></tr></thead><tbody><tr><td colspan="1" rowspan="1"> アイデンティティプロバイダーのエンドポイントURL </td><td colspan="1" rowspan="1"> Domoが認証リクエストを送信するURL。 </td></tr><tr><td colspan="1" rowspan="1"> エンティティID </td><td colspan="1" rowspan="1"> IdPのSAML App（このDomoインスタンスへのSSOなど）の一意の識別子。これは発行者とも呼ばれます。IdPによっては、デフォルト値を設定しているものもあれば、IdPでSAML Appを作成するときにこの値を指定するよう求めるものもあります。 </td></tr><tr><td colspan="1" rowspan="1"> x.509証明書をアップロード </td><td colspan="1" rowspan="1"> IDPによって提供された証明書。これにより、DomoとIdP間の信頼が確立され、DomoはSAMLアサーションが正当であることを確認できます。 <a id="information_for_idp_saml" target="_blank"></a></td></tr></tbody></table>
+| フィールド                     | 説明                                                                                                                            |
+| ------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| アイデンティティプロバイダーのエンドポイントURL | Domoが認証リクエストを送信するURL。                                                                                                         |
+| エンティティID                  | IdPのSAML App（このDomoインスタンスへのSSOなど）の一意の識別子。これは発行者とも呼ばれます。IdPによっては、デフォルト値を設定しているものもあれば、IdPでSAML Appを作成するときにこの値を指定するよう求めるものもあります。 |
+| x.509証明書をアップロード           | IDPによって提供された証明書。これにより、DomoとIdP間の信頼が確立され、DomoはSAMLアサーションが正当であることを確認できます。                                                       |
 
-[このページのトップへ](#intro)
-
-# IdPが必要とする情報
+## IdPが必要とする情報
 
 IdPのSAML Appに、Domoと統合する方法についての情報を提供することが必要な場合があります。これは、IdPおよびSAML Appの設定内容によって異なります。これらの値はDomoで定義されており、お使いのIdPでは異なる用語が使用されている場合があります。
 
 以下に記載する各フィールドに関する説明は、みなさんが情報の目的や、対応するパラメーターを特定してIdPで設定する方法を理解するのに役立ててもらうことを目的としています。詳細については、お使いのIdPのドキュメントを参照してください。
 
-<table border="1" cellpadding="1" cellspacing="1"><thead><tr><th colspan="1" rowspan="1"><p> フィールド </p></th><th colspan="1" rowspan="1"><p> 説明 </p></th></tr></thead><tbody><tr><td colspan="1" rowspan="1"> DomoエンティティID </td><td colspan="1" rowspan="1"> Domoインスタンスの一意の識別子。これは発行者と呼ばれることがあります。 </td></tr><tr><td colspan="1" rowspan="1"> SAMLアサーションのエンドポイントURL </td><td colspan="1" rowspan="1"> ユーザーの認証後にIdPがSAMLアサーションを送信するURL。これは、Assertion Consumer Service（ACS）URLとも呼ばれます。 </td></tr><tr><td colspan="1" rowspan="1"> Domo x.509証明書ダウンロード </td><td colspan="1" rowspan="1"> IdPはこの証明書を使用して、Domoからのリクエストを検証できます。Domoからの認証リクエストを検証するようにSAML Appが設定されている場合は、IdPのSAML Appにこの証明書をアップロードし、さらに認証リクエストに署名するようにDomoを設定する必要があります。 <a id="additional_settings_saml" target="_blank"></a> 後述の「 <a href="#sign_authentication_requests" target="_self"> 認証リクエストに署名する </a> 」を参照してください。 </td></tr><tr><td colspan="1" rowspan="1"> メタデータ </td><td colspan="1" rowspan="1"> Domoでは、Domoの現在のx.509署名証明書など、上記の情報を含むメタデータファイルを提供しています。メタデータのアップロードがサポートされている場合は、このメタデータをダウンロードしてIdPにアップロードすると、SAML Appの設定を簡素化できます。 </td></tr></tbody></table>
+| フィールド                 | 説明                                                                                                                                                                                                      |
+| --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| DomoエンティティID          | Domoインスタンスの一意の識別子。これは発行者と呼ばれることがあります。                                                                                                                                                                   |
+| SAMLアサーションのエンドポイントURL | ユーザーの認証後にIdPがSAMLアサーションを送信するURL。これは、Assertion Consumer Service（ACS）URLとも呼ばれます。                                                                                                                          |
+| Domo x.509証明書ダウンロード   | IdPはこの証明書を使用して、Domoからのリクエストを検証できます。Domoからの認証リクエストを検証するようにSAML Appが設定されている場合は、IdPのSAML Appにこの証明書をアップロードし、さらに認証リクエストに署名するようにDomoを設定する必要があります。後述の「認証リクエストに署名する」を参照してください。 |
+| メタデータ                 | Domoでは、Domoの現在のx.509署名証明書など、上記の情報を含むメタデータファイルを提供しています。メタデータのアップロードがサポートされている場合は、このメタデータをダウンロードしてIdPにアップロードすると、SAML Appの設定を簡素化できます。                                                                      |
 
-# 追加設定
+## 追加設定
 
-必要に応じてそれ以外のSSO設定を行います。詳しくは [後述のセクション](#configure_sso_settings) で説明します。
+必要に応じてそれ以外のSSO設定を行います。詳しくは[後述のセクション](#ssoの構成の設定にアクセスする)で説明します。
 
-# 設定を保存する
+## 設定を保存する
 
-必要な情報を入力して設定を行ったら、設定を保存します。SAMLがまだ有効になっていない場合は、保存して有効にするか、有効にせずに保存するかを選択できます。SSOを有効にする方法については、 [後述のセクション](#enable_sso_defaults) を参照してください。
+必要な情報を入力して設定を行ったら、設定を保存します。SAMLがまだ有効になっていない場合は、保存して有効にするか、有効にせずに保存するかを選択できます。SSOを有効にする方法については、[後述のセクション](#ssoの構成の設定にアクセスする)を参照してください。
 
-[このページのトップへ](#intro)
+## OIDCを使用してSSOを設定する
 
-### OIDCを使用してSSOを設定する
+[IdPを設定](#idp)したら、[上記](#ssoの構成の設定にアクセスする)の説明に従ってDomo SSOの設定にアクセスします。
 
-[IdPを設定](#configure_idp) したら、 [上記](#access_sso_settings) の説明に従ってDomo SSOの設定にアクセスします。
-
-* 以前にOIDC SSOが設定されていない場合は、OIDC項目の **［設定］** を選択します。
+- 以前にOIDC SSOが設定されていない場合は、OIDC項目の**［設定］**を選択します。  
     
-  <Frame><img alt="" src="/images/kb/ka0Vq000000G1xp-00N5w00000Ri7BU-0EMVq000006vHtW.jpg" style={{width: 500, height: 224}}/></Frame>
-* 以前にOIDCが設定されている場合は、
-  <InlineImage src="/images/kb/ja/ka0Vq000000KNbe-00N5w00000Ri7BU-0EMVq000006vBxm-2.jpg" /> **詳細** （縦の三点リーダー）> **［編集］** を選択すると、設定を編集できます。
 
-# IdPからの情報
+  <Frame>![Screenshot](/images/kb/ja/0EMVq000006vHtW.jpg)</Frame>
+- 以前にOIDCが設定されている場合は、<img src="/images/kb/ja/0EMVq000006vBxm.jpg" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/> **詳細**（縦の三点リーダー）>**［編集］**を選択すると、設定を編集できます。
+
+## IdPからの情報
 
 Domo SSO統合をOIDC経由で設定する場合は、DomoとIdPの統合方法を定義するための重要な情報を提供する必要があります。
 
-ほとんどのIdPには [既知の設定](#well_known_config) エンドポイントが用意されており、 この情報を簡単に共有できるようになっていますが、お使いのIdPで用意されていない場合は、既知の設定によって提供されるはずの情報を提供して、 [OIDCを手動で設定](#configure_oidc_manually) する必要があります。
+ほとんどのIdPには既知の設定エンドポイントが用意されており、この情報を簡単に共有できるようになっていますが、お使いのIdPで用意されていない場合は、既知の設定によって提供されるはずの情報を提供して、[OIDCを手動で設定](#samlとoidcの比較プロトコルを選択する)する必要があります。
 
-#### 既知の設定で設定する
+## 既知の設定で設定する
 
-1. **［設定］** を選択して設定モーダルを開き、 **［既知の設定］** がまだ選択されていなければ、選択します。
+1. **［設定］**を選択して設定モーダルを開き、**［既知の設定］**がまだ選択されていなければ、選択します。  
      
-   <Frame><img alt="" src="/images/kb/ka0Vq000000G1xp-00N5w00000Ri7BU-0EMVq000006vHVK.jpg" style={{width: 500, height: 275}}/></Frame>
+
+   <Frame>![Screenshot](/images/kb/ja/0EMVq000006vHVK.jpg)</Frame>
 2. IdPのDomo SSO Appに関連する次の情報を入力します。これらの値はIdPで定義されており、お使いのIdPでは異なる用語が使用されている場合があります。以下に記載する各フィールドに関する説明は、情報の目的を理解し、IdPでの名称がどのようなものであれ、IdPでそれぞれの値を見つけるのに役立てていただくことを目的としています。
 
-   <table border="1" cellpadding="1" cellspacing="1"><thead><tr><th colspan="1" rowspan="1"><p> フィールド </p></th><th colspan="1" rowspan="1"><p> 説明 </p></th></tr></thead><tbody><tr><td colspan="1" rowspan="1"> 既知の設定URL </td><td colspan="1" rowspan="1"><p> OIDC統合の設定方法をDomoに指示する主要な情報をIdPが公開するエンドポイントです。一般的に、既知の設定URLは次の形式になっています。 </p><p><code> https:/ /{ <em> お使いのIdPのドメイン </em> }/.well-known/openid-configuration </code></p></td></tr><tr><td colspan="1" rowspan="1"> クライアントID </td><td colspan="1" rowspan="1"> IdPのDomo OIDC Appに割り当てられているクライアント識別子。クライアントIDはIdPによって提供される必要があります。 </td></tr><tr><td colspan="1" rowspan="1"> クライアントシークレット </td><td colspan="1" rowspan="1"> クライアントIDと組み合わせて使用することで、DomoがIdPのOIDCリクエストを作成できます。クライアントシークレットは非常に機密性が高く、パスワード、シークレット、その他の機密情報に関する会社のポリシーに従って取り扱う必要があります。クライアントシークレットはIdPによって提供される必要があります。 <a id="configure_oidc_manually" target="_blank"></a></td></tr></tbody></table>
+   | フィールド | 説明 |
+   | --- | --- |
+   | 既知の設定URL | OIDC統合の設定方法をDomoに指示する主要な情報をIdPが公開するエンドポイントです。一般的に、既知の設定URLは次の形式になっています。  `https://{お使いのIdPのドメイン}/.well-known/openid-configuration` |
+   | クライアントID | IdPのDomo OIDC Appに割り当てられているクライアント識別子。クライアントIDはIdPによって提供される必要があります。 |
+   | クライアントシークレット | クライアントIDと組み合わせて使用することで、DomoがIdPのOIDCリクエストを作成できます。クライアントシークレットは非常に機密性が高く、パスワード、シークレット、その他の機密情報に関する会社のポリシーに従って取り扱う必要があります。クライアントシークレットはIdPによって提供される必要があります。 |
 
-[このページのトップへ](#intro)
+### 手動で設定する
 
-#### 手動で設定する
+IdPに既知の設定が用意されていない場合は、既知の設定によって提供されるはずの情報を手動で入力する必要があります。
 
-IdPに 既知の設定が用意されていない場合は、既知の設定によって提供されるはずの情報を手動で入力する必要があります。
-
-1. **［設定］** を選択して設定モーダルを開き、 **［手動で入力］** がまだ選択されていなければ、選択します。
+1. **［設定］**を選択して設定モーダルを開き、**［手動で入力］**がまだ選択されていなければ、選択します。   
      
-   <Frame><img alt="" src="/images/kb/ka0Vq000000G1xp-00N5w00000Ri7BU-0EMVq000006vNPR.jpg" style={{width: 500, height: 270}}/></Frame>
+
+   <Frame>![Screenshot](/images/kb/ja/0EMVq000006vNPR.jpg)</Frame>
 2. IdPのDomo SSO Appに関連する次の情報を入力します。これらの値はIdPで定義されており、お使いのIdPでは異なる用語が使用されている場合があります。以下に記載する各フィールドに関する説明は、情報の目的を理解し、IdPでの名称がどのようなものであれ、IdPでそれぞれの値を見つけるのに役立てていただくことを目的としています。
 
-   <table border="1" cellpadding="1" cellspacing="1"><thead><tr><th colspan="1" rowspan="1"><p> フィールド </p></th><th colspan="1" rowspan="1"><p> 説明 </p></th></tr></thead><tbody><tr><td colspan="1" rowspan="1"> 認証リクエストエンドポイントURL </td><td colspan="1" rowspan="1"> DomoがDomoユーザーの認証リクエストを送信するURL。 </td></tr><tr><td colspan="1" rowspan="1"> トークンエンドポイントURL </td><td colspan="1" rowspan="1"> Domoはこのエンドポイントにトークンリクエストを送信します。 </td></tr><tr><td colspan="1" rowspan="1"> ユーザー情報エンドポイントURL </td><td colspan="1" rowspan="1"> Domoは、このエンドポイントにユーザー属性（クレーム）のリクエストを送信します。 </td></tr><tr><td colspan="1" rowspan="1"> パブリックキー </td><td colspan="1" rowspan="1"> JSONウェブキーセット（JWKS）、もしくはJWKSのホストURL。Domoはこのキーを使用して、IdPからの正当なトークンのみを検証し、信頼します。 </td></tr><tr><td colspan="1" rowspan="1"> クライアントID </td><td colspan="1" rowspan="1"> IdPのDomo OIDC Appに割り当てられている識別子。クライアントIDはIdPによって提供される必要があります。 </td></tr><tr><td colspan="1" rowspan="1"> クライアントシークレット </td><td colspan="1" rowspan="1"> クライアントIDと組み合わせて使用することで、DomoがIdPのOIDCリクエストを作成できます。クライアントシークレットは非常に機密性が高く、パスワード、シークレット、その他の機密情報に関する会社のポリシーに従って取り扱う必要があります。クライアントシークレットはIdPによって提供される必要があります。 <a id="info_for_idp_oidc" target="_blank"></a></td></tr></tbody></table>
+   | フィールド | 説明 |
+   | --- | --- |
+   | 認証リクエストエンドポイントURL | DomoがDomoユーザーの認証リクエストを送信するURL。 |
+   | トークンエンドポイントURL | Domoはこのエンドポイントにトークンリクエストを送信します。 |
+   | ユーザー情報エンドポイントURL | Domoは、このエンドポイントにユーザー属性（クレーム）のリクエストを送信します。 |
+   | パブリックキー | JSONウェブキーセット（JWKS）、もしくはJWKSのホストURL。Domoはこのキーを使用して、IdPからの正当なトークンのみを検証し、信頼します。 |
+   | クライアントID | IdPのDomo OIDC Appに割り当てられている識別子。クライアントIDはIdPによって提供される必要があります。 |
+   | クライアントシークレット | クライアントIDと組み合わせて使用することで、DomoがIdPのOIDCリクエストを作成できます。クライアントシークレットは非常に機密性が高く、パスワード、シークレット、その他の機密情報に関する会社のポリシーに従って取り扱う必要があります。クライアントシークレットはIdPによって提供される必要があります。 |
 
-[このページのトップへ](#intro)
+## IdPが必要とする情報
 
-# IdPが必要とする情報
+Domo環境のOpenIDのコールバックURLをIdPに伝えることが必要な場合があります。このURLは、設定モーダルの**［IdPが必要とする情報］**という名前のセクションに記載されています。
 
-Domo環境のOpenIDのコールバックURLをIdPに伝えることが必要な場合があります。このURLは、設定モーダルの **［IdPが必要とする情報］** という名前のセクションに記載されています。
+**［設定］**/<img src="/images/kb/ja/0EMVq000006vBxm.jpg" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/> **詳細**（縦の三点リーダー）>**［編集］**を選択して、SSO設定からモーダルを開きます。
 
-**［設定］** / <InlineImage src="/images/kb/ja/ka0Vq000000KNbe-00N5w00000Ri7BU-0EMVq000006vBxm-3.jpg" /> **詳細** （縦の三点リーダー）> **［編集］** を選択して、SSO設定からモーダルを開きます。
+<Frame>![Screenshot](/images/kb/ja/0EMVq000006vFAA.jpg)</Frame>
 
-<Frame><img alt="" src="/images/kb/ka0Vq000000G1xp-00N5w00000Ri7BU-0EMVq000006vFAA.jpg" style={{width: 500, height: 123}}/></Frame>
-# 追加設定
+## 追加設定
 
-必要に応じてそれ以外のSSO設定を行います。詳しくは [後述のセクション](#configure_sso_settings) で説明します。
+必要に応じてそれ以外のSSO設定を行います。詳しくは[後述のセクション](#ssoの構成の設定にアクセスする)で説明します。
 
-# 設定を保存する
+## 設定を保存する
 
 必要な情報を入力して設定を行ったら、設定を保存します。OIDCがまだ有効になっていない場合は、保存して有効にするか、有効にせずに保存するかを選択できます。
 
-[このページのトップへ](#intro)
+## SSOの設定を行う
 
-### SSOの設定を行う
+<Frame>![Screenshot](/images/kb/ja/0EMVq000006vSlh.jpg)</Frame>
 
-<Frame><img alt="" src="/images/kb/ka0Vq000000G1xp-00N5w00000Ri7BU-0EMVq000006vSlh.jpg" style={{width: 550, height: 296}}/></Frame>
-これらの設定は、Domoインスタンス内でのSSOの動作を制御します。これらの設定はOIDCやSAMLの設定で行われ、設定された値は SAMLとOIDCの間で独立しています。つまり、SAMLで設定を行ってもOIDCの同等の設定には影響しませんし、その逆も同様です。
+これらの設定は、Domoインスタンス内でのSSOの動作を制御します。これらの設定はOIDCやSAMLの設定で行われ、設定された値はSAMLとOIDCの間で独立しています。つまり、SAMLで設定を行ってもOIDCの同等の設定には影響しませんし、その逆も同様です。
 
-<table border="1" cellpadding="1" cellspacing="1"><thead><tr><th colspan="1" rowspan="1"><p> フィールド </p></th><th colspan="1" rowspan="1"><p> オプション </p></th><th colspan="1" rowspan="1"><p> 説明 </p></th></tr></thead><tbody><tr><td colspan="1" rowspan="1"> ジャストインタイムのユーザープロビジョニング </td><td colspan="1" rowspan="1"><p> 許可（すべてのドメイン） </p><p> 許可（許可ドメインのみ） </p><p> 許可しない </p></td><td colspan="1" rowspan="1"><p> この設定は、Domoに存在しないユーザーがSSOでログインしようとしたときの動作を制御します。選択する動作は、ユースケースとIdPの設定によって左右されます。 </p><p> 例えば、すべてのIdPユーザーがDomoにログインできるようにIdPが設定されている場合は、Domoでのユーザーの自動作成を許可しないように設定できます。 </p><p> 一方、大規模で動的なユーザーベースがあり、IdPがDomoへのユーザーアクセスを制御している場合は、Domoでのユーザーの自動作成を許可することができます。招待されたユーザーのための許可ドメインを指定する方法を参照してください。 <a id="user_login_experience" target="_blank"></a></p><div class="mdx-embed"><Warning><p><b> 重要： </b> ジャストインタイムのユーザープロビジョニングを許可する場合は特に重要で、最小権限の原則に沿って、Domoのデフォルトのユーザー権限を「閲覧ユーザー」などの権限が小さいものにすることを強く推奨します。権限の割り当てについては、 <a href="#set_role_attributes_membership" target="_self"> 後述のセクション </a> を参照してください。 </p></Warning></div></td></tr><tr><td colspan="1" rowspan="1"> ユーザーのログイン体験 </td><td colspan="1" rowspan="1"><p> Domo認証情報 </p><p> シングルサインオン（Domoの認証画面） </p><p> シングルサインオン（IdPに自動リダイレクト） </p></td><td colspan="1" rowspan="1"><p> この設定は、Domoに直接移動する際のユーザー体験を制御します。すべてのDomoユーザーがSSO経由でログインすることを期待する場合は、この設定をSSOログイン用に設定することを推奨します（オプションで、Domoのログイン画面を表示するか、Domoのログイン画面をスキップして即座にIdPにリダイレクトします）。 </p><ul><li><b> Domo認証情報 — </b> このオプションを選択すると、Domo認証画面が表示され、（IdPではなく）Domoの認証情報の入力を求められます。SSOによるログインは引き続きサポートされますが、SSOのフローはIdPから開始する必要があります。一部のDomoユーザーがIdPのユーザーではない場合は、このオプションを検討してみてください。 </li><li><b> SSO（Domo認証画面） — </b> このオプションを選択すると、Domoログイン画面が、SSOログインを開始するためのボタンと一緒に表示されます。少なくとも1人のユーザーが <a href="#direct_sign_on" target="_self"> 直接ログインリスト </a> に存在する場合、認証画面には、（IdPではなく）Domoの認証情報を使用してログインするためのリンクも表示されます。 </li><li><b> SSO（IDPにスキップ） — </b> このオプションを選択すると、SSOログインのためにユーザーがIdPに自動的にリダイレクトされます。 </li></ul><div class="mdx-embed"><Note><p><b> 注記： </b> SAMLが有効になっており、SAMLの「ユーザーのログイン体験」が「シングルサインオン（Domoの認証画面）」か「シングルサインオン（IdPに自動リダイレクト）」に設定されている場合は、 <a href="#direct_sign_on" target="_self"> 直接ログインリスト </a> が適用されます。つまり、直接ログインリストのユーザー（および管理者のシステム権限を持つユーザー）のみがDomoの認証情報を使用してDomoにログインすることができ、ほかのユーザーはSSO経由でログインする必要があります。 <p></p> OIDC設定の「ユーザーのログイン体験」設定は、直接ログインリストの適用に影響を及ぼしません。 <p></p> ログイン体験にオプションが用意されていない場合、 <a href="#direct_sign_on" target="_self"> 直接ログインリスト </a> のユーザーおよび「管理者」のシステム権限を持つユーザーは、次のURLに移動することでDomoの認証情報を使用してDomoにログインできます： <br/><code> https:/ /{ <em> お使いのサブドメイン </em> }.domo. com/auth/index?domoManualLogin=true </code></p></Note></div></td></tr><tr><td colspan="1" rowspan="1"> ログアウトURL（オプション） </td><td colspan="1" rowspan="1"> — </td><td colspan="1" rowspan="1"> DomoからログアウトしたユーザーがリダイレクトされるURL。 </td></tr><tr><td colspan="1" rowspan="1"> アイデンティティープロバイダーからグループをインポート </td><td colspan="1" rowspan="1"> — </td><td colspan="1" rowspan="1"> この設定は、Domoディレクトリグループを作成するかどうか、およびSSO統合によってそのメンバーシップを維持するかどうかを決定します。有効にすると、ユーザーがSSO経由でログインしたときに、必要に応じてDomoディレクトリグループにユーザーが追加または削除されます。Domoのグループについては、 <a href="/s/article/360042934294" target="_self"> こちら </a> を参照してください。 <a id="sign_authentication_requests" target="_blank"></a></td></tr><tr><td colspan="1" rowspan="1"> カスタム属性の取り込みを有効にする </td><td colspan="1" rowspan="1"> — </td><td colspan="1" rowspan="1"> これを有効にすると、ユーザーがSSO経由でログインしたときに、DomoはカスタムDomoユーザー属性の値を継承します。属性については、 <a href="#set_role_attributes_membership" target="_self"> 後述のセクション </a> を参照してください。 </td></tr><tr><td colspan="1" rowspan="1"> （SAMLのみ）認証リクエストに署名 </td><td colspan="1" rowspan="1"> — </td><td colspan="1" rowspan="1"><p> この設定は、DomoがIdPに送信するSAML認証リクエストに署名するかどうかを制御します。 </p><p> IdPのSSO Appで認証リクエストの署名の検証を要求するように設定されている場合は、これを有効にして、さらにDomoのx.509署名証明書をIdPのSSO Appに読み込ませる必要があります。Domoの証明書は、SAMLの設定モーダルの <b> ［IdPが必要とする情報］ </b> という名前のセクションでダウンロードできます。 <a id="enable_sso_defaults" target="_blank"></a></p></td></tr><tr><td colspan="1" rowspan="1"> （SAMLのみ）SAML Relay Stateを使用してリダイレクトする </td><td colspan="1" rowspan="1"> — </td><td colspan="1" rowspan="1"> これを有効にすると、DomoはユーザーをSAML Relay Stateで指定された場所（Domoの特定のダッシュボードやAppなど）にリダイレクトします。 </td></tr></tbody></table>
+| フィールド | オプション | 説明  |
+| ----- | ----- | --- |
+| ジャストインタイムのユーザープロビジョニング | 許可（すべてのドメイン）  許可（許可ドメインのみ）  許可しない | この設定は、Domoに存在しないユーザーがSSOでログインしようとしたときの動作を制御します。選択する動作は、ユースケースとIdPの設定によって左右されます。  例えば、すべてのIdPユーザーがDomoにログインできるようにIdPが設定されている場合は、Domoでのユーザーの自動作成を許可しないように設定できます。  一方、大規模で動的なユーザーベースがあり、IdPがDomoへのユーザーアクセスを制御している場合は、Domoでのユーザーの自動作成を許可することができます。招待されたユーザーのための許可ドメインを指定する方法を参照してください。  <Warning>**重要：**ジャストインタイムのユーザープロビジョニングを許可する場合は特に重要で、最小権限の原則に沿って、Domoのデフォルトのユーザー権限を「閲覧ユーザー」などの権限が小さいものにすることを強く推奨します。権限の割り当てについては、後述のセクションを参照してください。</Warning> |
+| ユーザーのログイン体験 | Domo認証情報  シングルサインオン（Domoの認証画面）  シングルサインオン（IdPに自動リダイレクト） | この設定は、Domoに直接移動する際のユーザー体験を制御します。すべてのDomoユーザーがSSO経由でログインすることを期待する場合は、この設定をSSOログイン用に設定することを推奨します（オプションで、Domoのログイン画面を表示するか、Domoのログイン画面をスキップして即座にIdPにリダイレクトします）。   - **Domo認証情報 —** このオプションを選択すると、Domo認証画面が表示され、（IdPではなく）Domoの認証情報の入力を求められます。SSOによるログインは引き続きサポートされますが、SSOのフローはIdPから開始する必要があります。一部のDomoユーザーがIdPのユーザーではない場合は、このオプションを検討してみてください。 - **SSO（Domo認証画面） —** このオプションを選択すると、Domoログイン画面が、SSOログインを開始するためのボタンと一緒に表示されます。少なくとも1人のユーザーが直接ログインリストに存在する場合、認証画面には、（IdPではなく）Domoの認証情報を使用してログインするためのリンクも表示されます。 - **SSO（IDPにスキップ） —** このオプションを選択すると、SSOログインのためにユーザーがIdPに自動的にリダイレクトされます。   <Note>**注記：**SAMLが有効になっており、SAMLの「ユーザーのログイン体験」が「シングルサインオン（Domoの認証画面）」か「シングルサインオン（IdPに自動リダイレクト）」に設定されている場合は、直接ログインリストが適用されます。つまり、直接ログインリストのユーザー（および管理者のシステム権限を持つユーザー）のみがDomoの認証情報を使用してDomoにログインすることができ、ほかのユーザーはSSO経由でログインする必要があります。  OIDC設定の「ユーザーのログイン体験」設定は、直接ログインリストの適用に影響を及ぼしません。  ログイン体験にオプションが用意されていない場合、直接ログインリストのユーザーおよび「管理者」のシステム権限を持つユーザーは、次のURLに移動することでDomoの認証情報を使用してDomoにログインできます： `https://{お使いのサブドメイン}.domo.com/auth/index?domoManualLogin=true`</Note> |
+| ログアウトURL（オプション） | — | DomoからログアウトしたユーザーがリダイレクトされるURL。 |
+| アイデンティティープロバイダーからグループをインポート | — | この設定は、Domoディレクトリグループを作成するかどうか、およびSSO統合によってそのメンバーシップを維持するかどうかを決定します。有効にすると、ユーザーがSSO経由でログインしたときに、必要に応じてDomoディレクトリグループにユーザーが追加または削除されます。Domoのグループについては、[こちら](/s/article/360042934294)を参照してください。 |
+| カスタム属性の取り込みを有効にする | — | これを有効にすると、ユーザーがSSO経由でログインしたときに、DomoはカスタムDomoユーザー属性の値を継承します。属性については、後述のセクションを参照してください。 |
+| （SAMLのみ）認証リクエストに署名 | — | この設定は、DomoがIdPに送信するSAML認証リクエストに署名するかどうかを制御します。  IdPのSSO Appで認証リクエストの署名の検証を要求するように設定されている場合は、これを有効にして、さらにDomoのx.509署名証明書をIdPのSSO Appに読み込ませる必要があります。Domoの証明書は、SAMLの設定モーダルの**［IdPが必要とする情報］**という名前のセクションでダウンロードできます。 |
+| （SAMLのみ）SAML Relay Stateを使用してリダイレクトする | — | これを有効にすると、DomoはユーザーをSAML Relay Stateで指定された場所（Domoの特定のダッシュボードやAppなど）にリダイレクトします。 |
 
-[このページのトップへ](#intro)
+## SSOを有効にしてデフォルトを設定する
 
-### SSOを有効にしてデフォルトを設定する
+SAMLやOIDCの設定が完了したら、SSOの**［設定］**タブにあるスイッチを使用してSSOを有効にする必要があります。
 
-SAMLやOIDCの設定が完了したら、SSOの **［設定］** タブにあるスイッチを使用してSSOを有効にする必要があります。
+<Frame>![Screenshot](/images/kb/ja/0EMVq000006yVGn.jpg)</Frame>
 
-<Frame><img alt="" src="/images/kb/ka0Vq000000G1xp-00N5w00000Ri7BU-0EMVq000006yVGn.jpg" style={{width: 450, height: 155}}/></Frame>
-<Warning>
-  **重要：** 片方のプロトコルだけが有効になっている場合は、そのプロトコルが自動的にデフォルトになります。両方のプロトコルが有効になっている場合は、次の2つのシナリオでデフォルトを指定する必要があります。
+<Warning>**重要：**片方のプロトコルだけが有効になっている場合は、そのプロトコルが自動的にデフォルトになります。両方のプロトコルが有効になっている場合は、次の2つのシナリオでデフォルトを指定する必要があります。</Warning>
 
-  * **Domoインスタンスへのサインイン —**
-  <InlineImage src="/images/kb/ja/ka0Vq000000KNbe-00N5w00000Ri7BU-0EMVq000006vBxm-4.jpg" /> **詳細** （縦の三点リーダー）> **［サインインのデフォルトを作成］** を選択します。
-  * **エンベッドへのサインイン —**
-  <InlineImage src="/images/kb/ja/ka0Vq000000KNbe-00N5w00000Ri7BU-0EMVq000006vBxm-5.jpg" /> **詳細** （縦の三点リーダー）> **［エンベッドのデフォルトを作成］** を選択します。
+- **Domoインスタンスへのサインイン —** <img src="/images/kb/ja/0EMVq000006vBxm.jpg" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/> **詳細**（縦の三点リーダー）>**［サインインのデフォルトを作成］**を選択します。
+- **エンベッドへのサインイン —** <img src="/images/kb/ja/0EMVq000006vBxm.jpg" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/> **詳細**（縦の三点リーダー）>**［エンベッドのデフォルトを作成］**を選択します。  
+    
 
-  <Frame><img alt="" src="/images/kb/ka0Vq000000G1xp-00N5w00000Ri7BU-0EMVq000006vDTL.jpg" style={{width: 500, height: 212}}/></Frame>
-</Warning>
+  <Frame>![Screenshot](/images/kb/ja/0EMVq000006vDTL.jpg)</Frame>
 
-[このページのトップへ](#intro)
-
-### ユーザー権限、属性、グループメンバーシップを設定する
+## ユーザー権限、属性、グループメンバーシップを設定する
 
 ユーザーがDomoにログインするときに、IdPで指定された値に基づいてユーザー権限、属性、グループメンバーシップを設定または更新するようにSSOを設定できます。IdPのユーザー属性は、Domoの対応する属性（キーで識別）にマッピングされている必要があります。次の属性がサポートされています。
 
-<table border="1" cellpadding="1" cellspacing="1"><thead><tr><th colspan="1" rowspan="2"><p> 属性 </p></th><th colspan="2" rowspan="1"><p><em> SAMLアサーションまたはOIDCクレーム </em></p></th></tr><tr><th colspan="1" rowspan="1"><p> SAML </p></th><th colspan="1" rowspan="1"><p> OIDC </p></th></tr></thead><tbody><tr><td colspan="1" rowspan="1"><p> メール </p><p><b> 注記： </b> Domoでは、ユーザーの一意の識別子はメールアドレスです。メール属性に含まれる値は、SAMLアサーションのSAML件名の値よりも優先されます。 </p></td><td colspan="1" rowspan="1"> email </td><td colspan="1" rowspan="1"> email </td></tr><tr><td colspan="1" rowspan="3"><p> ユーザー名 </p><p><b> 注記： </b> SAMLでは、「name.personal」や「name.family」が指定されている場合、これらの値が結合され、名前で指定されているほかの値よりも優先されます。 </p><p><b> 注記： </b> OIDCでは、その他のいくつかのクレーム（「preferred_username」「given_name」「family_name」「middle_name」「nickname」）がサポートされています。ただし、名前クレームが存在する場合は、それが優先されます。 </p></td><td colspan="1" rowspan="1"><p> name </p></td><td colspan="1" rowspan="1"><p> name </p></td></tr><tr><td colspan="1" rowspan="1"><p> name.personal </p></td><td colspan="1" rowspan="2"><p><em> その他。注記を参照してください。 </em></p></td></tr><tr><td colspan="1" rowspan="1"><p> name.family </p></td></tr><tr><td colspan="1" rowspan="1"><p> 権限 </p><p><b> 注記： </b> Domoでは、ユーザー1人につき1つの権限のみがサポートされますIdPからDomoに渡される権限の値は、Domoで定義されている権限と完全に一致する必要があります。ジャストインタイムのプロビジョニングが許可されていて、受け入れ可能な権限がIdPから提供されない場合、ユーザーはDomoインスタンスのデフォルトの権限を受け取ります。 </p><p> 権限の管理については <a href="/s/article/360043438973" target="_self"> こちら </a> 、デフォルトの権限については <a href="https://domo-support.domo.com/s/article/000005839#instance_default_role" target="_self"> こちら </a> を参照してください。 </p></td><td colspan="1" rowspan="1"> role </td><td colspan="1" rowspan="1"><em> サポート対象外 </em></td></tr><tr><td colspan="1" rowspan="1"> 2次メール </td><td colspan="1" rowspan="1"> email.secondary </td><td colspan="1" rowspan="1"> alternate_email </td></tr><tr><td colspan="1" rowspan="1"> 社員ID </td><td colspan="1" rowspan="1"> employee. id </td><td colspan="1" rowspan="1"> sub </td></tr><tr><td colspan="1" rowspan="1"><p> 社員番号 </p><p><b> 注記： </b> 「employee. id」は、「employee. id」が数値の場合に社員番号にマッピングされます。 </p></td><td colspan="1" rowspan="1"> employee. id </td><td colspan="1" rowspan="1"><em> サポート対象外 </em></td></tr><tr><td colspan="1" rowspan="1"><p> 雇用日 </p><p><em> フォーマット：YYYY-MM-DD </em></p></td><td colspan="1" rowspan="1"> hire.date </td><td colspan="1" rowspan="1"> hiredate </td></tr><tr><td colspan="1" rowspan="1"> 役職 </td><td colspan="1" rowspan="1"> title </td><td colspan="1" rowspan="1"> title </td></tr><tr><td colspan="1" rowspan="1"> 部署 </td><td colspan="1" rowspan="1"> department </td><td colspan="1" rowspan="1"> department </td></tr><tr><td colspan="1" rowspan="1"> 場所 </td><td colspan="1" rowspan="1"> location </td><td colspan="1" rowspan="1"> location </td></tr><tr><td colspan="1" rowspan="1"> 携帯電話 </td><td colspan="1" rowspan="1"> user.phone </td><td colspan="1" rowspan="1"> phone_number </td></tr><tr><td colspan="1" rowspan="1"> 固定電話 </td><td colspan="1" rowspan="1"> desk.phone </td><td colspan="1" rowspan="1"> desk_phone_number </td></tr><tr><td colspan="1" rowspan="1"><p> ロケール </p><p><b> 有効な値： </b><em> de-DE、de-AT、de-CH、en-AU、en-CA、en-150、en-HK、en-IE、en-IN、en-IL、en-MO、en-NL、en-NZ、en-SG、en-GB、en-US、en-001、es-ES、es-US、es-419、es-MX、fr-BE、fr-CA、fr-FR、fr-CH、nl-BE、nl-NL、pt-BR、pt-PT、ja-JP、zh-CN、zh-Hans-HK、zh-Hans-MO、zh-Hans-SG </em></p></td><td colspan="1" rowspan="1"> locale </td><td colspan="1" rowspan="1"> locale </td></tr><tr><td colspan="1" rowspan="1"><p> タイムゾーン </p><p><b> 有効な値： </b><a href="https://en.wikipedia.org/wiki/List_of_tz_database_time_zones" target="_blank"> tzデータベース </a> で定義されているすべてのTZ識別子 <InlineImage src="/images/kb/ja/ka0Vq000000KNbe-00N5w00000Ri7BU-0EMVq000006wbdF.jpg" /> 。 </p></td><td colspan="1" rowspan="1"> timezone </td><td colspan="1" rowspan="1"> zoneinfo </td></tr><tr><td colspan="1" rowspan="1"><p><em> Domoで定義されているすべてのカスタム属性。 </em></p><p><b> 注記 </b> ：属性は、DomoがIdPから属性値を受け入れる前にDomoで定義しておく必要があります。「 <a href="/s/article/000005164" target="_self"> 属性 </a> 」を参照してください。 </p></td><td colspan="1" rowspan="1"><em> ターゲット属性に定義されたキー </em></td><td colspan="1" rowspan="1"><em> ターゲット属性に定義されたキー </em></td></tr><tr><td colspan="1" rowspan="1"><p> ディレクトリグループ </p><p><b> 注記： </b> ユーザーがメンバーであるディレクトリグループ。 </p></td><td colspan="1" rowspan="1"> groups </td><td colspan="1" rowspan="1"> groups <a id="direct_sign_on" target="_blank"></a></td></tr></tbody></table>
+| 属性   | *SAMLアサーションまたはOIDCクレーム* |     |
+| ---- | ----------------------- | --- |
+| SAML | OIDC                    |     |
+| メール  <Note>**注記：**Domoでは、ユーザーの一意の識別子はメールアドレスです。メール属性に含まれる値は、SAMLアサーションのSAML件名の値よりも優先されます。</Note> | email | email |
+| ユーザー名  <Note>**注記：**SAMLでは、「name.personal」や「name.family」が指定されている場合、これらの値が結合され、名前で指定されているほかの値よりも優先されます。</Note><Note>**注記：**OIDCでは、その他のいくつかのクレーム（「preferred\_username」「given\_name」「family\_name」「middle\_name」「nickname」）がサポートされています。ただし、名前クレームが存在する場合は、それが優先されます。</Note> | name | name |
+| name.personal | *その他。注記を参照してください。* |
+| name.family |
+| 権限  <Note>**注記：**Domoでは、ユーザー1人につき1つの権限のみがサポートされますIdPからDomoに渡される権限の値は、Domoで定義されている権限と完全に一致する必要があります。ジャストインタイムのプロビジョニングが許可されていて、受け入れ可能な権限がIdPから提供されない場合、ユーザーはDomoインスタンスのデフォルトの権限を受け取ります。  権限の管理については[こちら](/s/article/360043438973)、デフォルトの権限については[こちら](/ja/s/article/000005839)を参照してください。</Note> | role | *サポート対象外* |
+| 2次メール | email.secondary | alternate\_email |
+| 社員ID | employee.id | sub |
+| 社員番号  <Note>**注記：**「employee.id」は、「employee.id」が数値の場合に社員番号にマッピングされます。</Note> | employee.id | *サポート対象外* |
+| 雇用日  *フォーマット：YYYY-MM-DD* | hire.date | hiredate |
+| 役職 | title | title |
+| 部署 | department | department |
+| 場所 | location | location |
+| 携帯電話 | user.phone | phone\_number |
+| 固定電話 | desk.phone | desk\_phone\_number |
+| ロケール  **有効な値：***de-DE、de-AT、de-CH、en-AU、en-CA、en-150、en-HK、en-IE、en-IN、en-IL、en-MO、en-NL、en-NZ、en-SG、en-GB、en-US、en-001、es-ES、es-US、es-419、es-MX、fr-BE、fr-CA、fr-FR、fr-CH、nl-BE、nl-NL、pt-BR、pt-PT、ja-JP、zh-CN、zh-Hans-HK、zh-Hans-MO、zh-Hans-SG* | locale | locale |
+| タイムゾーン  **有効な値：**[tzデータベース](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones)で定義されているすべてのTZ識別子  <img src="/images/kb/ja/0EMVq000006wbdF.jpg" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/>  。 | timezone | zoneinfo |
+| *Domoで定義されているすべてのカスタム属性。*  <Note>**注記：**属性は、DomoがIdPから属性値を受け入れる前にDomoで定義しておく必要があります。「[属性](/s/article/000005164)」を参照してください。</Note> | *ターゲット属性に定義されたキー* | *ターゲット属性に定義されたキー* |
+| ディレクトリグループ  <Note>**注記：**ユーザーがメンバーであるディレクトリグループ。</Note> | groups | groups |
 
-[このページのトップへ](#intro)
-
-### 直接ログインリスト
+## 直接ログインリスト
 
 適用される場合、直接ログインリストはDomoの認証情報を使用してDomoに直接ログインできるDomoユーザーを指定します。ほかのユーザーはSSO経由でログインする必要があります。直接ログインリストは、SAMLが有効で、SAMLの「ユーザーのログイン体験」が「シングルサインオン（Domoの認証画面）」か「シングルサインオン（IdPに自動リダイレクト）」に設定されている場合に適用されます。
 
-<Note>
-  **注記：** Domoの「管理者」のシステム権限を持つユーザーは、直接ログインリストに存在するかどうかにかかわらず、いつでもDomoの認証情報を使用してDomoにログインできます。
+<Note>**注記：**Domoの「管理者」のシステム権限を持つユーザーは、直接ログインリストに存在するかどうかにかかわらず、いつでもDomoの認証情報を使用してDomoにログインできます。</Note>
 
-</Note>
+Domoで直接ログインリストを設定するには、**［管理者］**>**［認証］**>**［シングルサインオン（SSO）］**>**［直接ログインリスト］**（タブ）に移動します。
 
-Domoで直接ログインリストを設定するには、 **［管理者］** > **［認証］** > **［シングルサインオン（SSO）］** > **［直接ログインリスト］** （タブ）に移動します。
+<Frame>![Screenshot](/images/kb/ja/0EMVq000006wXt0.jpg)</Frame>
 
-<Frame><img alt="" src="/images/kb/ka0Vq000000G1xp-00N5w00000Ri7BU-0EMVq000006wXt0.jpg" style={{width: 850, height: 367}}/></Frame>
 <Warning>
-  **重要な注記：**
+**重要な注記：**
 
-  * SSOと直接ログインリストの設定によっては、Domoの認証画面で、Domoの認証情報を使用してDomoにログインするオプションが提供されない場合があります。この状態の場合、直接ログインリストのユーザーおよび「管理者」のシステム権限を持つユーザーは、次のURLに移動することでDomoの認証情報を使用してDomoにログインできます：
-
-  `HTTP s:/ /{ お使いのサブドメイン }.domo. com/auth/index?domoManualLogin=true`
-  * 直接ログインリストは、SAML SSOが有効で、SAMLの「ユーザーのログイン体験」が「シングルサインオン（Domoの認証画面）」か「シングルサインオン（IdPに自動リダイレクト）」のいずれかに設定されている場合にのみ適用されます。それ以外の場合は、すべてのユーザーがDomoの認証情報を使用してDomoにログインできます。
-
+- SSOと直接ログインリストの設定によっては、Domoの認証画面で、Domoの認証情報を使用してDomoにログインするオプションが提供されない場合があります。この状態の場合、直接ログインリストのユーザーおよび「管理者」のシステム権限を持つユーザーは、次のURLに移動することでDomoの認証情報を使用してDomoにログインできます：  
+  `HTTPs://{お使いのサブドメイン}.domo.com/auth/index?domoManualLogin=true`
+- 直接ログインリストは、SAML SSOが有効で、SAMLの「ユーザーのログイン体験」が「シングルサインオン（Domoの認証画面）」か「シングルサインオン（IdPに自動リダイレクト）」のいずれかに設定されている場合にのみ適用されます。それ以外の場合は、すべてのユーザーがDomoの認証情報を使用してDomoにログインできます。
 </Warning>
 
-[このページのトップへ](#intro)
-
-日本語

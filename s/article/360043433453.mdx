@@ -1,103 +1,168 @@
 ---
-title: "NetSuite SuiteAnalytics Connector"
+title: "NetSuite SuiteAnalytics Connect Connector"
 ---
 
 ## Intro
 
-NetSuite creates products for enterprise resource planning, financial management, e-commerce, and customer relationship management. You can use Domo's NetSuite SuiteAnalytics Connect Connector to pull data from tables you have access to through NetSuite using custom SQL queries. For more information about NetSuite SuiteAnalytics, visit their website. (http://www.netsuite.com/portal/products/business-intelligence.shtml)
+**Important Notice: NetSuite SuiteAnalytics Connector Permissions**
 
-The NetSuite Suite Analytics connector is a "Cloud App" connector, meaning it retrieves data stored in the cloud. In the Data Center, you can access the connector page for this and other Cloud App connectors by clicking **Cloud App** in the toolbar at the top of the window.
+Recent changes in the NetSuite environment may cause errors when using the SuiteAnalytics connector with **non-Admin NetSuite** credentials. To resolve these errors, you can:
 
-You connect to NetSuite in the Data Center. This topic discusses the fields and menus that are specific to the NetSuite SuiteAnalytics Connect connector user interface. General information for adding DataSets, setting update schedules, and editing DataSet information is discussed in [Adding a DataSet Using a Data Connector](/s/article/360042926274 "Adding a DataSet Using a Data Connector").
+- Assign the NetSuite user an Admin-level role, or
+- Use the [NetSuite JDBC OAuth connector](/s/article/000005906).
 
-<Note>
-**Note:** This connector does not allow you to retrieve already created Saved Searches. If you need to see the same results provided by these Save Search reports in Domo, you should create a new DataSet for each raw table involved in your end results and use Domo’s ETL tools to combine these DataSets.
-</Note>
+If your existing **NetSuite SuiteAnalytics** connectors are failing because of these changes, you can watch this video tutorial ([https://youtu.be/8vQlAACY0d8](https://youtu.be/8vQlAACY0d8)) for an optional migration process to move your connectors to the NetSuite JDBC OAuth connector.
 
-<table class="mt-responsive-table" data-aura-rendered-by="33:196;a"><tbody><tr><td class="mt-noheading" rowspan="1" colspan="1">
-<p><strong>Primary Use Cases</strong></p>
-</td><td class="mt-noheading" rowspan="1" colspan="1">
-<p>Use this connector to pull data from tables you access through NetSuite using custom SQL queries.</p>
-</td></tr><tr><td class="mt-noheading" rowspan="1" colspan="1">
-<p><strong>Primary Metrics</strong></p>
-</td><td class="mt-noheading" rowspan="1" colspan="1">
-<ul><li>
-<p>Revenue</p>
-</li><li>
-<p>Cost</p>
-</li><li>
-<p>Projected Revenue</p>
-</li><li>
-<p>Customer/Lead Dates</p>
-</li></ul>
-</td></tr><tr><td class="mt-noheading" rowspan="1" colspan="1">
-<p><strong>Primary Company Roles</strong></p>
-</td><td class="mt-noheading" rowspan="1" colspan="1">
-<ul><li>
-<p>Finance (P&amp;L data)</p>
-</li><li>
-<p>Sales managers</p>
-</li></ul>
-</td></tr><tr><td class="mt-noheading" rowspan="1" colspan="1">
-<p><strong>Average Implementation Time</strong></p>
-</td><td class="mt-noheading" rowspan="1" colspan="1">
-<p>5-10 hours</p>
-</td></tr><tr><td class="mt-noheading" rowspan="1" colspan="1">
-<p><strong>Ease of Use (on a 1-to-10 scale with 1 being easiest)</strong></p>
-</td><td class="mt-noheading" rowspan="1" colspan="1">
-<p>6</p>
-</td></tr></tbody></table>
+The video also explains required query updates for NetSuite2.com. These updates are mandatory for all NetSuite connectors that query data using NetSuite2.com and are independent of permission changes.
 
+NetSuite offers enterprise resource planning, financial management, e-commerce, and customer relationship management solutions. You can use Domo's NetSuite SuiteAnalytics Connect Connector to pull data from tables you have access to through NetSuite using custom SQL queries. For more information about NetSuite SuiteAnalytics, visit their website. ([http://www.netsuite.com/portal/products/business-intelligence.shtml](http://www.netsuite.com/portal/products/business-intelligence.shtml))
+
+The NetSuite SuiteAnalytics Connect connector is a "Cloud App" connector, meaning it retrieves data from the cloud. In the Data Center, you can access the connector page for this and other Cloud App connectors by clicking **Cloud App** in the toolbar at the top of the window.
+
+You connect to NetSuite in the Data Center. This topic discusses the fields and menus that are specific to the NetSuite SuiteAnalytics Connect connector user interface. General information for adding DataSets, setting update schedules, and editing DataSet information is discussed in [Adding a DataSet Using a Data Connector](/s/article/360042926274).
+
+<Note>**Note:** This connector does not allow you to retrieve already created Saved Searches. If you need to see the same results provided by these Save Search reports in Domo, you should create a new DataSet for each raw table involved in your end results and use Domo's ETL tools to combine these DataSets.</Note>
+
+<table border="1" cellpadding="1" cellspacing="1">
+  <thead>
+    <tr>
+      <th colspan="1" rowspan="1"><p></p></th>
+      <th colspan="1" rowspan="1"><p></p></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td colspan="1" rowspan="1"><p><b>Primary Use Cases</b></p></td>
+      <td colspan="1" rowspan="1"><p>Use this connector to pull data from tables you access through NetSuite using custom SQL queries.</p></td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1"><p><b>Primary Metrics</b></p></td>
+      <td colspan="1" rowspan="1"><p>- Revenue - Cost - Projected Revenue - Customer/Lead Dates</p></td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1"><p><b>Primary Company Roles</b></p></td>
+      <td colspan="1" rowspan="1"><p>- Finance (P&L data) - Sales managers</p></td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1"><p><b>Average Implementation Time</b></p></td>
+      <td colspan="1" rowspan="1"><p>5-10 hours</p></td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1"><p><b>Ease of Use (on a 1-to-10 scale with 1 being easiest)</b></p></td>
+      <td colspan="1" rowspan="1"><p>6</p></td>
+    </tr>
+  </tbody>
+</table>
 ## Prerequisites
 
-To connect to NetSuite and create a DataSet, you must have the following:
+To connect to NetSuite SuiteAnalytics Connect and create a DataSet, you must have the following:
 
-* Access to the SuiteAnalytics API, which you or your company must have purchased already (you can check to see if you have access by opening NetSuite Help Center in your NetSuite instance)
-* Your NetSuite username and password
-* The name of your NetSuite Service Host
-* The number of your NetSuite Service Port
-* Your NetSuite DataSet
-* Your NetSuite Role ID
-* Your NetSuite Account ID
+- Access to the SuiteAnalytics API, which you or your company must have purchased already (you can check to see if you have access by opening the NetSuite Help Center in your NetSuite instance)
+- Your NetSuite username and password
+- The name of your NetSuite Service Host
+- The number of your NetSuite Service Port
+- Your NetSuite Service Data Source
+- Your NetSuite Role ID
+- Your NetSuite Account ID
 
 You can find instructions for configuring **SuiteAnalytics Connect by opening Suite Analytics (Dashboards, Searches, & Reports) > SuiteAnalytics Connect > Introducing SuiteAnalytics Connect > Getting Started**.
 
 Your Service Host, Service Port, DataSet, Role ID, and Account ID can be found in the "SuiteAnalytics Connect: JDBC Driver Setup" screen in NetSuite. Follow these instructions to access this screen:
 
-1. Sign into Netsuite at https://system.netsuite.com/pages/login.jsp.
+1. Sign in to Netsuite at [https://system.netsuite.com/pages/login.jsp](https://system.netsuite.com/pages/login.jsp).
 2. Click **Set Up SuiteAnalytics Connect**, which is located under **Settings** in the bottom left corner of the screen.
 3. Click **JDBC**.
 4. Click **Default Configuration**.
-5. Copy all of the information into the required fields in Domo.
+5. Copy all the information into the required fields in Domo.
 
 **Follow the link below for instructions to setup:**
 
 [Setup Guide](https://www.netsuite.com/help/helpcenter/en_US/srbrowser/Browser2016_1/script/record/account.html)
 
-## Connecting to NetSuite SuiteAnalytics Connect
+## Connecting to NetSuite SuiteAnalytics Connect Connector
 
-This section enumerates the options in the **Credentials** and **Details** panes in the NetSuite SuiteAnalytics Connect Connector page. The components of the other panes in this page, **Scheduling** and **Name & Describe Your DataSet**, are universal across most connector types and are discussed in greater length in [Adding a DataSet Using a Data Connector](/s/article/360042926274 "Adding a DataSet Using a Data Connector").
+This section enumerates the options in the **Credentials** and **Details** panes in the NetSuite SuiteAnalytics Connect Connector page. The components of the other panes in this page, **Scheduling** and **Name & Describe Your DataSet**, are universal across most connector types and are discussed in greater length in [Adding a DataSet Using a Data Connector](/s/article/360042926274).
 
 ### Credentials Pane
 
 This pane contains fields for entering credentials to connect to your database. The following table describes what is needed for each field:
 
-<table border="1" cellpadding="1" cellspacing="1" data-aura-rendered-by="33:195;a"><thead><tr><th colspan="1" rowspan="1"><p> Field </p></th><th colspan="1" rowspan="1"><p> Description </p></th></tr></thead><tbody><tr><td colspan="1" rowspan="1"><p> Service Host </p></td><td colspan="1" rowspan="1"><p> Enter the name of your NetSuite Service Host. For more information, see "Prerequisites," above. </p></td></tr><tr><td colspan="1" rowspan="1"><p> Service Port </p></td><td colspan="1" rowspan="1"><p> Enter your NetSuite Service Port number. For more information, see "Prerequisites," above. </p></td></tr><tr><td colspan="1" rowspan="1"><p> Service DataSet </p></td><td colspan="1" rowspan="1"><p> Enter the name of your NetSuite Service DataSet. For more information, see "Prerequisites," above. </p></td></tr><tr><td colspan="1" rowspan="1"><p> Username </p></td><td colspan="1" rowspan="1"><p> Enter your NetSuite username. </p></td></tr><tr><td colspan="1" rowspan="1"><p> Password </p></td><td colspan="1" rowspan="1"><p> Enter your NetSuite password. </p></td></tr><tr><td colspan="1" rowspan="1"><p> Role ID </p></td><td colspan="1" rowspan="1"><p> Enter your NetSuite Role ID number. For more information, see "Prerequisites," above. </p></td></tr><tr><td colspan="1" rowspan="1"><p> Account ID </p></td><td colspan="1" rowspan="1"><p> Enter your NetSuite Account ID number. For more information, see "Prerequisites," above. </p></td></tr></tbody></table>
-
-Once you have entered valid NetSuite credentials, you can use the same account any time you go to create a new NetSuite SuiteAnalytics Connect DataSet. You can manage connector accounts in the **Accounts** tab in the Data Center. For more information about this tab, see [Managing User Accounts for Connectors](/s/article/360042926054 "Managing User Accounts for Connectors").
+<table border="1" cellpadding="1" cellspacing="1">
+  <thead>
+    <tr>
+      <th colspan="1" rowspan="1"><p>Field</p></th>
+      <th colspan="1" rowspan="1"><p>Description</p></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td colspan="1" rowspan="1"><p>Service Host</p></td>
+      <td colspan="1" rowspan="1"><p>Enter the name of your NetSuite Service Host. For more information, see "Prerequisites," above.</p></td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1"><p>Service Port</p></td>
+      <td colspan="1" rowspan="1"><p>Enter your NetSuite Service Port number. For more information, see "Prerequisites," above.</p></td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1"><p>Service Data Source</p></td>
+      <td colspan="1" rowspan="1"><p>Enter the name of your NetSuite Service Data Source. For more information, see "Prerequisites," above.</p></td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1"><p>Username</p></td>
+      <td colspan="1" rowspan="1"><p>Enter your NetSuite username.</p></td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1"><p>Password</p></td>
+      <td colspan="1" rowspan="1"><p>Enter your NetSuite password.</p></td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1"><p>Role ID</p></td>
+      <td colspan="1" rowspan="1"><p>Enter your NetSuite Role ID number. For more information, see "Prerequisites," above.</p></td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1"><p>Account ID</p></td>
+      <td colspan="1" rowspan="1"><p>Enter your NetSuite Account ID number. For more information, see "Prerequisites," above.</p></td>
+    </tr>
+  </tbody>
+</table>
+Once you have entered valid NetSuite SuiteAnalytics Connect credentials, you can use the same account any time you go to create a new NetSuite SuiteAnalytics Connect DataSet. You can manage connector accounts in the **Accounts** tab in the Data Center. For more information about this tab, see [Managing User Accounts for Connectors](/s/article/360042926054).
 
 ### Details Pane
 
 In this pane you create an SQL query to retrieve data from NetSuite database tables.
 
-<table border="1" cellpadding="1" cellspacing="1" data-aura-rendered-by="33:195;a"><thead><tr><th colspan="1" rowspan="1"><p> Menu </p></th><th colspan="1" rowspan="1"><p> Description </p></th></tr></thead><tbody><tr><td colspan="1" rowspan="1"><p> Query </p></td><td colspan="1" rowspan="1"><p> Enter the Structured Query Language (SQL) query to use in selecting the data you want. For example: </p><p><span class="mt-font-courier-new"> select * from Employees </span></p><p> You can see the available columns to use in building a query by selecting the desired table in the <b> Database Tables </b> menu. The columns for that table then appear in the <b> Table Columns </b> field. </p></td></tr><tr><td colspan="1" rowspan="1"><p> Database Tables </p></td><td colspan="1" rowspan="1"><p> Select a database table to see the columns in that table in the <b> Table Columns </b> field. </p></td></tr><tr><td colspan="1" rowspan="1"><p> Table Columns </p></td><td colspan="1" rowspan="1"><p> Browse to see the available columns in the table selected in the <b> Database Tables </b> menu. You can also select columns. Selected columns appear in the sample SQL query in the <b> Query Helper </b> field. </p></td></tr><tr><td colspan="1" rowspan="1"><p> Query Helper </p></td><td colspan="1" rowspan="1"><p> Use this to help build SQL queries. When you select a column in the <b> Table Columns </b> field, a sample query referencing that column appears in this field. If you select additional columns, those columns are added to the query. You can edit the sample query as desired. Queries you build here can be copied and pasted into the <b> Query </b> field for use in retrieving data. </p></td></tr></tbody></table>
-
+<table border="1" cellpadding="1" cellspacing="1">
+  <thead>
+    <tr>
+      <th colspan="1" rowspan="1"><p>Menu</p></th>
+      <th colspan="1" rowspan="1"><p>Description</p></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td colspan="1" rowspan="1"><p>Query</p></td>
+      <td colspan="1" rowspan="1"><p>Enter the Structured Query Language (SQL) query to use in selecting the data you want. For example:  select \* from Employees  You can see the available columns to use in building a query by selecting the desired table in the <b>Database Tables</b> menu. The columns for that table then appear in the <b> Table Columns</b> field.</p></td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1"><p>Database Tables</p></td>
+      <td colspan="1" rowspan="1"><p>Select a database table to see the columns in that table in the <b>Table Columns</b> field.</p></td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1"><p>Table Columns</p></td>
+      <td colspan="1" rowspan="1"><p>Browse to see the available columns in the table selected in the <b>Database Tables</b> menu. You can also select columns. Selected columns appear in the sample SQL query in the <b> Query Helper</b> field.</p></td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1"><p>Query Helper</p></td>
+      <td colspan="1" rowspan="1"><p>Use this to help build SQL queries. When you select a column in the <b>Table Columns</b> field, a sample query referencing that column appears in this field. If you select additional columns, those columns are added to the query. You can edit the sample query as desired. Queries you build here can be copied and pasted into the <b> Query</b> field for use in retrieving data.</p></td>
+    </tr>
+  </tbody>
+</table>
 ### Other Panes
 
-For information about the remaining sections of the connector interface, including how to configure scheduling, retry, and update options, see [Adding a DataSet Using a Data Connector](/s/article/360042926274 "Adding a DataSet Using a Data Connector").
+For information about the remaining sections of the connector interface, including how to configure scheduling, retry, and update options, see [Adding a DataSet Using a Data Connector](/s/article/360042926274).
 
 ## Troubleshooting
 
-* You can find field IDs in NetSuite by clicking on a given label. For example, if you have a field whose label was changed to from "Category" to "Class," you can navigate to a customer record and click on the "Class" label. You should see “Category” as the field ID within a pop-up.
-* Even though Field IDs might display in the connector configuration, the API will not return data that a user does not have access to. Likewise, if a user has filtered settings, e.g. to only see Income Statement accounts and not Balance Sheet accounts, only permissioned data will return (so the user would not get balance sheet accounts in the DataSet). Data access is managed by a NetSuite Admin within a customer's organization.
-* You may not have access to all the available data in your NetSuite instance. If you try to pull data that you don’t have access too, you will get an error or incomplete results. If this happens, you may have to talk to a NetSuite administrator to get access to the specific data.
+- You can find field IDs in NetSuite by clicking on a given label. For example, if you have a field whose label was changed from "Category" to "Class," you can navigate to a customer record and click on the "Class" label. You should see “Category” as the field ID within a pop-up.
+- Even though Field IDs might display in the connector configuration, the API will not return data that a user does not have access to. Likewise, if a user has filtered settings, e.g., to only see Income Statement accounts and not Balance Sheet accounts, only permissioned data will return (so the user would not get balance sheet accounts in the DataSet). Data access is managed by a NetSuite Admin within a customer's organization.
+- You may not have access to all the available data in your NetSuite instance. If you try to pull data that you don't have access to, you will get an error or incomplete results. If this happens, you may have to talk to a NetSuite administrator to get access to the specific data.

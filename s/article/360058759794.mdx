@@ -1,659 +1,177 @@
 ---
-title: "Azure Data Lake Storage Gen2 Using AAD WriteBack Connector"
+title: "Power BI AAD Writeback Connector"
 ---
 
 ## Intro
 
-Azure Data Lake Storage Gen2 is one of the most productive, robust, and effective storage that provides file system semantics, file-level security, and scale. It makes Azure Storage the foundation for building enterprise data lakes on Azure. It allows you to easily manage massive amounts of data and helps to speed up your transition from proof of concept to production. Azure Data Lake Storage Gen2 is a set of capabilities dedicated to big data analytics, built on Azure Blob storage. Azure Data Lake Storage Gen2 is the result of converging the capabilities of the two existing storage services, Azure Blob storage and Azure Data Lake Storage Gen1. Use Domo's prebuilt Azure Data Lake Storage Gen2 WriteBack connector that connects with Azure Active Directory to export your data from a Domo dataset to your Azure Data Lake Storage Gen2. For more information about Azure Data Lake Gen2, see [https://docs.microsoft.com/en-us/azure/storage/blobs/data-lake-storage-introduction](https://docs.microsoft.com/en-us/azure/storage/blobs/data-lake-storage-introduction "https://docs.microsoft.com/en-us/azure/storage/blobs/data-lake-storage-introduction").
+Power BI is a business analytics service by Microsoft. It aims to provide interactive visualizations and business intelligence capabilities with an interface simple enough for end users to create their own reports and dashboards. With Domo's Power BI AAD Writeback connector, you can transfer your data from a Domo dataset to your Power BI dataset. To learn more about the Power BI API, visit their page ([https://docs.microsoft.com/en-us/rest/api/power-bi/)](https://docs.microsoft.com/en-us/rest/api/power-bi/)).
 
-You export data to an Azure Data Lake Gen2 in the Data Center. This topic discusses the fields and menus that are specific to the Azure Data Lake Gen2 Writeback connector user interface. General information for adding DataSets, setting update schedules, and editing DataSet information is discussed in [Adding a DataSet Using a Connector](https://domo-support.domo.com/s/article/360042926274?language=en_US "Adding a DataSet Using a Connector").
+You configure your Power BI AAD account in the Data Center. This topic discusses the fields and menus that are specific to the Power BI AAD Writeback connector user interface. General information for adding DataSets, setting update schedules, and editing DataSet information is discussed in [Adding a DataSet Using a Connector](/s/article/360063090013).
 
+<Note>**Note:** The owner of a writeback dataset must also be an owner or co-owner of the input dataset.</Note>
 
-<Note>
-**Note:** The owner of a writeback dataset must also be an owner or co-owner of the input dataset.
-</Note>
-
+---
 
 ## Prerequisites
 
-To configure this connector, you need the following:
+To configure this connector, you must have the following:
 
-- Your client ID (GUID) and secret key of the client web app obtained from Azure Active Directory configuration
-- Your Azure Data Lake Storage account name
-- Your Tenant ID
-- Your Container name
+- An installed Microsoft Azure app.
+- The Client ID and Client Secret for your Azure app.
+- The Tenant ID for your Azure app. This is generated when you create your Azure app.
 
-### Configuring Your Azure App
+#### **To obtain the Azure App Client ID**:
 
-To create a connection with your Microsoft Exchange Metrics account, you must first create a Microsoft Azure Web App to obtain the necessary client ID and secret.
+1. Go to [https://portal.azure.com](https://portal.azure.com/).
 
-\***\*To configure an Azure App\*\***:
+2. Select Microsoft Entra ID > Under Manage > Select App registrations.
 
-1. Login into
-   [Azure Portal](https://portal.azure.com/#home "https://portal.azure.com/#home").
-2. Select \***\*Azure Active Directory > App Registrations > New Registration\*\***.
+3. Find and click on your web app.
 
-   
-<Frame>
+4. The "application ID" is your **Client ID**.  
 
-     
-<img alt="New_registration.png" src="/images/kb/ka05w00000127Jz-00N5w00000Ri7BU-0EM5w000005vO99.png" />
+<Frame>![Screenshot](/images/kb/0EMVq00000AEULR.jpg)</Frame>
 
-   
-</Frame>
+#### **To obtain a new Azure App Client secret**:
 
+1. Go to [https://portal.azure.com](https://portal.azure.com/).
 
-3. Fill out the registration form as follows:
+2. Select Microsoft Entra ID > Under Manage > Select App registrations.
 
-   - Name: Enter name for your application.
-   - Supported account types: Select an option to specify who can use this application or access this API.
-   - Redirect URI: Enter the redirect URI. The authentication response is sent to this URI after successfully authenticating the user. Providing the URI at this stage is optional and it can be changed later, but a value is required for most of the authentication scenarios.
+3. Find and click on your web app.
 
-   
-<Frame>
+4. Under Manage > Certificates & secrets.
 
-     <img
-       alt="clipboard_eac88f9aa2966a791f11417756903afc4.png"
-       src="/images/kb/ka05w00000127Jz-00N5w00000Ri7BU-0EM5w000005vO9B.png"
-     />
-   
-</Frame>
+5. Click **+New client secret**.
 
+6. Provide the client secret description and the expiry period for your secret. Click **Add**.
 
-4. Click **\*\*\*\***Register**\*\*\*\***. An overview of your registered App will appear. The \***\*Application ID\*\*** that appears here is the \***\*Client ID\*\*** you will enter in the \***\*Credentials\*\*** pane in Domo.
+7. Your new client secret will appear. Copy it and paste in your Domo connector Client Secret field.
 
-5. Click **\*\*\*\***API Permissions >> +Add a permission**\*\*\*\***.
+<Frame>![Screenshot](/images/kb/0EMVq00000AEUbZ.jpg)</Frame>
 
-6. \***\*Request API permissions\*\*** section appears. Add the API permissions for your application.
+#### **To obtain the Tenant ID**:
 
-   
-<Frame>
+1. Login to the Azure Portal ([https://portal.azure.com](https://portal.azure.com)).
 
-     <img
-       alt="clipboard_e9ed1fc0137b700a6e1c7bb384b55b721.png"
-       src="/images/kb/ka05w00000127Jz-00N5w00000Ri7BU-0EM5w000005vO91.png"
-     />
-   
-</Frame>
+2. Navigate to Microsoft Entra ID >> Under Manage >> Properties.
 
+3. Copy the Tenant ID.
 
-7. Now, click on
-   **\*\*\*\***Certificates and secrets**\*\*\*\***. Certificates can be used as secrets to prove the application’s identity when requesting a token. Also, can be referred to as public keys.
+<Frame>![Screenshot](/images/kb/0EMVq00000AIdDF.jpg)</Frame>
 
-8. Click \***\*+ \*\***New client secret**\*\*\*\***.
+### Creating an Azure App for Enterprise OAuth
 
-   {" "}
-   
-<Frame>
+To create a Microsoft Azure app, do the following:
 
-     <img
-       alt="clipboard_ea0abe516411f9db35904232995bd00d9.png"
-       src="/images/kb/ka0Vq0000003W6b-00N5w00000Ri7BU-0EM5w000005vO93.png"
-     />
-   
-</Frame>
+1. Log into [https://portal.azure.com](https://portal.azure.com/).
 
+2. Click on **App registrations**.
 
-9. Specify the client secret description and the expiry period for your client secret, and click
-   **\*\*\*\***Add**\*\*\*\***.
+3. Click **New registration**.
 
-10. Copy the value and paste it into the
-    **\*\*\*\***Client Secret**\*\*\*\*** field in the \***\*Connector credentials\*\*** section in Domo.
+4. Enter the application name and select the supported account type as below. Enter the Redirect URI for Web as **https://oauth.domo.com/api/data/v1/oauth/providers/power-bi-writeback-aad/exchange**
 
-### Assigning a role to the Azure APP
+5. Click **Register**. Once the application is registered, you can view the Client ID (application ID), client secret, and tenant ID.
 
-1. Go to
-   **Subscriptions**.
-2. Click
-   **Access Control (IAM) > Add > Add Role Assignment**.
-3. Select the role
-   **Storage Blob data contributor**.
-4. Select your Azure Application name. You can search for your application name and select it.
-5. Click
-   **Save**.
+6. Once the application is registered, assign the required API permissions for your application.
+
+7. Click **API Permissions > +Add a permission**.
+
+8. Request API Permissions page will appear displaying the commonly used APIs.
+
+9. Select the API, and add the Delegated and Application permissions.
+
+10. Click on **Grant admin consent**, then click **Yes** to allow the admin consent for your permissions.The added permissions will appear in the **Configured permissions** section with their details.
+
+11. Now, click on **Certificates & Secrets**. Certificates can be used as secrets to prove the application's identity when requesting a token. Also, can be referred to as public keys.
+
+12. Click on **+ New Client Secret** button.
+
+13. Specify the client secret description and the expiry period for your client secret, and click **Add**.
+
+14. Copy the **value** and paste it into the **Client Secret** field in the Connector credentials section in Domo.
+
+<Frame>![Screenshot](/images/kb/0EMVq00000AEUEz.jpg)</Frame>
+
+<Note>**Note:** Ensure to copy the Value and *not* the Secret ID.</Note>
+
+### Enabling the 'Allow public client flows'
+
+1. Go to [https://portal.azure.com](https://portal.azure.com/).
+
+2. Select Microsoft Entra ID > Under Manage > Select App registrations.
+
+3. Find and click on your web app.
+
+4. Click on **Authentication**.
+
+5. Enable the following mobile and desktop flows by selecting **YES**.
+
+### Granting Admin consent in App registration
+
+1. Go to [https://portal.azure.com](https://portal.azure.com/).
+
+2. Select Microsoft Entra ID > Under Manage > Select App registrations.
+
+3. Find and click on your web app that you want to enable the admin consent for.
+
+4. Select API permissions.
+
+5. Review the permissions that the application requires. If you agree, select **Grant admin consent**.  
+
+<Frame>![API Permissions](/images/kb/0EMVq00000AETPN.jpg)</Frame>
+
+ 
 
 ## Configuring the Connection
 
-This section enumerates the options in the **\*\*\*\***Credentials**\*\*\*\*** and **\*\*\*\***Details**\*\*\*\*** panes in the Azure Data Lake Storage Gen2 WriteBack Connector page. The components of the other panes in this page, **\*\*\*\***Scheduling**\*\*\*\*** and **\*\*\*\***Name & Describe Your DataSet**\*\*\*\***, are universal across most connector types and are discussed in greater length in [Adding a DataSet Using a Connector](https://domo-support.domo.com/s/article/360042926274?language=en_US "Adding a DataSet Using a Connector").
+This section enumerates the options in the **Credentials** and **Details** panes in the Power BI AAD Writeback Connector page. The components of the other panes in this page, **Scheduling** and **Name & Describe Your DataSet**, are universal across most Connector types and are discussed in great detail in [Adding a DataSet Using a Connector](/s/article/360042926274).
 
 ### Credentials Pane
 
-This pane contains fields for entering credentials to connect to your Azure Data Lake file system (container). The following table describes what is needed for each field:
+This pane contains fields for entering credentials to connect to your Power BI account. The following table describes what is needed for each field:  
 
-
-<table border="1" cellpadding="1" cellspacing="1" data-aura-rendered-by="33:195;a">
-
-  
-<thead>
-
-    
-<tr>
-
-      
-<th colspan="1" rowspan="1">
-
-        
-<p>
- Field 
-</p>
-
-      
-</th>
-
-      
-<th colspan="1" rowspan="1">
-
-        
-<p>
- Description 
-</p>
-
-      
-</th>
-
-    
-</tr>
-
-  
-</thead>
-
-  
-<tbody>
-
-    
-<tr>
-
-      
-<td colspan="1" rowspan="1">
-
-        {" "}
-        Azure Application Client ID{" "}
-      
-</td>
-
-      
-<td colspan="1" rowspan="1">
-
-        {" "}
-        Enter the client ID (GUID) of the client web app obtained from Azure Active Directory configuration. See Prerequisites
-        for more information.{" "}
-      
-</td>
-
-    
-</tr>
-
-    
-<tr>
-
-      
-<td colspan="1" rowspan="1">
-
-        {" "}
-        Azure Application Client Secret{" "}
-      
-</td>
-
-      
-<td colspan="1" rowspan="1">
-
-        {" "}
-        Enter the secret key of the client web app. See Prerequisites for more information.{" "}
-      
-</td>
-
-    
-</tr>
-
-    
-<tr>
-
-      
-<td colspan="1" rowspan="1">
-
-        {" "}
-        Tenant ID{" "}
-      
-</td>
-
-      
-<td colspan="1" rowspan="1">
-
-        {" "}
-        Enter your Tenant ID. Go to 
-<a href="http://Portal.azure.com" rel="noopener" target="_blank">
-
-          {" "}
-          Portal.azure.com{" "}
-        
-</a>
- &gt; Azure Active Directory &gt; Properties. The Directory ID is your Tenant ID.{" "}
-      
-</td>
-
-    
-</tr>
-
-    
-<tr>
-
-      
-<td colspan="1" rowspan="1">
-
-        {" "}
-        Account Name{" "}
-      
-</td>
-
-      
-<td colspan="1" rowspan="1">
-
-        {" "}
-        Enter your Azure Data Lake storage account name.{" "}
-      
-</td>
-
-    
-</tr>
-
-    
-<tr>
-
-      
-<td colspan="1" rowspan="1">
-
-        {" "}
-        Container{" "}
-      
-</td>
-
-      
-<td colspan="1" rowspan="1">
-
-        {" "}
-        Enter your container name.{" "}
-      
-</td>
-
-    
-</tr>
-
-  
-</tbody>
-
-
+<table border="1" cellpadding="1" cellspacing="1">
+  <thead>
+    <tr>
+      <th colspan="1" rowspan="1"><p>Field</p></th>
+      <th colspan="1" rowspan="1"><p>Description</p></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td colspan="1" rowspan="1"><p>Azure App Client ID</p></td>
+      <td colspan="1" rowspan="1"><p>Enter the client ID of the client web app obtained from Azure Active Directory configuration. For more information, see "Obtaining the Azure App Client ID".</p></td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1"><p>Azure App Client Secret</p></td>
+      <td colspan="1" rowspan="1"><p>Enter the secret key of the client web app. For more information, see "Obtaining the Azure App Client Secret".</p></td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1"><p>Azure Tenant ID</p></td>
+      <td colspan="1" rowspan="1"><p>Enter your Tenant ID. For more information, see "Obtaining the Tenant ID".</p></td>
+    </tr>
+  </tbody>
 </table>
 
+For more information about obtaining these credentials, see Prerequisites, above.
 
-Once you have entered valid credentials, you can use the same account any time you go to set up a new Domo-Azure Data Lake Storage Gen2 connection. You can manage connector accounts in the **\*\*\*\***Accounts**\*\*\*\*** tab in the Data Center. For more information about this tab, see [Manage Connector Accounts](https://domo-support.domo.com/s/article/360042926054?language=en_US "Manage Connector Accounts").
+Once you have entered valid Power BI credentials, you can use the same account any time you go to set up a new Domo-Power BI connection. You can manage connector accounts in the **Accounts** tab in the Data Center. For more information about this tab, see [Manage Connector Accounts](/s/article/360042926054).
 
 ### Details Pane
 
-This pane contains a primary **\*\*\*\***Reports**\*\*\*\*** menu, along with various other menus which may or may not appear depending on the report type you select.
-
-
-<table border="1" cellpadding="1" cellspacing="1" data-aura-rendered-by="33:195;a">
-
-  
-<thead>
-
-    
-<tr>
-
-      
-<th colspan="1" rowspan="1">
-
-        
-<p>
- Menu 
-</p>
-
-      
-</th>
-
-      
-<th colspan="1" rowspan="1">
-
-        
-<p>
- Description 
-</p>
-
-      
-</th>
-
-    
-</tr>
-
-  
-</thead>
-
-  
-<tbody>
-
-    
-<tr>
-
-      
-<td colspan="1" rowspan="1">
-
-        
-<p>
- Input DataSet ID 
-</p>
-
-      
-</td>
-
-      
-<td colspan="1" rowspan="1">
-
-        
-<p>
-
-          {" "}
-          Enter the DataSet ID (GUID) for the DataSet you want to copy to the selected Azure Data Lake Storage file system
-          (container). You can find the ID by opening the details view for the DataSet in the Data Center and looking at
-          the portion of the URL following datasources/.{" "}
-        
-</p>
-
-        
-<p>
-
-          {" "}
-          Example, in the URL 
-          <a
-            href="https://mycompany.domo.com/datasources/845305d8-da3d-4107-a9d6-13ef3f86d4a4/details/overview"
-            rel="noopener"
-            target="_blank"        >
-            {" "}
-            https://mycompany.domo.com/datasources/845305d8-da3d-4107-a9d6-13ef3f86d4a4/details/overview{" "}
-          
-</a>
- , the DataSet ID is 845305d8-da3d-4107-a9d6-13ef3f86d4a4.{" "}
-        
-</p>
-
-      
-</td>
-
-    
-</tr>
-
-    
-<tr>
-
-      
-<td colspan="1" rowspan="1">
-
-        {" "}
-        File System Name{" "}
-      
-</td>
-
-      
-<td colspan="1" rowspan="1">
-
-        {" "}
-        Enter the file system name where you wish to upload the file. A file system acts as a container for your files.{" "}
-      
-</td>
-
-    
-</tr>
-
-    
-<tr>
-
-      
-<td colspan="1" rowspan="1">
-
-        {" "}
-        Select Filename{" "}
-      
-</td>
-
-      
-<td colspan="1" rowspan="1">
-
-        {" "}
-        Select whether you want to reference your DataSet using the 
-<b>
-
-          
-<b>
-
-            
-<b>
-
-              
-<b>
-
-                
-<b>
-
-                  
-<b>
-
-                    
-<b>
-
-                      
-<b>
-
-                        
-<b>
-
-                          
-<b>
-
-                            
-<b>
-
-                              
-<b>
-
-                                
-<b>
-
-                                  
-<b>
-
-                                    
-<b>
-
-                                      
-<b>
-
-                                        
-<b>
-
-                                          
-<b>
-
-                                            
-<b>
-
-                                              
-<b>
-
-                                                
-<b>
-
-                                                  
-<b>
-
-                                                    
-<b>
-
-                                                      
-<b>
-
-                                                        
-<b>
-
-                                                          
-<b>
-
-                                                            
-<b>
-
-                                                              
-<b>
-
-                                                                
-<b>
-
-                                                                  
-<b>
-
-                                                                    
-<b>
-
-                                                                      
-<b>
- Input DataSet ID 
-</b>
-
-                                                                    
-</b>
-
-                                                                  
-</b>
-
-                                                                
-</b>
-
-                                                              
-</b>
-
-                                                            
-</b>
-
-                                                          
-</b>
-
-                                                        
-</b>
-
-                                                      
-</b>
-
-                                                    
-</b>
-
-                                                  
-</b>
-
-                                                
-</b>
-
-                                              
-</b>
-
-                                            
-</b>
-
-                                          
-</b>
-
-                                        
-</b>
-
-                                      
-</b>
-
-                                    
-</b>
-
-                                  
-</b>
-
-                                
-</b>
-
-                              
-</b>
-
-                            
-</b>
-
-                          
-</b>
-
-                        
-</b>
-
-                      
-</b>
-
-                    
-</b>
-
-                  
-</b>
-
-                
-</b>
-
-              
-</b>
-
-            
-</b>
-
-          
-</b>
-
-        
-</b>
- or an output 
-<b>
-
-          
-<b>
- file name 
-</b>
-
-        
-</b>
-.{" "}
-      
-</td>
-
-    
-</tr>
-
-    
-<tr>
-
-      
-<td colspan="1" rowspan="1">
-
-        {" "}
-        Filename{" "}
-      
-</td>
-
-      
-<td colspan="1" rowspan="1">
-
-        {" "}
-        Enter the output file name for your data.{" "}
-      
-</td>
-
-    
-</tr>
-
-  
-</tbody>
-
-
-</table>
-
+This pane contains a number of fields for specifying your data and indicating where it's going.
+
+| Menu | Description |
+| --- | --- |
+| Domo Input DataSet Id | Enter your Domo dataset ID(GUID) located in the dataset URL. For example: [https://customer.domo.com/datasources/](https://customer.domo.com/datasources/)<strong>aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee</strong>/details/settings |
+| Select Group | Select the group (The workspace ID). |
+| Enter Dataset Name | Enter the dataset name in the specified group (workspace). |
+| Enter Table Name | Enter the table name to update the metadata and schema for the specified table in the dataset from My workspace. |
+| Cast Decimal to Double (checkbox) | Select this checkbox to convert the **Decimal** column from the input dataset to **Double** in Power BI. |
+| Batch Size | Set a batch size for your dataset.  Enter a batch size between **1** and **10,000**. The default is **300** records per API call.  You can adjust this setting to improve performance:   - To **reduce dataset execution time**, increase the batch size. - If you get an **Out of Memory** error, try decreasing the batch size. |
 
 ### Other Panes
 
-For information about the remaining sections of the connector interface, including how to configure scheduling, retry, and update options, see [Adding a DataSet Using a Connector](https://domo-support.domo.com/s/article/360042926274?language=en_US "Adding a DataSet Using a Connector").
+For information about the remaining sections of the connector interface, including how to configure scheduling, retry, and update options, see [Adding a DataSet Using a Connector](/s/article/360042926274).

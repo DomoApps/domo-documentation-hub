@@ -1,0 +1,822 @@
+---
+title: Domo.js (Ryuu.js)
+permalink: e947d87e17547-ryuu-js-v4
+---
+
+**Version:** **v4** | [v5](/portal/Apps/App-Framework/Tools/domo-js-v5) | [v6 (latest)](/portal/Apps/App-Framework/Tools/domo-js)
+
+> A powerful JavaScript SDK for building custom applications within the Domo platform
+
+[![npm version](https://img.shields.io/badge/npm-v4.7.0-blue?logo=npm)](https://www.npmjs.com/package/ryuu.js/v/4.7.0)
+[![TypeScript](https://img.shields.io/badge/TypeScript-Ready-blue.svg)](https://www.typescriptlang.org/)
+
+domo.js (published as `ryuu.js`) is the JavaScript SDK for building Custom Apps inside the Domo platform. Apps run inside iframes — domo.js handles authenticated HTTP requests, messaging with the parent window, and mobile WebView bridges.
+
+---
+
+## Quick Start
+
+Get started with ryuu.js in just a few lines:
+
+```javascript
+import domo from 'ryuu.js';
+
+// Fetch data from a dataset
+const data = await domo.get('/data/v1/sales');
+console.log(data); // Array of objects with your data
+
+// Listen for dataset updates
+domo.onDataUpdate((alias) => {
+  console.log(`Dataset ${alias} was updated!`);
+  loadData();
+});
+
+// Listen for filter changes
+domo.onFiltersUpdate((filters) => {
+  console.log('Filters changed:', filters);
+  applyFilters(filters);
+});
+```
+
+---
+
+## Features
+
+- **HTTP API Access** — Authenticated requests to Domo datasets, datastores, and APIs
+- **Real-time Events** — Listen for dataset updates, filter changes, and variable updates
+- **Filter Management** — Get and set page-level filters programmatically
+- **Variable Management** — Access and update page variables
+- **Custom App Data** — Send custom data between apps on the same page
+- **Navigation** — Programmatically navigate within Domo
+- **Mobile Support** — iOS and Android compatibility
+- **TypeScript Ready** — Type definitions included
+- **Zero Dependencies** — Minimal bundle size with no runtime dependencies
+
+---
+
+## Installation
+
+### NPM
+
+```bash
+npm install ryuu.js@4
+```
+
+Then import in your application:
+
+```javascript
+// ES modules
+import domo from 'ryuu.js';
+
+// CommonJS
+const domo = require('ryuu.js');
+```
+
+### CDN / Script Tag
+
+Load the library directly from a CDN. The bundle exposes a global `domo` object:
+
+```html
+<script src="https://unpkg.com/ryuu.js"></script>
+<script>
+  domo.get('/data/v1/sales').then(data => console.log(data));
+</script>
+```
+
+When using the Domo CLI, `domo init` scaffolds a local `domo.js` file you can reference with `<script src="domo.js"></script>` instead.
+
+### TypeScript
+
+TypeScript definitions are included automatically:
+
+```typescript
+import domo, { Filter, RequestOptions, DataFormats, RequestMethods } from 'ryuu.js';
+```
+
+---
+
+## Core Concepts
+
+### Architecture
+
+Your Custom App runs in an `<iframe>` inside a Domo page. domo.js establishes communication between your app and the parent Domo window using two channels:
+
+- **MessageChannel (inbound)** — The SDK creates a `MessageChannel` and transfers `port2` to the parent on subscribe. The parent sends filter updates, variable changes through `port2`; your app receives them on `port1`.
+- **`window.parent.postMessage` (outbound)** — Outbound messages (filter requests, navigate, app data) always use `window.parent.postMessage`.
+
+`domo` is a **static class** — you never call `new domo()`. All methods are called directly on the class:
+
+```javascript
+// Correct
+const data = await domo.get('/data/v1/sales');
+
+// Wrong — do not instantiate
+const instance = new domo();
+```
+
+### Environment Context
+
+`domo.env` provides access to the current user and page context, populated from iframe query parameters:
+
+```javascript
+console.log(domo.env.userId);      // Current user ID
+console.log(domo.env.customer);    // Customer name
+console.log(domo.env.pageId);      // Current page ID
+console.log(domo.env.locale);      // Locale (e.g., 'en-US')
+console.log(domo.env.environment); // Environment (e.g., 'prod')
+console.log(domo.env.platform);    // 'desktop' | 'mobile'
+```
+
+**Security Note:** Environment properties come from URL parameters and can be spoofed. Always verify with the API for secure operations:
+
+```javascript
+const verified = await domo.get('/domo/environment/v1/');
+```
+
+### Token Injection
+
+A single `MutationObserver` watches `document.documentElement` with `subtree: true`. For every DOM node added at any depth, it automatically injects the Domo session token (`ryuu_sid`) into relative `href` and `src` attributes. Token is fetched once per batch — you don't need to manage auth manually.
+
+---
+
+## API Reference
+
+### HTTP Methods
+
+All HTTP methods use `XMLHttpRequest` internally and return Promises. The auth header `X-DOMO-Ryuu-Session` is injected automatically.
+
+---
+
+#### `domo.get(url, options?)`
+
+Fetch data from a Domo dataset or API endpoint.
+
+**Parameters:**
+
+- `url` (string) — API endpoint URL
+- `options` (object, optional) — Request options
+
+**Returns:** `Promise<ResponseBody>`
+
+**Basic Usage:**
+
+```javascript
+// Returns array of objects by default
+const data = await domo.get('/data/v1/sales');
+console.log(data); // [{ id: 1, amount: 100, ... }, ...]
+```
+
+**Format Options:**
+
+```javascript
+// CSV format
+const csv = await domo.get('/data/v1/sales', { format: 'csv' });
+
+// Array of arrays with column metadata
+const arrayData = await domo.get('/data/v1/sales', { format: 'array-of-arrays' });
+console.log(arrayData.columns); // ['id', 'amount', 'date']
+console.log(arrayData.rows);    // [[1, 100, '2024-01-01'], ...]
+
+// Excel format (returns Blob)
+const excel = await domo.get('/data/v1/sales', { format: 'excel' });
+```
+
+**Supported formats:**
+
+- `'array-of-objects'` (default) — `ObjectResponseBody[]`
+- `'array-of-arrays'` — `ArrayResponseBody` with `.columns` and `.rows`
+- `'csv'` — CSV string
+- `'excel'` — Blob
+- `'plain'` — plain text string
+
+**URL Query Parameters:**
+
+In v4, query parameters must be appended directly to the URL string:
+
+```javascript
+const data = await domo.get('/data/v1/sales?limit=100&offset=0&fields=id,amount,date');
+```
+
+---
+
+#### `domo.getAll(urls, options?)`
+
+Fetch multiple endpoints in parallel and return results as an array.
+
+```javascript
+const [sales, inventory, customers] = await domo.getAll([
+  '/data/v1/sales',
+  '/data/v1/inventory',
+  '/data/v1/customers',
+]);
+
+console.log(sales);     // First dataset
+console.log(inventory); // Second dataset
+console.log(customers); // Third dataset
+```
+
+**With Options:**
+
+```javascript
+const results = await domo.getAll(['/data/v1/sales', '/data/v1/inventory'], {
+  format: 'csv',
+});
+// All results will be CSV strings
+```
+
+---
+
+#### `domo.post(url, body?, options?)`
+
+```javascript
+const result = await domo.post(
+  '/domo/datastores/v1/collections/notes/documents/',
+  { text: 'hello', pinned: false }
+);
+```
+
+---
+
+#### `domo.put(url, body?, options?)`
+
+```javascript
+await domo.put(
+  '/domo/datastores/v1/collections/notes/documents/abc123',
+  { text: 'updated' }
+);
+```
+
+---
+
+#### `domo.delete(url, options?)`
+
+```javascript
+await domo.delete('/domo/datastores/v1/collections/notes/documents/abc123');
+```
+
+---
+
+### Event Listeners
+
+All listener methods return an **unsubscribe function**. Call it to stop listening.
+
+---
+
+#### `domo.onDataUpdate(callback)`
+
+Listen for dataset update events. Called when a dataset connected to your app is refreshed.
+
+**Parameters:**
+
+- `callback` — `(alias: string) => void`
+
+**Returns:** `function` — Unsubscribe function
+
+```javascript
+const unsubscribe = domo.onDataUpdate((alias) => {
+  console.log(`Dataset "${alias}" was updated`);
+  loadData();
+});
+
+// Stop listening
+unsubscribe();
+```
+
+---
+
+#### `domo.onFiltersUpdate(callback)`
+
+Listen for page-level filter changes.
+
+**Parameters:**
+
+- `callback` — `(filters: Filter[]) => void`
+
+**Returns:** `function` — Unsubscribe function
+
+```javascript
+domo.onFiltersUpdate((filters) => {
+  console.log('Filters updated:', filters);
+
+  const categoryFilter = filters.find(f => f.column === 'category');
+  if (categoryFilter) {
+    console.log('Category values:', categoryFilter.values);
+    applyFilters(categoryFilter.values);
+  }
+});
+```
+
+**Filter object structure:**
+
+```javascript
+{
+  column: 'category',           // Column name being filtered
+  operator: 'IN',               // Filter operator
+  values: ['ALERT', 'WARNING'], // Filter values
+  dataType: 'STRING',           // STRING | NUMERIC | DATE | DATETIME
+  dataSourceId: '46d91556-...',  // Source dataset ID (optional)
+  label: 'category'             // Display label (optional)
+}
+```
+
+**Supported operators:**
+
+**String operators:**
+- `"IN"` — Value is in list
+- `"NOT_IN"` — Value is not in list
+- `"CONTAINS"` — Value contains string
+- `"NOT_CONTAINS"` — Value doesn't contain string
+- `"STARTS_WITH"` — Value starts with string
+- `"NOT_STARTS_WITH"` — Value doesn't start with string
+- `"ENDS_WITH"` — Value ends with string
+- `"NOT_ENDS_WITH"` — Value doesn't end with string
+
+**Numeric / Date operators:**
+- `"EQUALS"` — Equals value
+- `"NOT_EQUALS"` — Not equals value
+- `"GREATER_THAN"` — Greater than value
+- `"GREAT_THAN_EQUALS_TO"` — Greater than or equals value
+- `"LESS_THAN"` — Less than value
+- `"LESS_THAN_EQUALS_TO"` — Less than or equals value
+- `"BETWEEN"` — Between two values
+
+---
+
+#### `domo.onVariablesUpdated(callback)`
+
+Listen for page variable changes.
+
+**Parameters:**
+
+- `callback` — `(variables: object) => void`
+
+**Returns:** `function` — Unsubscribe function
+
+```javascript
+domo.onVariablesUpdated((variables) => {
+  console.log('Variables updated:', variables);
+
+  // Access a specific variable by its Domo function ID
+  const themeVar = variables['391'];
+  if (themeVar) {
+    const theme = themeVar.parsedExpression.value;
+    setTheme(theme);
+  }
+});
+```
+
+**Variables object structure (v4):**
+
+```javascript
+{
+  "391": {
+    "parsedExpression": {
+      "exprType": "STRING_VALUE",  // or "NUMERIC_VALUE"
+      "value": "dark"
+    }
+  },
+  "392": {
+    "parsedExpression": {
+      "exprType": "NUMERIC_VALUE",
+      "value": "9"
+    }
+  }
+}
+```
+
+Variable IDs (like `"391"`) are defined by Domo. Inspect the variables object in your app to find the correct IDs for your page variables.
+
+---
+
+#### `domo.onAppData(callback)`
+
+Listen for custom data sent by other apps on the same Domo page.
+
+**Parameters:**
+
+- `callback` — `(data: any) => void`
+
+**Returns:** `function` — Unsubscribe function
+
+```javascript
+domo.onAppData((data) => {
+  console.log('Received app data:', data);
+
+  if (data.action === 'highlight') {
+    highlightRow(data.rowId);
+  }
+});
+```
+
+---
+
+### Emitters
+
+---
+
+#### `domo.filterContainer(filters, pageStateUpdate?)`
+
+Push filter changes to the parent Domo page.
+
+**Parameters:**
+
+- `filters` (Filter[] | null, required) — Filters to apply. Pass `null` to clear all filters.
+- `pageStateUpdate` (boolean | null, optional) — When `false`, only the card-level filter state is updated (default: `null`)
+
+```javascript
+// Apply filters
+domo.filterContainer([
+  {
+    column: 'category',
+    operator: 'IN',
+    values: ['ALERT', 'WARNING'],
+    dataType: 'STRING',
+  },
+  {
+    column: 'amount',
+    operator: 'GREATER_THAN',
+    values: [1000],
+    dataType: 'NUMERIC',
+  },
+]);
+
+// Clear all filters
+domo.filterContainer(null);
+
+// Update only card-level state (not page state)
+domo.filterContainer(filters, false);
+```
+
+**Filter requirements:**
+
+All filter objects must include `column`, `operator`, `values`, and `dataType`.
+
+---
+
+#### `domo.sendVariables(variables)`
+
+Send variable updates to the parent Domo page.
+
+**Parameters:**
+
+- `variables` (Variable[]) — Array of variable objects
+
+```javascript
+domo.sendVariables([
+  { functionId: 391, value: 'dark' },
+  { functionId: 392, value: 9 },
+]);
+```
+
+**Variable object structure:**
+
+```javascript
+{
+  functionId: number,  // Variable function ID from Domo
+  value: any           // New value for the variable
+}
+```
+
+---
+
+#### `domo.sendAppData(data)`
+
+Send custom data to other apps on the same Domo page.
+
+**Parameters:**
+
+- `data` (any) — Custom data object
+
+```javascript
+domo.sendAppData({
+  action: 'highlight',
+  rowId: 123,
+  timestamp: Date.now(),
+});
+```
+
+---
+
+### Navigation
+
+#### `domo.navigate(url, isNewWindow?)`
+
+Navigate the parent Domo page from inside your app iframe.
+
+**Parameters:**
+
+- `url` (string, required) — Domo page URL or route
+- `isNewWindow` (boolean, optional) — Open in new tab (default: `false`)
+
+```javascript
+// Navigate in same window
+domo.navigate('/page/123456789');
+
+// Open in new tab
+domo.navigate('/page/123456789', true);
+```
+
+**Important Notes:**
+
+- Use `domo.navigate()` instead of HTML links to change the page hosting the custom app
+- For mobile web platforms, routes are automatically prefixed with `/m#`
+- External links are restricted to whitelisted domains (configure in Admin > Network Security > Custom Apps authorized domains)
+
+---
+
+### Environment
+
+#### `domo.env`
+
+Provides typed access to the current user, instance, and page context. Populated from iframe query parameters.
+
+```javascript
+domo.env.pageId;      // Current page ID
+domo.env.userId;      // Current user ID
+domo.env.customer;    // Customer name (instance subdomain)
+domo.env.locale;      // Locale (e.g., 'en-US')
+domo.env.environment; // Environment (e.g., 'prod', 'dev3')
+domo.env.platform;    // 'desktop' | 'mobile'
+```
+
+---
+
+### Utilities
+
+#### `domo.__util`
+
+Internal utilities exposed for advanced use cases.
+
+```javascript
+domo.__util.isSuccess(statusCode);                    // true if status is 2xx
+domo.__util.isVerifiedOrigin(origin);                 // true if origin is a trusted Domo domain
+domo.__util.getQueryParams();                         // returns current URL query params as an object
+domo.__util.setFormatHeaders(req, url, options);      // set Accept headers on an XHR request
+```
+
+**Note:** These are internal utilities and may change between versions. Use at your own risk.
+
+---
+
+## TypeScript Support
+
+TypeScript definitions are included in the package.
+
+### Importing Types
+
+```typescript
+import domo, {
+  // Interfaces
+  Filter,
+  RequestOptions,
+  ObjectRequestOptions,
+  ArrayRequestOptions,
+  QueryParams,
+  ResponseBody,
+  ObjectResponseBody,
+  ArrayResponseBody,
+
+  // Enums
+  DataFormats,
+  FilterDataTypes,
+  RequestMethods,
+} from 'ryuu.js';
+```
+
+### Typed Requests
+
+```typescript
+const options: RequestOptions = {
+  format: 'array-of-objects',
+};
+
+const data: ObjectResponseBody[] = await domo.get('/data/v1/sales', options);
+```
+
+### Typed Filters
+
+```typescript
+const filters: Filter[] = [
+  {
+    column: 'category',
+    operator: 'IN',
+    values: ['ALERT', 'WARNING'],
+    dataType: 'STRING',
+  },
+];
+
+domo.filterContainer(filters);
+```
+
+### Custom Data Types
+
+```typescript
+interface SalesRecord {
+  id: number;
+  amount: number;
+  date: string;
+  category: string;
+}
+
+const sales = (await domo.get('/data/v1/sales')) as SalesRecord[];
+```
+
+---
+
+## Mobile Platform Support
+
+domo.js detects the platform and routes messages through the appropriate bridge automatically.
+
+| Platform | Bridge used |
+| --- | --- |
+| Desktop / Web | `window.parent.postMessage` |
+| iOS | `webkit.messageHandlers` (`domofilter`, `domovariable`) |
+| Android | Global objects (`window.domofilter`, `window.domovariable`) |
+
+### iOS Integration
+
+On iOS, domo.js uses `webkit.messageHandlers` for native communication:
+
+```javascript
+// Automatically handled by domo.js
+domo.filterContainer(filters);
+// Internally uses: webkit.messageHandlers.domofilter.postMessage()
+
+domo.sendVariables(variables);
+// Internally uses: webkit.messageHandlers.domovariable.postMessage()
+```
+
+### Android Integration
+
+On Android, domo.js uses global objects injected by the native app:
+
+```javascript
+// Automatically handled by domo.js
+domo.sendVariables(variables);
+// Internally uses: window.domovariable.postMessage()
+
+domo.filterContainer(filters);
+// Internally uses: window.domofilter.postMessage()
+```
+
+### Platform Detection
+
+```javascript
+if (domo.env.platform === 'mobile') {
+  renderMobileLayout();
+} else {
+  renderDesktopLayout();
+}
+```
+
+**Mobile considerations:**
+
+- Navigation routes are automatically prefixed with `/m#` on mobile web
+- Test on actual devices or simulators — not just browser DevTools mobile emulation
+- Optimize data fetching: mobile devices have limited memory and CPU
+
+---
+
+## Error Handling
+
+All HTTP methods return Promises. In v4, errors are thrown as generic `Error` objects. Use `try/catch` with async/await:
+
+```javascript
+try {
+  const data = await domo.get('/data/v1/sales');
+  console.log('Data loaded:', data);
+} catch (error) {
+  console.error('Failed to load data:', error.message);
+}
+```
+
+**Checking error types:**
+
+In v4, the error message comes from the XHR `statusText`. Check the message string to identify specific HTTP errors:
+
+```javascript
+try {
+  const data = await domo.get('/data/v1/sales');
+} catch (error) {
+  if (error.message === 'Forbidden') {
+    showError('You do not have permission to access this dataset.');
+  } else if (error.message === 'Not Found') {
+    showError('The dataset was not found.');
+  } else if (error.message === 'Network Error') {
+    showError('A network error occurred. Check your connection.');
+  } else {
+    showError('An unexpected error occurred.');
+  }
+}
+```
+
+---
+
+## Complete Example
+
+A real-world Custom App using the v4 API:
+
+```javascript
+import domo from 'ryuu.js';
+
+class SalesDashboard {
+  constructor() {
+    this.data = [];
+    this.filters = [];
+    this.initialize();
+  }
+
+  async initialize() {
+    this.setupEventListeners();
+    await this.loadData();
+    this.render();
+  }
+
+  setupEventListeners() {
+    domo.onDataUpdate((alias) => {
+      console.log(`Dataset ${alias} updated`);
+      this.loadData();
+    });
+
+    domo.onFiltersUpdate((filters) => {
+      this.filters = filters;
+      this.applyFilters();
+    });
+
+    domo.onVariablesUpdated((variables) => {
+      // Variables keyed by function ID in v4
+      const themeVar = variables['391'];
+      if (themeVar) {
+        this.updateTheme(themeVar.parsedExpression.value);
+      }
+    });
+
+    document.getElementById('filterBtn').addEventListener('click', () => {
+      this.updateFilters();
+    });
+
+    document.getElementById('exportBtn').addEventListener('click', () => {
+      this.exportData();
+    });
+  }
+
+  async loadData() {
+    try {
+      const [sales, customers] = await domo.getAll([
+        '/data/v1/sales',
+        '/data/v1/customers',
+      ]);
+      this.data = { sales, customers };
+      this.render();
+    } catch (error) {
+      console.error('Failed to load data:', error.message);
+      this.showError('Unable to load dashboard data');
+    }
+  }
+
+  applyFilters() {
+    const categoryFilter = this.filters.find(f => f.column === 'category');
+    const filtered = categoryFilter
+      ? this.data.sales.filter(s => categoryFilter.values.includes(s.category))
+      : this.data.sales;
+    this.renderSales(filtered);
+  }
+
+  updateFilters() {
+    const selected = Array.from(
+      document.querySelectorAll('.category-checkbox:checked')
+    ).map(cb => cb.value);
+
+    domo.filterContainer([{
+      column: 'category',
+      operator: 'IN',
+      values: selected,
+      dataType: 'STRING',
+    }]);
+  }
+
+  async exportData() {
+    const csv = await domo.get('/data/v1/sales', { format: 'csv' });
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'sales-export.csv';
+    a.click();
+  }
+
+  updateTheme(theme) {
+    document.body.className = `theme-${theme}`;
+  }
+}
+
+new SalesDashboard();
+```
+
+---
+
+## Getting Help
+
+- **GitHub Issues** — [github.com/DomoApps/domo.js/issues](https://github.com/DomoApps/domo.js/issues): report bugs or browse known issues
+- **Domo Community** — [dojo.domo.com](https://dojo.domo.com): community forums and answers
+- **Related docs** — [Domo Apps CLI](/portal/Apps/App-Framework/Tools/domo-CLI) | [manifest.json reference](/portal/Apps/App-Framework/Guides/manifest) | [App Framework overview](/portal/Apps/App-Framework)

@@ -1,0 +1,66 @@
+---
+title: "Meilleures pratiques de gestion des DataSets"
+---
+
+Affichage du résumé de la page
+
+## Meilleures pratiques générales
+
+- Assurez-vous que chaque DataSet créé ou importé ait un nom et une description détaillant notamment ce qu'il contient.
+- Pour éviter la redondance, n'incluez pas le nom du connecteur utilisé dans le titre du DataSet.
+- N'ajoutez pas de plages de dates dans le nom du DataSet (par exemple, « Analyse Google 2016 »). Le planning de la plupart des DataSets étant automatisé, le nom devient vite obsolète. De même, vous n'aurez pas à renommer le DataSet en question et tous les autres en modifiant les dates incluses dans leurs noms.
+- En ce qui concerne les descriptions de DataSet, décrivez simplement les données récupérées, par exemple les dépenses, les impressions, etc. Vous pouvez préciser la fréquence de mise à jour dans la description, mais cet élément dépend généralement de son importance pour l'utilisateur cible.
+- Désignez toujours le propriétaire du DataSet. La personne en question est responsable de ces données. Lorsqu'un utilisateur configure un DataSet sans le transférer au propriétaire des données chargé de le mettre à jour, c'est le créateur de ce jeu de données (pas le propriétaire présumé) qui reçoit l'alerte en cas de problème et non pas la personne chargée des réparations.
+- Comme il est difficile d'établir la traçabilité des données au sein des DataSets, dans les descriptions de vos DataSets de DataFlow, ajoutez les jeux en entrée et en sortie de ce DataFlow pour que les futurs utilisateurs puissent retrouver les informations relatives au DataSet ou DataFlow en question. De même, ajoutez la fréquence du DataFlow en précisant s'il est automatisé ou planifié.
+
+  - **Suggestion de descriptions de DataSets de DataFlow :**
+
+    - DataSets en entrée :
+    - DataSets en sortie :
+    - Fréquence d'exécution :
+- Lorsque les DataFlows créés contiennent un champ calculé, vous pouvez ajouter un préfixe ou un suffixe (tel que « CALC ») pour faire savoir aux futurs utilisateurs que le DataFlow comprend un tel champ. Lorsqu'il est ensuite nécessaire de réparer le DataFlow, le fait de savoir qu'il comprend des calculs simplifie la résolution du problème.
+
+  - **Préfixes recommandés dans les noms et signification associée**
+
+    - PROD : production ; créer des cartes avec ce DataSet.
+    - INT : DataSet intermédiaire du DataFlow ; ajouter DataSet PROD à la description.
+    - DEV : audit des données en cours ; à remplacer par PROD une fois l'audit terminé.
+    - TEMP : utilisé pour les requêtes et tests ad hoc ; à supprimer tous les trimestres.
+    - TEST : utilisé pour tester un connecteur ou un DataSet.
+  - **Suffixe recommandé dans le nom**
+
+    - CALC : champs calculés ajoutés au cours du processus ETL.
+- Lorsque vous créez un Beast Mode, vérifiez la pertinence de l'option Partager ce calcul avant de l'activer. Si ce calcul est un champ couramment utilisé par de nombreuses personnes, le partager est une bonne idée. S'il s'agit d'une fonction ad hoc et ponctuelle, il vaut peut-être mieux ne pas la partager, car elle pourrait poser des problèmes à ceux qui ne savent pas qu'elle doit être utilisée dans un certain contexte.
+
+## Gouvernance des données
+
+- Si votre société souhaite élaborer un modèle exhaustif de gouvernance, vous avez la possibilité d'ajouter des commentaires dans le calcul Beast Mode associé à un DataSet. Ces commentaires (pour l'essentiel les métadonnées incluses dans le calcul Beast Mode lui-même) permettent d'identifier l'auteur du calcul Beast Mode, de préciser la date et de décrire le calcul. Les autres utilisateurs disposent ainsi d'informations précieuses lorsqu'ils envisagent de l'utiliser dans leurs cartes, ou savent à qui s'adresser en cas de questions.
+
+  - **Exemples de métadonnées : Auteur du calcul Beast Mode, Date de création, Brève description**
+
+/\* auteur :
+
+Date de création :
+
+Description :
+
+  \*/
+
+- Si vous effectuez un test de connexion à un nouveau DataSet, définissez-le pour qu'il se mette à jour manuellement au lieu de tenter de configurer un flux automatique. Il est préférable de ne pas charger régulièrement un jeu de données avec un test ou qui pose un problème.
+- Demandez au MajorDomo ou à un autre intervenant clé d'examiner régulièrement les DataSets afin de vérifier l'absence de toute redondance et de s'assurer que les DataSets n'incluent pas de cartes nulles ou ne sont pas associés à des DataFlows nuls.
+- Le MajorDomo peut effectuer l'audit des cartes dans le Data Center en les classant par numéro de carte. Lorsque des cartes sont associées à des DataSets nuls, vous pouvez soit les supprimer, soit contacter les propriétaires de ces DataSets pour découvrir leur raison d'être et, au besoin, leur demander de le(s) supprimer.
+- Il est un peu plus difficile d'identifier les DataFlows non utilisés au cours d'un audit, mais le fait que l'un d'entre eux n'ait pas été exécuté depuis un mois ou deux laisse généralement supposer qu'il n'est pas planifié, voire que vous pouvez le supprimer ou interroger directement son propriétaire.
+- Lorsque vous configurez la gouvernance des données, assignez individuellement chaque outil. Par exemple, vous pouvez assigner l'audit de Workbench à une personne, l'audit des données sociales à quelqu'un d'autre, l'audit des données Magic ETL à une autre personne encore, etc. Connaître le propriétaire de chaque type de données permet d'être sûr que ces ressources feront systématiquement l'objet d'un audit. Cela permet de mieux répondre aux exigences de DataSet et réduit le nombre de problèmes nécessitant l'intervention du Centre d'Excellence.
+- Mettez en place la procédure à suivre par les utilisateurs pour 
+
+  - Charger les données.
+  - Valider l'exactitude des données (dans Workbench ou dans un autre outil).
+  - Valider à nouveau les données dans Domo pour être certain que les projections de chiffres soient celles prévues.
+  - Passez chaque étape de la procédure en revue pour être certain de l'exactitude des données et pouvoir créer des cartes à partir de ces données.
+  - Après avoir validé les données, vérifiez que le Card Builder comprend le DataSet.
+  - Après la création d'une carte, demandez au propriétaire des données de la valider, car certains aspects du filtrage peuvent parfois échapper au créateur de la carte.
+
+Le fait d'imposer ces diverses étapes de validation tout au long de la procédure vous permet d'être sûr que les chiffres sont présentés comme prévu et tiennent bien compte de la structure complexe des données ou n'incluent pas des calculs qui n'ont pas de sens.
+
+- Demandez aux personnes en charge des audits de données de rechercher systématiquement les erreurs et les échecs d'exécution. Assurez-vous que ces personnes disposent des identifiants de connexion nécessaires et qu'elles peuvent accéder aux comptes en question si elles n'en sont pas propriétaires.
+- Il est recommandé d'auditer le Data Center une fois par mois et de vérifier le bon fonctionnement de tous les DataFlows et DataSets importants. De même, vérifiez que tous les identifiants de connexion fonctionnent et actualisez ceux qui sont obsolètes.

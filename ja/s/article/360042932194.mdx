@@ -4,87 +4,39 @@ title: "Amazon S3 Writebackコネクター"
 
 ## はじめに
 
-Amazon S3は、Amazon Web Servicesが提供するオンラインファイルストレージのウェブサービスです。ウェブを使用していつでも、どこからでも、どんな量のデータも保存、取得することができます。このコネクターを使用すると、Domo DataSetからAmazon S3バケットにデータをエクスポートできます。Amazon S3 APIの詳細については、製品ページ（ [http://docs.aws.amazon.com/AmazonS3/...I/Welcome.html](http://docs.aws.amazon.com/AmazonS3/latest/API/Welcome.html "http://docs.aws.amazon.com/AmazonS3/latest/API/Welcome.html") ）を参照してください。
+Amazon S3は、Amazon Web Servicesが提供するオンラインファイルストレージのウェブサービスです。ウェブを使用していつでも、どこからでも、どんな量のデータも保存、取得することができます。このコネクターを使用すると、Domo DataSetからAmazon S3バケットにデータをエクスポートできます。Amazon S3 APIの詳細については、ウェブページ（[http://docs.aws.amazon.com/AmazonS3/...I/Welcome.html ](http://docs.aws.amazon.com/AmazonS3/latest/API/Welcome.html  "http://docs.aws.amazon.com/AmazonS3/latest/API/Welcome.html ")）を参照してください。
 
-データはData CenterのS3にエクスポートします。このトピックでは、Domo to S3 Writebackコネクターユーザーインターフェースに固有のフィールドとメニューについて説明します。DataSetの追加や更新スケジュールの設定、DataSet情報の編集に関する一般的な情報は、「 [コネクターを使用してDataSetを追加する](/ja/s/article/360042926274 "コネクターを使用してDataSetを追加する") 」を参照してください。
+Data Centerで、データをS3にエクスポートします。このトピックでは、Amazon S3 Writebackコネクターユーザーインターフェースに固有のフィールドとメニューについて説明します。DataSetの追加や更新スケジュールの設定、DataSet情報の編集に関する一般的な情報は、「[コネクターを使用してDataSetを追加する](https://domo-support.domo.com/s/article/360042926274 "コネクターを使用してDataSetを追加する")」を参照してください。
 
-<Note>
-**注記：** Writeback DataSetの所有者は、入力DataSetの所有者または共同所有者である必要があります。
-
-</Note>
+<Note>**注記：**Writeback DataSetの所有者は、入力DataSetの所有者または共同所有者である必要があります。</Note>
 
 ## 必要条件
 
 このコネクターを設定するには、次の情報が必要です。
 
-* DomoクライアントIDとクライアントシークレット。
-* AWSアクセスキー。これは、AWS Consoleの
-  ****［Security Credentials］**** セクションで確認できます。または、IAMを使用している場合は、 ****［Users］**** から確認できます。
-* AWSアクセスキーの作成時に取得したAWSシークレットキー。新しいシークレットキーは、AWSコンソールで生成することができます。
-* データのプッシュ先となるAWS S3バケットの名前。
-
-DomoクライアントIDとクライアントシークレットを入手するには、次の手順を実行します。
-
-1. [Domoデベロッパーアカウント](https://developer.domo.com/login "https://developer.domo.com/login")
-   にログインします。
-2. 右上隅の
-   **［My Account］** の下にある **［New Client］** をクリックします。
-3. アプリケーション名と説明を入力します。
-4. **［Data］**
-   と **［User］** のチェックボックスを選択して、アプリケーションのスコープを指定します。
-5. **［Create］**
-   をクリックします。
-6. クライアントの作成が完了したら、
-   **［Manage Client］** をクリックすることによってクライアントを管理できるようになります。
-
-**クライアントシークレット** が **［Manage Client］** セクションに表示されます。
-
-<Warning>
-**重要** ：Amazon S3への書き込み（s3:PutObject）権限が必要です。
-
-</Warning>
+- DomoクライアントIDとクライアントシークレット。クライアントIDとシークレットを取得する方法については、[こちらの記事](/s /article/000005240# create-api-clients)を参照してください。
+- AWSアクセスキー。これは、AWSコンソールの**［Security Credentials］**セクションで確認できます。または、IAMを使用している場合は、**［Users］**の中にもあります。
+- AWSアクセスキーの作成時に取得したAWSシークレットキー。新しいシークレットキーは、AWSコンソールで生成することができます。
+- データのプッシュ先となるAWS S3バケットの名前。
 
 ## 接続を設定する
 
-このセクションでは、Domo to S3 Writebackコネクターページの **［認証情報］** および **［詳細］** ペインのオプションについて説明します。このページのほかのペインの項目である **［スケジュール設定］** や **［DataSetに名前を付け、説明を入力］** に関しては、ほとんどのタイプのコネクターで共通しています。詳細については、「 [コネクターを使用してDataSetを追加する](/ja/s/article/360042926274 "コネクターを使用してDataSetを追加する") 」を参照してください。
+このセクションでは、Amazon S3 Writebackコネクターページの**［認証情報］**および**［詳細］**ペインのオプションについて説明します。このページのほかのペインの項目である**［スケジュール設定］**や**［DataSetに名前を付け、説明を入力］**に関しては、ほとんどのタイプのコネクターで共通しています。詳細については、「[コネクターを使用してDataSetを追加する](https://domo-support.domo.com/s/article/360042926274 "コネクターを使用してDataSetを追加する")」を参照してください。
 
 ### ［認証情報］ペイン
 
-このペインには、DomoデベロッパーアカウントとS3バケットに接続するための認証情報の入力フィールドがあります。下表では、各フィールドに必要な内容を説明しています。
+このペインには、DomoデベロッパーアカウントとS3バケットに接続するための認証情報の入力フィールドがあります。以下の表で、各フィールドに必要な内容を説明しています。
 
-<table border="1" cellpadding="1" cellspacing="1" data-aura-rendered-by="33:195;a"><thead><tr><th colspan="1" rowspan="1"><p><span class="s1"> フィールド </span></p></th><th colspan="1" rowspan="1"><p><span class="s1"> 説明 </span></p></th></tr></thead><tbody><tr><td colspan="1" rowspan="1"><p> Domo Client ID </p></td><td colspan="1" rowspan="1"><p> DomoクライアントIDを入力します。 </p></td></tr><tr><td colspan="1" rowspan="1"><p> Domo Client Secret </p></td><td colspan="1" rowspan="1"><p> Domoクライアントシークレットを入力します。 </p></td></tr><tr><td colspan="1" rowspan="1"><p> Access Key </p></td><td colspan="1" rowspan="1"><p> AWSアクセスキーを入力します。 </p></td></tr><tr><td colspan="1" rowspan="1"><p> Secret Key </p></td><td colspan="1" rowspan="1"><p> AWSシークレットキーを入力します。 </p></td></tr><tr><td colspan="1" rowspan="1"><p> Bucket </p></td><td colspan="1" rowspan="1"><p> Domoデータのプッシュ先となるバケットの名前を入力します。 </p></td></tr><tr><td colspan="1" rowspan="1"><p> Region </p></td><td colspan="1" rowspan="1"><p> バケットがあるAmazon S3リージョンを選択します。 </p></td></tr></tbody></table>
+<table border="1" cellpadding="1" cellspacing="1" data-aura-rendered-by="33:195;a"> <thead> <tr> <th colspan="1" rowspan="1"> <p> <span class="s1"> フィールド </span> </p> </th> <th colspan="1" rowspan="1"> <p> <span class="s1"> 説明 </span> </p> </th> </tr> </thead> <tbody> <tr> <td colspan="1" rowspan="1"> <p> Domo Client ID </p> </td> <td colspan="1" rowspan="1"> <p> DomoクライアントIDを入力します。</p> </td> </tr> <tr> <td colspan="1" rowspan="1"> <p> Domo Client Secret </p> </td> <td colspan="1" rowspan="1"> <p> Domoクライアントシークレットを入力します。</p> </td> </tr> <tr> <td colspan="1" rowspan="1"> <p> Access Key </p> </td> <td colspan="1" rowspan="1"> <p> AWSアクセスキーを入力します。</p> </td> </tr> <tr> <td colspan="1" rowspan="1"> <p> Secret Key </p> </td> <td colspan="1" rowspan="1"> <p> AWSシークレットキーを入力します。</p> </td> </tr> <tr> <td colspan="1" rowspan="1"> <p> Bucket </p> </td> <td colspan="1" rowspan="1"> <p> Domoデータのプッシュ先となるバケットの名前を入力します。</p> </td> </tr> <tr> <td colspan="1" rowspan="1"> <p> Region </p> </td> <td colspan="1" rowspan="1"> <p> バケットがあるAmazon S3リージョンを選択します。 </p> </td> </tr> </tbody> </table>
 
-有効な認証情報を一度入力しておくと、随時同じアカウントを使用して新しいDomo-S3接続を設定できます。コネクターアカウントは、Data Centerの **［アカウント］** タブで管理できます。このタブの詳細については、「 [コネクター/アダプターアカウントを管理する](/ja/s/article/360042926054 "コネクター/アダプターアカウントを管理する") 」を参照してください。
+有効な認証情報を一度入力しておくと、随時同じアカウントを使用して新しいDomo-S3接続を設定できます。コネクターアカウントは、Data Centerの**［アカウント］**タブで管理することができます。このタブの詳細については、「[コネクター/アダプターアカウントを管理する](https://domo-support.domo.com/s/article/360042926054 "コネクター/アダプターアカウントを管理する")」を参照してください。
 
 ### ［詳細］ペイン
 
 このペインには、データを指定してデータの送信先を示すための多数のフィールドがあります。
 
-<table border="1" cellpadding="1" cellspacing="1" data-aura-rendered-by="33:195;a">
-<thead>
-<tr><th colspan="1" rowspan="1"><p> メニュー </p></th><th colspan="1" rowspan="1"><p> 説明 </p></th></tr>
-</thead>
-<tbody>
-<tr>
-<td colspan="1" rowspan="1"><p><span> How would you like to select your folder path? </span></p></td><td colspan="1" rowspan="1"><p> Amazon S3フォルダのパスをどのように選択するかを指定します。 </p><table border="1"><tbody><tr><td colspan="1" rowspan="1"> Search Folder Path </td><td colspan="1" rowspan="1"> Amazon S3バケットに保存するファイルのフォルダパスを選択します。 </td></tr><tr><td colspan="1" rowspan="1"> Enter Folder Path </td><td colspan="1" rowspan="1"> Amazon S3バケットに保存するファイルのフォルダパスを手入力します。 </td></tr><tr><td colspan="1" rowspan="1"> Parameterized Date Path </td><td colspan="1" rowspan="1"> Amazon S3バケットに保存するファイルのフォルダパスに使用する日付（特定日付または相対日付）を選択します。フォルダが（S3バケットの中に）存在しない場合、コネクターは指定された日付パラメーターでフォルダを作成します。 </td></tr></tbody></table></td>
-</tr>
-<tr>
-<td colspan="1" rowspan="1">
-<p><span> Path </span></p>
-</td>
-<td colspan="1" rowspan="1">
-<p> データの保存先に選択したAmazon S3バケット内のパスを入力します。 </p> 
-<Note>
- <div class="info-box-wrapper"><div class="info-box-icon-container"></div><div class="info-box-content-container"><div class="info-box-content"><b> 注記： </b> パスの最後に、必ずスラッシュ（ <span class="x x-first x-last"> / </span> ）を追加してください。 <p><span> 例：testFolder1/testFolder2/ </span></p></div></div></div> 
-</Note>
-
- </td>
- </tr>
- <tr><td colspan="1" rowspan="1"><p><span> Select Folder Path </span></p></td><td colspan="1" rowspan="1"><p><span> 使用するフォルダのパスを選択します。 </span></p></td></tr><tr><td colspan="1" rowspan="1"><p><span> Dates </span></p></td><td colspan="1" rowspan="1"><p><span> 日付を選択します。 </span></p></td></tr><tr><td colspan="1" rowspan="1"><p> Overwrite? </p></td><td colspan="1" rowspan="1"><p> 選択されたファイル名でAmazon S3バケットの既存のファイルを上書きするには、このチェックボックスをチェックします。 </p></td></tr><tr><td colspan="1" rowspan="1"><span> Skip Header </span></td><td colspan="1" rowspan="1"><span> 入力DataSetからヘッダをスキップしてS3オブジェクトにエクスポートするには、このボックスをチェックします。 </span></td></tr><tr><td colspan="1" rowspan="1"><span> Remove Quotes </span></td><td colspan="1" rowspan="1"><span> 入力DataSetから引用を削除してS3オブジェクトにエクスポートするには、このボックスにチェックマークを入れます。 </span></td></tr><tr><td colspan="1" rowspan="1"><span> How would you like to select your input dataset? </span></td><td colspan="1" rowspan="1"><span> DataSet IDを検索するか手入力するかを指定します。 </span></td></tr><tr><td colspan="1" rowspan="1"><p> Input DataSet ID </p></td><td colspan="1" rowspan="1"><p> S3にコピーするDataSetのDataSet ID（GUID）を入力します。Data CenterでDataSetの詳細ビューを開き、URLの <span class="mt-font-courier-new"> datasources/ </span> に続く部分を見ると、IDを見つけることができます。 </p><p> 例えば、URLが <span class="mt-font-courier-new"><span class="nowiki"><a href="https://mycompany.domo.com/datasources/845305d8-da3d-4107-a9d6-13ef3f86d4a4/details/overview" rel="noopener" target="_blank"> https://mycompany.domo.com/datasources/845305d8-da3d-4107-a9d6-13ef3f86d4a4/details/overview </a></span></span> の場合、DataSet IDは <span class="mt-font-courier-new"><b> 845305d8-da3d-4107-a9d6-13ef3f86d4a4 </b> です。 </span></p></td></tr><tr><td colspan="1" rowspan="1"><span> Dataset Id </span></td><td colspan="1" rowspan="1"><span> 使用するDataSet IDを選択します。 </span></td></tr><tr><td colspan="1" rowspan="1"><p> Select Filename </p></td><td colspan="1" rowspan="1"><p><span> 出力ファイル名の選択方法を指定します。 </span></p></td></tr><tr><td colspan="1" rowspan="1" width="198"><p> Use Input DataSet ID </p></td><td colspan="1" rowspan="1" width="426"><p> コネクターで（DataSet URL内にある）Domo DataSet IDを出力ファイル名として使用します。 </p></td></tr><tr><td colspan="1" rowspan="1" width="198"><p> Use Input DataSet Name </p></td><td colspan="1" rowspan="1" width="426"><p> コネクターで、Domo DataSet名を出力ファイル名として使用します。DataSet名がスペースなしでマクロ&lt;current_date&gt;または&lt;current_date-1&gt;を含んでいると、&lt;current_date&gt;は今日の日付に置き換えられ、&lt;current_date-1&gt;は昨日の日付に置き換えられ、-31は31日前としてyyyy-mm-ddフォーマットで置き換えられます。 </p></td></tr><tr><td colspan="1" rowspan="1" width="198"><p> Enter Filename </p></td><td colspan="1" rowspan="1" width="426"><p> DataSetを保存する出力ファイル名を入力します。 </p></td></tr><tr><td colspan="1" rowspan="1" width="198"><p> Parameterized File Name </p></td><td colspan="1" rowspan="1" width="426"><p> DataSetの保存先のファイル名に使用する日付（特定日付または相対日付）を選択します。そのファイル名が（S3バケットの中に）存在しない場合、コネクターは指定された日付パラメーターでファイル名を作成します。 </p></td></tr><tr><td colspan="1" rowspan="1"><p> Filename </p></td><td class="blob-code blob-code-inner js-file-line" colspan="1" id="LC290" rowspan="1"><p><span class="pl-s"> 出力ファイル名を入力します。 </span></p><p><span class="pl-s"> 現在の日付をファイル名に追加するには、マクロ&lt;current_date&gt;か&lt;current_date-1&gt;を使用します。 </span></p><p><span class="pl-s"> 例えば、ファイル名がdomo_&lt;current_date&gt;の場合、S3バケットで生成される出力ファイルは、domo_2019-07-16のように、domo_（yyy-mm-ddフォーマットの今日の日付）となります。 </span></p></td></tr><tr><td colspan="1" rowspan="1"><span> Only Writeback New Data </span></td><td class="blob-num js-line-number" colspan="1" id="L291" rowspan="1"><span> 入力DataSetから最後の実行データのみを取り出してS3オブジェクトにエクスポートするには、このボックスをチェックします。 </span></td></tr><tr><td colspan="1" rowspan="1"><span> File Extension </span></td><td colspan="1" rowspan="1"><span> 出力ファイルに使用する拡張子を選択します。 </span></td></tr><tr><td colspan="1" rowspan="1"><span> Enter File Extension </span></td><td colspan="1" rowspan="1"><span> ファイル拡張子を入力します。 </span></td></tr><tr><td colspan="1" rowspan="1"><span> Delimiter </span></td><td colspan="1" rowspan="1"><span> 出力ファイルの区切り文字に使用する文字を選択します。 </span></td></tr><tr><td colspan="1" rowspan="1"><span> Choose the Export Dataset Escape character </span></td><td colspan="1" rowspan="1"><span> 出力ファイルのエスケープ文字に使用する文字を選択します。 </span></td></tr><tr><td colspan="1" rowspan="1"><span> Compression </span></td><td colspan="1" rowspan="1"><span> 出力ファイルに使用する圧縮方式を選択します。 </span></td></tr><tr><td colspan="1" rowspan="1"><span> Encryption Method </span></td><td colspan="1" rowspan="1"><span> 出力ファイルに使用する暗号化のタイプを選択します。 </span></td></tr><tr><td colspan="1" rowspan="1"><span> Encryption Key </span></td><td colspan="1" rowspan="1"><span> 暗号化キーを入力します。 </span></td></tr>
- </tbody></table>
+<table border="1" cellpadding="1" cellspacing="1" data-aura-rendered-by="33:195;a"> <thead> <tr> <th colspan="1" rowspan="1"> <p> メニュー </p> </th> <th colspan="1" rowspan="1"> <p> 説明 </p> </th> </tr> </thead> <tbody> <tr> <td colspan="1" rowspan="1"> <p> <span> How would you like to select your folder path?</span> </p> </td> <td colspan="1" rowspan="1"> <p> Amazon S3フォルダのパスをどのように選択するかを指定します。</p> <table border="1"> <tbody> <tr> <td colspan="1" rowspan="1"> {" "} Search Folder Path{" "} </td> <td colspan="1" rowspan="1"> {" "} Amazon S3バケットに保存するファイルのフォルダパスを選択します。{" "} </td> </tr> <tr> <td colspan="1" rowspan="1"> {" "} Enter Folder Path{" "} </td> <td colspan="1" rowspan="1"> {" "} Amazon S3バケットに保存するファイルのフォルダパスを手入力します。{" "} </td> </tr> <tr> <td colspan="1" rowspan="1"> {" "} Parameterized Date Path{" "} </td> <td colspan="1" rowspan="1"> {" "} Amazon S3バケットに保存するファイルのフォルダパスに使用する日付（特定日付または相対日付）を選択します。フォルダが（S3バケットの中に）存在しない場合、コネクターは指定された日付パラメーターでフォルダを作成します。{" "} </td> </tr> </tbody> </table> </td> </tr> <tr> <td colspan="1" rowspan="1"> <p> <span> Path </span> </p> </td> <td colspan="1" rowspan="1"> <p> データの保存先に選択したAmazon S3バケット内のパスを入力します。</p>{" "} <Note> <div class="info-box-wrapper"> <div class="info-box-icon-container"></div> <div class="info-box-content-container"> <div class="info-box-content"> <b>注記</b>：パスの最後に、必ずスラッシュ（{" "} <span class="x x-first x-last">/）を追加してください。</span> <p> <span>例：testFolder1/testFolder2/ </span> </p> </div> </div> </div> </Note> </td> </tr> <tr> <td colspan="1" rowspan="1"> <p> <span>Select Folder Path </span> </p> </td> <td colspan="1" rowspan="1"> <p> <span>使用するフォルダパスを選択します。</span> </p> </td> </tr> <tr> <td colspan="1" rowspan="1"> <p> <span> Dates </span> </p> </td> <td colspan="1" rowspan="1"> <p> <span> 日付を選択します。</span> </p> </td> </tr> <tr> <td colspan="1" rowspan="1"> <p> Overwrite?</p> </td> <td colspan="1" rowspan="1"> <p> {" "} 選択されたファイル名でAmazon S3バケットの既存のファイルを上書きするには、このチェックボックスをチェックします。{" "} </p> </td> </tr> <tr> <td colspan="1" rowspan="1"> <span> Skip Header </span> </td> <td colspan="1" rowspan="1"> <span> 入力DataSetからヘッダーをスキップしてS3オブジェクトにエクスポートするには、このボックスをチェックします。</span> </td> </tr> <tr> <td colspan="1" rowspan="1"> <span> Remove Quotes </span> </td> <td colspan="1" rowspan="1"> <span> 入力DataSetから引用を削除してS3オブジェクトにエクスポートするには、このボックスをチェックします。</span> </td> </tr> <tr> <td colspan="1" rowspan="1"> <span> How would you like to select your input dataset?</span> </td> <td colspan="1" rowspan="1"> <span> DataSet IDを検索するか手動で入力するかを指定します。</span> </td> </tr> <tr> <td colspan="1" rowspan="1"> <p> Input DataSet ID </p> </td> <td colspan="1" rowspan="1"> <p> {" "} S3にコピーするDataSetのDataSet ID（GUID）を入力します。Data CenterでDataSetの詳細ビューを開き、URLの<span class="mt-font-courier-new"> {" "}datasources/{" "} </span>に続く箇所で、IDを見つけることができます。{" "} </p> <p> {" "}例えば、URLが<span class="mt-font-courier-new"> <span class="nowiki"> <a href="https://mycompany.domo.com/datasources/845305d8-da3d-4107-a9d6-13ef3f86d4a4/details/overview" rel="noopener" target="_blank"> {" "} https://mycompany.domo.com/datasources/845305d8-da3d-4107-a9d6-13ef3f86d4a4/details/overview{" "} </a> </span> </span>の場合、DataSet IDは<span class="mt-font-courier-new"> <b> 845305d8-da3d-4107-a9d6-13ef3f86d4a4 </b>です。{" "} </span> </p> </td> </tr> <tr> <td colspan="1" rowspan="1"> <span> Dataset Id </span> </td> <td colspan="1" rowspan="1"> <span> 使用するDataSet IDを選択します。</span> </td> </tr> <tr> <td colspan="1" rowspan="1"> <p> Select Filename </p> </td> <td colspan="1" rowspan="1"> <p> <span> 出力ファイル名の選択方法を指定します。</span> </p> </td> </tr> <tr> <td colspan="1" rowspan="1" width="198"> <p> Use Input DataSet ID </p> </td> <td colspan="1" rowspan="1" width="426"> <p> コネクターは、（DataSet URL内にある）Domo DataSet IDを出力ファイル名として使用します。</p> </td> </tr> <tr> <td colspan="1" rowspan="1" width="198"> <p> Use Input DataSet Name </p> </td> <td colspan="1" rowspan="1" width="426"> <p> {" "} コネクターは、Domo DataSet名を出力ファイル名として使用します。DataSet名がスペースなしでマクロ&lt;current_date&gt;または&lt;current_date-1&gt;を含んでいると、&lt;current_date&gt;は今日の日付に置き換えられ、&lt;current_date-1&gt;は昨日の日付に置き換えられ、-31は31日前としてyyyy-MM-ddフォーマットで置き換えられます。{" "} </p> </td> </tr> <tr> <td colspan="1" rowspan="1" width="198"> <p> Enter Filename </p> </td> <td colspan="1" rowspan="1" width="426"> <p> DataSetを保存する出力ファイル名を入力します。</p> </td> </tr> <tr> <td colspan="1" rowspan="1" width="198"> <p> Parameterized File Name </p> </td> <td colspan="1" rowspan="1" width="426"> <p> {" "} DataSetの保存先のファイル名に使用する日付（特定日付または相対日付）を選択します。そのファイル名が（S3バケットの中に）存在しない場合、コネクターは指定された日付パラメーターでファイル名を作成します。{" "} </p> </td> </tr> <tr> <td colspan="1" rowspan="1"> <p> Filename </p> </td> <td class="blob-code blob-code-inner js-file-line" colspan="1" id="LC290" rowspan="1"> <p> <span class="pl-s"> 出力ファイル名を入力します。</span> </p> <p> <span class="pl-s"> {" "} 現在の日付をファイル名に追加するには、マクロ&lt;current_date&gt;または&lt;current_date-1&gt;を使用します。{" "} </span> </p> <p> <span class="pl-s"> {" "} 例えば、ファイル名がdomo_&lt;current_date&gt;の場合、S3バケットで生成される出力ファイルは、「domo_2019-07-16」のように、domo_（yyy-mm-ddフォーマットの今日の日付）となります。{" "} </span> </p> </td> </tr> <tr> <td colspan="1" rowspan="1"> <span> Only Writeback New Data </span> </td> <td class="blob-num js-line-number" colspan="1" id="L291" rowspan="1"> <span> {" "} 入力DataSetから最後の実行データのみを取り出してS3オブジェクトにエクスポートするには、このボックスをチェックします。{" "} </span> </td> </tr> <tr> <td colspan="1" rowspan="1"> <span> File Extension </span> </td> <td colspan="1" rowspan="1"> <span> 出力ファイルに使用する拡張子を選択します。</span> </td> </tr> <tr> <td colspan="1" rowspan="1"> <span> Enter File Extension </span> </td> <td colspan="1" rowspan="1"> <span> ファイル拡張子を入力します。</span> </td> </tr> <tr> <td colspan="1" rowspan="1"> <span> Delimiter </span> </td> <td colspan="1" rowspan="1"> <span> 出力ファイルの区切り文字に使用する文字を選択します。</span> </td> </tr> <tr> <td colspan="1" rowspan="1"> <span> Choose the Export Dataset Escape character </span> </td> <td colspan="1" rowspan="1"> <span> 出力ファイルのエスケープ文字に使用する文字を選択します。</span> </td> </tr> <tr> <td colspan="1" rowspan="1"> <span> Compression </span> </td> <td colspan="1" rowspan="1"> <span> 出力ファイルに使用する圧縮方式を選択します。</span> </td> </tr> <tr> <td colspan="1" rowspan="1"> <span> Encryption Method </span> </td> <td colspan="1" rowspan="1"> <span> 出力ファイルに使用する暗号化のタイプを選択します。</span> </td> </tr> <tr> <td colspan="1" rowspan="1"> <span> Encryption Key </span> </td> <td colspan="1" rowspan="1"> <span> 暗号化キーを入力します。 </span> </td> </tr> </tbody> </table>
 
 ### その他のペイン
 
-スケジュール設定、再試行、更新オプションなど、その他のコネクターインターフェースのセクションの詳細については、「 [コネクターを使用してDataSetを追加する](/ja/s/article/360042926274 "コネクターを使用してDataSetを追加する") 」を参照してください。
-
-
+スケジュール設定、再試行、更新に関するオプションなど、コネクターインターフェースのその他のペインに表示されるオプションについては、「[コネクターを使用してDataSetを追加する](https://domo-support.domo.com/s/article/360042926274 "コネクターを使用してDataSetを追加する")」を参照してください。

@@ -1,48 +1,136 @@
 ---
-title: "ServiceNow Connector"
+title: "ServiceNowコネクター"
 ---
 
 ## はじめに
 
-ServiceNow は、IT サービスマネジメントをサポートし、共通のビジネス・プラクティスを自動化するソフトウェア プラットフォームです。 Domo の ServiceNow Connector を使用すると、リストからデータテーブルを取得したり、カスタムテーブル名を設定したりすることができます。 ServiceNow API に関する詳細は、ウェブサイトを参照してください。 ([http://wiki.servicenow.com/index.php...\_API#gsc.tab=0](http://wiki.servicenow.com/index.php?title=REST_API#gsc.tab=0 "http://wiki.servicenow.com/index.php?title=REST_API#gsc.tab=0") )
+ServiceNowは、ITサービスマネジメントをサポートし、共通のビジネスプラクティスを自動化するソフトウェアプラットフォームです。DomoのServiceNowコネクターを使用すると、リストからデータテーブルを取得したり、カスタムテーブル名を設定したりすることができます。ServiceNow APIの詳細については、ウェブサイト（[http://wiki.servicenow.com/index.php...\_API#gsc.tab=0](http://wiki.servicenow.com/index.php?title=REST_API#gsc.tab=0)）を参照してください。
 
-ServiceNow Connector は「クラウド App」です。つまり、クラウドに保管されたデータを取得します。 データセンターでは、ウィンドウ上部のツールバーで **クラウド App** をクリックすることで、これを含む他のクラウド App Connector のページにアクセスできます。
+ServiceNowコネクターは「クラウドApp」コネクターであるため、クラウドに保管されたデータの取得が可能です。Data Centerでウィンドウ上部のツールバーで**［クラウドApp］**をクリックすると、これを含むほかのクラウドAppコネクターのページにアクセスできます。
 
-ServiceNow アカウントには、 データセンター からアクセスします。 このトピックでは、ServiceNow Connector ユーザーインターフェースに固有のフィールドとメニューについて説明します。 DataSet の追加、更新スケジュールの設定及び DataSet 情報の編集に関する一般的な情報は、 [追加する](/ja/s/article/360042926274 "データ Connector を使用して DataSet を追加する") で説明しています。
+標準のServiceNowコネクターに加えて、Domoは「ServiceNow Upsert」コネクターも提供しています。このコネクターは、「追加」と「置き換え」のほかに「Upsert」の更新オプションがある点を除いて、標準のServiceNowコネクターとまったく同じものです。このオプションについては、この記事の「その他のペイン」で説明します。
+
+ServiceNowアカウントには、Data Centerからアクセスします。このトピックでは、ServiceNowコネクターユーザーインターフェースに固有のフィールドとメニューについて説明します。DataSetの追加や更新スケジュールの設定、DataSet情報の編集に関する一般的な情報は、「[コネクターを使用してDataSetを追加する](/s/article/360042926274)」を参照してください。
+
+|                               |                                                                                                                    |
+| ----------------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| **主な使用事例**                    | - インシデントのトレンドを監視し、インシデント数を減らす方法を特定します。 - 変更リクエストの量を追跡し、変更リクエストプロセスのボトルネックを取り除きます。 - 問題の送信数を追跡し、インシデント数との関係を探します。   |
+| **主なメトリクス**                   | - オープンな高優先度インシデント - インシデントのトレンド - インシデントの平均解決時間（MTTR） - 重大度、優先度、影響、緊急度別のインシデント量 - 変更量のトレンド - オープンな緊急の変更 - 問題量のトレンド |
+| **社内における主な権限**                | ITサービスデスクマネージャー                                                                                                    |
+| **平均導入時間**                    | 3時間                                                                                                                |
+| **使いやすさ（1～10段階。1が「最も使いやすい」）** | 5                                                                                                                  |
+
+## ベストプラクティス
+
+インシデント、問題、変更リクエストのステータスの正確かつ最新の状況を継続的に把握できるように、短い間隔でレポートのスケジュールを設定します。
 
 ## 必要条件
 
-ServiceNow アカウントに接続して DataSet を作成するには、ServiceNow のユーザー名とパスワードが必要です。 ServiceNow サーバーの URL も必要になります。 これは、通常次のフォーマットになります：
+ServiceNowアカウントに接続してDataSetを作成するには、ServiceNowのユーザー名とパスワードが必要です。ServiceNowサーバーのURLも必要になります。通常は、https://mycompany.servicenow.comのフォーマットです。
 
-https://mycompany.servicenow.com
-。
+## ServiceNowアカウントに接続する
 
-## ServiceNow アカウントに接続する
+このセクションでは、ServiceNowコネクターページの**［認証情報］**および**［詳細］**ペインについて説明します。このページのほかのペインの項目である**［スケジュール設定］**や**［DataSetに名前を付け、説明を入力］**に関しては、ほとんどのタイプのコネクターで共通しています。詳細については、「[コネクターを使用してDataSetを追加する](/s/article/360042926274)」を参照してください。
 
-このセクションでは、ServiceNow Connector ページの **認証情報** および **詳細** ペインについて説明します。 このページの他のペインの項目である **スケジュール設定** や **DataSet の名前と説明** に関しては、ほとんどのタイプの Connector で共通しており、 [追加する](/ja/s/article/360042926274 "データ Connector を使用して DataSet を追加する") でより詳細に説明しています。
+### ［認証情報］ペイン
 
-### 認証情報ペイン
+このペインには、ServiceNowアカウントにアクセスするための認証情報を入力するフィールドがあります。下表では、各フィールドに必要な内容を説明しています。
 
-このペインには、ServiceNow アカウントにアクセスするための認証情報を入力するフィールドがあります。 下表では、各フィールドに必要な内容を説明しています：
+| フィールド    | 説明                                                           |
+| -------- | ------------------------------------------------------------ |
+| Host URL | ServiceNowサーバーのURLを入力します。例：https://mycompany.servicenow.com。 |
+| Username | ServiceNowのユーザー名を入力します。正確な日付を得るには、タイムゾーンをGMT時間に設定する必要があります。  |
+| Password | ServiceNowパスワードを入力します。                                       |
 
-<table border="1" cellpadding="1" cellspacing="1" data-aura-rendered-by="33:195;a"><thead><tr><th colspan="1" rowspan="1"><p> フィールド </p></th><th colspan="1" rowspan="1"><p> 説明 </p></th></tr></thead><tbody><tr><td colspan="1" rowspan="1"> ホスト URL </td><td colspan="1" rowspan="1"> ServiceNow サーバーの URL を入力します。例： <span class="mt-font-courier-new"><span class="nowiki"><a href="https://mycompany.servicenow.com" rel="noopener" target="_blank"> https://mycompany.servicenow.com </a></span> 。 </span></td></tr><tr><td colspan="1" rowspan="1"><p> ユーザー </p></td><td colspan="1" rowspan="1"><p> ServiceNow のユーザー名を入力します。 </p></td></tr><tr><td colspan="1" rowspan="1"><p> パスワード </p></td><td colspan="1" rowspan="1"><p> ServiceNow パスワードを入力します。 </p></td></tr></tbody></table>
+有効なServiceNow認証情報を一度入力しておくと、随時同じアカウントを使用して新しいServiceNow DataSetを作成することができます。コネクターのアカウントはData Centerの**［アカウント］**タブで管理できます。このタブの詳細については、「[コネクター/アダプターアカウントを管理する](/s/article/360042926054)」を参照してください。
 
-有効な認証情報を一度入力しておくと、いつでも同じアカウントを使用して新しい ServiceNow DataSet を作成することができます。 Connector アカウントは データセンター の **アカウント** タブで管理することができます。 このタブに関する詳細については、 [Connector のユーザーアカウントを管理する](/ja/s/article/360042926054 "Connector のユーザーアカウントを管理する") を参照してください。
+<Note>**注記：**接続されたServiceNowのユーザーアカウントは、*必ず*グリニッジ標準時（GMT）に設定する必要があります。別のタイムゾーンに設定すると、問題が発生します。自分のプロフィールのタイムゾーンを編集するには、以下を行います。 </Note>
 
-<Note>
+1. ServiceNowにログインしたら、**［Self Service］>［My Profile］**まで進みます。
+2. **［Time Zone］**プロパティに進みます。
+3. タイムゾーンに**［GMT］**を選択します。
 
-**注記：** 接続された ServiceNow のユーザーアカウントは、 *必ず* グリニッジ標準時 (GMT) に設定する必要があります。そうしないと、問題が発生します。 自分のプロフィールのタイムゾーンを編集するには、以下を行います：
+### ［詳細］ペイン
 
-1. ServiceNow にログインしたら、**Self Service > My Profile** まで進みます。
-2. **Time Zone** というプロパティに進みます。
-3. タイムゾーンに **GMT** を選びます。
+このペインには、メインの**［Report］**メニューがあり、そこで引き出したいテーブルのタイプを選択することができます。選択したテーブルタイプによっては、ほかのオプションも表示される場合があります。
 
-</Note>
+| メニュー | 説明  |
+| ---- | --- |
+| Report | ServiceNowレポートを選択します。以下のレポートが利用できます。<table><tbody><tr><td>Custom Query</td><td>カスタムクエリを作成します。どのフィールドがDataSetに返されるかを選べる機能が含まれます。</td></tr><tr><td>Custom Table</td><td>データを取得するためのカスタムテーブル名を設定します。</td></tr><tr><td>Standard Table</td><td>Service Nowの標準テーブルのリストから選択します。</td></tr></tbody></table> |
+| Table | データを取得したいServiceNowのテーブルを選択します。次のテーブルが利用できます。<table><tbody><tr><td>Incident</td><td>インパクト、緊急性、説明、クローズノートなど、特定の日付範囲におけるインシデントに関するデータを取得します。</td></tr><tr><td>Change Request</td><td>特定の日付範囲における変更リクエストを取得します。</td></tr><tr><td>Problem</td><td>特定の日付範囲において発生した問題に関するデータを取得します。</td></tr><tr><td>User Groups</td><td>特定の日付範囲におけるユーザーグループに関するデータを取得します。</td></tr><tr><td>Users</td><td>特定の日付範囲におけるユーザーに関するデータを取得します。</td></tr></tbody></table> |
+| Table Name | データを取得したいテーブルの名前を入力します。 |
+| Custom Query | カスタムクエリを入力します。sysparm\_queryに直接関係するクエリ値だけを入力するようにします。sysparm\_limitとsysparm\_offsetのフィールドは含めないようにします。フィールドsys\_created\_onを含める場合は、その値は次のフォーマットである必要があります：yyyy-MM-dd HH:mm:ss  例：  ORDERBYDESCsys\_created\_on^sys\_created\_on>2016-09-25+00:00:00^sys\_created\_on\<2016-09-27+23:59:59  クエリの構築方法の詳細については、ウェブサイト（[http://wiki.servicenow.com/index.php...le\_API#Methods](http://wiki.servicenow.com/index.php?title=Table_API#Methods)）を参照してください。  <Warning>**重要：**カスタムクエリを作成する場合は、sysparm\_queryに直接関係するクエリ値だけを入力するようにします。sysparm\_limitとsysparm\_offsetのフィールドは含めないようにします。フィールドsys\_created\_onを含める場合は、その値は次のフォーマットである必要があります：yyyy-MM-dd HH:mm:ss。</Warning> |
+| Fields | このDataSetとともに返すフィールドを、カンマ区切りのリストとして入力します。  例：  `parent,sys_updated_on,number` |
+| Data Date Format | ServiceNow APIが日付フィールドを返すフォーマットを選択します。文字列を選択すると、Domoはまったく日付を処理せずに、ServiceNow APIから返されたリテラル文字列を返します。 |
+| Upsert/Merge Key | Upsert/結合キーを入力します。デフォルトでは、sys\_idがUpsert/結合キーとして使用されます。 |
+| Select Date Type for Query<table><tbody><tr><td>**更新方法**</td><td>**説明**</td></tr><tr><td>---</td><td>---</td></tr><tr><td>**最初の実行**</td><td>選択した期間のクエリを選択した日付タイプで作成します。</td></tr><tr><td>**連続実行**</td><td>最後に正常に実行された日から今日までのクエリを**sys\_updated\_on**で作成し、既存のデータに追加します。</td></tr><tr><td>---</td><td>---</td></tr><tr><td>**最初の実行**</td><td>選択した期間のクエリを選択した日付タイプで作成します。</td></tr><tr><td>**連続実行**</td><td>最後に正常に実行された日から今日までのクエリを**sys\_updated\_on**で作成し、既存のデータに結合します。</td></tr></tbody></table> | Append |
+| Duration | レポートの期間を選択します（単一の日付または日付範囲）。 |
+| Report Date | データの対象を特定の日付にするか相対的な日付にするかを指定します。現在の日付から特定の日数を遡ったデータ（**［Days Back］**で指定）をレポートで取得したい場合は、**［Relative］**を選択します。例えば、**［Days Back］**に「5」を入力し、DataSetを毎日更新するように設定した場合、日が更新されるたびにその日から5日前の日付の情報が表示されます。 |
+| Select Specific Date | データを取得する日付を選択します。 |
+| Days Back | レポートで、現在の日付から過去何日分を表示するかを入力します。 |
+| Start Date | 日付範囲の開始日を、特定日付とするか相対日付とするかを指定します。現在の日付から特定の日数を遡ったデータ（**［Days Back to Start From］**で指定）をレポートで取得したい場合は、**［Relative］**を選択します。ここで**［Relative］**を選択した場合、**［End Date］**にも**［Relative］**を選択し、**［Days Back to End At］**を指定する必要があります。  例えば、**［Days Back to Start From］**に「10」を入力し、**［Days Back to End At］**に「5」を入力し、そのDataSetを毎日更新するように設定した場合、日が更新されるたびにその日の5日前から10日前までの情報が表示されます。 |
+| Select Specific Start Date | 日付範囲の最初の日付を選択します。 |
+| End Date | 日付範囲の最終日を、特定日付とするか相対日付とするかを指定します。現在の日付から特定の日数を遡ったデータ（**［Days Back to End At］**で指定）をレポートで取得したい場合は、**［Relative］**を選びます。ここで**［Relative］**を選択した場合、**［Start Date］**にも**［Relative］**を選択し、**［Days Back to Start From］**を指定する必要があります。  例えば、**［Days Back to Start From］**に「10」を入力し、**［Days Back to End At］**に「5」を入力し、そのDataSetを毎日更新するように設定した場合、日が更新されるたびにその日の5日前から10日前までの情報が表示されます。 |
+| Select Specific End Date | 日付範囲の最終日を選択します。 |
+| Days Back to Start From | 開始日として使用する現在の日付前の日数を入力します。  例えば、**［Days Back to Start From］**に「10」を入力し、**［Days Back to End At］**に「5」を入力し、そのDataSetを毎日更新するように設定した場合、毎日、その日の5日前から10日前までの情報が表示されます。 |
+| Days Back to End At | 終了日として使用する現在の日付前の日数を入力します。  例えば、**［Days Back to Start From］**に「10」を入力し、**［Days Back to End At］**に「5」を入力し、そのDataSetを毎日更新するように設定した場合、毎日、その日の5日前から10日前までの情報が表示されます。 |
 
-### 詳細ペイン
+### その他のペイン
 
-このペインには、メインの **レポート** というメニューがあり、そこで引き出したいテーブルのタイプを選択することができます。 選択したテーブルタイプによっては、他のオプションも表示される場合があります。
+このコネクターの「Upsert」バージョンには、標準の「置き換え」と「追加」に加えて、**［Upsert］**の更新オプションが含まれています。このオプションを選択すると、システムが古いデータの照合に使用するUpsertキーを提供するよう求められます。既存のデータ行でそのキーを使用しているものがある場合は、それらの行は新しい行としてDataSetに追加されるのではなく、新しいデータで置き換えられます。
 
-<table border="1" cellpadding="1" cellspacing="1" data-aura-rendered-by="33:195;a"><thead><tr><th colspan="1" rowspan="1"><p> メニュー </p></th><th colspan="1" rowspan="1"><p> 説明 </p></th></tr></thead><tbody><tr><td colspan="1" rowspan="1"><p> レポート </p></td><td colspan="1" rowspan="1"><p> ServiceNow レポートを選択します。 以下のレポートが利用できます： </p><table border="1" cellpadding="1" cellspacing="1"><tbody><tr><td colspan="1" rowspan="1"> 標準テーブル </td><td colspan="1" rowspan="1"><p> Service Now の標準テーブルのリストからテーブルを選択します。 <b></b> テーブルは、 <b> テーブル </b> メニューで選択します。 </p></td></tr><tr><td colspan="1" rowspan="1"> カスタムテーブル </td><td colspan="1" rowspan="1"> データを取得するためのカスタムテーブル名を設定します。 </td></tr><tr><td colspan="1" rowspan="1"> カスタムクエリ </td><td colspan="1" rowspan="1"> カスタムクエリを作成します。 どのフィールドが DataSet に返されるかを選べる機能が含まれます。 </td></tr></tbody></table></td></tr><tr><td colspan="1" rowspan="1"> テーブル </td><td colspan="1" rowspan="1"><p> データを取得したい ServiceNow のテーブルを選択します。 次のテーブルが利用できます： </p><table border="1" cellpadding="1" cellspacing="1" class="mt-responsive-table"><tbody><tr><td class="mt-noheading" colspan="1" rowspan="1"> インシデント </td><td class="mt-noheading" colspan="1" rowspan="1"> インパクト、緊急性、説明、クローズノートなど、特定の日付範囲におけるインシデントに関するデータを取得します。 </td></tr><tr><td class="mt-noheading" colspan="1" rowspan="1"> 変更リクエスト </td><td class="mt-noheading" colspan="1" rowspan="1"> 特定の日付範囲における変更リクエストを取得します。 </td></tr><tr><td class="mt-noheading" colspan="1" rowspan="1"> 問題 </td><td class="mt-noheading" colspan="1" rowspan="1"> 特定日付範囲において発生した問題に関するデータを取得します。 </td></tr><tr><td class="mt-noheading" colspan="1" rowspan="1"> ユーザーグループ </td><td class="mt-noheading" colspan="1" rowspan="1"> 特定の日付範囲におけるユーザーグループに関するデータを取得します。 </td></tr><tr><td class="mt-noheading" colspan="1" rowspan="1"> ユーザー </td><td class="mt-noheading" colspan="1" rowspan="1"> 特定の日付範囲におけるユーザーに関するデータを取得します。 </td></tr></tbody></table></td></tr><tr><td colspan="1" rowspan="1"> テーブルの名前 </td><td colspan="1" rowspan="1"> データを取得したいテーブルの名前を入力します。 </td></tr><tr><td colspan="1" rowspan="1"> カスタムクエリ </td><td colspan="1" rowspan="1"><p><span class="mt-color-#333333"><span class="mt-font-Open Sans,sans-serif"> カスタムクエリを入力します。 <span class="mt-font-courier-new"> sysparm_query </span> に直接関係するクエリ値だけを入力するようにします。 <span class="mt-font-courier-new"> sysparm_limit </span> と <span class="mt-font-courier-new"> sysparm_offset </span> のフィールドは含めないようにします。 フィールド <span class="mt-font-courier-new"> sys_created_on </span> を含める場合は、その値は次のフォーマットである必要があります： <span class="mt-font-courier-new"> yyyy-MM-dd HH:mm:ss </span></span></span></p><p><span class="mt-color-#333333"><span class="mt-font-inherit"> 例： </span></span></p><p><span class="mt-font-courier-new"><span class="mt-color-#333333"><span class="mt-font-Open Sans,sans-serif"> ORDERBYDESCsys_created_on^sys_created_on&gt;2016-09-25+00:00:00^sys_created_on&lt;2016-09-27+23:59:59 </span></span></span></p><p><span class="mt-color-#333333"><span class="mt-font-Open Sans,sans-serif"> クエリの構築については、こちらを参照してください </span></span><a href="http://wiki.servicenow.com/index.php?title=Table_API#Methods" target="_blank" title="http://wiki.servicenow.com/index.php?title=Table_API#Methods"> http://wiki.servicenow.com/index.php...le_API#Methods </a> 。 </p></td></tr><tr><td colspan="1" rowspan="1"> フィールド </td><td colspan="1" rowspan="1"><p> この DataSet と共に返すフィールドを、カンマ区切りのリストとして入力します。 </p><p> 例： </p><p><code> parent,sys_updated_on,number </code></p></td></tr><tr><td colspan="1" rowspan="1"> 期間 </td><td colspan="1" rowspan="1"> レポートのデータが、1 日または複数日を対象にしたものかを指定します。 </td></tr><tr><td colspan="1" rowspan="1"> レポートの日付 </td><td colspan="1" rowspan="1"> データが特定の日付のものか相対的な日付を対象にしたものかを指定します。 現在の日付から特定の日数を遡ったデータ（ <b> 遡る日数 </b> で指定）をレポートで取得したい場合は、 <b> 相対 </b> を選びます。 例えば、 <b> 遡る日数 </b> に <span class="mt-font-courier-new"> 5 </span> を入力し、DataSet を毎日更新するように設定した場合、日が更新される度にその日から 5 日前の日付の情報が表示されます。 </td></tr><tr><td colspan="1" rowspan="1"> 特定の日付を選択 </td><td colspan="1" rowspan="1"> データを取得する日付を選択します。 </td></tr><tr><td colspan="1" rowspan="1"> 遡る日数 </td><td colspan="1" rowspan="1"> レポートで、現在の日付から過去何日分を表示するかを入力します。 </td></tr><tr><td colspan="1" rowspan="1"> 開始日 </td><td colspan="1" rowspan="1"><p> 日付範囲の第 1 日目が特定日付か相対日付かを指定します。 現在の日付から特定の日数を遡ったデータ（ <b> 開始日まで遡る日数 </b> で指定）をレポートで取得したい場合は、 <b> 相対 </b> を選びます。 ここで <b> 相対 </b> を選択した場合、 <b> 終了日 </b> にも <b> 相対 </b> を選択し、 <b> 終了日まで遡る日数 </b> を指定する必要があります。 </p><p> 例えば、 <b> 開始日まで遡る日数 </b> に <span class="mt-font-courier-new"> 10 </span> を入力し 、 <b> 終了日まで遡る日数 </b> に <span class="mt-font-courier-new"> 5 </span> を入力し、その DataSet を毎日更新するように設定した場合、日が更新される度にその日の 5 日前から 10 日前までの情報が表示されます。 </p></td></tr><tr><td colspan="1" rowspan="1"> 特定の開始日を選択 </td><td colspan="1" rowspan="1"> 日付範囲の第 1 日目の日付を選択します。 </td></tr><tr><td colspan="1" rowspan="1"> 終了日 </td><td colspan="1" rowspan="1"><p> 日付範囲の最終日が特定の日か、相対日付かを指定します。 現在の日付から特定の日数を遡ったデータ（ <b> 終了日まで遡る日数 </b> で指定）をレポートで取得したい場合は、 <b> 相対 </b> を選びます。 ここで <b> 相対 </b> を選択した場合、 <b> 開始日 </b> にも <b> 相対 </b> を選択し、 <b> 開始日まで遡る日数 </b> に数値を指定する必要があります。 </p><p> 例えば、 <b> 開始日まで遡る日数 </b> に <span class="mt-font-courier-new"> 10 </span> を入力し 、 <b> 終了日まで遡る日数 </b> に <span class="mt-font-courier-new"> 5 </span> を入力し、その DataSet を毎日更新するように設定した場合、日が更新される度にその日の 5 日前から 10 日前までの情報が表示されます。 </p></td></tr><tr><td colspan="1" rowspan="1"> 特定の終了日を選択 </td><td colspan="1" rowspan="1"> 日付範囲の最終日を選択します。 </td></tr><tr><td colspan="1" rowspan="1"> 開始日まで遡る日数 </td><td colspan="1" rowspan="1"><p> 開始日として使用する現在の日付前の日数を入力します。 </p><p> 例えば、 <b> 開始日まで遡る日数 </b> に <span class="mt-font-courier-new"> 10 </span> を入力し、 <b> 終了日まで遡る日数 </b> に <span class="mt-font-courier-new"> 5 </span> を入力し、その DataSet を毎日更新するように設定した場合、毎日レポートが更新され、10 日前から 5 日前までの 5 日間の範囲で情報が表示されます。 </p></td></tr><tr><td colspan="1" rowspan="1"> 終了日までの日数 </td><td colspan="1" rowspan="1"><p> 終了日として使用する現在の日付前の日数を入力します。 </p><p> 例えば、 <b> 開始日まで遡る日数 </b> に <span class="mt-font-courier-new"> 10 </span> を入力し、 <b> 終了日まで遡る日数 </b> に <span class="mt-font-courier-new"> 5 </span> を入力し、その DataSet を毎日更新するように設定した場合、毎日レポートが更新され、10 日前から 5 日前までの 5 日間の範囲で情報が表示されます。 </p></td></tr></tbody></table>
+混乱を避けるために、様々な列番号と各種列データタイプを持つスキーマの保存について以下に説明します。
 
+- Domoでは古いスキーマが保持されます。これは、ユーザーが間違って元のスキーマとは異なるスキーマを返し、古いスキーマを使用しているすべてのアセットを破損してしまうことを防ぐためです。
+- クエリが以前に入力されたフィールドを返さない場合、DataSet内のフィールドは空白になりますが、削除はされません。
+- Domoは、取り込みの際に列のデータタイプを推測しようとします。データタイプを変更しないようにコネクターに指示することもできますが、フィールドを受け取る前にフィールドのインサイトが得られないカスタムクエリの場合は、推奨されません。例えば、最初の実行時に受け取ったのが数値だったため、その列が数値であるとコネクターが最初に推測するとします。次の実行時に文字と数値が含まれるものをクエリが返した場合、コネクターは列を数値ではなく文字列として認識するため、エラーが発生します。
+- コネクターは、APIが送信するフィールドを取り込みます。そのため、APIがフィールドを送信しない場合、コネクターはそれを取り込むことができません。
 
+スケジュール設定、再試行、更新に関するオプションなど、コネクターインターフェースのその他のペインに表示されるオプションについては、「[コネクターを使用してDataSetを追加する](/s/article/360042926274)」を参照してください。
+
+### よくある質問
+
+<AccordionGroup>
+
+<Accordion title="このコネクターはホワイトリスト登録（許可リスト登録）が必要ですか？">
+起動するには、ネットワークのホワイトリストにコネクターを追加する必要があります。  
+また、ITチームと協力して[ネットワークの許可リストにDomoのIPを追加する](/s/article/360043630093)ことで、コネクターがServiceNowインスタンスと通信できるようにDomoのコネクターを許可する必要があります。
+</Accordion>
+
+<Accordion title="このコネクターではどのバージョンのServiceNow APIを使用しますか？">
+このコネクターは、ServiceNow APIのバージョン1（https://{ホスト名}/api/now/v1）を使用します。
+</Accordion>
+
+<Accordion title="各レポートによってこのコネクターで呼び出されるのはどのエンドポイントですか？">
+| レポート名          | エンドポイントURL     |
+| -------------- | -------------- |
+| Custom Query   | /table/{テーブル名} |
+| Custom Table   | /table/{テーブル名} |
+| Standard Table | /table/{テーブル名} |
+</Accordion>
+
+<Accordion title="このコネクターを使用するにはどのような認証情報が必要ですか？">
+ホストURL（例：https://mycompany.service-now.com）と、ServiceNowインスタンスへのログインに使用するユーザー名とパスワードが必要です。
+</Accordion>
+
+<Accordion title="コネクターを設定するには、データサービスの特定の種類のアカウントが必要ですか？">
+アカウントには適切な権限が必要で、アクセスしようとしているテーブルでウェブサービスが有効になっている必要があります。
+</Accordion>
+
+<Accordion title="コネクターを作成するにはほかに何をする必要がありますか？">
+含まれているデフォルトのテーブルのいずれかを選択することもできますが、カスタムテーブルから取得する必要がある場合は、テーブル名が必要です。また、syssparmqueryを指定して、カスタムServiceNowクエリを実行することもできます。このようなクエリの構造については、ServiceNow Table APIのドキュメントを参照してください。
+</Accordion>
+
+<Accordion title="クエリが正しいかどうかを確認する方法はありますか？">
+適切なアクセス権があれば、ServiceNow内でクエリをテストすることができます。
+</Accordion>
+
+<Accordion title="継続してDataSetのエラーが発生しています。どのように修正すればよいですか？">
+返された日付が正しくない場合は、データを受け取った時点でDomoが適切にDomoのタイムゾーンに変換できるよう、ServiceNowインスタンスがGMTまたはUTCフォーマットに設定されているかどうかを検証する必要があります。会社全体でこれを変更できない場合は、タイムゾーンをGMTまたはUTCに設定したDomo専用の独立したユーザーを作成してください。
+</Accordion>
+
+<Accordion title="ServiceNowコネクターとServiceNow Upsertコネクターの違いは何ですか？">
+ServiceNow Upsertコネクターは、DataSetのスケジュールを設定するために、追加モードや置き換えモードのほかにUpsertモードもサポートしています。
+</Accordion>
+
+</AccordionGroup>

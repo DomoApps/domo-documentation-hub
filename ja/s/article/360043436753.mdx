@@ -4,141 +4,128 @@ title: "Microsoft OneDrive for Businessコネクター"
 
 ## はじめに
 
-Microsoft OneDrive for Businessは、ビジネス用オンラインファイル共有とパーソナルクラウドコンテンツ管理サービスです。OneDrive APIについての詳細は、 [https://msdn.microsoft.com/en-us/lib.../dn659752.aspx](https://msdn.microsoft.com/en-us/library/office/dn659752.aspx "https://msdn.microsoft.com/en-us/library/office/dn659752.aspx") を参照してください。
+Microsoft OneDrive for Businessは、ビジネス用オンラインファイル共有とパーソナルクラウドコンテンツ管理サービスです。OneDrive APIについての詳細は、[https://msdn.microsoft.com/en-us/lib.../dn659752.aspx](https://msdn.microsoft.com/en-us/library/office/dn659752.aspx)を参照してください。
 
-OneDrive for Businessアカウントには、Data Centerから接続します。このトピックでは、OneDrive for Businessコネクターユーザーインターフェースに固有のフィールドとメニューについて説明します。DataSetの追加や更新スケジュールの設定、DataSet情報の編集に関する一般的な情報は、「 [コネクターを使用してDataSetを追加する](/ja/s/article/360042926274 "コネクターを使用してDataSetを追加する") 」を参照してください。
+OneDrive for Businessアカウントには、Data Centerから接続します。このトピックでは、OneDrive for Businessコネクターユーザーインターフェースに固有のフィールドとメニューについて説明します。DataSetの追加や更新スケジュールの設定、DataSet情報の編集に関する一般的な情報は、「[コネクターを使用してDataSetを追加する](/ja/s/article/360042926274)」を参照してください。
 
 ## 必要条件
 
 OneDrive for Businessアカウントに接続してDataSetを作成するには、以下が必要です。
 
-* OneDrive for Businessクライアントシークレット
-* Microsoftのユーザー名とパスワード
+- OneDrive for Businessクライアントシークレット
+- Microsoftのユーザー名とパスワード
 
 Microsoft Graphを使用する場合は、新しく登録したAppを使用するか、既存のAppを使用するかによって、redirect\_uriを別のURLに設定する必要があります。
 
-* *新しく登録したApp* を使用する場合は、redirect\_uriを
+- *新しく登録したApp*を使用する場合は、redirect\_uriをhttps://oauth.domo.com/api/data/v1/oauth/providers/onedrive-business/exchangeに設定します。
+- *既存の*Appを使用する場合は、redirect\_uriをhttps://oauth.domo.com/api/data/v1/oauth/providers/microsoft-onedrive-business/exchangeに設定します。
 
-  https://oauth.domo.com
+OneDrive for BusinessのクライアントID、クライアントシークレットを取得し、SharePoint Server 2016を使用してAppを登録する手順については、[https://dev.onedrive.com/app-registration-server.htm](https://dev.onedrive.com/app-registration-server.htm)を参照してください。
 
-  /api/data/v1/oauth/providers/onedrive-business/exchange に設定します。
-* *既存の* Appを使用する場合は、redirect\_uriを
-
-  https://oauth.domo.com
-
-  /api/data/v1/oauth/providers/microsoft-onedrive-business/exchange に設定します。
-
-OneDrive for BusinessのクライアントID、クライアントシークレットを取得し、SharePoint Server 2016を使用してAppを登録する手順については、 [https://dev.onedrive.com/app-registration-server.htm](https://dev.onedrive.com/app-registration-server.htm "https://dev.onedrive.com/app-registration-server.htm") を参照してください。
-
-Microsoft GraphにAppを登録する手順については、 [https://docs.microsoft.com/en-us/onedrive/app-registration.htm](https://docs.microsoft.com/en-us/onedrive/developer/rest-api/getting-started/app-registration "https://docs.microsoft.com/en-us/onedrive/developer/rest-api/getting-started/app-registration") を参照してください。
+Microsoft GraphにAppを登録する手順については、[https://docs.microsoft.com/en-us/onedrive/app-registration.htm](https://docs.microsoft.com/en-us/onedrive/developer/rest-api/getting-started/app-registration)を参照してください。
 
 Microsoft OneDrive for Businessに接続して情報を取得するには、次のものが必要です。
 
-* Microsoft Azure Appのインストール。
-* クライアントIDとクライアントシークレット。Appを生成してこれらの認証情報を探す方法については、
-  [Microsoftのドキュメント](https://learn.microsoft.com/ja-jp/entra/identity-platform/quickstart-register-app?tabs=certificate "Microsoftのドキュメント") を参照してください。Appを登録するには、以下の情報が必要になる場合があります。
+- Microsoft Azure Appのインストール。
+- クライアントIDとクライアントシークレット。Appを生成してこれらの認証情報を探す方法については、[Microsoftのドキュメント](https://learn.microsoft.com/ja-jp/entra/identity-platform/quickstart-register-app?tabs=certificate)を参照してください。Appを登録するには、以下の情報が必要になる場合があります。
 
-  + **Azureポータル：** [https://portal.azure.com/](https://portal.azure.com/ "https://portal.azure.com/")
-  + **登録するSharePoint App：** SharePoint Online Rest API
-  + **DomoリダイレクトURL：** [https://oauth.domo.com/api/data/v1/oauth/providers/microsoft-onedrive-business/exchange](https://oauth.domo.com/api/data/v1/oauth/providers/microsoft-onedrive-business/exchange "https://oauth.domo.com/api/data/v1/oauth/providers/microsoft-onedrive-business/exchange")
-* Microsoft OneDrive for Businessコネクターには、次のAPI権限が必要です。
+  - **Azureポータル：**[https://portal.azure.com/](https://portal.azure.com/)
+  - **登録するSharePoint App：**SharePoint Online Rest API
+  - **DomoリダイレクトURL：**[https://oauth.domo.com/api/data/v1/oauth/providers/microsoft-onedrive-business/exchange](https://oauth.domo.com/api/data/v1/oauth/providers/microsoft-onedrive-business/exchange)
+- Microsoft OneDrive for Businessコネクターには、次のAPI権限が必要です。
 
-  + User.Read
-  + Files.Read.All
-  + offline\_access
+  - User.Read
+  - Files.Read.All
+  - offline\_access
 
 ### OneDriveのクライアントIDを取得するには：
 
-1. [https://portal.azure.com](https://portal.azure.com/ "https://portal.azure.com")
-   に移動します。
-2. **［Microsoft Entra ID］**（ [https://learn.microsoft.com/ja-jp/entra/fundamentals/new-name](https://learn.microsoft.com/ja-jp/entra/fundamentals/new-name "https://learn.microsoft.com/ja-jp/entra/fundamentals/new-name") ） **>［App registrations］** を選択します。
+1. [https://portal.azure.com](https://portal.azure.com/)に移動します。
+2. **［Microsoft Entra ID］**（[https://learn.microsoft.com/ja-jp/entra/fundamentals/new-name](https://learn.microsoft.com/ja-jp/entra/fundamentals/new-name)）**>［App registrations］**を選択します。
 3. Web Appを見つけて、クリックします。
 4. 「application ID」がクライアントIDです。
 
 ### OneDriveのクライアントシークレットを取得するには：
 
-1. [https://portal.azure.com](https://portal.azure.com/ "https://portal.azure.com")
-   に移動します。
-2. **［Microsoft Entra ID］**（ [https://learn.microsoft.com/ja-jp/entra/fundamentals/new-name](https://learn.microsoft.com/ja-jp/entra/fundamentals/new-name "https://learn.microsoft.com/ja-jp/entra/fundamentals/new-name") ）> **［App registrations］** を選択します。
+1. [https://portal.azure.com](https://portal.azure.com/)に移動します。
+2. **［Microsoft Entra ID］**（[https://learn.microsoft.com/ja-jp/entra/fundamentals/new-name](https://learn.microsoft.com/ja-jp/entra/fundamentals/new-name)）>**［App registrations］**を選択します。
 3. Web Appを見つけて、クリックします。
-4. **［Certificates and secrets］** を開きます。
-5. **［+New Value］** をクリックします。
-6. 値の説明とシークレットの有効期限を入力します。**［Add］** をクリックします。
-7. 新しい値が表示されます。［Value］フィールドをコピーして、Domoコネクターの［Value］フィールドに貼り付けます。
-
-   <Frame><img alt="Secret.png" src="/images/kb/ka0Vq000000A67N-00N5w00000Ri7BU-0EM5w000005vO71.png"/></Frame>
+4. **［Certificates and secrets］**を開きます。
+5. **［+New Value］**をクリックします。
+6. 値の説明とシークレットの有効期限を入力します。**［Add］**をクリックします。
+7. 新しい値が表示されます。［Value］フィールドをコピーして、Domoコネクターの［Value］フィールドに貼り付けます。<img alt="Secret.png" src="/images/kb/ja/0EM5w000005vO71.png" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/>
 
 ### エンタープライズOAuth用Azure Appを作成する
 
 Microsoft Azure Appを作成するには、以下の手順を実行します。
 
-1. [https://portal.azure.com](https://portal.azure.com/ "https://portal.azure.com")
-   にログインします。
-2. **［App registrations］** をクリックします。
+1. [https://portal.azure.com](https://portal.azure.com/)にログインします。
+2. **［App registrations］**をクリックします。<img alt="Capture1.PNG" src="/images/kb/ja/0EM5w000005vO6q.png" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/>
+3. **［New registration］**をクリックします。
+4. アプリケーション名を入力し、サポートされているアカウントのタイプを選択します。WebのリダイレクトURL（[https://oauth.domo.com/api/data/v1/oauth/providers/microsoft-onedrive-business/exchange](https://oauth.domo.com/api/data/v1/oauth/providers/microsoft-onedrive-business/exchange)）を入力します。  
+     
 
-   <Frame><img alt="Capture1.PNG" src="/images/kb/ka05w000001236O-00N5w00000Ri7BU-0EM5w000005vNz7.png"/></Frame>
+   <Frame>![Screenshot](/images/kb/ja/0EMVq000002NpNF.jpg)</Frame>
+5. **［Register］**をクリックします。
+6. 次に、**［API Permissions］**をクリックします。<img alt="API_permission.png" src="/images/kb/ja/0EM5w000005vO6o.png" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/>
+7. **［+Add Permissions］**ボタンをクリックします。<img alt="Capture8.PNG" src="/images/kb/ja/0EM5w000005vO6u.png" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/>
 
-3. **［New registration］** をクリックします。
-4. アプリケーション名を入力し、サポートされているアカウントのタイプを選択します。WebのリダイレクトURL（ [https://oauth.domo.com/api/data/v1/oauth/providers/microsoft-onedrive-business/exchange](https://oauth.domo.com/api/data/v1/oauth/providers/microsoft-onedrive-business/exchange "https://oauth.domo.com/api/data/v1/oauth/providers/microsoft-onedrive-business/exchange") ）を入力します。
-
-   <Frame><img src="/images/kb/ka0Vq000000Hfun-00N5w00000Ri7BU-0EMVq000002NpNF.jpg" style={{width: 869, height: 555}}/></Frame>
-
-5. **［Register］** をクリックします。
-6. 次に、**［API Permissions］** をクリックします。
-
-   <Frame><img alt="API_permission.png" src="/images/kb/ka0Vq0000006d0H-00N5w00000Ri7BU-0EM5w000005vO6o.png"/></Frame>
-
-7. **［+Add Permissions］** ボタンをクリックします。
-
-   <Frame><img alt="Capture8.PNG" src="/images/kb/ka05w00000123LH-00N5w00000Ri7BU-0EM5w000005vO61.png"/></Frame>
-
-8. **［Microsoft Graph］>［Delegated Permissions］** を選択します。
+8. **［Microsoft Graph］>［Delegated Permissions］**を選択します。
 9. 必要に応じて許可を選択してください。
-10. 許可を追加した後、すべての設定済みの許可が以下のように一覧表示されます。
+10. 許可を追加した後、すべての設定済みの許可が以下のように一覧表示されます。  
 
-    <Frame><img alt="Permissions modified.jpg" src="/images/kb/ka0Vq000000Hfun-00N5w00000Ri7BU-0EMVq000002NqUb.jpg" style={{width: 1545, height: 648}}/></Frame>
+    <Frame>![Permissions modified.jpg](/images/kb/ja/0EMVq000002NqUb.jpg)</Frame>
 
 ## OneDrive for Businessアカウントに接続する
 
-このセクションでは、Domoにアクセスするために必要なMicrosoftの **アクセス許可** 設定を列挙するとともに、OneDrive for Businessコネクターページの **［認証情報］** および **［詳細］** ペインのオプションについて説明します。このページのほかのペインの項目である **［スケジュール設定］** や **［DataSetに名前を付け、説明を入力］** に関しては、ほとんどのタイプのコネクターで共通しています。詳細については、「 [コネクターを使用してDataSetを追加する](/ja/s/article/360042926274 "コネクターを使用してDataSetを追加する") 」を参照してください。
+このセクションでは、Domoにアクセスするために必要なMicrosoftの**アクセス許可**設定を列挙するとともに、OneDrive for Businessコネクターページの**［認証情報］**および**［詳細］**ペインのオプションについて説明します。このページのほかのペインの項目である**［スケジュール設定］**や**［DataSetに名前を付け、説明を入力］**に関しては、ほとんどのタイプのコネクターで共通しています。詳細については、「[コネクターを使用してDataSetを追加する](/ja/s/article/360042926274)」を参照してください。
 
 ### ［認証情報］ペイン
 
 このペインには、OneDrive for Businessアカウントに接続する認証情報の入力フィールドが含まれています。下表では、各フィールドに必要な内容を説明しています。
 
-<table border="1" cellpadding="1" cellspacing="1" data-aura-rendered-by="33:201;a"><thead><tr><th colspan="1" rowspan="1"><p><span class="s1"> フィールド </span></p></th><th colspan="1" rowspan="1"><p><span class="s1"> 説明 </span></p></th></tr></thead><tbody><tr><td colspan="1" rowspan="1"><p> Client ID </p></td><td colspan="1" rowspan="1"><p> OneDrive for BusinessクライアントIDを入力します。 </p></td></tr><tr><td colspan="1" rowspan="1"><p> Client Secret </p></td><td colspan="1" rowspan="1"><p> OneDrive for Businessクライアントシークレットを入力します。 </p></td></tr></tbody></table>
+| フィールド         | 説明                                       |
+| ------------- | ---------------------------------------- |
+| Client ID     | OneDrive for BusinessクライアントIDを入力します。     |
+| Client Secret | OneDrive for Businessクライアントシークレットを入力します。 |
 
-これらの認証情報を入力すると、Microsoftログイン画面が表示されます。ここに、Microsoftアカウントのユーザー名とパスワードを入力します。接続に成功したら、いつでも同じアカウントを使用して、新しいOneDrive for Business DataSetを作成できます。コネクターアカウントは、Data Centerの **［アカウント］** タブで管理できます。このタブの詳細については、「 [コネクターのユーザーアカウントを管理する](/ja/s/article/360042926054 "コネクターのユーザーアカウントを管理する") 」を参照してください。
+これらの認証情報を入力すると、Microsoftログイン画面が表示されます。ここに、Microsoftアカウントのユーザー名とパスワードを入力します。接続に成功したら、いつでも同じアカウントを使用して、新しいOneDrive for Business DataSetを作成できます。コネクターアカウントは、Data Centerの**［アカウント］**タブで管理できます。このタブの詳細については、「[コネクターのユーザーアカウントを管理する](/ja/s/article/360042926054)」を参照してください。
 
 ### ［詳細］ペイン
 
-このペインには、メインとなる **［Report］** メニューのほか、選択したレポートタイプに応じて表示/非表示になる様々なメニューが含まれています。
+このペインには、メインとなる**［Report］**メニューのほか、選択したレポートタイプに応じて表示/非表示になる様々なメニューが含まれています。
 
-<table border="1" cellpadding="1" cellspacing="1" data-aura-rendered-by="33:201;a"><thead><tr><th colspan="1" rowspan="1"><p> メニュー </p></th><th colspan="1" rowspan="1"><p> 説明 </p></th></tr></thead><tbody><tr><td colspan="1" rowspan="1"><p> Report </p></td><td colspan="1" rowspan="1"><p> 実行するOneDrive for Businessレポートを選択します。以下のレポートが利用できます。 </p><table border="1" cellpadding="1" cellspacing="1"><tbody><tr><td colspan="1" rowspan="1"> Children </td><td colspan="1" rowspan="1"> 指定したフォルダまたはパスを持つアイテムの子を一覧表示します。 </td></tr><tr><td colspan="1" rowspan="1"> Default Drive </td><td colspan="1" rowspan="1"> 認証されたユーザーのOneDriveのデフォルトドライブに関するメタデータを返します。 </td></tr><tr><td colspan="1" rowspan="1"> Download Children Shared File </td><td colspan="1" rowspan="1"> 子フォルダのシェアされたファイルをDataSetとしてDomoにダウンロードします。その他の情報とともに、ファイルタイプおよびファイル/フォルダまたはパスを指定します。 </td></tr><tr><td colspan="1" rowspan="1"> Download File </td><td colspan="1" rowspan="1"> ファイルをDataSetとしてDomoにダウンロードします。その他の情報とともに、ファイルタイプおよびファイル/フォルダまたはパスを指定します。 </td></tr><tr><td colspan="1" rowspan="1"> Download Nested Children Shared File </td><td colspan="1" rowspan="1"> ネストされた子フォルダのシェアされたファイルをDataSetとしてDomoにダウンロードします。その他の情報とともに、ファイル名および完全なファイルパスを指定します。 </td></tr><tr><td colspan="1" rowspan="1"> Download Shared File </td><td colspan="1" rowspan="1"> シェアされたファイルをDataSetとしてDomoにダウンロードします。その他の情報とともに、ファイルタイプおよびファイル/フォルダまたはパスを指定します。 </td></tr><tr><td colspan="1" rowspan="1"> Drive By Id </td><td colspan="1" rowspan="1"> 選択したドライブIDのドライブを一覧表示します。 </td></tr><tr><td colspan="1" rowspan="1"> Drives </td><td colspan="1" rowspan="1"> 認証されたユーザーが利用可能なドライブを一覧表示します。 </td></tr><tr><td colspan="1" rowspan="1"> Properties </td><td colspan="1" rowspan="1"> 指定したファイル/フォルダまたはパスを持つアイテムのプロパティを返します。 </td></tr><tr><td colspan="1" rowspan="1"> Recent Items </td><td colspan="1" rowspan="1"> 認証されたユーザーが最近使用したアイテムのリストを返します。このリストには、ユーザーのドライブにあるアイテムと、ほかのドライブからアクセスできるアイテムが含まれます。 </td></tr><tr><td colspan="1" rowspan="1"> Shared Items </td><td colspan="1" rowspan="1"> 認証されたユーザーと共有されているアイテムを一覧表示します。 </td></tr></tbody></table></td></tr><tr><td colspan="1" rowspan="1"> Addressing </td><td colspan="1" rowspan="1"> アイテムのアドレス指定がIDベース（ファイルまたはフォルダ名を指定）か、パスベース（ファイルパスを指定）かを指定します。 </td></tr><tr><td colspan="1" rowspan="1"> Path </td><td colspan="1" rowspan="1"> レポートを取得するファイルまたはフォルダの相対パスを入力します。例： <span class="mt-font-courier-new"> /Documents/test.csv </span></td></tr><tr><td colspan="1" rowspan="1"> File/Folder Name </td><td colspan="1" rowspan="1"> 取得するMS OneDriveファイル/フォルダの名前（または名前の一部）を拡張子なしで入力します。コネクターは、 <b> ［Date Field］ </b> メニューで選択した内容にもとづき、名前が一致するものから、最後に作成または変更したファイルを返します。 </td></tr><tr><td colspan="1" rowspan="1"> Match Type </td><td colspan="1" rowspan="1"> 取得するファイルのファイル名が <b> ［File Name］ </b> で入力した名前から始まるのか、それともファイル名にその名前が含まれるのかを指定します。 </td></tr><tr><td colspan="1" rowspan="1"> Parent Folder/Parent Folder Name </td><td colspan="1" rowspan="1"> 完全なフォルダ名（大文字小文字の区別なし）を入力して、ファイル検索を特定フォルダのルートコンテンツに限定します。サブフォルダは無視されます。これを空白にすると、自分がアクセスできるすべてのフォルダのすべてのファイルが検索の対象になります。 </td></tr><tr><td colspan="1" rowspan="1"> Date Field </td><td colspan="1" rowspan="1"><p> ファイルを作成日または最終変更日のどちらで取得するかを指定します。これは、 <b> ［File Name］ </b> に入力した名前が複数のファイルに含まれている場合に便利です。 </p></td></tr><tr><td colspan="1" rowspan="1"> File Type </td><td colspan="1" rowspan="1"> 取得するデータファイルのファイルタイプを選択します。 </td></tr><tr><td colspan="1" rowspan="1"> Is Password Protected? </td><td colspan="1" rowspan="1"> ファイルがパスワード保護されているかどうかを選択します。 </td></tr><tr><td colspan="1" rowspan="1"> Sheet Name </td><td colspan="1" rowspan="1"> 指定したスプレッドシート上の取得するシート名を入力します。 </td></tr><tr><td colspan="1" rowspan="1"> Sheet Name Match Type </td><td colspan="1" rowspan="1"> シート名に対して実行する一致タイプを選択します。 </td></tr><tr><td colspan="1" rowspan="1"> File Name or Portion of File Name to Search For in ZIP </td><td colspan="1" rowspan="1"> 取得する圧縮ファイル名を入力します。空白のままにすると、最初の圧縮ファイルを取得します。 </td></tr><tr><td colspan="1" rowspan="1"> Zipped File Type </td><td colspan="1" rowspan="1"> 取得する圧縮データファイルのファイルタイプを選択します。 </td></tr><tr><td colspan="1" rowspan="1"> Drive ID </td><td colspan="1" rowspan="1"> 情報を取得するドライブを選択します。 </td></tr></tbody></table>
+| メニュー | 説明  |
+| ---- | --- |
+| Report | 実行するOneDrive for Businessレポートを選択します。以下のレポートが利用できます。<table><tbody><tr><td>Children</td><td>指定したフォルダまたはパスを持つアイテムの子を一覧表示します。</td></tr><tr><td>Default Drive</td><td>認証されたユーザーのOneDriveのデフォルトドライブに関するメタデータを返します。</td></tr><tr><td>Download Children Shared File</td><td>子フォルダのシェアされたファイルをDataSetとしてDomoにダウンロードします。その他の情報とともに、ファイルタイプおよびファイル/フォルダまたはパスを指定します。</td></tr><tr><td>Download File</td><td>ファイルをDataSetとしてDomoにダウンロードします。その他の情報とともに、ファイルタイプおよびファイル/フォルダまたはパスを指定します。</td></tr><tr><td>Download Nested Children Shared File</td><td>ネストされた子フォルダのシェアされたファイルをDataSetとしてDomoにダウンロードします。その他の情報とともに、ファイル名および完全なファイルパスを指定します。</td></tr><tr><td>Download Shared File</td><td>シェアされたファイルをDataSetとしてDomoにダウンロードします。その他の情報とともに、ファイルタイプおよびファイル/フォルダまたはパスを指定します。</td></tr><tr><td>Drive By Id</td><td>選択したドライブIDのドライブを一覧表示します。</td></tr><tr><td>Drives</td><td>認証されたユーザーが利用可能なドライブを一覧表示します。</td></tr><tr><td>Properties</td><td>指定したファイル/フォルダまたはパスを持つアイテムのプロパティを返します。</td></tr><tr><td>Recent Items</td><td>認証されたユーザーが最近使用したアイテムのリストを返します。このリストには、ユーザーのドライブにあるアイテムと、ほかのドライブからアクセスできるアイテムが含まれます。</td></tr><tr><td>Shared Items</td><td>認証されたユーザーと共有されているアイテムを一覧表示します。</td></tr></tbody></table> |
+| Addressing | アイテムのアドレス指定がIDベース（ファイルまたはフォルダ名を指定）か、パスベース（ファイルパスを指定）かを指定します。 |
+| Path | レポートを取得するファイルまたはフォルダの相対パスを入力します。例：/Documents/test.csv |
+| File/Folder Name | 取得するMS OneDriveファイル/フォルダの名前（または名前の一部）を拡張子なしで入力します。コネクターは、**［Date Field］**メニューで選択した内容にもとづき、名前が一致するものから、最後に作成または変更したファイルを返します。 |
+| Match Type | 取得するファイルのファイル名が**［File Name］**で入力した名前から始まるのか、それともファイル名にその名前が含まれるのかを指定します。 |
+| Parent Folder/Parent Folder Name | 完全なフォルダ名（大文字小文字の区別なし）を入力して、ファイル検索を特定フォルダのルートコンテンツに限定します。サブフォルダは無視されます。これを空白にすると、自分がアクセスできるすべてのフォルダのすべてのファイルが検索の対象になります。 |
+| Date Field | ファイルを作成日または最終変更日のどちらで取得するかを指定します。これは、**［File Name］**に入力した名前が複数のファイルに含まれている場合に便利です。 |
+| File Type | 取得するデータファイルのファイルタイプを選択します。 |
+| Is Password Protected? | ファイルがパスワード保護されているかどうかを選択します。 |
+| Sheet Name | 指定したスプレッドシート上の取得するシート名を入力します。 |
+| Sheet Name Match Type | シート名に対して実行する一致タイプを選択します。 |
+| File Name or Portion of File Name to Search For in ZIP | 取得する圧縮ファイル名を入力します。空白のままにすると、最初の圧縮ファイルを取得します。 |
+| Zipped File Type | 取得する圧縮データファイルのファイルタイプを選択します。 |
+| Drive ID | 情報を取得するドライブを選択します。 |
 
 ## よくある質問
 
 <AccordionGroup>
+
 <Accordion title="このコネクターを使用するにはどのような認証情報が必要ですか？">
-
-
 OneDrive AppのクライアントIDとクライアントシークレットが必要です。
-
-
 </Accordion>
+
 <Accordion title="データはどれくらいの頻度で更新できますか？">
-
-
 DataSetの更新は、1時間に1回程度になるように設定してください。
-
-
 </Accordion>
+
 <Accordion title="注意すべきAPI制限はありますか？">
-
-
 Microsoftでは、APIの呼び出しはユーザー/Appごとに制限されています。レート制限を回避するには、同時に実行するようにスケジュール設定されているDataSetの数を減らします。
-
-
-
 </Accordion>
+
 </AccordionGroup>

@@ -1,0 +1,233 @@
+---
+title: "Embedded Scheduled Reports"
+permalink: 21f7b5c7ee313-embedded-scheduled-reports
+tag: "Beta"
+---
+
+<Note>
+  **Note:** This feature is in beta. Beta Program participants can enable features [here](https://embed.domo.com/embed/pages/DQ8Ek). To join the
+  Beta Program, fill out [this form](https://embed.domo.com/embed/pages/K8GMx).
+  For beta questions or feedback, email
+  [beta.admin@domo.com](mailto:beta.admin@domo.com).
+</Note>
+
+## Overview
+
+Domo Scheduled Reports allow you to automatically deliver report content to users on a recurring schedule. For general information about scheduled reports, see the [Domo Scheduled Reports documentation](/s/article/360043437773?language=en_US).
+
+This guide explains how to use scheduled reports with embedded Domo content, enabling you to securely deliver scheduled report data to recipients outside of Domo. When configuring embedded scheduled reports, you can provide a **Recipient authentication callback URL**. This is a customer-hosted endpoint that Domo will call with a list of email addresses requesting access to the scheduled report.
+
+Your endpoint is responsible for:
+
+- Decrypting the request payload using the Authentication secret you generated in the Domo Everywhere settings screen.
+- Validating the list of email addresses and returning a JSON object with two fields: `validEmails` and `invalidEmails`, each containing a list of email addresses (strings).
+- Encrypting the response body before returning it to Domo (encryption details are covered later in this guide).
+
+**Note:** The list of email addresses you provide will also be filtered by the Invite Authorized Domains configured in the **Admin > Network Security** settings page of your Domo instance. Only emails from allowed domains will be eligible to receive scheduled reports.
+
+This approach allows you to control which recipients are authorized to receive scheduled reports in embedded scenarios, while keeping all data exchanges secure and verifiable.
+
+For more details on configuring scheduled reports, see the [here](/s/article/360043437773?language=en_US).
+
+## How It Works
+
+1. You configure your validation webhook URL in the Domo Everywhere Settings screen (see the image below).
+2. When a scheduled report is requested for a given list of email addresses (for example, when a user attempts to send a report to those recipients), Domo sends a request to your validation webhook with an encrypted payload containing the list of recipient email addresses. We will also send a X-Domo-Signature header with an hmac signature of the encrypted body you may use to ensure the integrety of the payload.
+3. Your endpoint decrypts the payload, validates the email addresses, and returns a JSON object with `validEmails` and `invalidEmails`, encrypted as required. The response must have an HTTP 200 status code; any non-200 response will result in all provided emails being treated as invalid.
+4. Domo uses your response to determine which recipients are eligible to receive the scheduled report.
+
+## Prerequisites
+
+To successfully implement embedded scheduled reports with secure recipient validation, you will need:
+
+- A webhook endpoint capable of receiving POST requests with encrypted payloads as described above.
+
+- The ability to decrypt incoming requests and respond with a JSON object, encrypting the response using the provided secret according to the documented encryption scheme.
+
+## Step-by-Step Setup
+
+### 1. Build a Webhook Endpoint
+
+Your webhook endpoint must meet the following requirements:
+
+1. It must be accessible over the internet via HTTPS, accept unauthenticated POST requests, and expect the request body to be encrypted as described below.
+2. It must verify the HMAC signature provided in the `X-Domo-Signature` header to ensure the integrity of the payload.
+3. After decrypting the payload, it should expect a JSON array of strings, where each string is an email address to be validated.
+4. The response must be a JSON object in the format shown below, encrypted using the same method as the incoming payload. The endpoint must return an HTTP 200 OK response.
+
+See the sections below for code examples on how to encrypt and decrypt the content, as well as details on the expected JSON request and response body formats.
+
+**Encryption Details:**
+
+- The payload is base 64 encoded and encrypted using AES.
+- The first 16 bytes of the encrypted data are the Initialization Vector (IV) used for AES encryption.
+- Bytes 17-32 are the Salt.
+- The remainder is the encrypted report data.
+
+<Tabs><Tab title="Python">
+
+```python
+# Example Python code for AES encryption/decryption with HMAC-SHA256
+import base64
+import hashlib
+import os
+import binascii
+
+pad = lambda s: s + (BS - len(s) % BS) * chr(BS - len(s) % BS)
+unpad = lambda s: s[0:-s[-1]]
+
+def get_private_key(secretKey, salt):
+    key = hashlib.pbkdf2_hmac('SHA256', secretKey.encode(), salt, 65536)
+    return key
+
+
+def encrypt(message, secretKey):
+    message = pad(message).encode('utf-8')
+    iv = os.urandom(BS)
+    salt = os.urandom(BS)
+    private_key = get_private_key(secretKey, salt)
+    cipher = AES.new(private_key, AES.MODE_CBC, iv)
+    return base64.b64encode(iv + salt + cipher.encrypt(message))
+
+def decrypt(enc, secretKey):
+    enc = base64.b64decode(enc)
+    iv = enc[:BS]
+    salt = enc[BS:2*BS]
+    private_key = get_private_key(secretKey, salt)
+    cipher = AES.new(private_key, AES.MODE_CBC, iv)
+    return unpad(cipher.decrypt(enc[2*BS:]))
+
+```
+
+</Tab>
+<Tab title="Java">
+
+```java
+import javax.crypto.Cipher;
+import javax.crypto.SecretKey;
+import javax.crypto.SecretKeyFactory;
+import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.PBEKeySpec;
+import javax.crypto.spec.SecretKeySpec;
+import java.nio.charset.StandardCharsets;
+import java.security.SecureRandom;
+import java.security.spec.KeySpec;
+import java.util.Base64;
+
+public class EmbedEncryptionUtil {
+    private static final int KEY_LENGTH = 256;
+    private static final int SALT_SIZE = 16;
+    private static final int IV_SIZE = 16;
+    private static final int ITERATION_COUNT = 65536;
+    private static final SecureRandom random = new SecureRandom();
+
+    public static String encryptAES256WithSecret(final String payload, final String secret) {
+        try {
+            byte[] salt = new byte[SALT_SIZE];
+            random.nextBytes(salt);
+
+            SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
+            KeySpec spec = new PBEKeySpec(secret.toCharArray(), salt, ITERATION_COUNT, KEY_LENGTH);
+            byte[] key = factory.generateSecret(spec).getEncoded();
+            SecretKeySpec secretKeySpec = new SecretKeySpec(key, "AES");
+
+            byte[] iv = new byte[IV_SIZE];
+            random.nextBytes(iv);
+            IvParameterSpec ivSpec = new IvParameterSpec(iv);
+
+            Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+            cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec, ivSpec);
+            byte[] encValue = cipher.doFinal(payload.getBytes(StandardCharsets.UTF_8));
+            Base64.Encoder enc = Base64.getEncoder().withoutPadding();
+
+            byte[] finalCiphertext = new byte[encValue.length+SALT_SIZE+IV_SIZE];
+            System.arraycopy(iv, 0, finalCiphertext, 0, IV_SIZE);
+            System.arraycopy(salt, 0, finalCiphertext, IV_SIZE, SALT_SIZE);
+            System.arraycopy(encValue, 0, finalCiphertext, IV_SIZE + SALT_SIZE, encValue.length);
+
+            return enc.encodeToString(finalCiphertext);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static String decryptAES256WithSecret(final String encryptedPayload, final String secret) {
+        try {
+            byte[] encryptedData = Base64.getDecoder().decode(encryptedPayload);
+            byte[] salt = new byte[SALT_SIZE];
+            byte[] iv = new byte[IV_SIZE];
+
+            System.arraycopy(encryptedData, 0, iv, 0, iv.length);
+            System.arraycopy(encryptedData, iv.length, salt, 0, salt.length);
+
+            byte[] cipherText = new byte[encryptedData.length - SALT_SIZE - IV_SIZE];
+            System.arraycopy(encryptedData, SALT_SIZE + IV_SIZE, cipherText, 0, cipherText.length);
+
+            IvParameterSpec ivSpec = new IvParameterSpec(iv);
+
+            SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
+            KeySpec spec = new PBEKeySpec(secret.toCharArray(), salt, ITERATION_COUNT, KEY_LENGTH);
+            SecretKey tmp = factory.generateSecret(spec);
+            SecretKeySpec secretKeySpec = new SecretKeySpec(tmp.getEncoded(), "AES");
+
+            Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+            cipher.init(Cipher.DECRYPT_MODE, secretKeySpec, ivSpec);
+            byte[] decryptedText = cipher.doFinal(cipherText);
+            return new String(decryptedText, StandardCharsets.UTF_8);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+}
+```
+
+</Tab>
+</Tabs>
+
+**Expected Response**
+
+Your response to Domo should be a JSON object with the following structure:
+
+```json
+{
+  "validEmails": ["user1@example.com", "user2@example.com"],
+  "invalidEmails": ["baduser@example.com"]
+}
+```
+
+Your response must be encrypted and base64 encoded using the same pattern as the request payload you received from Domo.
+
+### 2. Generate an Authentication Secret
+
+You will need a secure authentication secret to derive the private key used for encrypting and decrypting scheduled report payloads. This secret is generated and managed through the Domo Everywhere Settings page in the DomoWeb UI.
+
+1. Navigate to **Domo Everywhere > Settings** in your Domo instance.
+2. Under **Allow Scheduled Reports in embedded Dashboards**, enter your recipient authentication callback URL.
+3. Click **Generate Secret** next to the Authentication secret field. This will create a new secret for your scheduled reports integration.
+4. Copy and store this secret securely. Do not share it publicly.
+
+![Domo Everywhere Settings - Generate Secret](/images/dev/stoplight.io/images/domo-everywhere-settings-scheduled-reports.png)
+
+### 3. Configure Scheduled Reports
+
+In the platform, when embedding your Domo dashboard or card, make sure to check the box for **Allow scheduled reports** in the embed options. **Note:** This option is only available when you are embedding your content as "Private" (privately embedded). Scheduled reports are not supported for public or non-private embeds.
+
+Checking this box enables scheduled reports for your embedded content. Then, embed your Domo content as you usually would (using the provided embed code or share link).
+
+![Embed Scheduled Reports Setup](/images/dev/stoplight.io/images/domo-everywhere-embed-schedule-reports-setup.png)
+
+After enabling this option and completing your embed setup, scheduled reports will be available for your embedded content, and your configured webhook will be used for recipient validation.
+
+### 4. Schedule a Report in Embedded Domo Content
+
+To schedule a report from your embedded Domo dashboard or card:
+
+1. Click the **Share** button in the upper right corner of your privately embedded content.
+2. In the scheduling popup, fill out the report details, select the frequency, and enter the recipient email addresses.
+3. When you click **Schedule**, Domo will validate the recipient emails using your webhook callback URL.
+
+If any email addresses are rejected by your webhook (for example, if they are not authorized or do not meet your validation criteria), an error will be shown in the popup, as illustrated below:
+
+![Invalid Email Error Example](/images/dev/stoplight.io/images/domo-everywhere-bademail-embed-schedule-reports.png)
+
+If all emails are valid and no errors are returned, the popup will close and the report will be scheduled successfully for the provided recipients.

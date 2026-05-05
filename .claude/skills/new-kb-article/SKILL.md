@@ -28,150 +28,34 @@ After the Article Intake Summary is confirmed, ask the following two questions b
 
 ---
 
-## Step 3: Write the article
+## Step 3: Read the style guide and article template
 
-Once the Article Intake Summary and release information are confirmed, create the MDX file. Do not ask for any information already answered.
+Before writing, read both of these files:
+
+1. **`Domo-KB-Style-Guide.mdx`** — the authoritative style guide. Apply every rule in this file when writing the article.
+2. **`New-Article-Template.mdx`** — the canonical file structure and encoding conventions (frontmatter, section order, image syntax, callout components, code blocks, tables, etc.). Use this as the structural template for the new article.
+
+---
+
+## Step 4: Write the article
+
+Once the Article Intake Summary, release information, style guide, and template are all loaded, create the MDX file. Do not ask for any information already answered.
 
 Create a new MDX file in `s/article/` using the filename format `Article-Title-Here.mdx` (Title Case, hyphen-separated, no special characters).
 
-The file must follow the structure and conventions below exactly.
+Follow the structure from `New-Article-Template.mdx` and apply all style rules from `Domo-KB-Style-Guide.mdx` exactly.
 
----
+### Apply the beta convention (if applicable)
 
-## File Structure
+Use the release-status answer from Step 2 to decide which beta treatment, if any, to apply. The full convention lives in `Domo-KB-Style-Guide.mdx` › **Beta Features** — read it before writing.
 
-```mdx
----
-title: "Article Title Here"
----
+- **Entire article is beta:** add `tag: "Beta"` to the frontmatter and place the standard beta Note immediately after the frontmatter, above the Intro. Do not append `(Beta)` to the title.
+- **Only certain sections are beta:** append `<Badge className="text-primary bg-primary/10 font-bold">Beta</Badge>` to each beta section's heading. Place the standard beta Note under the **first** beta section only — do not repeat it for subsequent beta sections in the same article. Do not append `(Beta)` to any heading.
+- **Entire article is GA:** no beta tag, badge, or Note.
 
+The `className` on the Badge is required and must be exactly `text-primary bg-primary/10 font-bold` — it matches the sidebar `tag` styling.
 
-
-## Intro
-
-Brief overview of what this article covers and why it matters to the user. One to three sentences.
-
----
-
-
-
-## Required Grants
-
-List the grants a user needs to complete the tasks in this article. If none are required, write "No special grants are required."
-
-
-
-## Access [Feature Name]
-
-Step-by-step instructions for navigating to the feature. Use numbered steps.
-
-1. In the navigation header, select **[Menu Item]**.
-   The [result of the action].
-
-2. Select **[Next Element]**.
-
-
-
-## Create [Something]
-
-Step-by-step instructions. Follow the CRUD order (Create, Review, Update, Delete) — only include sections that apply.
-
-1. First step. Include orienting language if needed.
-   
-   <Frame>![Alt text describing the screenshot](/images/kb/image-name.png)</Frame>
-
-2. Second step. Always an action.
-
-3. (Optional) Optional step.
-
-4. (Conditional) Conditional step.
-
-
-
-## FAQ
-
-
-<AccordionGroup>
-
-<Accordion title="Frequently asked question?">
-Frequently asked answer.
-</Accordion>
-
-<Accordion title="Frequently asked question?">
-Frequently asked answer.
-</Accordion>
-
-</AccordionGroup>
-```
-
----
-
-## Style Rules to Apply
-
-**Article structure**
-- Do not include a table of contents — written or linked — at the top of the article. Tables of contents are generated automatically from the article's headings when the page renders on the Knowledge Base site.
-
-**Voice and tense**
-- Write in present tense: "This opens the panel" not "This will open the panel."
-- Use active voice. Avoid passive voice unless who performs the action does not matter.
-- Use "select" not "click," except when specifying right-click, left-click, or double-click.
-- Contractions are acceptable unless you need to emphasize "not."
-- Spell out numbers less than 10.
-- Never use "utilize" — use "use."
-- No exclamation points.
-- Use the Oxford comma.
-- Eliminate unnecessary words ("will," "you are able to," "that").
-- Avoid Latin expressions (i.e., e.g., etc.) — use "such as," "as in," or a list.
-- Use "allowlist" and "blocklist," never "whitelist" or "blacklist."
-- Write all headings (article titles, section headings, step headings) in the imperative mood — never the gerund. **Correct:** "Connect Data to Domo" **Incorrect:** "Connecting Data to Domo"
-- When describing a sequence of actions in a step, do not use "once" to denote a causal or dependent relationship — use "after" instead. **Correct:** "After you save the DataSet, select **Done**." **Incorrect:** "Once you save the DataSet, select **Done**."
-- Do not place spaces on either side of an em-dash. **Correct:** "AI tools—such as Claude—secure access" **Incorrect:** "AI tools — such as Claude — secure access"
-
-**Text emphasis**
-- **Bold** static UI elements (fields, menus, buttons, icons). For a series: **Admin** > **Security** > **Whitelist** (do not bold the >).
-- *Italics* for variables the user fills in with their own data.
-- "Quotation marks" for on-screen text not used as an interface element, and for DataSet column names and ETL actions.
-- `Code style` for code snippets.
-
-**Domo-specific terminology (capitalize exactly as shown)**
-- DataSet, DataFlow, DataFusion, Magic ETL, Beast Mode, AppDB
-- Admin Settings (not bolded, not a UI element)
-- Data Center, Alerts Center, Knowledge Base
-- Dashboard (not Page), Dashboard Filters (not Page Filters)
-- Grants (lowercase unless naming a specific grant, e.g., Manage All Users grant)
-- "select" not "click"; "field" not "box"; "pill" for rounded non-button elements
-- Do not use: Dojo (use Community Forums), KPI card (use Visualization Card), image card (use Doc Card), Domo story (use Dashboard), Drilldown (use Drill Path or "drill into"), Page/Page Filters
-
-**Links**
-- Internal article links: `[link text](/s/article/Article-Title)`
-- Section links: `[link text](/s/article/Article-Title#section-heading)`
-- External links: `[link text](https://full-url.com)`
-
-**Images**
-- Auto-sized screenshot wrapped in Frame: `<Frame>![alt text](/images/kb/image-name.png)</Frame>`
-- Specifically sized: `<Frame><img alt="alt text" src="/images/kb/image-name.png" style={{width: 500, height: 500}}/></Frame>`
-- Inline icon: `<img alt="alt text" src="/images/kb/icon-name.png" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/>`
-- Screenshots should be taken in Modocorp or a demo instance, not the company instance.
-
-**Callout components** (always bold the label)
-- `<Note>**Note:** Text here.</Note>`
-- `<Warning>**Important:** Text here.</Warning>`
-- `<Tip>**Tip:** Text here.</Tip>`
-
-**Beta features**
-- Do not put "(Beta)" in the article title. A single article can cover a mix of GA and beta functionality, so beta status is marked at the section level, not the title level.
-- Immediately below the heading for any beta section or feature, add:
-  ```mdx
-  <Note>
-    **Note:** This feature is in beta. Contact your Domo account team to join.
-  </Note>
-  ```
-- If the entire article covers only beta functionality, place this note at the top of the Intro section.
-
-**FAQ**
-- Place at the bottom of the article, above Troubleshooting if it exists.
-- Always use `<AccordionGroup>` containing `<Accordion title="Question?">` items.
-Follow the file structure in `.claude/skills/article-templates/file-structure.md` and apply all style rules in `.claude/skills/article-templates/style-rules.md`. Read both files before writing.
+The standard beta Note must be used verbatim — do not paraphrase or change the links. Copy it from the style guide.
 
 ---
 

@@ -1,5 +1,5 @@
 ---
-title: 'Basic To-Do App'
+title: Todo App with AppDB
 permalink: 7657a3402ae5e-to-do-app-tutorial
 ---
 
@@ -7,894 +7,864 @@ permalink: 7657a3402ae5e-to-do-app-tutorial
 
 ---
 
-This tutorial will walk you through building a task management app. You will learn how to create a web app from scratch using Domo's React app template.
+This tutorial walks through building a shared Todo app with React, TypeScript, Redux Toolkit, and [AppDB](/portal/API-Reference/app-framework-apis/AppDB-API). The app is scaffolded with the [DA CLI](/portal/Apps/App-Framework/Tools/da-cli), loads the current Domo user's identity and avatar, and stamps ownership onto every todo so users can see who added what.
 
-You can check out [complete code examples of the To-do App on Github](https://github.com/DomoApps/basic-react-app-todo-tutorial).
+You'll learn the patterns you'll reach for in every real Domo app:
 
-#### What we're building
+- Scaffold a Vite + React + TypeScript project with `da new`
+- Declare an AppDB collection in `manifest.json` and publish an initial design
+- Build a typed service layer over `AppDBClient`, `IdentityClient`, and `UserClient`
+- Manage async state with Redux Toolkit's `buildCreateSlice` + `asyncThunkCreator`
+- Compose small, presentational components that read from and dispatch against the store
 
-We will go through how to create a basic React app, use Domo's AppDB to implement CRUD functionality, and deploy the application on the Domo platform.
+The finished code is at [DomoApps/basic-react-app-todo-tutorial on GitHub](https://github.com/DomoApps/basic-react-app-todo-tutorial).
 
-### Step 1: Setup and Installation
+<Note>
+  **Prerequisite:** Complete the [Setup and Installation](/portal/Apps/App-Framework/Quickstart/Setup-and-Installation) guide and run `domo login` before starting.
+</Note>
 
----
-
-For this tutorial, we will use yarn as a node package manager, but you can follow the instructions from the <a href="https://create-react-app.dev/docs/getting-started#creating-an-app">create-react-app documentation</a> to install a new react app with the `@domoinc` template based on the package manager of your choice (`npx`, `yarn`, or `npm`). Before starting, make sure you've successfully [installed the Domo Apps CLI](/portal/Apps/App-Framework/Quickstart/Setup-and-Installation) and completed the `domo login` command to authenticate against your instance of Domo.
-
-#### Create Basic React App
-
-```
-yarn create react-app todo-app --template @domoinc
-```
-
-This command will create your project in a `todo-app` folder with the following included:
-
-- The manifest and thumbnail are provided in the `public` folder.
-- The proxy server is setup with `@domoinc/ryuu-proxy` for local development to your Domo instance.
-- An upload script has been added to the `package.json` for easy upload.
-
-You can see more details on the dependencies and utility scripts setup in this template by default in the `package.json` file.
-
-```json
-{
-  "name": "todo-app",
-  "version": "0.1.0",
-  "private": true,
-  "dependencies": {
-    "@domoinc/ryuu-proxy": "^4.0.6",
-    "@testing-library/jest-dom": "^5.11.4",
-    "@testing-library/react": "^11.0.4",
-    "@testing-library/user-event": "^12.1.4",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
-    "react-scripts": "5.0.1",
-    "web-vitals": "^0.2.4"
-  },
-  "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject",
-    "upload": "yarn build && cd build && domo publish && cd .."
-  },
-  "eslintConfig": {
-    "extends": "react-app"
-  },
-  "browserslist": {
-    "production": [">0.2%", "not dead", "not op_mini all"],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
-  }
-}
-```
-
-### Step 2: Create an AppDB collection to store tasks
+### Step 1: Install the DA CLI and scaffold the app
 
 ---
 
-[AppDB](/portal/API-Reference/app-framework-apis/AppDB-API) is a nosql database for storing arbitrary JSON documents, we can use it to persist data in our app.
+The [DA CLI](/portal/Apps/App-Framework/Tools/da-cli) clones the [@domoinc/vite-react-template](https://www.npmjs.com/package/@domoinc/vite-react-template) — a Vite + React + TypeScript project preconfigured with the Domo proxy, ESLint, Prettier, Vitest, Storybook, and `da generate` scaffolding.
 
-#### Define a collection
+Install the CLI globally:
 
-The collections reference has to be specified in the `manifest.json` file, by adding the `collections` attribute array, for this tutorial we will add a collection named TasksCollection using the following code.
+```bash
+# pnpm (recommended)
+pnpm add -g @domoinc/da
 
-```json
-    "collections": [
-        {
-            "name": "TasksCollection",
-            "schema": {
-              "columns": [
-                { "name": "title", "type": "STRING" },
-                { "name": "description", "type": "STRING" },
-                { "name": "dueDate", "type": "STRING" },
-                { "name": "status", "type": "STRING" },
-                { "name": "priority", "type": "STRING" }
-              ]
-            }
-        }
-    ]
+# or yarn
+yarn global add @domoinc/da
+
+# or npm
+npm install -g @domoinc/da
 ```
 
-Your manifest.json will look like the following.
+Create the project:
+
+```bash
+da new todo-appdb-demo
+cd todo-appdb-demo
+```
+
+`da new` prompts for a package manager (pick **pnpm**), clones the template, writes your app name, initializes git, and installs dependencies.
+
+<Tip>
+  App names must be lowercase with hyphens only. Capitals, underscores, and periods are rejected.
+</Tip>
+
+The scaffold gives you:
+
+- `public/manifest.json` — app metadata, size, collections
+- `public/thumbnail.png` — thumbnail shown in the Asset Library
+- `src/main.tsx` — React entry point
+- `src/manifestOverrides.json` — per-environment manifest overrides (dev/qa/prod)
+- A Vite dev server wired through `@domoinc/ryuu-proxy` to your Domo instance
+- Scripts: `start`, `build`, `upload`, `generate`, `test`, `storybook`
+
+Add the two runtime dependencies we'll use beyond the scaffold:
+
+```bash
+pnpm add @reduxjs/toolkit react-redux @domoinc/toolkit
+```
+
+### Step 2: Declare the Todos collection
+
+---
+
+Replace `public/manifest.json` with:
 
 ```json
 {
-  "name": "To-do app",
+  "name": "Todo AppDB Demo",
   "version": "0.0.1",
-  "size": {
-    "width": 3,
-    "height": 3
-  },
+  "size": { "width": 5, "height": 3 },
+  "fullpage": true,
   "mapping": [],
   "collections": [
     {
-      "name": "TasksCollection",
+      "name": "Todos",
+      "syncEnabled": true,
       "schema": {
         "columns": [
           { "name": "title", "type": "STRING" },
-          { "name": "description", "type": "STRING" },
+          { "name": "completed", "type": "STRING" },
+          { "name": "priority", "type": "STRING" },
           { "name": "dueDate", "type": "STRING" },
-          { "name": "status", "type": "STRING" },
-          { "name": "priority", "type": "STRING" }
+          { "name": "ownerId", "type": "STRING" },
+          { "name": "ownerName", "type": "STRING" }
         ]
-      }
+      },
+      "defaultPermission": [
+        "READ",
+        "READ_CONTENT",
+        "CREATE_CONTENT",
+        "UPDATE_CONTENT",
+        "DELETE_CONTENT"
+      ]
     }
   ]
 }
 ```
 
-### Step 3: Wire the local instance to Domo
+<Note>
+  **Note:** AppDB columns are always `STRING`. Booleans are stored as `"true"` / `"false"` and parsed at the UI layer. `ownerId` and `ownerName` give us the basis for per-user ownership displays and filters.
+</Note>
+
+### Step 3: Publish the initial design and wire the proxy
 
 ---
 
-Now that we have our `manifest.json` ready, we can publish the initial design of our app, which will allow us to wire our app to resources in our Domo instance like AppDB.
+Before local dev can read or write documents, Domo needs to provision the collection and hand you a `proxyId`.
 
-To publish the app, you need to be authenticated in the terminal first; you can run `domo login` if you are not. As mentioned in the first step of this tutorial, an `upload` script was added to the `package.json` for easy upload. We will use that command to build and upload the app.
-
-#### Upload command
-
-```
-yarn upload
+```bash
+pnpm upload
 ```
 
-After running the command, you will get an output like the following with the information of the new design.
+This runs `pnpm build` and `domo publish` from the `build/` folder. The output prints a link to the new App Design.
 
-![yarn_upload_output.png](/images/dev/stoplight.io/images/yarn_upload_output.png)
+Then, in the Domo UI:
 
-#### Create a new card for the app
+1. Open the App Design link.
+2. Click **New Card** → **Select Collection** → **Create New** → **Create Collection** to provision an empty `Todos` collection.
+3. Save the card.
 
-Let's create the card that we will wire to the AppDB collection. To do this, we need to open the created design in the link that we got from the command output and click the "New Card" option.
-
-![create_card.png](/images/dev/stoplight.io/images/create_card.png)
-
-We need to map the collection we added to the `manifest.json`. Click "Select Collection".
-
-![select_collection.png](/images/dev/stoplight.io/images/select_collection.png)
-
-Since we are creating the collection for the app, let's create a new one by clicking on "Create New".
-
-![Screenshot 2024-05-15 at 10.49.19 AM.png](/images/dev/stoplight.io/images/Screenshot-2024-05-15-at-10.49.19-AM.png)
-
-Click "Create Collection" to start with an empty collection.
-
-![Screenshot 2024-05-15 at 10.51.20 AM.png](/images/dev/stoplight.io/images/Screenshot-2024-05-15-at-10.51.20-AM.png)
-
-After creating the collection we can save the card.
-
-![save_collection.png](/images/dev/stoplight.io/images/save_collection.png)
-
-Once we've saved our card, you should be able to see details about the card on the page for your App Design. You can locate it using the link provided in the console output earlier in this tutorial or by going to "More" > "Asset Library" > Selecting your App Design.
-
-![proxy.png](/images/dev/stoplight.io/images/proxy.png)
-
-Now, with the card created, you can tell your app which resources to develop against locally. You have to add the following attributes to your `manifest.json` file.
-
-- `id` for linking your app to the published design and
-- `proxyId` for wiring your development instance to the card
-
-You can see in the image above where you can locate the App Design `id` property as well as the `proxyId` property.
-
-Your manifest.json will now look similar to this:
+Copy the App Design `id` and the card's `proxyId` from the design page, and add both to `public/manifest.json`:
 
 ```json
 {
-  "name": "To-do app",
-  "version": "0.0.1",
-  "size": {
-    "width": 3,
-    "height": 3
-  },
-  "mapping": [],
-  "collections": [
-    {
-      "name": "TasksCollection",
-      "schema": {
-        "columns": [
-          { "name": "title", "type": "STRING" },
-          { "name": "description", "type": "STRING" },
-          { "name": "dueDate", "type": "STRING" },
-          { "name": "status", "type": "STRING" },
-          { "name": "priority", "type": "STRING" }
-        ]
-      }
-    }
-  ],
   "id": "23307940-6dfe-40c4-86f8-8a7b0f5d8b3a",
   "proxyId": "95bd96f9-0385-465a-b485-c16935cf771a"
 }
 ```
 
-### Step 4: Create a tasks collection service
+<Tip>
+  For multi-environment apps, use `da manifest` to add overrides to `src/manifestOverrides.json` instead of hand-editing `manifest.json`. `da apply-manifest` runs automatically as a `prestart` / `prebuild` hook.
+</Tip>
+
+### Step 4: Types and service layer
 
 ---
 
-With our App connected to the Domo card and the collection created, you are ready to start making requests to appDB, for this we will use the `AppDBClient` that can be found in `@domoinc/toolkit` package, add this package by running the following command. See more on the [Domo Toolkit library here](/portal/Apps/App-Framework/Tools/Toolkit).
+Create `src/services/types.ts`:
 
-```
-yarn add @domoinc/toolkit
-```
+```typescript
+import type { Identity, User } from '@domoinc/toolkit/src/models';
 
-Let's create the CRUD service that the app will use to interact with the tasks collection.
+export interface TodoData {
+  title: string;
+  completed: string;   // "true" | "false"
+  priority: string;    // "low" | "medium" | "high"
+  dueDate: string;
+  ownerId: string;
+  ownerName: string;
+}
 
-You can create a new file `taskService.js` in the `src` directory and place the following code:
+export interface Todo extends TodoData {
+  id: string;
+  createdOn?: string;
+  updatedOn?: string;
+}
 
-```js
-import { AppDBClient } from '@domoinc/toolkit';
-
-const TaskTableClient = new AppDBClient.DocumentsClient('TasksCollection');
-
-const fetchTasks = async (status) => {
-  const queryParams = {};
-
-  if (status !== undefined) {
-    queryParams['content.status'] = { $eq: status };
-  }
-  const response = await TaskTableClient.get(queryParams);
-  const data = Array.isArray(response.data)
-    ? response.data.map((document) => ({
-        ...document.content,
-        id: document.id,
-      }))
-    : [{ ...data.content }];
-
-  return data;
-};
-
-const createTask = async (task) => {
-  const response = await TaskTableClient.create(task);
-  return { id: response.data.id, ...response.data.content };
-};
-
-const deleteTasks = async (tasksIds) => await TaskTableClient.delete(tasksIds);
-
-const updateTask = async (id, content) => {
-  const response = await TaskTableClient.update({ id, content });
-  return response.data.content;
-};
-
-export const TaskService = {
-  fetchTasks,
-  createTask,
-  deleteTasks,
-  updateTask,
-};
+export interface UserInfo {
+  identity: Identity;
+  user: User;
+  avatarUrl: string;
+}
 ```
 
-The code above implements simple functions for interacting with our tasks in AppDB. These functions cover CREATE, READ (FETCH), UPDATE, and DELETE capabilities and should be relatively self-explanatory.
+Create `src/services/app.ts`:
 
-### Step 5: Create App UI
+```typescript
+import type { AppDBDocument } from '@domoinc/toolkit';
+import { AppDBClient, IdentityClient, UserClient } from '@domoinc/toolkit';
 
----
+import type { Todo, TodoData, UserInfo } from './types';
 
-Now that the app is able to interact with AppDB, let's add some React components to display and manage our tasks.
+const TodosClient = new AppDBClient.DocumentsClient<TodoData>('Todos');
 
-#### Install sass
+const extractDocs = (docs: AppDBDocument<TodoData>[]): Todo[] =>
+  docs.map((doc) => ({
+    id: doc.id,
+    createdOn: doc.createdOn,
+    updatedOn: doc.updatedOn,
+    ...doc.content,
+  }));
 
-For this app we will use sass to speed up styling our app.
+export const AppService = {
+  async loadUserInfo(): Promise<UserInfo> {
+    const identity = (await IdentityClient.get(undefined, true)).data;
+    const user = (await UserClient.getUser(identity.userId, true)).data;
+    const avatarUrl = `/api/content/v1/avatar/USER/${identity.userId}?size=100${
+      user.avatarKey ? `&v=${encodeURIComponent(user.avatarKey)}` : ''
+    }`;
+    return { identity, user, avatarUrl };
+  },
 
-```
-yarn add sass
-```
-
-### App components
-
-One of the best parts of working with the React framework is how it makes [Component Driven Development](https://www.geeksforgeeks.org/what-are-some-advantages-of-component-driven-development/) easier. We'll break down the components we need for this app as follows:
-
-1. TasksContainer
-2. TaskListItem
-3. TaskForm
-
-For each of our components, we'll create a separate file within `src/components/TasksContainer/`
-
-#### TasksContainer
-
-App content section, this is the wrapper where all the tasks will be listed.
-
-**Code**
-
-For this parent component, we'll place the following Javascript code in `src/components/TasksContainer/index.jsx`.
-
-```js
-import React, { useEffect, useState, useRef } from 'react';
-import { TaskService } from '../../taskService';
-import styles from './index.module.scss';
-import { TaskListITem } from './TaskListItem';
-import { TaskForm } from './TaskForm';
-
-const TasksEmptyState = () => (
-  <div className={styles.List__empty}>You have no tasks</div>
-);
-const TaskList = ({ tasks = [], onCheck, onClick }) =>
-  tasks.map((task) => (
-    <TaskListITem
-      key={task.id}
-      task={task}
-      onCheck={onCheck}
-      onTaskClick={onClick}
-    />
-  ));
-
-const Content = () => {
-  const [tasks, setTasks] = useState([]);
-  const [selectedTasks, setSelectedTasks] = useState([]);
-  const [editingTask, setEditingTask] = useState({});
-  const [loading, setLoading] = useState(false);
-  const dialogRef = useRef(null);
-
-  useEffect(() => {
-    setLoading(true);
-    TaskService.fetchTasks('active').then((response) => {
-      setTasks(response);
-      setLoading(false);
-    });
-  }, []);
-
-  const handleSave = async (task) => {
-    try {
-      let request;
-      const newTasks = [...tasks];
-      if (task.id !== undefined) {
-        const updatedTask = newTasks.find((newTask) => newTask.id === task.id);
-        Object.assign(updatedTask, task);
-        const { id, isSelected, ...content } = task;
-        request = TaskService.updateTask(id, content);
-      } else {
-        request = TaskService.createTask(task);
-        newTasks.push(task);
-      }
-      const savedTask = await request;
-      setTasks(newTasks);
-      return savedTask;
-    } catch (error) {
-      return null;
-    }
-  };
-
-  const completeTasks = async () => {
-    try {
-      const newTasks = [...tasks];
-      const requests = tasks
-        .filter((task) => selectedTasks.includes(task.id))
-        .map((task) => {
-          const newTask = { ...task, status: 'completed' };
-          const completedTask = newTasks.find(
-            (newTask) => newTask.id === task.id,
-          );
-          Object.assign(completedTask, newTask);
-          const { id, isSelected, ...content } = newTask;
-          return TaskService.updateTask(id, content);
-        });
-      await Promise.all[requests];
-      setTasks(newTasks);
-    } catch (error) {
-      return null;
-    }
-  };
-
-  const deleteTasks = async () => {
-    try {
-      const newTasks = tasks.filter((task) => !selectedTasks.includes(task.id));
-      TaskService.deleteTasks(selectedTasks);
-      setTasks(newTasks);
-    } catch (error) {
-      return null;
-    }
-  };
-
-  const onTaskCheck = (taskId) => {
-    const isSelected = selectedTasks.includes(taskId);
-    if (isSelected) {
-      const newSelected = selectedTasks.filter((task) => task !== taskId);
-      setSelectedTasks(newSelected);
-    } else {
-      setSelectedTasks([...selectedTasks, taskId]);
-    }
-    const newTasks = tasks.map((task) =>
-      task.id === taskId ? { ...task, isSelected: !isSelected } : task,
+  async loadTodos(): Promise<Todo[]> {
+    const response = await TodosClient.get(
+      {},
+      { orderby: ['createdOn descending'] },
     );
-    setTasks(newTasks);
-  };
+    return extractDocs(response.data);
+  },
 
-  const onTaskClick = (task) => {
-    setEditingTask(task);
-    dialogRef.current.showModal();
-  };
+  async createTodo(data: TodoData): Promise<Todo> {
+    const response = await TodosClient.create(data);
+    return extractDocs(
+      Array.isArray(response.data) ? response.data : [response.data],
+    )[0];
+  },
 
-  const onClose = () => {
-    dialogRef.current.close();
-    setEditingTask({});
-  };
+  async updateTodo(id: string, data: TodoData): Promise<Todo> {
+    const response = await TodosClient.update({ id, content: data });
+    return extractDocs([response.data])[0];
+  },
 
-  if (loading ?? false) return <div>Loading...</div>;
+  async deleteTodo(id: string): Promise<string> {
+    await TodosClient.delete(id);
+    return id;
+  },
+};
+```
+
+Two things worth calling out:
+
+- **`IdentityClient` + `UserClient`** give you the current user's ID, email, display name, role, and avatar — everything you need to stamp ownership on documents and render a friendly header.
+- **`extractDocs`** flattens the AppDB envelope (`{ id, content, createdOn, ... }`) into plain todo objects, so the rest of the app never has to think about document metadata.
+
+### Step 5: Redux store with `buildCreateSlice`
+
+---
+
+We'll use Redux Toolkit's `buildCreateSlice` with the `asyncThunkCreator` so that async thunks can be declared inline on each slice — no separate `actions.ts` file.
+
+Create `src/reducers/createAppSlice.ts`:
+
+```typescript
+import { asyncThunkCreator, buildCreateSlice } from '@reduxjs/toolkit';
+
+export const createAppSlice = buildCreateSlice({
+  creators: { asyncThunk: asyncThunkCreator },
+});
+```
+
+Create `src/reducers/index.ts`:
+
+```typescript
+import {
+  type Action,
+  configureStore,
+  type ThunkAction,
+} from '@reduxjs/toolkit';
+import {
+  type TypedUseSelectorHook,
+  useDispatch,
+  useSelector,
+} from 'react-redux';
+
+import AppSlice from './app/slice';
+import TodosSlice from './todos/slice';
+
+export const store = configureStore({
+  reducer: {
+    app: AppSlice,
+    todos: TodosSlice,
+  },
+});
+
+export type RootState = ReturnType<typeof store.getState>;
+export type AppThunk<ReturnType = void> = ThunkAction<
+  ReturnType,
+  RootState,
+  unknown,
+  Action<string>
+>;
+export type AppDispatch = typeof store.dispatch;
+export const useAppDispatch = () => useDispatch<AppDispatch>();
+export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector;
+```
+
+**App slice — user identity.** Create `src/reducers/app/slice.ts`:
+
+```typescript
+import { AppService } from 'services/app';
+import type { UserInfo } from 'services/types';
+
+import { createAppSlice } from '../createAppSlice';
+
+interface State {
+  userInfo: UserInfo | null;
+  loading: boolean;
+  error: string | null;
+}
+
+const initialState: State = {
+  userInfo: null,
+  loading: false,
+  error: null,
+};
+
+export const AppSlice = createAppSlice({
+  name: 'app',
+  initialState,
+  reducers: (create) => ({
+    loadUserInfo: create.asyncThunk<UserInfo, void>(
+      async () => await AppService.loadUserInfo(),
+      {
+        pending: (state) => {
+          state.loading = true;
+          state.error = null;
+        },
+        fulfilled: (state, { payload }) => {
+          state.loading = false;
+          state.userInfo = payload;
+        },
+        rejected: (state, action) => {
+          state.loading = false;
+          state.error = action.error.message ?? 'Failed to load user';
+        },
+      },
+    ),
+  }),
+  selectors: {
+    selectUserInfo: (state) => state.userInfo,
+    selectUserLoading: (state) => state.loading,
+    selectUserError: (state) => state.error,
+  },
+});
+
+export const { loadUserInfo } = AppSlice.actions;
+export const { selectUserInfo, selectUserLoading, selectUserError } =
+  AppSlice.selectors;
+
+export default AppSlice.reducer;
+```
+
+**Todos slice — CRUD thunks.** Create `src/reducers/todos/slice.ts`:
+
+```typescript
+import { AppService } from 'services/app';
+import type { Todo, TodoData } from 'services/types';
+
+import { createAppSlice } from '../createAppSlice';
+
+interface State {
+  items: Todo[];
+  loading: boolean;
+  saving: boolean;
+  error: string | null;
+}
+
+const initialState: State = {
+  items: [],
+  loading: false,
+  saving: false,
+  error: null,
+};
+
+export const TodosSlice = createAppSlice({
+  name: 'todos',
+  initialState,
+  reducers: (create) => ({
+    loadTodos: create.asyncThunk<Todo[], void>(
+      async () => await AppService.loadTodos(),
+      {
+        pending: (state) => {
+          state.loading = true;
+          state.error = null;
+        },
+        fulfilled: (state, { payload }) => {
+          state.loading = false;
+          state.items = payload;
+        },
+        rejected: (state, action) => {
+          state.loading = false;
+          state.error = action.error.message ?? 'Failed to load todos';
+        },
+      },
+    ),
+
+    createTodo: create.asyncThunk<Todo, TodoData>(
+      async (data) => await AppService.createTodo(data),
+      {
+        pending: (state) => {
+          state.saving = true;
+        },
+        fulfilled: (state, { payload }) => {
+          state.saving = false;
+          state.items = [payload, ...state.items];
+        },
+        rejected: (state, action) => {
+          state.saving = false;
+          state.error = action.error.message ?? 'Failed to create todo';
+        },
+      },
+    ),
+
+    updateTodo: create.asyncThunk<Todo, { id: string; data: TodoData }>(
+      async ({ id, data }) => await AppService.updateTodo(id, data),
+      {
+        pending: (state) => {
+          state.saving = true;
+        },
+        fulfilled: (state, { payload }) => {
+          state.saving = false;
+          state.items = state.items.map((t) =>
+            t.id === payload.id ? payload : t,
+          );
+        },
+        rejected: (state, action) => {
+          state.saving = false;
+          state.error = action.error.message ?? 'Failed to update todo';
+        },
+      },
+    ),
+
+    toggleTodo: create.asyncThunk<Todo, Todo>(
+      async (todo) => {
+        const data: TodoData = {
+          title: todo.title,
+          completed: todo.completed === 'true' ? 'false' : 'true',
+          priority: todo.priority,
+          dueDate: todo.dueDate,
+          ownerId: todo.ownerId,
+          ownerName: todo.ownerName,
+        };
+        return await AppService.updateTodo(todo.id, data);
+      },
+      {
+        fulfilled: (state, { payload }) => {
+          state.items = state.items.map((t) =>
+            t.id === payload.id ? payload : t,
+          );
+        },
+      },
+    ),
+
+    deleteTodo: create.asyncThunk<string, string>(
+      async (id) => await AppService.deleteTodo(id),
+      {
+        fulfilled: (state, { payload }) => {
+          state.items = state.items.filter((t) => t.id !== payload);
+        },
+      },
+    ),
+  }),
+  selectors: {
+    selectTodos: (state) => state.items,
+    selectTodosLoading: (state) => state.loading,
+    selectTodosSaving: (state) => state.saving,
+    selectTodosError: (state) => state.error,
+  },
+});
+
+export const { loadTodos, createTodo, updateTodo, toggleTodo, deleteTodo } =
+  TodosSlice.actions;
+export const {
+  selectTodos,
+  selectTodosLoading,
+  selectTodosSaving,
+  selectTodosError,
+} = TodosSlice.selectors;
+
+export default TodosSlice.reducer;
+```
+
+A few patterns to notice:
+
+- **`loading` vs `saving`** — `loading` covers the initial list fetch; `saving` is toggled by creates, updates, and toggles so the form can disable its submit button without blanking the list.
+- **`toggleTodo`** takes the whole todo (not just an ID) so the reducer can build the full `TodoData` payload without refetching.
+- **Selectors declared on the slice** — callers never reach into `state.todos.items` directly; they import `selectTodos` and get type safety for free.
+
+### Step 6: Components
+
+---
+
+Each component lives in its own folder under `src/components/` with a matching `.module.scss`. We'll show the TypeScript; grab the SCSS from the [GitHub source](https://github.com/DomoApps/basic-react-app-todo-tutorial).
+
+**UserHeader** renders the current user's avatar, name, role, and email, with a gradient-initials fallback if the avatar URL 404s.
+
+```tsx
+// src/components/UserHeader/UserHeader.tsx
+import { FC, useState } from 'react';
+import { useAppSelector } from 'reducers';
+import { selectUserInfo, selectUserLoading } from 'reducers/app/slice';
+
+import styles from './UserHeader.module.scss';
+
+export const UserHeader: FC = () => {
+  const userInfo = useAppSelector(selectUserInfo);
+  const loading = useAppSelector(selectUserLoading);
+  const [avatarFailed, setAvatarFailed] = useState(false);
+
+  if (loading && !userInfo) {
+    return <div className={styles.header}>Loading user…</div>;
+  }
+  if (!userInfo) return null;
+
+  const { identity, user, avatarUrl } = userInfo;
+  const initials = user.displayName
+    ?.split(' ')
+    .map((part) => part[0])
+    .filter(Boolean)
+    .slice(0, 2)
+    .join('')
+    .toUpperCase();
 
   return (
-    <>
-      <div className={styles.List__container}>
-        {tasks.length === 0 ? (
-          <TasksEmptyState />
-        ) : (
-          <TaskList tasks={tasks} onCheck={onTaskCheck} onClick={onTaskClick} />
+    <div className={styles.header}>
+      {avatarFailed ? (
+        <div className={styles.avatarFallback}>{initials || '?'}</div>
+      ) : (
+        <img
+          src={avatarUrl}
+          alt={user.displayName}
+          className={styles.avatar}
+          onError={() => setAvatarFailed(true)}
+        />
+      )}
+      <div className={styles.info}>
+        <div className={styles.name}>{user.displayName}</div>
+        <div className={styles.meta}>{identity.userEmail}</div>
+        {user.detail?.title && (
+          <div className={styles.meta}>{user.detail.title}</div>
         )}
+        <span className={styles.role}>{user.role}</span>
+      </div>
+    </div>
+  );
+};
+```
+
+**TodoForm** is a simple controlled form that stamps `ownerId` / `ownerName` from the store onto every new todo at submit time.
+
+```tsx
+// src/components/TodoForm/TodoForm.tsx
+import { FC, FormEvent, useState } from 'react';
+import { useAppDispatch, useAppSelector } from 'reducers';
+import { selectUserInfo } from 'reducers/app/slice';
+import { createTodo, selectTodosSaving } from 'reducers/todos/slice';
+
+import styles from './TodoForm.module.scss';
+
+export const TodoForm: FC = () => {
+  const dispatch = useAppDispatch();
+  const userInfo = useAppSelector(selectUserInfo);
+  const saving = useAppSelector(selectTodosSaving);
+
+  const [title, setTitle] = useState('');
+  const [priority, setPriority] = useState('medium');
+  const [dueDate, setDueDate] = useState('');
+
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+    if (!title.trim() || !userInfo) return;
+
+    await dispatch(
+      createTodo({
+        title: title.trim(),
+        completed: 'false',
+        priority,
+        dueDate,
+        ownerId: String(userInfo.identity.userId),
+        ownerName: userInfo.user.displayName,
+      }),
+    );
+
+    setTitle('');
+    setDueDate('');
+    setPriority('medium');
+  };
+
+  return (
+    <form className={styles.form} onSubmit={handleSubmit}>
+      <input
+        type="text"
+        className={styles.title}
+        placeholder="What needs to be done?"
+        value={title}
+        onChange={(e) => setTitle(e.target.value)}
+      />
+      <select
+        className={styles.select}
+        value={priority}
+        onChange={(e) => setPriority(e.target.value)}
+      >
+        <option value="low">Low</option>
+        <option value="medium">Medium</option>
+        <option value="high">High</option>
+      </select>
+      <input
+        type="date"
+        className={styles.date}
+        value={dueDate}
+        onChange={(e) => setDueDate(e.target.value)}
+      />
+      <button
+        type="submit"
+        className={styles.submit}
+        disabled={saving || !title.trim() || !userInfo}
+      >
+        {saving ? 'Adding…' : 'Add Todo'}
+      </button>
+    </form>
+  );
+};
+```
+
+**TodoItem** renders a single row — checkbox, title, owner, due date, and delete button. A priority class on the container drives the colored left border.
+
+```tsx
+// src/components/TodoItem/TodoItem.tsx
+import { FC } from 'react';
+import { useAppDispatch } from 'reducers';
+import { deleteTodo, toggleTodo } from 'reducers/todos/slice';
+import type { Todo } from 'services/types';
+
+import styles from './TodoItem.module.scss';
+
+interface Props {
+  todo: Todo;
+}
+
+const priorityClass: Record<string, string> = {
+  high: styles.priorityHigh,
+  medium: styles.priorityMedium,
+  low: styles.priorityLow,
+};
+
+export const TodoItem: FC<Props> = ({ todo }) => {
+  const dispatch = useAppDispatch();
+  const isCompleted = todo.completed === 'true';
+
+  return (
+    <li className={`${styles.item} ${priorityClass[todo.priority] ?? ''}`}>
+      <input
+        type="checkbox"
+        className={styles.checkbox}
+        checked={isCompleted}
+        onChange={() => dispatch(toggleTodo(todo))}
+      />
+      <div className={styles.content}>
+        <div className={`${styles.title} ${isCompleted ? styles.completed : ''}`}>
+          {todo.title}
+        </div>
+        <div className={styles.meta}>
+          <span>By {todo.ownerName || 'Unknown'}</span>
+          {todo.dueDate && <span>Due {todo.dueDate}</span>}
+          <span>{todo.priority}</span>
+        </div>
       </div>
       <button
-        className={styles.List__addButton}
-        onClick={() => dialogRef.current.showModal()}
+        type="button"
+        className={styles.delete}
+        onClick={() => dispatch(deleteTodo(todo.id))}
+        aria-label="Delete todo"
       >
-        {' '}
-        Add Task
+        ×
       </button>
-      {selectedTasks.length > 0 && (
-        <>
-          <button className={styles.List__addButton} onClick={completeTasks}>
-            {' '}
-            Complete Tasks
-          </button>
-          <button className={styles.List__addButton} onClick={deleteTasks}>
-            {' '}
-            Delete Tasks
-          </button>
-        </>
-      )}
-      <dialog ref={dialogRef}>
-        <TaskForm onClose={onClose} onSave={handleSave} task={editingTask} />{' '}
-      </dialog>
-    </>
+    </li>
   );
 };
-
-export const TasksContainer = () => (
-  <div className={styles.List__container}>
-    <Content />
-  </div>
-);
 ```
 
-We'll also add the following CSS to a new file: `src/components/TasksContainer/index.module.scss`.
+**TodoList** handles filtering (all / active / completed) and the count header.
 
-```css
-.List__container {
-  margin: 3% auto;
-}
+```tsx
+// src/components/TodoList/TodoList.tsx
+import { TodoItem } from 'components/TodoItem/TodoItem';
+import { FC, useState } from 'react';
+import { useAppSelector } from 'reducers';
+import { selectTodos, selectTodosLoading } from 'reducers/todos/slice';
 
-.List__empty {
-  margin: 2% auto;
-}
+import styles from './TodoList.module.scss';
 
-.List__add {
-  float: right;
-  margin-right: 16px;
-  background-color: #99ccee;
-}
+type Filter = 'all' | 'active' | 'completed';
 
-.List__addButton {
-  min-width: 100px;
-  margin: 4px;
-  padding: 8px;
-  font-weight: 500;
-}
+export const TodoList: FC = () => {
+  const todos = useAppSelector(selectTodos);
+  const loading = useAppSelector(selectTodosLoading);
+  const [filter, setFilter] = useState<Filter>('all');
 
-.List__loading {
-  margin-top: 24px;
-}
-```
+  const filtered = todos.filter((t) => {
+    if (filter === 'active') return t.completed !== 'true';
+    if (filter === 'completed') return t.completed === 'true';
+    return true;
+  });
+  const activeCount = todos.filter((t) => t.completed !== 'true').length;
 
-#### TaskListItem
-
-Next, we'll add the Javascript and CSS for our `TaskListItem` component which is used to represent each of the tasks in our Todo App.
-
-Add the following Javascript in a new directory inside of the `TasksContainer` with the following path: `/src/components/TasksContainer/TaskListItem/index.jsx`.
-
-**Code**
-
-```js
-import React from 'react';
-import styles from './index.module.scss';
-
-const COLOR_MAP = {
-  High: '#fbad56',
-  Urgent: '#fd9a93',
-  Low: '#fdecad',
-};
-
-export const TaskListITem = ({ task, onCheck, onTaskClick }) => (
-  <div>
-    <div className={styles.Main__wrapper}>
-      <div className={styles.Row_content_wrapper}>
-        <input
-          type="checkbox"
-          disabled={task.status === 'completed'}
-          className={styles.Row__checkbox}
-          checked={task.isSelected}
-          onChange={(event) => onCheck(task.id)}
-        />
-        <div className={styles.Row__content}>
-          {task.status === 'completed' ? (
-            <div className={styles.Row__completedTask__subtitle}>
-              {task.title}
-            </div>
-          ) : (
-            <div
-              className={styles.Row__tasktitle}
-              onClick={() => onTaskClick(task)}
-            >
-              {task.title}
-            </div>
-          )}
-          <div className={styles.Row__subtitle}>{task?.description}</div>
-        </div>
-        <div
-          label={task.priority}
-          className={styles.Row__priority}
-          style={{ background: COLOR_MAP[task.priority] }}
-        />
-      </div>
-    </div>
-  </div>
-);
-```
-
-The CSS specific to this component can then go in: `src/components/TasksContainer/TaskListItem/index.module.scss`.
-
-```css
-.Main__wrapper {
-  width: 100%;
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  padding: 8px 0px;
-}
-
-.Row_content_wrapper {
-  display: flex;
-  flex-direction: row;
-}
-
-.Row__checkbox {
-  margin-right: 8px;
-}
-
-.Row__content {
-  display: flex;
-  width: 300px;
-  flex-direction: column;
-  justify-content: center;
-  align-content: flex-start;
-}
-
-.Row__subtitle {
-  color: gray;
-}
-
-.Row__completedTask__subtitle {
-  text-decoration: line-through;
-}
-
-.Row__tasktitle {
-  cursor: pointer;
-  margin: 4px 0px;
-  &:hover {
-    text-decoration: underline;
+  if (loading && todos.length === 0) {
+    return <div className={styles.count}>Loading todos…</div>;
   }
-}
-
-.Row__priority {
-  width: 20px;
-  height: 20px;
-}
-```
-
-#### TaskForm
-
-Finally, let's add the form that we can use to create new tasks.
-
-**Code**
-
-We'll add the following Javascript to a new directory in `TaskContainer` with the following path: `src/components/TasksContainer/TaskForm/index.jsx`;
-
-```js
-import React, { useState, useEffect } from 'react';
-import styles from './index.module.scss';
-
-export const TaskForm = ({ onSave, onClose, task = {} }) => {
-  const [stagedTask, setStagedTask] = useState(task);
-  const [alert, setAlert] = useState('');
-
-  useEffect(() => {
-    setStagedTask(task);
-  }, [task]);
-
-  const handleStagedTaskUpdate = (key, value) => {
-    const newStagedData = { ...stagedTask, [key]: value };
-    setStagedTask(newStagedData);
-  };
-
-  const handleSave = async () => {
-    const task = {
-      id: stagedTask.id,
-      title: stagedTask.title,
-      description: stagedTask.description,
-      priority: stagedTask.priority || 'Low',
-      dueDate: stagedTask?.dueDate,
-      status: 'active',
-    };
-    const response = await onSave(task);
-    if (response?.id !== undefined) setStagedTask({});
-    setAlert(
-      `Task ${task.id !== undefined ? 'updated' : 'created'} Successfully!`,
-    );
-    setTimeout(() => {
-      onClose();
-      setAlert('');
-    }, 1000);
-  };
 
   return (
-    <div className={styles.TaskForm}>
-      <div className={styles.TaskForm__titleBox}>
-        {task.id !== undefined ? 'Update Task' : 'Add your new To-Do'}
-      </div>
-      <div className={styles.TaskForm__formBox}>
-        <div className={styles.TaskForm__formBoxContent}>
-          <input
-            id="title-input"
-            className={styles.TaskForm__formInput}
-            placeholder="Task Title"
-            onChange={(event) =>
-              handleStagedTaskUpdate('title', event.target.value)
-            }
-            value={stagedTask?.title || ''}
-          />
-          <textarea
-            multiline
-            maxRows={3}
-            id="description-input"
-            className={styles.TaskForm__formNotes}
-            placeholder="Notes"
-            value={stagedTask?.description || ''}
-            onChange={(event) =>
-              handleStagedTaskUpdate('description', event.target.value)
-            }
-          />
-          <div className={styles.TaskForm__formSubTitle}>
-            Completion Due Date
-          </div>
-          <div>
-            <input
-              className={styles.TaskForm__formInput}
-              type="date"
-              value={stagedTask?.dueDate}
-              onChange={(event) =>
-                handleStagedTaskUpdate(
-                  'dueDate',
-                  new Date(event.target.value).toISOString().split('T')[0],
-                )
-              }
-            />
-          </div>
-          <div className={styles.TaskForm__formSubTitle}>Set Priority</div>
-          <select
-            className={styles.TaskForm__formInput}
-            value={stagedTask.priority}
-            onChange={(event) =>
-              handleStagedTaskUpdate('priority', event.target.value)
-            }
-          >
-            <option value="Low">Low</option>
-            <option value="High">High</option>
-            <option value="Urgent">Urgent</option>
-          </select>
-          <div className={styles.TaskForm__ButtonsWrapper}>
+    <div>
+      <div className={styles.header}>
+        <span className={styles.count}>
+          {activeCount} active · {todos.length} total
+        </span>
+        <div className={styles.filters}>
+          {(['all', 'active', 'completed'] as Filter[]).map((f) => (
             <button
-              className={styles.TaskForm__createButton}
-              disabled={!stagedTask.title}
-              onClick={handleSave}
+              key={f}
+              type="button"
+              className={`${styles.filterBtn} ${filter === f ? styles.active : ''}`}
+              onClick={() => setFilter(f)}
             >
-              SAVE
+              {f}
             </button>
-            <button onClick={onClose}>CANCEL</button>
-          </div>
+          ))}
         </div>
-        {alert !== '' && <div className={styles.TaskForm__alert}>{alert}</div>}
       </div>
+      {filtered.length === 0 ? (
+        <div className={styles.count} style={{ padding: '16px 0' }}>
+          No todos to show.
+        </div>
+      ) : (
+        <ul className={styles.list}>
+          {filtered.map((todo) => (
+            <TodoItem key={todo.id} todo={todo} />
+          ))}
+        </ul>
+      )}
     </div>
   );
 };
 ```
 
-Then, we can add the CSS for our form at `src/components/TasksContainer/TaskForm/index.module.scss`;
+**App** is the root: it kicks off both initial loads in a `useEffect`, surfaces any error from either slice in a banner, and renders the header, form, and list.
 
-```css
-.TaskForm {
-  border-radius: 12px;
-  background-color: #fafafa;
-  width: 500px;
-  height: 575px;
-  & input,
-  select,
-  textarea {
-    width: 85%;
-    border: 1px solid #999999;
-  }
-}
+```tsx
+// src/components/App/App.tsx
+import { TodoForm } from 'components/TodoForm/TodoForm';
+import { TodoList } from 'components/TodoList/TodoList';
+import { UserHeader } from 'components/UserHeader/UserHeader';
+import { FC, useEffect } from 'react';
+import { useAppDispatch, useAppSelector } from 'reducers';
+import { loadUserInfo, selectUserError } from 'reducers/app/slice';
+import { loadTodos, selectTodosError } from 'reducers/todos/slice';
 
-.TaskForm__ButtonsWrapper {
-  margin-top: 30px;
-  display: flex;
-  gap: 2%;
-  & > button {
-    width: 48%;
-  }
-}
+import styles from './App.module.scss';
 
-.TaskForm__titleBox {
-  padding: 24px 12px;
-}
+export const App: FC = () => {
+  const dispatch = useAppDispatch();
+  const userError = useAppSelector(selectUserError);
+  const todosError = useAppSelector(selectTodosError);
 
-.TaskForm__formBox {
-  display: flex;
-  flex-direction: column;
-}
+  useEffect(() => {
+    dispatch(loadUserInfo());
+    dispatch(loadTodos());
+  }, [dispatch]);
 
-.TaskForm__formBoxContent {
-  padding: 19px 16px !important;
-}
-
-.TaskForm__formInput {
-  padding: 16px 22px 17px 22px;
-  background-color: white;
-  border-color: white;
-  border-radius: 8px;
-  color: black !important;
-  margin-bottom: 12px !important;
-
-  & > input {
-    padding: 0;
-  }
-  fieldset {
-    border: none !important;
-  }
-}
-
-.TaskForm__formNotes {
-  min-height: 98px;
-  background-color: white;
-  border-color: white;
-  border-radius: 8px;
-  color: black !important;
-  margin-bottom: 12px !important;
-  &::placeholder {
-    padding: 12px !important;
-  }
-}
-
-.TaskForm__formSubTitle {
-  padding-top: 12px;
-  color: rgba(0, 0, 0, 0.5);
-}
-
-.TaskForm__createButton {
-  padding: 8px;
-  background-color: #fc9927 !important;
-  color: white !important;
-  font-weight: 700 !important;
-  font-size: 12px !important;
-}
-
-.TaskForm__createButton:disabled {
-  border: 1px solid #999999;
-  background-color: #cccccc !important;
-  color: #666666;
-}
-
-.TaskForm__alert {
-  margin: auto;
-}
+  return (
+    <div className={styles.App}>
+      <h1 className={styles.title}>My Todos</h1>
+      <UserHeader />
+      {(userError || todosError) && (
+        <div className={styles.errorBanner}>{userError || todosError}</div>
+      )}
+      <TodoForm />
+      <TodoList />
+    </div>
+  );
+};
 ```
 
-With the custom components created, we just need to call the TasksContainer in the app index.js located at `src/index.js`.
+### Step 7: Wire up `main.tsx`
 
-```js
-import React from 'react';
+---
+
+Replace `src/main.tsx` with:
+
+```tsx
+import './index.scss';
+
+import { App } from 'components/App/App';
+import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
-import './index.css';
-import { TasksContainer } from './components/TasksContainer';
-import reportWebVitals from './reportWebVitals';
+import { Provider } from 'react-redux';
+import { store } from 'reducers';
 
-const container = document.getElementById('root');
-const root = createRoot(container);
-root.render(
-  <React.StrictMode>
-    <h1>Tasks Manager</h1>
-    <TasksContainer />
-  </React.StrictMode>,
+declare const DOMO_APP_NAME: string;
+declare const DOMO_APP_VERSION: string;
+
+if (import.meta.env.DEV) {
+  console.log(`${DOMO_APP_NAME}@${DOMO_APP_VERSION}`);
+}
+
+createRoot(document.getElementById('root')!).render(
+  <StrictMode>
+    <Provider store={store}>
+      <App />
+    </Provider>
+  </StrictMode>,
 );
-
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-reportWebVitals();
 ```
 
-Your final file directory structure should look like this. You
+`DOMO_APP_NAME` and `DOMO_APP_VERSION` are injected by the Vite template from `manifest.json` — useful for logging and telemetry.
 
-```
-├── README
-├── build
-│   ├── asset-manifest.json
-│   ├── favicon.ico
-│   ├── index.html
-│   ├── logo192.png
-│   ├── logo512.png
-│   ├── manifest.json
-│   ├── robots.txt
-│   ├── static
-│   │   ├── css
-│   │   │   ├── main.71624b60.css
-│   │   │   └── main.71624b60.css.map
-│   │   └── js
-│   │       ├── 422.c8d9e89e.chunk.js
-│   │       ├── 422.c8d9e89e.chunk.js.map
-│   │       ├── main.f9359c52.js
-│   │       ├── main.f9359c52.js.LICENSE.txt
-│   │       └── main.f9359c52.js.map
-│   └── thumbnail.png
-├── package.json
-├── public
-│   ├── favicon.ico
-│   ├── index.html
-│   ├── logo192.png
-│   ├── logo512.png
-│   ├── manifest.json
-│   ├── robots.txt
-│   └── thumbnail.png
-├── src
-│   ├── App.css
-│   ├── App.js
-│   ├── App.test.js
-│   ├── components
-│   │   └── TasksContainer
-│   │       ├── TaskForm
-│   │       │   ├── index.jsx
-│   │       │   └── index.module.scss
-│   │       ├── TaskListItem
-│   │       │   ├── index.jsx
-│   │       │   └── index.module.scss
-│   │       ├── index.jsx
-│   │       └── index.module.scss
-│   ├── index.css
-│   ├── index.js
-│   ├── logo.svg
-│   ├── reportWebVitals.js
-│   ├── setupProxy.js
-│   ├── setupTests.js
-│   └── taskService.js
-├── yarn-error.log
-└── yarn.lock
+Your final `src/` tree:
+
+```text
+src/
+├── main.tsx
+├── index.scss
+├── components/
+│   ├── App/
+│   │   ├── App.tsx
+│   │   └── App.module.scss
+│   ├── TodoForm/
+│   │   ├── TodoForm.tsx
+│   │   └── TodoForm.module.scss
+│   ├── TodoItem/
+│   │   ├── TodoItem.tsx
+│   │   └── TodoItem.module.scss
+│   ├── TodoList/
+│   │   ├── TodoList.tsx
+│   │   └── TodoList.module.scss
+│   └── UserHeader/
+│       ├── UserHeader.tsx
+│       └── UserHeader.module.scss
+├── reducers/
+│   ├── index.ts
+│   ├── createAppSlice.ts
+│   ├── app/
+│   │   └── slice.ts
+│   └── todos/
+│       └── slice.ts
+└── services/
+    ├── app.ts
+    └── types.ts
 ```
 
-### Step 6: Test your App Locally
+### Step 8: Test locally
 
 ---
 
-Before you publish your App to your Domo instance you can test that it is functioning as expected using the built in local server. Just run the `yarn start` script command.
+```bash
+pnpm start
+```
 
-Your app should look like the screenshot below and you should be able to create, edit, deleete, and mark tasks as completed.
+The Vite dev server starts on port 3000 (or 3001/3002 if busy). Because `proxyId` is set, `AppDBClient`, `IdentityClient`, and `UserClient` all talk to your real Domo instance — create, toggle, and delete todos and they persist across reloads. Log in as a different user and you'll see your name/avatar in the header and `By <name>` on every new todo.
 
-![Screenshot 2024-07-18 at 3.40.01 PM.png](/images/dev/stoplight.io/images/Screenshot-2024-07-18-at-3.40.01-PM.png)
-
-![Screenshot 2024-07-18 at 3.40.52 PM.png](/images/dev/stoplight.io/images/Screenshot-2024-07-18-at-3.40.52-PM.png)
-
-### Step 7: Publish App to Domo instance
+### Step 9: Publish
 
 ---
 
-To publish your finished app, you can use the upload script we used to publish the initial design.
+```bash
+pnpm upload
+```
 
-`yarn upload`
+The script runs `pnpm build` (which lints, tests, and builds), then `domo publish` from the `build/` folder. The new build becomes the active design. Anyone instantiating the app from the Asset Library picks it up.
 
-You should now be able to create new instances of your App, which has been successfully deployed into your Domo instance.
+### Next steps
 
-![Screenshot 2024-07-18 at 3.42.47 PM.png](/images/dev/stoplight.io/images/Screenshot-2024-07-18-at-3.42.47-PM.png)
+---
+
+- Run `da generate component` or `da generate reducer` to scaffold new slices that follow the same `createAppSlice` pattern.
+- Add a `UserPreferences` collection with a `limitToOwner` filter to persist per-user theme or default filter — see [AppDB filters](/portal/API-Reference/app-framework-apis/AppDB-API).
+- Layer dev/qa/prod `id` + `proxyId` values with `da manifest` and `src/manifestOverrides.json` instead of hand-editing.
+- Continue with [AI Book Recommender](/portal/Apps/App-Framework/Tutorials/React/AI-Book-Recommender) or [Mapbox World Map](/portal/Apps/App-Framework/Tutorials/React/Mapbox-World-App).

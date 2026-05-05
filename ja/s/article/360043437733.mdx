@@ -2,186 +2,145 @@
 title: "Domo CLI（コマンドラインインターフェース）ツール"
 ---
 
-### はじめに
+## はじめに
 
 Domo CLI（コマンドラインインターフェース）ツールを使用すると、テキストベースのコマンドを使用して、膨大なDataSetをアップロードする、カードの名前を変更する、ユーザーとグループを管理する、DataSetをエクスポートするなどの多くのデータ管理機能を実行できます。利用可能なその他の機能には、AWS S3でのインポート/エクスポート、DataFusionヘルパーなどがあります。大きなファイルを自動的に小さく分割することによって、より効率的にCSVファイルやGzip圧縮したCSVファイルをDomoインスタンスにアップロードできます。
 
-<Warning>
-  **重要：** このツールにはJava 7以降が必要です。
+<Warning>**重要：**このツールにはJava 7以降が必要です。</Warning>
 
-</Warning>
+<Frame>![Screenshot 2023-08-01 at 2.34.21 PM.png](/images/kb/ja/0EM5w000006vTTJ.jpg)</Frame>
 
-<Frame><img alt="Screenshot 2023-08-01 at 2.34.21 PM.png" src="/images/kb/ka0Vq000000Gnnx-00N5w00000Ri7BU-0EM5w000006vTTJ.jpg" style={{width: 500, height: 434}}/></Frame>
 ---
 
 この記事では、Domo CLIツールの使用について次のトピックで説明します。
 
-* [CLIツールをインストールして起動する](#install_and_launch)
-* [利用可能なコマンドを表示する](#view_available_commands)
-* [廃止されたコマンド](#deprecated_commands)
-* [コマンドの使用事例](#command_use_cases)
-* [スクリプティング](#scripting)
-* [一般的な問題](#common_issues)
-
 ---
 
-### CLIツールをインストールして起動する
+## CLIツールをインストールして起動する
 
 Domo CLIツールを使用するには、次の手順に従って自分のマシンにツールをダウンロードしてインストールします。
 
-1. ナビゲーションヘッダーで、 **［その他］** > **［管理者］** を選択します。
-2. **［もっと見る］** メニューで **［ツールダウンロード］** を選択します。
-3. **Domo CLI** ツールを見つけて、 **［Domo CLIを試す］** を選択します。
-     
+1. ナビゲーションヘッダーで、**［その他］**>**［管理者］**を選択します。
+2. **［もっと見る］**メニューで**［ツールダウンロード］**を選択します。
+3. **Domo CLI**ツールを見つけて、**［Domo CLIを試す］**を選択します。  
    ユーティリティファイルがマシンにダウンロードされます。
 4. ターミナルアプリケーションを開きます（macOSのターミナル、またはWindowsのPowerShell）。
-5. Java: `java -jar domoUtil.jar`
+5. Java: `java -jar domoUtil.jar`を使用してCLIバイナリーファイルを実行します。
 
-   を使用してCLIバイナリーファイルを実行します。
+<Tip>   **ヒント：**Windowsマシンを使用している場合は、.jarファイルをC:\domo\javaなどのフォルダに置きます。その後、次のコマンドラインを使用してCLIツールを起動できます。`java -jar C:\Domo\java\domoUtil.jar`</Tip>
 
-   <Tip>
-     **ヒント：** Windowsマシンを使用している場合は、.jarファイルをC:\domo\javaなどのフォルダに置きます。その後、次のコマンドラインを使用してCLIツールを起動できます。 `java -jar C:\Domo\java\domoUtil.jar`
+## 利用可能なコマンドを表示する
 
-   </Tip>
+利用可能なコマンドのリストを表示するには、「`help`**」と入力します。**
 
-### 利用可能なコマンドを表示する
+そのコマンドの特定のフラグとパラメーターを表示するには、`help [command name]`と入力します。
 
-利用可能なコマンドのリストを表示するには、「 `help` **」と入力します。**
-
-そのコマンドの特定のフラグとパラメーターを表示するには、 `help [command name]` と入力します。
-
-### 廃止されたコマンド
+## 廃止されたコマンド
 
 使用しているバージョンのツールで利用可能として一覧表示されているコマンドは、ダウンロード後には一部既に廃止されています。次の廃止されたコマンドのリストを参照してください。
 
-<table class="mt-responsive-table" data-aura-rendered-by="33:205;a"><tbody><tr><td class="mt-noheading" colspan="1" rowspan="1"><font face="monospace"> backup </font></td></tr><tr><td class="mt-noheading" colspan="1" rowspan="1"><font face="monospace"> backup-card </font></td></tr><tr><td class="mt-noheading" colspan="1" rowspan="1"><font face="monospace"> convert-sql </font></td></tr><tr><td class="mt-noheading" colspan="1" rowspan="1"><font face="monospace"> move-page </font></td></tr><tr><td class="mt-noheading" colspan="1" rowspan="1"><font face="monospace"> set-dataset-retention-window </font></td></tr><tr><td class="mt-noheading" colspan="1" rowspan="1"><font face="monospace"> restore card </font></td></tr></tbody></table>
+|                              |
+| ---------------------------- |
+| backup                       |
+| backup-card                  |
+| convert-sql                  |
+| move-page                    |
+| set-dataset-retention-window |
+| restore card                 |
 
-[このページのトップへ](#intro)
-
-### コマンドの使用事例
+## コマンドの使用事例
 
 このセクションでは、コマンドの使用事例について説明し、コマンドの使用に必要な情報または役立つ情報を示します。次のリストをスクロールするか、目的の項目に移動します。
 
-* [Domoインスタンスに接続する](#connect_domo_instance)
-* [Domoインスタンスとの接続を切断する](#disconnect_domo_instance)
-* [新規DataSetを作成する](#create_new_dataset)
-* [DataSetを削除する](#delete_dataset)
-* [データをDataSetにアップロードする](#upload_data_to_dataset)
-* [JDBCでデータをデータベースからアップロードする](#upload_data_via_jdbc)
-* [ユーザーを作成する](#create_user)
-* [データをクエリ（エクスポート）する](#query_data)
-* [カード画像を生成する](#generate_card_image)
-* [カードデータをエクスポートする](#export_card_data)
-* [ダッシュボードを移動する](#move_dashboard)
-* [ダッシュボードを降格する](#demote_dashboard)
-* [ダッシュボードを昇格する](#promote_dashboard)
-* [データを移動する](#move_data)
-* [DataSetのリストを表示する](#list_datasets)
-* [Domoを検索する](#search_domo)
-* [ログインユーザーを確認する](#who_am_i)
-* [セッションを終了する](#end_a_session)
+## Domoインスタンスに接続する
 
-# Domoインスタンスに接続する
+Domoインスタンスに接続するには、`connect`コマンドを実行して、次のパラメーターを入力します。
 
-Domoインスタンスに接続するには、 `connect` コマンドを実行して、次のパラメーターを入力します。
-
-<table class="mt-responsive-table" data-aura-rendered-by="33:205;a"><tbody><tr><td class="mt-noheading" colspan="1" rowspan="1"> -u、--username &lt;USERNAME&gt; </td><td class="mt-noheading" colspan="1" rowspan="1"> Domoログインユーザー名 </td></tr><tr><td class="mt-noheading" colspan="1" rowspan="1"> -p、--password &lt;PASSWORD&gt; </td><td class="mt-noheading" colspan="1" rowspan="1"> Domoログインパスワード </td></tr><tr><td class="mt-noheading" colspan="1" rowspan="1"> -s、--server &lt;SERVERNAME&gt; </td><td class="mt-noheading" colspan="1" rowspan="1"> Domoサーバー </td></tr><tr><td class="mt-noheading" colspan="1" rowspan="1"> -pp、--proxypassword &lt;proxypassword&gt; </td><td class="mt-noheading" colspan="1" rowspan="1"> プロキシパスワード </td></tr><tr><td class="mt-noheading" colspan="1" rowspan="1"> -ps、--proxyserver &lt;proxyserver&gt; </td><td class="mt-noheading" colspan="1" rowspan="1"> プロキシサーバー </td></tr><tr><td class="mt-noheading" colspan="1" rowspan="1"> -pt、--proxyport &lt;proxyport&gt; </td><td class="mt-noheading" colspan="1" rowspan="1"> プロキシポート </td></tr><tr><td class="mt-noheading" colspan="1" rowspan="1"> -pu、--proxyuser &lt;proxyuser&gt; </td><td class="mt-noheading" colspan="1" rowspan="1"> プロキシユーザー </td></tr><tr><td class="mt-noheading" colspan="1" rowspan="1"> -t、--token &lt;TOKEN&gt; </td><td class="mt-noheading" colspan="1" rowspan="1"> トークン </td></tr></tbody></table>
+|                                     |               |
+| ----------------------------------- | ------------- |
+| -u、--username \<USERNAME\>            | Domoログインユーザー名 |
+| -p、--password \<PASSWORD\>            | Domoログインパスワード |
+| -s、--server \<SERVERNAME\>            | Domoサーバー      |
+| -pp、--proxypassword \<proxypassword\> | プロキシパスワード     |
+| -ps、--proxyserver \<proxyserver\>     | プロキシサーバー      |
+| -pt、--proxyport \<proxyport\>         | プロキシポート       |
+| -pu、--proxyuser \<proxyuser\>         | プロキシユーザー      |
+| -t、--token \<TOKEN\>                  | トークン          |
 
 **例**
 
-```
-connect -u
+`connect -u jim.smith@xyzcompany.com -p abc123 -s xyzcompany.domo.com`
 
-  jim.smith@xyzcompany.com
-
--p abc123 -s
-
- xyzcompany.domo.com
-
-connect -s
-
- xyzcompany.domo.com
-
--t mffde8e727f825ae23e1117070f0ad67cfeb40c607dddd
-```
-
-[このページのトップへ](#intro)
+`connect -s xyzcompany.domo.com -t mffde8e727f825ae23e1117070f0ad67cfeb40c607dddd`
 
 ---
 
-# Domoインスタンスとの接続を切断する
+## Domoインスタンスとの接続を切断する
 
-Domoインスタンスとの接続を切断するには、パラメーターなしで `disconnect` コマンドを実行します。
+Domoインスタンスとの接続を切断するには、パラメーターなしで`disconnect`コマンドを実行します。
 
 ---
 
-# 新規DataSetを作成する
+## 新規DataSetを作成する
 
 CLIツールを使用して新規にDataSetを作成するには、次の手順を実行します。
 
-1. Domoアクセストークンを作成します。アクセストークンの作成方法と管理方法の詳細については、「
-   [アクセストークンを管理する](/s/article/360042934494) 」を参照してください。
-2. `derive-schema` コマンドを実行し、DomoにアップロードするDataSetのJSONフォーマットのスキーマファイルを取得します。
+1. Domoアクセストークンを作成します。アクセストークンの作成方法と管理方法の詳細については、「[アクセストークンを管理する](/s/article/360042934494)」を参照してください。
+2. `derive-schema`コマンドを実行し、DomoにアップロードするDataSetのJSONフォーマットのスキーマファイルを取得します。
 
-   <Note>
-     **注記：** 既存のCSVファイルからスキーマを取得するには、次のコマンドを使用します。「filename.csv」は自分のファイル名に置き換えます。 `derive-schema -d 'C:\directory\[filename.csv]' -s 'C:\directory\schemafile.json'`
+<Note>   **注記：**既存のCSVファイルからスキーマを取得するには、次のコマンドを使用します。「filename.csv」は自分のファイル名に置き換えます。`derive-schema -d 'C:\directory\[filename.csv]' -s 'C:\directory\schemafile.json'`
+3. 少数の行を含むクリーンで誤りのないCSVを生成し、データの事前チェックを実行します。スキーマファイルを取得し、`create-dataset`コマンドを実行してアップロードが機能することを確認します。その後は、自分の判断でDomoからそのDataSetを削除できます。</Note>
 
-   </Note>
-
-3. 少数の行を含むクリーンで誤りのないCSVを生成し、データの事前チェックを実行します。スキーマファイルを取得し、 `create-dataset` コマンドを実行してアップロードが機能することを確認します。その後は、自分の判断でDomoからそのDataSetを削除できます。
-
-   <Tip>
-     **ヒント：** CSV内にエスケープするカンマがある場合は、二重引用符（"）で囲む必要があります。囲まない場合、カンマはCLIツールによって区切り文字として使用されます。
-
-   </Tip>
-
+<Tip>   **ヒント：**CSV内にエスケープするカンマがある場合は、二重引用符（"）で囲む必要があります。囲まない場合、カンマはCLIツールによって区切り文字として使用されます。
 4. コマンドが成功すると、DataSet IDが表示されます。
-5. 事前チェックが成功したら、完全なファイルのスキーマファイルを使用して `create-dataset` コマンドを実行します。
+5. 事前チェックが成功したら、完全なファイルのスキーマファイルを使用して`create-dataset`コマンドを実行します。</Tip>
 
 ---
 
-# DataSetを削除する
+## DataSetを削除する
 
-DomoのDataSetを削除するには、 `delete-dataset` コマンドを使用します。[dataset id]は、削除するDataSetのIDに置き換えます。
+DomoのDataSetを削除するには、`delete-dataset`コマンドを使用します。[dataset id]は、削除するDataSetのIDに置き換えます。
 
 `delete-dataset -id [dataset id]`
 
-`list-dataset` コマンドを使用すると、DataSet IDのリストを取得できます。
-
-[このページのトップへ](#intro)
+`list-dataset`コマンドを使用すると、DataSet IDのリストを取得できます。
 
 ---
 
-# データをDataSetにアップロードする
+## データをDataSetにアップロードする
 
-作成したデータをDataSetにアップロードするには、 `upload-dataset` コマンドを使用します。[dataset id]は、更新するDataSetのIDに置き換えます。
+作成したデータをDataSetにアップロードするには、`upload-dataset`コマンドを使用します。[dataset id]は、更新するDataSetのIDに置き換えます。
 
-<Warning>
-  **重要：** デフォルトでは、appendパラメーターを使用せずにDataSetを更新すると、既存のDataSet全体が新しいアップロードに置き換えられます。
+<Warning>**重要：**デフォルトでは、appendパラメーターを使用せずにDataSetを更新すると、既存のDataSet全体が新しいアップロードに置き換えられます。</Warning>
 
-</Warning>
+`upload-dataset`コマンドで利用可能なパラメーターは、次の通りです。
 
-`upload-dataset` コマンドで利用可能なパラメーターは、次の通りです。
-
-<table class="mt-responsive-table" data-aura-rendered-by="33:205;a"><tbody><tr><td class="mt-noheading" colspan="1" rowspan="1"> -a、--append </td><td class="mt-noheading" colspan="1" rowspan="1"> 既存のデータに追加します。 </td></tr><tr><td class="mt-noheading" colspan="1" rowspan="1"> -c、--compressed </td><td class="mt-noheading" colspan="1" rowspan="1"> データファイルがGzip圧縮されます。 </td></tr><tr><td class="mt-noheading" colspan="1" rowspan="1"> -d、--dir &lt;DIRECTORY&gt; </td><td class="mt-noheading" colspan="1" rowspan="1"> データ（CSV）ディレクトリ。 </td></tr><tr><td class="mt-noheading" colspan="1" rowspan="1"> -f、--data &lt;FILENAME&gt; </td><td class="mt-noheading" colspan="1" rowspan="1"> データ（CSV）ファイル。 </td></tr><tr><td class="mt-noheading" colspan="1" rowspan="1"> -h、--headers </td><td class="mt-noheading" colspan="1" rowspan="1"> データファイルにはヘッダー行があります。 </td></tr><tr><td class="mt-noheading" colspan="1" rowspan="1"> -i、--id &lt;ID&gt; </td><td class="mt-noheading" colspan="1" rowspan="1"> DataSet ID。 </td></tr><tr><td class="mt-noheading" colspan="1" rowspan="1"> -p、--partition &lt;arg&gt; </td><td class="mt-noheading" colspan="1" rowspan="1"> パーティションタグ。 </td></tr><tr><td class="mt-noheading" colspan="1" rowspan="1"> -t、--temp-dir &lt;TEMP&gt; </td><td class="mt-noheading" colspan="1" rowspan="1"> 使用する一時的なパス。 </td></tr></tbody></table>
+|                      |                      |
+| -------------------- | -------------------- |
+| -a、--append          | 既存のデータに追加します。        |
+| -c、--compressed      | データファイルがGzip圧縮されます。  |
+| -d、--dir \<DIRECTORY\> | データ（CSV）ディレクトリ。      |
+| -f、--data \<FILENAME\> | データ（CSV）ファイル。        |
+| -h、--headers         | データファイルにはヘッダー行があります。 |
+| -i、--id \<ID\>         | DataSet ID。          |
+| -p、--partition \<arg\> | パーティションタグ。           |
+| -t、--temp-dir \<TEMP\> | 使用する一時的なパス。          |
 
 **例**
 
-```
-upload-dataset -id [dataset id] -data "c:\directory\datafile.csv"
+`upload-dataset -id [dataset id] -data "c:\directory\datafile.csv"`
 
-upload-dataset -i <dataset_id> -f <filename>
+`upload-dataset -i <dataset_id> -f <filename>`
 
-upload-dataset -i <dataset_id> -f <filename> -a
+`upload-dataset -i <dataset_id> -f <filename> -a`
 
-upload-dataset -i <dataset_id> -f <filename> -a -p <partition_name>
+`upload-dataset -i <dataset_id> -f <filename> -a -p <partition_name>`
 
-upload-dataset -i <dataset_id> -d <directory_name>
-```
+`upload-dataset -i <dataset_id> -d <directory_name>`
 
 ---
 
-# JDBCでデータをデータベースからアップロードする
+## JDBCでデータをデータベースからアップロードする
 
 JDBCドライバーJARファイルが現在の作業ディレクトリにあることを確認します。
 
@@ -195,33 +154,30 @@ upload-jdbc --dataset example_jdbc_upload --jdbcConnection jdbc:mysql://localhos
 
 ---
 
-# ユーザーを作成する
+## ユーザーを作成する
 
 CLIツールを使用して、メール、メール招待状を送信するかどうか、フルネーム、およびそれらのアクセス権限を指定して、ユーザーを作成します。現在、管理者、パワーユーザー、編集ユーザー、閲覧ユーザー、ソーシャルのアクセス権限を持つユーザーを作成できます。
 
-`create-user -n 'James Smith' -r Editor -i true -e jim.smith@xyzcompany.com`
-
-[このページのトップへ](#intro)
+`create-user -n 'James Smith' -r Editor -i true -e [jim.smith@xyzcompany.com](mailto:jim.smith@xyzcompany.com)`
 
 ---
 
-# データをクエリ（エクスポート）する
+## データをクエリ（エクスポート）する
 
-<Warning>
-  **重要：** デフォルトでは、クエリは最大100万行を返します。クエリにはより高い制限を指定できますが、結果が大きすぎる場合はタイムアウトが発生する可能性があります。フルエクスポートの場合は、 `export-data` コマンドを使用します。
+<Warning>**重要：**デフォルトでは、クエリは最大100万行を返します。クエリにはより高い制限を指定できますが、結果が大きすぎる場合はタイムアウトが発生する可能性があります。フルエクスポートの場合は、`export-data`コマンドを使用します。</Warning>
 
-</Warning>
+`query-data`コマンドは、指定されたDataSet IDからCSVファイルにデータをエクスポートします。このコマンドでは、`-q`または`-qf`のいずれかのパラメーターを使用する必要があります。
 
-`query-data` コマンドは、指定されたDataSet IDからCSVファイルにデータをエクスポートします。このコマンドでは、 `-q` または `-qf` のいずれかのパラメーターを使用する必要があります。
-
-<Note>
-  **注記：** エクスポートされるファイルは、指定されたDataSetに設定されているPersonalized Data Permission（PDP）に従います。
-
-</Note>
+<Note>**注記：**エクスポートされるファイルは、指定されたDataSetに設定されているPersonalized Data Permission（PDP）に従います。</Note>
 
 このコマンドで利用可能なパラメーターは、次の通りです。
 
-<table class="mt-responsive-table" data-aura-rendered-by="33:205;a"><tbody><tr><td class="mt-noheading" colspan="1" rowspan="1"> -i、--id &lt;ID&gt; </td><td class="mt-noheading" colspan="1" rowspan="1"> DataSet ID </td></tr><tr><td class="mt-noheading" colspan="1" rowspan="1"> -q、--query &lt;QUERY&gt; </td><td class="mt-noheading" colspan="1" rowspan="1"> ファイルをJSONフォーマットでクエリする </td></tr><tr><td class="mt-noheading" colspan="1" rowspan="1"> -qf、--queryfile &lt;QUERYFILE&gt; </td><td class="mt-noheading" colspan="1" rowspan="1"> ファイル名をクエリする <a id="export_card_data" target="_blank"></a></td></tr><tr><td class="mt-noheading" colspan="1" rowspan="1"> -xf、--exportfile &lt;EXPORTNAME&gt; </td><td class="mt-noheading" colspan="1" rowspan="1"> ファイル名をエクスポートする </td></tr></tbody></table>
+|                               |                       |
+| ----------------------------- | --------------------- |
+| -i、--id \<ID\>                  | DataSet ID            |
+| -q、--query \<QUERY\>            | ファイルをJSONフォーマットでクエリする |
+| -qf、--queryfile \<QUERYFILE\>   | ファイル名をクエリする           |
+| -xf、--exportfile \<EXPORTNAME\> | ファイル名をエクスポートする        |
 
 **例**
 
@@ -231,99 +187,103 @@ query-data -i [dataset id] -qf [query file in JSON format] -xf [filename]
 
 ---
 
-# カード画像を生成する
+## カード画像を生成する
 
-`generate-card-image` コマンドは、指定されたカードIDのPNG画像を生成します。
+`generate-card-image`コマンドは、指定されたカードIDのPNG画像を生成します。
 
 `generate-card-image -i <card id> -f <file name>`
 
 ---
 
-# カードデータをエクスポートする
+## カードデータをエクスポートする
 
-`download-card-data` コマンドは、指定されたカードIDからデータをダウンロードします。
+`download-card-data`コマンドは、指定されたカードIDからデータをダウンロードします。
 
 `download-card-data -i <card id> -f <output_csv_file>`
 
 ---
 
-# ダッシュボードを移動する
+## ダッシュボードを移動する
 
-`move-page` コマンドを使用すると、階層内の最上位ページとしてページを上に移動したり、階層内のサブページにページを移動したりできます。
+`move-page`コマンドを使用すると、階層内の最上位ページとしてページを上に移動したり、階層内のサブページにページを移動したりできます。
 
 このコマンドで利用可能なパラメーターは、次の通りです。
 
-<table class="mt-responsive-table" data-aura-rendered-by="33:205;a"><tbody><tr><td class="mt-noheading" colspan="1" rowspan="1"> -a、--move type </td><td class="mt-noheading" colspan="1" rowspan="1"> ページの移動先に応じて昇格または降格を選択します。 </td></tr><tr><td class="mt-noheading" colspan="1" rowspan="1"> -c、--page </td><td class="mt-noheading" colspan="1" rowspan="1"> ページID </td></tr><tr><td class="mt-noheading" colspan="1" rowspan="1"> -p、--newparentpage </td><td class="mt-noheading" colspan="1" rowspan="1"> ページを降格する場合の親ページID。 </td></tr></tbody></table>
-
-[このページのトップへ](#intro)
-
----
-
-# ダッシュボードを降格する
-
-```
-move-page -a demote -c 1234567 -p 7654321
-
-move-page -a promote -c 1234567
-```
+|                    |                           |
+| ------------------ | ------------------------- |
+| -a、--move type     | ページの移動先に応じて昇格または降格を選択します。 |
+| -c、--page          | ページID                     |
+| -p、--newparentpage | ページを降格する場合の親ページID。        |
 
 ---
 
-# ダッシュボードを昇格する
+## ダッシュボードを降格する
 
-<Tip>
-  **ヒント：** ページIDの確認方法の詳細については、「 ページIDを検索する 」を参照してください。
-
-</Tip>
+`move-page -a demote -c 1234567 -p 7654321`
 
 ---
 
-# データを移動する
+## ダッシュボードを昇格する
+
+`move-page -a promote -c 1234567`
+
+<Tip>**ヒント：**ページIDの確認方法の詳細については、「ページIDを検索する」を参照してください。</Tip>
+
+---
+
+## データを移動する
 
 move-dataコマンドを使用すると、既存のDataSetから別の既存のDataSetにデータを移動できます。
 
 このコマンドで利用可能なパラメーターは、次の通りです。
 
-<table class="mt-responsive-table" data-aura-rendered-by="33:205;a"><tbody><tr><td class="mt-noheading" colspan="1" rowspan="1"> -a、--append </td><td class="mt-noheading" colspan="1" rowspan="1"> 既存のデータに追加する </td></tr><tr><td class="mt-noheading" colspan="1" rowspan="1"> -d、--destination &lt;destination&gt; </td><td class="mt-noheading" colspan="1" rowspan="1"> 宛先DataSet </td></tr><tr><td class="mt-noheading" colspan="1" rowspan="1"> -s、--source &lt;source&gt; </td><td class="mt-noheading" colspan="1" rowspan="1"> ソースDataSet </td></tr></tbody></table>
+|                                |             |
+| ------------------------------ | ----------- |
+| -a、--append                    | 既存のデータに追加する |
+| -d、--destination \<destination\> | 宛先DataSet   |
+| -s、--source \<source\>           | ソースDataSet  |
 
 **例**
 
 `move-data -a -s [DataSet ID of where the data is coming from] -d [DataSet ID of where the data will be moved to]`
 
-<Note>
-  **注記：** replaceメソッドを使用してデータを移動する場合は、コマンドラインから-aパラメーターを削除します。
-
-</Note>
+<Note>**注記：**replaceメソッドを使用してデータを移動する場合は、コマンドラインから-aパラメーターを削除します。</Note>
 
 ---
 
-# DataSetのリストを表示する
+## DataSetのリストを表示する
 
-`list-dataset` コマンドは、所有者、検索語、特定のDataSet IDにもとづいてすべてのDataSetのリストを表示します。
+`list-dataset`コマンドは、所有者、検索語、特定のDataSet IDにもとづいてすべてのDataSetのリストを表示します。
 
 このコマンドで利用可能なパラメーターは、次の通りです。
 
-<table class="mt-responsive-table" data-aura-rendered-by="33:205;a"><tbody><tr><td class="mt-noheading" colspan="1" rowspan="1"> -i、--id &lt;ID&gt; </td><td class="mt-noheading" colspan="1" rowspan="1"> DataSet ID </td></tr><tr><td class="mt-noheading" colspan="1" rowspan="1"> -n、--name-like &lt;NAME_PATTERN&gt; </td><td class="mt-noheading" colspan="1" rowspan="1"> フィルターに名前を付ける </td></tr><tr><td class="mt-noheading" colspan="1" rowspan="1"> -o、--owner-id &lt;TYPE&gt; </td><td class="mt-noheading" colspan="1" rowspan="1"> DataSet所有者ID<div class="mdx-embed"><Note><p><b> 注記 </b><b> ： </b> 現在認証されているユーザーを使用する場合は、DataSet所有者IDの代わりに「me」を使用します。 </p></Note></div></td></tr></tbody></table>
+|                                |              |
+| ------------------------------ | ------------ |
+| -i、--id \<ID\>                   | DataSet ID   |
+| -n、--name-like `<NAME\_PATTERN>` | フィルターに名前を付ける |
+| -o、--owner-id \<TYPE\> | DataSet所有者ID **注記****：**現在認証されているユーザーを使用する場合は、DataSet所有者IDの代わりに「me」を使用します。 |
 
 **例**
 
-```
-list-dataset -o me -name-like "sales"
+`list-dataset -o me -name-like "sales"`
 
-list-dataset -name-like "marketing"
-```
-
-[このページのトップへ](#intro)
+`list-dataset -name-like "marketing"`
 
 ---
 
-# Domoを検索する
+## Domoを検索する
 
-`search-Domo` コマンドは、エンティティータイプと検索語でDomoからリストを検索してエクスポートします。
+`search-Domo`コマンドは、エンティティータイプと検索語でDomoからリストを検索してエクスポートします。
 
 このコマンドで利用可能なパラメーターは、次の通りです。
 
-<table class="mt-responsive-table" data-aura-rendered-by="33:205;a"><tbody><tr><td class="mt-noheading" colspan="1" rowspan="1"> -e、--entities &lt;ENTITIES&gt; </td><td class="mt-noheading" colspan="1" rowspan="1"> エンティティータイプ。有効なエンティティーには、app、buzz、buzz_channel、connector、dataflow、dataset、dojo_message、feature、knowledge_base、project、task、page、card、user、groupがあります。 </td></tr><tr><td class="mt-noheading" colspan="1" rowspan="1"> -f、--filename &lt;NAME&gt; </td><td class="mt-noheading" colspan="1" rowspan="1"> 情報をエクスポートするファイル名。 </td></tr><tr><td class="mt-noheading" colspan="1" rowspan="1"> -l、--limit &lt;LIMIT&gt; </td><td class="mt-noheading" colspan="1" rowspan="1"> 結果の上限。 </td></tr><tr><td class="mt-noheading" colspan="1" rowspan="1"> -o、--offset &lt;OFFSET&gt; </td><td class="mt-noheading" colspan="1" rowspan="1"> 結果のオフセット。 </td></tr><tr><td class="mt-noheading" colspan="1" rowspan="1"> -t、--term &lt;TERM&gt; </td><td class="mt-noheading" colspan="1" rowspan="1"> 検索語。 <a id="end_a_session" target="_blank"></a></td></tr></tbody></table>
+|                          |                                                                                                                                                         |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| -e、--entities \<ENTITIES\> | エンティティータイプ。有効なエンティティーには、app、buzz、buzz\_channel、connector、dataflow、dataset、dojo\_message、feature、knowledge\_base、project、task、page、card、user、groupがあります。 |
+| -f、--filename \<NAME\>     | 情報をエクスポートするファイル名。                                                                                                                                       |
+| -l、--limit \<LIMIT\>       | 結果の上限。                                                                                                                                                  |
+| -o、--offset \<OFFSET\>     | 結果のオフセット。                                                                                                                                               |
+| -t、--term \<TERM\>         | 検索語。                                                                                                                                                    |
 
 **例**
 
@@ -331,42 +291,37 @@ list-dataset -name-like "marketing"
 
 ---
 
-# ログインユーザーを確認する
+## ログインユーザーを確認する
 
 whoamiコマンドは、現在ログインしている個人のユーザー名とユーザーIDを返します。このコマンドにはパラメーターはありません。
 
-```
-> whoami
+`> whoami`
 
-John Smith (userid: 123456789)
-```
+`John Smith (userid: 123456789)`
 
 ---
 
-# セッションを終了する
+## セッションを終了する
 
-CLIセッションを終了するには、 `disconnect` と `quit` のコマンドを実行します。これらのコマンドにはパラメーターはありません。
+CLIセッションを終了するには、`disconnect`と`quit`のコマンドを実行します。これらのコマンドにはパラメーターはありません。
 
-### スクリプティング
+## スクリプティング
 
 コマンドプロンプトで上述のコマンドを入力することもできますが、そのコマンドを含むテキストファイルを作成してスクリプトファイルとして実行することもできます。
 
 **スクリプトファイルの例**
 
-`connect -t [access token id] -s xyzcompany.domo.com upload-dataset -id [dataset id] -data "c:\directory\datafile.csv" -append quit`
+`connect -t [access token id] -s xyzcompany.domo.com  
+upload-dataset -id [dataset id] -data "c:\directory\datafile.csv" -append  
+quit`
 
 **スクリプトファイルの実行例**
 
 `java -jar domoUtil-2.31.jar -script c:\directory\<uploadfile.script>`
 
-<Tip>
-  ヒント： **上述の例の\<uploadfile.script>は、自分のスクリプトファイルの名前に変更してください。**
+ヒント：**上述の例の\<uploadfile.script\>は、自分のスクリプトファイルの名前に変更してください。**
 
-</Tip>
-
-[このページのトップへ](#intro)
-
-### 一般的な問題
+## 一般的な問題
 
 Java 17以降がインストールされている場合は、CLIを実行するコマンドに次のJVMパラメーターを追加する必要があります。
 
@@ -380,6 +335,3 @@ Java 17以降がインストールされている場合は、CLIを実行する�
 java --add-opens java.base/java.nio=ALL-UNNAMED -jar domoUtil.jar
 ```
 
-[このページのトップへ](#intro)
-
-日本語

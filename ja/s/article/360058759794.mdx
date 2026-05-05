@@ -4,92 +4,93 @@ title: "Microsoft Azure Data Lake Gen2 AAD Writebackコネクター"
 
 ## はじめに
 
-Azure Data Lake Storage Gen2は最も生産性の高いデータレイクの1つです。これにより、Azure Storageが、Azure上にエンタープライズデータレイクを構築するための基礎になります。大量のデータを簡単に管理することができ、概念実証から生産への移行を迅速に行うことができます。Azure Data Lake Storage Gen2は、Azure Blob Storage上に構築されたビッグデータ分析専用の機能セットです。Azure Data Lake Storage Gen2は、既存の2つのストレージサービス（Azure Blob StorageとAzure Data Lake StorageGen1）の機能を統合したものです。Domoの構築済みAzure Data Lake Storage Gen2 WriteBackコネクターを使用して、Azure Active Directoryと接続し、Domo DataSetからMicrosoft Azure Data Lake Storage Gen2にデータをエクスポートします。Microsoft Azure Data Lake Gen2について詳しくは、 [https://docs.microsoft.com/en-us/azure/storage/blobs/data-lake-storage-introduction](https://docs.microsoft.com/en-us/azure/storage/blobs/data-lake-storage-introduction "https://docs.microsoft.com/en-us/azure/storage/blobs/data-lake-storage-introduction") を参照してください。
+Azure Data Lake Storage Gen2は最も生産性の高いデータレイクの1つです。これにより、Azure Storageが、Azure上にエンタープライズデータレイクを構築するための基礎になります。大量のデータを簡単に管理することができ、概念実証から生産への移行を迅速に行うことができます。Azure Data Lake Storage Gen2は、Azure Blob Storage上に構築されたビッグデータ分析専用の機能セットです。Azure Data Lake Storage Gen2は、既存の2つのストレージサービス（Azure Blob StorageとAzure Data Lake StorageGen1）の機能を統合したものです。Domoの構築済みAzure Data Lake Storage Gen2 WriteBackコネクターを使用して、Azure Active Directoryと接続し、Domo DataSetからMicrosoft Azure Data Lake Storage Gen2にデータをエクスポートします。Microsoft Azure Data Lake Gen2について詳しくは、[https://docs.microsoft.com/en-us/azure/storage/blobs/data-lake-storage-introduction](https://docs.microsoft.com/en-us/azure/storage/blobs/data-lake-storage-introduction)を参照してください。
 
-Azure Data Lake Gen2へのデータのエクスポートはData Centerで行います。このトピックでは、Microsoft Azure Data Lake Gen2 Writebackコネクターのユーザーインターフェースに固有のフィールドとメニューについて説明します。DataSetの追加や更新スケジュールの設定、DataSet情報の編集に関する一般的な情報については、「 [コネクターを使用してDataSetを追加する](/ja/s/article/360042926274) 」を参照してください。
+Azure Data Lake Gen2へのデータのエクスポートはData Centerで行います。このトピックでは、Microsoft Azure Data Lake Gen2 Writebackコネクターのユーザーインターフェースに固有のフィールドとメニューについて説明します。DataSetの追加や更新スケジュールの設定、DataSet情報の編集に関する一般的な情報については、「[コネクターを使用してDataSetを追加する](/s/article/360042926274)」を参照してください。
 
 ## 必要条件
 
 このコネクターを設定するには、次の情報が必要です。
 
-* Azure Active Directory設定から取得したクライアントWeb AppのクライアントID（GUID）とシークレットキー
-* Microsoft Azure Data Lake Storageのアカウント名
-* テナントID
-* コンテナー名
+- Azure Active Directory設定から取得したクライアントWeb AppのクライアントID（GUID）とシークレットキー
+- Microsoft Azure Data Lake Storageのアカウント名
+- テナントID
+- コンテナー名
 
 ### Azure Appを設定する
 
 Microsoft Exchange Metricsアカウントとの接続を作成するには、最初にMicrosoft Azure Web Appを作成して、必要なクライアントIDとシークレットを取得する必要があります。
 
-****Azure Appを設定するには**** ：
+****Azure Appを設定するには****：
 
-1. [Azureポータル](https://portal.azure.com/#home "https://portal.azure.com/#home")
-   にログインします。
-2. ****［Azure Active Directory］>［App Registrations］>［New Registration］****
-   の順に選択します。
+1. [Azureポータル](https://portal.azure.com/#home)にログインします。
+2. ****［Azure Active Directory］>［App Registrations］>［New Registration］****の順に選択します。
 
-<Frame><img alt="New_registration.png" src="/images/kb/ka05w00000127Jz-00N5w00000Ri7BU-0EM5w000005vO99.png"/></Frame>
+<Frame>![New_registration.png](/images/kb/ja/0EM5w000005wL4Z.png)</Frame>
 
 3. 次のように登録フォームに入力します。
 
-* Name：アプリケーションの名前を入力します。
-* サポートされているアカウントのタイプ：このアプリケーションまたはAPIにアクセスできるユーザーを指定するオプションを選択します。
-* Redirect URI：リダイレクトURIを入力します。認証応答は、ユーザーの認証に成功した後にこのURIに送信されます。この段階でURIを指定することは任意で、後で変更することもできますが、ほとんどの認証シナリオでは値が必要です。
+- Name：アプリケーションの名前を入力します。
+- サポートされているアカウントのタイプ：このアプリケーションまたはAPIにアクセスできるユーザーを指定するオプションを選択します。
+- Redirect URI：リダイレクトURIを入力します。認証応答は、ユーザーの認証に成功した後にこのURIに送信されます。この段階でURIを指定することは任意で、後で変更することもできますが、ほとんどの認証シナリオでは値が必要です。
 
-<Frame><img alt="clipboard_eac88f9aa2966a791f11417756903afc4.png" src="/images/kb/ka05w00000127Jz-00N5w00000Ri7BU-0EM5w000005vO9B.png"/></Frame>
+<Frame>![clipboard_eac88f9aa2966a791f11417756903afc4.png](/images/kb/ja/0EM5w000005wL4m.png)</Frame>
 
-4. ********［Register］******** をクリックします。登録されているAppの概要が表示されます。ここに表示される ****アプリケーションID**** は、Domoの ****［認証情報］**** ペインに入力する ****クライアントID**** です。
+4. ********［Register］********をクリックします。登録されているAppの概要が表示されます。ここに表示される****アプリケーションID****は、Domoの****［認証情報］****ペインに入力する****クライアントID****です。
 
-5. ********［API Permissions］>>［+Add a permission］******** の順にクリックします。
+5. ********［API Permissions］>>［+Add a permission］********の順にクリックします。
 
-6. ****［Request API permissions］**** セクションが表示されます。アプリケーションのAPIのアクセス許可を追加します。
+6. ****［Request API permissions］****セクションが表示されます。アプリケーションのAPIのアクセス許可を追加します。
 
-<Frame><img alt="clipboard_e9ed1fc0137b700a6e1c7bb384b55b721.png" src="/images/kb/ka05w00000127Jz-00N5w00000Ri7BU-0EM5w000005vO91.png"/></Frame>
+<Frame>![clipboard_e9ed1fc0137b700a6e1c7bb384b55b721.png](/images/kb/ja/0EM5w000005wL4X.png)</Frame>
 
-7. 次に、
-********［Certificates and secrets］******** をクリックします。証明書は、トークンを要求するときにアプリケーションの識別情報を証明するためのシークレットとして使用できます。また、パブリックキーと呼ばれることもあります。
+7. 次に、********［Certificates and secrets］********をクリックします。証明書は、トークンを要求するときにアプリケーションの識別情報を証明するためのシークレットとして使用できます。また、パブリックキーと呼ばれることもあります。
 
-8. ［
-****+ ****New client secret］******** をクリックします。
+8. ［****+****New client secret］********をクリックします。
 
-<Frame><img alt="clipboard_ea0abe516411f9db35904232995bd00d9.png" src="/images/kb/ka0Vq0000003W6b-00N5w00000Ri7BU-0EM5w000005vO93.png"/></Frame>
+<Frame>![clipboard_ea0abe516411f9db35904232995bd00d9.png](/images/kb/ja/0EM5w000005wL4l.png)</Frame>
 
-9. クライアントシークレットの説明と有効期限を指定し、
-********［Add］******** をクリックします。
+9. クライアントシークレットの説明と有効期限を指定し、********［Add］********をクリックします。
 
-10. 値をコピーし、Domoの
-****コネクターの［認証情報］**** セクションの ********［Client Secret］******** フィールドに貼り付けます。
+10. 値をコピーし、Domoの****コネクターの［認証情報］****セクションの********［Client Secret］********フィールドに貼り付けます。
 
 ### Azure APPに役割を割り当てる
 
-1. **［Subscriptions］**
-   に移動します。
-2. **［Access Control (IAM)］>［Add］>［Add Role Assignment］**
-   の順にクリックします。
-3. **［Storage Blob data contributor］**
-   の役割を選択します。
+1. **［Subscriptions］**に移動します。
+2. **［Access Control (IAM)］>［Add］>［Add Role Assignment］**の順にクリックします。
+3. **［Storage Blob data contributor］**の役割を選択します。
 4. Azureアプリケーション名を選択します。アプリケーション名を検索して選択できます。
-5. **［Save］**
-   をクリックします。
+5. **［Save］**をクリックします。
 
 ## 接続を設定する
 
-このセクションでは、Azure Data Lake Gen2 Writebackコネクターページの ********［認証情報］******** および ********［詳細］******** ペインのオプションについて説明します。このページのほかのペインの項目である ********［スケジュール設定］******** や ********［DataSetに名前を付け、説明を入力］******** に関しては、ほとんどのタイプのコネクターで共通しています。詳細については「 [コネクターを使用してDataSetを追加する](/ja/s/article/360042926274 "コネクターを使用してDataSetを追加する") 」を参照してください。
+このセクションでは、Azure Data Lake Gen2 Writebackコネクターページの********［認証情報］********および ********［詳細］********ペインのオプションについて説明します。このページのほかのペインの項目である********［スケジュール設定］********や********［DataSetに名前を付け、説明を入力］********に関しては、ほとんどのタイプのコネクターで共通しています。詳細については「[コネクターを使用してDataSetを追加する](/s/article/360042926274)」を参照してください。
 
 ### ［認証情報］ ペイン
 
 このペインには、Azure Data Lakeファイルシステム（コンテナ）に接続するための認証情報を入力するフィールドが含まれます。下表では、各フィールドに必要な内容を説明しています。
 
-<table border="1" cellpadding="1" cellspacing="1" data-aura-rendered-by="33:195;a"><thead><tr><th colspan="1" rowspan="1"><p> フィールド </p></th><th colspan="1" rowspan="1"><p> 説明 </p></th></tr></thead><tbody><tr><td colspan="1" rowspan="1"> Azure Application Client ID </td><td colspan="1" rowspan="1"> Azure Active Directory設定から取得されるクライアントWeb AppのクライアントID（GUID）を入力します。詳細は、「必要条件」を参照してください。 </td></tr><tr><td colspan="1" rowspan="1"> Azure Application Client Secret </td><td colspan="1" rowspan="1"> クライアントWeb Appのシークレットキーを入力します。詳細については「必要条件」を参照してください。 </td></tr><tr><td colspan="1" rowspan="1"> Tenant ID </td><td colspan="1" rowspan="1"> テナントIDを入力します。［ <a href="http://Portal.azure.com" rel="noopener" target="_blank"> Portal.azure.com </a> ］&gt;［Azure Active Directory］&gt;［Properties］に移動します。ディレクトリIDはお使いのテナントIDです。 </td></tr><tr><td colspan="1" rowspan="1"> Account Name </td><td colspan="1" rowspan="1"> Microsoft Azure Data Lake Storageアカウント名を入力します。 </td></tr><tr><td colspan="1" rowspan="1"> Container </td><td colspan="1" rowspan="1"> コンテナー名を入力します。 </td></tr></tbody></table>
+| フィールド                           | 説明                                                                                                 |
+| ------------------------------- | -------------------------------------------------------------------------------------------------- |
+| Azure Application Client ID     | Azure Active Directory設定から取得されるクライアントWeb AppのクライアントID（GUID）を入力します。詳細は、「必要条件」を参照してください。             |
+| Azure Application Client Secret | クライアントWeb Appのシークレットキーを入力します。詳細については「必要条件」を参照してください。                                               |
+| Tenant ID                       | テナントIDを入力します。［Portal.azure.com］>［Azure Active Directory］>［Properties］に移動します。ディレクトリIDはお使いのテナントIDです。 |
+| Account Name                    | Microsoft Azure Data Lake Storageアカウント名を入力します。                                                     |
+| Container                       | コンテナー名を入力します。                                                                                      |
 
-有効な認証情報を一度入力しておくと、随時同じアカウントを使用して新しいDomo-Azure Data Lake Storage Gen2接続を設定できます。コネクターのアカウントはData Centerの ********［アカウント］******** タブで管理できます。このタブについて、詳しくは「 [コネクターのユーザーアカウントを管理する](/ja/s/article/360042926054 "コネクターのユーザーアカウントを管理する") 」を参照してください。
+有効な認証情報を一度入力しておくと、随時同じアカウントを使用して新しいDomo-Azure Data Lake Storage Gen2接続を設定できます。コネクターのアカウントはData Centerの ********［アカウント］********タブで管理できます。このタブについて、詳しくは「[コネクターのユーザーアカウントを管理する](/s/article/360042926054)」を参照してください。
 
 ### ［詳細］ペイン
 
-このペインには、メインの ********［Reports］******** メニューに加えて、選択したレポートタイプに応じて表示/非表示になるその他様々なメニューがあります。
+このペインには、メインの********［Reports］********メニューに加えて、選択したレポートタイプに応じて表示/非表示になるその他様々なメニューがあります。
 
-<table border="1" cellpadding="1" cellspacing="1" data-aura-rendered-by="33:195;a"><thead><tr><th colspan="1" rowspan="1"><p> メニュー </p></th><th colspan="1" rowspan="1"><p> 説明 </p></th></tr></thead><tbody><tr><td colspan="1" rowspan="1"><p> Input DataSet ID </p></td><td colspan="1" rowspan="1"><p> 選択したAzure Data Lake Storageファイルシステム（コンテナ）にコピーするDataSetのDataSet ID（GUID）を入力します。Data CenterでDataSetの詳細ビューを開き、URLの「datasources/」に続く部分でIDを見つけることができます。 </p><p> 例えば、URLが <a href="https://mycompany.domo.com/datasources/845305d8-da3d-4107-a9d6-13ef3f86d4a4/details/overviewの" rel="noopener" target="_blank"> https://mycompany.domo.com/datasources/845305d8-da3d-4107-a9d6-13ef3f86d4a4/details/overviewの </a> 場合、DataSet IDは845305d8-da3d-4107-a9d6-13ef3f86d4a4です。 </p></td></tr><tr><td colspan="1" rowspan="1"> File System Name </td><td colspan="1" rowspan="1"> ファイルをアップロードするファイルシステム名を入力します。ファイルシステムはお使いのファイルのコンテナとして機能します。 </td></tr><tr><td colspan="1" rowspan="1"> Select Filename </td><td colspan="1" rowspan="1"> DataSetの参照に <b><b><b><b><b><b><b><b><b><b><b><b><b><b><b><b><b><b><b><b><b><b><b><b><b><b><b><b><b><b><b><b> 入力DataSet ID </b></b></b></b></b></b></b></b></b></b></b></b></b></b></b></b></b></b></b></b></b></b></b></b></b></b></b></b></b></b></b></b> を使用するか、出力 <b><b> ファイル名 </b></b> を使用するかを選択します。 </td></tr><tr><td colspan="1" rowspan="1"> Filename </td><td colspan="1" rowspan="1"> データの出力ファイル名を入力します。 </td></tr></tbody></table>
+| メニュー             | 説明                                                                                                                                                                                                                                                                                                             |
+| ---------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Input DataSet ID | 選択したAzure Data Lake Storageファイルシステム（コンテナ）にコピーするDataSetのDataSet ID（GUID）を入力します。Data CenterでDataSetの詳細ビューを開き、URLの「datasources/」に続く部分でIDを見つけることができます。  例えば、URLがhttps://mycompany.domo.com/datasources/845305d8-da3d-4107-a9d6-13ef3f86d4a4/details/overviewの場合、DataSet IDは845305d8-da3d-4107-a9d6-13ef3f86d4a4です。 |
+| File System Name | ファイルをアップロードするファイルシステム名を入力します。ファイルシステムはお使いのファイルのコンテナとして機能します。                                                                                                                                                                                                                                                   |
+| Select Filename  | DataSetの参照に****************************************************************入力DataSet ID**************************************************************** を使用するか、出力****ファイル名****を使用するかを選択します。                                                                                                                    |
+| Filename         | データの出力ファイル名を入力します。                                                                                                                                                                                                                                                                                             |
 
 ### その他のペイン
 
-スケジュール設定、再試行、更新に関するオプションなど、コネクターインターフェースのその他のペインに表示されるオプションについては、「 [コネクターを使用してDataSetを追加する](/ja/s/article/360042926274) 」を参照してください。
+スケジュール設定、再試行、更新に関するオプションなど、コネクターインターフェースのその他のペインに表示されるオプションについては、「[コネクターを使用してDataSetを追加する](/s/article/360042926274)」を参照してください。

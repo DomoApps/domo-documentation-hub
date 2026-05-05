@@ -2,13 +2,13 @@
 title: "Create a Model in Jupyter Workspaces"
 ---
 
-### Intro
+## Intro
 
 This article provides instructions for how to build an AI/ML model in a Jupyter Workspace. The model is also uploaded to the Domo Model Management interface where it can be deployed for real-time or batch inference.
 
 ---
 
-### Training Data
+## Training Data
 
 The example is intended to be simple and will not use machine learning to train a model. Instead, given a list of colored shapes, we will define a simple algorithm that classifies the shapes as blue or not blue.
 
@@ -32,7 +32,7 @@ train_x.join(train_y).head()
 
 <table border="1" data-aura-rendered-by="33:200;a"><thead><tr><th colspan="1" rowspan="1"></th><th colspan="1" rowspan="1"> Shape </th><th colspan="1" rowspan="1"> Color </th><th colspan="1" rowspan="1"> Blue </th></tr></thead><tbody><tr><td colspan="1" rowspan="1"> 0 </td><td colspan="1" rowspan="1"> Circle </td><td colspan="1" rowspan="1"> Red </td><td colspan="1" rowspan="1"> 0 </td></tr><tr><td colspan="1" rowspan="1"> 1 </td><td colspan="1" rowspan="1"> Square </td><td colspan="1" rowspan="1"> Blue </td><td colspan="1" rowspan="1"> 1 </td></tr><tr><td colspan="1" rowspan="1"> 2 </td><td colspan="1" rowspan="1"> Oval </td><td colspan="1" rowspan="1"> Green <a id="hyperparameters" target="_blank"></a></td><td colspan="1" rowspan="1"> 0 </td></tr><tr><td colspan="1" rowspan="1"> 3 </td><td colspan="1" rowspan="1"> Rectangle </td><td colspan="1" rowspan="1"> Orange </td><td colspan="1" rowspan="1"> 0 </td></tr><tr><td colspan="1" rowspan="1"> 4 </td><td colspan="1" rowspan="1"> Rectangle </td><td colspan="1" rowspan="1"> Pink </td><td colspan="1" rowspan="1"> 0 </td></tr></tbody></table>
 
-### Hyperparameters
+## Hyperparameters
 
 When using machine learning to train the model, parameters are required to configure the training process. In our example, we are not using them, but we include them here for reference.
 
@@ -43,7 +43,7 @@ hyperparameters = {
 }
 ```
 
-### Model Training
+## Model Training
 
 At this point, we would normally use a machine learning library to train a model to fit our training DataSet. For the purposes of this notebook, this is the model.
 
@@ -73,7 +73,7 @@ This model implements an invoke function that gives us a common place to impleme
 
 When using this model in a DataFlow, the invoke function accepts and returns data as a CSV string.
 
-### Validation
+## Validation
 
 To ensure your model is read for deployment, we recommend testing using the invoke function. To keep things simple in this example, we will test against a training DataSet.
 
@@ -89,7 +89,7 @@ predicted_y = model.invoke(train_csv, `text/csv`, `text/csv`)
 print(predicted_y)
 ```
 
-# Response
+### Response
 
 ```python
 0
@@ -99,7 +99,7 @@ print(predicted_y)
 0
 ```
 
-### Model Schema
+## Model Schema
 
 Each model defines an input and output type and optionally a schema for CSV or JSON types.
 
@@ -107,7 +107,7 @@ CSVModelIOConfiguration, JSONModelIOConfiguration()
 
 For example, a model may accept a CSV as an input, and return a CSV as an output. In addition to manually creating a CSV schema, you can also create a CSV schema from a DataFrame which may be simpler if a DataFrame is in use.
 
-### Metrics
+## Metrics
 
 During training and validation, we can define metrics to measure model performance. Example metrics are included below as a reference.
 
@@ -126,7 +126,7 @@ now = datetime.now()
 domo_metrics = {k: Metric(k, v, None, now) for (k,v) in metrics.items()}
 ```
 
-### Model Task
+## Model Task
 
 Domo lets you specify which task(s) your model is trained to perform, including:
 
@@ -148,7 +148,7 @@ task = ModelTask(ModelTaskType.CLASSIFICATION, input_config=input_config,
 output_config=output_config)
 ```
 
-### Kernel Snapshots
+## Kernel Snapshots
 
 Domo Jupyter Workspaces allow you to customize your environment by installing third-party libraries. To ensure that the model hosting environment matches your customized Jupyter environment, a snapshot is created of the conda environment running the Jupyter kernel.
 
@@ -156,7 +156,7 @@ A kernel snapshot is automatically created the first time you create a model in 
 
 Creating a new snapshot can take several minutes.
 
-### Create the Model
+## Create the Model
 
 Upload the model to the Domo Model Management interface where its performance can be compared with other models, and it may be deployed as an endpoint or DataFlow tile in Magic ETL when it is ready.
 

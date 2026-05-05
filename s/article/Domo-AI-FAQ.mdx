@@ -1,0 +1,57 @@
+---
+title: Domo AI FAQ
+---
+
+## Intro 
+
+This article answers common questions about how Domo's AI engine processes data, handles security, and manages privacy.
+
+---
+
+<AccordionGroup>
+
+  <Accordion title="Does the AI engine process customer data? If so, does it require access to raw data in clear text, or can it operate exclusively on metadata?">
+    In order to answer specific questions about your data, the agent first uses metadata (schemas, table definitions, semantic layers) to generate a SQL query. The results of that SQL query are then provided to the model in plain text to generate a final answer. All applicable user permissions and PDP policies apply.
+  </Accordion>
+
+  <Accordion title="Does the solution rely on third-party AI providers for model inference or data processing?">
+    When using DomoGPT (based on Anthropic Claude models in Amazon Bedrock), data sent to the model stays within Domo's hosting environment in AWS. Data sent to the model is not accessible by Anthropic and may not be used to further train models.
+  </Accordion>
+
+  <Accordion title="Does the solution implement technical controls to mitigate prompt injection attacks?">
+    In addition to protections built into the models, Domo implements additional guardrails to help mitigate prompt injection attacks. However, prompt injection remains a risk. Domo recommends that customers take care when configuring custom agents with additional capabilities that could allow an agent to perform an action based on injected instructions.
+  </Accordion>
+
+  <Accordion title="Are prompts, inputs, embeddings, or outputs stored by the solution or any third-party provider?">
+    Domo stores agent requests and responses to provide session and conversation history. Third-party providers do not store this data.
+  </Accordion>
+
+  <Accordion title="Are customer prompts, inputs, embeddings, or outputs used for model training, fine-tuning, or performance improvement?">
+    No. AI Chat includes a feedback option that may be used for improvements, but the underlying model prompts and outputs are not used for model training, fine-tuning, or performance improvement.
+  </Accordion>
+
+  <Accordion title="Are prompts, contextual memory, embeddings, and session data isolated between users, agents, and tenants?">
+    Yes. Prompts, contextual memory, embeddings, and session data are logically and technically isolated between users, agents, and tenants.
+  </Accordion>
+
+  <Accordion title="Are data leakage prevention controls implemented to prevent the LLM from disclosing sensitive or cross-tenant information?">
+    All document and dataset permissions and PDP policies are applied to queries before data is sent to the LLM. This ensures the model only has access to data the requesting user is authorized to view.
+  </Accordion>
+
+  <Accordion title="Are model updates version-controlled and communicated to customers prior to deployment?">
+    AI features use Domo-provided models by default, which are periodically updated to improve performance. Default models can be configured in **Admin Settings** under **AI Services** for features like Workflow AI Service tasks, or via API, giving customers more control over which models are available for those features.
+  </Accordion>
+
+  <Accordion title="Are prompts, outputs, and agent actions logged and exportable for audit purposes?">
+    Yes. AI Chat prompts and outputs are available in a Domostat report for audit and review purposes.
+  </Accordion>
+
+  <Accordion title="Are mechanisms implemented to prevent abuse or excessive consumption of the model?">
+    Yes. Domo implements per-user and per-instance rate limiting, as well as per-request maximum token limits, to prevent abuse and excessive model consumption.
+  </Accordion>
+
+  <Accordion title="Is the geographic location of AI data processing configurable and contractually defined?">
+    When using DomoGPT, AI data processing stays within Domo's hosting environment. For example, in Domo's EU hosting environment, only EU-hosted models are used for DomoGPT. Geographic processing location is tied to the customer's hosting environment.
+  </Accordion>
+
+</AccordionGroup>

@@ -2,100 +2,74 @@
 title: "Domo on Amazon Redshift（推奨）"
 ---
 
-import { InlineImage } from "/snippets/InlineImage.mdx";
-
-# はじめに
+## はじめに
 
 Cloud Amplifierでは、Amazon Redshiftを使用してDomoインスタンスを稼働させることができます。設定が完了したら、Redshiftから読み込まれた仮想テーブルの使用を開始できます。この仮想テーブルは、カードの作成、アラートの設定、Magic ETL DataFlowでの入力に使用できます。
 
-このガイドは、Redshiftに精通しているユーザーを対象としており、RedshiftをCloud Amplifierに登録する手順や一般的なトラブルシューティング方法について説明しています。Cloud Amplifierの詳細については、 [概要](/ja/s/article/4412849158167) を参照してください。
+このガイドは、Redshiftに精通しているユーザーを対象としており、RedshiftをCloud Amplifierに登録する手順や一般的なトラブルシューティング方法について説明しています。Cloud Amplifierの詳細については、[概要](/ja/s/article/4412849158167)を参照してください。
 
-<Frame><img alt="redshift icon.jpeg" src="/images/kb/ka0Vq0000000Rcv-00N5w00000Ri7BU-0EM5w000006v2XQ.jpg" style={{width: 138.999, height: 139.979}}/></Frame>
+<Frame>![redshift icon.jpeg](/images/kb/ja/0EM5w000006wDhV.jpg)</Frame>
 
 ---
 
 この記事では、RedshiftをCloud Amplifierに登録する方法について、次のトピックで説明します。
 
-* [必要条件](#prerequisites)
-  + [IPアドレスを許可リストに登録する](#allowlist)
-* [設定](#setup)
-* [Redshiftから供給されたDataSetを使用する](#use_redshift_datasets)
-
 ---
 
-# 必要条件
+## 必要条件
 
 Redshift–Cloud Amplifier接続を設定する前に、次の手順を完了することを推奨します。
 
-* Redshiftサービスユーザーを作成する — この統合に特化した新しいRedshiftユーザーを作成することを推奨します。スキーマの「Usage」権限とテーブルの「Select」権限を持つアカウントを使用できますが、通常はサービスユーザーがベストプラクティスです。
-  + サービスユーザーは、Redshiftで読み込み元のスキーマの「Usage」権限を持っている必要があります。
-  + サービスユーザーは、Redshiftで読み込み元のテーブルの「Select」権限を持っている必要があります。
-  + サービスユーザーは、
-    **svv\_table\_info** システムビューの「Select」権限を持っている必要があります。
-    - スキーマの「Usage」権限またはテーブルの「Select」権限をユーザー/権限に付与する方法については、
-      [こちらの記事](https://docs.aws.amazon.com/ja_jp/redshift/latest/dg/r_GRANT.html) を参照してください。
-* Domoサービスアカウントを作成する — この統合専用の新しいDomoアカウントを作成することを推奨します。アカウント権限では、「クラウドアカウントを管理」および「DataSetを管理」の許可が有効になっている必要があります。権限および許可の詳細については、「
-  [カスタマイズされた権限を管理する](/ja/s/article/360043438973) 」を参照してください。
+- Redshiftサービスユーザーを作成する — この統合に特化した新しいRedshiftユーザーを作成することを推奨します。スキーマの「Usage」権限とテーブルの「Select」権限を持つアカウントを使用できますが、通常はサービスユーザーがベストプラクティスです。
+  - サービスユーザーは、Redshiftで読み込み元のスキーマの「Usage」権限を持っている必要があります。
+  - サービスユーザーは、Redshiftで読み込み元のテーブルの「Select」権限を持っている必要があります。
+  - サービスユーザーは、**svv\_table\_info**システムビューの「Select」権限を持っている必要があります。
+    - スキーマの「Usage」権限またはテーブルの「Select」権限をユーザー/権限に付与する方法については、[こちらの記事](https://docs.aws.amazon.com/ja_jp/redshift/latest/dg/r_GRANT.html)を参照してください。
+- Domoサービスアカウントを作成する — この統合専用の新しいDomoアカウントを作成することを推奨します。アカウント権限では、「クラウドアカウントを管理」および「DataSetを管理」の許可が有効になっている必要があります。権限および許可の詳細については、「[カスタマイズされた権限を管理する](/s/article/360043438973)」を参照してください。
 
-#### IPアドレスを許可リストに登録する
+### IPアドレスを許可リストに登録する
 
-Redshiftデータベースに接続する前に、接続先となるデータベースサーバーのポートでIPアドレスをいくつか許可リストに登録する必要があります。IPアドレスの完全なリストについては、 [こちらのドキュメント](/ja/s/article/360043630093) を参照してください。
+Redshiftデータベースに接続する前に、接続先となるデータベースサーバーのポートでIPアドレスをいくつか許可リストに登録する必要があります。IPアドレスの完全なリストについては、[こちらのドキュメント](/s/article/360043630093)を参照してください。
 
-# 設定
+## 設定
 
 Cloud Amplifierを使用してDomo内からの読み取りアクセス権を設定し、Redshiftテーブルの参照を開始するには、次の手順に従います。
 
 1. Domoサービスアカウントにログインします。
-2. ナビゲーションヘッダーで
-   **［データ］** を選択します。Data Centerが表示されます。
-3. Data Warehouseページが表示されない場合は、左サイドレールを使用して
+2. ナビゲーションヘッダーで**［データ］**を選択します。Data Centerが表示されます。
+3. Data Warehouseページが表示されない場合は、左サイドレールを使用して<img alt="自動的に生成されたアイコンの説明" src="/images/kb/ja/0EM5w000006wDbN.png" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/>
 
-   <InlineImage src="/images/kb/ka0Vq000000BCKP-00N5w00000Ri7BU-0EM5w000006wDbN.png" /> **［Data Warehouse］** に進みます。
+   **［Data Warehouse］**に進みます。
 4. 画面のメイン領域で、焦点を合わせる分子を選択します。
 
-   <Frame><img alt="molecule.jpeg" src="/images/kb/ka0Vq000000BCKP-00N5w00000Ri7BU-0EM5w000006wDev.jpg" style={{width: 632.997, height: 436.989}}/></Frame>
+   <Frame>![molecule.jpeg](/images/kb/ja/0EM5w000006wDev.jpg)</Frame>
 
-   <Frame><img alt="molecule zoom.jpeg" src="/images/kb/ka0Vq000000BCKP-00N5w00000Ri7BU-0EM5w000006wDdZ.jpg" style={{width: 195.994, height: 215.98}}/></Frame>
+   <Frame>![molecule zoom.jpeg](/images/kb/ja/0EM5w000006wDdZ.jpg)</Frame>
+5. **<img alt="add_new_cloud.png" src="/images/kb/ja/0EM5w000005vNtv.png" style={{width: 25, height: 28, display: 'inline', verticalAlign: 'start', margin: '0'}}/>****［新しいクラウドを追加］**を選択します。  
+    ［新しい統合を追加］モーダルが表示されます。
+6. **［ネイティブ統合］**メニューで**［Redshift］**を選択します。
 
-5. **<InlineImage src="/images/kb/ka0Vq000000BCKP-00N5w00000Ri7BU-0EM5w000005vNtv.png" />**
-   **［新しいクラウドを追加］** を選択します。
+   <Frame>![select redshift.jpg](/images/kb/ja/0EM5w000006wDfZ.jpg)</Frame>
+7. **［+新しい統合を追加］**を選択します。
 
-   ［新しい統合を追加］モーダルが表示されます。
-6. **［ネイティブ統合］**
-   メニューで **［Redshift］** を選択します。
-
-   <Frame><img alt="select redshift.jpg" src="/images/kb/ka0Vq000000BCKP-00N5w00000Ri7BU-0EM5w000006wDfZ.jpg" style={{width: 526.996, height: 358.999}}/></Frame>
-
-7. **［+新しい統合を追加］**
-   を選択します。
-
-   <Frame><img alt="new redshift integration.jpg" src="/images/kb/ka0Vq000000BCKP-00N5w00000Ri7BU-0EM5w000006wDfj.jpg" style={{width: 530, height: 371.982}}/></Frame>
-
+   <Frame>![new redshift integration .jpg](/images/kb/ja/0EM5w000006wDfj.jpg)</Frame>
 8. 次のRedshiftの設定情報を入力します。
-   * **［統合名］ —**
-     Domoの統合を識別するのに役立つ固有の名前です。
-   * （オプション）
-     **［統合の説明］ —** 統合の説明。
-   * **Redshift username**
-   * **Redshift password**
-   * **［Redshift connection URL］ —**
-     これは、接続先の指定されたデータベースクラスターのJDBC URLです。
+   - **［統合名］ —** Domoの統合を識別するのに役立つ固有の名前です。
+   - （オプション）**［統合の説明］ —** 統合の説明。
+   - **Redshift username**
+   - **Redshift password**
+   - **［Redshift connection URL］ —** これは、接続先の指定されたデータベースクラスターのJDBC URLです。
 
-     <Frame><img alt="redshift setup info.jpg" src="/images/kb/ka0Vq000000BCKP-00N5w00000Ri7BU-0EM5w000006wDg8.jpg" style={{width: 551.989, height: 382.997}}/></Frame>
+     <Frame>![redshift setup info.jpg](/images/kb/ja/0EM5w000006wDg8.jpg)</Frame>
+9. **［次へ］**を選択します。これで、読み取り専用設定が完了しました。
 
-9. **［次へ］**
-   を選択します。これで、読み取り専用設定が完了しました。
+   <Frame>![redshift configured.jpg](/images/kb/ja/0EM5w000006wDgN.jpg)</Frame>
+10. （オプション）**［Choose Tables to Connect］**を選択して、DomoでDataSetを作成します。適切なAmazonデータベース>スキーマ>テーブルを選択して、使用するテーブルに移動します。
 
-   <Frame><img alt="redshift configured.jpg" src="/images/kb/ka0Vq000000BCKP-00N5w00000Ri7BU-0EM5w000006wDgN.jpg" style={{width: 551.982, height: 382.99}}/></Frame>
+    <Frame>![select redshift tables.jpg](/images/kb/ja/0EM5w000006wDfk.jpg)</Frame>
+11. **［DataSetを作成］**を選択します。
 
-10. （オプション）
-    **［Choose Tables to Connect］** を選択して、DomoでDataSetを作成します。適切なAmazonデータベース>スキーマ>テーブルを選択して、使用するテーブルに移動します。
-
-    <Frame><img alt="select redshift tables.jpg" src="/images/kb/ka0Vq000000BCKP-00N5w00000Ri7BU-0EM5w000006wDfk.jpg" style={{width: 551.982, height: 382.99}}/></Frame>
-
-11. **［DataSetを作成］**
-    を選択します。
-
-# Redshiftから供給されたDataSetを使用する
+## Redshiftから供給されたDataSetを使用する
 
 Redshiftから供給されたDataSetをDataFlowで使用すると、フローの実行時にRedshiftがそのデータをライブでクエリします。
+

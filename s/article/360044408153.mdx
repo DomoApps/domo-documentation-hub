@@ -2,12 +2,10 @@
 title: "Scorecard App | Implementation Guide"
 ---
 
-import {InlineImage} from "/snippets/InlineImage.mdx";
-
 Thank you for choosing to install the Scorecard App! This guide is intended to help you connect this app to your own data. If you have completed the purchasing process for this app or have purchased AppsPass, you will be able to go through all of the steps of this guide. The first steps are to make sure that the app and the app's DataFlow have been properly downloaded from the Appstore, and that your data is in the correct format to be used by the app.
 
 <Frame><img alt="Scorecard.png" src="/images/kb/ka05w0000012Aey-00N5w00000Ri7BU-0EM5w000005vON0.png"/></Frame>
-### Prerequisites:
+## Prerequisites:
 
 * An understanding of the Appstore tool called Grid Builder. A walkthrough of how to use the Grid Builder can be found here:
   [https://developer.domo.com/docs/installation-guides/grid-builder-walkthrough](https://developer.domo.com/docs/installation-guides/grid-builder-walkthrough "https://developer.domo.com/docs/installation-guides/grid-builder-walkthrough").
@@ -29,7 +27,7 @@ When you are familiar with how the Grid Builder works, follow these steps to mak
    * Click **DataFlows** on the left side of the screen, then use the Data Center search bar to search for "scorecard". You should see a DataFlow that matches the name of the version of scorecard you downloaded. Ex. "Helpdesk Scorecard" or "Sales Scorecard"
    * Alternatively, you can locate the DataFlow using the following method. Navigate to the page where the app is deployed and click on the bottom banner of the app to access the app detail view. Scroll down to the bottom of the page and you'll be able to see the DataSets that are powering the app. One of the DataSets should be named similarly to the app. Ex. "Sales Scorecard" or "Retail Scorecard". Click on that DataSet, and then click the wrench on the right side of the page, and then click **Edit DataFlow** in the dropdown. This will take you to the DataFlow for the app.
 
-### Step 1: Prepare Your Data
+## Step 1: Prepare Your Data
 
 The Scorecard App displays data filtered by date and grouped by a primary group (Sales Rep, Campaign, Helpdesk Rep, Store Location, etc.) This means that you need to get your data into a format where you have a column for dates and a column for your primary group with each row representing a member of your primary group on the respective date. Then the other columns in the data would be numeric columns for metrics you want to display in the app, or categorical columns that you would like to use as filtering options. See the example below.
 
@@ -45,7 +43,7 @@ In this example, the Primary Group is "Sales Rep", there are three numeric colum
 
 </Tip>
 
-### Step 2: Add Your Source Data to the DataFlow
+## Step 2: Add Your Source Data to the DataFlow
 
 As soon as you have prepared your data, you will need to navigate to the DataFlow and add your data as inputs to the DataFlow. Follow these steps to do so:
 
@@ -63,7 +61,7 @@ As soon as you have prepared your data, you will need to navigate to the DataFlo
 6. After you have added your DataSets, scroll to the bottom of the page and click the **Save** button.
 7. Navigate back to the Data Center.
 
-### Step 3: Edit the Grid Builder
+## Step 3: Edit the Grid Builder
 
 For this step, you will need to edit the appropriate fields in the grid builder to match you input data. This guide presents a basic set of steps here, but for a more comprehensive tutorial on how the Grid Builder works, please review the [Grid Builder Walkthrough](https://developer.domo.com/docs/installation-guides/grid-builder-walkthrough "https://developer.domo.com/docs/installation-guides/grid-builder-walkthrough"). As you make changes, it may be wise to occasionally copy your work into an Excel sheet to track your changes, in case the web browser encounters any errors.
 
@@ -80,24 +78,24 @@ Follow these steps to edit the grid builder:
 5. Under the “AS” column from C201 on down, choose names for the columns that you listed in the “SELECT” column. Avoid using spaces, numbers, and special characters in the names here. For example, use Gross\_Sales as opposed to Gross Sales. This will make later steps easier (#3 in example image below.)
      
    <Frame><img alt="Grid_Screen_1.png" src="/images/kb/ka05w0000012Aey-00N5w00000Ri7BU-0EM5w000005vOMv.png"/></Frame>
-6. The app requires a specific field to function called the “PhotoUrl” field. Add one more row at the end of this grouping. Assign it a number in the “C” column. If your customer has a column with photo URLs then use that in the “SELECT” column. Otherwise, put two single quotes in that column (‘’). Put “PhotoUrl” in the “AS” column. This is case sensitive, so make sure that only the “P” and “U” are capitalized (#4 in example image.)
-7. Under the “Include” column place a 1 in each row that you are including from your data that isn’t being used solely for a join. This is generally everything except your date field, since the date is also coming from the calendar that the app generates (#5 in example image.)
+6. The app requires a specific field to function called the “PhotoUrl” field. Add one more row at the end of this grouping. Assign it a number in the “C” column. If your customer has a column with photo URLs then use that in the “SELECT” column. Otherwise, put two single quotes in that column (''). Put “PhotoUrl” in the “AS” column. This is case sensitive, so make sure that only the “P” and “U” are capitalized (#4 in example image.)
+7. Under the “Include” column place a 1 in each row that you are including from your data that isn't being used solely for a join. This is generally everything except your date field, since the date is also coming from the calendar that the app generates (#5 in example image.)
 8. Double check the JoinType and JoinCondition columns on row C201. When joining with the calendar, typically, use “INNER” for JoinType and make sure the JoinCondition references the row where your date column is brought in from your DataSet (#6 in example image.)
-9. Repeat this process for any additional DataSet that you bring in. Each new DataSet should be assigned the next 100’s value under the “C” column. Ex. Start with 301 for the second DataSet, 401 for the third, etc. Additional joins usually use “LEFT” for the JoinType and join on date and your primary group from your first DataSet. Ex C201 = C301 AND C202 = C302 (If 201 and 301 were both the primary and 202 and 302 were both the date.)
+9. Repeat this process for any additional DataSet that you bring in. Each new DataSet should be assigned the next 100's value under the “C” column. Ex. Start with 301 for the second DataSet, 401 for the third, etc. Additional joins usually use “LEFT” for the JoinType and join on date and your primary group from your first DataSet. Ex C201 = C301 AND C202 = C302 (If 201 and 301 were both the primary and 202 and 302 were both the date.)
      
    <Frame><img alt="Filters.png" src="/images/kb/ka05w0000012Aey-00N5w00000Ri7BU-0EM5w000005vON2.png"/></Frame>
-10. As soon as you have the information entered for your DataSets you’ll need to configure your filters. On each row of the grid builder that references a column in your data that you would like to use as a filter you’ll need to update the five filter columns, “FilterId”, “FilterName”, “FilterInputType”, “FilterIsPrimary”, and “FilterIsPrimaryGroup”.
+10. As soon as you have the information entered for your DataSets you'll need to configure your filters. On each row of the grid builder that references a column in your data that you would like to use as a filter you'll need to update the five filter columns, “FilterId”, “FilterName”, “FilterInputType”, “FilterIsPrimary”, and “FilterIsPrimaryGroup”.
 11. On the row that references your Primary Group, use “2” for the FilterID, choose a name under FilterName, “Multi Select” for FilterInputType, and put a “1” in the FilterIsPrimary.
-12. On other rows that you would like to use as filters, use incrementing numbers for the FilterID (3,4,5 etc.) choose names under FilterName, use “Multi Select” or “Single Select” for FilterInputType (Check out the Grid Builder Walkthrough for more information on what the two filter types do,) leave FilterIsPrimary empty for these rows, then add incrementing numbers under FilterIsPrimaryGroup for any rows that reference columns that you’d like to use as alternative Primary Groups in the app.
+12. On other rows that you would like to use as filters, use incrementing numbers for the FilterID (3,4,5 etc.) choose names under FilterName, use “Multi Select” or “Single Select” for FilterInputType (Check out the Grid Builder Walkthrough for more information on what the two filter types do,) leave FilterIsPrimary empty for these rows, then add incrementing numbers under FilterIsPrimaryGroup for any rows that reference columns that you'd like to use as alternative Primary Groups in the app.
 13. Click **Save & Continue** at the top of the page to save the DataSet.
 
 As soon as you've made changes to the grid builder, go to the Data Center and run the Scorecard DataFlow. If the DataFlow runs successfully, you've most likely filled out the grid builder correctly. If you encountered errors, review the Grid Builder Walkthrough, or contact Technical Support. For information on how to contact Support, please see: [Getting Help](/s/article/360042922874).
 
-### Step 4: Edit the Metrics Form
+## Step 4: Edit the Metrics Form
 
 The final step in setting up the app is editing the metrics form. Follow these steps to edit the Metrics form:
 
-##### Adding standard metrics:
+#### Adding standard metrics:
 
 1. In the Data Center, navigate to the metrics form. It will be named similarly to the grid builder, with the name of the version of scorecard that you installed, followed by “- Metrics”. Ex. “Helpdesk Scorecard – Metrics”.
 2. Click on the DataSet and then click on the wrench to edit the webform.
@@ -107,14 +105,14 @@ The final step in setting up the app is editing the metrics form. Follow these s
 4. In the “Calculation” column, enter the calculation for the metric. Only simple calculations are supported. You can use simple sums, averages, max, and min (“SUM(column)” or “AVG(column)”), simple single operations (“SUM(columnA)
      - SUM(column)” or “SUM(columnA) \* MIN(columnB)”, etc. ), or ratio calculations (“SUM(columnA)/SUM(columnB)\*100”). More complicated calculations will need to be calculated in part beforehand in the grid builder.
 5. In the DataType column, enter “Currency”, “Number” or “Percent”. This tells the app how to display your metric.
-6. In the “SortHighToLow” column, put “true” if you want the metric’s bar chart to display from highest to lowest, or input “false” if you’d like the metric’s bar chart to display lowest to highest.
+6. In the “SortHighToLow” column, put “true” if you want the metric's bar chart to display from highest to lowest, or input “false” if you'd like the metric's bar chart to display lowest to highest.
 7. Under “UnitOfMeasurement” write the unit of the metric. Ex. Dollars, People, Referrals, etc. May be left blank.
 8. Under “Description” write a short description of the metric. May be left blank.
-9. Under “Bookmarks”, enter the name of the Bookmark that you would like the metric to be a part of. This is where bookmarks are created for the app. You may name your bookmarks anything that you’d like. Metrics can be part of more than one bookmark, simply list all of the bookmarks you’d like the metric to be a part of separated by commas (no spaces.)
-10. Under “Decimal” list the number of decimals you’d like to display for that metric. The options are 0,1 and 2. Leaving this blank defaults to 2 decimal places.
+9. Under “Bookmarks”, enter the name of the Bookmark that you would like the metric to be a part of. This is where bookmarks are created for the app. You may name your bookmarks anything that you'd like. Metrics can be part of more than one bookmark, simply list all of the bookmarks you'd like the metric to be a part of separated by commas (no spaces.)
+10. Under “Decimal” list the number of decimals you'd like to display for that metric. The options are 0,1 and 2. Leaving this blank defaults to 2 decimal places.
 11. Under “IsDetail” write “FALSE” for all standard metrics. This is used when adding a detail view to the app which is detailed below.
 
-##### Adding detail views and metrics:
+#### Adding detail views and metrics:
 
 Detail views and detail metrics appear in the detail window when a specific member of your primary group is clicked.
 
@@ -122,29 +120,29 @@ Detail views and detail metrics appear in the detail window when a specific memb
 There are a handful of options for detail views that you can create, including Single Values such as text, currency, numbers and percents, as well as pie and line charts. To create a detail view follow the steps below:
 
 <Frame><img alt="Details_1.png" src="/images/kb/ka05w0000012Aey-00N5w00000Ri7BU-0EM5w000005vON3.png"/></Frame>
-###### Single Value Details:
+##### Single Value Details:
 
 1. To create a single value detail view, first, under the “Name” column enter the name you want to use to label your detail, then leave the other columns before “IsDetail” blank.
 2. Under “IsDetail” write “TRUE”.
 3. Under “DetailType” you can use the following option to choose the format of your single value detail: “single value”, “text”, “currency”, “percent”, and “number”.
 4. Leave “DetailGroup” and “DetailItem” blank.
 5. Under “DetailValue” either enter a calculation for a numeric detail, or enter DISTINCT(column) for a text value.
-6. Under “DetailDimensions” use a comma separated list (no spaces) of the different primary groupings to which you’d like to apply this detail. Use the same values that were entered in the “FilterName” column in the grid builder.
+6. Under “DetailDimensions” use a comma separated list (no spaces) of the different primary groupings to which you'd like to apply this detail. Use the same values that were entered in the “FilterName” column in the grid builder.
 
-###### Chart Details:
+##### Chart Details:
 
 1. Under the “Name” column enter the name you want to use to label your detail, then leave the other columns before “IsDetail” blank.
 2. Under “IsDetail” write “TRUE”.
 3. Under “DetailType” use “pie” for a pie chart, or use “line” for a line graph.
 4. Leave “DetailGroup” blank.
-5. Under “DetailItem” if you are creating a pie chart use “GROUP\_BY(column)”, choosing a column in your data that you would like to use as the different pieces of the pie chart. If you are creating a line graph use “DATE\_GRAIN(dateColumn)” choosing a column that represents the date grain you’d like to use for the chart.
-6. Under “DetailValue” enter the calculation of the metric you’d like to track.
-7. Under “DetailDimensions” use a comma separated list (no spaces) of the different primary groupings to which you’d like to apply this detail. Use the same values that were entered in the “FilterName” column in the grid builder.
+5. Under “DetailItem” if you are creating a pie chart use “GROUP\_BY(column)”, choosing a column in your data that you would like to use as the different pieces of the pie chart. If you are creating a line graph use “DATE\_GRAIN(dateColumn)” choosing a column that represents the date grain you'd like to use for the chart.
+6. Under “DetailValue” enter the calculation of the metric you'd like to track.
+7. Under “DetailDimensions” use a comma separated list (no spaces) of the different primary groupings to which you'd like to apply this detail. Use the same values that were entered in the “FilterName” column in the grid builder.
 
   <Frame><img src="/images/kb/ka05w0000012Aey-00N5w00000Ri7BU-0EM5w000005vOMw.png" /></Frame>
   <Frame><img alt="Pie.png" src="/images/kb/ka05w0000012Aey-00N5w00000Ri7BU-0EM5w000005vOMx.png"/></Frame>
 
-### Step 5: Validation
+## Step 5: Validation
 
 Now that you have configured the grid builder and the metrics forms, you should be ready to check your app to validate your metrics. We suggest the following process to validate:
 
@@ -153,6 +151,6 @@ Now that you have configured the grid builder and the metrics forms, you should 
 3. If you find discrepancies, check if you need to change join conditions or groupings in the grid builder and double check your calculations.
 4. Repeat this process for any metrics you need to validate.
 
-#### Congratulations!
+### Congratulations!
 
 Your Scorecard App should be good to go! Enjoy getting great value out of your data. If you have any questions or need help troubleshooting, contact Technical Support. For information on how to contact Support, please see: [Getting Help](/s/article/360042922874).

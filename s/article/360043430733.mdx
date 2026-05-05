@@ -2,7 +2,7 @@
 title: "DataSet Update Methods"
 ---
 
-### Intro
+## Intro
 
 Domo uses four update methods in data pipelines: Replace, Append, Merge, and Partition. In some Domo material, you may see these referred to as accumulation methods. Each method has use cases it might be best suited for, and some have known limitations. The availability of each method for a given task depends on the connector or tool you are using. Before choosing a method, it may be helpful to ask, "Will this method allow me to get the data to the people who need it in a timely manner?"
 
@@ -10,24 +10,24 @@ The methods vary in robustness—a robust data pipeline is self-correcting, can 
 
 ---
 
-### Replace
+## Replace
 
 Replace is the default update method for most connectors. Replace removes all existing data in the DataSet and leaves an entirely new batch of data. Replace can create a significant processing load if your DataSet is large, but if you have the time and resources to pull a large amount of data on a regular basis, Replace may be the best way for you to maintain and store the end state of the data after it has stabilized, if applicable.
 
-# Use Case
+### Use Case
 
 Your DataSet contains two years of historical sales data. Each month, you use Replace to update the DataSet. This provides you with a constant two-year historical reference from which to create visualizations. Replace works well for this kind of transactional data that doesn't change state.
 
 For example, in August 2024 your DataSet includes data from July 2022–July 2024. At the end of the month, you replace the data to contain data from August 2022–August 2024.
 
-# Known Limitations
+### Known Limitations
 
 * Large DataSets require extended processing time
 
 This GIF illustrates Replace—incoming data completely replaces all existing data.
 
 <Frame><img alt="Replace (1).gif" src="/images/kb/ka0Vq0000002DkL-00N5w00000Ri7BU-0EM5w000006vuq4.jpg" style={{width: 710.994, height: 400}}/></Frame>
-### Append
+## Append
 
 With the Append method, all incoming data is appended to the existing DataSet, with no consideration for whether data has been updated. If you want to avoid the processing load and time of a full Replace, you may choose to use Append. Append is the least robust update method and can create duplicate records because all incoming data is appended, even if it already exists in the DataSet.
 
@@ -35,11 +35,11 @@ It is possible to use a recursive Append DataFlow to specifically look for dupli
 
 If your DataSet changes with time, Append allows you to see snapshots of the data and view trends over time to display in your visualizations.
 
-# Use Case
+### Use Case
 
 If your data changes state with an identifier, such as Opportunity ID, you can use Append and snapshot your data. You can take a snapshot of all your opportunities each week on Monday and track opportunity X over time. Two months ago, opportunity X was in stage 1. It took two weeks to get to stage 2, three more weeks to enter stage 3, and so on. This method helps you understand the sales cycle as the opportunity progressed.
 
-# Known Limitations
+### Known Limitations
 
 * Possible data duplication
 * If an update fails, there may be gaps in your data
@@ -48,19 +48,19 @@ If your data changes state with an identifier, such as Opportunity ID, you can u
 This graphic illustrates Append—incoming data is placed at the bottom of the existing data.
 
 <Frame><img alt="Screenshot 2023-09-19 at 12.42.43 PM.png" src="/images/kb/ka0Vq0000002DkL-00N5w00000Ri7BU-0EM5w000006vubZ.jpg" style={{width: 710, height: 453.999}}/></Frame>
-### Merge (Upsert)
+## Merge (Upsert)
 
 Some connectors allow you to use the Merge method (elsewhere "Upsert"). With Merge, rather than replacing the entire DataSet or appending all incoming data, data can be either appended or replaced, depending on whether the incoming records are new or updates to existing records. It is important to note that the Merge method does not check the incoming data for new and updated records—this is the responsibility of the user.
   
 Because of the computation time needed to scan the incoming data for only new or updated records, and the time needed to process the changes, Merge may not be the most time-efficient method if a large percentage of the data is being updated. On the other hand, if the existing DataSet is large and the ratio of incoming to existing records is low, Merge may be much more efficient than a full Replace.
 
-# Merge Key
+### Merge Key
 
 Merge uses a key that indicates to Domo whether an incoming record already exists in the DataSet. If the Merge Key values of an incoming row match those of an existing row, the incoming record replaces the existing record. If no match is found, the incoming record is treated as a new record and appended to the DataSet.
   
 The Merge Key must have a text or numeric data type and cannot include null values or duplicates.
 
-# Known Limitations
+### Known Limitations
 
 * May require more effort to configure incoming data to include only new and updated records
 * Data must include a viable Merge Key
@@ -69,7 +69,7 @@ The Merge Key must have a text or numeric data type and cannot include null valu
 This graphic illustrates Merge—incoming data either replaces existing data or is appended to the DataSet.
 
 <Frame><img alt="merge graphic.jpg" src="/images/kb/ka0Vq0000002DkL-00N5w00000Ri7BU-0EM5w000006vuff.jpg" style={{width: 710, height: 453.999}}/></Frame>
-### Partition
+## Partition
 
 The Partition method allows you to separate DataSet records with the same key values into logical groups, or partitions. When data is updated, entire partitions (as opposed to individual records, as with [Merge](#merge) ) are replaced or appended. This can improve efficiency because only partitions that are being replaced or appended are processed.
   
@@ -77,7 +77,7 @@ To use Partition, select a field or set of fields to use as the Partition Key. D
 
 For Partition to work correctly, you need to make sure that incoming data partitions include all records for that partition, even if not all records in the partition are new or updated. Otherwise, when an existing partition is replaced by an incoming partition, you may lose data.
 
-# Known Limitations
+### Known Limitations
 
 * May require more effort to configure incoming data to include only full partitions for new and updated records
 * Data must include a viable Partition Key

@@ -2,97 +2,91 @@
 title: "Workbench Enterprise | 実装ガイド"
 ---
 
-import { InlineImage } from "/snippets/InlineImage.mdx";
-
-### はじめに
+## はじめに
 
 Workbench Enterpriseは、既存のオンプレミスのWorkbenchに代わるウェブベースのソリューションで、優れた新機能を多数備えています。
 
-* **マルチユーザー —** 複数のユーザーが、Workbenchジョブのプールにアクセスして管理できます。
-* **ウェブベース —** ウェブサーバーがオンプレミスのままでも、様々なプラットフォームやブラウザーを使用してWorkbenchジョブにリモートでアクセスし、管理することができます。
-* **マルチプラットフォーム —** Linux、Windows、macOS上で動作します。
-* **高可用性 —** ジョブ間のフェイルオーバーロジックが改善され、サーバー上の様々なワーカーノード間で大規模なジョブを分割できます。
+- **マルチユーザー —** 複数のユーザーが、Workbenchジョブのプールにアクセスして管理できます。
+- **ウェブベース —** ウェブサーバーがオンプレミスのままでも、様々なプラットフォームやブラウザーを使用してWorkbenchジョブにリモートでアクセスし、管理することができます。
+- **マルチプラットフォーム —** Linux、Windows、macOS上で動作します。
+- **高可用性 —** ジョブ間のフェイルオーバーロジックが改善され、サーバー上の様々なワーカーノード間で大規模なジョブを分割できます。
 
 これらの機能により、特に大量のジョブを実行している場合、Workbenchジョブの管理が容易になります。また、Workbenchジョブのセキュリティが強化され、複雑なジョブの信頼性が向上します。
 
-### 必要条件
+---
+
+## 必要条件
 
 Workbench Enterpriseを使用するには、以下が必要です。
 
-* コンピューターにDockerがインストールされていること。
-* （条件付き）既存のRabbitMQアカウントを使用する場合は、認証情報を入力します。
-* Workbench Enterpriseの許可については、以下を参照してください。
+- コンピューターにDockerがインストールされていること。
+- （条件付き）既存のRabbitMQアカウントを使用する場合は、認証情報を入力します。
+- Workbench Enterpriseの許可については、以下を参照してください。
 
-<Note>
-**注記：** RabbitMQを使用すると、コントロールセンターとノード間のすべての通信が暗号化されます。必要なRabbitMQは1つだけです。数百のノードがある場合は、複数のRabbitMQインスタンスをリンクして、過負荷を回避することを推奨します。
+<Note>**注記：**RabbitMQを使用すると、コントロールセンターとノード間のすべての通信が暗号化されます。必要なRabbitMQは1つだけです。数百のノードがある場合は、複数のRabbitMQインスタンスをリンクして、過負荷を回避することを推奨します。</Note>
 
-</Note>
-
-### 必要な許可
+## 必要な許可
 
 Workbench Enterpriseを使用するには、以下の3つの許可が必要です。
 
-* **Workbench Enterpriseにログインする —** Workbench Enterpriseにログインするのに必要です。Workbench Enterpriseを使用するすべてのユーザーは、この許可が有効になっている権限が必要です。
-* **Workbench Enterpriseにジョブを作成 —** Workbench Enterpriseのジョブを作成できます。
-* **Workbench Enterpriseを管理 —** Workbench Enterpriseですべてのジョブと設定を編集できます。
+- **Workbench Enterpriseにログインする —** Workbench Enterpriseにログインするのに必要です。Workbench Enterpriseを使用するすべてのユーザーは、この許可が有効になっている権限が必要です。
+- **Workbench Enterpriseにジョブを作成 —** Workbench Enterpriseのジョブを作成できます。
+- **Workbench Enterpriseを管理 —** Workbench Enterpriseですべてのジョブと設定を編集できます。
 
-### Workbench Enterpriseを設定する
+## Workbench Enterpriseを設定する
 
 以下のセクションでは、Workbench Enterpriseの設定箇所とその設定手順について説明します。
 
-# Domoを設定する
+## Domoを設定する
 
-1. メインナビゲーションで、**［その他］** > **［管理者］** の順に選択します。
-
+1. メインナビゲーションで、**［その他］**>**［管理者］**の順に選択します。  
    管理者設定が表示されます。
-2. **［認証］** で **［Workbench Enterprise］** を選択します。
-
-   **Workbench Enterprise** ページが表示されます。
+2. **［認証］**で**［Workbench Enterprise］**を選択します。  
+   **Workbench Enterprise**ページが表示されます。
 3. OAuthを使用して安全にアクセスできるように、Workbench EnterpriseインスタンスのURLを入力します。
 
-   <Frame><img alt="enter urls.jpg" src="/images/kb/ka0Vq000000GlhJ-00N5w00000Ri7BU-0EM5w000006w4dZ.jpg" style={{width: 664, height: 310}}/></Frame>
+   <Frame>![enter urls.jpg](/images/kb/ja/0EM5w000006w4dZ.jpg)</Frame>
+4. **［キーを生成する］**を選択します。  
+   **［キー］**フィールドにキーが表示されます。
+5. **［コピー］**を選択してキーをクリップボードにコピーします。  
 
-4. **［キーを生成する］** を選択します。
+   <Frame>![copy key.jpg](/images/kb/ja/0EM5w000006w4de.jpg)</Frame>
 
-   **［キー］** フィールドにキーが表示されます。
-5. **［コピー］** を選択してキーをクリップボードにコピーします。
+## Dockerイメージをダウンロードする
 
-   <Frame><img alt="copy key.jpg" src="/images/kb/ka0Vq000000GlhJ-00N5w00000Ri7BU-0EM5w000006w4de.jpg" style={{width: 669, height: 250}}/></Frame>
+最新のDockerイメージをダウンロードするには、Windowsのコマンドプロンプト、Macのターミナル、Linuxのターミナルなどのターミナルウィンドウで次のコマンドを実行します。ARMアーキテクチャーでDockerイメージを実行する場合は、`arm-latest`タグを使用します。
 
-# Dockerイメージをダウンロードする
-
-最新のDockerイメージをダウンロードするには、Windowsのコマンドプロンプト、Macのターミナル、Linuxのターミナルなどのターミナルウィンドウで次のコマンドを実行します。ARMアーキテクチャーでDockerイメージを実行する場合は、 `arm-latest` タグを使用します。
-
-```bash
+```
 docker pull public.ecr.aws/domo/workbench/workbenchenterprise:latest docker pull rabbitmq:management
 ```
 
-# Dockerイメージを起動する
+## Dockerイメージを起動する
 
 ローカルシステム上に、Workbench Enterpriseの設定と長期保存用のディレクトリを作成します。
 
 例えば、Linuxでは、ディレクトリは次のようになります。
 
-/usr/share/domo
-以下のDockerコマンドを実行します。ハイライトされたセクションに新しいファイルディレクトリが挿入されています。ARMアーキテクチャーでDockerイメージを実行する場合は、 `arm-latest` タグを使用します。
+/usr/share/domo  
+  
+以下のDockerコマンドを実行します。ハイライトされたセクションに新しいファイルディレクトリが挿入されています。ARMアーキテクチャーでDockerイメージを実行する場合は、`arm-latest`タグを使用します。
 
-```bash
+```
 docker run -p 80:8080 --mount type=bind,source=/usr/share/Domo,target=/usr/share/Domo --mount type=bind,source=/usr/share/Domo,target=/app/Data public.ecr.aws/domo/workbench/workbenchenterprise:latest
 ```
 
 これは、選択した任意のポートでローカルに実行できます。
 
-リバースプロキシを使用してHTTPS経由でアクセスする場合は、443:8080を使用します。リバースプロキシの設定方法については、 [こちら](#configure_reverse_proxy) を参照してください。
+リバースプロキシを使用してHTTPS経由でアクセスする場合は、443:8080を使用します。リバースプロキシの設定方法については、こちらを参照してください。
 
 URLで指定されている場合は、特定のポートを使用することもできます。例えば、-p 1337:8080は、http://[customdomain]:1337というURLを意味します。[customdomain]は、ウェブサーバーにアクセスしたいIPまたはドメインです。
 
-```bash
+```
 docker run -d -p 5672:5672 -p 15672:15672 --mount type=bind,source=/usr/share/Domo/rabbitmq,target=/var/lib/rabbitmq/mnesia/ rabbitmq:management
 ```
 
-http:// *\<\<your-host-computer\>\>* に移動してWorkbench Enterpriseを開けるようになります。
+http://`<<your-host-computer>>`に移動してWorkbench Enterpriseを開けるようになります。
 
-# リバースプロキシを設定する
+## リバースプロキシを設定する
 
 リバースプロキシをDockerと併用することで、自分の証明書を使用して、HTTPではなくHTTPSでブラウジングを行えるようになります。
 
@@ -102,205 +96,177 @@ http:// *\<\<your-host-computer\>\>* に移動してWorkbench Enterpriseを開�
 # Complete Nginx Docker reverse proxy config file events { worker_connections 4096; } http{ server { listen 80; listen [::]:80; server_name {Your-server-name}; #The IP of your Workbench Enterprise location / { proxy_set_header Host $host; proxy_set_header X-Real-IP $remote_addr; proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for; proxy_set_header Upgrade $http_upgrade; proxy_set_header Connection $http_connection; proxy_pass {Your-passthrough-location}; } } }
 ```
 
-# ワンタイムセットアップ
+## ワンタイムセットアップ
 
-**［ワンタイムセットアップ］** ページでは、以下の情報を入力する必要があります。
+**［ワンタイムセットアップ］**ページでは、以下の情報を入力する必要があります。
 
-1. **［RabbitMQ Setup］** の該当フィールドに、必要なすべての認証情報を入力します。
-   * 既存のサーバーを使用する場合は、管理者の認証情報を入力する必要があります。
-   * 前出のDockerコマンドでRabbitMQサーバーを使用している場合、管理者の認証情報が設定されているため、既存の認証情報は不要です。
-2. **［Domoのセットアップ］** に、Domoドメインを入力します。
+1. **［RabbitMQ Setup］**の該当フィールドに、必要なすべての認証情報を入力します。
+   - 既存のサーバーを使用する場合は、管理者の認証情報を入力する必要があります。
+   - 前出のDockerコマンドでRabbitMQサーバーを使用している場合、管理者の認証情報が設定されているため、既存の認証情報は不要です。
+2. **［Domoのセットアップ］**に、Domoドメインを入力します。
 3. 前出のWorkbenchの認証からクリップボードにコピーしたキーをペーストします。
-4. **［送信］** を選択します。
-
+4. **［送信］**を選択します。  
    Workbench Enterpriseのログインページにリダイレクトされ、Workbench EnterpriseにDomoインスタンスへのアクセス権を付与することができます。
 
-<Frame><img alt="one time setup.jpg" src="/images/kb/ka0Vq000000GlhJ-00N5w00000Ri7BU-0EM5w000006w5i1.jpg" style={{width: 701, height: 484}}/></Frame>
+<Frame>![one time setup.jpg](/images/kb/ja/0EM5w000006w5i1.jpg)</Frame>
 
-# ログイン
+## ログイン
 
-Workbench Enterpriseのログインページで、 **［Domoでログイン］** を選択します。
+Workbench Enterpriseのログインページで、**［Domoでログイン］**を選択します。
 
-<Frame><img alt="Login.jpg" src="/images/kb/ka0Vq000000GlhJ-00N5w00000Ri7BU-0EMVq000000kJm1.jpg" style={{width: 750, height: 467}}/></Frame>
+<Frame>![Login.jpg](/images/kb/ja/0EMVq000000kJm1.jpg)</Frame>
 
-# 最初のノードを設定する
+## 最初のノードを設定する
 
-<Note>
-**注記：** ノードは現在、WindowsとLinuxで動作します。このセクションでは、各プラットフォームでの設定手順について説明します。
-
-</Note>
+<Note>**注記：**ノードは現在、WindowsとLinuxで動作します。このセクションでは、各プラットフォームでの設定手順について説明します。</Note>
 
 これらの手順を実行するには、使用するコンピューターの管理者権限が必要です。
 
 1. コンピューターの管理者としてウェブブラウザーを起動し、Workbench Enterpriseサーバーに移動します。
 2. Workbench Enterpriseにログインします。
-3. **［ノード］** に移動します。
+3. **［ノード］**に移動します。
 4. Windowsパッケージをダウンロードします。
-5. ZIPファイルを展開し、フォルダを既知の場所に移動します。
-6. 使用するコンピューターの **［スタート］** メニューから、管理者としてコマンドプロンプトを起動します。使用するシステムに応じて、以下の手順に従います。
+5. ZIPファイルを展開し、フォルダーを既知の場所に移動します。
+6. 使用するコンピューターの**［スタート］**メニューから、管理者としてコマンドプロンプトを起動します。使用するシステムに応じて、以下の手順に従います。
 
-##### Windows
+## Windows
 
-1. ZIPファイルを保存したフォルダに移動し、
+1. ZIPファイルを保存したフォルダーに移動し、
 
    ```
    EnterpriseThinClient.exe -i
    ```
 
    と入力して、ワークベンチノードをWindowsサービスとして登録します。
-   * サービスとしてインストールされた際に、ThinClientがスタンドアロンモードで実行されないように保護機能が備わっています。ThinClientが作成するサービスは、自動的に起動し、障害発生時に再起動するように設定する必要があります。
-   * サービスとしてインストールした場合、ThinClientの管理は、その後のすべての使用においてサービスを通じて行う必要があります。
-2. Workbench Enterpriseで、**［ノード］** > **［信頼されていない］** の順に移動します。
-3. ノードを見つけて、**［信頼］** を選択し、Workbench Enterpriseがノードでジョブを実行できるようにします。
+   - サービスとしてインストールされた際に、ThinClientがスタンドアロンモードで実行されないように保護機能が備わっています。ThinClientが作成するサービスは、自動的に起動し、障害発生時に再起動するように設定する必要があります。
+   - サービスとしてインストールした場合、ThinClientの管理は、その後のすべての使用においてサービスを通じて行う必要があります。
+2. Workbench Enterpriseで、**［ノード］**>**［信頼されていない］**の順に移動します。
+3. ノードを見つけて、**［信頼］**を選択し、Workbench Enterpriseがノードでジョブを実行できるようにします。  
+     
 
-   <Frame><img alt="trust node.jpg" src="/images/kb/ka0Vq000000GlhJ-00N5w00000Ri7BU-0EMVq000000kv3J.jpg" style={{width: 748, height: 244}}/></Frame>
+   <Frame>![trust node.jpg](/images/kb/ja/0EMVq000000kv3J.jpg)</Frame>
 
-##### Linux
+### Linux
 
-1. ZIPファイルを保存したフォルダに移動し、以下の手順でWorkbenchノードをLinuxデーモンとして登録します。
-   * 実行を許可するには、chmodを使用してEnterpriseThinClientのACLを更新します。
-   * EnterpriseThinClient -iを起動します。
-2. Workbench Enterpriseで、**［ノード］** > **［信頼されていない］** の順に移動します。
-3. 追加したノードを見つけて、**［信頼］** を選択し、Workbench Enterpriseがノードでジョブを実行できるようにします。
+1. ZIPファイルを保存したフォルダーに移動し、以下の手順でWorkbenchノードをLinuxデーモンとして登録します。
+   - 実行を許可するには、chmodを使用してEnterpriseThinClientのACLを更新します。
+   - EnterpriseThinClient -iを起動します。
+2. Workbench Enterpriseで、**［ノード］**>**［信頼されていない］**の順に移動します。
+3. 追加したノードを見つけて、**［信頼］**を選択し、Workbench Enterpriseがノードでジョブを実行できるようにします。  
+     
 
-   <Frame><img alt="trust node.jpg" src="/images/kb/ka0Vq000000GlhJ-00N5w00000Ri7BU-0EMVq000000kv3J.jpg" style={{width: 748, height: 244}}/></Frame>
+   <Frame>![trust node.jpg](/images/kb/ja/0EMVq000000kv3J.jpg)</Frame>
 
-   <Note>
-   **ノード：**
+**ノード：**
 
-   * Workbench Enterpriseに接続できるノードの数に制限はありません。
-   * ジョブは特定のノードには関連付けられません。ノードに割り当てられた「クラスター」に関連付けることはできます。
-   * ジョブは常に使用可能な最初のノードで実行されます。ジョブは、クラスターに割り当てられている場合、そのクラスターで使用可能な最初のノードで実行されます。ノードがダウンした場合、ジョブは使用可能な次のノードで実行されます。
-   * Workbench Enterpriseのマスターノードはありません。すべてのノードは同じように処理されます。
+- Workbench Enterpriseに接続できるノードの数に制限はありません。
+- ジョブは特定のノードには関連付けられません。ノードに割り当てられた「クラスター」に関連付けることはできます。
+- ジョブは常に使用可能な最初のノードで実行されます。ジョブは、クラスターに割り当てられている場合、そのクラスターで使用可能な最初のノードで実行されます。ノードがダウンした場合、ジョブは使用可能な次のノードで実行されます。
+- Workbench Enterpriseのマスターノードはありません。すべてのノードは同じように処理されます。
 
-   </Note>
-
-# 最初の共有認証情報を設定する
+## 最初の共有認証情報を設定する
 
 これらの手順を実行するには、Workbench Enterpriseに管理者としてログインする必要があります。
 
-1. Workbench Enterprise内で、**［管理者］** > **［共有認証情報］** の順に移動します。
-2. **［新しい共有認証情報］** > **［データベース］** の順に選択し、作成モーダルを開きます。
+1. Workbench Enterprise内で、**［管理者］**>**［共有認証情報］**の順に移動します。
+2. **［新しい共有認証情報］**>**［データベース］**の順に選択し、作成モーダルを開きます。
 
-   <Frame><img alt="new database credentials.jpg" src="/images/kb/ka0Vq000000GlhJ-00N5w00000Ri7BU-0EMVq000002Hd5R.jpg" style={{width: 898, height: 426}}/></Frame>
+   <Frame>![new database credentials.jpg](/images/kb/ja/0EMVq000002Hd5R.jpg)</Frame>
+3. **［データベース］**モーダルに、共有認証情報の値を入力します。
 
-3. **［データベース］** モーダルに、共有認証情報の値を入力します。
+   <Frame>![database NEW.jpg](/images/kb/ja/0EMVq000000kKJu.jpg)</Frame>
+4. **［認証情報を保存］**を選択します。
 
-   <Frame><img alt="database NEW.jpg" src="/images/kb/ka0Vq000000GlhJ-00N5w00000Ri7BU-0EMVq000000kKJu.jpg" style={{width: 758, height: 617}}/></Frame>
+## 最初のジョブを設定する
 
-4. **［認証情報を保存］**  を選択します。
-
-# 最初のジョブを設定する
-
-1. Workbench Enterpriseの左側のナビゲーションで、
-   **［ジョブ］** を選択します。
-2. **［新規ジョブ］** を選択します。
-3. ジョブの名前を入力し、**［送信］** を選択します。
+1. Workbench Enterpriseの左側のナビゲーションで、**［ジョブ］**を選択します。
+2. **［新規ジョブ］**を選択します。
+3. ジョブの名前を入力し、**［送信］**を選択します。
 4. ジョブリストで、自分のジョブを見つけて選択します。
-5. ジョブの詳細ビューで、**［設定］** タブに移動します。
-6. **［データ］** で、［接続タイプ］を［接続文字列ビルダー］に変更します。
-7. **［データベースの共有認証情報を使用］** を選択します。
+5. ジョブの詳細ビューで、**［設定］**タブに移動します。
+6. **［データ］**で、［接続タイプ］を［接続文字列ビルダー］に変更します。
+7. **［データベースの共有認証情報を使用］**を選択します。
 8. 先ほど設定した共有認証情報を選択します。
 9. ジョブのクエリを入力します。
-10. **［保存］** を選択します。
-11. **［プレビュー］** を選択します。
+10. **［保存］**を選択します。
+11. **［プレビュー］**を選択します。
 
-# ジョブをWorkbench Enterpriseにインポートする
+## ジョブをWorkbench Enterpriseにインポートする
 
 次の手順に従ってWorkbenchジョブをWorkbench Enterpriseにインポートします。
 
 1. 以前のWorkbenchインストールで、ジョブを含むバックアップファイルを作成します。
-2. Workbench Enterpriseで、<InlineImage src="/images/kb/ka0Vq000000GlhJ-00N5w00000Ri7BU-0EMVq0000038Ptx.jpg" /> **［管理者］** > **［Workbenchインポート］** に進みます。
+2. Workbench Enterpriseで、<img alt="workbench admin option.jpg" src="/images/kb/ja/0EMVq0000038Ptx.jpg" style={{width: 25, height: 26, display: 'inline', verticalAlign: 'start', margin: '0'}}/>
 
-   <Frame><img alt="workbench import.jpg" src="/images/kb/ka0Vq000000GlhJ-00N5w00000Ri7BU-0EMVq0000038Q0P.jpg" style={{width: 899, height: 407}}/></Frame>
+   **［管理者］**>**［Workbenchインポート］**に進みます。  
+     
 
+   <Frame>![workbench import.jpg](/images/kb/ja/0EMVq0000038Q0P.jpg)</Frame>
 3. Workbenchのバックアップファイルを、所定のスペースにドロップします。
-4. **［バックアップファイルのパスワード］** でバックアップファイルのパスワードを入力し、 **［ジョブを読み込む］** を選択します。
+4. **［バックアップファイルのパスワード］**でバックアップファイルのパスワードを入力し、**［ジョブを読み込む］**を選択します。
 5. リストからインポートするジョブを選択し、クラスターに割り当てます。
-6. 準備ができたら、**［インポート］** を選択します。
+6. 準備ができたら、**［インポート］**を選択します。
 
-# 最初のジョブを実行する
+## 最初のジョブを実行する
 
-手順に従って [最初のジョブを設定](#configure_first_job) したら、以下を実行します。
+手順に従って最初のジョブを設定したら、以下を実行します。
 
-1. Workbench Enterpriseの左側のナビゲーションで、**［ジョブ］** を選択します。
+1. Workbench Enterpriseの左側のナビゲーションで、**［ジョブ］**を選択します。
 2. ［ジョブ］リストで、実行するジョブを見つけます。
-3. <InlineImage src="/images/kb/ka05w0000012BE1-00N5w00000Ri7BU-0EM5w000006w7XZ.jpg" /> **［その他］** > **［実行］** の順に選択します。
+3. <Frame>![meatball menu more.png](/images/kb/ja/0EM5w000006w5jx.jpg)</Frame>
 
-### 認証情報を共有する
+   **［その他］**>**［実行］**の順に選択します。
 
-Workbench Enterpriseの管理者は認証情報を共有できます。左側のナビゲーションで、 **［管理者］** > **［共有認証情報］** の順に選択します。
+## 認証情報を共有する
 
-### ファイル監視を使用する
+Workbench Enterpriseの管理者は認証情報を共有できます。左側のナビゲーションで、**［管理者］**>**［共有認証情報］**の順に選択します。
+
+## ファイル監視を使用する
 
 使用しているプラグインが対応している場合は、ファイル監視を使用できます。ファイル監視を設定するには、以下の手順に従います。
 
-1. ジョブリストで、自分のジョブを見つけて選択します。
+1. ジョブリストで、自分のジョブを見つけて選択します。  
+     
 
-   <Frame><img alt="job.jpg" src="/images/kb/ka0Vq0000003LPh-00N5w00000Ri7BU-0EMVq0000038jJB.jpg" style={{width: 901, height: 409}}/></Frame>
+   <Frame>![job.jpg](/images/kb/ja/0EMVq0000038goN.jpg)</Frame>
+2. ジョブの詳細の**［スケジュール］**タブで、**［基本スケジュール］**または**［スケジュールの詳細設定］**タブの**［変更を監視］**というラベルの付いたチェックボックスをオンにすると、  
+     
 
-2. ジョブの詳細の **［スケジュール］** タブで、 **［基本スケジュール］** または **［スケジュールの詳細設定］** タブの **［変更を監視］** というラベルの付いたチェックボックスをオンにすると、
+   <Frame>![watch for changes.jpg](/images/kb/ja/0EMVq0000038Z0T.jpg)</Frame>
 
-   <Frame><img alt="watch for changes.jpg" src="/images/kb/ka0Vq000000GlhJ-00N5w00000Ri7BU-0EMVq0000038Z0T.jpg" style={{width: 901, height: 407}}/></Frame>
+     
+     
+   WBEがソースへの変更の監視を開始します。次の例では、WBEはFile2.csvの変更を監視します。ファイルが変更されると、ジョブが実行されます。  
+     
 
-   WBEがソースへの変更の監視を開始します。次の例では、WBEはFile2.csvの変更を監視します。ファイルが変更されると、ジョブが実行されます。
+   <Frame>![Screenshot 2024-10-08 at 2.59.51 PM.jpg](/images/kb/ja/0EMVq0000038aRB.jpg)</Frame>
 
-   <Frame><img alt="Screenshot 2024-10-08 at 2.59.51 PM.jpg" src="/images/kb/ka0Vq000000GlhJ-00N5w00000Ri7BU-0EMVq0000038aRB.jpg" style={{width: 900, height: 408}}/></Frame>
+<Tip>**ヒント：**サードパーティツールでWorkbench Enterpriseジョブを起動する方法については[こちら](/s/article/000005587)を参照してください。</Tip>
 
-   <Tip>
-   **ヒント：** サードパーティツールでWorkbench Enterpriseジョブを起動する方法については [こちら](/ja/s/article/000005587) を参照してください。
-
-   </Tip>
-
-### よくある質問
+## よくある質問
 
 <AccordionGroup>
-<Accordion title="# 接続">
 
-
-
-</Accordion>
 <Accordion title="Workbench EnterpriseはJDBCをサポートしていますか？">
-
-
 JDBCはJavaベースのテクノロジー専用です。Workbench EnterpriseはJavaベースではないため、JDBCドライバーに接続できません。一般にJDBCドライバーが存在する場合はODBCドライバーも存在します。
-
-
 </Accordion>
+
 <Accordion title="Workbench Enterpriseは、Windows以外のWorkbench Enterpriseプラットフォーム（LinuxやmacOSなど）でODBCをサポートしていますか？">
-
-
 はい。サポートしています。
-
-
 </Accordion>
-<Accordion title="# アップグレードとプラグイン">
 
-
-
-</Accordion>
 <Accordion title="Workbench Enterpriseは手動でアップデートする必要がありますか？">
-
-
 コントロールセンターはDockerコンテナであるため、手動で更新する必要があります。デフォルトでは、ノードはコントロールセンターと同じバージョンに自動的に更新されます。これは、コントロールセンター内で手動で更新できるように、ノード単位で無効にすることができます。
-
-
 </Accordion>
+
 <Accordion title="標準WorkbenchプラグインはWorkbench Enterpriseで動作しますか？">
-
-
 いいえ。Workbench用に構築されたプラグインはWorkbench専用であり、Workbench Enterprise用に構築されたプラグインはWorkbench Enterprise専用です。
-
-
 </Accordion>
+
 <Accordion title="特定のプラットフォームに既知の制限はありますか。">
-
-
 環境がそのプラグインをサポートしており、適切に設定されている限り、現在すべてのプラグインはすべての環境で動作します。
 
 Linuxはほかのプラットフォームに比べて、ODBCの設定が困難です。
-
-
-
 </Accordion>
+
 </AccordionGroup>

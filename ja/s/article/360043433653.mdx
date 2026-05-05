@@ -4,88 +4,90 @@ title: "Adobe Analytics v2 OAuth Partitionコネクター"
 
 ## はじめに
 
-Adobe Analyticsを使用すると、顧客との相互作用を実行可能なインサイトに変え、ビジネスの全体像を把握できるようになります。DomoのAdobe Analytics v2コネクターを使用すると、あらかじめ用意されたレポート経由でデータを取得できます。その後、メトリクスをCRM、POS、ほかのシステムからのデータと組み合わせ、より正確な情報にもとづいてよりスピーディーに、ビジネスの意思決定ができるようになります。Adobe Analytics APIについて詳しくは、ウェブサイト（
-https://marketing.adobe.com/developer/en_US/get-started/introduction/c-introduction
-）を参照してください。
+Adobe Analyticsを使用すると、顧客との相互作用を実行可能なインサイトに変え、ビジネスの全体像を把握できるようになります。DomoのAdobe Analytics v2コネクターを使用すると、あらかじめ用意されたレポート経由でデータを取得できます。その後、メトリクスをCRM、POS、ほかのシステムからのデータと組み合わせ、より正確な情報にもとづいてよりスピーディーに、ビジネスの意思決定ができるようになります。Adobe Analytics APIについて詳しくは、ウェブサイト（[https://marketing.adobe.com/developer/en\_US/get-started/introduction/c-introduction](https://marketing.adobe.com/developer/en_US/get-started/introduction/c-introduction) ）を参照してください。
 
 Adobe Analytics APIには、Data Centerで接続します。
 
-このトピックでは、Adobe Analytics v2コネクターのユーザーインターフェース固有のフィールドとメニューについて説明します。DataSetの追加や更新スケジュールの設定、DataSet情報の編集に関する一般的な情報は、「 [コネクターを使用してDataSetを追加する](/ja/s/article/360042926274 "コネクターを使用してDataSetを追加する") 」を参照してください。
+このトピックでは、Adobe Analytics v2コネクターのユーザーインターフェース固有のフィールドとメニューについて説明します。DataSetの追加や更新スケジュールの設定、DataSet情報の編集に関する一般的な情報は、「[コネクターを使用してDataSetを追加する](/s/article/360042926274)」を参照してください。
 
 ## 必要条件
 
 Adobe Analytics API v2に接続してDataSetを作成するには、Adobe Analytics v2アカウントに関連付けられたクライアントIDとクライアントシークレットが必要です。
 
-クライアントIDとクライアントシークレットの取得方法については、[Adobe Oauth Connection](https://www.adobe.io/authentication/auth-methods.html#!AdobeDocs/adobeio-auth/master/AuthenticationOverview/OAuthIntegration.md "https://www.adobe.io/authentication/auth-methods.html#!AdobeDocs/adobeio-auth/master/AuthenticationOverview/OAuthIntegration.md") のドキュメントを参照してください。
+クライアントIDとクライアントシークレットの取得方法については、[Adobe Oauth Connection](https://www.adobe.io/authentication/auth-methods.html#!AdobeDocs/adobeio-auth/master/AuthenticationOverview/OAuthIntegration.md)のドキュメントを参照してください。
 
 ### Adobe Developer Consoleで新しいOAuthプロジェクトを作成する
 
 Google Developers Consoleで新しいOAuthプロジェクトを作成するには、次の手順を実行します。
 
-1. [https://console.adobe.io/projects](https://console.adobe.io/projects "フォローリンク") にログインします。
+1. [https://console.adobe.io/projects](https://console.adobe.io/projects)にログインします。
 
-2. ［Create new project］ **ボタンをクリックします**。
+2. ［Create new project］**ボタンをクリックします**。
 
-<Frame><img alt="New_Project_button.png" src="/images/kb/ka0Vq00000012UP-00N5w00000Ri7BU-0EM5w000005vO15.png"/></Frame>
+<Frame>![New_Project_button.png](/images/kb/ja/0EM5w000005wKzW.png)</Frame>
 
-3. ［Add API］ **をクリックしてAdobeサービスを開始します**。
+3. ［Add API］**をクリックしてAdobeサービスを開始します**。
 
-<Frame><img alt="Add_API.png" src="/images/kb/ka0Vq00000012UP-00N5w00000Ri7BU-0EM5w000005vO16.png"/></Frame>
+<Frame>![Add_API.png](/images/kb/ja/0EM5w000005wKzJ.png)</Frame>
 
-4. 利用可能なAPIは **［Add an API］** ウィンドウにリストされます。
+4. 利用可能なAPIは**［Add an API］**ウィンドウにリストされます。**［Adobe Analytics］**を選択します。
 
-**［Adobe Analytics］** を選択します。
+<Frame>![Add_an_API-Adobe_Analytics.png](/images/kb/ja/0EM5w000005wKzV.png)</Frame>
 
-<Frame><img alt="Add_an_API-Adobe_Analytics.png" src="/images/kb/ka0Vq00000012UP-00N5w00000Ri7BU-0EM5w000005vO19.png"/></Frame>
+5. 認証タイプを選択します。ここで**［OAuth］**を選択します。
 
-5. 認証タイプを選択します。ここで **［OAuth］** を選択します。
+<Frame>![OAuth-service_account_OAuth.png](/images/kb/ja/0EM5w000005wKzL.png)</Frame>
 
-<Frame><img alt="OAuth-service_account_OAuth.png" src="/images/kb/ka0Vq0000008NaX-00N5w00000Ri7BU-0EM5w000005vO1D.png"/></Frame>
+6. **［Web］**プラットフォームを選択してAPIを設定します。
 
-6. **［Web］** プラットフォームを選択してAPIを設定します。**デフォルトの** **リダイレクトURI** を **https://oauth.domo.com/api/data/v2/oauth/providers/adobe-analytics-oauth/exchange** と入力します。
+**デフォルトの** **リダイレクトURI**を**https://oauth.domo.com/api/data/v2/oauth/providers/adobe-analytics-oauth/exchange**  
+と入力します。
 
-**［Redirect URI pattern］** に https://oauth/.domo/.com/api/data/v2/oauth/providers/adobe-analytics-oauth/exchange と **入力します。**
+**［Redirect URI pattern］**にhttps://oauth/.domo/.com/api/data/v2/oauth/providers/adobe-analytics-oauth/exchangeと**入力します。**
 
-7. **［Save configured API］** をクリックします。
+7. **［Save configured API］**をクリックします。
 
 ## Adobe Analytics API v2に接続する
 
-このセクションでは、Adobe Analytics v2コネクターページの **［認証情報］** および **［詳細］** ペインのオプションについて説明します。このページのほかのペインの項目にある **［スケジュール設定］** と **［DataSetに名前を付け、説明を入力］** については、ほとんどのコネクターで共通しています。詳細については、「 [コネクターを使用してDataSetを追加する](/ja/s/article/360042926274 "コネクターを使用してDataSetを追加する") 」を参照してください。
+このセクションでは、Adobe Analytics v2コネクターページの**［認証情報］**および**［詳細］**ペインのオプションについて説明します。このページのほかのペインの項目にある**［スケジュール設定］**と**［DataSetに名前を付け、説明を入力］**については、ほとんどのコネクターで共通しています。詳細については、「[コネクターを使用してDataSetを追加する](/s/article/360042926274)」を参照してください。
 
 ### ［認証情報］ペイン
 
 このペインには、Adobe Analytics API v2に接続する認証情報の入力フィールドが含まれています。下表は、各フィールドに必要な内容を説明しています。
 
-<table border="1" cellpadding="1" cellspacing="1"><thead><tr><th colspan="1" rowspan="1"><p> フィールド </p></th><th colspan="1" rowspan="1"><p> 説明 </p></th></tr></thead><tbody><tr><td colspan="1" rowspan="1"> Client ID </td><td colspan="1" rowspan="1"> Adobe Analytics v2アカウントに関連付けられているクライアントIDを入力します。 </td></tr><tr><td colspan="1" rowspan="1"> Client Secret </td><td colspan="1" rowspan="1"> Adobe Analytics v2アカウントに関連付けられているクライアントシークレットを入力します。 </td></tr></tbody></table>
+| フィールド         | 説明                                                   |
+| ------------- | ---------------------------------------------------- |
+| Client ID     | Adobe Analytics v2アカウントに関連付けられているクライアントIDを入力します。     |
+| Client Secret | Adobe Analytics v2アカウントに関連付けられているクライアントシークレットを入力します。 |
 
-有効な認証情報を一度入力しておくと、いつでも同じアカウントを使用して新しいAdobe Analytics v2 DataSetを作成することができます。コネクターのアカウントは、Data Centerの **［アカウント］** タブで管理することができます。このタブについて詳しくは、「 コネクターのユーザーアカウントを管理する [」を参照してください。](/ja/s/article/360042926054 "コネクターのユーザーアカウントを管理する")
+有効な認証情報を一度入力しておくと、いつでも同じアカウントを使用して新しいAdobe Analytics v2 DataSetを作成することができます。コネクターのアカウントは、Data Centerの**［アカウント］**タブで管理することができます。このタブについて詳しくは、「コネクターのユーザーアカウントを管理する[」を参照してください。](/s/article/360042926054)
 
 ### ［詳細］ペイン
 
 このペインには、あらかじめ定義されたAdobe Analytics v2レポートに関する情報が含まれています。
 
-<table border="1" cellpadding="1" cellspacing="1"><thead><tr><th colspan="1" rowspan="1"><p> メニュー </p></th><th colspan="1" rowspan="1"><p> 説明 </p></th></tr></thead><tbody><tr><td colspan="1" rowspan="1"><p> Predefined Report </p></td><td colspan="1" rowspan="1"><p> 実行するAdobe Analytics v2レポートを選択します。 </p><table border="1" cellpadding="1" cellspacing="1"><tbody><tr><td colspan="1" rowspan="1"> Calculated Metrics </td><td colspan="1" rowspan="1"> このレポートは計算されたメトリクスのリストを返します。 </td></tr><tr><td colspan="1" rowspan="1"> Collections </td><td colspan="1" rowspan="1"> このレポートはレポートスイートのリストを返します。 </td></tr><tr><td colspan="1" rowspan="1"> Dimensions </td><td colspan="1" rowspan="1"> このレポートは特定のレポートスイートのディメンションのリストを返します。 </td></tr><tr><td colspan="1" rowspan="1"> Metrics </td><td colspan="1" rowspan="1"> このレポートは特定のレポートスイートのメトリクスのリストを返します。 </td></tr><tr><td colspan="1" rowspan="1"> Report <span> Data </span></td><td colspan="1" rowspan="1"> このレポートは、指定された日付範囲の要求されたメトリクスとディメンションのレポートデータを返します。 </td></tr><tr><td colspan="1" rowspan="1"> Segments </td><td colspan="1" rowspan="1"> このレポートはセグメントのリストを返します。 </td></tr><tr><td colspan="1" rowspan="1"> Users </td><td colspan="1" rowspan="1"> このレポートは会社のユーザーリストを返します。 </td></tr></tbody></table></td></tr><tr><td colspan="1" rowspan="1"> Include Type </td><td colspan="1" rowspan="1"> ユーザーが所有していない追加の計算メトリクスを含めます。「All」オプションは「Shared」よりも優先されます。 </td></tr><tr><td colspan="1" rowspan="1"> Report Suite ID </td><td colspan="1" rowspan="1"> レポートスイートIDを選択します。 </td></tr><tr><td colspan="1" rowspan="1"> Metrics </td><td colspan="1" rowspan="1"> 利用可能なメトリクスからメトリクスを選択します。 </td></tr><tr><td colspan="1" rowspan="1"> Dimensions </td><td colspan="1" rowspan="1"> ディメンションを選択します。 </td></tr></tbody></table>
+| メニュー | 説明  |
+| ---- | --- |
+| Predefined Report | 実行するAdobe Analytics v2レポートを選択します。<table><tbody><tr><td>Calculated Metrics</td><td>このレポートは計算されたメトリクスのリストを返します。</td></tr><tr><td>Collections</td><td>このレポートはレポートスイートのリストを返します。</td></tr><tr><td>Dimensions</td><td>このレポートは特定のレポートスイートのディメンションのリストを返します。</td></tr><tr><td>Metrics</td><td>このレポートは特定のレポートスイートのメトリクスのリストを返します。</td></tr><tr><td>Report Data</td><td>このレポートは、指定された日付範囲の要求されたメトリクスとディメンションのレポートデータを返します。</td></tr><tr><td>Segments</td><td>このレポートはセグメントのリストを返します。</td></tr><tr><td>Users</td><td>このレポートは会社のユーザーリストを返します。</td></tr></tbody></table> |
+| Include Type | ユーザーが所有していない追加の計算メトリクスを含めます。「All」オプションは「Shared」よりも優先されます。 |
+| Report Suite ID | レポートスイートIDを選択します。 |
+| Metrics | 利用可能なメトリクスからメトリクスを選択します。 |
+| Dimensions | ディメンションを選択します。 |
 
 ## その他のペイン
 
-スケジュール設定、再試行、更新に関するオプションなど、コネクターインターフェースのその他のペインに表示されるオプションについては、「 [コネクターを使用してDataSetを追加する](/ja/s/article/360042926274) 」を参照してください。
+スケジュール設定、再試行、更新に関するオプションなど、コネクターインターフェースのその他のペインに表示されるオプションについては、「[コネクターを使用してDataSetを追加する](/s/article/360042926274)」を参照してください。
 
 ## よくある質問
 
 Q：Adobe Analytics OAuthアカウントが正しく作成されたにもかかわらず、それから約2週間後に「Adobe Analytics OAuthアカウントが無効になりました」というアラートが表示されました。このアラートが表示されるのはなぜですか？この場合はどうすればよいですか？
 
-A：Adobe Analytics OAuthには、2週間で期限切れになる更新トークンが付属しています（ [Adobeのドキュメント](https://www.adobe.io/authentication/auth-methods.html#!AdobeDocs/adobeio-auth/master/OAuth/OAuth.md#exchanging-refresh-tokens "https://www.adobe.io/authentication/auth-methods.html#!AdobeDocs/adobeio-auth/master/OAuth/OAuth.md#exchanging-refresh-tokens")
-
-を参照）。このため、2週間が経過するとAdobe OAuthを認証できなくなります。これは、Adobeによって設定された制約事項です。以前のデータベースでは、WSSE認証方式（ユーザー名として会社名を入力し、パスワードを入力する認証方式）が使用されていましたが、AdobeはこのWSSE認証方式を廃止しました。この問題の解決策については、Adobeのサポート窓口にお問い合わせください。
+A：Adobe Analytics OAuthには、2週間で期限切れになる更新トークンが付属しています（[Adobeのドキュメント](https://www.adobe.io/authentication/auth-methods.html#!AdobeDocs/adobeio-auth/master/OAuth/OAuth.md#exchanging-refresh-tokens)を参照）。このため、2週間が経過するとAdobe OAuthを認証できなくなります。これは、Adobeによって設定された制約事項です。以前のデータベースでは、WSSE認証方式（ユーザー名として会社名を入力し、パスワードを入力する認証方式）が使用されていましたが、AdobeはこのWSSE認証方式を廃止しました。この問題の解決策については、Adobeのサポート窓口にお問い合わせください。
 
 Q：レポートをAdobe Analytics APIのバージョン1.4からバージョン2に移行するにはどうすればいいですか？
 
-A：詳細については、Adobe Analyticsの 「 [移行ガイド](https://www.adobe.io/apis/experiencecloud/analytics/docs.html#!AdobeDocs/analytics-2.0-apis/master/migration-guide.md "https://www.adobe.io/apis/experiencecloud/analytics/docs.html#!AdobeDocs/analytics-2.0-apis/master/migration-guide.md")
-
-」 を参照してください。バージョン2は、大きなリクエストの処理が遅いバージョン1.4と比較して、小さなリクエストをすばやく実行するように設計されています。この設計変更は、DomoがDataSetをバージョン2に自動的に移行できないことを意味します。
+A：詳細については、Adobe Analyticsの「[移行ガイド](https://www.adobe.io/apis/experiencecloud/analytics/docs.html#!AdobeDocs/analytics-2.0-apis/master/migration-guide.md)」を参照してください。バージョン2は、大きなリクエストの処理が遅いバージョン1.4と比較して、小さなリクエストをすばやく実行するように設計されています。この設計変更は、DomoがDataSetをバージョン2に自動的に移行できないことを意味します。
 
 Q：このコネクターは、ほかのAdobe Analyticsコネクターとどのように異なっていますか？
 
 A：Adobe AnalyticsコネクターおよびAdobe Analytics AdvancedコネクターはAdobe Analytics APIのバージョン1.4を使用しますが、このコネクターはバージョン2を使用します。
-
-

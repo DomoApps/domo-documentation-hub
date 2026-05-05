@@ -1,0 +1,172 @@
+name: Mintlify Preview Deployments
+
+# Triggers the Mintlify preview-deploy API for:
+#   - any pull request event (opens / pushes / reopens / ready-for-review),
+#     using the PR's head branch as the preview branch
+#   - any push to a `release/**` branch, using the ref name as the preview branch
+#
+# Required repo secrets:
+#   MINTLIFY_KEY         Admin API key (prefixed `mint_`) from
+#                        https://dashboard.mintlify.com/settings/organization/api-keys
+#   MINTLIFY_PROJECT_ID  Project ID from the same dashboard page
+#
+# Preview deployments require a Mintlify Pro or Enterprise plan.
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+  push:
+    branches:
+      - "release/**"
+
+permissions:
+  contents: read
+  pull-requests: write   # for the sticky preview-URL comment
+
+concurrency:
+  # Coalesce per-branch so back-to-back pushes don't burn the 5 req/min limit.
+  group: mintlify-preview-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  preview:
+    runs-on: ubuntu-latest
+    # Skip drafts; push events have no draft concept so the null check lets them through.
+    if: github.event.pull_request == null || github.event.pull_request.draft == false
+    steps:
+      - name: Show event context
+        run: |
+          echo "Event: ${{ github.event_name }}"
+          echo "Ref:   ${{ github.ref }}"
+          echo "Head branch (PR only): ${{ github.head_ref }}"
+          echo "Base branch (PR only): ${{ github.base_ref }}"
+          echo "PR number (PR only):   ${{ github.event.pull_request.number }}"
+
+      - name: Resolve preview branch
+        id: branch
+        run: |
+          set -euo pipefail
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            BRANCH="${{ github.head_ref }}"
+          else
+            BRANCH="${{ github.ref_name }}"
+          fi
+          if [ -z "$BRANCH" ]; then
+            echo "::error::Could not resolve preview branch from event context."
+            exit 1
+          fi
+          echo "name=$BRANCH" >> $GITHUB_OUTPUT
+          echo "Previewing branch: $BRANCH"
+
+      - name: Trigger Mintlify preview
+        id: trigger
+        env:
+          MINTLIFY_TOKEN: ${{ secrets.MINTLIFY_KEY }}
+          MINTLIFY_PROJECT_ID: ${{ secrets.MINTLIFY_PROJECT_ID }}
+          PREVIEW_BRANCH: ${{ steps.branch.outputs.name }}
+        run: |
+          set -euo pipefail
+
+          if [ -z "${MINTLIFY_TOKEN:-}" ] || [ -z "${MINTLIFY_PROJECT_ID:-}" ]; then
+            echo "::error::Repo secrets MINTLIFY_KEY and MINTLIFY_PROJECT_ID are both required."
+            exit 1
+          fi
+
+          if [[ "$MINTLIFY_TOKEN" != mint_* ]]; then
+            echo "::warning::MINTLIFY_KEY does not start with 'mint_' — Mintlify admin API keys are prefixed with 'mint_'. The call will likely 401."
+          fi
+
+          echo "Triggering Mintlify preview for branch: $PREVIEW_BRANCH"
+
+          HTTP_STATUS=$(curl --silent --show-error \
+            --write-out '%{http_code}' \
+            --output /tmp/mint-response.json \
+            -X POST "https://api.mintlify.com/v1/project/preview/${MINTLIFY_PROJECT_ID}" \
+            -H "Authorization: Bearer ${MINTLIFY_TOKEN}" \
+            -H "Content-Type: application/json" \
+            -d "{\"branch\": \"${PREVIEW_BRANCH}\"}")
+
+          echo "HTTP $HTTP_STATUS"
+          echo "--- response body ---"
+          cat /tmp/mint-response.json || true
+          echo ""
+          echo "---------------------"
+
+          case "$HTTP_STATUS" in
+            202)
+              ;;
+            400)
+              echo "::error::Mintlify rejected the request (400). Body: $(cat /tmp/mint-response.json)"
+              exit 1
+              ;;
+            401|403)
+              echo "::error::Mintlify auth/plan error (HTTP $HTTP_STATUS). Preview deploys require a Pro or Enterprise plan, and MINTLIFY_KEY must be valid for MINTLIFY_PROJECT_ID."
+              exit 1
+              ;;
+            429)
+              echo "::error::Rate limited by Mintlify (429). Endpoint allows 5 req/min/org. Re-run after waiting."
+              exit 1
+              ;;
+            *)
+              echo "::error::Unexpected HTTP $HTTP_STATUS from Mintlify preview trigger."
+              exit 1
+              ;;
+          esac
+
+          PREVIEW_URL=$(jq -r '.previewUrl // empty' /tmp/mint-response.json)
+          STATUS_ID=$(jq -r '.statusId // empty' /tmp/mint-response.json)
+
+          echo "preview_url=$PREVIEW_URL" >> $GITHUB_OUTPUT
+          echo "status_id=$STATUS_ID"     >> $GITHUB_OUTPUT
+
+          {
+            echo "## Preview"
+            echo ""
+            echo "- Branch: \`$PREVIEW_BRANCH\`"
+            if [ -n "$PREVIEW_URL" ]; then
+              echo "- Preview URL: <$PREVIEW_URL>"
+            fi
+            if [ -n "$STATUS_ID" ]; then
+              echo "- Status ID: \`$STATUS_ID\`"
+            fi
+          } >> $GITHUB_STEP_SUMMARY
+
+      # Determine which PR (if any) should receive the sticky comment.
+      #   PR events: the PR being built.
+      #   Push to release/**: the first open PR whose head is this release branch (if any).
+      - name: Resolve PR for sticky comment
+        id: find-pr
+        if: steps.trigger.outputs.preview_url != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            PR_NUMBER="${{ github.event.pull_request.number }}"
+          else
+            PR_NUMBER=$(gh pr list \
+              --repo "${{ github.repository }}" \
+              --head "${{ github.ref_name }}" \
+              --state open \
+              --json number \
+              --jq '.[0].number // empty')
+          fi
+          echo "pr_number=${PR_NUMBER}" >> $GITHUB_OUTPUT
+          if [ -n "$PR_NUMBER" ]; then
+            echo "Sticky comment will go on PR #$PR_NUMBER"
+          else
+            echo "No PR to comment on; skipping."
+          fi
+
+      - name: Post sticky preview comment
+        if: steps.find-pr.outputs.pr_number != ''
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          number: ${{ steps.find-pr.outputs.pr_number }}
+          header: mintlify-preview
+          message: |
+            ### Mintlify preview
+
+            **[Open preview](${{ steps.trigger.outputs.preview_url }})** — deployed from `${{ steps.branch.outputs.name }}`.
+
+            <sub>Updated on each push. Preview deploys can take a minute or two to finish building — refresh the preview URL if it shows a build-in-progress splash.</sub>

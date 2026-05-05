@@ -2,52 +2,50 @@
 title: "ワークフローを管理する"
 ---
 
-import {InlineImage} from "/snippets/InlineImage.mdx";
+## はじめに
 
-### はじめに
-
-この記事では、ワークフロー管理と、 [許可](#required_grants) やワークフロー固有の [権限](#manage_permissions) などのガバナンスのトピックについて説明します。また、ワークフローの [バージョン管理](#manage_workflow_versions) や [リカバリ](#recover_an_execution) についても学習します。管理者と「ワークフローを管理する」の許可を持つユーザーは、代替トリガーを管理してワークフローを開始できます。トリガーの詳細については、 [こちら](#manage_triggers) を参照してください。
+この記事では、ワークフロー管理と、 許可 やワークフロー固有の 権限 などのガバナンスのトピックについて説明します。また、ワークフローの バージョン管理 や リカバリ についても学習します。管理者と「ワークフローを管理する」の許可を持つユーザーは、代替トリガーを管理してワークフローを開始できます。トリガーの詳細については、 こちら を参照してください。
 
 <Note>
   **用語集** ：この記事の 二重引用符で囲まれている用語には、ワークフロー内の特定の定義があります。 [用語集](/ja/s/article/000005108#glossary) では、定義を示します。
 
 </Note>
 
-ワークフローの有効化、設定、または操作のサポートについては、Domoアカウントチームまたは [Domoサポート <InlineImage src="/images/kb/ja/ka0Vq0000009e9W-00N5w00000Ri7BU-0EMVq000002l1KT.jpg" />](https://domo-support.domo.com/s/) にお問い合わせください。
+ワークフローの有効化、設定、または操作のサポートについては、Domoアカウントチームまたは [Domoサポート <img src="/images/kb/ja/ka0Vq0000009e9W-00N5w00000Ri7BU-0EMVq000002l1KT.jpg" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/>](https://domo-support.domo.com/s/) にお問い合わせください。
 
 ---
 
-* [必要な許可](#required_grants)
-* [権限を管理する](#manage_permissions)
-* [ワークフロー名と説明を編集する](#edit_workflow_name_and_description)
-* [ワークフローを編集する](#edit_a_workflow)
-  + [ロックされたバージョンにアクセスする](#locked_version)
-* [ワークフローを削除する](#delete_a_workflow)
-* [ワークフローバージョンを管理する](#manage_workflow_versions)
-  + [バージョンアクション](#version_actions)
-  + [新しいバージョンを作成する](#create_a_new_version)
-* [ワークフローのトリガーを管理する](#manage_triggers)
-  + [ワークフローのトリガーを作成する](#workflow_trigger)
-  + [トリガーを削除する](#delete_trigger)
-* [ワークフローの実行を表示する](#view_executions)
-  + [ワークフローを一括でキャンセルする](#cancel_workflows_in_bulk)
-  + [実行の詳細を確認する](#review_execution_details)
-  + [再生コントロールを使用する](#playback_controls)
-* [実行をリカバリ/再試行する](#recover_an_execution)
-  + [リカバリオプション](#recovery_options)
+* 必要な許可
+* 権限を管理する
+* ワークフロー名と説明を編集する
+* ワークフローを編集する
+  + ロックされたバージョンにアクセスする
+* ワークフローを削除する
+* ワークフローバージョンを管理する
+  + バージョンアクション
+  + 新しいバージョンを作成する
+* ワークフローのトリガーを管理する
+  + ワークフローのトリガーを作成する
+  + トリガーを削除する
+* ワークフローの実行を表示する
+  + ワークフローを一括でキャンセルする
+  + 実行の詳細を確認する
+  + 再生コントロールを使用する
+* 実行をリカバリ/再試行する
+  + リカバリオプション
 
 ---
 
-### 必要な許可
+## 必要な許可
 
 次の許可によって、ワークフロー機能の権限が付与されます。
 
-* **ワークフローを作成する —** この許可を使用すると、 [テンプレートライブラリー](/ja/s/article/000005331?language=ja#create_workflow_from_template) からの作成も含め、 [新しいワークフローを作成できます](/ja/s/article/000005331#create_a_workflow_blank_canvas) 。新しいワークフローを作成する必要があるインスタンス内のすべてのユーザーが、この許可を持っている必要があります。
-* **ワークフローを管理する —** この許可を使用すると、Domoインスタンス内の任意のワークフローに対して任意のアクションを実行できます。スーパーユーザー、管理者、インスタンスのワークフローの管理を支援するユーザーには、この許可が付与されている必要があります。 "実行済み"ワークフローインスタンスにアクセスする必要があり、この許可を持つユーザーは、権限モーダルで「実行リストを表示」および「実行の詳細を編集」の許可を明示的に自分に付与する必要があります。 [権限](#manage_permissions) については、次のセクションを参照してください。
+* **ワークフローを作成する —** この許可を使用すると、 [テンプレートライブラリー](/ja/s/article/000005331) からの作成も含め、 [新しいワークフローを作成できます](/ja/s/article/000005331) 。新しいワークフローを作成する必要があるインスタンス内のすべてのユーザーが、この許可を持っている必要があります。
+* **ワークフローを管理する —** この許可を使用すると、Domoインスタンス内の任意のワークフローに対して任意のアクションを実行できます。スーパーユーザー、管理者、インスタンスのワークフローの管理を支援するユーザーには、この許可が付与されている必要があります。 "実行済み"ワークフローインスタンスにアクセスする必要があり、この許可を持つユーザーは、権限モーダルで「実行リストを表示」および「実行の詳細を編集」の許可を明示的に自分に付与する必要があります。 権限 については、次のセクションを参照してください。
 
-「 [権限を管理する](#manage_permissions) 」セクションでは、インスタンス内の管理者以外のユーザーに特定のワークフローへのアクセス権を与える方法について説明します。使用可能な権限がいくつかあります。
+「 権限を管理する 」セクションでは、インスタンス内の管理者以外のユーザーに特定のワークフローへのアクセス権を与える方法について説明します。使用可能な権限がいくつかあります。
 
-### 権限を管理する
+## 権限を管理する
 
 ワークフロー内で、 "権限"はワークフローへのユーザーやグループのアクセス権をより細かく指定する方法です。
 
@@ -62,7 +60,7 @@ import {InlineImage} from "/snippets/InlineImage.mdx";
   **権限 —** 使用可能な権限は、次のとおりです。
 
   * **管理者 —**
-  ワークフローで任意のアクションを実行するためのアクセス権を付与します。この権限は、Domoインスタンス内のすべてのワークフローへのアクセス権を誰かに付与する「ワークフローを管理する」の [許可](#required_grants) とは別です。
+  ワークフローで任意のアクションを実行するためのアクセス権を付与します。この権限は、Domoインスタンス内のすべてのワークフローへのアクセス権を誰かに付与する「ワークフローを管理する」の 許可 とは別です。
 
   デフォルトでは、ワークフローの所有者にはワークフローに対する管理者権限がありますが、このアクセス権は変更または無効にすることができます。
   * **削除 —**
@@ -78,20 +76,20 @@ import {InlineImage} from "/snippets/InlineImage.mdx";
   * **実行 —**
   ワークフローの展開済みバージョンを実行するアクセス権を付与します。
   * **実行リストを表示 —**
-  ワークフローの [実行](#view_executions) への閲覧専用アクセス権を許可します（ [実行の詳細](#review_execution_details) および [再生コントロール](#playback_controls) を含む）。
+  ワークフローの 実行 への閲覧専用アクセス権を許可します（ 実行の詳細 および 再生コントロール を含む）。
 
-  権限の所有者に「ワークフローを管理する」の [許可](#required_grants) が与えられていない場合、実行リストには、個人的に開始した実行のみが表示されます。ワークフローに対する「実行リストを表示」の許可を持ち、 *かつ* 「ワークフローを管理する」の許可があるユーザーは、ワークフローのすべての実行を表示できます。
+  権限の所有者に「ワークフローを管理する」の 許可 が与えられていない場合、実行リストには、個人的に開始した実行のみが表示されます。ワークフローに対する「実行リストを表示」の許可を持ち、 *かつ* 「ワークフローを管理する」の許可があるユーザーは、ワークフローのすべての実行を表示できます。
   * **実行の詳細を編集 —**
-  失敗した、または進行中の ワークフロー [実行](#view_executions) を編集およびリカバリするためのアクセス権を付与します。
+  失敗した、または進行中の ワークフロー 実行 を編集およびリカバリするためのアクセス権を付与します。
 
-  権限の所有者に「ワークフローを管理する」の [許可](#required_grants) が与えられていない場合、個人的に開始した実行のみを編集またはリカバリできます。ワークフローに対して「実行の詳細を編集」の許可と「ワークフローを管理する」の許可を持つユーザーは、「進行中」または「失敗」ステータスの実行済みワークフローを編集またはリカバリできます。
+  権限の所有者に「ワークフローを管理する」の 許可 が与えられていない場合、個人的に開始した実行のみを編集またはリカバリできます。ワークフローに対して「実行の詳細を編集」の許可と「ワークフローを管理する」の許可を持つユーザーは、「進行中」または「失敗」ステータスの実行済みワークフローを編集またはリカバリできます。
 
 </Note>
 
 ワークフローの権限を管理するには、次の手順に従います。
 
 1. ワークフローのデフォルトビューで、権限を管理するワークフローを探し、
-   <InlineImage src="/images/kb/ja/ka0Vq0000009e9W-00N5w00000Ri7BU-0EMVq000005xtVR.jpg" /> **詳細** （水平の三点リーダー）> **［権限を管理］** を選択します。
+   <img src="/images/kb/ja/ka0Vq0000009e9W-00N5w00000Ri7BU-0EMVq000005xtVR.jpg" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/> **詳細** （水平の三点リーダー）> **［権限を管理］** を選択します。
      
    <Frame><img alt="" src="/images/kb/ka0Vq0000009THK-00N5w00000Ri7BU-0EMVq000005xtQb.jpg" style={{width: 899, height: 384}}/></Frame>
    権限モーダルが表示されます。
@@ -106,28 +104,25 @@ import {InlineImage} from "/snippets/InlineImage.mdx";
 
 3. モーダルを閉じる前に変更を保存します。
 
-[このページのトップへ](#intro)
+## ワークフロー名と説明を編集する
 
-### ワークフロー名と説明を編集する
-
-ワークフローの編集 [権限](#manage_permissions) または管理者権限が与えられている場合、 <InlineImage src="/images/kb/ja/ka0Vq0000009e9W-00N5w00000Ri7BU-0EMVq000005xtVR-1.jpg" /> **詳細** （水平の三点リーダー）> **［詳細を編集］** を選択して、ワークフローのデフォルトビューから名前と説明を変更できます。
+ワークフローの編集 権限 または管理者権限が与えられている場合、 <img src="/images/kb/ja/ka0Vq0000009e9W-00N5w00000Ri7BU-0EMVq000005xtVR-1.jpg" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/> **詳細** （水平の三点リーダー）> **［詳細を編集］** を選択して、ワークフローのデフォルトビューから名前と説明を変更できます。
 
 <Frame><img alt="" src="/images/kb/ka0Vq0000009THK-00N5w00000Ri7BU-0EMVq000005xtX3.jpg" style={{width: 900, height: 352}}/></Frame>
-[このページのトップへ](#intro)
 
-### ワークフローを編集する
+## ワークフローを編集する
 
 <Note>
-  **注記：** ワークフローを "展開"した後は、ワークフローを編集できません。代わりに、新しいワークフローの "バージョン"を作成する必要があります。「 [ワークフローバージョンを管理する](#manage_workflow_versions) 」を参照してください。
+  **注記：** ワークフローを "展開"した後は、ワークフローを編集できません。代わりに、新しいワークフローの "バージョン"を作成する必要があります。「 ワークフローバージョンを管理する 」を参照してください。
 
 </Note>
 
 ワークフローバージョンが展開されていない場合は、次の手順に従って編集を続行できます。
 
 1. デフォルトのワークフロービューで、バージョンリストを開くワークフローを選択します。バージョンリストの詳細については、
-   [こちら](#manage_workflow_versions) を参照してください。
+   こちら を参照してください。
 2. バージョンリストで、編集するワークフローバージョンに対して
-   <InlineImage src="/images/kb/ja/ka0Vq0000009e9W-00N5w00000Ri7BU-0EMVq000005xtdV.jpg" /> **詳細** （縦の三点リーダー）> **［ワークフローを編集］** を選択します。
+   <img src="/images/kb/ja/ka0Vq0000009e9W-00N5w00000Ri7BU-0EMVq000005xtdV.jpg" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/> **詳細** （縦の三点リーダー）> **［ワークフローを編集］** を選択します。
      
    バージョンがキャンバスに編集モードで開きます。
      
@@ -135,25 +130,22 @@ import {InlineImage} from "/snippets/InlineImage.mdx";
    <Warning>
      **ロックされたバージョンにアクセスする：** "事前展開済み"バージョンは一度に1人のユーザーのみが編集できます。事前展開済みバージョンを編集しているユーザーがいる場合、そのバージョンを編集しようとするほかのユーザーには、更新が上書きされないように **［バージョンはロックされています］** モーダルが示されます。モーダルにはバージョンを編集しているユーザーの名前が表示され、バージョンを閲覧専用モードで表示するオプションが提供されます。
 
-     ワークフローの管理者 [権限](#manage_permissions) を持っている場合、ロックされたバージョンをロック解除できます。ロック解除すると、ほかのユーザーによる変更が保存されないと警告されます。例えば作業中に誰かがロック解除した場合、未保存の編集内容がすべて 失われ、ほかのユーザーがそのバージョンを開いて編集できるようになります。
+     ワークフローの管理者 権限 を持っている場合、ロックされたバージョンをロック解除できます。ロック解除すると、ほかのユーザーによる変更が保存されないと警告されます。例えば作業中に誰かがロック解除した場合、未保存の編集内容がすべて 失われ、ほかのユーザーがそのバージョンを開いて編集できるようになります。
 
      <Frame><img alt="locked version.jpg" src="/images/kb/ka0Vq0000009THK-00N5w00000Ri7BU-0EMVq000001qbUL.jpg" style={{width: 400, height: 229}}/></Frame>
    </Warning>
 
-[このページのトップへ](#intro)
-
-### ワークフローを削除する
+## ワークフローを削除する
 
 ワークフローを削除すると、そのすべてのバージョンが削除されます。アクティブなバージョンがあるワークフローは削除できません。そのため、ワークフローを削除するには、すべてのバージョンを "無効化"しておく必要があります。
 
-ワークフローを削除するには、そのワークフローの削除権限または管理者権限が必要です。権限の詳細については、 [こちら](#manage_permissions) を参照してください。
+ワークフローを削除するには、そのワークフローの削除権限または管理者権限が必要です。権限の詳細については、 こちら を参照してください。
 
-<InlineImage src="/images/kb/ja/ka0Vq0000009e9W-00N5w00000Ri7BU-0EMVq000005xtVR-2.jpg" /> **詳細** （水平の三点リーダー）> **［削除］** を選択して、ワークフローのデフォルトビューからワークフローを削除します。
+<img src="/images/kb/ja/ka0Vq0000009e9W-00N5w00000Ri7BU-0EMVq000005xtVR-2.jpg" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/> **詳細** （水平の三点リーダー）> **［削除］** を選択して、ワークフローのデフォルトビューからワークフローを削除します。
 
 <Frame><img alt="" src="/images/kb/ka0Vq0000009THK-00N5w00000Ri7BU-0EMVq000005UtfK.jpg" style={{width: 898, height: 302}}/></Frame>
-[このページのトップへ](#intro)
 
-### ワークフローバージョンを管理する
+## ワークフローバージョンを管理する
 
 ワークフローを "展開"した後は、ワークフローを編集できません。代わりに、新しいワークフローのバージョンを作成（ **［名前を付けて保存］** ）して、新しい *バージョン* を編集する必要があります。1つのワークフローに複数のバージョンを設定できます。各バージョンには、 *\<major.minor.patch\>* フォーマットで独自のバージョン番号が付いています（例：1.1.2）。ワークフローのバージョンリストを表示するには、ワークフローのホームからワークフローを選択します。
 
@@ -164,30 +156,27 @@ import {InlineImage} from "/snippets/InlineImage.mdx";
 リストからバージョンを選択すると、キャンバスが開き、権限とモデルのステータスにもとづいて、バージョンのグラフィックモデルが最も制限の少ないモードで表示されます。
 
 * バージョンが "展開済み"の場合、モデルは閲覧専用モードで開きます。展開済みバージョンは編集できません。編集するには、新しいバージョンを作成する必要があります。
-* バージョンが "事前展開済み"ではなく、ワークフローの読み取り [権限](#manage_permissions) のみが与えられている場合、モデルは閲覧専用モードで開きます。
-* バージョンが "事前展開済み"ではなく、ワークフローの書き込み [権限](#manage_permissions) または管理者権限を持っている場合は、バージョンが編集モードで開きます。ワークフローの設計方法については、 [こちら](/ja/s/article/000005331#design_your_workflow) を参照してください。
+* バージョンが "事前展開済み"ではなく、ワークフローの読み取り 権限 のみが与えられている場合、モデルは閲覧専用モードで開きます。
+* バージョンが "事前展開済み"ではなく、ワークフローの書き込み 権限 または管理者権限を持っている場合は、バージョンが編集モードで開きます。ワークフローの設計方法については、 [こちら](/ja/s/article/000005331) を参照してください。
 
 <Frame><img alt="" src="/images/kb/ka0Vq0000009THK-00N5w00000Ri7BU-0EMVq000005Uul3.jpg" style={{width: 899, height: 407}}/></Frame>
-[このページのトップへ](#intro)
 
-# バージョンアクション
+### バージョンアクション
 
-**［バージョン］** タブで、各バージョンの <InlineImage src="/images/kb/ja/ka0Vq0000009e9W-00N5w00000Ri7BU-0EMVq000005xtdV-1.jpg" /> **詳細** メニュー（縦の三点リーダー）には、下の表で説明する次のオプションがあります。
+**［バージョン］** タブで、各バージョンの <img src="/images/kb/ja/ka0Vq0000009e9W-00N5w00000Ri7BU-0EMVq000005xtdV-1.jpg" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/> **詳細** メニュー（縦の三点リーダー）には、下の表で説明する次のオプションがあります。
 
 <Frame><img alt="" src="/images/kb/ka0Vq0000009THK-00N5w00000Ri7BU-0EMVq000005UvSb.jpg" style={{width: 547, height: 407}}/></Frame>
 <Note>
-  **注記：** メニューのアクションにアクセスできない場合は、アクションを実行する [権限](#manage_permissions) がないか、バージョンの *ステータス* のためにアクションを利用できないかのどちらかです。バージョンステータスの確認については、「 [実行の詳細を確認する](#review_execution_details) 」を参照してください。
+  **注記：** メニューのアクションにアクセスできない場合は、アクションを実行する 権限 がないか、バージョンの *ステータス* のためにアクションを利用できないかのどちらかです。バージョンステータスの確認については、「 実行の詳細を確認する 」を参照してください。
 
 </Note>
 
-<table border="1" cellpadding="1" cellspacing="1" data-aura-rendered-by="33:206;a"><thead><tr><th colspan="1" rowspan="1"><p> アクション </p></th><th colspan="1" rowspan="1"><p> 必要な権限 </p></th><th colspan="1" rowspan="1"><p> 説明 </p></th></tr></thead><tbody><tr><td colspan="1" rowspan="1"><p><b> 表示のみ </b></p></td><td colspan="1" rowspan="1"><p> 表示、編集、または管理者 </p></td><td colspan="1" rowspan="1"><p> バージョンを閲覧専用モードで開きます。 </p></td></tr><tr><td colspan="1" rowspan="1"><p><b> ワークフローを編集 </b></p></td><td colspan="1" rowspan="1"><p> 編集または管理者 </p></td><td colspan="1" rowspan="1"><p> **これは、バージョンが展開されていない場合にのみ使用できます。 </p><p> バージョンを編集モードで開きます。 </p></td></tr><tr><td colspan="1" rowspan="1"><p><b> バージョン詳細を編集 </b></p></td><td colspan="1" rowspan="1"><p> 編集または管理者 </p></td><td colspan="1" rowspan="1"><p> バージョンの説明を編集できるモーダルを開きます。 </p></td></tr><tr><td colspan="1" rowspan="1"><p><b> 新しいバージョンを作成 </b></p></td><td colspan="1" rowspan="1"><p> 編集または管理者 </p></td><td colspan="1" rowspan="1"><p><b> ［新しいバージョンを作成］ </b> モーダルが開きます。 </p><p> 新しいバージョンの作成についての説明を確認してください。 </p></td></tr><tr><td colspan="1" rowspan="1"><p><b> 展開 </b></p></td><td colspan="1" rowspan="1"><p> 展開または管理者 </p></td><td colspan="1" rowspan="1"><p> バージョンの展開を試みます。バージョンは、展開されるまで実行できません。バージョンを展開すると、デフォルトで有効になります。 </p><p><a href="https://domo-support.domo.com/s/article/000005331#validate_a_workflow" target="_self"> 検証 </a> の問題がある場合は、展開する前にエラーを解決する必要があります。 </p></td></tr><tr><td colspan="1" rowspan="1"><p><b> 有効にする </b> / <b> 無効にする </b></p></td><td colspan="1" rowspan="1"><p> 編集または管理者 </p></td><td colspan="1" rowspan="1"><p> 展開済みバージョンを有効または無効にします。 </p><p> バージョンは、アクティブになるまで実行できません。バージョンを展開すると、デフォルトで有効になります。バージョンを無効化して実行したままにすることはできますが、展開した後は展開を「解除」できません。 </p><p> 無効化されたバージョンは開始できません。 </p></td></tr><tr><td colspan="1" rowspan="1"><p><b> 開始 </b></p></td><td colspan="1" rowspan="1"><p> 実行または管理者 </p></td><td colspan="1" rowspan="1"><p> フォームの起動を含むワークフローの実行を開始します。 </p></td></tr><tr><td colspan="1" rowspan="1"><p><b> 実行数のリストを開く </b></p></td><td colspan="1" rowspan="1"><p> 実行リストを表示、実行の詳細を編集、または管理者 </p></td><td colspan="1" rowspan="1"><p><a href="#access_executions_list" target="_self"> ［実行数］ </a> タブを開きます。 </p></td></tr><tr><td colspan="1" rowspan="1"><p><b> 削除 </b></p></td><td colspan="1" rowspan="1"><p> 削除または管理者 </p></td><td colspan="1" rowspan="1"><p> バージョンを削除します。 </p><p> アクティブステータスの展開済みバージョンは削除できません。 <a id="create_a_new_version" target="_blank"></a></p></td></tr></tbody></table>
+<table border="1" cellpadding="1" cellspacing="1" data-aura-rendered-by="33:206;a"><thead><tr><th colspan="1" rowspan="1"><p> アクション </p></th><th colspan="1" rowspan="1"><p> 必要な権限 </p></th><th colspan="1" rowspan="1"><p> 説明 </p></th></tr></thead><tbody><tr><td colspan="1" rowspan="1"><p><b> 表示のみ </b></p></td><td colspan="1" rowspan="1"><p> 表示、編集、または管理者 </p></td><td colspan="1" rowspan="1"><p> バージョンを閲覧専用モードで開きます。 </p></td></tr><tr><td colspan="1" rowspan="1"><p><b> ワークフローを編集 </b></p></td><td colspan="1" rowspan="1"><p> 編集または管理者 </p></td><td colspan="1" rowspan="1"><p> **これは、バージョンが展開されていない場合にのみ使用できます。 </p><p> バージョンを編集モードで開きます。 </p></td></tr><tr><td colspan="1" rowspan="1"><p><b> バージョン詳細を編集 </b></p></td><td colspan="1" rowspan="1"><p> 編集または管理者 </p></td><td colspan="1" rowspan="1"><p> バージョンの説明を編集できるモーダルを開きます。 </p></td></tr><tr><td colspan="1" rowspan="1"><p><b> 新しいバージョンを作成 </b></p></td><td colspan="1" rowspan="1"><p> 編集または管理者 </p></td><td colspan="1" rowspan="1"><p><b> ［新しいバージョンを作成］ </b> モーダルが開きます。 </p><p> 新しいバージョンの作成についての説明を確認してください。 </p></td></tr><tr><td colspan="1" rowspan="1"><p><b> 展開 </b></p></td><td colspan="1" rowspan="1"><p> 展開または管理者 </p></td><td colspan="1" rowspan="1"><p> バージョンの展開を試みます。バージョンは、展開されるまで実行できません。バージョンを展開すると、デフォルトで有効になります。 </p><p><a href="/s/article/000005331#validate-a-workflow" target="_self"> 検証 </a> の問題がある場合は、展開する前にエラーを解決する必要があります。 </p></td></tr><tr><td colspan="1" rowspan="1"><p><b> 有効にする </b> / <b> 無効にする </b></p></td><td colspan="1" rowspan="1"><p> 編集または管理者 </p></td><td colspan="1" rowspan="1"><p> 展開済みバージョンを有効または無効にします。 </p><p> バージョンは、アクティブになるまで実行できません。バージョンを展開すると、デフォルトで有効になります。バージョンを無効化して実行したままにすることはできますが、展開した後は展開を「解除」できません。 </p><p> 無効化されたバージョンは開始できません。 </p></td></tr><tr><td colspan="1" rowspan="1"><p><b> 開始 </b></p></td><td colspan="1" rowspan="1"><p> 実行または管理者 </p></td><td colspan="1" rowspan="1"><p> フォームの起動を含むワークフローの実行を開始します。 </p></td></tr><tr><td colspan="1" rowspan="1"><p><b> 実行数のリストを開く </b></p></td><td colspan="1" rowspan="1"><p> 実行リストを表示、実行の詳細を編集、または管理者 </p></td><td colspan="1" rowspan="1"><p><a href="" target="_self"> ［実行数］ </a> タブを開きます。 </p></td></tr><tr><td colspan="1" rowspan="1"><p><b> 削除 </b></p></td><td colspan="1" rowspan="1"><p> 削除または管理者 </p></td><td colspan="1" rowspan="1"><p> バージョンを削除します。 </p><p> アクティブステータスの展開済みバージョンは削除できません。 <a id="create_a_new_version" target="_blank"></a></p></td></tr></tbody></table>
 
-[このページのトップへ](#intro)
-
-# 新しいバージョンを作成する
+### 新しいバージョンを作成する
 
 <Warning>
-  **重要：** 新しいバージョンを作成するには、「ワークフローを作成する」の [許可](#required_grants) と、ワークフローの書き込み [権限](#manage_permissions) または管理者権限が必要です。
+  **重要：** 新しいバージョンを作成するには、「ワークフローを作成する」の 許可 と、ワークフローの書き込み 権限 または管理者権限が必要です。
 
 </Warning>
 
@@ -203,17 +192,15 @@ import {InlineImage} from "/snippets/InlineImage.mdx";
 
     *アクティブ* とは、ワークフローがスケジュールに従って実行されるように、またはトリガーに応答して実行されるように現在設定されていることを意味します。
 
-    ワークフローを "無効化"すると、削除することなく実行を回避できます。ステータスの詳細およびその他のバージョン情報を確認するには、 [［実行数］](#view_executions) タブに進みます。
+    ワークフローを "無効化"すると、削除することなく実行を回避できます。ステータスの詳細およびその他のバージョン情報を確認するには、 ［実行数］ タブに進みます。
 
   </Note>
 
-[このページのトップへ](#intro)
+## ワークフローのトリガーを管理する
 
-### ワークフローのトリガーを管理する
+トリガーを使用すると、App Studio App内など、Domoのほかの場所から、またはタイマーを使用してワークフローを開始できます。手動トリガーは、そのワークフローバージョン内の [開始形状](/ja/s/article/000005331) から設定できます。手動トリガーの設定プロセスはこれのみです。ワークフローの **［トリガー］** タブには、ワークフローバージョンに設定されたすべてのトリガーが表示されます。
 
-トリガーを使用すると、App Studio App内など、Domoのほかの場所から、またはタイマーを使用してワークフローを開始できます。手動トリガーは、そのワークフローバージョン内の [開始形状](/ja/s/article/000005331?#configure_workflow_start) から設定できます。手動トリガーの設定プロセスはこれのみです。ワークフローの **［トリガー］** タブには、ワークフローバージョンに設定されたすべてのトリガーが表示されます。
-
-ワークフローのトリガーを作成するには、「ワークフローを管理する」の [許可](#required_grants) *および* 管理者 [権限](#manage_permissions) またはワークフローの実行権限を持っている必要があります。
+ワークフローのトリガーを作成するには、「ワークフローを管理する」の 許可 *および* 管理者 権限 またはワークフローの実行権限を持っている必要があります。
 
 <Note>
   **注記：** 手動トリガー以外のすべてのトリガー（タイマーを含む）は、ワークフローを "展開"した後にのみ設定できます。一部のトリガーは、App Studioなどのトリガーの実行元となる機能で設定する必要があります。
@@ -239,7 +226,7 @@ import {InlineImage} from "/snippets/InlineImage.mdx";
    * **アラート —** DataSetの詳細ページに進み、 **［アラート］** タブに移動します。新しいアラートを作成するとき、または既存のアラートを編集するときに、アラートトリガー時に実行するワークフローバージョンとしてアクションを設定します。アラートを作成する方法については、 [こちら](/s/article/360042925994) を参照してください。
        
      <Frame><img alt="" src="/images/kb/ka0Vq0000009THK-00N5w00000Ri7BU-0EMVq000005xu4v.jpg" style={{width: 898, height: 286}}/></Frame>
-   * **ワークフロー —** ワークフローを別のワークフローでトリガーするために、ワークフローのトリガーを作成する方法については、 [こちら](#workflow_trigger) を参照してください。
+   * **ワークフロー —** ワークフローを別のワークフローでトリガーするために、ワークフローのトリガーを作成する方法については、 こちら を参照してください。
    * **タイマー —** ワークフローバージョンを選択し、更新頻度と開始時間を指定してタイマーを設定します。更新頻度のオプションは次のとおりです。
        
      + **［毎分］ —** ［毎分］、［5分毎］、［15分毎］ のオプションがある **［期間（分）］** ドロップダウンが表示されます。
@@ -257,16 +244,14 @@ import {InlineImage} from "/snippets/InlineImage.mdx";
 * **APIトリガー —** ワークフローバージョンを選択します。構文がJavaScriptとPythonで生成されます。構文にはトリガーIDが含まれています。構文はコピーしてAPIコールに貼り付けることができます。このトリガーIDを使用して行われたコールは、追跡目的でのみ使用されるため、ワークフローを開始したトリガーを特定できます。
     
   <Frame><img alt="" src="/images/kb/ka0Vq0000009THK-00N5w00000Ri7BU-0EMVq000005yyWH.jpg" style={{width: 898, height: 313}}/></Frame>
-1. 設定されたトリガーは **［トリガー］** タブに表示されます。また、展開済みバージョンのトリガーをキャンバスの **［トリガー］** [タブ](/ja/s/article/000005331#left_panel) で表示および設定することもできます。
+1. 設定されたトリガーは **［トリガー］** タブに表示されます。また、展開済みバージョンのトリガーをキャンバスの **［トリガー］** [タブ](/ja/s/article/000005331) で表示および設定することもできます。
 
    <Note>
      **注記：** トリガーは現在、ワークフローバージョンから別のワークフローバージョンにコピーすることはできません。
 
    </Note>
 
-[このページのトップへ](#intro)
-
-# ワークフローのトリガーを作成する
+### ワークフローのトリガーを作成する
 
 1. トリガーとなるワークフローを編集モードで開きます。これは "事前展開済み"である必要があります。それ以外の場合は、新しいバージョンを作成します。
 2. ステップを追加して、ターゲットワークフローを開始します。
@@ -280,20 +265,19 @@ import {InlineImage} from "/snippets/InlineImage.mdx";
      
    そのワークフローの **［トリガー］** タブにワークフローのトリガーが表示されます。
 
-# トリガーを削除する
+### トリガーを削除する
 
 アラート、App Studio、プロコードApp、ワークフローでは、トリガーを設定した機能からトリガーを削除できます。
 
-タイマーまたはAPIコールでは、設定モーダルの <InlineImage src="/images/kb/ja/ka0Vq0000009e9W-00N5w00000Ri7BU-0EMVq000005yzKH.jpg" /> **削除** （ゴミ箱アイコン）オプションを使用して、トリガーを削除します。
+タイマーまたはAPIコールでは、設定モーダルの <img src="/images/kb/ja/ka0Vq0000009e9W-00N5w00000Ri7BU-0EMVq000005yzKH.jpg" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/> **削除** （ゴミ箱アイコン）オプションを使用して、トリガーを削除します。
 
 <Frame><img alt="" src="/images/kb/ka0Vq0000009THK-00N5w00000Ri7BU-0EMVq000005yzSL.jpg" style={{width: 700, height: 244}}/></Frame>
-[このページのトップへ](#intro)
 
-### ワークフローの実行を表示する
+## ワークフローの実行を表示する
 
-所有者と管理者 [権限](#manage_permissions) を持つユーザーは、ワークフローの実行を表示できます。ほかのユーザーは、ワークフローに対して「実行リストを表示」または「実行の詳細を編集」の許可を持っている場合、ワークフローの実行を表示または編集できます。
+所有者と管理者 権限 を持つユーザーは、ワークフローの実行を表示できます。ほかのユーザーは、ワークフローに対して「実行リストを表示」または「実行の詳細を編集」の許可を持っている場合、ワークフローの実行を表示または編集できます。
 
-ワークフローのホームから **詳細** （水平の三点リーダー）> <InlineImage src="/images/kb/ja/ka0Vq0000009e9W-00N5w00000Ri7BU-0EMVq000001n7m9.jpg" /> **［実行数のリストを開く］** を選択します。
+ワークフローのホームから **詳細** （水平の三点リーダー）> <img src="/images/kb/ja/ka0Vq0000009e9W-00N5w00000Ri7BU-0EMVq000001n7m9.jpg" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/> **［実行数のリストを開く］** を選択します。
   
 **［実行数］** タブが表示されます。
 
@@ -311,7 +295,7 @@ import {InlineImage} from "/snippets/InlineImage.mdx";
 
 </Warning>
 
-# ワークフローを一括でキャンセルする
+### ワークフローを一括でキャンセルする
 
 **［実行数］** タブで一度に複数の進行中または失敗したワークフローの実行をキャンセルするには、 **［実行を一括でキャンセル］** スイッチを切り替えます。キャンセルされたワークフローのステータスは変更できません。
 
@@ -321,14 +305,13 @@ import {InlineImage} from "/snippets/InlineImage.mdx";
 **注記：** キャンセルするワークフローが多いほど、リクエストの処理にかかる時間が長くなります。
 
 <Frame><img alt="" src="/images/kb/ka0Vq0000009THK-00N5w00000Ri7BU-0EMVq000005UxxR.jpg" style={{width: 900, height: 445}}/></Frame>
-[このページのトップへ](#intro)
 
-# 実行の詳細を確認する
+### 実行の詳細を確認する
 
-ワークフローに対して「実行リストを表示」の [許可](#manage_permissions) を持っている場合、 **［実行数］** タブから実行を選択して、特定の形状の実行に要した時間や実行が失敗した形状などといった詳細情報を表示できます。
+ワークフローに対して「実行リストを表示」の 許可 を持っている場合、 **［実行数］** タブから実行を選択して、特定の形状の実行に要した時間や実行が失敗した形状などといった詳細情報を表示できます。
 
 <Frame><img alt="" src="/images/kb/ka0Vq0000009THK-00N5w00000Ri7BU-0EMVq000005UylR.jpg" style={{width: 897, height: 427}}/></Frame>
-実行の詳細がワークフローキャンバスに表示されます。このキャンバスには、実行の現在のステータス、 [再生コントロール](#playback_controls) 、および画面下部にサイズ変更可能なデータパネルが表示されます。
+実行の詳細がワークフローキャンバスに表示されます。このキャンバスには、実行の現在のステータス、 再生コントロール 、および画面下部にサイズ変更可能なデータパネルが表示されます。
 
 実行されたワークフローには、次の4つのステータスのいずれかがあります。
 
@@ -345,8 +328,6 @@ import {InlineImage} from "/snippets/InlineImage.mdx";
   <Frame><img alt="execution details.jpg" src="/images/kb/ka0Vq0000009THK-00N5w00000Ri7BU-0EMVq000001gWkU.jpg" style={{width: 900, height: 405}}/></Frame>
 </Note>
 
-[このページのトップへ](#intro)
-
 #### 再生コントロールを使用する
 
 再生コントロールを使用すると、実行のイベントを開始したりもう一度再生したりできます。
@@ -354,7 +335,7 @@ import {InlineImage} from "/snippets/InlineImage.mdx";
 <Frame><img alt="playback controls.jpg" src="/images/kb/ka0Vq0000009THK-00N5w00000Ri7BU-0EMVq000001gXzt.jpg" style={{width: 900, height: 405}}/></Frame>
 次の表では、再生コントロールについて説明します。
 
-<table border="1" cellpadding="1" cellspacing="1" data-aura-rendered-by="33:206;a"><thead><tr><th colspan="1" rowspan="1"><p> アイコン </p></th><th colspan="1" rowspan="1"><p> コントロール </p></th><th colspan="1" rowspan="1"><p> 説明 </p></th></tr></thead><tbody><tr><td colspan="1" rowspan="1"><p><InlineImage src="/images/kb/ja/ka0Vq0000009e9W-00N5w00000Ri7BU-0EM5w000006uPIp.jpg" /></p></td><td colspan="1" rowspan="1"><p> 切り替え </p></td><td colspan="1" rowspan="1"><p> 画面で実行の自動再生を開始するか、フロー内で到達した最も遠いポイントを表示するかを制御します。 </p></td></tr><tr><td colspan="1" rowspan="1"><p><InlineImage src="/images/kb/ja/ka0Vq0000009e9W-00N5w00000Ri7BU-0EM5w000006uPIu.jpg" /></p></td><td colspan="1" rowspan="1"><p> もう一度再生 </p></td><td colspan="1" rowspan="1"><p> 最初の開始形状から実行をもう一度再生します。 </p></td></tr><tr><td colspan="1" rowspan="1"><p><InlineImage src="/images/kb/ja/ka0Vq0000009e9W-00N5w00000Ri7BU-0EM5w000006uPJ4.jpg" /></p></td><td colspan="1" rowspan="1"><p> 再生 </p></td><td colspan="1" rowspan="1"><p> 最後に停止したポイントから実行を再生または再開します。 </p></td></tr><tr><td colspan="1" rowspan="1"><p><InlineImage src="/images/kb/ja/ka0Vq0000009e9W-00N5w00000Ri7BU-0EM5w000006uPJO.jpg" /></p></td><td colspan="1" rowspan="1"><p> 停止 </p></td><td colspan="1" rowspan="1"><p></p><p> 実行の再生を停止/一時停止します。 </p><p></p></td></tr><tr><td colspan="1" rowspan="1"><p><InlineImage src="/images/kb/ja/ka0Vq0000009e9W-00N5w00000Ri7BU-0EM5w000006uPJT.jpg" /></p></td><td colspan="1" rowspan="1"><p> 早送り </p></td><td colspan="1" rowspan="1"><p> 再生速度を上げます。4つの速度があり、ボタンを繰り返し選択すると、速度が切り替わります。 </p></td></tr></tbody></table>
+<table border="1" cellpadding="1" cellspacing="1" data-aura-rendered-by="33:206;a"><thead><tr><th colspan="1" rowspan="1"><p> アイコン </p></th><th colspan="1" rowspan="1"><p> コントロール </p></th><th colspan="1" rowspan="1"><p> 説明 </p></th></tr></thead><tbody><tr><td colspan="1" rowspan="1"><p><img src="/images/kb/ja/ka0Vq0000009e9W-00N5w00000Ri7BU-0EM5w000006uPIp.jpg" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/></p></td><td colspan="1" rowspan="1"><p> 切り替え </p></td><td colspan="1" rowspan="1"><p> 画面で実行の自動再生を開始するか、フロー内で到達した最も遠いポイントを表示するかを制御します。 </p></td></tr><tr><td colspan="1" rowspan="1"><p><img src="/images/kb/ja/ka0Vq0000009e9W-00N5w00000Ri7BU-0EM5w000006uPIu.jpg" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/></p></td><td colspan="1" rowspan="1"><p> もう一度再生 </p></td><td colspan="1" rowspan="1"><p> 最初の開始形状から実行をもう一度再生します。 </p></td></tr><tr><td colspan="1" rowspan="1"><p><img src="/images/kb/ja/ka0Vq0000009e9W-00N5w00000Ri7BU-0EM5w000006uPJ4.jpg" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/></p></td><td colspan="1" rowspan="1"><p> 再生 </p></td><td colspan="1" rowspan="1"><p> 最後に停止したポイントから実行を再生または再開します。 </p></td></tr><tr><td colspan="1" rowspan="1"><p><img src="/images/kb/ja/ka0Vq0000009e9W-00N5w00000Ri7BU-0EM5w000006uPJO.jpg" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/></p></td><td colspan="1" rowspan="1"><p> 停止 </p></td><td colspan="1" rowspan="1"><p></p><p> 実行の再生を停止/一時停止します。 </p><p></p></td></tr><tr><td colspan="1" rowspan="1"><p><img src="/images/kb/ja/ka0Vq0000009e9W-00N5w00000Ri7BU-0EM5w000006uPJT.jpg" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/></p></td><td colspan="1" rowspan="1"><p> 早送り </p></td><td colspan="1" rowspan="1"><p> 再生速度を上げます。4つの速度があり、ボタンを繰り返し選択すると、速度が切り替わります。 </p></td></tr></tbody></table>
 
 再生中と再生後に、実行データを確認する形状を選択できます。形状を選択すると、形状がハイライト表示され、データパネルが開きます。このパネルには、形状で使用されている値、変数名とその型、および実際に使用されている値が表示されます。
 
@@ -364,11 +345,9 @@ import {InlineImage} from "/snippets/InlineImage.mdx";
 <Frame><img alt="Screenshot 2024-07-09 at 11.48.22 AM.png" src="/images/kb/ka0Vq0000009THK-00N5w00000Ri7BU-0EMVq000001ga89.jpg" style={{width: 900, height: 269}}/></Frame>
 複数回アクティブ化された形状の場合、データパネル内で反復のページを移動すると、反復ごとのデータを表示できます。
 
-[このページのトップへ](#intro)
+## 実行をリカバリ/再試行する
 
-### 実行をリカバリ/再試行する
-
-ワークフローに対して「実行の詳細を編集」の [許可](#manage_permissions) がある場合は、失敗したワークフローの実行のリカバリができます。リカバリとは、 **a）** エラーの発生した形状でデータを更新してから、 **b）** 実行を再試行できることを意味します。
+ワークフローに対して「実行の詳細を編集」の 許可 がある場合は、失敗したワークフローの実行のリカバリができます。リカバリとは、 **a）** エラーの発生した形状でデータを更新してから、 **b）** 実行を再試行できることを意味します。
 
 <Note>
   **注記：** リカバリモードを開始できるのは、エラーが発生したとき、あるいは進行中のユーザータスクまたは待機中の形状が完了するのを実行が待機しているときだけです。ほかの形状の完了が速すぎるため、進行中にリカバリオプションを適用できません。
@@ -381,9 +360,8 @@ import {InlineImage} from "/snippets/InlineImage.mdx";
 リカバリモードでは、画面上部のバナーに、次に示すリカバリオプションが表示されます。
 
 <Frame><img alt="recovery banner.jpg" src="/images/kb/ka0Vq0000009THK-00N5w00000Ri7BU-0EMVq000001gb93.jpg" style={{width: 900, height: 578}}/></Frame>
-[このページのトップへ](#intro)
 
-# リカバリオプション
+### リカバリオプション
 
 使用可能なリカバリオプションは次のとおりです。
 
@@ -391,22 +369,20 @@ import {InlineImage} from "/snippets/InlineImage.mdx";
 * **［再試行］—** ワークフローが失敗した場所から、または 現在進行中の場所から実行を再度試みます。
 * **［インスタンスをキャンセル］—** ワークフロー実行を停止し、ステータスを［キャンセルしました］に更新します。
 
-# 実行データを編集する
+### 実行データを編集する
 
-リカバリモードでは、再試行を試みる前に、実行の現在または最後のアクティブポイントで入力データを変更できます。これを行うには、データパネルで変更する入力を見つけて、その入力の <InlineImage src="/images/kb/ja/ka0Vq0000009e9W-00N5w00000Ri7BU-0EMVq000001gQX0.jpg" /> **［編集］** を選択します。
+リカバリモードでは、再試行を試みる前に、実行の現在または最後のアクティブポイントで入力データを変更できます。これを行うには、データパネルで変更する入力を見つけて、その入力の <img src="/images/kb/ja/ka0Vq0000009e9W-00N5w00000Ri7BU-0EMVq000001gQX0.jpg" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/> **［編集］** を選択します。
 
 <Frame><img alt="edit input.jpg" src="/images/kb/ka0Vq0000009THK-00N5w00000Ri7BU-0EMVq000001gbfJ.jpg" style={{width: 649, height: 190}}/></Frame>
-変更を行った後、必ず <InlineImage src="/images/kb/ja/ka0Vq0000009e9W-00N5w00000Ri7BU-0EM5w000006uPKg.jpg" /> **［保持］** を選択して保存してください。
+変更を行った後、必ず <img src="/images/kb/ja/ka0Vq0000009e9W-00N5w00000Ri7BU-0EM5w000006uPKg.jpg" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/> **［保持］** を選択して保存してください。
 
 <Frame><img alt="keep changes.jpg" src="/images/kb/ka0Vq0000009THK-00N5w00000Ri7BU-0EMVq000002HgGD.jpg" style={{width: 643, height: 158}}/></Frame>
 バナーの **［再試行］** オプションを選択する前に、形状のデータ入力を必要なだけ変更します。
 
-### ワークフローの実行をキャンセルする
+## ワークフローの実行をキャンセルする
 
 ［進行中］ステータスのワークフロー実行が［完了］ステータスに到達しないことが分かっている場合は、その実行をキャンセルし、実行がログに正しく表示され、誤って更新されないようにするのがベストプラクティスです。
 
 ユーザータスクが［キャンセルしました］に更新されると、タスクは自動的に [タスクセンター](/s/article/000005172) で無効になります。
-
-[このページのトップへ](#intro)
 
 日本語

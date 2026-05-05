@@ -19,7 +19,7 @@ The user has provided: $ARGUMENTS
 
 **Never touch localized directories.** Do not read, modify, suggest changes to, or reference anything in `/de`, `/es`, `/fr`, or `/ja`. These are managed separately.
 
-**Follow shared standards.** When writing or rewriting any article content — including merged or split articles — read and apply the templates in `.claude/skills/article-templates/`: `file-structure.md` for document structure, `style-rules.md` for voice, formatting, and terminology.
+**Follow shared standards.** When writing or rewriting any article content — including merged or split articles — read `New-Article-Template.mdx` for document structure and encoding conventions, and `Domo-KB-Style-Guide.mdx` for voice, formatting, and terminology. Read both files before writing any content.
 
 ---
 
@@ -49,6 +49,7 @@ Once the file(s) are identified, ask the user what type of change they need — 
 8. **Navigation move** — relocate the article in the site nav
 9. **Merge** — combine two or more articles into one
 10. **Split** — break one article into two or more
+11. **Beta status change** — mark a feature as beta, promote a beta feature to GA, or convert a legacy beta marker to the current convention
 
 Use AskUserQuestion if you need to clarify which type applies, or if the user's description could map to more than one type.
 
@@ -155,6 +156,18 @@ Update the `src` attribute in the `<Frame>` or `<img>` tag. Update `alt` text if
 ### Navigation move
 
 Invoke the `add-to-nav` skill. Do not attempt to edit `docs.json` directly for navigation moves.
+
+### Beta status change
+
+Apply the convention defined in `Domo-KB-Style-Guide.mdx` › **Beta Features**. Read it before making changes. Summary:
+
+- **Mark a whole article as beta:** add `tag: "Beta"` to the frontmatter and insert the standard beta Note immediately after the frontmatter, above the Intro. Do not append `(Beta)` to the title.
+- **Mark a section as beta:** append `<Badge className="text-primary bg-primary/10 font-bold">Beta</Badge>` to the heading. If the article has no other beta sections, also place the standard beta Note under that section. If another section in the same article is already marked beta, do not add another Note — one Note per article.
+- **Promote beta to GA (whole article):** remove the `tag: "Beta"` line from frontmatter and remove the standard beta Note above the Intro.
+- **Promote beta to GA (section):** remove the Badge from the heading. If the Note immediately below this section was the article's single beta Note, decide where it should go: if other sections remain beta, move it under the first remaining beta section; if no beta sections remain, remove the Note.
+- **Convert legacy beta markers:** when you find `(Beta)` or `(BETA)` in titles or headings, ad-hoc beta notes, references to `betafeedback@domo.com` or `betadmin@domo.com`, or other legacy treatments, replace them with the current convention (tag + standard Note for whole-article betas; Badge + single standard Note for section-level betas). When updating cross-article links whose anchor text contained `(Beta)`, drop the parenthetical from the link text as well.
+
+The Badge `className` must be exactly `text-primary bg-primary/10 font-bold`. The standard beta Note must be used verbatim — copy it from the style guide.
 
 ### Merge
 

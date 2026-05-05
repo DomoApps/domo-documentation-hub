@@ -1,0 +1,551 @@
+---
+title: "DataSet Fields"
+---
+
+This section provides field-by-field descriptions for specific DomoStats report DataSets.
+
+## Activity Log DataSet
+
+| **Field** | **Description** |
+| --- | --- |
+| Object\_Name | The name of the object that received an action. |
+| User\_ID | The ID of the person or thing that performed an action. |
+| Source\_ID | The ID of the type. For a simplified example, let's say a user added a card to a page. You would get these two actions on an event, and both would be returned on the DataSet.   - "User updated page." This returns the following in the DataSet:   - UserId: user\_id   - Type: USER   - Source\_Id: userId   - action: updated   - object\_type: page   - object\_id: page\_id - "Card added to page." This returns the following in the DataSet:   - UserId: user\_id   - Type: CARD   - Source\_Id: card\_id   - action: added\_to   - object\_type: page   - object\_id: page\_id |
+| Name | The name of the object that performed an action. |
+| Action | The event that took place. The following actions may be logged here:  |  |  | | --- | --- | | LOGGEDIN | Logged when someone successfully logs in from the login page using their password. Mobile logins are recorded when a person logs out of the app and back into the app. If a person opens and closes the app, that is not counted toward logins. | | LOGGEDIN\_SSO | Logged when someone successfully logs in from the login page using SSO. | | LOGGEDIN\_TWO\_FACTOR | Logged when a two-factor code is successfully used to login. | | PAGE VIEW | Counted each time a page renders. | | CARD VIEW | Counted only if a user clicks into the Details view for a Card. | |
+| Object\_Type | Clarifies what the object is. |
+| Object\_ID | The ID of the object. |
+| Type | The type of person or thing that performed an action. |
+| Event\_Time | The time at which the event occurred. The audit endpoint records/returns it in UTC, but the connector converts it to the user's time zone. |
+| Authentication\_Method | This column may contain data for historical records but is NULL for newly logged activities. |
+| IP\_Address | — |
+| Device | — |
+| Browser\_Details | — |
+| \_BATCH\_ID\_ | — |
+| \_BATCH\_LAST\_RUN\_ | — |
+
+#### 
+
+## AI Chat Sessions DataSet
+
+| Field | Description |
+| --- | --- |
+| Session Id | The unique identifier for the chat session. |
+| Request Id | The unique identifier for the specific user request. |
+| User Id | The unique identifier for the user initiating the request. |
+| DataSource Ids | The identifiers for data sources involved in the request (if any). |
+| Ignorable DataSource Ids | The identifiers for data sources found in `Focus` but not used. |
+| Card Ids | The identifiers for UI components used to help formulate the response. |
+| Page Ids | The page identifiers related to the request. |
+| Filters | Any filters applied during the session. |
+| TOE | The identifier of the execution, used by Domo for troubleshooting. |
+| Request | The text of the user's query. |
+| Request Timestamp | The timestamp for when the request was made. |
+| Response | The chat's response to the user request. |
+| Response Timestamp | The timestamp for when the response was generated. |
+| Duration | The time taken to generate the response in milliseconds. |
+| Error Message | The description of the error. |
+| Error Code | The error classification. |
+| Response Status | The numeric code representing the outcome.  Example: `200` |
+| Models | The model(s) used to generate the response. |
+| BATCH\_ID | Batch processing ID (used for internal tracking). |
+| BATCH\_LAST\_RUN | Timestamp of the last batch process run. |
+
+#### 
+
+## AI Model Endpoints DataSet
+
+| Field | Description |
+| --- | --- |
+| Model Id | The numeric identifier for the model. |
+| Event Type | Where the endpoint is executed or where the source is triggered for the model.  Examples values:   - AutoML - Jupyter |
+| Date | The date the model was last updated. |
+| Tier | The usage tier the model uses.  Example values:   - Tier 3 - Tier 4 |
+| Status | The current status of the model.  Examples values:   - Stopped - Created - Failed |
+| Failure Reason | The model's failure status, if it is in a fail state.  Example values:   - Timed out initializing. - Request to service failed. |
+| User ID | The user ID of the model owner. |
+
+#### 
+
+## AI Models DataSet
+
+| Field | Description |
+| --- | --- |
+| Model Name | The model name. |
+| Description | The model's description. |
+| Projects | The number of projects the model has been added to. |
+| Created | The date the model was created. |
+| Owner | The user ID of the model owner. |
+| Model ID | The numeric identifier for the model. |
+| Provider | The model provider.  Example values:   - Open AI - Amazon Sagemaker |
+| Project IDs | The IDs for the projects the model has been added to. |
+
+#### 
+
+## AI Projects DataSet
+
+| Field | Description |
+| --- | --- |
+| Project Id | The numeric identifier for the project. |
+| Project Name | The name of the project. |
+| Description | The project's description. |
+| Created | The date the project was created. |
+| Updated | The last date the project was updated. |
+| Owner | The user ID of the project owner. |
+| Number of Models | The number of models the project has been added to. |
+
+## AI Readiness
+
+| Field | Description |
+| --- | --- |
+| Dataset Id | A unique identifier for the dataset, represented as a string. |
+| Has Dictionary | Indicates whether a dictionary is associated with the DataSet.  Options: `Yes` or `No` |
+| Dictionary Id | The unique identifier of the dictionary associated with the DataSet. |
+| Dictionary Name | The name of the dictionary associated with the DataSet. |
+| Dataset Context | The context or purpose of the DataSet.  Examples: `business domain`, `usage scenario` |
+| Context Length | The number of context items or length of context data tied to the DataSet. |
+| Synonym Count | The number of synonyms defined for terms within the DataSet or its dictionary. |
+| Beast Modes Enabled | The number of custom calculated fields (or "Beast Modes") that are enabled for the DataSet. |
+| Total Columns | The total number of columns present in the DataSet. |
+| Percentage Columns Enabled | The percentage of columns that are enabled or active, expressed as an integer (between 0–100). |
+| Columns AI Enabled | The number of DataSet columns that have AI-related functionality enabled. |
+| Columns Not AI Enabled | The number of DataSet columns that do not have AI functionality enabled. |
+
+## AI Readiness Details
+
+| Field | Description |
+| --- | --- |
+| Dictionary Id | A unique identifier (string) for the dictionary that the column metadata belongs to. |
+| Column Name | The name of the column within a dataset that the dictionary entry is associated with. |
+| Context | A description or classification that provides meaning or usage context for the column. |
+| Synonyms | Alternate names or terms that can be used to refer to the column, stored as a string. |
+| AI Enabled | A boolean value (true or false) indicating whether AI features are enabled for this column. |
+
+## AI Services DataSet
+
+| Field | Description |
+| --- | --- |
+| Provider | The model service provider.  Example values:   - Open AI - Amazon Sagemaker |
+| Service | The AI service used in the model.  Examples values:   - Text to SQL - Text Generation |
+| Model Name | The model's name. |
+| Model Id | The date the model was created. |
+| Description | The model's description. |
+| Default | This field displays if the model is used by default in the associated service. |
+| Domo Provided | This field displays if Domo has provided the model or if it is an externally provided model. |
+
+#### 
+
+## App Studio App Pages DataSet
+
+| Field | Description |
+| --- | --- |
+| App ID | The numeric identifier for the app. |
+| App Page ID | Identifier for the page in the App Studio app. |
+| App Page Title | The title or name of the page in the App Studio app. |
+| Number of views | The number of views of the page in the App Studio app. |
+
+## App Studio Apps DataSet
+
+| Field | Description |
+| --- | --- |
+| App ID | The numeric identifier for the app. |
+| App Title | The title/name of the app in your instance. |
+| Owner ID | The numeric identifier for the app owner. |
+| Owner Type | The type of app owner.   Options include: `USER`, `GROUP` |
+| Created | The date and time when the app was created. |
+| Locked | Indicates whether the app is locked.  `BOOLEAN` |
+| \_BATCH\_ID\_ | The identifier for the batch. |
+| \_BATCH\_LAST\_RUN\_ | The date and time when the batch was last run. |
+
+#### 
+
+## Beast Mode Datasource
+
+| Field | Description |
+| --- | --- |
+| BeastModeID | The numeric identifier for the calculated field.  Type: Integer |
+| DatasourceID | The alphanumeric identifier for the DataSet. |
+| Status | The DataFlow's status. Possible options include:   - **Valid —** The Datasource link is valid. - **ILLEGAL\_REFERENCE —** There is an invalid column referenced in the calculated field. - **ILLEGAL\_ FUNCTION —** There is an invalid SQL function used in the calculated field. - **ILLEGAL\_DEPTH —** The calculated file is nested too deeply (more than one level deep). - **INVALID\_LINK —** Indicates there is a problem with the Datasource. - **UNKNOWN —** The calculated field was syntactically invalid when it was saved, in a way that validating the Datasource link did not make sense. |
+
+#### 
+
+## Beast Modes DataSet
+
+| Field | Description |
+| --- | --- |
+| ID | The numeric identifier of the calculation. |
+| Name | The name of the calculation. |
+| LinkedID | The identifier of the card or DataSet to which the calculation is saved. |
+| LinkedType | The type of location type where the calculation is saved.  `DATA_SOURCE`, `CARD` |
+| LinkedName | The name of the card or DataSet to which the calculation is saved. |
+| ArchivedStatus | The status of the calculation.  `Active`, `Archived` |
+| Validity | The validity status of the calculation.  `Valid`, `Invalid` |
+
+#### 
+
+## Card Loads DataSet
+
+| Field | Description |
+| --- | --- |
+| cardId | The numeric identifier of the card. |
+| context | The location where the card is being loaded.  Example: `page` |
+| date | The date when the card was loaded.  Example: `March 22, 2024` |
+| errorCode | The status message for the card load.  Options include: `Success`, `Misconfigured card`, `Query timeout`, and `Other` |
+| platform | The platform where the card is being loaded.  Options include: `Web` and `Mobile` |
+| totalCount | Count of card loads with these same details on this date. |
+| totalDuration | The total duration of all combined card loads on this date. |
+| \_BATCH\_ID\_ | The numeric identifier for the batch as a floating decimal.  Example: `363.00` |
+| \_BATCH\_LAST\_RUN\_ | The date and time when the batch was last run. |
+
+## Card Permissions DataSet
+
+| **Field** | **Description** |
+| --- | --- |
+| cardId | The ID of the card to check permissions for. |
+| entity type | The entity (user or group) for whom permissions exist. |
+| entityId | The user or group ID of the entity for whom permissions exist. |
+| permission mask | A numerical representation of the set of permissions granted to a user or group. |
+| Permission | A permission mask followed by a visual breakdown of the permissions granted to a user or group.  R = Read W = Write  D = Delete S = Share  A = Admin |
+
+#### 
+
+## Connector Permissions DataSet
+
+|  |  |
+| --- | --- |
+| **Field** | **Descritpion** |
+| State | The type of policy.   |  |  | | --- | --- | | **State** | **Policy Type** | | DENY | Restrict specific connectors | | ALLOW | Allow specific connectors | |
+| Connector Id | The ID of the connector that the policy applies to, where an asterisk (\*) represents all connectors. |
+| Display Name | The name of the connector that the policy applies to. |
+| Created | The date, in epoch time, when the policy was created. |
+| Modified | The date, in epoch time, when the policy was last modified. |
+| userGroups ID | The ID of the entity that the policy applies to. |
+| userGroups\_notGroup | Indicates whether the policy applies to a user or a group. A value of true indicates a user; a value of false indicates a group. |
+| userGroups\_group | Indicates whether the policy applies to a user or group. A value of true indicates a group; a value of false indicates a user. |
+| userGroups\_isGroup | Indicates whether the policy applies to a user or group. A value of true indicates a group; a value of false indicates a user. |
+
+## Certified Content Known Limitation
+
+There is a limitation if you attempt to combine a Certified Content DomoStats DataSet with an Activity Log DomoStats DataSet.
+
+## DataFlows DataSet
+
+| **Field** | **Description** |
+| --- | --- |
+| Current Version | Returns the version number of the DataFlow. |
+| ID | Returns the DataFlow ID number. |
+| Description | Returns the description for the DataFlow if one has been specified. |
+| Type | The type of DataFlow. |
+| Status | The status for the DataFlow. The following statuses may appear here:  |  |  | | --- | --- | | Success | The DataFlow was executed successfully. | | Not Runnable/Rejected | There is a problem with the DataFlow definition; please view the DataFlow details. | | Canceled | A user manually canceled the execution of the DataFlow. | | Enabled | The DataFlow has been built but not yet run. | | Failed | There was an internal problem executing the DataFlow. | | Running | The DataFlow is currently being executed. | | Success | Executed successfully. | |
+| Owner ID | Returns the user ID of the DataFlow owner. This ID is the same as the User ID in the DomoStats People DataSet. |
+| Display Name | Returns the current name of the DataFlow. |
+| Last Executed Date | Returns a timestamp for the time of the last execution. |
+| Last Updated Date | Returns a timestamp for the time when the DataFlow was last updated. |
+| Last Updated By | Returns the user ID of the last person to edit the DataFlow. |
+
+## DataFlows History DataSet
+
+| **Field** | **Description** |
+| --- | --- |
+| ID | An ID for a specific run of the DataFlow. |
+| DataFlow ID | The ID number for the DataFlow. |
+| Display Name | The name of the DataFlow. |
+| Type | Returns the DataFlow type, either ETL, MYSQL, or REDSHIFT. |
+| Status | Returns the status for the DataFlow run, either CANCELLED, FAILED, REJECTED, or SUCCESS. |
+| Execution Type | Returns the type of execution, either DATA\_UPDATE, MANUAL, RETRY, or SCHEDULED. |
+| Start Time | A timestamp for the time the DataFlow started executing. |
+| End Time | A timestamp for the time the DataFlow stopped executing. |
+
+#### 
+
+## DataSets DataSet
+
+| **Field** | **Description** |
+| --- | --- |
+| Status | The status for the DataSet. The following statuses may appear here:  |  |  | | --- | --- | | Error | Error during the import. | | Idle | A stream has been created but the DataSet has not yet been executed. | | Success | The import completed successfully. | | Active (or blank) | The import is in process. | | Invalid | There may be another execution still running and this has been deactivated until the previous one is complete. | |
+| ID | The unique identifying value for the DataSet. |
+| Owner\_User\_ID | The unique identifying value for the person who owns the DataSet.  A DataSet owner is either the person who created the DataSet or the person whom ownership was assigned to. |
+| Created\_Date | The date on which the DataSet was run for the first time. |
+| Last\_Run\_Date | The date on which the DataSet last successfully completed a run. |
+| Name | The current name given to the DataSet. |
+| Schedule | The schedule option that has been configured for this DataSet. The following options may appear here:  |  |  | | --- | --- | | Manual | The schedule has been set so that it only updates when you manually go in and run the DataSet. | | Day | The DataSet is set to run once per day. | | Minute | The DataSet is set to run within the given minute interval. | | Hour | The DataSet is set to run once per hour. | | Blank | The DataSet has been created but no schedule has been set. | |
+| Import\_Type | The source for the DataSet. Could be a Connector, DataFlow, API, etc. |
+| Source\_Type | UNDER CONSTRUCTION |
+
+## DataSets History DataSet
+
+| **Field** | **Description** |
+| --- | --- |
+| Stream ID | A Domo-specific ID to map to the stream. |
+| Execution ID | The ID for a specific run of the DataSet. |
+| Datasource ID | A Domo-specific datasource ID |
+| Status | The status for the DataSet history item. The following statuses may appear here:  |  |  | | --- | --- | | Success | Data was imported successfully. | | Error | Error during the import. | | Invalid | There may be another execution still running and this has been deactivated until the previous one is complete. | |
+| Execution Type | The type of execution. The following execution types may appear here:  |  |  | | --- | --- | | Manually | The import was executed manually. | | Automated | The import was executed on a schedule. | | Retry | The import failed and Domo automatically tried to execute it again. | | Replay | A previously imported DataSet was rerun. | | Batch | Data was imported in batches. | | Extended | The data import continued into the next scheduled run. | |
+| Start Time | The time the DataSet started running. |
+| End Time | The time the DataSet finished running, went into an error state, or became invalid. |
+
+#### 
+
+## OKR Objectives DataSet
+
+The fields in this section use "Objectives" and "Key Results". Your organization may refer to them as goals, metrics, or something else depending on your Goals Admin Settings. For more information about using the DomoStats Connector with Goals, see [Accessing Goals Data](/s/article/4577793742615). 
+
+| **Field** | **Description** |
+| --- | --- |
+| ID | The unique identifier of the objective. |
+| Name | The name of the objective. |
+| Description | The description of the objective. |
+| State | The current state of the objective. Possible states are listed below:    OPEN: The objective's expiration date has not elapsed and the objective has not been marked complete.    EXPIRED: The objective's expiration date has elapsed.    CLOSED: The objective has been marked complete. |
+| Owner ID | The ID of the individual user or group that owns the objective. When multiple individuals or groups own an objective, the ID of the first owner is populated in this field. |
+| Owner Type | Indicates whether or not the objective owner is an individual user or group. Possible types are listed below:    USER: A Domo user    GROUP: A Domo group |
+| Type | The type of objective. Possible values are:  PERSONAL  TEAM  COMPANY |
+| Team ID | The ID of the Domo group that is assigned to the objective.  (For Team-type objectives) |
+| Parent ID | The ID of the parent objective, if applicable. |
+| Parent IDs | The IDs of the parent objectives if the objective has multiple parents, if applicable. |
+| Multiple Parents | Indicates whether or not the objective has multiple parents. |
+| Period ID | The ID of the period that the objective is active (based on Start and expiration date). |
+| Period IDs | The IDs of periods *if*an objective is active for multiple periods. |
+| Company ID | The ID of the organization that is assigned to the objective.  (For Company-Type objectives) |
+| Company IDs | The ID of each Company-type objective *if* linked to multiple Company-type objectives. |
+| Self Assessment | The optional self assessment submitted when marking an objective complete. |
+| Confidence | A numerical value based on the objective status. Values with their associated status are listed below:    1: ON TRACK  0.5: NEEDS ATTENTION  0: AT RISK |
+| Likes | The number of likes the objective has received. |
+| Dislikes | The number of dislikes the objective has received. |
+| Subscriptions | The number of users who have subscribed to the objective. |
+| Company Objective | Indicates if the objective is a Company-type objective. |
+| Start Date | The start date of the objective. |
+| Expire Date | The end date of the objective. |
+| Impact Start Date | *(DEPRECATED)* The date when the impact of the achieved objective is expected to begin. |
+| Impact End Date | *(DEPRECATED)* The date when the impact of the achieved objective is expected to end |
+| Tags | A list of tags associated with the objective. This list is separated by commas. |
+| Tag Categories | A list of tag categories associated with items in the Tags field. This list is separated by commas. |
+| Created Date | The date the objective was created. |
+| Creator ID | The ID of the user who created the objective. |
+| Modified Date | The date/time the objective was last modified. If the objective has not been modified, this will be the date and time the objective was originally created. |
+| Modifier ID | The ID of the user who modified the objective. If the objective has not been modified, this will be the ID of the user who created the objective. |
+| Owners | A comma-separated list of the ID and Type of the user or group that owns the objective.  For example, if user ID 12345678 owns the objective, the field will contain the value 12345678:USER.  If group 54231564 owns the objective then the field will contain the value 54231564:GROUP. |
+| Assigned Team IDs | A comma-separated list of the Domo group IDs that the objective has been assigned to. |
+| \_BATCH\_ID\_ | An incremental batch number representing each DataSet update. |
+| \_BATCH\_LAST\_RUN\_ | The date and time that the DataSet was last run. |
+
+#### 
+
+## OKR Key Results DataSet
+
+The fields in this section use "Objectives" and "Key Results". Your organization may refer to them as goals, metrics, or something else depending on your Goals Admin Settings. For more information about using the DomoStats Connector with Goals, see [Accessing Goals Data](/s/article/4577793742615). 
+
+| **Field** | **Description** |
+| --- | --- |
+| ID | The unique identifier of the key result. |
+| Name | The name of the key result. |
+| Description | The description of the key result. |
+| State | The current state of the key result. Possible states are listed below:    OPEN: The key result's expiration date has not elapsed and the key result has not been marked complete.    EXPIRED: The key result's expiration date has elapsed.    CLOSED: The objective that the key result belongs to has been marked complete. |
+| Owner ID | The ID of the individual user or group that owns the key result. When multiple individuals or groups own a key result, the ID of the first owner is populated in this field. |
+| Owner Type | Indicates whether or not the key result owner is an individual user or group. Possible types are listed below:    USER: A Domo user  GROUP: A Domo group |
+| Objective ID | The ID of the objective that the key result belongs to. |
+| Card ID | The ID of the card that the key result is linked to (for automatic/card-based key results). |
+| Alert ID | A unique ID generated for each key result that is linked to a card. |
+| Completion | A percentage representing the progress of the key result as measured by the relationship of the actual value to the target value.    The completion is calculated in the following ways:    Automatic, card-based key results: Progress is driven based on values in the card relative to a target.    Manual/percent completion-based key results: Value is determined based on the percent completion specified in the key result slider bar.    Manual/choose your own value key results: Progress is determined based on the actual value of the key result divided by the target of the key result.    Projects and Tasks-based key results: Progress is determined by how many projects/tasks have been completed completed in the Projects and Tasks feature. |
+| Pacing | When enabled, this field shows the completion of the key result as a percentage compared to the percentage of time that the key result has been open (time between start and end date). |
+| Start Value | The initial value of the key result. |
+| Current Value | The current value of the key result. |
+| Target Value | The target value of the key result |
+| Weight | (NOT USED) |
+| Fixed Weight | (NOT USED) |
+| Manual Type | For manually-managed key results, this field indicates the type of the key result.    Possible values are listed below:    VALUE: Key result measured with a single value.  SCALE: Key result measured using a percent completion scale.  PROJECT\_AND\_TASK: Key result associated to a Domo project. |
+| Unit Type | The data type of the key result's value and target. Possible values include:    NUMERICAL  PERCENT |
+| Project ID | The ID of the project that is linked to the key result (only applicable to Projects and Tasks-based key results). |
+| Likes | The number of likes the key result has received. |
+| Dislikes | The number of dislikes the key result has received. |
+| Start Date | The start date of the key result. |
+| Expire Date | The end date of the key result. |
+| Cure Period | Indicates when changes to the key result will no longer be tracked. |
+| Tags | A comma-separated list of tags associated with objective. |
+| Tag Categories | A comma-separated list of tags associated with objective. |
+| Created Date | The date the objective was created. |
+| Creator ID | The ID of the user who created the objective. |
+| Modified Date | The date/time the objective was last modified. If the objective has not been modified, this will be the date and time the objective was originally created. |
+| Modifier ID | The ID of the user who modified the key result. If the objective has not been modified, this will be the ID of the user who created the it. |
+| Owners | A comma-separated list of the ID and Type of the user or group that owns the key result.  For example, if user ID 12345678 owns the objective, the field will contain the value 12345678:USER.  If group 54231564 owns the key result, the field will contain the value 54231564:GROUP. |
+| \_BATCH\_ID\_ | An incremental batch number representing each DataSet update. |
+| \_BATCH\_LAST\_RUN\_ | The date and time that the DataSet was last run. |
+
+#### 
+
+## People DataSet
+
+If any of the "personal information" fields (name, email, location, etc.) return blank in this DataSet, you can fill in the missing information in the user's Profile page or their page in **Admin Settings > People**. For more information, see [Specifying Your Personal Profile Information](/s/article/360043439413).
+
+| **Field** | **Description** |
+| --- | --- |
+| Department | The user's department within your organization. |
+| Display Name | The name used to represent the user within Domo. |
+| Role | The user's role within your organization. |
+| Title | The user's title within your organization. |
+| Email | The user's email address. |
+| Alternate Email | The user's alternate email address. |
+| Phone Number | The user's personal phone number. |
+| Desk Phone Number | The user's desk phone number. |
+| Employee Number | The user's employee number within your organization. |
+| Location | The company location the user has been assigned to. |
+| Locale | UNDER CONSTRUCTION |
+| Timezone | The user's time zone. |
+| Role ID | A Domo-generated ID for a specific role. |
+| User ID | A Domo-generated user ID for each person. |
+| Last Login | A timestamp for the last time this user logged in. Login is measured by any regular, SSO, or mobile login. To count as a login for mobile, a person must actually log out of the instance and log back in. Opening and closing the app does not count as a login. |
+| Password Created | A timestamp for when a user's password was created. This gets updated when the password is updated. |
+| Account Locked | Returns a "True" value if the account is locked. |
+| Profile Picture | Returns a "True" value if a profile picture has been added in the user's Profile page or on his/her page in **Admin Settings > Governance > People**. |
+| Org Chart | Returns a "True" value if the user has been added as a report on their company org chart in the Profile page. |
+| Two Factor Enabled | Returns a "True" value if the company has enabled two-factor authentication as an option in **Admin Settings > Authentication > Authentication** and the user has chosen to have two-factor enabled in their Settings menu (available via clicking the Gear menu under their profile picture). |
+| Created Date | A timestamp for the date the user was added to the system. |
+| Last Updated Date | A timestamp for the date the user's information was last updated. |
+
+#### 
+
+## Project Stages DataSet
+
+| **Field** | **Description** |
+| --- | --- |
+| Priority | Defines the order in which the lists or stages are shown. Smaller numbers are on the left. |
+| Project\_id | ID number for the project. |
+| Project\_name | Name of the project. |
+| List\_name | Name of the list. |
+| List\_type | Type of the list. |
+| Project\_list\_id | ID number of the list. |
+| Created | Person who created the project. |
+| Updated | The time when the list was last edited (e.g. moved, renamed, etc.). |
+| Active | Returns "True" if the list or stage hasn't been archived. |
+
+## Projects DataSet
+
+| **Field** | **Description** |
+| --- | --- |
+| Created\_by\_user | The person who created the project. |
+| Project\_id | The ID number for the project. |
+| Created | Project creation date and time. |
+| DueDate | Due date for the project. |
+| Created\_by | User ID of the person who created the project. |
+| Project\_name | Name of the project. |
+| Description | Description for the project, if one has been specified. |
+| Active | Returns "True" if the project is currently viewable. |
+| Deleted | Returns "True" if the project has been deleted. |
+
+#### 
+
+## Task Center DataSet
+
+|  |  |
+| --- | --- |
+| **Field** | **Description** |
+| Task ID | The unique numeric identifier for the task. |
+| Task identifier | The field value(s) configured as task identifier(s). Learn about [task identifiers](/s/article/000005171). |
+| Form Name | The name of the form being used in the task. |
+| Form ID | The unique identifier for the form. |
+| Task status | The current status of the task. |
+| Queue | The name of the queue where the task is located. |
+| Queue ID | The unique identifier for the queue. |
+| Created On | The date the task was created. |
+| Completed On | The date the task was completed. |
+| Completed By | The unique identifier for the person who completed the task. |
+| Assignee | The unique identifier for the person or group assigned to the task. |
+| Assignee Type | The type of assignee assigned to the task.  Options include: `User` or `Group` |
+| Source ID | The unique identifier for the source that generated the task. |
+| Source Entity | The entity type of the source that generated the task.  Example: `Workflow` |
+| Updated On | The date of the most recent update to the task. |
+
+#### 
+
+## Task Owners DataSet
+
+| **Field** | **Description** |
+| --- | --- |
+| ProjectTaskName | Name of the task. |
+| ProjectName | Name of the parent project for the task. |
+| ProjectListId | ID number of the list in which the task is found. |
+| ProjectListName | Name of the list in which the task is found. |
+| ProjectListType | Type of list in which the task is found. |
+| ProjectTaskID | ID number for the task. |
+| ProjectID | ID number for the parent project of the task. |
+| Created | Date and time the task was created. |
+| AssignedBy | ID number of the person who assigned the task. |
+| AssignedByName | Name of the person who assigned the task. |
+| AssignedTo | ID number of the person the task has been assigned to. |
+| AssignedToName | Name of the person the task has been assigned to. |
+
+## Tasks DataSet
+
+| **Field** | **Description** |
+| --- | --- |
+| DueDate | Due date for the task. |
+| Project\_id | ID number for the parent project for the task. |
+| ProjectListId | ID number of the list the task is found in. |
+| ProjectListName | Name of the list the task is found in. |
+| ProjectListType | Type of the list the task is found in. |
+| ProjectTaskId | ID number for the task. |
+| ProjectTaskName | Name of the task. |
+| Created | Date and time the task was created. |
+| Updated | Date and time the task was last updated. |
+| ProjectName | Name of the parent project for the task. |
+| CreatedBy | User ID of the person who created the task. |
+| CreatedByName | Name of the person who created the task. |
+| Owner | The ID number for the task owner. The task owner is the creator by default, but can be changed to anyone in the instance. |
+| OwnerName | The name of the person who created the task. In the case that the original owner reassigned ownership, then it is the name of the new owner. |
+| Priority | The order in which the task shows up on the task board. Lower priority numbers are above higher priority numbers. |
+| Active | Returns "True" if the task hasn't been archived. |
+| Description | The description of the task, if one has been specified. |
+| Contributors | Individuals assigned to work on the task. |
+
+#### 
+
+## User Activity — AI Services Billing
+
+| **Field** | **Description** |
+| --- | --- |
+| Date | The date of the AI Service event. |
+| SKU | The Domo Consumption SKU for the AI Service. |
+| Entity Type | The action taken in Domo. |
+| Entity ID | The unique ID of the action. |
+| Usage Unit | The unit of measure for the action. |
+| Usage Quantity | The number of actions recorded. |
+
+#### 
+
+## Workbench DataSet
+
+| **Field** | **Description** |
+| --- | --- |
+| Workbench Agent | The name of the machine running the Workbench job. |
+| Owner ID | The ID number of the owner of the job. |
+| DataSet ID | The value that is the identifier for the DataSet. |
+| DataSet Name | The name of the DataSet. |
+| Job Name | The name of the job. |
+| Job Status | The status of the job (Ex. success, fail) |
+| Created Date | The date the job was created. |
+| Last Run | The date when the job last ran. |
+| Next Run | The date when the job will run next. |
+| Last Successful Run | When the job ran last successfully. |
+| Update Method | The update method used for the DataSet. (Ex. Append, Replace) |
+| Rows Updated | The number of rows that were updated. |
+| Schedule Type | Shows the schedule type (Ex. manual, custom) |
+
+#### 
+
+## Workflows DataSet
+
+| Field | Description |
+| --- | --- |
+| Workflow\_Name | The name of the workflow. |
+| Workflow\_Version | The workflow version number. |
+| Execution\_ID | The identifier for a specific execution. |
+| Model\_ID | The identifier for the workflow model. |
+| Trigger\_Type | The type of trigger that started the workflow execution. |
+| Trigger\_ID | The identifier of the trigger that started the workflow execution. |
+| Created\_By | The name of the person who created the workflow. |
+| Started\_By | The name of the person who started the workflow execution. |
+| Deployed\_By | The name of the person who deployed the workflow version. |
+| Workflow\_Status | The status of the workflow execution. |
+| Start\_Time | The time the workflow execution was started. |
+| End\_Time | The time the workflow execution ended. |
+| Cycle\_Time | The duration of the workflow execution from start time to current state. |
+| Qualifying\_Tasks | The number of partial credits the workflow has accumulated during its execution. (These are for any executed start shape, automated function, or User Task.) |

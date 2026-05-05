@@ -1,127 +1,80 @@
-# Destination Repo Scripts
+# OpenAPI Sync Scripts
 
-These scripts are designed to be copied to your destination repository (e.g., your Mintlify docs repo) to handle cross-repo OpenAPI synchronization.
+Helper scripts used by `.github/workflows/sync-api-docs.yml` to sync OpenAPI YAML files from the source repo (`domoinc/internal-domo-apis`) into this repo (`openapi/product/`) and update `docs.json` navigation.
 
-## Overview
-
-These scripts work together to:
-1. Detect which YAML files in the source repo have changed
-2. Sync the YAML files to the destination repo
-3. Create PRs for review (optional)
-
-The TOC generator action then updates `docs.json` navigation automatically.
-
-## Scripts
+## Active scripts
 
 ### `detect_yaml_changes.py`
 
-Detects which YAML files in the source repo have changed compared to the destination.
+Detects which YAML files in the source repo differ from the destination via **SHA-256 content hashing**. Writes `changed_files.txt` (one source path per line) and the GitHub Actions outputs `changed_files` and `summary`.
 
 ```bash
 python detect_yaml_changes.py \
-  --source source-repo/api-specs \
+  --source source-repo/api-docs/public \
   --dest openapi/product \
   --force false
 ```
 
 **Arguments:**
 - `--source`: Path to source repo YAML directory
-- `--dest`: Path to destination repo YAML directory
-- `--force`: Set to `true` to force sync all files
+- `--dest`: Path to destination YAML directory
+- `--force`: `true` to force sync all files
 
-**Output:**
-- Creates `changed_files.txt` with list of files to sync
-- Sets GitHub Actions outputs: `changed_files`, `summary`
+**Notes:**
+- Comparison is by content hash, not mtime — `actions/checkout` resets mtimes on both clones, making mtime comparison unreliable.
+- Case-only filename renames are treated as modifications so the destination filename gets normalized.
+- Always exits 0. The caller decides whether to act on the results via `changed_files.txt`.
+
+---
+
+### `prune_stale_nav.py`
+
+Walks `docs.json` and removes OpenAPI page entries (`"openapi/product/<file>.yaml METHOD /path"`) whose referenced YAML does not exist on disk. Fixes the case where Mintlify preview deploys fail after a YAML is deleted upstream or case-renamed (e.g., `Filesets.yaml` → `filesets.yaml`) but the old nav entry lingers.
+
+```bash
+# Preview what would be pruned (exits 1 if any found):
+python prune_stale_nav.py --check --docs-json ./docs.json --repo-root .
+
+# Actually prune:
+python prune_stale_nav.py --docs-json ./docs.json --repo-root .
+```
+
+**Why the explicit case-sensitive check?** Dev repos on macOS APFS are case-insensitive, so `os.path.isfile("Filesets.yaml")` returns True even when only `filesets.yaml` exists. CI and Mintlify preview both run on case-sensitive Linux where the reference is stale. The script checks `os.listdir()` membership directly to match Linux behavior.
+
+Wired into `sync-api-docs.yml` after the nav-regen step so every sync PR also cleans up dangling entries.
 
 ---
 
 ### `sync_to_destination.py`
 
-Copies YAML files from source to destination directory.
+Standalone helper that copies YAMLs from a list into a destination directory, removing any case-variant duplicates. **Not invoked by `sync-api-docs.yml` directly** — the workflow inlines a single-file copy in its matrix job — but kept for local testing / ad-hoc syncs.
 
 ```bash
 python sync_to_destination.py \
-  --source source-repo/api-specs \
+  --source source-repo/api-docs/public \
   --destination openapi/product \
   --changed-list changed_files.txt
 ```
 
-**Arguments:**
-- `--source`: Source YAML directory
-- `--destination`: Destination directory for YAML files
-- `--changed-list`: File containing list of files to sync
-
 ---
+
+## Deprecated
 
 ### `create_individual_prs.py`
 
-Creates individual pull requests for each changed YAML file. Includes duplicate PR prevention.
+**Do not use.** This predated the matrix-based workflow in `sync-api-docs.yml`. It produces one PR per YAML but never invokes the nav-generation action, so PRs it creates leave `docs.json` stale. The matrix job in `sync-api-docs.yml` replaces it. Candidate for deletion — left in place only to avoid surprise during this transition.
 
-```bash
-python create_individual_prs.py \
-  --changed-list changed_files.txt \
-  --source-dir source-repo/api-specs \
-  --dest-dir openapi/product \
-  --base-branch main \
-  --pr-branch-prefix openapi-sync \
-  --repo your-org/your-repo
-```
+---
 
-**Arguments:**
-- `--changed-list`: File containing list of changed YAML files
-- `--source-dir`: Source directory with YAML files
-- `--dest-dir`: Destination directory for YAML files
-- `--base-branch`: Base branch for PRs (default: main)
-- `--pr-branch-prefix`: Branch name prefix (default: openapi-sync)
-- `--repo`: GitHub repository in owner/repo format
+## Workflow
 
-**Features:**
-- Duplicate PR prevention (skips files with existing open PRs)
-- Comprehensive error handling
-- Git branch management
+See `.github/workflows/sync-api-docs.yml`. High-level flow:
 
-## Workflow Integration
-
-### Direct Commit Workflow
-
-Use `sync-api-docs.yml` for automatic sync without PRs:
-
-1. Detect changes
-2. Sync YAML files
-3. Run TOC generator to update docs.json
-4. Commit directly to main
-
-### PR-Based Workflow
-
-Use `sync-with-prs.yml` when you want review:
-
-1. Detect changes
-2. Create individual PR for each changed file
-3. Review and merge PRs
-4. TOC generator runs on merge to update docs.json
+1. `detect` job finds changed YAMLs and emits them as a JSON array.
+2. `sync-file` matrix job fans out: one parallel-capped job per changed file.
+3. Each matrix job: copies the YAML into `openapi/product/`, runs `DomoApps/documentation-generator-action@main` against that single file, opens a PR containing just that YAML and its `docs.json` nav update.
 
 ## Requirements
 
 - Python 3.7+
-- `git` CLI
-- `gh` (GitHub CLI) - for PR creation
-- GitHub App or PAT for cross-repo access
-
-## File Structure
-
-```
-destination-repo/
-├── docs.json                    # Updated by TOC generator
-├── openapi/
-│   └── product/                 # YAML files synced here
-│       ├── users.yaml
-│       └── documents.yaml
-└── .github/
-    ├── scripts/
-    │   ├── detect_yaml_changes.py
-    │   ├── sync_to_destination.py
-    │   └── create_individual_prs.py
-    └── workflows/
-        ├── sync-api-docs.yml    # Direct commit
-        └── sync-with-prs.yml    # Individual PRs
-```
+- GitHub App installed on both source and destination repos (`APP_ID`, `APP_PRIVATE_KEY` secrets).

@@ -1,12 +1,23 @@
 ---
-title: 'FileSet API (BETA)'
-permalink: 7e8654dedb1c8-file-set-api-beta
+title: "FileSet API"
+tag: "Beta"
+permalink: 7e8654dedb1c8-file-set-api
 ---
+
+<Note>
+  **Note:** This feature is in beta. Beta Program participants can enable
+  features [here](https://embed.domo.com/embed/pages/DQ8Ek). To join the Beta
+  Program, fill out [this form](https://embed.domo.com/embed/pages/K8GMx). For beta questions or feedback, email
+  [beta.admin@domo.com](mailto:beta.admin@domo.com).
+</Note>
 
 This API reference documents the endpoints for managing FileSets and Files in Domo from within a Domo app.
 
-> **BETA:** This API is currently in BETA and is subject to change. Endpoints, request/response formats, and functionality may change without notice.
-> **Note:** All code examples below are tested and match the working Domo app UI. Use `domo.*` methods for all API calls except File upload/download, which require `fetch` for binary or FormData support.
+<Note>
+  **Note:** All code examples below are tested and match the working Domo app
+  UI. Use `domo.*` methods for all API calls except File upload/download, which
+  require `fetch` for binary or FormData support.
+</Note>
 
 ---
 
@@ -156,9 +167,9 @@ fetch(`/domo/files/v1/filesets/${filesetId}/files/${fileId}/download`)
   .then((response) => response.blob())
   .then((blob) => {
     const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
+    const a = document.createElement("a");
     a.href = url;
-    a.download = 'downloaded-file'; // Set your filename
+    a.download = "downloaded-file"; // Set your filename
     document.body.appendChild(a);
     a.click();
     a.remove();
@@ -201,8 +212,8 @@ fetch(`/domo/files/v1/filesets/${filesetId}/files/${fileId}/download`)
 ```js
 domo
   .post(`/domo/files/v1/filesets/${filesetId}/query`, {
-    query: 'search for text in documents', // Required: Text to search for in files
-    directoryPath: 'reports/quarterly', // Optional: Limit search to specific directory
+    query: "search for text in documents", // Required: Text to search for in files
+    directoryPath: "reports/quarterly", // Optional: Limit search to specific directory
     topK: 5, // Optional: Maximum number of results to return
   })
   .then((result) => console.log(result))
@@ -214,11 +225,11 @@ domo
 
 ```js
 fetch(`/domo/files/v1/filesets/${filesetId}/query`, {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
   body: JSON.stringify({
-    query: 'search for text in documents', // Required: Text to search for in files
-    directoryPath: 'reports/quarterly', // Optional: Limit search to specific directory
+    query: "search for text in documents", // Required: Text to search for in files
+    directoryPath: "reports/quarterly", // Optional: Limit search to specific directory
     topK: 5, // Optional: Maximum number of results to return
   }),
 })
@@ -269,14 +280,14 @@ fetch(`/domo/files/v1/filesets/${filesetId}/query`, {
 const file = fileInput.files[0];
 const formdata = new FormData();
 formdata.append(
-  'file',
-  new File([file], file.name, { type: 'text/plain' }),
+  "file",
+  new File([file], file.name, { type: "text/plain" }),
   file.name,
 );
-formdata.append('createFileRequest', JSON.stringify({ directoryPath: '' }));
+formdata.append("createFileRequest", JSON.stringify({ directoryPath: "" }));
 
 fetch(`/domo/files/v1/filesets/${filesetId}/files`, {
-  method: 'POST',
+  method: "POST",
   body: formdata,
 })
   .then((response) => response.json())
@@ -375,22 +386,22 @@ domo
       // Sort by file name in ascending order
       fieldSort: [
         {
-          field: 'name',
-          order: 'ASC',
+          field: "name",
+          order: "ASC",
         },
       ],
       // Filter files by name
       filters: [
         {
-          field: 'name',
-          value: ['.pdf'],
-          operator: 'LIKE',
+          field: "name",
+          value: [".pdf"],
+          operator: "LIKE",
         },
       ],
       // Filter files created in past 30 days
       dateFilters: [
         {
-          field: 'created',
+          field: "created",
           start: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(), // 30 days ago as ISO string
           end: new Date().toISOString(), // Current time as ISO string
         },
@@ -407,8 +418,8 @@ domo
 ```js
 // Example 1: List all files
 fetch(`/domo/files/v1/filesets/${filesetId}/files/search`, {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
   body: JSON.stringify({}),
 })
   .then((response) => response.json())
@@ -419,28 +430,28 @@ fetch(`/domo/files/v1/filesets/${filesetId}/files/search`, {
 fetch(
   `/domo/files/v1/filesets/${filesetId}/files/search?directoryPath=reports&immediateChildren=true&limit=20`,
   {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       // Sort by file name in ascending order
       fieldSort: [
         {
-          field: 'name',
-          order: 'ASC',
+          field: "name",
+          order: "ASC",
         },
       ],
       // Filter files by name
       filters: [
         {
-          field: 'name',
-          value: ['.pdf'],
-          operator: 'LIKE',
+          field: "name",
+          value: [".pdf"],
+          operator: "LIKE",
         },
       ],
       // Filter files created in past 30 days
       dateFilters: [
         {
-          field: 'created',
+          field: "created",
           start: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(), // 30 days ago as ISO string
           end: new Date().toISOString(), // Current time as ISO string
         },
@@ -503,8 +514,8 @@ domo
     )}`,
   )
   .then((result) => {
-    if (result === 1 || (result && result.status === 'success')) {
-      console.log('File deleted successfully.');
+    if (result === 1 || (result && result.status === "success")) {
+      console.log("File deleted successfully.");
     } else {
       console.log(result);
     }
@@ -521,13 +532,13 @@ fetch(
     filePath,
   )}`,
   {
-    method: 'DELETE',
+    method: "DELETE",
   },
 )
   .then((response) => response.json())
   .then((result) => {
-    if (result === 1 || (result && result.status === 'success')) {
-      console.log('File deleted successfully.');
+    if (result === 1 || (result && result.status === "success")) {
+      console.log("File deleted successfully.");
     } else {
       console.log(result);
     }
@@ -568,8 +579,8 @@ fetch(
 domo
   .delete(`/domo/files/v1/filesets/${filesetId}/files/${fileId}`)
   .then((result) => {
-    if (result === 1 || (result && result.status === 'success')) {
-      console.log('File deleted successfully.');
+    if (result === 1 || (result && result.status === "success")) {
+      console.log("File deleted successfully.");
     } else {
       console.log(result);
     }
@@ -582,12 +593,12 @@ domo
 
 ```js
 fetch(`/domo/files/v1/filesets/${filesetId}/files/${fileId}`, {
-  method: 'DELETE',
+  method: "DELETE",
 })
   .then((response) => response.json())
   .then((result) => {
-    if (result === 1 || (result && result.status === 'success')) {
-      console.log('File deleted successfully.');
+    if (result === 1 || (result && result.status === "success")) {
+      console.log("File deleted successfully.");
     } else {
       console.log(result);
     }
@@ -662,34 +673,34 @@ fetch(`/domo/files/v1/filesets/${filesetId}/files/${fileId}`, {
 ```js
 // Example 1: List all FileSets (empty search)
 domo
-  .post('/domo/files/v1/filesets/search', {})
+  .post("/domo/files/v1/filesets/search", {})
   .then((result) => console.log(result.fileSets))
   .catch((error) => console.error(`Error: ${error}`));
 
 // Example 2: Advanced search with filters and sorting
 domo
-  .post('/domo/files/v1/filesets/search', {
+  .post("/domo/files/v1/filesets/search", {
     // Sort by name in ascending order
     fieldSort: [
       {
-        field: 'name',
-        order: 'ASC',
+        field: "name",
+        order: "ASC",
       },
     ],
     // Filter FileSet by name containing "Marketing"
     filters: [
       {
-        field: 'name',
-        value: ['Marketing'],
-        operator: 'LIKE',
+        field: "name",
+        value: ["Marketing"],
+        operator: "LIKE",
       },
     ],
     // Filter FileSet created between two dates
     dateFilters: [
       {
-        field: 'created',
-        start: '2025-06-01T19:23:55.156Z', // June 1, 2024
-        end: '2025-06-30T19:23:55.156Z', // June 30, 2024
+        field: "created",
+        start: "2025-06-01T19:23:55.156Z", // June 1, 2024
+        end: "2025-06-30T19:23:55.156Z", // June 30, 2024
       },
     ],
   })
@@ -702,9 +713,9 @@ domo
 
 ```js
 // Example 1: List all FileSets (empty search)
-fetch('/domo/files/v1/filesets/search', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
+fetch("/domo/files/v1/filesets/search", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
   body: JSON.stringify({}),
 })
   .then((response) => response.json())
@@ -712,31 +723,31 @@ fetch('/domo/files/v1/filesets/search', {
   .catch((error) => console.error(`Error: ${error}`));
 
 // Example 2: Advanced search with filters and sorting
-fetch('/domo/files/v1/filesets/search?limit=50&offset=0', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
+fetch("/domo/files/v1/filesets/search?limit=50&offset=0", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
   body: JSON.stringify({
     // Sort by name in ascending order
     fieldSort: [
       {
-        field: 'name',
-        order: 'ASC',
+        field: "name",
+        order: "ASC",
       },
     ],
     // Filter FileSet by name containing "Marketing"
     filters: [
       {
-        field: 'name',
-        value: ['Marketing'],
-        operator: 'LIKE',
+        field: "name",
+        value: ["Marketing"],
+        operator: "LIKE",
       },
     ],
     // Filter FileSet created between two dates
     dateFilters: [
       {
-        field: 'created',
-        start: '2025-06-01T19:23:55.156Z', // June 1, 2024
-        end: '2025-06-30T19:23:55.156Z', // June 30, 2024
+        field: "created",
+        start: "2025-06-01T19:23:55.156Z", // June 1, 2024
+        end: "2025-06-30T19:23:55.156Z", // June 30, 2024
       },
     ],
   }),
@@ -793,9 +804,9 @@ fetch('/domo/files/v1/filesets/search?limit=50&offset=0', {
 
 ```js
 domo
-  .post('/domo/files/v1/filesets', {
-    name: 'Sample FileSet',
-    description: 'A sample FileSet for demonstration purposes.',
+  .post("/domo/files/v1/filesets", {
+    name: "Sample FileSet",
+    description: "A sample FileSet for demonstration purposes.",
     // accountId: 12345, // Optional
     // connectorContext: { connector: 'S3', relativePath: 'bucket/path' }, // Optional
   })
@@ -807,12 +818,12 @@ domo
 <Tab title="Javascript (fetch)">
 
 ```js
-fetch('/domo/files/v1/filesets', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
+fetch("/domo/files/v1/filesets", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
   body: JSON.stringify({
-    name: 'Sample FileSet',
-    description: 'A sample FileSet for demonstration purposes.',
+    name: "Sample FileSet",
+    description: "A sample FileSet for demonstration purposes.",
     // accountId: 12345, // Optional
     // connectorContext: { connector: 'S3', relativePath: 'bucket/path' }, // Optional
   }),
@@ -909,8 +920,8 @@ fetch(`/domo/files/v1/filesets/${filesetId}`)
 ```js
 domo
   .post(`/domo/files/v1/filesets/${filesetId}`, {
-    name: 'Updated FileSet Name', // Optional: New name for the FileSet
-    description: 'Updated description.', // Optional: New description
+    name: "Updated FileSet Name", // Optional: New name for the FileSet
+    description: "Updated description.", // Optional: New description
   })
   .then((result) => console.log(result))
   .catch((error) => console.error(`Error: ${error}`));
@@ -921,11 +932,11 @@ domo
 
 ```js
 fetch(`/domo/files/v1/filesets/${filesetId}`, {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
   body: JSON.stringify({
-    name: 'Updated FileSet Name', // Optional: New name for the FileSet
-    description: 'Updated description.', // Optional: New description
+    name: "Updated FileSet Name", // Optional: New name for the FileSet
+    description: "Updated description.", // Optional: New description
   }),
 })
   .then((response) => response.json())
@@ -976,7 +987,7 @@ domo
 
 ```js
 fetch(`/domo/files/v1/filesets/${filesetId}`, {
-  method: 'DELETE',
+  method: "DELETE",
 })
   .then((response) => response.json())
   .then((result) => console.log(result))

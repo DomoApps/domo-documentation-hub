@@ -28,7 +28,7 @@ Key Mintlify components in use:
 - `<Frame>` — wraps screenshots (auto-sizes to content width)
 - `<Note>`, `<Warning>`, `<Tip>` — callout blocks (always bold the label: `**Note:**`)
 - `<AccordionGroup>` + `<Accordion title="...">` — FAQ sections
-- Inline images use raw `<img>` with inline `style={{}}` props
+- Inline UI icons use the Domo icon font: `<i className="icon-{name}" aria-hidden="true" />`. Avoid Mintlify's `<Icon>` component for local SVGs — color/dark-mode breaks. Fall back to the `InlineImage` snippet (`/snippets/InlineImage.mdx`) only when the glyph isn't in the font. See `Domo-KB-Style-Guide.mdx` › **Icons**.
 
 Internal links use root-relative paths: `[text](/s/article/Article-Title)`
 

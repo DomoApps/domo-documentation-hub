@@ -41,7 +41,7 @@ Once the file(s) are identified, ask the user what type of change they need — 
 
 1. **Rename** — change the article title, filename, or both
 2. **Content update** — edit body text, callouts, or other prose
-3. **Image/screenshot swap** — replace one or more images
+3. **Image/screenshot swap** — replace one or more images, or swap a legacy image-based UI icon for the Domo icon font
 4. **Content removal** — delete a section, step, or block
 5. **File path update** — rename a file and update all references to it
 6. **Cross-file change** — the same change needs to appear in multiple articles
@@ -152,6 +152,20 @@ Use the Edit tool with enough surrounding context (2–3 lines) to make `old_str
 ### Image/screenshot swap
 
 Update the `src` attribute in the `<Frame>` or `<img>` tag. Update `alt` text if appropriate. Do not move or delete image files — note to the user that the image asset itself must be updated separately in `images/kb/`.
+
+### Image-based icon → icon font swap
+
+Many older articles use `<img>`, `InlineImage`, or `<Icon icon="/images/icons/*.svg" />` for inline UI icons that now exist in the Domo icon font. The font version inherits text color and adapts to light/dark mode automatically; image-based icons don't.
+
+When you're already updating an article and notice an image-based icon, propose swapping it to the font convention:
+
+```mdx
+<i className="icon-{name}" aria-hidden="true" />
+```
+
+Confirm a matching glyph exists at [Domo Icons](https://git.empdev.domo.com/pages/Development/DomoIcons/#!/icons/domocons) before proposing the swap — if the icon isn't in the font, leave the image as-is. Don't open a wholesale icon migration as a side effect of an unrelated update; only swap icons in the section the user asked you to change, plus any that read awkwardly inconsistent next to the change.
+
+**Check the surrounding prose for an inline label.** When swapping (or auditing existing font icons), confirm the icon is named in the surrounding prose. If the prose says "click \<icon\>" with no inline label, propose rewriting it to "click the {name} icon \<icon\>". The inline-label rewrite is preferred over `aria-label` in flowing prose because it helps every reader, not just screen-reader users. Reserve `role="img"` + `aria-label="..."` for the narrow case where the icon truly stands alone with no room for prose (icon-only button, sole content of a link). See `Domo-KB-Style-Guide.mdx` › **Icons** for the full convention.
 
 ### Navigation move
 

@@ -135,13 +135,55 @@ As much as possible, screenshots should be taken in Modocorp or another demo ins
 
 Take as many high-quality screenshots as possible. Not all may make it into the final draft of the article, but it's better to have too many than too few. Take them at as high a resolution as possible and do not compress them for sending to another machine—if necessary you can add them to a Sharepoint folder to preserve quality and share the link to the folder with another individual.
 
-**Inline images (UI icons)**
+## Icons
 
-For small Domo UI icons that appear within body text, recommended sizes are:
+Inline UI icons should use the Domo icon font, not images. The font ships ~1,000 glyphs and is wired up in `style.css` — every article can use it without any imports.
 
-- **20×20 —** matches the size of surrounding display text
-- **30×30 —** slightly larger; good for most inline icons
-- **40×40 —** best for header-level icons
+```mdx
+Click <i className="icon-gear" aria-hidden="true" /> **Settings** to open Settings.
+```
+
+- The class name is always `icon-{name}`, where `{name}` matches the Domo design system. Browse available icons at [Domo Icons](https://git.empdev.domo.com/pages/Development/DomoIcons/#!/icons/phosphor?size=xl).
+- Icons inherit text color and size, so they adapt to light/dark mode and surrounding font size automatically.
+- To override size for a single icon, use `style={{fontSize: 24}}`. Don't override unless the default looks wrong inline.
+
+**Accessibility: always pair an icon with an inline text label**
+
+The icon font uses Unicode Private Use Area codepoints, which screen readers announce as garbage if not handled. The default pattern hides the icon from the accessibility tree and lets surrounding prose carry the meaning:
+
+```mdx
+Click <i className="icon-gear" aria-hidden="true" /> **Settings** to open Settings.
+```
+
+If the existing prose doesn't already name the icon (e.g. "click \<icon\>"), **rewrite the prose to include the label inline** rather than relying on `aria-label`. This helps every reader, not just screen-reader users — sighted users also benefit from being told what the glyph represents instead of having to recognize it cold.
+
+- **Don't:** "Click <i className="icon-chart-line" aria-hidden="true" /> to view the chart."
+- **Do:** "Click the line chart icon <i className="icon-chart-line" aria-hidden="true" /> to view the chart."
+
+**Narrow exception — icon-only controls with no room for prose**
+
+When the icon truly stands alone with no surrounding text (icon-only button, icon as the only content of a link, glyph in a tight UI table cell), use `role="img"` and `aria-label` instead of `aria-hidden`:
+
+```mdx
+<i className="icon-gear" role="img" aria-label="Settings" />
+```
+
+Use this exception sparingly — in flowing prose, the inline-label rewrite above is always preferable.
+
+**When the glyph isn't in the font**
+
+If the UI element you need to depict isn't in Domo's icon set, fall back to the `InlineImage` snippet (see *Inline images*). The icon font is preferred whenever a matching glyph exists.
+
+**Migrating legacy image-based icons**
+
+Many older articles use `<img>` or `InlineImage` for icons that now exist in the font. These will be migrated to the font convention over time. When you're already updating an article that contains image-based icons, swap them to the font version if a matching glyph exists.
+
+## Inline images
+
+For inline glyphs that aren't in the icon font (small UI fragments captured as screenshots), use the `InlineImage` snippet from `/snippets/InlineImage.mdx`. Recommended display heights:
+
+- **1.2em–1.6em —** matches surrounding body text
+- **2em —** for header-level inline images
 
 ## Callouts
 

@@ -2,20 +2,11 @@
 title: "集計Beast Modeで非集計列を使用する"
 ---
 
+## はじめに
 
-### はじめに
+このガイドでは、集計Beast Modeで非集計列を使用する方法を紹介します。 集計Beast Modeに非集計列を適用する場合は、SQLについて基本レベルから中級レベルの知識と [Domoサポート](https://domo-support.domo.com/s/) <img src="/images/kb/ja/ka0Vq00000074Jp-00N5w00000Ri7BU-0EMVq000002tuV5.jpg" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/> へのアクセス権を持っていることが理想的です。
 
-このガイドでは、集計Beast Modeで非集計列を使用する方法を紹介します。 集計Beast Modeに非集計列を適用する場合は、SQLについて基本レベルから中級レベルの知識と [Domoサポート](https://domo-support.domo.com/minasan/s/) <img src="/images/kb/ja/ka0Vq00000074Jp-00N5w00000Ri7BU-0EMVq000002tuV5.jpg" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/> へのアクセス権を持っていることが理想的です。
-
----
-
-* [GROUP\_BY関数を使用する](#use_group_by)
-* [非集計列を使用する集計](#aggregation_using_non)
-* [総計行と小計行](#grand_total_subtotal)
-
----
-
-### GROUP BY関数を使用する
+## GROUP BY関数を使用する
 
 `SELECT` ステートメントで、集計された関数と非集計列を使用するSQLクエリを作成する場合、すべての非集計列をクエリの `GROUP BY` ステートメントに含めるする必要があります。
 
@@ -42,9 +33,8 @@ SELECT `Ship Mode`, SUM(`Sales`) AS `Total Sales` FROM Dataset GROUP BY `Ship Mo
 `SELECT` ステートメントには、集計Beast Mode、「Total Sales」、および非集計列「Ship Mode」が含まれます。したがって、非集計列「Ship Mode」は `GROUP BY` ステートメントに含まれている必要があります。
 
 <Frame><img alt="" src="/images/kb/ka0Vq0000003ruD-00N5w00000Ri7BU-0EMVq0000038OZi.jpg" style={{width: 894, height: 417}}/></Frame>
-[このページのトップへ](#intro)
 
-### 非集計列を使用する集計
+## 非集計列を使用する集計
 
 非集計列を使用する集計Beast Modeの操作は難しくなりますが、以下のヒントをもとに実行することができます。
 
@@ -97,9 +87,7 @@ FROM DataSet GROUP BY `Customer ID,` `Ship Mode`
 
 「Ship Mode」列は、 `SELECT` ステートメントに含まれていないため、表示されません。テーブルを表示している他のユーザーは、「Ship Mode」に入る値を把握していません。また、顧客ごとの実際の「Total Sales」を確認することもできません。
 
-[このページのトップへ](#intro)
-
-### 表の総計行と小計行
+## 表の総計行と小計行
 
 ピボットテーブルの「Grand Total」行には、すべての顧客の実際の「Total Sales」値を取得できる2番目のクエリが含まれている必要があります。通常、「合計」行を計算する場合、クエリから特定の列を削除しますが、この場合はメインクエリを使用して「Customer ID」を削除します。Beast Modeは非集計列を使用するため、 `GROUP BY` ステートメントに追加する必要があります。
 
@@ -133,7 +121,5 @@ FROM DataSet GROUP BY `Customer ID,` `Ship Mode`) AS subquery
 ```
 
 このクエリは、「Customer ID」および「Ship Mode」ごとに複数の行が存在する可能性に備えた形式になっているため、テーブル全体のクエリを実行し、サブクエリに配置して、サブクエリに基づいて `SUM` を計算する必要があります。
-
-[このページのトップへ](#intro)
 
 日本語

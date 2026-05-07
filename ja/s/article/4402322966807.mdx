@@ -1,24 +1,24 @@
 ---
-title: "> Domo on Snowflake（推奨）"
+title: "Domo on Snowflake（推奨）"
 ---
 
-### はじめに
+## はじめに
 
 Cloud Amplifierを使用すると、Snowflake内のエンタープライズデータアセットを使用するためのアクセス権をDomoに付与できます。SnowflakeとCloud Amplifierの統合により、データは組織のガバナンス構造とデータ構造内でSnowflakeに残り、Snowflakeはデータアクセスとクエリ処理を制御します。Cloud Amplifierでは、Domoのデータエクスペリエンス機能の包括的なポートフォリオにアクセスして、データからより多くの価値を引き出すことができます。
 
-このガイドでは、Snowflakeに精通しているユーザー向けに、読み取り/書き込み機能の設定や[OAuthの設定方法](#oauth_configuration)など、SnowflakeをCloud Amplifierに登録する方法を説明します。
+このガイドでは、Snowflakeに精通しているユーザー向けに、読み取り/書き込み機能の設定や[OAuthの設定方法](#oauth)など、SnowflakeをCloud Amplifierに登録する方法を説明します。
 
 <Note>**注記：**Magic ETLはSnowflakeとCloud Amplifierの統合を活用するため、ユーザーはSnowflake内のデータを簡単に変換することができます。Snowflake上のMagic ETLについては、[こちら](/s/article/000005455)を参照してください。</Note>
 
 ---
 
-### 構造的な概要
+## 構造的な概要
 
 この画像は、Cloud Amplifier-Snowflakeの統合を表しています。
 
 <Frame>![Snowflake architecture diagram.png](/images/kb/ja/0EMVq000003DfBh.jpg)</Frame>
 
-### 必要条件
+## 必要条件
 
 Cloud Amplifierの設定は、読み取り専用または読み取り/書き込みの2つの部分で構成されています。
 
@@ -52,7 +52,7 @@ Snowflake接続を設定する前に、以下の手順を完了することを�
 
   これはSnowflakeの要件であり、これによってDomo内でSnowflake管理者の認証情報を管理する必要がなくなります。これは、Snowflake管理者がDomoにアクセスできない可能性のある大規模な組織では特に重要です。統合が確立された後、Snowflake管理者アカウントは不要になります。
 
-### 読み取り専用設定
+## 読み取り専用設定
 
 以下の手順に従って、読み取り専用アクセス権を設定し、Cloud Amplifierを使用してDomo内からSnowflakeテーブルの参照を開始します。
 
@@ -88,7 +88,7 @@ Snowflake接続を設定する前に、以下の手順を完了することを�
    - **［デフォルトの権限を使用］ —** デフォルトでは、ユーザーがSnowflakeに接続すると、初期の権限が割り当てられます。デフォルトの権限が指定されていない場合、システムはデフォルトでパブリック権限になり、何にもアクセスできません。
    - **［権限を指定］ —** 新規ユーザーに、パブリック権限ではなくデフォルトの権限を選択できます。
    - **［二次的な権限を使用］ —** これはSnowflakeがサポートする機能です。設定すると、Snowflakeは、自身に付与されている権限でテーブルにアクセスできるユーザーがいるかどうかを自動的に判断します。SnowflakeユーザーがSnowflakeで複数の権限を持ち、各権限が複数のテーブルにアクセスできる場合、そのユーザーは頻繁に権限を切り替える必要があります。二次的な権限機能は、複数の権限を切り替えることなくテーブルにアクセスできるようにすることでこれを防止します。このオプションでは、クエリ時にユーザーがSnowflakeの権限を選択することはできません。DomoがSnowflakeにクエリを実行する必要がある場合は、代わりにすべてのユーザーに特定の権限を定義できます。
-8. **［OAuthを設定］**で、OAuthでユーザーを個別に認証できるようにスイッチを切り替えます。後述の「[DomoのOAuthを設定する](#configure_oauth_in_domo)」を参照してください。
+8. **［OAuthを設定］**で、OAuthでユーザーを個別に認証できるようにスイッチを切り替えます。後述の「[DomoのOAuthを設定する](#domooauth)」を参照してください。
 9. データの読み込みとクエリに使用するSnowflakeウェアハウスを選択します。
 
    <Frame>![load and query.png](/images/kb/ja/0EM5w000005wyYi.jpg)</Frame>
@@ -100,7 +100,7 @@ Snowflake接続を設定する前に、以下の手順を完了することを�
 
     <Frame>![database and schema.png](/images/kb/ja/0EM5w000005wyYx.jpg)</Frame>
 
-### 書き込み設定
+## 書き込み設定
 
 このセクションの手順を完了する前に、上記の[必要条件](#prerequisites)を満たしてください。
 
@@ -150,11 +150,11 @@ Snowflake接続を設定する前に、以下の手順を完了することを�
 
 これでSnowflakeの書き込み設定が完了しました。
 
-### Snowflakeから供給されたDataSetを使用する
+## Snowflakeから供給されたDataSetを使用する
 
 Snowflakeから供給されたDataSetをDataFlowで使用すると、フローの実行時にSnowflakeがそのデータをライブでクエリします。また、Snowflakeから供給されたDataSetは、テーブルのLAST\_ALTEREDの日時にもとづいて15分ごとに更新がチェックされます。最後にチェックした後にテーブルが更新された場合、このテーブルをトリガーとして使用するDataFlowが実行されます。
 
-### Snowflake接続のセキュリティ
+## Snowflake接続のセキュリティ
 
 Snowflake接続を保護するには、キーペア認証とユーザー名とパスワードによる基本認証の2つのオプションがあります。OAuthの設定を選択することもできます。
 
@@ -186,7 +186,7 @@ Snowflakeは、セキュリティ強化のためにキーペア認証をサポ�
    <Frame>![select snowflake.jpg](/images/kb/ja/0EMVq000002Y3vB.jpg)</Frame>
 5. 既存の統合にマウスポインターを合わせ、<img alt="" src="/images/kb/ja/0EMVq000005vp69.jpg" style={{width: 30, height: 29, display: 'inline', verticalAlign: 'start', margin: '0'}}/>
 
-   **［オプション］**>**［アカウントを編集］**を選択するか、[新しい統合を作成します](#read_only_setup)。
+   **［オプション］**>**［アカウントを編集］**を選択するか、新しい統合を作成します。
 6. 統合モーダルの**［Snowflakeアカウントを編集］**で**［キーペア］**のラジオボタンを選択します。モーダルには、キーペア認証に関するSnowflakeのドキュメントを確認するオプションが用意されています。  
      
 
@@ -200,11 +200,11 @@ Snowflakeは、セキュリティ強化のためにキーペア認証をサポ�
 
 <Note>**注記：**接続に問題がある場合は、後述の「[よくある質問](#faq)」および「[トラブルシューティング](#troubleshooting)」セクションを参照してください。</Note>
 
-### OAuthの設定
+## OAuthの設定
 
 SnowflakeのOAuthを有効にすることができます。これには、SnowflakeとCloud Amplifierの統合のすべてのユーザーがSnowflakeで認証を受け、許可されたSnowflakeデータのみにアクセスできるようにする必要があります。
 
-SnowflakeのOAuthを設定するには、まずSnowflakeで設定を完了し、次にDomoで設定を完了する必要があります。その後、[Okta SSOと統合](#configure_okta_for_sso)することを選択できます。
+SnowflakeのOAuthを設定するには、まずSnowflakeで設定を完了し、次にDomoで設定を完了する必要があります。その後、[Okta SSOと統合](#oktasso)することを選択できます。
 
 ## SnowflakeのOAuthを設定する
 
@@ -243,7 +243,7 @@ Snowflake OAuthセキュリティ統合の設定から始めます。
 
 ## DomoのOAuthを設定する
 
-1. 上記の[読み取り専用設定](#read_only_setup)の手順1～8を実行してから、ここに戻ります。
+1. 上記の読み取り専用設定の手順1～8を実行してから、ここに戻ります。
 2. スイッチを切り替えてOAuthを有効にすると、以下のフィールドが表示されます。
    - **［Snowflakeのアカウント識別子］ —** このフィールドが既に入力されている場合は、変更しないでください。
    - **［SnowflakeクライアントID］ —** Snowflakeから取得したクライアントIDを貼り付けます。
@@ -282,7 +282,7 @@ SnowflakeとCloud Amplifierの接続がData Warehouse内に表示されるよう
 
 ## Oktaを設定してSSOでアクセスする
 
-以下のOkta SSOの手順に従う前に、[OAuthの設定](#oauth_configuration)を完了する必要があります。
+以下のOkta SSOの手順に従う前に、[OAuthの設定](#oauth)を完了する必要があります。
 
 1. Oktaの管理者ダッシュボードに移動します。  
      
@@ -323,18 +323,15 @@ SnowflakeとCloud Amplifierの接続がData Warehouse内に表示されるよう
     <Frame>![select done.jpg](/images/kb/ja/0EMVq0000016rU5.jpg)</Frame>
 12. 設定手順の新しいページに移動し、手順を完了します。
 
-### よくある質問
+## よくある質問
 
 <AccordionGroup>
 <Accordion title="データベース設定（Domo外）またはベストプラクティスの要件はありますか？">
 
-
 Domoの統合のために、Snowflake内に専用のデータベースを作成してください。既存のSnowflakeデータベースに接続した場合、Domoにはそのデータベースにあるテーブルは表示されません。
-
 
 </Accordion>
 <Accordion title="SnowflakeのウェアハウスをCloud Amplifier用に設定する際のガイダンスはありますか？">
-
 
 Domoは、CDWアカウント内でデータの読み込み、クエリ、データ変換などの様々なアクティビティを実行します。多くの使用事例で、小規模なマルチクラスターウェアハウス（読み込み、クエリ、変換用の多目的ウェアハウス）を自動的にスケールアップするように設定することを推奨します。
 
@@ -342,10 +339,8 @@ Domoは、CDWアカウント内でデータの読み込み、クエリ、デー�
 
 実稼働ワークロードの準備が整い、既存の機能的なウェアハウスを使用することと、Domo統合用の新しいウェアハウスを設定することのどちらがよいかを検討している場合は、Cloud Amplifierによる最適化についての [Domoブログの投稿](https://www.domo.com/blog/how-to-optimize-data-warehouse-strategy-with-cloud-amplifier/) <img src="/images/kb/ka0Vq00000001FR-00N5w00000Ri7BU-0EMVq0000000XDh.jpg" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/> を参照してください。
 
-
 </Accordion>
 <Accordion title="Snowflakeデータでデータ変換を使用するにはどうすればよいですか？">
-
 
 Snowflakeのデータについて、Domoはデータを変換するための2つの異なるメカニズムをサポートしています。
 
@@ -365,10 +360,8 @@ Snowflakeのデータについて、Domoはデータを変換するための2つ
 
    </Note>
 
-
 </Accordion>
 <Accordion title="Domoで管理されるSnowflake DataSetとお客様が管理するSnowflake DataSetの違いは何ですか？">
-
 
 DomoをSnowflakeアカウントに接続すると、Domoは2つのクラスのデータベースと基盤となるテーブルを操作します。独立したパイプラインまたは取り込みメカニズムを使用して直接作成して更新したテーブルは、Domoで探索して登録し、読み取り専用アクセスを行えます。Domoは、これらのお客様が管理するデータベースを読み取り、直接クエリできます。
 
@@ -376,94 +369,70 @@ DomoをSnowflakeアカウントに接続すると、Domoは2つのクラスの�
 
 Domoは、このDomoで管理されるデータベースを使用してデータ変換の出力（DataFlow出力）を作成します。
 
-
 </Accordion>
 <Accordion title="DomoとSnowflakeの間で権限はどのように設定されていますか？">
 
-
 Snowflakeからの権限は、プログラムによってDomoに渡されるわけではありません。ただし、Domoのネイティブの権限モデルと、データセキュリティのためのPersonalized Data Permission（PDP）を使用して、Snowflakeの基盤となるアセットへのデータアクセスを管理することはできます。
-
 
 </Accordion>
 <Accordion title="コネクターを使用してSnowflakeからDataSetを作成する方法と、Cloud Amplifierを使用してDataSetを作成する方法の違いは何ですか？">
 
-
 * **Snowflakeにデータを残す** — 最大の違いは、すべてのSnowflakeコネクターがSnowflakeからDomoにデータをインポート/複製しているのに対し、Cloud AmplifierはSnowflakeにデータを残していることです。
 * **一括作成** — Cloud Amplifierでは、最大50個のSnowflakeのテーブルを検索して一括選択し、50個の異なるDataSetを即座に作成できます。コネクターを使用してこれを行うには、各DataSetをコネクターで個別に設定する必要があります。
-
 
 </Accordion>
 <Accordion title="行や更新があってもSnowflakeビューのDataSetに、0行と表示され、 *最終更新日* が変更されません。これはどうしてでしょうか？">
 
-
 これは、Snowflakeビューの標準動作です。Snowflakeエンドポイントは、データが明示的にクエリされない限り、行数を提供しません。
-
 
 </Accordion>
 <Accordion title="SnowflakeでALTER USERステートメントを実行できません。何がいけないのでしょうか？">
 
-
 Snowflakeで、ユーザーに対する所有者権限またはセキュリティ/管理者権限を持っていることを確認します。
-
 
 </Accordion>
 <Accordion title="秘密鍵をアップロードし、秘密鍵パスフレーズを入力しましたが、接続を確立できません。何が間違っているのでしょうか？">
 
-
 こちらの [Snowflakeのドキュメント <img src="/images/kb/ka0Vq00000001FR-00N5w00000Ri7BU-0EMVq0000000XDh.jpg" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/>](https://docs.snowflake.com/ja/user-guide/key-pair-auth) のすべての指示に従います。パスフレーズが、キーペアの作成に使用したパスフレーズと一致し、ALTER USERステートメントが正常に実行されたことを確認します。
 
-### このページのトップへ
+## このページのトップへ
 
-### トラブルシューティング
+## トラブルシューティング
 
 Cloud AmplifierとSnowflakeの統合で問題が発生した場合、以下の情報が役立つ可能性があります。 [Domoサポート](https://domo-support.domo.com) [<img src="/images/kb/ka0Vq00000001FR-00N5w00000Ri7BU-0EMVq0000000XDh.jpg" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/>](https://docs.snowflake.com/ja/user-guide/key-pair-auth) にリクエストを送信することもできます。
-
 
 </Accordion>
 <Accordion title="## テーブルが見つからない">
 
-
 アカウントにアクセス権のあるテーブルが見つからない場合は、そのテーブルがマテリアライズされているかどうかを確認してください。Snowflake側の一時的なテーブルや仮のテーブルは、Cloud AmplifierでDataSetを作成する際には使用できません。
-
 
 </Accordion>
 <Accordion title="## 設定の問題">
 
-
 Cloud AmplifierとSnowflakeの統合に問題がある場合は、以下の手順に従います。
-
 
 </Accordion>
 <Accordion title="Snowflakeサービスアカウントを確認する">
 
-
 1. サービスアカウントの認証情報を使用してSnowflakeにログインします。
 2. インポートするデフォルトのSnowflakeデータベースとクエリテーブルが表示されることを確認します。
-
 
 </Accordion>
 <Accordion title="正しい権限を割り当てる">
 
-
 ACCOUNTADMIN権限を持つSnowflake管理者が、Domoにより提供されるSQLをSnowflakeで実行していることを確認します。
-
 
 </Accordion>
 <Accordion title="正しいURLを使用する">
-
 
 DomoのSnowflake接続URLがSnowflakeログインURLと一致していることを確認します。
 
 URLはSnowflakeログインページにあります。URLのフォーマットは次のようになります。 *\<インスタンス名\>.\<リージョン\>.* [snowflakecomputing.com](http://snowflakecomputing.com)
 
-[このページのトップへ](#intro)
-
 <Note>
 **次のステップ：** 統合が完了したら、 [Snowflake上のMagic ETL](/ja/s/article/000005455) の使い方や「 [Magic ETL DataFlowを作成する](/ja/s/article/360055259234) 」をご覧ください。
 
 </Note>
-
-
 
 </Accordion>
 </AccordionGroup>

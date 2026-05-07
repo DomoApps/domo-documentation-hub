@@ -2,33 +2,33 @@
 title: "DataSet Update Methods in Magic ETL"
 ---
 
-### Intro
+## Intro
 
 Magic ETL has four possible DataSet update methods in the Output DataSet tile: Replace, Append, Partition, and Upsert. The best update method for your DataFlow depends on your use case.
 
-### Update Methods
+## Update Methods
 
 This table gives basic definitions for each available method. Follow the link to learn more about each method.
 To learn more about update methods, see our article on general [DataSet Update Methods](https://domo-support.domo.com/s/article/360043430733?language=en_US) (outside of Magic ETL).
 
 <table border="1" cellpadding="1" cellspacing="1" data-aura-rendered-by="33:208;a"><thead><tr><th colspan="1" rowspan="1"><p> Item </p></th><th colspan="1" rowspan="1"><p> Description </p></th></tr></thead><tbody><tr><td colspan="1" rowspan="1"><p><a href="#replace" target="_self"> Replace </a></p></td><td colspan="1" rowspan="1"><p> Each execution replaces the output DataSet's contents with its latest results. </p></td></tr><tr><td colspan="1" rowspan="1"><p><a href="#append" target="_self"> Append </a></p></td><td colspan="1" rowspan="1"><p> Each execution appends its results to the output DataSet as a new batch. </p></td></tr><tr><td colspan="1" rowspan="1"><p><a href="#partition" target="_self"> Partition </a></p></td><td colspan="1" rowspan="1"><p> Each execution groups rows into batches according to a name, which is the value of a specific column. Each unique batch name in a DataSet is called a partition. These partitions are all appended to the DataSet, and any pre-existing partitions with matching names are replaced. </p><p> Finally, if a partition filter expression is specified, all partitions are evaluated against it, and any that do not pass are deleted. </p></td></tr><tr><td colspan="1" rowspan="1"><p><a href="#upsert" target="_self"> Upsert </a></p></td><td colspan="1" rowspan="1"><p> Each execution uses a defined key (a value from a column or combination of columns that signifies a unique row in the DataSet) to compare the rows resulting from the execution with the rows already in the output DataSet. <a id="replace" target="_blank"></a><br/><br/> Rows with keys that match existing rows in the output DataSet are updated in the output DataSet. <br/> Rows with keys not already present in the output DataSet are appended to the <br/> output DataSet. </p></td></tr></tbody></table>
 
-### Replace
+## Replace
 
 Replace is the default update method for Magic ETL. It removes all existing data in the DataSet and replaces it with the new batch of data from the execution of a Magic ETL DataFlow. This method is good if your output DataSet is relatively small or if all the data needs to be updated every time the DataFlow executes.
 
 <Frame><img alt="Replace (1).gif" src="/images/kb/ka0Vq0000002DkL-00N5w00000Ri7BU-0EM5w000006vuq4.jpg" style={{width: 710.994, height: 400}}/></Frame>
-### Append
+## Append
 
 Append takes all data resulting from the execution of a Magic ETL DataFlow and appends it to the output DataSet. This method doesn't take into account any of the existing data in the output DataSet and appends the new data without considering potential duplication. Append is a good choice if each execution of your DataFlow results in net new rows that need to be added to the existing output DataSet.  However, this update method can be brittle and result in duplicated or missing data.
 
 <Frame><img alt="Screenshot 2023-09-19 at 12.42.43 PM.png" src="/images/kb/ka0Vq0000002DkL-00N5w00000Ri7BU-0EM5w000006vubZ.jpg" style={{width: 710, height: 453.999}}/></Frame>
-### Partition
+## Partition
 
 Partitioning is a way of organizing your data into groups to make data updates faster and more efficient. The graphic below demonstrates replacing and appending data with partitions.
 
 <Frame><img alt="partition graphic.jpg" src="/images/kb/ka0Vq0000002DkL-00N5w00000Ri7BU-0EM5w000006vuj3.jpg" style={{width: 710, height: 453.999}}/></Frame>
-# Partition Basics
+### Partition Basics
 
 A common way to understand partitions is to think of a physical encyclopedia — a collection of books that are part of the same set but individually different. If an update is made to one book and it is republished, you can buy a new copy of that book without replacing the entire set of books.  Partitions divide your data into separate collections, or subsets, so that when you replace some data, you do not need to replace all of it. Appending data when using partitions is like buying a new volume of the encyclopedia and adding it to the end of your collection.
 
@@ -38,7 +38,7 @@ After partitions on a DataSet are defined, new data is evaluated based on the pa
 
 For example, if your input DataSet contains data for March 1st, March 2nd, and March 3rd (and your partitions are defined based on that date), any data existing for March 1st, 2nd, or 3rd are replaced in the output DataSet with the new, incoming data.
 
-# Partition Best Practices
+### Partition Best Practices
 
 A good partition needs to be large enough to take advantage of partitioning's enhanced processing speed and granular enough to meet your specific needs.
 
@@ -50,7 +50,7 @@ Some organizations need partitions that are more granular than day level. If tha
   **Important:** There is a 3000-partition limit for each DataSet. If you create too many partitions, you may reach this limit and experience problems. In the example from the previous paragraph, if you create a partition key using store ID + date, you can only store 375 days' worth of data (3000 partitions divided by 8 stores).
 </Warning>
 
-# Configure Partitioning
+### Configure Partitioning
 
 Follow the steps below to configure partitioning as the update method for your DataSet in Magic ETL:
 
@@ -73,18 +73,18 @@ Follow the steps below to configure partitioning as the update method for your D
      **Tip:** Learn how to [add subset processing to your DataFlow](/s/article/000005150).
    </Tip>
 
-### Upsert
+## Upsert
 
 Upsert allows you to update rows in your output DataSet without reprocessing the full DataSet based on a unique row-level key. The graphic below demonstrates replacing and appending data with Upsert.
 
 <Frame><img alt="merge graphic.jpg" src="/images/kb/ka0Vq0000002DkL-00N5w00000Ri7BU-0EM5w000006vuff.jpg" style={{width: 710, height: 453.999}}/></Frame>
-# Upsert Basics
+### Upsert Basics
 
 With Upsert, rather than replacing the entire DataSet with each DataFlow execution or appending all incoming rows of a DataFlow execution, data can be either appended or replaced, depending on whether the incoming rows are new or updates to rows that already exist in the output DataSet.
 
 Upsert uses a key, which indicates whether a record resulting from a DataFlow execution is new or already exists in the output DataSet. If the key value of a row matches that of an existing row, the incoming row replaces the existing row. If no match is found, the incoming row is treated as a new row and is appended to the output DataSet.
 
-# Upsert Best Practices
+### Upsert Best Practices
 
 An Upsert key can be a value in a single column or a combination of values from multiple columns, but the key must indicate uniqueness for that row. You cannot identify an Upsert key if it has duplicate values within the column(s). You also cannot identify an upsert key if it has null values in the column.
 
@@ -92,7 +92,7 @@ Upsert is a good update method if you have occasional updates to individual reco
 
 The availability of Upsert as an update method in a Magic ETL DataFlow should remove the need to create recursive DataFlows to update output DataSets.
 
-# Upsert Configuration
+### Upsert Configuration
 
 Follow these steps to configure upsert as the update method for your DataSet in Magic ETL:
 

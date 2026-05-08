@@ -135,6 +135,20 @@ As much as possible, screenshots should be taken in Modocorp or another demo ins
 
 Take as many high-quality screenshots as possible. Not all may make it into the final draft of the article, but it's better to have too many than too few. Take them at as high a resolution as possible and do not compress them for sending to another machine—if necessary you can add them to a Sharepoint folder to preserve quality and share the link to the folder with another individual.
 
+**Wrap screenshots in `<Frame>`**
+
+Block-level screenshots should be wrapped in a `<Frame>` component. Frame styles the image consistently across the site and auto-sizes it to fit the available column width while preserving the image's aspect ratio.
+
+```mdx
+<Frame>
+  <img src="/images/kb/example.png" alt="Descriptive alt text" />
+</Frame>
+```
+
+Do not add explicit `width` or `height` styles to the `<img>` — they override Frame's auto-sizing and often distort the image. If a screenshot needs to render smaller than the column width, crop the source image rather than scaling it down with inline styles.
+
+For inline glyphs and small UI fragments that flow with surrounding text, use the icon font or the `InlineImage` snippet instead — see *Icons* and *Inline images* below.
+
 ## Icons
 
 Inline UI icons should use the Domo icon font, not images. The font ships ~1,000 glyphs and is wired up in `style.css` — every article can use it without any imports.
@@ -322,6 +336,10 @@ Do not use `<br/>` between multiple callout elements (`<Note>`, `<Warning>`, `<T
 **Nested tables**
 
 For a table within a table, write the inner table as HTML and embed it inside the outer table cell. This renders correctly when published.
+
+**Images in table cells**
+
+Do not use `<Frame>` inside table cells — its block-level chrome and auto-sizing fight the cell width and break the layout. Use the `InlineImage` snippet (see *Inline images*) instead, regardless of the image size. If a screenshot is too large to read at inline sizes, link out to a separate article or place the screenshot outside the table.
 
 ## Code
 

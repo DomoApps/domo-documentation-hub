@@ -1,0 +1,124 @@
+---
+title: "Databricks Using OAuth M2M Authentication Connector"
+---
+
+## Intro
+
+This article explains how to use the Databricks OAuth M2M Authentication connector to configure OAuth 2.0 client credentials, connect to your Databricks workspace, and import Databricks data into Domo.
+
+---
+
+## Prerequisites
+
+To configure this connector, you must have the following:
+
+- Databricks server hostname
+- Databricks port number
+- HTTP path
+- OAuth client ID
+- OAuth client secret
+
+For more information about the Databricks API, see the [Databricks API documentation](https://docs.databricks.com/aws/en/reference/api).
+
+This article covers the fields and menus specific to the Databricks using OAuth M2M Authentication connector user interface. For general information about adding DataSets, setting update schedules, and editing DataSet information, see [Add a DataSet Using a Data Connector](/s/article/360042926274).
+
+
+## Configure Databricks OAuth Machine-to-Machine (M2M) Authentication
+
+To configure OAuth 2.0 client credentials (M2M) authentication for Databricks, complete the following tasks:
+
+1. Create a Databricks service principal in your Databricks workspace, and create an OAuth secret for it. For instructions, see [Authorize service principal access to Databricks with OAuth](https://docs.databricks.com/aws/en/dev-tools/auth/oauth-m2m). Make a note of the service principal UUID (Application ID) and the secret value.
+2. Grant the service principal access to the compute resources it needs. See [Compute permissions](https://docs.databricks.com/aws/en/compute/clusters-manage#cluster-level-permissions) or [Manage a SQL warehouse](https://docs.databricks.com/aws/en/compute/sql-warehouse/create#manage).
+
+Before you begin, complete the following:
+
+- Create a Databricks service principal. See [Add service principals to your account](https://docs.databricks.com/aws/en/admin/users-groups/service-principals#manage-sp-permissions).
+- On the service principal's **Configuration** tab, select the entitlements it needs for this workspace.
+- On the **Permissions** tab, grant access to any Databricks users, service principals, and groups that need to manage or use this service principal. For details, see [Who can manage and use service principals?](https://docs.databricks.com/aws/en/admin/users-groups/manage-service-principals#add-sp).
+
+
+### Add a service principal to your account
+
+As an account admin, use the account console to add a service principal.
+
+1. Sign in to the account console.
+2. In the sidebar, select **User management**.
+3. Select the **Service principals** tab, and then select **Add service principal**.
+4. Enter a name for the service principal.
+5. Select **Add**.
+
+
+### Create an OAuth secret
+
+To authorize access to your Databricks resources with OAuth, create an OAuth secret. Databricks uses this secret to generate OAuth access tokens for authentication. Each service principal can have up to five OAuth secrets, and each secret can be valid for up to two years.
+
+Account admins and workspace admins can create OAuth secrets for service principals.
+
+1. In the Databricks workspace, select your username, and then select **Settings**.
+2. Select the **Identity and access** tab.
+3. Next to **Service principals**, select **Manage**.
+4. Select the service principal.
+5. Select the **Secrets** tab.
+6. Select **Generate secret**.
+7. Set the secret lifetime in days (maximum 730).
+8. Select **Generate**.
+9. Copy the displayed secret and client ID, and then select **Done**. The secret appears only once. The client ID is the same as the service principal application ID.
+
+<Note>**Note:** Account admins can also create an OAuth secret in the account console. On the **User management** tab, select the service principal, and then go to the **Credentials & secrets** tab.</Note>
+
+
+
+## Configure the Connection
+
+This section describes the options in the **Credentials** and **Details** panes on the Databricks using OAuth M2M Authentication connector page. The components of the **Scheduling** and **Name & Describe Your DataSet** panes are universal across most connector types and are discussed in [Add a DataSet Using a Data Connector](/s/article/360042926274).
+
+
+### Enter your credentials
+
+The **Credentials** pane contains fields for entering credentials to connect to your Databricks account. The following table describes what is needed for each field.
+
+| Field               | Description                                                                                                                                                                                            |
+| ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Host                | Enter the Databricks server hostname. To find it, go to the **JDBC/ODBC** tab under the cluster's **Advanced Options**. If you do not have access to this tab, contact your Databricks administrator.  |
+| Port                | Enter the Databricks port number. For secure connections, Databricks always uses port 443.                                                                                                             |
+| HTTP Path           | Enter the HTTP path. To find it, go to the **JDBC/ODBC** tab under the cluster's **Advanced Options** in Databricks. If you do not have access to this tab, contact your Databricks administrator.     |
+| OAuth Client ID     | Enter the application (client) ID for your service principal. This unique identifier is used for machine-to-machine (M2M) authentication.                                                              |
+| OAuth Client Secret | Enter the client secret for your service principal. This confidential key is associated with the application (client) ID.                                                                              |
+
+After you enter valid credentials, you can use the same account any time you set up a new Databricks using OAuth M2M Authentication connection. You can manage connector accounts in the **Accounts** tab in the Data Center. For more information about this tab, see [Manage User Accounts for Connectors](/s/article/360042926054).
+
+
+### Configure the Details pane
+
+In the **Details** pane, you can configure various fields.
+
+| Field                                        | Description                                                                                                                                                                                                                                                                       |
+| -------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| How would you like to import data into Domo? | Select how you want to import your data.                                                                                                                                                                                                                                          |
+| Catalogs                                     | Select the catalog.                                                                                                                                                                                                                                                               |
+| Database Name                                | Select the database name.                                                                                                                                                                                                                                                         |
+| Query Type                                   | <table border="1"><tbody><tr><td><b>Report Name</b></td><td><b>Description</b></td></tr><tr><td>Custom Query</td><td>Enter the query to execute.</td></tr><tr><td>Query Builder</td><td>Select a table and fields to automatically generate your query.</td></tr></tbody></table> |
+| Query                                        | Enter your query.                                                                                                                                                                                                                                                                 |
+| Database Tables                              | Select the table.                                                                                                                                                                                                                                                                 |
+| Table Columns                                | Select the columns.                                                                                                                                                                                                                                                               |
+| Query Helper                                 | Generated query.                                                                                                                                                                                                                                                                  |
+| Upsert Key Column(s)                         | Enter the upsert key column name. To specify multiple columns, enter a comma-separated list. This field is required only when the Import Data method is set to UPSERT.                                                                                                            |
+| Partition Criteria                           | Select whether to partition your data by using date keys or a meta query.                                                                                                                                                                                                         |
+| Partition Query to determine partition tags  | Enter the partition meta query to return the distinct partition tags (or keys). Use the column that contains **Date** values as the partition column. For example: `SELECT DISTINCT(COLUMN_NAME) FROM TABLENAME`.                                                                  |
+| Partition Column Name                        | Select the partition column name. Only date fields appear in this list.                                                                                                                                                                                                           |
+| Partition Support Format                     | Select the partition format.                                                                                                                                                                                                                                                      |
+| Past Days                                    | Enter how many days back you want to pull data from, such as 30 for the last 30 days. Use a number greater than zero.                                                                                                                                                             |
+| Past Years                                   | Enter how many years back you want to pull data from, such as 10 for the last 10 years. Use a number greater than zero.                                                                                                                                                           |
+| Past Months                                  | Enter how many months back you want to pull data from, such as 24 for the last 24 months. Use a number greater than zero.                                                                                                                                                         |
+| Future Years                                 | Enter how many years ahead you want to retrieve data for. Enter a positive integer, such as 10.                                                                                                                                                                                   |
+| Future Months                                | Enter how many months ahead you want to retrieve data for. Enter a positive integer, such as 15.                                                                                                                                                                                  |
+| Date Format                                  | Select the date format that matches the format in the partition column. By default, **yyyy-MM-dd** is used.                                                                                                                                                                       |
+| Custom Date Format                           | Enter the custom date format.                                                                                                                                                                                                                                                     |
+| Partition Non Date Key Column Name           | Select the partition column name.                                                                                                                                                                                                                                                 |
+| Fetch Size                                   | Enter the fetch size to control memory usage. If you leave this field blank, the connector uses the default fetch size. If you get an "out of memory" error, try a smaller fetch size.                                                                                            |
+
+
+
+## Configure Other Options
+
+For information about the remaining sections of the connector interface, including how to configure scheduling, retry, and update options, see [Add a DataSet Using a Data Connector](/s/article/360042926274).

@@ -1,6 +1,13 @@
 ---
 title: "Access Tokens"
+tag: "Beta"
 ---
+<Note>
+  **Note:** This feature is in beta. Beta Program participants can enable
+  features [here](https://embed.domo.com/embed/pages/DQ8Ek). To join the Beta
+  Program, fill out [this form](https://embed.domo.com/embed/pages/K8GMx). For beta questions or feedback, email
+  [beta.admin@domo.com](mailto:beta.admin@domo.com).
+</Note>
 
 ## Intro
 
@@ -14,28 +21,15 @@ To generate access tokens, you need one of the following:
 
 - An Admin security role
 - A custom role with at least one of the following grants:
-  - The **Create Access Tokens** grant <Badge className="text-primary bg-primary/10 font-bold">Beta</Badge>
+  - The **Create Access Tokens** grant
   - The **Manage all access tokens and API clients** grant
-  - The **Manage all company settings** grant
+
+Users with the **Create Access Tokens** grant can generate, list, and revoke access tokens they own without administrator involvement. This grant does not allow listing or revoking tokens owned by other users.
+Users with the **Manage all access tokens and API clients** grant can generate access tokens and list and revoke any access token owned by any user.
 
 For more information about security roles and grants, see [Managing Custom Roles](/s/article/360043438973).
 
-<Warning>**Important:** Treat access tokens like a password. Do not share them, hard-code them in scripts, or commit them to version control. An access token grants the same level of access as the user account it belongs to. If the user's permissions change, the token's access level changes accordingly.</Warning>
-
-## Self-serve Access Token Creation <Badge className="text-primary bg-primary/10 font-bold">Beta</Badge>
-
-<Note>
-  **Note:** This feature is in beta. Beta Program participants can enable
-  features [here](https://embed.domo.com/embed/pages/DQ8Ek). To join the Beta
-  Program, fill out [this form](https://embed.domo.com/embed/pages/K8GMx). For beta questions or feedback, email
-  [beta.admin@domo.com](mailto:beta.admin@domo.com).
-</Note>
-
-Users with the **Create Access Tokens** grant can generate, view, and revoke access tokens they own without administrator involvement. This grant does not allow viewing or revoking tokens owned by other users.
-
-Users who already have the **Manage all access tokens and API clients** grant receive the **Create Access Tokens** grant automatically when this feature is enabled for your instance.
-
-<Note>**Note:** As part of the self-serve beta, all users—including Domo administrators—are prevented from creating access tokens on behalf of another user. Administrators retain the ability to view and revoke any token on the instance.</Note>
+<Warning>**Important:** Treat access tokens like a password: Do not share them, hard-code them in scripts, or commit them to version control. Access tokens grant the same level of access as the user account they belong to. If the user's permissions change, the token's access level changes accordingly; revoking or restricting a user's access also limits what their tokens can do.</Warning>
 
 ## Generate an Access Token
 
@@ -49,13 +43,13 @@ Follow these steps to generate an access token:
    The **Manage access tokens** page displays.
 3. Select **+ Generate access token**.
 
-   <Frame>![Generate access token button](/images/kb/access-tokens-generate-button.png)</Frame>
+   <Frame>![Generate access token button](/images/kb/generate-access-token.jpg)</Frame>
 
 4. In the **Access token description** field, enter a name for the token. Use a name that helps you identify the token's purpose later.
-5. In the **Expire after** list, select how long before the token expires.
+5. In the **Expire after** list, select the lifespan of the token.
 6. Select **Generate**.
 
-   <Frame>![Generate access token dialog](/images/kb/access-tokens-generate-dialog.png)</Frame>
+   <Frame>![Generate access token dialog](/images/kb/access-token-details.png)</Frame>
 
 7. Copy the token and store it somewhere secure. The token does not display again after you close this dialog.
 
@@ -63,9 +57,9 @@ Follow these steps to generate an access token:
 
 ## View Your Access Tokens
 
-After navigating to the **Manage access tokens** page, your active tokens are listed in the table. The table displays each token's description, creation date, expiration date, and status.
+After navigating to the **Manage access tokens** page, your access tokens are listed in the table. The table displays each token's description, creation date, expiration date, and status.
 
-If you have the **Manage all access tokens and API clients** grant or an Admin role, you can view all tokens issued on the Domo instance. You can search by user name or token name.
+If you have the **Manage all access tokens and API clients** grant or the Admin system role, you can view all tokens issued on the Domo instance. You can search by user name or token name.
 
 ## Revoke an Access Token
 
@@ -80,16 +74,18 @@ Follow these steps to revoke an access token:
 
 <Note>**Note:** There is no confirmation dialog after selecting **Revoke**. Verify you are revoking the correct token before proceeding.</Note>
 
+If you have the **Manage all access tokens and API clients** grant or the Admin system role, you can revoke any access token in the Domo instance.
+
 ## FAQ
 
 <AccordionGroup>
 
-<Accordion title="Can admins create access tokens for other users?">
-  No. The ability to create tokens on behalf of another user has been removed for all users, including Domo administrators. Each user creates and manages their own tokens.
+<Accordion title="Are access tokens sensitive? What if a token is compromised?">
+  Yes. Treat access tokens like a password: Do not share them, hard-code them in scripts, or commit them to version control. Revoke any token you believe may have been compromised. Users with the ability to create access tokens can also revoke tokens they own. Administrators of your Domo instance can revoke any access token.
 </Accordion>
 
-<Accordion title="What happens to existing access tokens when this feature is enabled?">
-  Existing tokens are not affected. Tokens issued before the feature is enabled retain their original expiration dates and continue to work normally.
+<Accordion title="Can admins create access tokens for other users?">
+  No. Each user creates and manages their own tokens. Previously, Domo administrators were able to generate access tokens on behalf of other users.
 </Accordion>
 
 <Accordion title="Is there a limit to how many access tokens I can have?">

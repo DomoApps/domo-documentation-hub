@@ -1,0 +1,103 @@
+---
+title: "Access Tokens"
+---
+
+## Intro
+
+This article explains how to generate, view, and revoke access tokens in Domo.
+
+---
+
+## Required Grants
+
+To generate access tokens, you need one of the following:
+
+- An Admin security role
+- A custom role with at least one of the following grants:
+  - The **Create Access Tokens** grant <Badge className="text-primary bg-primary/10 font-bold">Beta</Badge>
+  - The **Manage all access tokens and API clients** grant
+  - The **Manage all company settings** grant
+
+For more information about security roles and grants, see [Managing Custom Roles](/s/article/360043438973).
+
+<Warning>**Important:** Treat access tokens like a password. Do not share them, hard-code them in scripts, or commit them to version control. An access token grants the same level of access as the user account it belongs to. If the user's permissions change, the token's access level changes accordingly.</Warning>
+
+## Self-serve Access Token Creation <Badge className="text-primary bg-primary/10 font-bold">Beta</Badge>
+
+<Note>
+  **Note:** This feature is in beta. Beta Program participants can enable
+  features [here](https://embed.domo.com/embed/pages/DQ8Ek). To join the Beta
+  Program, fill out [this form](https://embed.domo.com/embed/pages/K8GMx). For beta questions or feedback, email
+  [beta.admin@domo.com](mailto:beta.admin@domo.com).
+</Note>
+
+Users with the **Create Access Tokens** grant can generate, view, and revoke access tokens they own without administrator involvement. This grant does not allow viewing or revoking tokens owned by other users.
+
+Users who already have the **Manage all access tokens and API clients** grant receive the **Create Access Tokens** grant automatically when this feature is enabled for your instance.
+
+<Note>**Note:** As part of the self-serve beta, all users—including Domo administrators—are prevented from creating access tokens on behalf of another user. Administrators retain the ability to view and revoke any token on the instance.</Note>
+
+## Generate an Access Token
+
+<Note>**Note:** Generating an access token requires [elevation](/s/article/000005831). You are prompted to confirm your identity before proceeding.</Note>
+
+Follow these steps to generate an access token:
+
+1. From the navigation header, select **More** > **Admin**.
+   The Admin Settings display.
+2. Under **Authentication**, select **Access tokens**.
+   The **Manage access tokens** page displays.
+3. Select **+ Generate access token**.
+
+   <Frame>![Generate access token button](/images/kb/access-tokens-generate-button.png)</Frame>
+
+4. In the **Access token description** field, enter a name for the token. Use a name that helps you identify the token's purpose later.
+5. In the **Expire after** list, select how long before the token expires.
+6. Select **Generate**.
+
+   <Frame>![Generate access token dialog](/images/kb/access-tokens-generate-dialog.png)</Frame>
+
+7. Copy the token and store it somewhere secure. The token does not display again after you close this dialog.
+
+<Note>**Note:** Each user is limited to 50 active access tokens.</Note>
+
+## View Your Access Tokens
+
+After navigating to the **Manage access tokens** page, your active tokens are listed in the table. The table displays each token's description, creation date, expiration date, and status.
+
+If you have the **Manage all access tokens and API clients** grant or an Admin role, you can view all tokens issued on the Domo instance. You can search by user name or token name.
+
+## Revoke an Access Token
+
+Follow these steps to revoke an access token:
+
+1. From the navigation header, select **More** > **Admin**.
+   The Admin Settings display.
+2. Under **Authentication**, select **Access tokens**.
+   The **Manage access tokens** page displays.
+3. Locate the token you want to revoke. You can search by user name or token name.
+4. Select **Revoke**.
+
+<Note>**Note:** There is no confirmation dialog after selecting **Revoke**. Verify you are revoking the correct token before proceeding.</Note>
+
+## FAQ
+
+<AccordionGroup>
+
+<Accordion title="Can admins create access tokens for other users?">
+  No. The ability to create tokens on behalf of another user has been removed for all users, including Domo administrators. Each user creates and manages their own tokens.
+</Accordion>
+
+<Accordion title="What happens to existing access tokens when this feature is enabled?">
+  Existing tokens are not affected. Tokens issued before the feature is enabled retain their original expiration dates and continue to work normally.
+</Accordion>
+
+<Accordion title="Is there a limit to how many access tokens I can have?">
+  Yes. Each user is limited to 50 active access tokens at a time.
+</Accordion>
+
+<Accordion title="What is elevation, and why is it required?">
+  Elevation is an identity confirmation step Domo requires before performing sensitive actions. When you generate an access token, you are prompted to confirm your identity before proceeding. For more information, see [Elevation](/s/article/000005831).
+</Accordion>
+
+</AccordionGroup>

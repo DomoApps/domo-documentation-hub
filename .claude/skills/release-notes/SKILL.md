@@ -55,7 +55,7 @@ Follow this structure:
 ```
 Hello everyone!
 
-We're excited to announce that version <X.Y.Z> of the Domo Documentation Hub is now available! <one-sentence framing of the release's overall theme>
+We're excited to announce that version <X.Y.Z> of the Domo Documentation Hub is now available! <one-sentence framing of the release's overall theme> You can view these changes in our knowledge base at www.domo.com/docs.
 
 
 🌟 What's New

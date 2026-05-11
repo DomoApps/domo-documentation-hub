@@ -2,63 +2,90 @@
 title: "Snowflake Partitionコネクター"
 ---
 
-<Note>
-**注記：** Snowflakeは、2025年11月以降にユーザー名とパスワードによる認証メカニズムのサポートを終了します。そのため、このConnectorの提供を段階的に終了します。代わりに、以下のいずれかの接続方法の利用をご検討ください。
+<Note>**注記：**Snowflakeは、2025年11月以降にユーザー名とパスワードによる認証メカニズムのサポートを終了します。そのため、このConnectorの提供を段階的に終了します。代わりに、以下のいずれかの接続方法の利用をご検討ください。</Note>
 
-* [Cloud Amplifier](/ja/s/article/4402322966807 "フォローリンク")
-* [Snowflake KeyPair Partitionコネクター](/ja/s/article/1500000888261 "Snowflake KeyPair Partitionコネクター")
-* [Snowflake OAuth High Bandwidth With Advanced Partitions](/ja/s/article/4402638182935 "Snowflake OAuth High Bandwidth With Advanced Partitions")
-
-</Note>
+- [Cloud Amplifier](/ja/s/article/4402322966807)
+- [Snowflake KeyPair Partitionコネクター](/s/article/1500000888261)
+- [Snowflake OAuth High Bandwidth With Advanced Partitions](/s/article/4402638182935)
 
 ## はじめに
 
-Snowflakeは、クラウドベースのアナリティクスData Warehouseシステムです。Domo Snowflake Partitionコネクターを使用すると、指定した過去の日数にもとづいてSnowflake Data Warehouseからすべてのデータを簡単にDomoに取り込むことができます。データウェアハウジングソリューションとして既にSnowflakeを使用している場合、このコネクターは、SnowflakeとDomoを併用してデータを最大限に活用するために役立ちます。SnowflakeのデータがDomoに取り込まれると、他のすべてのDomoデータと組み合わせることで、最もミッションクリティカルなデータを集約して表示できます。Snowflake APIの詳細については、Snowflakeのウェブサイト（ [https://docs.snowflake.com/ja](https://docs.snowflake.com/ja "https://docs.snowflake.com/ja") ）を参照してください。
+Snowflakeは、クラウドベースのアナリティクスData Warehouseシステムです。Domo Snowflake Partitionコネクターを使用すると、指定した過去の日数にもとづいてSnowflake Data Warehouseからすべてのデータを簡単にDomoに取り込むことができます。データウェアハウジングソリューションとして既にSnowflakeを使用している場合、このコネクターは、SnowflakeとDomoを併用してデータを最大限に活用するために役立ちます。SnowflakeのデータがDomoに取り込まれると、他のすべてのDomoデータと組み合わせることで、最もミッションクリティカルなデータを集約して表示できます。Snowflake APIの詳細については、Snowflakeのウェブサイト（[https://docs.snowflake.com/ja](https://docs.snowflake.com/ja)）を参照してください。
 
-Data CenterでSnowflakeアカウントに接続します。このトピックでは、Snowflake Partitionコネクターのユーザインターフェースに固有のフィールドとメニューについて説明します。DataSetの追加や更新スケジュールの設定、DataSet情報の編集に関する一般的な情報は、「 [コネクターを使用してDataSetを追加する](/ja/s/article/360042926274 "コネクターを使用してDataSetを追加する") 」を参照してください。
+Data CenterでSnowflakeアカウントに接続します。このトピックでは、Snowflake Partitionコネクターのユーザインターフェースに固有のフィールドとメニューについて説明します。DataSetの追加や更新スケジュールの設定、DataSet情報の編集に関する一般的な情報は、「[コネクターを使用してDataSetを追加する](/ja/s/article/360042926274)」を参照してください。
 
 ## 必要条件
 
 Snowflakeアカウントに接続してDataSetを作成するには以下が必要です。
 
-* アカウントのフルネーム（Snowflakeが提供）。米国西部地域は ********account\_name******** 、その他の地域は ********account\_name.region\_id******** です。これはSnowflake URLの https://の 直後に続く部分です。
-
-  アカウントのフルネームには、アカウントがホストされる地域とクラウドプラットフォームを識別する追加のセグメントが含まれる場合があることに注意してください。以下の表に、クラウドプラットフォームまたは地域別のアカウント名の例を示します。各行では、アカウント名が「xy12345」であると仮定しています。
-
-  <Frame><img alt="Region.png" src="/images/kb/ka05w00000123Kp-00N5w00000Ri7BU-0EM5w000005vO5U.png"/></Frame>
-
-* Snowflakeホストに接続するために使用されるユーザー名とパスワード。
+- アカウントのフルネーム（Snowflakeが提供）。米国西部地域は********account\_name********、その他の地域は********account\_name.region\_id********です。これはSnowflake URLのhttps://の直後に続く部分です。  
+    
+  アカウントのフルネームには、アカウントがホストされる地域とクラウドプラットフォームを識別する追加のセグメントが含まれる場合があることに注意してください。以下の表に、クラウドプラットフォームまたは地域別のアカウント名の例を示します。各行では、アカウント名が「xy12345」であると仮定しています。<img alt="Region.png" src="/images/kb/ja/0EM5w000005vO8h.png" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/>
+- Snowflakeホストに接続するために使用されるユーザー名とパスワード。
 
 ## Snowflakeアカウントに接続する
 
-このセクションでは、 Snowflake Partition コネクターページの **［認証情報］** ペインと **［詳細］** ペインのオプションについて説明します。このページのほかのペインの項目である **［スケジュール設定］** や **［DataSetに名前を付け、説明を入力］** に関しては、ほとんどのタイプのコネクターで共通しています。詳細については、「 [コネクターを使用してDataSetを追加する](/ja/s/article/360042926274 "コネクターを使用してDataSetを追加する") 」を参照してください。
+このセクションでは、Snowflake Partitionコネクターページの**［認証情報］**ペインと**［詳細］**ペインのオプションについて説明します。このページのほかのペインの項目である**［スケジュール設定］**や**［DataSetに名前を付け、説明を入力］**に関しては、ほとんどのタイプのコネクターで共通しています。詳細については、「[コネクターを使用してDataSetを追加する](/ja/s/article/360042926274)」を参照してください。
 
 ## ［認証情報］ペイン
 
 このペインには、（サードパーティツールの）アカウントに接続するための認証情報を入力するフィールドがあります。下の表は、各フィールドに必要な内容を説明しています。
 
-<table border="1" cellpadding="1" cellspacing="1" data-aura-rendered-by="33:207;a"><thead><tr><th colspan="1" rowspan="1"><p><span class="s1"> フィールド </span></p></th><th colspan="1" rowspan="1"><p><span class="s1"> 説明 </span></p></th></tr></thead><tbody><tr><td colspan="1" rowspan="1"> Account Name </td><td colspan="1" rowspan="1"> アカウントの名前（Snowflakeが提供）を入力します。米国西部地域は <b> account_name </b> 、その他の地域は <b> account_name.region_id </b> です。 </td></tr><tr><td colspan="1" rowspan="1"> Username </td><td colspan="1" rowspan="1"> Snowflakeホストに関連付けられたユーザー名を入力します。 </td></tr><tr><td colspan="1" rowspan="1"> Password </td><td colspan="1" rowspan="1"> Snowflakeホストに関連付けられたパスワードを入力します。 </td></tr><tr><td colspan="1" rowspan="1"> Role </td><td colspan="1" rowspan="1"> 権限を入力します。 </td></tr></tbody></table>
+| フィールド        | 説明                                                                                           |
+| ------------ | -------------------------------------------------------------------------------------------- |
+| Account Name | アカウントの名前（Snowflakeが提供）を入力します。米国西部地域は**account\_name**、その他の地域は**account\_name.region\_id**です。 |
+| Username     | Snowflakeホストに関連付けられたユーザー名を入力します。                                                             |
+| Password     | Snowflakeホストに関連付けられたパスワードを入力します。                                                             |
+| Role         | 権限を入力します。                                                                                    |
 
-有効なSnowflakeの認証情報を一度入力しておくと、随時同じアカウントを使用して新しいSnowflake Partition DataSetを作成することができます。コネクターアカウントは、Data Centerの **［アカウント］** タブで管理できます。このタブの詳細については、「 [コネクター/アダプターアカウントを管理する](/ja/s/article/360042926054 "コネクター/アダプターアカウントを管理する") 」を参照してください。
+有効なSnowflakeの認証情報を一度入力しておくと、随時同じアカウントを使用して新しいSnowflake Partition DataSetを作成することができます。コネクターアカウントは、Data Centerの **［アカウント］**タブで管理できます。このタブの詳細については、「[コネクター/アダプターアカウントを管理する](/ja/s/article/360042926054)」を参照してください。
 
 ## ［詳細］ペイン
 
 このペインでは、SQLクエリを作成して、データベースからデータを取得します。特定のデータベース表とパーティション列を選択できます。また、データを取得したい過去の日数を入力できます。
 
-<table border="1" cellpadding="1" cellspacing="1" data-aura-rendered-by="33:207;a"><thead><tr><th colspan="1" rowspan="1"><p> メニュー </p></th><th colspan="1" rowspan="1"><p> 説明 </p></th></tr></thead><tbody><tr><td colspan="1" rowspan="1"><span> How would you like to import data into Domo? </span></td><td colspan="1" rowspan="1"><p><span></span><span> 標準の更新方法（置き換え/追加）、パーティション、またはUpsertモードのどれを使用してデータをインポートするかを選択します。 </span></p></td></tr><tr><td colspan="1" rowspan="1"><span> How would you like to build your Query? </span></td><td colspan="1" rowspan="1"><table border="1"><thead><tr><td colspan="1" rowspan="1"><span> クエリタイプ </span></td><td colspan="1" rowspan="1"> 説明 </td></tr></thead><tbody><tr><td colspan="1" rowspan="1"> Custom Query </td><td colspan="1" rowspan="1"><span> 実行するSQLクエリを入力します。 </span></td></tr><tr><td colspan="1" rowspan="1"> Query Builder </td><td colspan="1" rowspan="1"><span> クエリを自動生成する表とフィールドを選択します。 </span></td></tr></tbody></table></td></tr><tr><td colspan="1" rowspan="1"> Query </td><td colspan="1" rowspan="1"><span> 実行するクエリを入力します。クエリの形式は、次のようにする必要があります。select * from </span><span class="pl-cce"> \" </span><span> databaseName </span><span class="pl-cce"> \" </span><span>. </span><span class="pl-cce"> \" </span><span> schemaName </span><span class="pl-cce"> \" </span><span>. </span><span class="pl-cce"> \" </span><span> tableName </span><span class="pl-cce"> \" </span></td></tr><tr><td colspan="1" rowspan="1"> Warehouses </td><td colspan="1" rowspan="1"> 取得したいデータが格納されているウェアハウスを選択します。このリストには、認証情報にもとづいてアクセス権のあるすべてのウェアハウスが表示されます。 </td></tr><tr><td colspan="1" rowspan="1"> Databases </td><td colspan="1" rowspan="1"> 取得したいデータが格納されているデータベースを選択します。このリストには、認証情報にもとづいてアクセス権のあるすべてのデータベースが表示されます。 </td></tr><tr><td colspan="1" rowspan="1"> Schemas </td><td colspan="1" rowspan="1"> 取得したいデータが格納されているデータベーススキーマを選択します。このリストには、認証情報にもとづいてアクセス権のあるすべてのスキーマが表示されます。 </td></tr><tr><td colspan="1" rowspan="1"> Database Objects </td><td colspan="1" rowspan="1"> 取得したいデータが格納されているデータベースオブジェクトを選択します。このリストには、認証情報にもとづいてアクセス権のあるすべてのオブジェクトが表示されます。 </td></tr><tr><td colspan="1" rowspan="1"> Tables </td><td colspan="1" rowspan="1"> 取得するデータベース表を選択します。このリストには、認証情報にもとづいてアクセス権のあるすべての表が表示されます。データベース表を選択しない場合は、コネクターはデータベーススキーマ全体を取得します。 </td></tr><tr><td colspan="1" rowspan="1"> Views </td><td colspan="1" rowspan="1"> ビューを選択します。 </td></tr><tr><td colspan="1" rowspan="1"> Table Column Name </td><td colspan="1" rowspan="1"> パーティション列の名前を選択します。 </td></tr><tr><td colspan="1" rowspan="1"><span> Table Query Helper </span></td><td colspan="1" rowspan="1"><p> 選択したフィールドにもとづいてクエリが生成されます。このテキストをコピーして、［QUERY］フィールドに貼り付けます。必要に応じてこのクエリを編集します。 </p></td></tr><tr><td colspan="1" rowspan="1"> View Column Name </td><td colspan="1" rowspan="1"> パーティション列の名前を選択します。 </td></tr><tr><td colspan="1" rowspan="1"><span> View Query Helper </span></td><td colspan="1" rowspan="1"> 選択したフィールドにもとづいてクエリが生成されます。このテキストをコピーして、［QUERY］フィールドに貼り付けます。必要に応じてこのクエリを編集します。 </td></tr><tr><td colspan="1" rowspan="1"><span> Partition Criteria </span></td><td colspan="1" rowspan="1"><span> 日付のキー、日付以外のキー、またはメタクエリを使用してデータをパーティション分割するかどうかを選択します。 </span></td></tr><tr><td colspan="1" rowspan="1"><span> Partition Column Name </span></td><td colspan="1" rowspan="1"><span> パーティション列の名前を選択します。このディスカバリーには日付フィールドのみが表示されます。 </span></td></tr><tr><td colspan="1" rowspan="1"><span> Partition Support Format </span></td><td colspan="1" rowspan="1"><span> パーティションサポートの形式を選択します。 </span></td></tr><tr><td colspan="1" rowspan="1"><span> Partition Non Date Key Column Name </span></td><td colspan="1" rowspan="1"><span> データをパーティション分割する日付以外のキーの列名を選択します。このドロップダウンには、［Date］フィールドを除くすべてのフィールドが表示されます。 </span></td></tr><tr><td colspan="1" rowspan="1"><span> Partition Query to determine partition tags </span></td><td colspan="1" rowspan="1"><p><span> パーティションタグ（キー）を特定するために、パーティションメタクエリを入力します。 <b> ［Date］ </b> データを含む列が、パーティション列です。 </span></p><p><span> 例：SELECT DISTINCT (DATE_COLUMN_NAME) FROM TABLENAME </span></p></td></tr><tr><td colspan="1" rowspan="1"> Past Days </td><td colspan="1" rowspan="1"> データを取得する過去の日数を入力します。値はXとすることができ、この場合Xは正の整数です。例：30。 </td></tr><tr><td colspan="1" rowspan="1"> Past Years </td><td colspan="1" rowspan="1"><span> データを取得する過去の年数を入力します。値はXとすることができ、この場合Xは正の整数です。例：30。 </span></td></tr><tr><td colspan="1" rowspan="1"> Future Years </td><td colspan="1" rowspan="1"><span> データを取得する未来の年数を入力します。値はXとすることができ、この場合Xは正の整数です。例：30 </span></td></tr><tr><td colspan="1" rowspan="1"> Past Months </td><td colspan="1" rowspan="1"><span> データを取得する過去の月数を入力します。値はXとすることができ、この場合Xは正の整数です。例：30 </span></td></tr><tr><td colspan="1" rowspan="1"> Future Months </td><td colspan="1" rowspan="1"><span> データを取得する未来の月数を入力します。値はXとすることができ、この場合Xは正の整数です。例：30 </span></td></tr><tr><td colspan="1" rowspan="1"> Date Format </td><td colspan="1" rowspan="1"><span> パーティション列にある日付形式に従って、正しい日付形式を選択/入力してください。デフォルトでは、 <b> yyyy-MM-dd </b> が使用されます。 </span></td></tr><tr><td colspan="1" rowspan="1"> Custom Date Format </td><td colspan="1" rowspan="1"> カスタマイズされた日付形式を入力します。 </td></tr><tr><td colspan="1" rowspan="1"><span> Upsert Key Column(s) </span></td><td colspan="1" rowspan="1"><span> Upsertキー列名またはUpsertキー列名のカンマ区切りのリストを入力します。 <b> 更新方法がMergeの場合にのみ必要です </b> 。 </span></td></tr><tr><td colspan="1" rowspan="1"> Query Tag </td><td colspan="1" rowspan="1"><span> SnowflakeでConnector SQLの実行に <b> クエリタグ </b> としてタグ付けするために使用できるオプションのパラメーターです。 </span></td></tr></tbody></table>
+| メニュー | 説明  |
+| ---- | --- |
+| How would you like to import data into Domo? | 標準の更新方法（置き換え/追加）、パーティション、またはUpsertモードのどれを使用してデータをインポートするかを選択します。 |
+| How would you like to build your Query?<table><thead><tr><th>クエリタイプ</th><th>説明</th></tr></thead><tbody><tr><td>Custom Query</td><td>実行するSQLクエリを入力します。</td></tr><tr><td>Query Builder</td><td>クエリを自動生成する表とフィールドを選択します。</td></tr></tbody></table> |     |
+| Query | 実行するクエリを入力します。クエリの形式は、次のようにする必要があります。select \* from \"databaseName\".\"schemaName\".\"tableName\" |
+| Warehouses | 取得したいデータが格納されているウェアハウスを選択します。このリストには、認証情報にもとづいてアクセス権のあるすべてのウェアハウスが表示されます。 |
+| Databases | 取得したいデータが格納されているデータベースを選択します。このリストには、認証情報にもとづいてアクセス権のあるすべてのデータベースが表示されます。 |
+| Schemas | 取得したいデータが格納されているデータベーススキーマを選択します。このリストには、認証情報にもとづいてアクセス権のあるすべてのスキーマが表示されます。 |
+| Database Objects | 取得したいデータが格納されているデータベースオブジェクトを選択します。このリストには、認証情報にもとづいてアクセス権のあるすべてのオブジェクトが表示されます。 |
+| Tables | 取得するデータベース表を選択します。このリストには、認証情報にもとづいてアクセス権のあるすべての表が表示されます。データベース表を選択しない場合は、コネクターはデータベーススキーマ全体を取得します。 |
+| Views | ビューを選択します。 |
+| Table Column Name | パーティション列の名前を選択します。 |
+| Table Query Helper | 選択したフィールドにもとづいてクエリが生成されます。このテキストをコピーして、［QUERY］フィールドに貼り付けます。必要に応じてこのクエリを編集します。 |
+| View Column Name | パーティション列の名前を選択します。 |
+| View Query Helper | 選択したフィールドにもとづいてクエリが生成されます。このテキストをコピーして、［QUERY］フィールドに貼り付けます。必要に応じてこのクエリを編集します。 |
+| Partition Criteria | 日付のキー、日付以外のキー、またはメタクエリを使用してデータをパーティション分割するかどうかを選択します。 |
+| Partition Column Name | パーティション列の名前を選択します。このディスカバリーには日付フィールドのみが表示されます。 |
+| Partition Support Format | パーティションサポートの形式を選択します。 |
+| Partition Non Date Key Column Name | データをパーティション分割する日付以外のキーの列名を選択します。このドロップダウンには、［Date］フィールドを除くすべてのフィールドが表示されます。 |
+| Partition Query to determine partition tags | パーティションタグ（キー）を特定するために、パーティションメタクエリを入力します。**［Date］**データを含む列が、パーティション列です。  例：SELECT DISTINCT (DATE\_COLUMN\_NAME) FROM TABLENAME |
+| Past Days | データを取得する過去の日数を入力します。値はXとすることができ、この場合Xは正の整数です。例：30。 |
+| Past Years | データを取得する過去の年数を入力します。値はXとすることができ、この場合Xは正の整数です。例：30。 |
+| Future Years | データを取得する未来の年数を入力します。値はXとすることができ、この場合Xは正の整数です。例：30 |
+| Past Months | データを取得する過去の月数を入力します。値はXとすることができ、この場合Xは正の整数です。例：30 |
+| Future Months | データを取得する未来の月数を入力します。値はXとすることができ、この場合Xは正の整数です。例：30 |
+| Date Format | パーティション列にある日付形式に従って、正しい日付形式を選択/入力してください。デフォルトでは、**yyyy-MM-dd**が使用されます。 |
+| Custom Date Format | カスタマイズされた日付形式を入力します。 |
+| Upsert Key Column(s) | Upsertキー列名またはUpsertキー列名のカンマ区切りのリストを入力します。**更新方法がMergeの場合にのみ必要です**。 |
+| Query Tag | SnowflakeでConnector SQLの実行に**クエリタグ**としてタグ付けするために使用できるオプションのパラメーターです。 |
 
 ### 更新モードを選択する
 
-データをどのようにDomoにインポートするか （標準の更新モード（置き換え/追加）、パーティション、またはUpsertモードを使用する）を決定したら、コネクターの **［スケジュール設定］** セクションで該当する更新モードを選択する必要があります。
+データをどのようにDomoにインポートするか（標準の更新モード（置き換え/追加）、パーティション、またはUpsertモードを使用する）を決定したら、コネクターの**［スケジュール設定］**セクションで該当する更新モードを選択する必要があります。
 
-* ［詳細］セクションで［USE PARTITION］を選択した場合は、［スケジュール設定］セクションで［Append］更新モードを選択する必要があります
+- ［詳細］セクションで［USE PARTITION］を選択した場合は、［スケジュール設定］セクションで［Append］更新モードを選択する必要があります
 
-<Frame><img alt="Partition-Append.png" src="/images/kb/ka0Vq000000BWXd-00N5w00000Ri7BU-0EM5w000005vO8o.png"/></Frame>
+<Frame>![Partition-Append.png](/images/kb/ja/0EM5w000005vO8o.png)</Frame>
 
-* ［詳細］セクションで［USE UPSERT］を選択した場合は、［スケジュール設定］セクションで［Merge］更新モードを選択する必要があります。
+- ［詳細］セクションで［USE UPSERT］を選択した場合は、［スケジュール設定］セクションで［Merge］更新モードを選択する必要があります。
 
-<Frame><img alt="Upsert-Merge.png" src="/images/kb/ka0Vq000000BWXd-00N5w00000Ri7BU-0EM5w000005vO8n.png"/></Frame>
+<Frame>![Upsert-Merge.png](/images/kb/ja/0EM5w000005vO8n.png)</Frame>
 
 ## その他のペイン
 
-スケジュール設定、再試行、更新に関するオプションなど、コネクターインターフェースのその他のペインに表示されるオプションについては、「 [コネクターを使用してDataSetを追加する](/ja/s/article/360042926274 "コネクターを使用してDataSetを追加する") 」を参照してください。
+スケジュール設定、再試行、更新に関するオプションなど、コネクターインターフェースのその他のペインに表示されるオプションについては、「[コネクターを使用してDataSetを追加する](/ja/s/article/360042926274)」を参照してください。

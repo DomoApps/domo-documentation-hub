@@ -2,160 +2,133 @@
 title: "Snowflake Writebackコネクター"
 ---
 
-**注記：** **Snowflakeは2025年11月以降、ユーザー名とパスワードによる認証メカニズムのサポートを終了します。そのため、このConnectorは以下のスケジュールで提供を段階的に終了します。
-  
-- 2025年8月1日(米国時間): このConnectorを使った新規DataSetの作成が出来なくなります。既存のDataSetの更新は継続されます。
-  
-- 2025年10月1日(米国時間): このConnectorを使ったすべてのDataSetの更新が停止します。
-  
+<Note>
+
+**注記：** **Snowflakeは2025年11月以降、ユーザー名とパスワードによる認証メカニズムのサポートを終了します。そのため、このConnectorは以下のスケジュールで提供を段階的に終了します。  
+- 2025年8月1日(米国時間): このConnectorを使った新規DataSetの作成が出来なくなります。既存のDataSetの更新は継続されます。  
+- 2025年10月1日(米国時間): このConnectorを使ったすべてのDataSetの更新が停止します。  
 代わりに、以下のいずれかの接続方法のご利用をご検討ください。**
 
-* [Cloud Amplifier](/ja/s/article/4402322966807 "Cloud Amplifier")
-* [Snowflake OAuth Writebackコネクター](/ja/s/article/1500011338741 "Snowflake OAuth Writebackコネクター")
-* [Snowflake Key Pair Authentication Writebackコネクター](/ja/s/article/360058760154 "Snowflake Key Pair Authentication Writebackコネクター")
+</Note>
+
+- [Cloud Amplifier](/ja/s/article/4402322966807)
+- [Snowflake OAuth Writebackコネクター](/ja/s/article/1500011338741)
+- [Snowflake Key Pair Authentication Writebackコネクター](/ja/s/article/360058760154)
 
 ## はじめに
 
-Snowflakeは、すべてのデータを簡単にまとめて、分析する必要のあるすべてのユーザーとシステムが利用できるようにするData Warehouseです。DomoのSnowflake Writebackコネクターを使用すると、データをDomo DataSetからSnowflakeデータベースにプッシュすることができます。Snowflake APIの詳細については、 [https://docs.snowflake.net/manuals](https://docs.snowflake.net/manuals "https://docs.snowflake.net/manuals") を参照してください。
+Snowflakeは、すべてのデータを簡単にまとめて、分析する必要のあるすべてのユーザーとシステムが利用できるようにするData Warehouseです。DomoのSnowflake Writebackコネクターを使用すると、データをDomo DataSetからSnowflakeデータベースにプッシュすることができます。Snowflake APIの詳細については、[https://docs.snowflake.net/manuals](https://docs.snowflake.net/manuals)を参照してください。
 
-このトピックでは、Snowflake Writebackコネクターのユーザーインターフェースに固有のフィールドとメニューについて説明します。DataSetの追加や更新スケジュールの設定、DataSet情報の編集に関する一般的な情報は、「 [コネクターを使用してDataSetを追加する](/ja/s/article/360042926274 "コネクターを使用してDataSetを追加する") 」を参照してください。
+このトピックでは、Snowflake Writebackコネクターのユーザーインターフェースに固有のフィールドとメニューについて説明します。DataSetの追加や更新スケジュールの設定、DataSet情報の編集に関する一般的な情報は、「[コネクターを使用してDataSetを追加する](/s/article/360042926274)」を参照してください。
 
 ## 必要条件
 
 Snowflakeデータベースに接続し、DataSetを作成するには、以下が必要です。
 
-* アカウントのフルネーム（Snowflakeが提供）。これは、Snowflake URLの
-  https:// の直後に続く部分です。
+- アカウントのフルネーム（Snowflakeが提供）。これは、Snowflake URLのhttps://の直後に続く部分です。  
     
-  アカウントのフルネームには、アカウントがホストされる地域とクラウドプラットフォームを識別する追加のセグメントが含まれる場合があることに注意してください。以下の表に、クラウドプラットフォームまたは地域別のアカウント名の例を示します。各行に対して、アカウント名が「xy12345」であると仮定しています。
-    
-  <Frame><img alt="snowflake_account_names.png" src="/images/kb/ka05w00000123Kt-00N5w00000Ri7BU-0EM5w000005vO5S.png"/></Frame>
+  アカウントのフルネームには、アカウントがホストされる地域とクラウドプラットフォームを識別する追加のセグメントが含まれる場合があることに注意してください。以下の表に、クラウドプラットフォームまたは地域別のアカウント名の例を示します。各行に対して、アカウント名が「xy12345」であると仮定しています。<img alt="snowflake_account_names.png" src="/images/kb/ja/0EM5w000005wLoC.png" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/>
+- Snowflakeアカウントのユーザー名とパスワード。
+- DomoクライアントIDとクライアントシークレット。これらの認証情報を取得するには、次の手順を実行します。
 
-* Snowflakeアカウントのユーザー名とパスワード。
-* DomoクライアントIDとクライアントシークレット。これらの認証情報を取得するには、次の手順を実行します。
+  1. Domoデベロッパーアカウント（[https://developer.domo.com/login](https://developer.domo.com/login)）にログインします。
+  2. [新しいクライアントを作成します](https://developer.domo.com/new-client)。
 
-  1. Domoデベロッパーアカウント（[https://developer.domo.com/login](https://developer.domo.com/login "https://developer.domo.com/login") ）にログインします。
-  2. [新しいクライアントを作成します](https://developer.domo.com/new-client "DomoからS3 Writebackコネクター")。
+<Note>     **注記：**新しいクライアントを作成するときに、複数のDomoインスタンスを使用する場合は、必ず正しいインスタンスを使用してデベロッパーポータルにログインしてください。</Note>
+  3. クライアントを作成するときは、すべてのスコープ（［Account］、［Audit］、［Buzz］、［Data］、［Dashboard］、［User］、［Workflow］）を選択します。  
+  <Frame>![](/images/kb/ja/0EM5w000005wLoD.png)</Frame>
+  4. ****［Create］****をクリックします。
 
-     <Note>
-     **注記：** 新しいクライアントを作成するときに、複数のDomoインスタンスを使用する場合は、必ず正しいインスタンスを使用してデベロッパーポータルにログインしてください。
+**重要**：Snowflakeでは以下の権限が必要です
 
-     </Note>
-
-  3. クライアントを作成するときは、すべてのスコープ（［Account］、［Audit］、［Buzz］、［Data］、［Dashboard］、［User］、［Workflow］）を選択します。
-       
-     <Frame><img alt="snowflake_writeback_new_client.png" src="/images/kb/ka0Vq000000GnBF-00N5w00000Ri7BU-0EM5w000005vO9S.png"/></Frame>
-
-  4. ****［Create］**** をクリックします。
-
-     <Warning>
-      **重要** ：Snowflakeでは以下の権限が必要です
-
-      * CREATE TABLE
-      * COPY INTO
-      * PUT
-      * CREATE FILE FORMAT
-      * REMOVE
-      * LIST
-
-     </Warning>
+- CREATE TABLE
+- COPY INTO
+- PUT
+- CREATE FILE FORMAT
+- REMOVE
+- LIST
 
 ## 接続を設定する
 
-このセクションでは、Snowflake Writebackコネクターページの **［認証情報］** および **［詳細］** ペインのオプションについて説明します。このページのほかのペインの項目である **［スケジュール設定］** や **［DataSetに名前を付け、説明を入力］** に関しては、ほとんどのタイプのコネクターで共通しています。詳細については「 [コネクターを使用してDataSetを追加する](/ja/s/article/360042926274 "コネクターを使用してDataSetを追加する") 」を参照してください。
+このセクションでは、Snowflake Writebackコネクターページの**［認証情報］**および**［詳細］**ペインのオプションについて説明します。このページのほかのペインの項目である**［スケジュール設定］**や**［DataSetに名前を付け、説明を入力］**に関しては、ほとんどのタイプのコネクターで共通しています。詳細については「[コネクターを使用してDataSetを追加する](/s/article/360042926274)」を参照してください。
 
 ### ［認証情報］ペイン
 
 このペインには、DomoデベロッパーアカウントとSnowflakeアカウントの認証情報を入力するためのフィールドが含まれています。下表は、各フィールドに必要な内容を説明しています。
 
-<table border="1" cellpadding="1" cellspacing="1" data-aura-rendered-by="33:195;a"><thead><tr><th colspan="1" rowspan="1"><p> フィールド </p></th><th colspan="1" rowspan="1"><p> 説明 </p></th></tr></thead><tbody><tr><td colspan="1" rowspan="1"><p> Account Name </p></td><td colspan="1" rowspan="1"><p> Snowflakeアカウント名を入力します。アカウント名を検索する方法については、「 <a target="_blank" title="Snowflake Writebackコネクター"> 必要条件 </a> 」を参照してください。 </p></td></tr><tr><td colspan="1" rowspan="1"><p> Username </p></td><td colspan="1" rowspan="1"><p> Snowflakeアカウントに関連するユーザー名を入力します。 </p></td></tr><tr><td colspan="1" rowspan="1"><p> Password </p></td><td colspan="1" rowspan="1"><p> Snowflakeアカウントに関連するパスワードを入力します。 </p></td></tr><tr><td colspan="1" rowspan="1"><p> Role </p></td><td colspan="1" rowspan="1"><p> 権限を入力します。 </p></td></tr><tr><td colspan="1" rowspan="1"><p> Domo Client ID </p></td><td colspan="1" rowspan="1"><p> DomoクライアントIDを入力します。 </p></td></tr><tr><td colspan="1" rowspan="1"><p> Domo Client Secret </p></td><td colspan="1" rowspan="1"><p> Domoクライアントシークレットを入力します。 </p></td></tr></tbody></table>
+| フィールド              | 説明                                                        |
+| ------------------ | --------------------------------------------------------- |
+| Account Name       | Snowflakeアカウント名を入力します。アカウント名を検索する方法については、「必要条件」を参照してください。 |
+| Username           | Snowflakeアカウントに関連するユーザー名を入力します。                           |
+| Password           | Snowflakeアカウントに関連するパスワードを入力します。                           |
+| Role               | 権限を入力します。                                                 |
+| Domo Client ID     | DomoクライアントIDを入力します。                                       |
+| Domo Client Secret | Domoクライアントシークレットを入力します。                                   |
 
-有効な認証情報を入力すると、いつでも同じアカウントを使用してSnowflake Writeback DataSetを作成することができます。コネクターのアカウントは Data Center の **［アカウント］** タブで管理できます。このタブの詳細については、「 [コネクターのユーザーアカウントを管理する](/ja/s/article/360042926054 "コネクターのユーザーアカウントを管理する") 」を参照してください。
+有効な認証情報を入力すると、いつでも同じアカウントを使用してSnowflake Writeback DataSetを作成することができます。コネクターのアカウントはData Centerの**［アカウント］**タブで管理できます。このタブの詳細については、「[コネクターのユーザーアカウントを管理する](/s/article/360042926054)」を参照してください。
 
 ### ［詳細］ペイン
 
 このペインには、SQLクエリを入力したり、取得するデータの場所を指定したりするための多数のフィールドとメニューがあります。
 
-<table border="1" cellpadding="1" cellspacing="1" data-aura-rendered-by="33:195;a"><thead><tr><th colspan="1" rowspan="1"><p> パラメーター </p></th><th colspan="1" rowspan="1"><p> 説明 </p></th></tr></thead><tbody><tr><td colspan="1" rowspan="1"><p> Input DataSet ID </p></td><td colspan="1" rowspan="1"><p> SnowflakeにコピーするDataSetのDataSet ID（GUID）を入力します。Data CenterでDataSetの詳細ビューを開き、URLの <span class="mt-font-courier-new"> datasources/ </span> に続く箇所で、IDを見つけることができます。例えば、URLが <span class="nowiki"><span class="mt-font-courier-new"><a href="https://mycompany.domo.com/datasources/845305d8-da3d-4107-a9d6-13ef3f86d4a4/details/overview" rel="noopener" target="_blank"> https://mycompany.domo.com/datasources/845305d8-da3d-4107-a9d6-13ef3f86d4a4/details/overview </a></span></span> であれば、DataSet IDは <span class="mt-font-courier-new"> 845305d8-da3d-4107-a9d6-13ef3f86d4a4 </span> になります。 </p></td></tr><tr><td colspan="1" rowspan="1"><p> Select Table Name </p></td><td colspan="1" rowspan="1"><p> データがコピーされるテーブルの命名方法を選択します。 </p><ul><li><p><b><b> ［Use Input DataSet GUID］ </b></b> 。テーブル名は、 <b> ［Input </b><b><b> DataSet ID］ </b></b> に入力した番号になります。 </p></li><li><p><b><b> ［Use Input DataSet Name］ </b></b> 。テーブル名は、入力DataSetの名前と同じになります。 </p></li><li><p><b> ［Enter Table Name］ </b> 。 <b><b> ［Custom Table Name］ </b></b> フィールドにテーブルのカスタム名を入力します。 </p></li></ul></td></tr><tr><td colspan="1" rowspan="1"><p> Enter Table Name </p></td><td colspan="1" rowspan="1"><p> データをコピーするSnowflakeテーブルの名前を入力します（スペースや特殊文字はアンダースコアに置き換えられます）。 </p></td></tr><tr><td colspan="1" rowspan="1"><p> Warehouses </p></td><td colspan="1" rowspan="1"><p> データを送信したいテーブルが格納されているウェアハウスを選択します。 </p></td></tr><tr><td colspan="1" rowspan="1"><p> Databases </p></td><td colspan="1" rowspan="1"><p> データを送信したいテーブルが格納されているデータベースを選択します。 </p></td></tr><tr><td colspan="1" rowspan="1"><p> Database Schema </p></td><td colspan="1" rowspan="1"><p> 取得したいデータが含まれているデータベーススキーマを選択します。 </p></td></tr></tbody></table>
+| パラメーター            | 説明                                                                                                                                                                                                                                                                              |
+| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Input DataSet ID  | SnowflakeにコピーするDataSetのDataSet ID（GUID）を入力します。Data CenterでDataSetの詳細ビューを開き、URLのdatasources/に続く箇所で、IDを見つけることができます。例えば、URLがhttps://mycompany.domo.com/datasources/845305d8-da3d-4107-a9d6-13ef3f86d4a4/details/overviewであれば、DataSet IDは845305d8-da3d-4107-a9d6-13ef3f86d4a4になります。 |
+| Select Table Name | データがコピーされるテーブルの命名方法を選択します。   - ****［Use Input DataSet GUID］****。テーブル名は、**［Input** ****DataSet ID］****に入力した番号になります。 - ****［Use Input DataSet Name］****。テーブル名は、入力DataSetの名前と同じになります。 - **［Enter Table Name］**。****［Custom Table Name］****フィールドにテーブルのカスタム名を入力します。                  |
+| Enter Table Name  | データをコピーするSnowflakeテーブルの名前を入力します（スペースや特殊文字はアンダースコアに置き換えられます）。                                                                                                                                                                                                                    |
+| Warehouses        | データを送信したいテーブルが格納されているウェアハウスを選択します。                                                                                                                                                                                                                                              |
+| Databases         | データを送信したいテーブルが格納されているデータベースを選択します。                                                                                                                                                                                                                                              |
+| Database Schema   | 取得したいデータが含まれているデータベーススキーマを選択します。                                                                                                                                                                                                                                                |
 
 ### その他のペイン
 
-スケジュール設定、再試行、更新に関するオプションなど、コネクターインターフェースのその他のペインに表示されるオプションについては、 [「コネクターを使用してDataSetを追加する」](/ja/s/article/360042926274 "コネクターを使用してDataSetを追加する") を参照してください。
+スケジュール設定、再試行、更新に関するオプションなど、コネクターインターフェースのその他のペインに表示されるオプションについては、[「コネクターを使用してDataSetを追加する」](/s/article/360042926274)を参照してください。
 
 ### よくある質問
-
 <AccordionGroup>
+
 <Accordion title="このコネクターはいつ使用しますか？">
 
-
 Domo Snowflake Writebackコネクターを使用すると、ローカルユーザー名とパスワードを使って、データをDomo DataSetからSnowflakeインスタンスに書き込むことができます。コネクターをまだ有効にしていない場合は、Domoアカウントエグゼクティブにお問い合わせください。
-
-
 </Accordion>
 <Accordion title="Snowflakeではどの権限が必要ですか？">
 
-
 Snowflakeでは、CREATE TABLE、COPY INTO、PUT、CREATE FILE FORMAT、REMOVE、LISTの権限が必要です。
-
-
 </Accordion>
 <Accordion title="Snowflake Writebackコネクターを作成するにはどのような認証情報が必要ですか？">
 
-
 アカウントのフルネーム（Snowflakeが提供）、Domoデベロッパーアカウント認証情報（クライアントIDとクライアントシークレット）、Snowflake認証情報（ユーザ名とパスワード）が必要です。
-
-
 </Accordion>
 <Accordion title="DomoクライアントIDとクライアントシークレットはどこにありますか？">
 
-
 新規クライアントを作成するには：
 
-* [Domoデベロッパーアカウント](https://developer.domo.com/login) にログインします。
-* 右上隅の **［My Account］** の下にある **［New Client］** をクリックします。
-* アプリケーション名と説明を入力します。
-* **［Data］** と **［User］** のチェックボックスを選択して、アプリケーションのスコープを指定します。
-* **［Create］** をクリックします。
+- [Domoデベロッパーアカウント](https://developer.domo.com/login)にログインします。
+- 右上隅の**［My Account］**の下にある**［New Client］**をクリックします。
+- アプリケーション名と説明を入力します。
+- **［Data］**と**［User］**のチェックボックスを選択して、アプリケーションのスコープを指定します。
+- **［Create］**をクリックします。
 
-クライアントを作成したら、 **［Manage Client］** をクリックしてそのクライアントを管理できます。
-
-
+クライアントを作成したら、**［Manage Client］**をクリックしてそのクライアントを管理できます。
 </Accordion>
 <Accordion title="データはどれくらいの頻度で更新されますか？">
 
-
 必要に応じて何回でも更新できます。
-
-
 </Accordion>
 <Accordion title="注意すべきAPI制限はありますか？">
 
-
 制限は使用するサーバー構成によって異なります。
-
-
 </Accordion>
 <Accordion title="同一のSnowflake Writebackアカウントを複数のDataSetに使用できますか？">
 
-
 はい
-
-
 </Accordion>
 <Accordion title="Snowflakeデータベースに接続できない理由は？IPアドレスのホワイトリスト登録が必要でしょうか？">
 
-
-DomoでSnowflakeデータベースに接続する前に、接続するポート上のデータベースサーバーにある多数のIPアドレスをホワイトリストに登録する必要があります。IPアドレスの詳細なリストは、「 [コネクターとフェデレーテッドアダプターのIPアドレスをホワイトリストに登録する](/ja/s/article/360043630093) 」を参照してください。
-
-
+DomoでSnowflakeデータベースに接続する前に、接続するポート上のデータベースサーバーにある多数のIPアドレスをホワイトリストに登録する必要があります。IPアドレスの詳細なリストは、「[コネクターとフェデレーテッドアダプターのIPアドレスをホワイトリストに登録する](/s/article/360043630093)」を参照してください。
 </Accordion>
 <Accordion title="入力DataSet IDはどのように見つけることができますか？">
 
-
-Domoの入力DataSet IDは、データのエクスポート元となるDataSetのURLで見つけることができます。例：
-https://customer.domo.com/datasources/aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee/details/settings
-
-
-
+Domoの入力DataSet IDは、データのエクスポート元となるDataSetのURLで見つけることができます。例：https://customer.domo.com/datasources/aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee/details/settings
 </Accordion>
 </AccordionGroup>

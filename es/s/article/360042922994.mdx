@@ -1,0 +1,126 @@
+---
+title: "Creación de un DataFlow de SQL (Lenguaje de consulta estructurado)"
+---
+
+## Introducción
+
+Puede crear DataFlows con consultas SQL (Lenguaje de consulta estructurado). Se trata de un procedimiento más complicado que usar ETL (Extracción, transformación y carga), pero puede ofrecer un abanico de opciones más amplio. Para obtener información sobre la creación de un DataFlow de ETL (Extracción, transformación y carga), consulte [DataFlows de ETL (Extracción, transformación y carga)](/s/topic/0TO5w000000ZanvGAC).
+
+<Warning>
+**Importante:**Los DataSets de entrada de un DataFlow no se pueden restringir con las políticas de permisos personalizados de datos; todas las filas disponibles *deben* pasar por el DataFlow. Por ello, debe aplicar políticas de permisos personalizados de datos a los DataSets de salida generados por un DataFlow.
+</Warning>
+
+Al crear un DataFlow mediante un DataSet de entrada con políticas de permisos personalizados de datos en vigor, el DataFlow se rompe, a menos que se cumpla alguno de los siguientes criterios:
+
+- Tener un perfil de seguridad de "Administrador" o un rol personalizado con el privilegio "Administrar DataFlows" habilitado.
+- Ser el propietario del DataSet.
+- Formar parte de la política "Todas las filas". Esto le da acceso a todas las filas del DataSet.
+
+Para obtener información sobre el uso de los permisos personalizados de datos con DataFlows, consulte [Permisos personalizados de datos y DataFusions/DataFlows](/s/article/360043439333).
+
+Puede acceder a la interfaz para crear un DataFlow de SQL (Lenguaje de consulta estructurado) desde Data Center. Para obtener información sobre Data Center, consulte  [Diseño de Data Center](/s/article/360047553253).
+
+Siga este tutorial detallado para configurar un nuevo DataFlow con MySQL.
+
+## Creación de un DataFlow de SQL (Lenguaje de consulta estructurado)
+
+<Note>
+**Nota:** Redshift *no* admite procedimientos almacenados, como bien se documenta aquí: [http://docs.aws.amazon.com/redshift/latest/dg/c\_unsupported-postgresql-features.html](http://docs.aws.amazon.com/redshift/latest/dg/c_unsupported-postgresql-features.html). Como alternativa, use un DataFlow de MySQL, ya que MySQL sí admite los procedimientos almacenados.
+</Note>
+
+**Para crear un DataFlow de SQL (Lenguaje de consulta estructurado):**
+
+1. En Domo, haga clic en **> Data Center**.
+2. Haga clic en **SQL (Lenguaje de consulta estructurado)** en la barra de herramientas **Transformación Magic** en la parte superior de la ventana.
+
+   <Tip>
+   **Consejo:** También puede abrir el editor de DataFlow de SQL (Lenguaje de consulta estructurado) desde cualquier ubicación de Domo al seleccionar en la barra de herramientas de la aplicación y, a continuación, **Datos > SQL (Lenguaje de consulta estructurado)**.
+   </Tip>
+3. Seleccione el tipo de DataFlow que desea crear.  
+   A continuación, se abre la vista **Crear DataFlow**.
+4. Escriba un nombre y una descripción para el DataFlow.
+5. Seleccione los DataSets de entrada que desea incluir en el DataFlow; para ello, haga lo siguiente:
+
+   1. Haga clic en **Seleccionar un DataSet**.
+
+      <Note>
+      **Nota:**Los DataSets de entrada de un DataFlow ya *deben* existir en Domo; no puede cargar los nuevos DataSets en la vista **Crear DataFlow**. Para obtener más información sobre la carga de nuevos DataSets en Domo, consulte [Conexión a datos con conectores](/s/topic/0TO5w000000ZanLGAS).
+      </Note>
+   2. Seleccione el DataSet deseado.  
+      Aparece la información para el DataSet seleccionado, como el número de tarjetas alimentadas por el DataSet, la hora de la última actualización, los nombres de columna, etc.
+   3. Haga clic en **Seleccionar DataSet**.  
+      En la pantalla aparece un icono para el DataSet seleccionado. Puede hacer clic en el icono del DataSet para abrir la ventana de vista previa.  
+        
+      1.(Opcional) En **Seleccionar columnas**, puede quitar las columnas que no desea incluir en el DataSet; para ello, haga clic en la "X" situada junto al nombre de la columna, o bien haga clic en **Quitar todas las columnas** para quitar todas las columnas.  
+        
+      También puede volver a agregar columnas individuales al DataSet; para ello, haga clic en **Agregar columna** y seleccione las columnas correspondientes, o bien puede hacer clic en **Agregar todas las columnas** para volver a agregar todas las columnas al DataSet.
+
+      2.Seleccione cómo se procesará el DataSet en la pestaña **Configurar**. Las opciones incluyen el procesamiento del DataSet completo o solo las filas nuevas adjuntadas desde la última ejecución del DataFlow.
+
+      <Warning>
+      **Importante:** Solo puede usar el método de procesamiento de anexión del DataFlow si dicho DataSet de entrada está configurado para actualizarse con un método de anexión. Para obtener más información sobre la programación del DataSet con una actualización del tipo de anexión, consulte [Planificación básica de un DataSet](/s/article/360042926274).
+      </Warning>
+
+      <Tip>
+      **Consejo:** Si el DataSet de entrada tiene muchas filas, intente usar el método de procesamiento de anexión. Esto agilizará significativamente la ejecución del DataFlow en caso de que se procesen solo las filas nuevas.
+      </Tip>
+   4. Repita el paso 5 para seleccionar tantos DataSet de entrada adicionales como desee.
+6. (Opcional) Siga los pasos detallados a continuación para agregar transformaciones:
+
+   1. Haga clic en **Agregar transformación**.  
+      Se abre un cuadro de diálogo **Transformar** con varias opciones. Para obtener información más detallada sobre estas opciones, consulte Descripción de las opciones Transformar y DataSet de salida.
+   2. Escriba el código SQL para realizar las transformaciones deseadas en los DataSets de entrada.  
+      Los nombres de todos los DataSets de entrada seleccionados aparecen en la parte superior del cuadro de diálogo **Transformar** para facilitar la creación de instrucciones SQL.
+   3. Haga clic en **Aplicar**.
+7. Haga clic en **Agregar DataSet de salida**.  
+   Se abre un cuadro de diálogo **DataSet de salida** con varias opciones. Para obtener información más detallada sobre estas opciones, consulte Descripción de las opciones Transformar y DataSet de salida.
+
+   1. Escriba el código SQL para indicar cómo desea que se combinen los DataSets de entrada.  
+      Los nombres de todos los DataSets de entrada seleccionados aparecen en la parte superior del cuadro de diálogo **DataSet de salida** para facilitar la creación de instrucciones SQL. Si ha transformado los DataSets de entrada en el cuadro de diálogo **Transformar**, dichas transformaciones se aplican aquí.
+   2. (Opcional) Repita los dos pasos anteriores para agregar DataSets de salida adicionales.
+   3. Haga clic en **Listo**.
+8. Seleccione **Opciones adicionales** para programar el DataFlow. Para obtener más información sobre las diferentes opciones de programación, consulte [Programación de DataFlows](https://domohelp.domo.com/hc/en-us/search/click?data=BAh7CzoHaWRsKwhZt0LUUwA6D2FjY291bnRfaWRpA%2FtFkjoJdHlwZUkiDGFydGljbGUGOgZFVDoIdXJsSSJdaHR0cHM6Ly9kb21vaGVscC5kb21vLmNvbS9oYy9lbi11cy9hcnRpY2xlcy8zNjAwNDM0Mjc2NzMtU2NoZWR1bGluZy1hLU1hZ2ljLUVUTC1EYXRhRmxvdwY7CFQ6DnNlYXJjaF9pZEkiKWY5MGJmZTU2LWY0YmItNDJkMi04MGMxLWEwNWQyYjI5NWI3ZAY7CEY6CXJhbmtpBg%3D%3D--929fd105e568b8b103c111b36a0dca4d35245c5d).
+
+   <Note>
+   **Nota:** Si no se ha especificado ninguna programación, de forma predeterminada, se realizará una programación manual del DataFlow.
+   </Note>
+9. (Condicional) Si desea ejecutar el DataFlow en modo estricto, active la opción **Modo estricto**.  
+   Para obtener más información sobre esta opción, consulte Descripción del modo estricto.
+10. (Condicional) Realice alguna de las siguientes acciones para guardar el DataFlow:
+
+    - Si desea ejecutar el script que convierte este DataFlow en un DataSet utilizable en Domo, haga clic en **Guardar y ejecutar**, escriba una descripción de la versión, si lo desea, y, a continuación, haga clic en **Guardar** para confirmar.  
+      A continuación, se inicia el proceso de generación de DataSets a partir del DataFlow. Este proceso de generación puede durar desde un minuto hasta una hora o más, en función del tamaño de los DataSets de entrada. Además de la generación de DataSets, se agrega una tarjeta para el DataFlow a la lista de **DataFlows** de Data Center.
+    - Si desea guardar este DataFlow sin convertirlo en DataSets por el momento, haga clic en **Guardar**, escriba una descripción de la versión, si lo desea, y, a continuación, vuelva a hacer clic en **Guardar** para confirmar. Se agrega una tarjeta para el DataFlow a la lista de **DataFlows** de Data Center, pero no se genera ningún DataSet. Puede ejecutar el DataFlow para generar DataSets en cualquier momento; para ello, mantenga el cursor sobre la tarjeta para el DataFlow en la lista de **DataFlows**, haga clic en y seleccione **Ejecutar**. Esta opción y las demás opciones disponibles en este menú se abordan más adelante en este tema.
+
+Al guardar un DataFlow, se agrega una entrada para esta versión a la pestaña **Versiones** en la vista Detalles del DataFlow. Si escribió una descripción al guardar, esta se muestra en la entrada del DataFlow. Para obtener más información sobre las versiones, vea [Consulta del historial de versiones de un DataFlow](https://domohelp.domo.com/hc/en-us/search/click?data=BAh7CzoHaWRsKwhCBDvUUwA6D2FjY291bnRfaWRpA%2FtFkjoJdHlwZUkiDGFydGljbGUGOgZFVDoIdXJsSSJoaHR0cHM6Ly9kb21vaGVscC5kb21vLmNvbS9oYy9lbi11cy9hcnRpY2xlcy8zNjAwNDI5MjMwNzQtVmlld2luZy10aGUtVmVyc2lvbi1IaXN0b3J5LWZvci1hLURhdGFGbG93BjsIVDoOc2VhcmNoX2lkSSIpZjkxMjI0NDktNTU1Yy00YzM5LWJmNjgtZTMxNmQyMGYyZGMyBjsIRjoJcmFua2kG--a805020b230a60d9bd4556533ae40afc532868f6).
+
+<Note>
+**Nota:** Muchos usuarios preguntan por qué los DataSets de salida de un DataFlow no se marcan como "Actualizados" cuando el DataFlow se ejecuta correctamente. Normalmente, esto se debe a que los datos no han cambiado realmente, es decir, que no se ha producido ninguna actualización. Por tanto, los DataSets no se muestran como actualizados.
+</Note>
+
+### Descripción de las opciones Transformar y DataSet de salida
+
+Las opciones disponibles en los cuadros de diálogo **Transformar** y **DataSet de salida** son prácticamente idénticas, con dos diferencias principales: las opciones **Generar tabla de salida** y **Mostrar columnas**, que aparecen en el cuadro de diálogo **Transformar**, pero no en el cuadro de diálogo **DataSet de salida**.
+
+En la siguiente captura de pantalla se muestran los componentes del cuadro de diálogo **Transformar**.
+
+Puede usar la tabla siguiente para obtener más información sobre estos componentes:
+
+| Componente | Descripción |
+| --- | --- |
+| Lista Entradas/Transformaciones | Muestra los nombres de todos los DataSets de entrada seleccionados para este DataFlow, a fin de facilitar la escritura de instrucciones SQL (Lenguaje de consulta estructurado). Además, aquí aparecen todas las transformaciones creadas anteriormente. Estos nombres aparecen en los dos cuadros de diálogo **Transformar** y **DataSet de salida**. Si transforma uno o varios DataSets de entrada en el cuadro de diálogo **Transformar**, dichas transformaciones se aplican a los DataSets de entrada al hacer referencia a ellas en el cuadro de diálogo **DataSet de salida**.  Al hacer clic en un DataSet de entrada, se abre una lista de todas las columnas del DataSet y sus tipos de datos (decimal, texto, fecha/hora, etc.). |
+| Campo SQL (Lenguaje de consulta estructurado) | Permite crear código SQL (Lenguaje de consulta estructurado) para transformar o combinar los DataSets de entrada. El campo contiene una función de autocompletar para facilitar la escritura de código. |
+| Generar tabla de salida (solo transformaciones) | Cuando esta opción está marcada, se genera una tabla temporal que almacena las transformaciones al hacer clic en **Listo**. |
+| Menú Ejecutar SQL (Lenguaje de consulta estructurado) | Permite acceder a dos opciones:     - **Ejecutar SQL (Lenguaje de consulta estructurado)**. Le permite ejecutar una prueba para determinar si el código SQL (Lenguaje de consulta estructurado) es válido. - **Explicar SQL (Lenguaje de consulta estructurado)**. Muestra un plan explicativo de SQL (Lenguaje de consulta estructurado): una lista ordenada de los pasos que la base de datos seguirá al ejecutar la consulta. Se puede utilizar para ayudar a optimizar las consultas. Sin embargo, como estos pasos son muy complejos y técnicos, esta característica se recomienda solo para usuarios avanzados.  - **Nota:** Como MySQL determina qué índices son necesarios para mejorar la eficacia del tiempo de ejecución, puede que no todas las transformaciones de índices aparezcan en Explicar SQL (Lenguaje de consulta estructurado) si MySQL ha determinado que la ejecución del índice podría causar fallos. |
+
+## Descripción del modo estricto
+
+El modo estricto controla cómo MySQL controla los valores no válidos o que faltan en las instrucciones de cambio de datos y también afecta al control de división por cero, fechas cero y ceros en fechas. Puede encontrar más información en [https://dev.mysql.com/doc/refman/5.6/en/sql-mode.html#sql-mode-strict](https://dev.mysql.com/doc/refman/5.6/en/sql-mode.html#sql-mode-strict).
+
+## Prácticas recomendadas para crear DataFlows
+
+Cada DataFlow debe:
+
+- Incluir nombres descriptivos para cada paso de la transformación.
+- Incluir una descripción de los DataSets de entrada que se van a fusionar o manipular y el DataSet que se va a crear, y también se debe indicar el propietario de los datos.
+- Adoptar el mismo nombre que el DataFlow de salida; de hecho, como las salidas de un DataFlow se convierten en su propio DataSet en Data Center, esto permite identificar con facilidad qué DataSets producen los DataFlows y cuáles son estos últimos.

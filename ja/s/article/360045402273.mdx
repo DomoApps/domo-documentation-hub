@@ -2,193 +2,167 @@
 title: "Magic ETLのタイル：DataSet"
 ---
 
-import {InlineImage} from "/snippets/InlineImage.mdx";
-
-### はじめに
+## はじめに
 
 Magic ETLインターフェースの［DataSet］タブには、3種類のタイルがあります。
 
-* 入力DataSet
-* 出力DataSet
-* ライトバック
+- 入力DataSet
+- 出力DataSet
+- ライトバック
 
 （実際のDataSetを表す）［入力DataSet］タイルと［出力DataSet］タイルは、すべてのMagic ETL DataFlowに必要です。少なくとも1つの入力DataSetが必要ですが、必要な数を含めることができます。DataFlowの最後には1つの出力DataSetが必要です。これはDomoカードとAppを起動するために使用できるDataSetです。
 
-Magic ETL DataFlowを作成する方法については、 [こちら](/s/article/360055259234 "Magic ETL DataFlowを作成する") を参照してください。
+Magic ETL DataFlowを作成する方法については、[こちら](/s/article/360055259234)を参照してください。
 
-<Frame><img alt="Screenshot 2024-07-29 at 11.45.57 AM.png" src="/images/kb/ka0Vq000000MHv3-00N5w00000Ri7BU-0EMVq000001yOV7.jpg" style={{width: 230, height: 239}}/></Frame>
-# DataFlowとPersonalized Data Permission（PDP）
+<Frame>![Screenshot 2024-07-29 at 11.45.57 AM.png](/images/kb/ja/0EMVq000001yOV7.jpg)</Frame>
 
-<Warning>
-  **重要：** DataFlowの入力DataSetは、PDPポリシーで制限することはできません。利用可能なすべての行がDataFlowを経由する *必要があります* 。つまり、PDPポリシーは、入力DataSetではなく、DataFlowの出力DataSetに適用する必要があります。
+## DataFlowとPersonalized Data Permission（PDP）
 
-  PDPポリシーが有効な状態で入力DataSetを使ってDataFlowを作成する場合は、以下の条件が少なくとも1つ満たされていないとDataFlowに不具合が発生します。
+<Warning>**重要：**DataFlowの入力DataSetは、PDPポリシーで制限することはできません。利用可能なすべての行がDataFlowを経由する*必要があります*。つまり、PDPポリシーは、入力DataSetではなく、DataFlowの出力DataSetに適用する必要があります。</Warning>
 
-  * 自分自身に「管理者」セキュリティプロフィール、または「DataFlowを管理」の許可をもつカスタマイズされた権限がある。
-  * そのDataSetの所有者である。
-  * DataSetの「全ての行」ポリシーに自分のユーザーアカウントが追加されている。これにより、DataSetのすべての行にアクセスできます。
+PDPポリシーが有効な状態で入力DataSetを使ってDataFlowを作成する場合は、以下の条件が少なくとも1つ満たされていないとDataFlowに不具合が発生します。
 
-  DataFlowでPDPを使用する方法については、「 [PDPとDataFlow/DataFusion](/ja/s/article/360042934614?#pdp_and_dataflows "http://knowledge.domo.com?cid=pdpdatafusions") 」を参照してください。
+- 自分自身に「管理者」セキュリティプロフィール、または「DataFlowを管理」の許可をもつカスタマイズされた権限がある。
+- そのDataSetの所有者である。
+- DataSetの「全ての行」ポリシーに自分のユーザーアカウントが追加されている。これにより、DataSetのすべての行にアクセスできます。
 
-</Warning>
+DataFlowでPDPを使用する方法については、「[PDPとDataFlow/DataFusion](/ja/s/article/360042934614#pdpポリシーが複数ある場合のandorロジック)」を参照してください。
 
 ---
 
-* [DataFlowに入力DataSetを追加する](#add_an_input_dataset)
-  + [［入力DataSet］タイルを設定する](#configure_input_dataset_tiles)
-* [DataFlowに出力DataSetを追加する](#add_an_output_dataset)
-  + [［出力DataSet］タイルを設定する](#configure_output_dataset_tiles)
-* [［ライトバック］タイル](#writeback_tile)
+## DataFlowに入力DataSetを追加する
 
-  + [［ライトバック］タイルを設定する](#configure_writeback_tile)
-* [よくある質問](#faq)
+<Frame>![Input_DataSet_Tile.png](/images/kb/ja/0EM5w000005vNiz.png)</Frame>
 
----
-
-### DataFlowに入力DataSetを追加する
-
-<Frame><img alt="Input_DataSet_Tile.png" src="/images/kb/ka0Vq000000MHv3-00N5w00000Ri7BU-0EM5w000005vNiz.png"/></Frame>
 DataFlowには少なくとも1つの入力DataSetが必要です。仮想DataSetはフェデレーテッドDataSetとは異なり、Magic ETLでも異なる方法で処理されます。Magic ETLへの入力として仮想DataSetを使用することはできますが、フェデレーテッドDataSetを使用することはできません。以下の手順に従います。
 
 1. Magic ETLを開きます。
-2. 左側レールの **［DataSet］** から［入力DataSet］タイルをキャンバスにドラッグします。キャンバスの下にタイルエディターが開きます。
+2. 左側レールの**［DataSet］**から［入力DataSet］タイルをキャンバスにドラッグします。キャンバスの下にタイルエディターが開きます。   
      
-   <Frame><img alt="" src="/images/kb/ka0Vq000000MHv3-00N5w00000Ri7BU-0EMVq0000060rKD.jpg" style={{width: 898, height: 345}}/></Frame>
-3. タイルエディターで **［DataSetを選択］** を選択して、DataFlowの入力DataSetを選択します。
-   <Note>
-     **注記：** Magic ETLで使用できる最大列数は1,500です。
 
-   </Note>
+   <Frame>![Screenshot](/images/kb/ja/0EMVq0000060rKD.jpg)</Frame>
+3. タイルエディターで**［DataSetを選択］**を選択して、DataFlowの入力DataSetを選択します。
 
-   <Frame><img alt="" src="/images/kb/ka0Vq000000MHv3-00N5w00000Ri7BU-0EMVq0000060ld0.jpg" style={{width: 651, height: 389}}/></Frame>
-4. **［DataSetを選択］** モーダルで、DataSetを探して選択します。複数の［入力DataSet］を追加するには、［入力DataSet］ごとに手順2～4を繰り返す必要があります。
+<Note>   **注記：**Magic ETLで使用できる最大列数は1,500です。</Note>
+
      
-   <Frame><img alt="choose dataset.jpg" src="/images/kb/ka0Vq000000MHv3-00N5w00000Ri7BU-0EMVq000001yQru.jpg" style={{width: 400, height: 316}}/></Frame>
-5. （オプション）タイルエディターで **［データ］** タブに進み、入力データのプレビューを表示します。
      
-   <Frame><img alt="" src="/images/kb/ka0Vq000000MHv3-00N5w00000Ri7BU-0EMVq0000060rLq.jpg" style={{width: 892, height: 506}}/></Frame>
-[このページのトップへ](#intro)
 
-# ［入力DataSet］タイルを設定する
+   <Frame>![Screenshot](/images/kb/ja/0EMVq0000060ld0.jpg)</Frame>
+4. **［DataSetを選択］**モーダルで、DataSetを探して選択します。複数の［入力DataSet］を追加するには、［入力DataSet］ごとに手順2～4を繰り返す必要があります。  
+     
 
-<Note>
-  **DataSetの詳細を表示する：** タイルエディターの **［詳細］** タブには、DataSetの名前、所有者、更新日、列名とタイプなどの情報が含まれます。
+   <Frame>![choose dataset.jpg](/images/kb/ja/0EMVq000001yQru.jpg)</Frame>
+5. （オプション）タイルエディターで**［データ］**タブに進み、入力データのプレビューを表示します。  
+     
 
-</Note>
+   <Frame>![Screenshot](/images/kb/ja/0EMVq0000060rLq.jpg)</Frame>
+
+## ［入力DataSet］タイルを設定する
+
+**DataSetの詳細を表示する：**タイルエディターの**［詳細］**タブには、DataSetの名前、所有者、更新日、列名とタイプなどの情報が含まれます。
 
 ［入力DataSet］タイルを設定するには、以下の手順に従います。
 
-1. **［入力DataSet］** タイルをキャンバスにドラッグして、タイルエディターを開きます。
-2. タイルエディターで **［DataSetを選択］** を選択します。表示されるモーダルで、 既存のDataSetを選択するか、 **［新規作成］** を選択して新しいDataSetを使用します。
+1. **［入力DataSet］**タイルをキャンバスにドラッグして、タイルエディターを開きます。
+2. タイルエディターで**［DataSetを選択］**を選択します。表示されるモーダルで、既存のDataSetを選択するか、**［新規作成］**を選択して新しいDataSetを使用します。  
      
-   <Frame><img alt="choose dataset.jpg" src="/images/kb/ka0Vq000000MHv3-00N5w00000Ri7BU-0EMVq00000231OD.jpg" style={{width: 700, height: 280}}/></Frame>
-3. タイルエディターの **［設定］** タブの **［データ選択］** ドロップダウンで、以下のいずれかを選択します。
+
+   <Frame>![choose dataset.jpg](/images/kb/ja/0EMVq00000231OD.jpg)</Frame>
+3. タイルエディターの**［設定］**タブの**［データ選択］**ドロップダウンで、以下のいずれかを選択します。  
      
-   <Frame><img alt="data selection dropdown.jpg" src="/images/kb/ka0Vq000000MHv3-00N5w00000Ri7BU-0EMVq0000020HCb.jpg" style={{width: 700, height: 500}}/></Frame>
-   * **［全て］** （デフォルト） **—** DataSetからすべての行を読み込みます。
-   * **［新規］ —** 最後に正常に実行された後にDataSetに追加された新しい行を読み込みます。
+
+   <Frame>![data selection dropdown.jpg](/images/kb/ja/0EMVq0000020HCb.jpg)</Frame>
+
+   - **［全て］**（デフォルト） **—** DataSetからすべての行を読み込みます。
+   - **［新規］ —** 最後に正常に実行された後にDataSetに追加された新しい行を読み込みます。  
+<Note>
+
+**注記：**このオプションを選択した場合は、データ更新方法を［置き換え］ではなく［追加］に設定する必要があります。
+   - **［バッチでフィルター］ —** 作成日または名前（パーティションの場合）にもとづいて読み込むバッチを選択できます。  
+     このオプションを選択すると、**［バッチでフィルター］**エリアが表示されます。
+
+</Note>
        
-     **注記：** このオプションを選択した場合は、データ更新方法を［置き換え］ではなく［追加］に設定する必要があります。
-   * **［バッチでフィルター］ —** 作成日または名前（パーティションの場合）にもとづいて読み込むバッチを選択できます。
+     データが処理された時期とカスタマイズされた数式のどちらにもとづいてバッチにフィルターをかけるかを指定し、日付パラメーターを選択します。例：*過去7日間*の*処理済みデータ*。  
        
-     このオプションを選択すると、 **［バッチでフィルター］** エリアが表示されます。
-       
-     データが処理された時期とカスタマイズされた数式のどちらにもとづいてバッチにフィルターをかけるかを指定し、日付パラメーターを選択します。例： *過去7日間* の *処理済みデータ* 。
-       
-     <Frame><img alt="Screenshot 2024-08-01 at 7.18.28 PM.png" src="/images/kb/ka0Vq000000MHv3-00N5w00000Ri7BU-0EMVq000002327N.jpg" style={{width: 497, height: 188}}/></Frame>
-4. （オプション）入力DataSetがパーティション分割されている場合は、 **［パーティション列名］** フィールドを使用してパーティション名を公開できます。
-5. **［データ処理］** エリアで 列データタイプを変更します。これにより、入力データに発生する可能性のあるスキーマの変更によってDataFlowが破損するのを防ぐことができます。
+
+     <Frame>![Screenshot 2024-08-01 at 7.18.28 PM.png](/images/kb/ja/0EMVq000002327N.jpg)</Frame>
+4. （オプション）入力DataSetがパーティション分割されている場合は、**［パーティション列名］**フィールドを使用してパーティション名を公開できます。
+5. **［データ処理］**エリアで列データタイプを変更します。これにより、入力データに発生する可能性のあるスキーマの変更によってDataFlowが破損するのを防ぐことができます。  
      
-   <Frame><img alt="change data type.jpg" src="/images/kb/ka0Vq000000MHv3-00N5w00000Ri7BU-0EMVq00000232H3.jpg" style={{width: 801, height: 360}}/></Frame>
-6. <InlineImage src="/images/kb/ja/ka0Vq000000MHwf-00N5w00000Ri7BU-0EMVq00000232FR.jpg" /> **［設定を変換］** を使用して、列内の **［不正な値］** や **［NULL値］** などについて、各列の特別な処理を設定します。
 
-   <Columns>
-     <Frame><img src="/images/kb/ka0Vq000000MHv3-00N5w00000Ri7BU-0EMVq00000231ck.jpg" /></Frame>
-     <Frame><img alt="data settings.jpg" src="/images/kb/ka0Vq000000MHv3-00N5w00000Ri7BU-0EMVq00000231BK.jpg" style={{width: 160, height: 274}}/></Frame>
-   </Columns>
-   <Tip>
-     Advanced DataFlow TriggeringでDataFlowの実行を自動化する方法については、 [こちら](/s/article/000005216) を参照してください。
+   <Frame>![change data type.jpg](/images/kb/ja/0EMVq00000232H3.jpg)</Frame>
+6. <img alt="settings.png" src="/images/kb/ja/0EMVq00000232FR.jpg" style={{width: 22, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/>
 
-   </Tip>
+   **［設定を変換］**を使用して、列内の**［不正な値］**や**［NULL値］**などについて、各列の特別な処理を設定します。  
+     
 
-[このページのトップへ](#intro)
+   <Frame>![bad values.jpg](/images/kb/ja/0EMVq00000231ck.jpg)</Frame>
 
-### ［出力DataSet］タイル
+   <Frame>![data settings.jpg](/images/kb/ja/0EMVq00000231BK.jpg)</Frame>
 
-<Frame><img alt="Output_DataSet_Tile.png" src="/images/kb/ka0Vq000000MHv3-00N5w00000Ri7BU-0EM5w000005vNih.png" style={{width: 102, height: 93}}/></Frame>
+Advanced DataFlow TriggeringでDataFlowの実行を自動化する方法については、[こちら](/s/article/000005216)を参照してください。
+
+## ［出力DataSet］タイル
+
+<Frame>![Output_DataSet_Tile.png](/images/kb/ja/0EM5w000005vNih.png)</Frame>
+
 DataFlowには出力DataSetが必要です。出力DataSetを使用して、カード（またはほかのDataFlow）に情報を追加します。
 
-# ［出力DataSet］タイルを設定する
+## ［出力DataSet］タイルを設定する
 
 ［出力DataSet］タイルを設定するには、以下の手順に従います。
 
 1. DataFlowのすべてのタイルが接続され、設定されていることを確認します。
-2. 左側パネルの **［DataSet］** の **［出力DataSet］** タイルをキャンバスにドラッグして、接続します。
+2. 左側パネルの**［DataSet］**の**［出力DataSet］**タイルをキャンバスにドラッグして、接続します。
 3. タイルエディターでタイルの名前を変更します。これは、Data Centerに表示される出力DataSetの名前です。
-4. **［更新方法］** ドロップダウンを使用して、更新されるデータの処理方法を選択します。Domoでの更新方法については、 [こちら](/s/article/360043430733) を参照してください。
+4. **［更新方法］**ドロップダウンを使用して、更新されるデータの処理方法を選択します。Domoでの更新方法については、[こちら](/s/article/360043430733)を参照してください。
 
-   <Tip>
-     **ヒント：** 出力DataSetにあるデータをプレビューするには、プレビューを実行し、［出力DataSet］タイルを選択してから **［プレビュー］** タブを選択します 。
+<Tip>**ヒント：**出力DataSetにあるデータをプレビューするには、プレビューを実行し、［出力DataSet］タイルを選択してから**［プレビュー］**タブを選択します。</Tip>
 
-     <Frame><img alt="preview output.jpg" src="/images/kb/ka0Vq000000MHv3-00N5w00000Ri7BU-0EMVq00000232nJ.jpg" style={{width: 802, height: 316}}/></Frame>
-   </Tip>
+<Frame>![preview output .jpg](/images/kb/ja/0EMVq00000232nJ.jpg)</Frame>
+
+**DataSetの詳細を表示する：**DataFlowが少なくとも1回実行された後は、タイルエディターの**［詳細］**タブに、出力DataSetに関するすべての情報が含まれます。
+
+5. **［DataSetをクラウドに追加］**ドロップダウンを使用して、データを書き込む場所を選択します。
+6. クラウドでデータを保存する**データベース**の名前を入力します。
+7. データベースでデータを保存する**スキーマ**の名前を入力します。
+8. スキーマ内で使用する**表**の名前を入力します。
 
 <Note>
-  **DataSetの詳細を表示する：** DataFlowが少なくとも1回実行された後は、タイルエディターの **［詳細］** タブに、出力DataSetに関するすべての情報が含まれます。
+**注記：**
 
+- **［DataSetをクラウドに追加］**するオプションは、Cloud Amplifierを使用していて、ライトバック用に設定された統合がある場合にのみ利用可能です。
+- **データベース、** **スキーマ**、**表**フィールドは、Cloud Amplifier統合がクラウド（現在はSnowflakeのみ利用可能ですが、ほかのエンジンもまもなく利用可能になる予定です）内の位置パラメーターをサポートしている場合に利用できます。
 </Note>
 
-5. **［DataSetをクラウドに追加］** ドロップダウンを使用して、データを書き込む場所を選択します。
-6. クラウドでデータを保存する **データベース** の名前を入力します。
-7. データベースでデータを保存する **スキーマ** の名前を入力します。
-8. スキーマ内で使用する **表** の名前を入力します。
+## ［ライトバック］タイル
 
-   <Note>
-     **注記：**
+<Frame>![Writeback_Tile.png](/images/kb/ja/0EM5w000005vNii.png)</Frame>
 
-     * **［DataSetをクラウドに追加］**
-     するオプションは、Cloud Amplifierを使用していて、ライトバック用に設定された統合がある場合にのみ利用可能です。
-     * **データベース、**
-     **スキーマ** 、 **表** フィールドは、Cloud Amplifier統合がクラウド（現在はSnowflakeのみ利用可能ですが、ほかのエンジンもまもなく利用可能になる予定です）内の位置パラメーターをサポートしている場合に利用できます。
-
-   </Note>
-
-[このページのトップへ](#intro)
-
-### ［ライトバック］タイル
-
-<Frame><img alt="Writeback_Tile.png" src="/images/kb/ka0Vq000000MHv3-00N5w00000Ri7BU-0EM5w000005vNii.png" style={{width: 85, height: 102}}/></Frame>
 ［ライトバック］タイルを使用して、変換されたデータをDataSetとして出力し、データを別のシステムに送ることができます。
 
-# ［ライトバック］タイルを設定する
+## ［ライトバック］タイルを設定する
 
 ［ライトバック］タイルを設定するには、以下の手順に従います。
 
 1. ［入力DataSet］タイルの代わりに、［ライトバック］タイルをキャンバスにドラッグします。
-2. ［ライトバック］タイルの名前を変更し、
-   <InlineImage src="/images/kb/ja/ka0Vq000000MHwf-00N5w00000Ri7BU-0EMVq0000060jJS.jpg" /> **［編集］** を選択して名前と説明を入力することで、出力するDataSetの名前を指定します。
-3. （オプション） **［追加オプション］** メニューを選択し、 **［更新方法］** を選択して、データを置き換えるか（デフォルト）、追加します。
-4. **［ライトバックを設定］** を選択して、使用するWritebackコネクターを選択します。
+2. ［ライトバック］タイルの名前を変更し、<img alt="" src="/images/kb/ja/0EMVq0000060jJS.jpg" style={{width: 23, height: 23, display: 'inline', verticalAlign: 'start', margin: '0'}}/>
+
+   **［編集］**を選択して名前と説明を入力することで、出力するDataSetの名前を指定します。
+3. （オプション）**［追加オプション］**メニューを選択し、**［更新方法］**を選択して、データを置き換えるか（デフォルト）、追加します。
+4. **［ライトバックを設定］**を選択して、使用するWritebackコネクターを選択します。
 5. ほかのタイルを［ライトバック］タイルに接続してDataFlowを完了し、［出力DataSet］タイルで終了します。
 
-<Note>
-  **［ライトバック］タイルの詳細を表示する：** DataFlowが少なくとも1回実行された後は、タイルエディターの **［詳細］** タブに、ライトバック出力DataSetに関するすべての情報が含まれます。
+**［ライトバック］タイルの詳細を表示する：**DataFlowが少なくとも1回実行された後は、タイルエディターの**［詳細］**タブに、ライトバック出力DataSetに関するすべての情報が含まれます。
 
-</Note>
-
-[このページのトップへ](#intro)
-
-### よくある質問
+## よくある質問
 
 <AccordionGroup>
+
 <Accordion title="少数の列が小数点以下5桁まで切り捨てられるのはなぜですか？">
-
-
 Domoでは、固定小数に（19,5）の精度/スケールを使用します。そのため、小数点の右側に5桁のみ表示されます。DataSetをより高い精度/スケールを使用する設定にするようリクエストできます。
-
-[このページのトップへ](#intro)
-
-日本語
-
 </Accordion>
+
 </AccordionGroup>

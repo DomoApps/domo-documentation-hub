@@ -6,89 +6,109 @@ title: "Google BigQuery Workload Identity Federation Data Connector"
 
 Google BigQuery Enterprise is a cloud-based big data analytics web service for processing very large read-only data sets. You can use Domo's Google BigQuery connector to pull data from a specified project. Google BigQuery queries are written using a variation of the standard SQL SELECT statement.
 
-You can connect to your Google BigQuery Workload Identity Federation Data account in the Data Center. This topic discusses the fields and menus that are specific to the Google BigQuery Workload Identity Federation Data connector user interface. To add DataSets, set update schedules, and edit DataSet information, see [Adding a DataSet Using a Data Connector](https://domo-support.domo.com/s/article/360042926274?language=en_US "Adding a DataSet Using a Data Connector").
+You can connect to your Google BigQuery Workload Identity Federation Data account in the Data Center. This topic discusses the fields and menus that are specific to the Google BigQuery Workload Identity Federation Data connector user interface. To add DataSets, set update schedules, and edit DataSet information, see [Adding a DataSet Using a Data Connector](/s/article/360042926274).
 
 ## Prerequisites
 
-To connect to your Google BigQuery Workload Identity Federation Data account and create a DataSet, you must have the following: **Note:** The following steps highlight how to create a WIF configuration file, which can also be used when setting up a Cloud Amplifier connection to BigQuery.
+To connect to your Google BigQuery Workload Identity Federation Data account and create a DataSet, you must have the following:  
 
-* If you have an existing Workload Identity Federation account setup in Google Cloud console, then follow the below steps:
-   
-   1. From the drop-down list, select **Use an existing Workload Identity Federation**.
-   2. If you select **Enter configuration values manually** from the drop-down list, then:
-      
-      1. Enter the **Project Number**, **Project ID**, **Pool ID**, **Provider ID**, and the **Service Account Email**.
-      2. To allow external identities to impersonate a service account, you need to grant Workload Identity User role (roles/iam.workloadIdentityUser) on the service account. You can grant the role to a specific external identity, or to multiple external identities.
+<Note>**Note:** The following steps highlight how to create a WIF configuration file, which can also be used when setting up a Cloud Integrations connection to BigQuery.</Note>
 
-            1. Navigate to the Workload Identity Pool [Workload Identity Pool page](https://console.cloud.google.com/iam-admin/workload-identity-pools?project=undefined "Workload Identity Pool page")
-            2. Click the pool you have created.
-            3. Click **grant access**.
-            4. Select the service account you have setup.
-            5. You can grant access to all identities in the pool by selecting **Allow access to all identities in the pool** from the drop-down list, or you can filter by the user's email address, by selecting **Filter by user email address** from the drop-down list, or you can filter by a unique GUID ID representing the connector and your Domo instance, by selecting **Filter by unique code representing your Domo instance and connector** from the drop-down list.
-   3. If you select **Enter the JSON configuration from Google Cloud Console** from the drop-down list, then:
-      
-      1. Enter the JSON Configuration for the Workload Identity Federation.
-      2. You can limit the external identities access by selecting any one of the following option from the filter:
-            
-         + **Filter by user email address**
-         + **Filter by unique code representing your Domo instance and connector**
-         + **Allow access to all identities in the pool**
-* If you do not have an existing Workload Identity Federation account setup in Google Cloud console, then follow the below steps:
-   
-   1. Select **Go through prerequisite** from the drop-down list.
-   2. You need to setup a google cloud project.
-      
-      1. Navigate to [Google Cloud Dashboard](https://console.cloud.google.com/projectselector2/home/dashboard "Google Cloud Dashboard").
-      2. Click **Create Project**.
-      3. Enter the **Project Name** and **Location** and select **Create**.
-      4. Navigate to [Google Cloud Console](https://console.cloud.google.com/welcome "Google Cloud Console"), the created project information appears.
-      5. Enter the **Project Number** and **Project ID**.
-      6. To provide the project with access to **Identity and Access Management (IAM) API**, **Cloud Resource Manager API**, **IAM Service Account Credentials API**, **Security Token Service API**, navigate to [Enable access](https://console.cloud.google.com/apis/enableflow?apiid=iam.googleapis.com,cloudresourcemanager.googleapis.com,iamcredentials.googleapis.com,sts.googleapis.com "Enable access") API, click **Next**, and click **Enable**.
-   3. To create a workload identity pool and provider:
-      
-      1. Navigate to [Workload Identity Pools page](https://console.cloud.google.com/iam-admin/workload-identity-pools?project=undefined "Workload Identity Pools page").
-      2. If the previous link does not open, then go to **IAM & Admin** > **Workload Identity Federation**.
-      3. Click **Get Started**.
-      4. Enter the created **Pool ID**.
-      5. From the provider drop-down, select **SAML**.
-      6. Enter the **Provider ID**.
-      7. Download the metadata file and upload to [Google](https://app.domo.com/DomoConnectors/DomoWIF/metadata.xml "Google").
-      8. To configure the provider attributes, in Google 1: **google.subject** is the key and **assertion.subject** is the value.
-      9. Save your workload identity pool and provider.
-   4. If you do not have a service account, you need to set up the account:
-     **Note:** Your service account doesn't need to be in the same project as your workload identity pool and provider.
-      
-      1. To create a service account, navigate to [create service account](https://console.cloud.google.com/projectselector2/iam-admin/serviceaccounts/create "create service account").or if you already have a service account, navigate to [service account page](https://console.cloud.google.com/iam-admin/serviceaccounts?project=undefined "service account page").
-      2. Enter the **Service Account Email**.
-      3. Grant the service account access to resources that you want Domo to access.
-5. To allow the external workload to impersonate the service account:
-      **Note:** To allow external identities to impersonate a service account, you need to grant the user the Workload Identity User role (roles/iam.workloadIdentityUser) on the service account. You can grant the role to a specific external identity, or to multiple external identities
+- If you have an existing Workload Identity Federation account set up in the Google Cloud console, then follow the steps below:
+  1. From the drop-down list, select **Use an existing Workload Identity Federation**.
+  2. If you select **Enter configuration values manually** from the drop-down list, then:
+     1. Enter the **Project Number**, **Project ID**, **Pool ID**, **Provider ID**, and the **Service Account Email**.
+     2. To allow external identities to impersonate a service account, you need to grant Workload Identity User role (roles/iam.workloadIdentityUser) on the service account. You can grant the role to a specific external identity or to multiple external identities.
 
-      1. Navigate to the Workload Identity Pool [Workload Identity Pool page](https://console.cloud.google.com/iam-admin/workload-identity-pools?project=undefined "Workload Identity Pool page")
+- 2. 1. 1. Navigate to the Workload Identity Pool [Workload Identity Pool page](https://console.cloud.google.com/iam-admin/workload-identity-pools?project=undefined)
+        2. Click the pool you have created.
+        3. Click **grant access**.
+        4. Select the service account you have setup.
+        5. You can grant access to all identities in the pool by selecting **Allow access to all identities in the pool** from the drop-down list, or you can filter by the user's email address, by selecting **Filter by user email address** from the drop-down list, or you can filter by a unique GUID ID representing the connector and your Domo instance, by selecting **Filter by unique code representing your Domo instance and connector**from the drop-down list.
+  3. If you select **Enter the JSON configuration from Google Cloud Console** from the drop-down list, then:
+     1. Enter the JSON Configuration for the Workload Identity Federation.
+     2. You can limit the external identities access by selecting any one of the following option from the filter:  
+        - **Filter by user email address**
+        - **Filter by unique code representing your Domo instance and connector**
+        - **Allow access to all identities in the pool**
+- If you do not have an existing Workload Identity Federation account setup in Google Cloud console, then follow the below steps:
+  1. Select **Go through prerequisite** from the drop-down list.
+  2. You need to setup a google cloud project.
+     1. Navigate to [Google Cloud Dashboard](https://console.cloud.google.com/projectselector2/home/dashboard).
+     2. Click **Create Project**.
+     3. Enter the **Project Name** and **Location** and select **Create**.
+     4. Navigate to [Google Cloud Console](https://console.cloud.google.com/welcome), the created project information appears.
+     5. Enter the **Project Number** and **Project ID**.
+     6. To provide the project with access to **Identity and Access Management (IAM) API**, **Cloud Resource Manager API**, **IAM Service Account Credentials API**, **Security Token Service API**, navigate to [Enable access](https://console.cloud.google.com/apis/enableflow?apiid=iam.googleapis.com,cloudresourcemanager.googleapis.com,iamcredentials.googleapis.com,sts.googleapis.com) API, click **Next**, and click **Enable**.
+  3. To create a workload identity pool and provider:
+     1. Navigate to [Workload Identity Pools page](https://console.cloud.google.com/iam-admin/workload-identity-pools?project=undefined).
+     2. If the previous link does not open, then go to **IAM & Admin** > **Workload Identity Federation**.
+     3. Click **Get Started**.
+     4. Enter the created **Pool ID**.
+     5. From the provider drop-down, select **SAML**.
+     6. Enter the **Provider ID**.
+     7. Download the metadata file and upload to [Google](https://app.domo.com/DomoConnectors/DomoWIF/metadata.xml).
+     8. To configure the provider attributes, in Google 1: **google.subject** is the key and **assertion.subject** is the value.
+     9. Save your workload identity pool and provider.
+  4. If you do not have a service account, you need to set up the account:  
+     
+<Note>
+
+**Note:** Your service account doesn't need to be in the same project as your workload identity pool and provider.   
+     1. To create a service account, navigate to [create service account](https://console.cloud.google.com/projectselector2/iam-admin/serviceaccounts/create).or if you already have a service account, navigate to [service account page](https://console.cloud.google.com/iam-admin/serviceaccounts?project=undefined).
+     2. Enter the **Service Account Email**.
+     3. Grant the service account access to resources that you want Domo to access.
+  5. To allow the external workload to impersonate the service account:  
+     **Note:** To allow external identities to impersonate a service account, you need to grant the user the Workload Identity User role (roles/iam.workloadIdentityUser) on the service account. You can grant the role to a specific external identity, or to multiple external identities
+
+</Note>
+
+1. 1. 1. Navigate to the Workload Identity Pool [Workload Identity Pool page](https://console.cloud.google.com/iam-admin/workload-identity-pools?project=undefined)
       2. Click the pool you have created.
       3. Click **grant access**.
       4. Select the service account you have already setup.
-      5. You can grant access to all identities in the pool by selecting **Allow access to all identities in the pool** from the drop-down list, or you can filter by the user's email address, by selecting **Filter by user email address** from the drop-down list, or you can filter by a unique GUID ID representing the connector and your Domo instance, by selecting **Filter by unique code representing your Domo instance and connector** from the drop-down list.
+      5. You can grant access to all identities in the pool by selecting **Allow access to all identities in the pool** from the drop-down list, or you can filter by the user's email address, by selecting **Filter by user email address** from the drop-down list, or you can filter by a unique GUID ID representing the connector and your Domo instance, by selecting **Filter by unique code representing your Domo instance and connector**from the drop-down list.
       6. If needed download the configuration file. This file can be used to create an account in Domo later.
 
 ## Connecting to Your Google BigQuery Workload Identity Federation Data Account
 
-This section enumerates the options in the **Credentials** and **Details** panes in the Google BigQuery Workload Identity Federation Data Connector page. The components of the other panes in this page, **Scheduling** and **Name & Describe Your DataSet**, are universal across most connector types and are discussed in great detail in [Adding a DataSet Using a Data Connector](https://domo-support.domo.com/s/article/360042926274?language=en_US "Adding a DataSet Using a Data Connector").
+This section enumerates the options in the **Credentials** and **Details** panes in the Google BigQuery Workload Identity Federation Data Connector page. The components of the other panes in this page, **Scheduling** and **Name & Describe Your DataSet**, are universal across most connector types and are discussed in great detail in [Adding a DataSet Using a Data Connector](/s/article/360042926274).
 
 ## Credentials Pane
 
-This pane contains fields for entering credentials to connect to your Google BigQuery Workload Identity Federation Data account. The following table describes what is needed for each field:
+This pane contains fields for entering credentials to connect to your Google BigQuery Workload Identity Federation Data account. The following table describes what is needed for each field:  
 
-<table border="1" cellpadding="1" cellspacing="1" data-aura-rendered-by="33:207;a"><thead><tr><th colspan="1" rowspan="1"><p><span class="s1"> Field </span></p></th><th colspan="1" rowspan="1"><p><span class="s1"> Description </span></p></th></tr></thead><tbody><tr><td colspan="1" rowspan="1"><p> Project Number </p></td><td colspan="1" rowspan="1"><p> Enter the project number of the project you created. </p></td></tr><tr><td colspan="1" rowspan="1"><p> Project ID </p></td><td colspan="1" rowspan="1"><p> Enter the project ID of the project you created. </p></td></tr><tr><td colspan="1" rowspan="1"><p> Pool ID </p></td><td colspan="1" rowspan="1"><p> Enter the pool ID. </p></td></tr><tr><td colspan="1" rowspan="1"><p> Provider ID </p></td><td colspan="1" rowspan="1"><p> Enter the provider ID. </p></td></tr><tr><td colspan="1" rowspan="1"><p> Service Account Email </p></td><td colspan="1" rowspan="1"><p> Enter the service account email address generated for the chosen service account id. </p></td></tr></tbody></table>
+| Field | Description |
+| --- | --- |
+| Project Number | Enter the project number of the project you created. |
+| Project ID | Enter the project ID of the project you created. |
+| Pool ID | Enter the pool ID. |
+| Provider ID | Enter the provider ID. |
+| Service Account Email | Enter the service account email address generated for the chosen service account id. |
 
-Once you have entered valid Google BigQuery Workload Identity Federation Data credentials, you can use the same account any time to create a new Google BigQuery Workload Identity Federation Data DataSet. You can manage connector accounts in the **Accounts** tab in the Data Center. For more information about this tab, see [Managing User Accounts for Connectors](https://domo-support.domo.com/s/article/360042926054?language=en_US "Managing User Accounts for Connectors").
+Once you have entered valid Google BigQuery Workload Identity Federation Data credentials, you can use the same account any time to create a new Google BigQuery Workload Identity Federation Data DataSet. You can manage connector accounts in the **Accounts** tab in the Data Center. For more information about this tab, see [Managing User Accounts for Connectors](/s/article/360042926054).
 
 ## Details Pane
 
 This pane contains a primary **Reports** menu, along with various other menus which may or may not appear depending on the report type you select.
 
-<table border="1" cellpadding="1" cellspacing="1" data-aura-rendered-by="33:207;a"><thead><tr><th colspan="1" rowspan="1"><p> Menu </p></th><th colspan="1" rowspan="1"><p> Description </p></th></tr></thead><tbody><tr><td colspan="1" rowspan="1"><p> Report </p></td><td colspan="1" rowspan="1"><p> Select the Google BigQuery Workload Identity Federation Data report you want to run. The following reports are available: </p><table border="1"><tbody><tr><td colspan="1" rowspan="1"><b> Report Name </b></td><td colspan="1" rowspan="1"><b> Description </b></td></tr><tr><td colspan="1" rowspan="1"><p> Query </p></td><td colspan="1" rowspan="1"> Returns the data from Big Query by running legacy or standard SQL. </td></tr><tr><td colspan="1" rowspan="1"><p> Table Information </p></td><td colspan="1" rowspan="1"> Returns the information of the Table. </td></tr><tr><td colspan="1" rowspan="1"><p> Table Data </p></td><td colspan="1" rowspan="1"> Returns the data from the Table. </td></tr></tbody></table></td></tr><tr><td colspan="1" rowspan="1"><p> What Query Type would you like to use? </p></td><td colspan="1" rowspan="1"><p> Select the query type that you would like to use. By default Legacy SQL is selected. </p></td></tr><tr><td colspan="1" rowspan="1"><p> Query </p></td><td colspan="1" rowspan="1"><p> Enter a fully qualified Google BigQuery query. </p></td></tr><tr><td colspan="1" rowspan="1"><p> Query Parameter </p></td><td colspan="1" rowspan="1"><p> Enter the query parameter value, it is the initial value for query parameter. The last run date is optional by default it is '02/01/1700' if is not provided. For example: `!{lastvalue:_id}!=1,!{lastrundate:start_date}!=02/01/1944` </p></td></tr><tr><td colspan="1" rowspan="1"><p> Project ID </p></td><td colspan="1" rowspan="1"><p> Enter the ID for the project you want to retrieve data. </p></td></tr><tr><td colspan="1" rowspan="1"><p> Expect Large Results </p></td><td colspan="1" rowspan="1"><p> Queries with large results will create a temporary table and deletes it when the job is completed. A dataset ID is required to create the temporary table. </p></td></tr><tr><td colspan="1" rowspan="1"><p> Dataset ID </p></td><td colspan="1" rowspan="1"><p> Enter the ID for the dataset you want to retrieve data. </p></td></tr><tr><td colspan="1" rowspan="1"><p> Projects </p></td><td colspan="1" rowspan="1"><p> Select the project from available list of projects. </p></td></tr><tr><td colspan="1" rowspan="1"><p> Datasets </p></td><td colspan="1" rowspan="1"><p> Select the dataset from available list of datasets. </p></td></tr><tr><td colspan="1" rowspan="1"><p> Tables </p></td><td colspan="1" rowspan="1"><p> Select the table from available list of tables. </p></td></tr><tr><td colspan="1" rowspan="1"><p> Location </p></td><td colspan="1" rowspan="1"><p> Enter the location. The location information can be found " <a href="https://cloud.google.com/bigquery/docs/locations" target="_blank" title="https://cloud.google.com/bigquery/docs/locations."> https://cloud.google.com/bigquery/docs/locations. </a></p></td></tr><tr><td colspan="1" rowspan="1"><p> Selected Fields </p></td><td colspan="1" rowspan="1"><p> Select fields. </p></td></tr><tr><td colspan="1" rowspan="1"><p> Max Results </p></td><td colspan="1" rowspan="1"><p> Max Results is the number of results returned per page of data. By default, Max Results is a 10,000 results per page. If your dataset throws an out of memory error, decrease Max Results. </p></td></tr><tr><td colspan="1" rowspan="1"><p> Use Google BigQuery Schema </p></td><td colspan="1" rowspan="1"><p> Select this checkbox to use the schema received from Google BigQuery. This is useful when a column's datatype may be perceived incorrectly to Domo. For example, your table has '123' in a String column. </p></td></tr></tbody></table>
+| Menu | Description |
+| --- | --- |
+| Report | Select the Google BigQuery Workload Identity Federation Data report you want to run. The following reports are available:   |  |  | | --- | --- | | **Report Name** | **Description** | | Query | Returns the data from Big Query by running legacy or standard SQL. | | Table Information | Returns the information of the Table. | | Table Data | Returns the data from the Table. | |
+| What Query Type would you like to use? | Select the query type that you would like to use. By default Legacy SQL is selected. |
+| Query | Enter a fully qualified Google BigQuery query. |
+| Query Parameter | Enter the query parameter value, it is the initial value for query parameter. The last run date is optional by default it is '02/01/1700' if is not provided. For example: <tt>!&#123;lastvalue:\_id&#125;!=1,!&#123;lastrundate:start\_date&#125;!=02/01/1944</tt> |
+| Project ID | Enter the ID for the project you want to retrieve data. |
+| Expect Large Results | Queries with large results will create a temporary table and deletes it when the job is completed. A dataset ID is required to create the temporary table. |
+| Dataset ID | Enter the ID for the dataset you want to retrieve data. |
+| Projects | Select the project from available list of projects. |
+| Datasets | Select the dataset from available list of datasets. |
+| Tables | Select the table from available list of tables. |
+| Location | Enter the location. The location information can be found "[https://cloud.google.com/bigquery/docs/locations.](https://cloud.google.com/bigquery/docs/locations) |
+| Selected Fields | Select fields. |
+| Max Results | Max Results is the number of results returned per page of data. By default, Max Results is a 10,000 results per page. If your dataset throws an out of memory error, decrease Max Results. |
+| Use Google BigQuery Schema | Select this checkbox to use the schema received from Google BigQuery. This is useful when a column's datatype may be perceived incorrectly to Domo. For example, your table has '123' in a String column. |
 
 ## Other Panes
 
-For information about the remaining sections of the connector interface, including how to configure scheduling, retry, and update options, see [Adding a DataSet Using a Data Connector](https://domo-support.domo.com/s/article/360042926274?language=en_US "Adding a DataSet Using a Data Connector").
+For information about the remaining sections of the connector interface, including how to configure scheduling, retry, and update options, see [Adding a DataSet Using a Data Connector](/s/article/360042926274).

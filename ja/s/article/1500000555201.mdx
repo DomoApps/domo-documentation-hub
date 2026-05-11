@@ -4,207 +4,151 @@ title: "Snowflake KeyPair Unload V2コネクター"
 
 ## はじめに
 
-Snowflakeは、あらゆるデータおよびユーザー向けのクラウド用として構築されたData Warehouseです。Domo Snowflake KeyPair Unload V2コネクターでは、データをSnowflakeデータベースからAmazon S3へとアンロードし、簡単かつ安全にSnowflakeデータにアクセスできます。 非常に大きなクエリを実行している場合は、このコネクターがSnowflakeコネクターよりも優先されます。
+Snowflakeは、あらゆるデータおよびユーザー向けのクラウド用として構築されたData Warehouseです。Domo Snowflake KeyPair Unload V2コネクターでは、データをSnowflakeデータベースからAmazon S3へとアンロードし、簡単かつ安全にSnowflakeデータにアクセスできます。非常に大きなクエリを実行している場合は、このコネクターがSnowflakeコネクターよりも優先されます。
 
-Snowflakeデータベースには、Data Centerから接続します。このトピックでは、Snowflake KeyPair Unload V2コネクターのユーザーインターフェースに固有のフィールドとメニューについて説明します。DataSetの追加や更新スケジュールの設定、DataSet情報の編集に関する一般的な情報は、「 [コネクターを使用してDataSetを追加する](/ja/s/article/360042926274 "コネクターを使用してDataSetを追加する") 」を参照してください。
+Snowflakeデータベースには、Data Centerから接続します。このトピックでは、Snowflake KeyPair Unload V2コネクターのユーザーインターフェースに固有のフィールドとメニューについて説明します。DataSetの追加や更新スケジュールの設定、DataSet情報の編集に関する一般的な情報は、「[コネクターを使用してDataSetを追加する](/s/article/360042926274)」を参照してください。
 
 ## 必要条件
 
 Snowflakeデータベースに接続し、DataSetを作成するには、以下が必要です。
 
-* アカウントのフルネーム（Snowflakeが提供）。これは、Snowflake URLの
-  https://の
-  直後に続く部分です。
-    
-  アカウントのフルネームには、アカウントがホストされる地域とクラウドプラットフォームを識別する追加のセグメントが含まれる場合があることに注意してください。米国西部地域は ****account\_name**** 、その他の地域は ****account\_name.region\_id**** です。以下の表に、クラウドプラットフォームまたは地域別のアカウント名の例を示します。各行に対して、アカウント名が「xy12345」であると仮定しています。
+- アカウントのフルネーム（Snowflakeが提供）。これは、Snowflake URLのhttps://の直後に続く部分です。  
+  アカウントのフルネームには、アカウントがホストされる地域とクラウドプラットフォームを識別する追加のセグメントが含まれる場合があることに注意してください。米国西部地域は****account\_name****、その他の地域は****account\_name.region\_id****です。以下の表に、クラウドプラットフォームまたは地域別のアカウント名の例を示します。各行に対して、アカウント名が「xy12345」であると仮定しています。
 
-<Frame><img alt="snowflake_account_names.png" src="/images/kb/ka05w00000123Kt-00N5w00000Ri7BU-0EM5w000005vO5S.png"/></Frame>
+<Frame>![snowflake_account_names.png](/images/kb/ja/0EM5w000005vO5d.png)</Frame>
 
-* Snowflakeホストへの接続に使用するユーザー名。
-* シークレットキー。
-* パスフレーズ。シークレットキーを暗号化する場合、OpenSSLが、シークレットキーファイルの暗号化に使用されるパスフレーズの入力を求めてきます。
-* 自分の権限の名称。
-* AWSアクセスキー。
-  これは、AWSコンソールの **［セキュリティ認証情報］** セクションで、 **IAM** を使用している場合は **［ユーザー］** で確認できます。
-* アクセスキーの作成時に提供されたAWSシークレットキー。新しいシークレットキーは、AWSコンソールで生成できます。
-* SnowflakeデータがアンロードされるAWS S3バケットの名前。
-* Amazon S3リージョン。
+- Snowflakeホストへの接続に使用するユーザー名。
+- シークレットキー。
+- パスフレーズ。シークレットキーを暗号化する場合、OpenSSLが、シークレットキーファイルの暗号化に使用されるパスフレーズの入力を求めてきます。
+- 自分の権限の名称。
+- AWSアクセスキー。これは、AWSコンソールの**［セキュリティ認証情報］**セクションで、**IAM**を使用している場合は**［ユーザー］**で確認できます。
+- アクセスキーの作成時に提供されたAWSシークレットキー。新しいシークレットキーは、AWSコンソールで生成できます。
+- SnowflakeデータがアンロードされるAWS S3バケットの名前。
+- Amazon S3リージョン。
 
 ### パブリックキーペア/シークレットキーペアの設定
 
 パブリック/シークレットキーペアを設定するには、以下のステップに従ってください。
 
-1. ターミナルウィンドウのコマンドラインからシークレットキーを生成します。
-     
-   シークレットキーの暗号化バージョンも、シークレットキーの暗号化されていないバージョンも生成できます。
-     
-   * 暗号化されていないバージョンを生成するには、以下のコマンドを使用します。
+1. ターミナルウィンドウのコマンドラインからシークレットキーを生成します。  
+   シークレットキーの暗号化バージョンも、シークレットキーの暗号化されていないバージョンも生成できます。  
+   - 暗号化されていないバージョンを生成するには、以下のコマンドを使用します。  
        
      `$ openssl genrsa -out rsa_key.pem 2048`
-   * 暗号化されたバージョンを生成するには、以下のコマンドを使用します。
+   - 暗号化されたバージョンを生成するには、以下のコマンドを使用します。  
        
-     `$ openssl genrsa 2048 | openssl pkcs8 -topk8 -inform PEM -out rsa_key.p8`
+     `$ openssl genrsa 2048 | openssl pkcs8 -topk8 -inform PEM -out rsa_key.p8`  
        
-     通常、暗号化されたバージョンを生成する方が安全です。
+     通常、暗号化されたバージョンを生成する方が安全です。  
        
-     2番目のコマンドを使用してシークレットキーを暗号化する場合、OpenSSLが、シークレットキーファイルの暗号化に使用されるパスフレーズの入力を求めてきます。シークレットキーを保護するために強力なパスフレーズを使用することを推奨します。このパスフレーズを安全な場所に記録します。Snowflakeに接続するときにパスフレーズを入力します。パスフレーズはシークレットキーの保護にのみ使用され、Snowflakeに送信されることはないことに注意してください。
+     2番目のコマンドを使用してシークレットキーを暗号化する場合、OpenSSLが、シークレットキーファイルの暗号化に使用されるパスフレーズの入力を求めてきます。シークレットキーを保護するために強力なパスフレーズを使用することを推奨します。このパスフレーズを安全な場所に記録します。Snowflakeに接続するときにパスフレーズを入力します。パスフレーズはシークレットキーの保護にのみ使用され、Snowflakeに送信されることはないことに注意してください。   
        
-     PEMシークレットキーの例を以下に示します。
+     PEMシークレットキーの例を以下に示します。  
        
-     ```
-     -----BEGIN ENCRYPTED PRIVATE KEY-----
-       
-     MIIE6TAbBgkqhkiG9w0BBQMwDgQILYPyCppzOwECAggABIIEyLiGSpeeGSe3xHP1
-       
-     wHLjfCYycUPennlX2bd8yX8xOxGSGfvB+99+PmSlex0FmY9ov1J8H1H9Y3lMWXbL
-     
-     ...
-       
-     -----END ENCRYPTED PRIVATE KEY-----
-     ```
+     `-----BEGIN ENCRYPTED PRIVATE KEY-----   
+     MIIE6TAbBgkqhkiG9w0BBQMwDgQILYPyCppzOwECAggABIIEyLiGSpeeGSe3xHP1  
+      wHLjfCYycUPennlX2bd8yX8xOxGSGfvB+99+PmSlex0FmY9ov1J8H1H9Y3lMWXbL  
+      ...  
+      -----END ENCRYPTED PRIVATE KEY-----`
 2. コマンドラインからシークレットキーを参照してパブリックキーを生成します。シークレットキーが暗号化され、「rsa\_key.p8」という名前のファイルに含まれていると仮定して、次のコマンドを使用します。
 
-   `$ openssl rsa -in rsa_key.p8 -pubout -out rsa_key.pub`
+   `$ openssl rsa -in rsa_key.p8 -pubout -out rsa_key.pub`  
      
-   以下がPEMパブリックキーのサンプルです。
+   以下がPEMパブリックキーのサンプルです。  
      
-   ```
-   -----BEGIN PUBLIC KEY-----
-     
-   MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAy+Fw2qv4Roud3l6tjPH4
-     
-   zxybHjmZ5rhtCz9jppCV8UTWvEXxa88IGRIHbJ/PwKW/mR8LXdfI7l/9vCMXX4mk
-     
-   ...
-     
-   -----END PUBLIC KEY-----
-   ```
+   `-----BEGIN PUBLIC KEY-----  
+    MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAy+Fw2qv4Roud3l6tjPH4  
+    zxybHjmZ5rhtCz9jppCV8UTWvEXxa88IGRIHbJ/PwKW/mR8LXdfI7l/9vCMXX4mk  
+    ...  
+    -----END PUBLIC KEY-----`
 3. パブリックキーファイルとシークレットキーファイルをローカルディレクトリにコピーして保存します。ファイルのパスを記録します。シークレットキーはPKCS#8（公開鍵暗号標準）フォーマットを使用して保存され、前のステップで指定したパスフレーズで暗号化されることに注意してください。ただし、OSが提供するファイル許可機構を使用して、ファイルを不正アクセスから保護する必要があります。使用されていないときにファイルをセキュリティ保護するのはユーザーの責任です。
 4. ALTER USERを使用して、Snowflakeユーザーにパブリックキーを割り当てます。例：
 
    `alter user jsmith set rsa_public_key='MIIBIjANBgkqh...';`
 
-   <Note>
-   **注記：**
-   * セキュリティ管理者（例えばSECURITYADMIN権限を持つユーザー）以上がユーザーを変更できます。
-   * SQLステートメント内のパブリックキーヘッダーとフッターを除外します。
+<Note>
 
-   </Note>
-
+**注記：**
+- セキュリティ管理者（例えばSECURITYADMIN権限を持つユーザー）以上がユーザーを変更できます。
+   - SQLステートメント内のパブリックキーヘッダーとフッターを除外します。
 5. DESCRIBEUSERを使用してユーザーのパブリックキーの指紋を確認します。
-     
-   <table><thead><tr><th colspan="1" rowspan="1"> プロパティ </th><th colspan="1" rowspan="1"> 値 </th><th colspan="1" rowspan="1"> デフォルト </th><th colspan="1" rowspan="1"> 説明 </th></tr></thead><tbody><tr><td colspan="1" rowspan="1"> 名前 </td><td colspan="1" rowspan="1"> JSMITH </td><td colspan="1" rowspan="1"> NULL値 </td><td colspan="1" rowspan="1"> 名前 </td></tr><tr><td colspan="1" rowspan="1"> RSA_PUBLIC_KEY_FP </td><td colspan="1" rowspan="1"> SHA256:nvnONUsfiuycCLMXIEWG4eTp4FjhVUZQUQbNpbSHXiA= </td><td colspan="1" rowspan="1"> NULL値 </td><td colspan="1" rowspan="1"> ユーザーのRSAパブリックキーの指紋。 </td></tr><tr><td colspan="1" rowspan="1"> RSA_PUBLIC_KEY_2_FP </td><td colspan="1" rowspan="1"> NULL値 </td><td colspan="1" rowspan="1"> NULL値 </td><td colspan="1" rowspan="1"> ユーザーの2番目のRSAパブリックキーの指紋。 </td></tr></tbody></table>
 
-   <Note>
-   **注記：** RSA\_PUBLIC\_KEY\_2\_FPプロパティの詳細については、「 [キーローテーション](#h_01ES6Z0BJZFCZ3TSR79F91AE6J) 」を参照してください。
+</Note>
 
-   </Note>
+   | プロパティ | 値 | デフォルト | 説明 |
+   | --- | --- | --- | --- |
+   | 名前 | JSMITH | NULL値 | 名前 |
+   | RSA\_PUBLIC\_KEY\_FP | SHA256:nvnONUsfiuycCLMXIEWG4eTp4FjhVUZQUQbNpbSHXiA= | NULL値 | ユーザーのRSAパブリックキーの指紋。 |
+   | RSA\_PUBLIC\_KEY\_2\_FP | NULL値 | NULL値 | ユーザーの2番目のRSAパブリックキーの指紋。 |
 
+<Note>
+
+**注記：**RSA\_PUBLIC\_KEY\_2\_FPプロパティの詳細については、「キーローテーション」を参照してください。
 6. 下のサンプルコードを修正して実行します。このコードはシークレットキーファイルを復号してSnowflakeドライバーに渡し、接続を作成します。
-   * セキュリティパラメーターを更新：
-     + \<path>は作成したシークレットキーファイルへのローカルパスを指定します。
-   * セッションのパラメーターを更新：
-     + \<user>はSnowflakeログイン名を指定します。
-     + \<account>はアカウントの名前を指定します（Snowflakeにより提供される）。
-   * サンプルコードは以下のとおりです。
+   - セキュリティパラメーターを更新：
+     - \<path\>は作成したシークレットキーファイルへのローカルパスを指定します。
+   - セッションのパラメーターを更新：
+     - \<user\>はSnowflakeログイン名を指定します。
+     - \<account\>はアカウントの名前を指定します（Snowflakeにより提供される）。
+   - サンプルコードは以下のとおりです。
 
-     ```import java.util.Properties;
-       
-     import java.sql.Connection;
-       
-     import java.sql.Statement;
-       
-     import java.sql.ResultSet;
-       
-     import java.sql.DriverManager;
-       
-     import java.io.File;
-       
-     import java.io.FileInputStream;
-       
-     import java.io.DataInputStream;
-       
-     import java.util.Base64;
-       
-     import java.security.spec.PKCS8EncodedKeySpec;
-       
-     import java.security.KeyFactory;
-       
-     import java.security.PrivateKey;
-       
-     import javax.crypto.EncryptedPrivateKeyInfo;
-       
-     import javax.crypto.SecretKeyFactory;
-       
-     import javax.crypto.spec.PBEKeySpec;`
+</Note>
 
-     `public class TestJdbc
-       
-     {
-       
-     public static void main(String[] args)
-       
-     throws Exception
-       
-     {
-       
-     File f = new File("<path>/rsa_key.p8");
-       
-     FileInputStream fis = new FileInputStream(f);
-       
-     DataInputStream dis = new DataInputStream(fis);
-       
-     byte[] keyBytes = new byte[(int) f.length()];
-       
-     dis.readFully(keyBytes);
-       
-     dis.close();`
+     ```
+      import java.util.Properties;  
+      import java.sql.Connection;  
+      import java.sql.Statement;  
+      import java.sql.ResultSet;  
+      import java.sql.DriverManager;  
+      import java.io.File;  
+      import java.io.FileInputStream;  
+      import java.io.DataInputStream;  
+      import java.util.Base64;  
+      import java.security.spec.PKCS8EncodedKeySpec;  
+      import java.security.KeyFactory;  
+      import java.security.PrivateKey;  
+      import javax.crypto.EncryptedPrivateKeyInfo;  
+      import javax.crypto.SecretKeyFactory;  
+      import javax.crypto.spec.PBEKeySpec;`
 
-     `String encrypted = new String(keyBytes);
-       
-     String passphrase = System.getenv("PRIVATE_KEY_PASSPHRASE");
-       
-     encrypted = encrypted.replace("-----BEGIN ENCRYPTED PRIVATE KEY-----", "");
-       
-     encrypted = encrypted.replace("-----END ENCRYPTED PRIVATE KEY-----", "");
-       
-     EncryptedPrivateKeyInfo pkInfo = new EncryptedPrivateKeyInfo(Base64.getMimeDecoder().decode(encrypted));
-       
-     PBEKeySpec keySpec = new PBEKeySpec(passphrase.toCharArray());
-       
-     SecretKeyFactory pbeKeyFactory = SecretKeyFactory.getInstance(pkInfo.getAlgName());
-       
-     PKCS8EncodedKeySpec encodedKeySpec = pkInfo.getKeySpec(pbeKeyFactory.generateSecret(keySpec));
-       
-     KeyFactory keyFactory = KeyFactory.getInstance("RSA");
-       
-     PrivateKey encryptedPrivateKey = keyFactory.generatePrivate(encodedKeySpec);`
+     `public class TestJdbc  
+      {  
+      public static void main(String[] args)  
+      throws Exception  
+      {  
+      File f = new File("<path>/rsa_key.p8");  
+      FileInputStream fis = new FileInputStream(f);  
+      DataInputStream dis = new DataInputStream(fis);  
+      byte[] keyBytes = new byte[(int) f.length()];  
+      dis.readFully(keyBytes);  
+      dis.close();`
 
-     `String url = "jdbc:snowflake://<account>. snowflakecomputing.com ";
-       
-     Properties prop = new Properties();
-       
-     prop.put("user", "<user>");
-       
-     prop.put("account", "<account>");
-       
-     prop.put("privateKey", encryptedPrivateKey);`
+     `String encrypted = new String(keyBytes);  
+      String passphrase = System.getenv("PRIVATE_KEY_PASSPHRASE");  
+      encrypted = encrypted.replace("-----BEGIN ENCRYPTED PRIVATE KEY-----", "");  
+      encrypted = encrypted.replace("-----END ENCRYPTED PRIVATE KEY-----", "");  
+      EncryptedPrivateKeyInfo pkInfo = new EncryptedPrivateKeyInfo(Base64.getMimeDecoder().decode(encrypted));  
+      PBEKeySpec keySpec = new PBEKeySpec(passphrase.toCharArray());  
+      SecretKeyFactory pbeKeyFactory = SecretKeyFactory.getInstance(pkInfo.getAlgName());  
+      PKCS8EncodedKeySpec encodedKeySpec = pkInfo.getKeySpec(pbeKeyFactory.generateSecret(keySpec));  
+      KeyFactory keyFactory = KeyFactory.getInstance("RSA");  
+      PrivateKey encryptedPrivateKey = keyFactory.generatePrivate(encodedKeySpec);`
 
-     `Connection conn = DriverManager.getConnection(url, prop);
-       
-     Statement stat = conn.createStatement();
-       
-     ResultSet res = stat.executeQuery("select 1");
-       
-     res.next();
-       
-     System.out.println(res.getString(1));
-       
-     conn.close();
-       
-     }
-       
-     }```
+     `String url = "jdbc:snowflake://<account>.snowflakecomputing.com";  
+      Properties prop = new Properties();  
+      prop.put("user", "<user>");  
+      prop.put("account", "<account>");  
+      prop.put("privateKey", encryptedPrivateKey);`
+
+     `Connection conn = DriverManager.getConnection(url, prop);  
+      Statement stat = conn.createStatement();  
+      ResultSet res = stat.executeQuery("select 1");  
+      res.next();  
+      System.out.println(res.getString(1));  
+      conn.close();  
+      }  
+      }
+      ```
 
 #### キーローテーション
 
@@ -214,69 +158,77 @@ Snowflakeは、中断しないローテーションができるように、複�
 
 キーをローテーションするには、以下の手順を実行します。
 
-1. キーペア使用認証のステップを完了します...
-     
-   * 新しいシークレットキーとパブリックキーのセットを生成します。
-   * ユーザーにパブリックキーを割り当てます。パブリックキーの値をRSA\_PUBLIC\_KEY または RSA\_PUBLIC\_KEY\_2（キーの値が現在使用されていないどちらか）に設定します。
-       
-     例：
+1. キーペア使用認証のステップを完了します...  
+   - 新しいシークレットキーとパブリックキーのセットを生成します。
+   - ユーザーにパブリックキーを割り当てます。パブリックキーの値をRSA\_PUBLIC\_KEY または RSA\_PUBLIC\_KEY\_2（キーの値が現在使用されていないどちらか）に設定します。  
+     例：  
        
      `alter user jsmis set rsa_public_key_2='JERUE Htcve...';`
-2. コードを更新してSnowflakeに接続します。新しいシークレットキーを指定します。
-     
-   Snowflakeは、接続情報とともに送信されたシークレットキーにもとづいて、認証用の正しいアクティブなパブリックキーを検証します。
-3. ユーザープロフィールから古いパブリックキーを削除します。例：
+2. コードを更新してSnowflakeに接続します。新しいシークレットキーを指定します。  
+    Snowflakeは、接続情報とともに送信されたシークレットキーにもとづいて、認証用の正しいアクティブなパブリックキーを検証します。
+3. ユーザープロフィールから古いパブリックキーを削除します。例：  
      
    `alter user jsmith unset rsa_public_key;`
 
 ## Snowflakeアカウントに接続する
 
-このセクションでは、 Snowflake KeyPair Unload V2 コネクターページの **［認証情報］** および **［詳細］** ペインのオプションについて説明します。このページのほかのペインの項目である **［スケジュール設定］** や **［DataSetに名前を付け、説明を入力］** に関しては、ほとんどのタイプのコネクターで共通しています。詳細については、「 [コネクターを使用してDataSetを追加する](/ja/s/article/360042926274 "コネクターを使用してDataSetを追加する") 」を参照してください。
+このセクションでは、Snowflake KeyPair Unload V2コネクターページの**［認証情報］**および**［詳細］**ペインのオプションについて説明します。このページのほかのペインの項目である**［スケジュール設定］**や**［DataSetに名前を付け、説明を入力］**に関しては、ほとんどのタイプのコネクターで共通しています。詳細については、「[コネクターを使用してDataSetを追加する](/s/article/360042926274)」を参照してください。
 
 ### ［認証情報］ペイン
 
 このペインには、Snowflakeアカウントに認証情報を入力するためのフィールドがあります。以下の表は、各フィールドに必要な内容を説明しています。
 
-<table border="1" cellpadding="1" cellspacing="1" data-aura-rendered-by="33:195;a"><thead><tr><th colspan="1" rowspan="1"><p><span class="s1"> フィールド </span></p></th><th colspan="1" rowspan="1"><p><span class="s1"> 説明 </span></p></th></tr></thead><tbody><tr><td colspan="1" rowspan="1"> Account Name </td><td colspan="1" rowspan="1"> アカウントのフルネームを入力します（Snowflakeから提供されます）。米国西部地域では <b><b> account_name </b></b> 、その他の全地域では <b><b> account_name.region_id </b></b> です。 </td></tr><tr><td colspan="1" rowspan="1"> Username </td><td colspan="1" rowspan="1"> Snowflakeホストへの接続に使用するユーザー名を入力します。 </td></tr><tr><td colspan="1" rowspan="1"> Private Key </td><td colspan="1" rowspan="1"> シークレットキーを入力します。 </td></tr><tr><td colspan="1" rowspan="1"> Passphrase </td><td colspan="1" rowspan="1"> シークレットキーを暗号化する場合、OpenSSLが、シークレットキーファイルの暗号化に使用されるパスフレーズの入力を求めてきます。パスフレーズをここに入力します。 </td></tr><tr><td colspan="1" rowspan="1"> Role </td><td colspan="1" rowspan="1"><span> 権限を入力します。 </span></td></tr><tr><td colspan="1" rowspan="1"> アクセスキー </td><td colspan="1" rowspan="1"><span> AWSアクセスキーを入力します。これは、AWSコンソールの［セキュリティ認証情報］セクションで、IAMを使用している場合は［ユーザー］で確認できます。 </span></td></tr><tr><td colspan="1" rowspan="1"> Secret Key </td><td colspan="1" rowspan="1"><span> AWSシークレットアクセスキーを入力します。これは、アクセスキーを作成したときに提供されたものです。新しいシークレットキーは、AWSコンソールで生成できます。 </span></td></tr><tr><td colspan="1" rowspan="1"> Bucket </td><td colspan="1" rowspan="1"> SnowflakeデータがアンロードされるAWS S3バケットの名前を入力します。 </td></tr><tr><td colspan="1" rowspan="1"> リージョン </td><td colspan="1" rowspan="1"><span> Amazon S3のリージョンを選択します。 </span></td></tr></tbody></table>
+| フィールド        | 説明                                                                                                              |
+| ------------ | --------------------------------------------------------------------------------------------------------------- |
+| Account Name | アカウントのフルネームを入力します（Snowflakeから提供されます）。米国西部地域では****account\_name****、その他の全地域では****account\_name.region\_id****です。 |
+| Username     | Snowflakeホストへの接続に使用するユーザー名を入力します。                                                                               |
+| Private Key  | シークレットキーを入力します。                                                                                                 |
+| Passphrase   | シークレットキーを暗号化する場合、OpenSSLが、シークレットキーファイルの暗号化に使用されるパスフレーズの入力を求めてきます。パスフレーズをここに入力します。                               |
+| Role         | 権限を入力します。                                                                                                       |
+| アクセスキー       | AWSアクセスキーを入力します。これは、AWSコンソールの［セキュリティ認証情報］セクションで、IAMを使用している場合は［ユーザー］で確認できます。                                     |
+| Secret Key   | AWSシークレットアクセスキーを入力します。これは、アクセスキーを作成したときに提供されたものです。新しいシークレットキーは、AWSコンソールで生成できます。                                 |
+| Bucket       | SnowflakeデータがアンロードされるAWS S3バケットの名前を入力します。                                                                       |
+| リージョン        | Amazon S3のリージョンを選択します。                                                                                          |
 
-有効な認証情報を一度入力しておくと、いつでも同じアカウントを使用して新しいSnowflake KayPair Unload V2 DataSetを作成することができます。コネクターアカウントは、Data Centerの **［アカウント］** タブで管理できます。このタブの詳細については、「 [コネクター/アダプターアカウントを管理する](/ja/s/article/360042926054 "コネクター/アダプターアカウントを管理する") 」を参照してください。
+有効な認証情報を一度入力しておくと、いつでも同じアカウントを使用して新しいSnowflake KayPair Unload V2 DataSetを作成することができます。コネクターアカウントは、Data Centerの**［アカウント］**タブで管理できます。このタブの詳細については、「[コネクター/アダプターアカウントを管理する](/s/article/360042926054)」を参照してください。
 
 ### ［詳細］ペイン
 
-このペインには、メインの **［Reports］** メニューのほか、選択したレポートタイプに応じて表示/非表示になるその他様々なメニューがあります。
+このペインには、メインの**［Reports］**メニューのほか、選択したレポートタイプに応じて表示/非表示になるその他様々なメニューがあります。
 
-<table border="1" cellpadding="1" cellspacing="1" data-aura-rendered-by="33:195;a"><thead><tr><th colspan="1" rowspan="1"><p> メニュー </p></th><th colspan="1" rowspan="1"><p> 説明 </p></th></tr></thead><tbody><tr><td colspan="1" rowspan="1"><p> Report </p></td><td colspan="1" rowspan="1"><p> クエリタイプを選択します。以下のクエリタイプを利用できます。 </p><table border="1" cellpadding="1" cellspacing="1"><tbody><tr><td colspan="1" rowspan="1"> Custom Query </td><td colspan="1" rowspan="1"> 実行するSQLクエリを入力します。 </td></tr><tr><td colspan="1" rowspan="1"> Query Builder </td><td colspan="1" rowspan="1"> クエリを自動生成する表とフィールドを選択します。 </td></tr></tbody></table></td></tr><tr><td colspan="1" rowspan="1"><p><span class="wysiwyg-color-black"> クエリ </span></p></td><td colspan="1" rowspan="1"><p> データを取得するために使用するSQLクエリを入力します。 <b> Query Helper </b> パラメーターを使って、使用可能なSQLクエリを記述できます。 <b> クエリヘルパー </b> を使用するには、以下を行います。 </p><ol><li><p> 各メニューで、目的のウェアハウス、データベース、データベーススキーマ、データベーステーブル、テーブルの列を選択します。 </p></li><li><p><b> ［クエリヘルパー］ </b> フィールドに表示されるSQLステートメントをコピーします。 </p></li><li><p> コピーしたSQLステートメントを <b> ［クエリ］ </b> フィールドに貼り付けます。 </p></li></ol></td></tr><tr><td colspan="1" rowspan="1"><p> ウェアハウス </p></td><td colspan="1" rowspan="1"><p> 取得したいデータが格納されているウェアハウスを選択します。このリストには、認証情報にもとづいてアクセスできるすべてのウェアハウスが表示されます。 </p></td></tr><tr><td colspan="1" rowspan="1"><p> データベース </p></td><td colspan="1" rowspan="1"><p> 取得したいデータが格納されているデータベースを選択します。このリストには、認証情報にもとづいてアクセスできるすべてのデータベースが表示されます。 </p></td></tr><tr><td colspan="1" rowspan="1"><p> スキーマ </p></td><td colspan="1" rowspan="1"><p> 取得したいデータが含まれているデータベーススキーマを選択します。このリストには、認証情報にもとづいてアクセスできるすべてのスキーマが表示されます。 </p></td></tr><tr><td colspan="1" rowspan="1"><p> 表 </p></td><td colspan="1" rowspan="1"><p> 取得するデータベーステーブルを選択します。このリストには、認証情報にもとづいてアクセスできるすべてのテーブルが表示されます。データベーステーブルを選択しない場合は、コネクターはデータベーススキーマ全体を取得します。 </p></td></tr><tr><td colspan="1" rowspan="1"><p> 表の列 </p></td><td colspan="1" rowspan="1"><p><span> レポートに含めるテーブルの列を選択します。テーブルの列を選択しないと、コネクターは選択したデータベーステーブル全体を取得します。 </span></p></td></tr><tr><td colspan="1" rowspan="1"><p> クエリ </p></td><td colspan="1" rowspan="1"><p><span> 実行するSQLクエリを入力します。 </span></p></td></tr><tr><td colspan="1" rowspan="1"><p> クエリヘルパー </p></td><td colspan="1" rowspan="1"><p><span> 上のメニューから、ウェアハウス、データベース、スキーマ、テーブルなどを選択すると、利用可能なSQLクエリがこのフィールドに作成されます。このテキストをコピーして、［クエリ］フィールドに貼り付けます。必要に応じてこのクエリを編集します。 </span></p></td></tr></tbody></table>
+| メニュー | 説明  |
+| ---- | --- |
+| Report | クエリタイプを選択します。以下のクエリタイプを利用できます。<table><tbody><tr><td>Custom Query</td><td>実行するSQLクエリを入力します。</td></tr><tr><td>Query Builder</td><td>クエリを自動生成する表とフィールドを選択します。</td></tr></tbody></table> |
+| クエリ  | データを取得するために使用するSQLクエリを入力します。**Query Helper**パラメーターを使って、使用可能なSQLクエリを記述できます。**クエリヘルパー**を使用するには、以下を行います。   1. 各メニューで、目的のウェアハウス、データベース、データベーススキーマ、データベーステーブル、テーブルの列を選択します。 2. **［クエリヘルパー］**フィールドに表示されるSQLステートメントをコピーします。 3. コピーしたSQLステートメントを**［クエリ］**フィールドに貼り付けます。 |
+| ウェアハウス | 取得したいデータが格納されているウェアハウスを選択します。このリストには、認証情報にもとづいてアクセスできるすべてのウェアハウスが表示されます。 |
+| データベース | 取得したいデータが格納されているデータベースを選択します。このリストには、認証情報にもとづいてアクセスできるすべてのデータベースが表示されます。 |
+| スキーマ | 取得したいデータが含まれているデータベーススキーマを選択します。このリストには、認証情報にもとづいてアクセスできるすべてのスキーマが表示されます。 |
+| 表    | 取得するデータベーステーブルを選択します。このリストには、認証情報にもとづいてアクセスできるすべてのテーブルが表示されます。データベーステーブルを選択しない場合は、コネクターはデータベーススキーマ全体を取得します。 |
+| 表の列  | レポートに含めるテーブルの列を選択します。テーブルの列を選択しないと、コネクターは選択したデータベーステーブル全体を取得します。 |
+| クエリ  | 実行するSQLクエリを入力します。 |
+| クエリヘルパー | 上のメニューから、ウェアハウス、データベース、スキーマ、テーブルなどを選択すると、利用可能なSQLクエリがこのフィールドに作成されます。このテキストをコピーして、［クエリ］フィールドに貼り付けます。必要に応じてこのクエリを編集します。 |
 
 ### その他のペイン
 
-スケジュール設定、再試行、更新に関するオプションなど、コネクターインターフェースのその他のペインに表示されるオプションについては、「 [コネクターを使用してDataSetを追加する](/ja/s/article/360042926274) 」を参照してください。
+スケジュール設定、再試行、更新に関するオプションなど、コネクターインターフェースのその他のペインに表示されるオプションについては、「[コネクターを使用してDataSetを追加する](/s/article/360042926274)」を参照してください。
 
 ## よくある質問
 
 <AccordionGroup>
+
 <Accordion title="注意すべきAPI制限はありますか？">
-
-
 制限は、使用するサーバー構成によって異なります。
-
-
 </Accordion>
+
 <Accordion title="データ更新の頻度はどのくらいですか？">
-
-
 DataSetは15分ごとに実行できます。ただし、クエリの実行時間によっては、DataSetの実行頻度が低くなる場合があります。
-
-
 </Accordion>
+
 <Accordion title="クエリの記述の際に注意すべき点はありますか？">
-
-
 すべての単語、表名、フィールド名が正しく記述されていることを確認します。クエリのヘルプについては、［Query Helper］フィールドを参照してください。
-
-
 </Accordion>
-<Accordion title="Snowflakeデータベースに接続できない理由は？IPアドレスのホワイトリスト登録が必要でしょうか？">
 
+<Accordion title="Snowflakeデータベースに接続できない理由は？IPアドレスのホワイトリスト登録が必要でしょうか？">
 
 Snowflakeデータベースに接続する前に、接続するポート上のデータベースサーバーにある多数のIPアドレスをホワイトリストに登録する必要があります。IPアドレスの詳細なリストは、「
 
@@ -288,8 +240,6 @@ Snowflakeデータベースに接続する前に、接続するポート上の�
 * 設定を見直し、すべての必須項目が選択されていることを確認してください。
 * コネクターの履歴にエラーメッセージが記録されていないか確認してください。
 * まれに、リクエストした情報が多すぎた結果、API制限またはタイムアウトに達する場合があります。記録されている場合は、コネクターの履歴でエラーメッセージと実行時間を確認することができます。また、取得するアカウント数やレポートのメトリクス数を減らしたり、取得するタイムフレームを短縮したりすることができます。
-
-
 
 </Accordion>
 </AccordionGroup>

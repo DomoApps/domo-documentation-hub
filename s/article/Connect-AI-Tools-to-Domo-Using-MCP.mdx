@@ -1,14 +1,17 @@
 ---
-title: "Connect AI Tools to Domo Using MCP (Beta)"
+title: "Connect AI Tools to Domo Using MCP"
+tag: "Beta"
+sidebarTitle: "MCP Server"
 ---
 
-
+<Note>
+  **Note:** This feature is in beta. Beta Program participants can enable
+  features [here](https://embed.domo.com/embed/pages/DQ8Ek). To join the Beta
+  Program, fill out [this form](https://embed.domo.com/embed/pages/K8GMx). For beta questions or feedback, email
+  [beta.admin@domo.com](mailto:beta.admin@domo.com).
+</Note>
 
 ## Intro
-
-<Note>
-  **Note:** This feature is in beta. Contact your Domo account team to join.
-</Note>
 
 The Model Context Protocol (MCP) is an open standard that allows AI assistants to securely interact with external platforms and data sources. Domo's MCP Server is a hosted service that gives AI tools — such as Claude, Cursor, VS Code, and ChatGPT — secure access to your Domo instance.
 
@@ -21,13 +24,9 @@ After you're connected, you can use your AI tool to:
 
 This article walks through how to connect Claude Desktop, Claude Code, or VS Code to the Domo MCP Server and verify your connection.
 
-<Frame>
-  ![](/images/kb/DOMO-MCP-Server-Screenshot-1.png)
-</Frame>
+<Frame>![](/images/kb/DOMO-MCP-Server-Screenshot-1.png)</Frame>
 
 ---
-
-
 
 ## Prerequisites
 
@@ -35,9 +34,8 @@ Before connecting, ensure you have the following:
 
 - **Node.js** version 21 or higher installed. Use [nvm](https://github.com/nvm-sh/nvm) to manage your Node.js version.
 - A Domo **Access Token** with appropriate permissions. You can provision one at **Admin** > **Authentication** > **Access Tokens**, or request one from your MajorDomo. See [Manage Access Tokens](/s/article/360042934494#manage-access-tokens) for instructions.
+- Your user has the following grants enabled: **Use AI Chat** & **Use AI Services**
 - A supported AI code editor (Claude Desktop, Claude Code, VS Code, Cursor, or another MCP-compatible client).
-
-
 
 ## Connect Claude Desktop
 
@@ -47,9 +45,7 @@ Claude Desktop does not natively support remote MCP servers, so you connect usin
 
 In your Domo instance, go to **Admin** > **Authentication** > **Access Tokens** and generate a token. See [Manage Access Tokens](/s/article/360042934494#manage-access-tokens) for instructions.
 
-<Frame>
-  ![](/images/kb/DOMO-MCP-Server-Screenshot-2.png)
-</Frame>
+<Frame>![](/images/kb/DOMO-MCP-Server-Screenshot-2.png)</Frame>
 
 ### Step 2: Install mcp-remote
 
@@ -63,17 +59,13 @@ npm install mcp-remote
 
 Download and install [Claude Desktop](https://claude.ai/download).
 
-<Frame>
-  ![](/images/kb/DOMO-MCP-Server-Screenshot-3.png)
-</Frame>
+<Frame>![](/images/kb/DOMO-MCP-Server-Screenshot-3.png)</Frame>
 
 ### Step 4: Edit the Claude Desktop configuration
 
 In Claude Desktop, go to **Settings** > **Developer** and select **Edit Config**.
 
-<Frame>
-  ![](/images/kb/DOMO-MCP-Server-Screenshot-4.png)
-</Frame>
+<Frame>![](/images/kb/DOMO-MCP-Server-Screenshot-4.png)</Frame>
 
 This opens the configuration file located at:
 
@@ -81,9 +73,7 @@ This opens the configuration file located at:
 /Users/<username>/Library/Application Support/Claude/claude_desktop_config.json
 ```
 
-<Frame>
-  ![](/images/kb/DOMO-MCP-Server-Screenshot-5.png)
-</Frame>
+<Frame>![](/images/kb/DOMO-MCP-Server-Screenshot-5.png)</Frame>
 
 ### Step 5: Add the Domo MCP Server configuration
 
@@ -108,17 +98,14 @@ Paste the following into the configuration file, replacing `<DOMO_DOMAIN>` with 
 ### Step 6: Restart Claude Desktop
 
 Quit and restart Claude Desktop for the configuration to take effect.
-<Frame>
-  ![](/images/kb/DOMO-MCP-Server-Screenshot-6.png)
-</Frame>
+
+<Frame>![](/images/kb/DOMO-MCP-Server-Screenshot-6.png)</Frame>
 
 ### Step 7: Verify the connection
 
 Go to **Settings** > **Connectors** and confirm the Domo MCP server is listed and connected.
 
-<Frame>
-  ![](/images/kb/DOMO-MCP-Server-Screenshot-7.png)
-</Frame>
+<Frame>![](/images/kb/DOMO-MCP-Server-Screenshot-7.png)</Frame>
 
 Select the server to view its tool permissions. You should see the following tools listed:
 
@@ -127,24 +114,18 @@ Select the server to view its tool permissions. You should see the following too
 - `FileSetQueryTool`
 - `SearchTool`
 
-<Frame>
-  ![](/images/kb/DOMO-MCP-Server-Screenshot-8.png)
-</Frame>
+<Frame>![](/images/kb/DOMO-MCP-Server-Screenshot-8.png)</Frame>
 
 To test the connection, try a prompt such as: "How many datasets do I have access to?"
 
-<Frame>
-  ![](/images/kb/DOMO-MCP-Server-Screenshot-9.png)
-</Frame>
-
-
+<Frame>![](/images/kb/DOMO-MCP-Server-Screenshot-9.png)</Frame>
 
 ## Connect Claude Code
 
 In Claude Code, run the following command from the root of your project. Replace `<DOMO_DOMAIN>` with your Domo instance domain and `<DOMO_ACCESS_TOKEN>` with your Access Token:
 
-```
-claude mcp add --transport http secure-api \
+```bash
+claude mcp add --transport http domo-mcp \
   https://<DOMO_DOMAIN>/api/ai/v1/assistant/mcp/toolkits/DOMO_BASIC_MCP \
   --header "X-DOMO-DEVELOPER-TOKEN: <DOMO_ACCESS_TOKEN>"
 ```
@@ -165,34 +146,38 @@ This adds the configuration to a `.mcp` file in the root of your project:
 }
 ```
 
-
-
 ## Connect VS Code
 
 1. Open the Command Palette with **Cmd+Shift+P** (Mac) or **Ctrl+Shift+P** (Windows/Linux).
 
 2. Choose your configuration scope:
-   - For a **global configuration** available across all workspaces, search for and select **MCP: Open User Configuration**.
-   - For a **workspace-specific configuration** (recommended for sharing within a project), search for and select **MCP: Open Workspace Folder MCP Configuration**. This creates or opens `.vscode/mcp.json`.
+   - For a **global (user) configuration** (recommended) available across all workspaces, search for and select **MCP: Open User Configuration**.
+   - For a **workspace-specific configuration** (not recommended for security, as it may expose your credentials), search for and select **MCP: Open Workspace Folder MCP Configuration**. This creates or opens `.vscode/mcp.json`.
+   - For a **WSL configuration**, search for and select **MCP: Open Remote User MCP Configuration**. This creates or opens `~/.vscode-server/data/User/mcp.json`.
 
-3. Add the following entry to the `servers` object in the configuration file. Replace `<DOMO_DOMAIN>` with your Domo instance domain and `<DOMO_ACCESS_TOKEN>` with your Access Token:
+3. Add the following entry for `domo-mcp` to the `servers` object and `domo-access-token` to the `inputs` array in the configuration file. Replace `<DOMO_DOMAIN>` with your Domo instance domain. You'll be prompted to enter your Access Token when you start the server:
 
    ```json
    {
      "servers": {
        "domo-mcp": {
+         "url": "https://<DOMO_DOMAIN>/api/ai/v1/assistant/mcp/toolkits/DOMO_BASIC_MCP",
          "type": "http",
-         "uri": "https://<DOMO_DOMAIN>/api/ai/v1/assistant/mcp/toolkits/DOMO_BASIC_MCP",
          "headers": {
-           "X-DOMO-DEVELOPER-TOKEN": "<DOMO_ACCESS_TOKEN>"
-         },
-         "version": "1.0.0"
+           "X-DOMO-DEVELOPER-TOKEN": "${input:domo-access-token}"
+         }
        }
-     }
+     },
+     "inputs": [
+       {
+         "id": "domo-access-token",
+         "type": "promptString",
+         "description": "Domo Access Token",
+         "password": true
+       }
+     ]
    }
    ```
-
-
 
 ## Troubleshoot
 
@@ -210,25 +195,29 @@ If `npx` cannot be found, add an `env` property to the `domo-mcp-npx` server ent
 
 **Windows**
 
-If `npx` cannot be found, replace the `"command"` value in your configuration with the full path to the `npx` executable:
+If `npx` cannot be found, replace the `"command"` value in your configuration with the full path to the `npx` executable, for example:
 
 ```json
 "command": "C:\\Program Files\\nodejs\\npx.cmd"
 ```
 
-
-
 ## FAQ
-
 
 <AccordionGroup>
 
 <Accordion title="Which AI tools are compatible with the Domo MCP Server?">
-The Domo MCP Server works with any MCP-compatible AI client, including Claude Desktop, Claude Code, VS Code, Cursor, and ChatGPT.
+  The Domo MCP Server works with any MCP-compatible AI client, including Claude
+  Desktop, Claude Code, VS Code, Cursor, and ChatGPT.
 </Accordion>
 
 <Accordion title="What can I do after I'm connected?">
-After you're connected, you can query your Domo DataSets, query documents stored in Domo, and search across your Domo instance. Card and page summarization are coming soon.
+  After you're connected, you can query your Domo DataSets, query documents
+  stored in Domo, and search across your Domo instance. Card and page
+  summarization are coming soon.
+</Accordion>
+
+<Accordion title="I connected successfully, but I get an error when I query data.">
+	Your user will need the following grants enabled: **Use AI Chat** & **Use AI Services**.
 </Accordion>
 
 </AccordionGroup>

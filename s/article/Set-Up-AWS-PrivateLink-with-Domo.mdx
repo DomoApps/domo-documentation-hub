@@ -1,0 +1,238 @@
+---
+title: "Set Up AWS PrivateLink with Domo"
+---
+
+## Intro
+
+This article explains how to evaluate AWS PrivateLink for use with Domo, complete the customer-side setup, and manage an existing PrivateLink connection.
+
+If PrivateLink is not the right fit for your situation, contact your Domo representative to discuss alternatives such as IP allowlisting.
+
+---
+
+## Required Grants
+
+No specific Domo grants are required to complete this setup. Admin access to your AWS account is required.
+
+## Understand How PrivateLink Works
+
+PrivateLink connects two sides:
+
+- **Endpoint Service (your side) —** You host an AWS Network Load Balancer (NLB) backed by the private resources you want to allow connections to. You then create an Endpoint Service associated with that NLB and grant Domo permission to connect to it.
+- **VPC Endpoint (Domo's side) —** Domo's cloud engineers create a VPC Endpoint in Domo's AWS account that connects to your Endpoint Service. Domo also creates a security group that restricts traffic to only the ports you specify.
+
+All connection requests are initiated by Domo (the Endpoint/client side) toward servers on or behind your NLB. This means Domo can pull data from your private resources, but connections initiated from your network won't reach Domo's private VPC.
+
+## Review Considerations Before Setup
+
+Review the following before committing to a PrivateLink setup.
+
+### Region Requirement
+
+PrivateLink Endpoints can only be created in the same AWS region as the Endpoint Service they connect to. **Your Endpoint Service must be in the same AWS region as your Domo instance.** US-based customers are typically in `us-east-1` (US East, N. Virginia) or `us-west-2` (US West, Oregon). If unsure, ask your Domo representative which region hosts your instance.
+
+If your private resources are in a different region, you will need to bridge that gap with AWS inter-region routing before the PrivateLink can be established:
+
+- [VPC Peering](https://docs.aws.amazon.com/vpc/latest/peering)
+- [Transit Gateway](https://docs.aws.amazon.com/vpc/latest/tgw)
+
+Cross-region links may be possible under certain circumstances (see the Snowflake section and the FAQ), but require exception approval and may incur additional data transfer costs.
+
+### Connection Direction
+
+PrivateLink allows bidirectional TCP communication, but **all connections must be initiated from the Domo (Endpoint) side**. Your servers must be listening and accepting inbound connections; Domo's connectors and Cloud Amplifier will connect to them as clients.
+
+### Access Multiple Resources
+
+Although AWS supports multiple NLBs behind a single Endpoint Service, Domo's Endpoint will only map to one of them. To expose multiple resources over a single PrivateLink, route them to different TCP ports on the same NLB (each with its own Listener and Target Group). Alternatively, multiple PrivateLink connections can be created, though each may incur additional charges.
+
+If you already have an existing PrivateLink and want to add access to a new resource in the same VPC, the preferred approach is to add a new Listener and Target Group to your existing NLB rather than creating an entirely new link.
+
+### Security
+
+PrivateLink does not replace authentication. Resources accessible over the link should have their own access controls (database credentials, TLS certificates, and so on) in place. The PrivateLink itself provides network-level isolation, not application-level security.
+
+## Pricing
+
+Domo charges two SKUs for PrivateLink:
+
+| SKU Description                                     |
+| --------------------------------------------------- |
+| PrivateLink Setup (one-time fee, per link)          |
+| PrivateLink Annual Fee (maintenance, support, data) |
+
+Contact your Domo representative for pricing details. Some non-standard scenarios require VP approval. AWS also charges separately for Endpoint and data transfer usage on both sides of the link.
+
+## Set Up PrivateLink
+
+### Step 1 — Identify Your Resources
+
+Decide which private resources you want to expose to Domo and how they will map to ports on the NLB. Each resource must have a unique TCP port. Document the hostname/IP and port for each.
+
+### Step 2 — Create the Network Load Balancer
+
+See the [AWS Network Load Balancer documentation](https://docs.aws.amazon.com/elasticloadbalancing/latest/network).
+
+- Configure the NLB in **all availability zones** in the region if practical. If a target resource is not available in all zones, enable **cross-zone load balancing** on the NLB. This is strongly recommended—without it, Domo's Endpoint in one AZ may not be able to reach a target that only exists in another AZ.
+- Create a **Listener** and **Target Group** for each resource/port combination.
+- **Do not attach a Security Group to your NLB** unless necessary. If you do attach one, you must configure the NLB to *not* enforce inbound rules on PrivateLink traffic (see [NLB security group settings](https://docs.aws.amazon.com/elasticloadbalancing/latest/network/load-balancer-security-groups.html#update-security-settings)). Failing to do so requires either allowing inbound traffic from any IP address (which undermines the security model), or knowledge of Domo's private networking ranges (which undermines the network abstraction).
+
+### Step 3 — Create the Endpoint Service
+
+See the [AWS Endpoint Service documentation](https://docs.aws.amazon.com/vpc/latest/privatelink/create-endpoint-service.html).
+
+- Create the Endpoint Service with the **Network** load balancer type, associated with the NLB you created above.
+- Enable **Acceptance Required** for new Endpoints. This lets you review and approve Domo's connection request before it becomes active.
+
+### Step 4 — Add Permissions for Domo
+
+See the [AWS documentation for adding Endpoint Service permissions](https://docs.aws.amazon.com/vpc/latest/privatelink/add-endpoint-service-permissions.html).
+
+Add Domo's AWS account principal ARN to the allowed principals for your Endpoint Service. Use the ARN for the region your Domo instance is in:
+
+| Region                  | Identifier     | Domo Account ARN                 |
+| ----------------------- | -------------- | -------------------------------- |
+| US East (N. Virginia)   | us-east-1      | `arn:aws:iam::339405024189:root` |
+| US West (Oregon)        | us-west-2      | `arn:aws:iam::339405024189:root` |
+| Canada (Central)        | ca-central-1   | `arn:aws:iam::710710207408:root` |
+| Europe (Ireland)        | eu-west-1      | `arn:aws:iam::687132894031:root` |
+| Europe (London)         | eu-west-2      | `arn:aws:iam::632843870520:root` |
+| Asia Pacific (Sydney)   | ap-southeast-2 | `arn:aws:iam::010251424122:root` |
+| Asia Pacific (Tokyo)    | ap-northeast-1 | `arn:aws:iam::622384692065:root` |
+| Asia Pacific (Mumbai)   | ap-south-1     | `arn:aws:iam::266735800013:root` |
+
+### Step 5 — Send Information to Domo
+
+Provide the following to your Domo representative:
+
+1. **Endpoint Service Name** — found in the AWS console under **VPC** > **Endpoint Services**. It has the form `com.amazonaws.vpce.REGION.vpce-svc-XXXXXXXXXXXXXXXXX`.
+2. **TCP port(s)** — the port(s) you have configured (or plan to configure) Listeners for on your NLB.
+3. **Private DNS names** (optional) — if your resources require specific hostnames on the Domo side (for example, to match a TLS certificate CN or a virtual hostname), include those as well.
+
+### Step 6 — Wait for Domo to Create the Endpoint
+
+Domo's cloud engineers will verify that your Endpoint Service is accessible from Domo's AWS account, then create a VPC Endpoint and a security group that allows only the ports you specified. They will also create any requested private DNS records in a Route 53 Private Hosted Zone.
+
+### Step 7 — Accept the Connection Request
+
+See the [AWS documentation for accepting Endpoint requests](https://docs.aws.amazon.com/vpc/latest/privatelink/accept-reject-endpoint-requests.html).
+
+After Domo creates the Endpoint, it will appear as **Pending** on your Endpoint Service. Accept the connection request in the AWS console. Within a few minutes the status should change to **Available**.
+
+Notify your Domo representative that you have accepted the connection. If the status does not become **Available**, Domo can assist with troubleshooting.
+
+### Step 8 — Configure Your Domo Connectors or Cloud Amplifier
+
+Your Domo representative will provide the DNS name for the Endpoint on Domo's side. It has the form:
+
+```
+vpce-XXXXXXXXXXXXXXXXX-XXXXXXXX.vpce-svc-XXXXXXXXXXXXXXXXX.REGION.vpce.amazonaws.com
+```
+
+Use this as the **hostname** when configuring any Domo connector or Cloud Amplifier data flow that needs to reach your private resources. If you requested custom private DNS names, you may use those instead.
+
+<Note>**Note:** You cannot use a private IP address to connect. PrivateLink abstracts the two networks from each other, so private IPs from your network have no meaning within Domo's VPC. Always use the DNS name (or a custom DNS alias) to reach the Domo side of the PrivateLink—never a raw IP address.</Note>
+
+## Set Up Snowflake PrivateLink
+
+Connecting Domo's Cloud Amplifier to Snowflake over PrivateLink is a supported use case but has a different workflow, since Snowflake is a fully managed service and you do not have direct access to the underlying AWS VPC.
+
+### Prerequisites
+
+1. **Snowflake account tier:** PrivateLink is only supported on Snowflake's **Business Critical** edition or above. Verify your tier before proceeding.
+2. **Region match:** Snowflake's PrivateLink endpoint must be in the same AWS region as your Domo instance. You can determine your Snowflake region by running `SELECT CURRENT_REGION();` in a Snowflake session. If there is a region mismatch, a cross-region exception may be possible—contact your Domo representative.
+
+### Process
+
+1. Open a **Snowflake support ticket** requesting PrivateLink access for a cloud service vendor. Refer to the [Snowflake PrivateLink setup guide for cloud service vendors](https://community.snowflake.com/s/article/HowtosetupPrivatelinktoSnowflakefromCloudServiceVendors).
+2. Provide Snowflake with **Domo's AWS account ID** for your region. For `us-east-1` and `us-west-2`, this is `339405024189`. For other regions, see the ARN table in Step 4 above (the account ID is the 12-digit number in the ARN).
+3. After Snowflake authorizes Domo's account, determine the **PrivateLink VPCE ID** (`privatelink-vpce-id` in Snowflake's documentation). This is the Endpoint Service Name you will pass to Domo.
+4. Share your **Snowflake account URL** with your Domo representative.
+5. Domo will complete the connection setup. You will then configure Cloud Amplifier to use the private DNS name Domo provides in place of the standard Snowflake public hostname.
+
+## Troubleshoot
+
+### Resolve Endpoint Creation Failures
+
+The most common cause is that the Domo AWS account ARN has not been added to the Endpoint Service's allowed principals. Verify that the correct ARN for your region (see Step 4 above) has been added. After adding it, Domo can re-attempt verification.
+
+### Resolve Connectivity Issues After the Link Is Available
+
+If the network connection is established (link is Available) but Domo connectors fail to connect, check:
+
+- **Healthy targets:** Does your NLB Listener have healthy targets in the Target Group?
+- **Cross-zone load balancing:** If Domo's Endpoint is in a different AZ from your targets, cross-zone load balancing must be enabled on the NLB.
+- **NLB security group:** If you attached a Security Group to your NLB, did you also disable enforcement of inbound rules on PrivateLink traffic? If not, either remove the security group or update that setting.
+- **Correct port:** Verify that the port you gave Domo matches an active Listener on your NLB.
+
+### Resolve Connector Errors After Successful Network Connectivity
+
+If Domo can establish a TCP connection to the NLB but the connector still fails (for example, `Login failed for user` on a SQL Server connection), the PrivateLink network layer is working correctly. The issue is with application-level authentication—verify credentials, database permissions, and allowed login sources on the database itself. In some cases, a custom DNS name is required for authentication to succeed or for the correct resources to be mapped. Notify your Domo representative of any custom DNS names needed.
+
+### Understand Why Private IP Addresses Do Not Work
+
+This is expected behavior. PrivateLink traffic is routed via DNS, not IP. You must use the DNS name that Domo provides (or a custom DNS alias), never a raw private IP address. The private IP of a resource behind the NLB is not routable from Domo's VPC.
+
+## Manage Existing Links
+
+### Add Ports or Resources
+
+To expose a new resource or additional port over an existing PrivateLink, add a new Listener and Target Group to your existing NLB for the new port, then notify your Domo representative with the new port number. Domo will update the security group to allow the new port. You do not need to create a new Endpoint Service or PrivateLink for this use case.
+
+### Create Additional Links
+
+If a new resource is in a different AWS VPC or network (not reachable through the existing NLB), a new Endpoint Service and PrivateLink will be needed. Repeat the setup procedure above. Each additional link may incur additional charges from Domo and AWS.
+
+### Remove a Link
+
+If a PrivateLink is no longer needed, notify your Domo representative and reject the existing link. Domo will decommission the VPC Endpoint. You may then delete the Endpoint Service and NLB on your side. CloudWatch metrics in the AWS console can help determine whether a link is actively passing traffic before making a teardown decision.
+
+## FAQ
+
+<AccordionGroup>
+
+<Accordion title="Can I use PrivateLink if my data source is in a different AWS region from my Domo instance?">
+Not directly. PrivateLink requires the Endpoint and Endpoint Service to be in the same AWS region. If your resources are in a different region, you will need to use AWS VPC Peering or Transit Gateway to route traffic to an NLB in the correct region. In the specific case of Snowflake, if the region mismatch cannot be resolved (because Snowflake's configuration is fixed), Domo may be able to approve a cross-region exception—contact your Domo representative.
+</Accordion>
+
+<Accordion title="Can I connect to Snowflake over PrivateLink for use with Cloud Amplifier?">
+Yes. This is a supported use case. Because Snowflake is a fully managed service, the process is different: you open a Snowflake support ticket to allow Domo's AWS account, and Snowflake provides the Endpoint Service Name. You do not set up the NLB yourself. See the Set Up Snowflake PrivateLink section above for full details. Snowflake support for PrivateLink requires Business Critical edition or above.
+</Accordion>
+
+<Accordion title="Do I need to set up a separate PrivateLink for each resource I want to connect to?">
+Not necessarily. Multiple resources can be accessed over a single PrivateLink by using different TCP ports on the NLB (one Listener and Target Group per resource/port). A separate PrivateLink is only needed if a resource is in a different AWS VPC or network that cannot be reached through the same NLB.
+</Accordion>
+
+<Accordion title="Should I attach a security group to my NLB?">
+No. Attaching a security group to an NLB is neither required nor recommended for PrivateLink. If you do attach one, you must configure the NLB to not enforce inbound rules on PrivateLink traffic; otherwise you would need to allow inbound traffic from any IP address, which provides no useful security. Leave the NLB without a security group and rely on access controls on the targets themselves.
+</Accordion>
+
+<Accordion title="Why does the connection show as 'Pending' even after Domo creates the Endpoint?">
+The Pending state is expected until you (the Endpoint Service owner) accept the connection. Go to **VPC** > **Endpoint Services** in the AWS console, find the pending connection request, and accept it. The status will change to Available within a few minutes.
+</Accordion>
+
+<Accordion title="What hostname do I use when configuring a Domo connector to talk to my private resource?">
+Use the DNS name that Domo provides after the link is set up. It has the form `vpce-XXXXXXXXXXXXXXXXX-XXXXXXXX.vpce-svc-XXXXXXXXXXXXXXXXX.REGION.vpce.amazonaws.com`. If you requested custom private DNS names, you may use those instead. Do not use a private IP address—PrivateLink traffic must be routed by DNS name.
+</Accordion>
+
+<Accordion title="Can I use a private IP address instead of the DNS name?">
+No. Private IP addresses behind your NLB are not routable from Domo's VPC. You must always connect using the DNS name Domo provides (or a custom DNS alias that resolves to it). Attempting to use a raw IP address will fail.
+</Accordion>
+
+<Accordion title="My connector is getting a login failure after the link is connected. Is that a PrivateLink problem?">
+Probably not. If Domo can establish a TCP connection to your NLB (which the engineering team can verify), but the connector returns an authentication error (for example, `Login failed for user`), the network layer is working correctly. The issue is at the application layer—check database credentials, user permissions, and whether the database allows connections from the private IP of your NLB. In some cases, a custom DNS name is required for authentication to succeed or for the correct resources to be mapped. Notify your Domo representative of any custom DNS names needed.
+</Accordion>
+
+<Accordion title="What if I need to add a port or resource to an existing PrivateLink?">
+Add a new Listener and Target Group to your existing NLB for the new port, then ask your Domo representative to update the security group rules to allow the new port. You do not need a new Endpoint Service and there are no additional charges from Domo.
+</Accordion>
+
+<Accordion title="How do I know which AWS region my Domo instance is in?">
+Ask your Domo representative. US-based customers are typically in `us-east-1` or `us-west-2`. The region determines which Domo account ARN you need to allow and whether a PrivateLink from your resources is feasible without cross-region routing.
+</Accordion>
+
+<Accordion title="Is there a cost to PrivateLink?">
+Yes. Domo charges a one-time setup fee and an annual maintenance fee (see the Pricing section above). AWS also charges for Endpoint hours and data transfer on both sides of the link. Your Domo representative can provide current pricing and applicable discounts.
+</Accordion>
+
+</AccordionGroup>

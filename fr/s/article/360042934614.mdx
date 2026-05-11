@@ -1,0 +1,110 @@
+---
+title: "Création et suppression des politiques PDP"
+---
+
+Affichage du résumé de la page
+
+## Introduction
+
+Pour personnaliser l'expérience de vos utilisateurs et groupes dans Domo, vous pouvez définir des politiques PDP (Personalized Data Permissions) sur les DataSets. Ces politiques vous permettent de filtrer les données de vos DataSets pour des utilisateurs et groupes spécifiques. Ces utilisateurs et groupes ne voient alors que les données qui les concernent lorsqu'ils consultent des cartes KPI et Sumo auxquelles des politiques PDP s'appliquent.
+
+Par exemple, disons que le plan de l'une de vos cartes présente les données de deux régions des États-Unis : les régions Ouest et Est. Vous pouvez alors créer deux politiques PDP, l'une pour la région « Ouest » et l'autre pour la région « Est ». Vous pouvez ensuite sélectionner les commerciaux qui travaillent dans la région « Ouest » et les associer à la politique « Ouest », et sélectionner les commerciaux qui travaillent dans la région « Est » et les associer à la politique « Est ». Lorsque Larry, commercial basé à Washington, ouvre ensuite cette carte, il ne voit alors *que* les données relatives aux États de la région Ouest ; ceux de la région Est n'affichent aucune donnée.
+
+Les politiques PDP s'appliquent également dans d'autres outils de Domo, par exemple aux alertes et aux DataFusions. Lorsque vous vous abonnez à une alerte définie sur une carte alimentée par un DataSet PDP, cette alerte est personnalisée pour refléter les politiques PDP en vigueur. Lorsque vous créez une DataFusion à partir d'un ou plusieurs DataSets d'entrée soumis à des politiques PDP, ces dernières sont incorporées au DataSet en sortie.
+
+## Création des politiques PDP
+
+Vous pouvez créer et gérer les politiques PDP dans le Data Center.
+
+**Pour créer une politique PDP,**
+
+1. Cliquez sur **> Data Center**.
+2. Cliquez sur **DataSets** dans le volet de navigation gauche.
+3. Localisez, puis cliquez sur le DataSet auquel la politique doit s'appliquer.
+4. Cliquez sur l'onglet **Personalized Data Permissions**.
+5. (Facultatif) Cliquez sur le bouton **Impact** pour ouvrir la liste des cartes et des alertes que les politiques PDP appliquées à ce DataSet vont affecter.   
+   Bien que cela ne soit pas obligatoire, il est vivement recommandé de consulter cette liste avant de continuer. Pour obtenir plus d'informations, consultez la rubrique [Affichage de l'impact des politiques PDP](/s/article/360042934614).
+6. (Facultatif) Si, en plus du propriétaire et des utilisateurs « Administrateurs », d'autres personnes doivent avoir accès à l'ensemble des données de ce DataSet, procédez comme suit pour leur accorder un accès complet :
+
+   1. Cliquez sur dans la ligne **Toutes les lignes**.
+   2. Dans la boîte de dialogue **Ajouter des groupes et des personnes**, entrez le nom de l'utilisateur ou du groupe devant disposer d'un accès complet aux données. Sélectionnez un nom pour l'ajouter à la politique.
+   3. Cliquez sur **Appliquer**.
+7. Cliquez sur **Ajouter la politique**.
+8. Donnez-lui un nom descriptif.
+9. Cliquez sur **Ajouter des données** pour ouvrir la boîte de dialogue **Ajouter un accès aux données**.
+10. Dans la liste déroulante **Nom de colonne**, sélectionnez la colonne que vous souhaitez filtrer.
+11. Dans le champ **Rechercher/Ajouter des valeurs de ligne**, entrez le nom d'une ligne à filtrer. Sélectionnez un nom de ligne pour l'ajouter à la politique.
+12. (Facultatif) Reprenez l'étape 8 autant de fois que nécessaire pour ajouter toutes les lignes que vous souhaitez filtrer.
+13. Cliquez sur **Appliquer**.
+14. Cliquez sur pour ouvrir la boîte de dialogue **Ajouter des groupes et des personnes**.
+15. Dans le champ **Rechercher/Ajouter des groupes et des personnes**, entrez le nom de l'utilisateur ou du groupe que vous souhaitez ajouter à la politique. Sélectionnez un nom pour l'ajouter à la politique.
+16. (Facultatif) Reprenez l'étape 12 autant de fois que nécessaire pour ajouter tous les groupes et utilisateurs désirés à cette politique.
+17. Cliquez sur **Enregistrer**.
+
+La politique a bien été créée. Toutefois, elle ne s'applique pas encore à ce DataSet. Pour activer la politique PDP pour le DataSet, cliquez sur à côté de « Activer les autorisations PDP ». Désormais, tous les éléments alimentés ou associés à ce DataSet dans Domo sont soumis à cette politique et sont estampillés avec pour signaler aux utilisateurs qu'une politique PDP les empêche de voir toutes les données disponibles.
+
+Pour désactiver cette politique, cliquez sur .
+
+Pour ajouter plusieurs politiques au même DataSet, cliquez sur **Ajouter la politique** dans l'onglet **Personalized Data Permissions** du DataSet, puis reprenez la procédure précédente.
+
+### Ajout d'utilisateurs à plusieurs politiques PDP
+
+Il est parfois nécessaire d'ajouter un utilisateur ou un groupe à plusieurs politiques sur le même DataSet. Par exemple, l'un de vos commerciaux, « Ted », peut travailler dans la région Est, mais devoir également pouvoir accéder aux données de la Californie. Dans ce cas, vous pouvez ajouter une *nouvelle* politique dans laquelle les données de la Californie s'appliquent à Ted. Ajouter « Californie » à la politique dans laquelle vous avez sélectionné la région Est *ne fonctionnera pas*. Dans un tel cas, votre DataSet semblerait vide, car sélectionner plusieurs valeurs dans le même DataSet applique une instruction AND, mais comme dans le DataSet, la Californie n'est pas dans la région Est, la politique empêche l'affichage des données. Les différentes politiques présentes dans le même DataSet, sont elles considérées comme des instructions OR ; les données de Ted s'affichent donc à la fois pour la région Est et la Californie.
+
+### Affichage de l'impact des politiques PDP
+
+Le bouton **Impact** vous permet d'ouvrir une boîte de dialogue qui présente l'impact des politiques PDP d'un DataSet sur les DataFlows et cartes associées à ce DataSet. Les DataFlows affectés s'affichent dans l'onglet **Attention**, et les cartes affectées dans l'onglet **Personnalisées**. Lorsque les politiques n'affectent aucun DataFlow ou carte, aucun onglet ne s'affiche.
+
+Il est vivement recommandé d'examiner l'impact des politiques PDP avant de créer des politiques sur un DataSet, en particulier lorsque celui-ci est un DataSet d'entrée inclus dans un DataFlow. Lorsque les politiques PDP définies sur ce DataSet rompent un DataFlow, un bouton **Corriger cela** s'affiche. Vous pouvez également inclure le propriétaire du DataFlow dans le groupe **Toutes les lignes** pour être sûr que le DataFlow ne soit pas interrompu.
+
+### Aperçu des DataSets affectés par les politiques PDP
+
+Toutes les politiques PDP permettent d'afficher un aperçu des données du DataSet après application de cette politique. Afficher un aperçu des données après application de la politique créée est donc une bonne pratique, et permet de s'assurer que seules les données requises s'affichent.
+
+**Pour afficher l'aperçu d'un DataSet pour une politique PDP,**
+
+1. Dans l'onglet **Personalized Data Permissions** du DataSet pour lequel l'aperçu doit s'afficher, survolez la ligne de la politique à prévisualiser avec votre souris.
+2. Cliquez sur l'icône en forme d'œil pour afficher l'aperçu.
+3. Cliquez ensuite sur **Terminé** pour fermer l'aperçu.
+
+### Exemple de scénario : Application d'une politique PDP à une carte
+
+Cet exemple simple vous montre comment le fait d'ajouter des politiques PDP à une carte affecte la façon dont les données s'affichent selon l'utilisateur. Supposons que la société « Kablinko Electronics » surveille l'évolution de ses ventes aux États-Unis à l'aide d'un DataSet dans lequel les données sont réparties par région (« Est » et « Ouest »). Les données s'affichent dans une carte des États-Unis. Par défaut, aucune politique PDP ne s'applique, donc toutes les données du DataSet s'affichent comme suit :
+
+<Frame>![pdp_example_1.png](/images/kb/fr/0EM5w000005wJFI.png)</Frame>
+
+Ross Janssen, responsable du département commercial, souhaite s'assurer que les commerciaux de chaque région voient uniquement les données qui les concernent. Comme les commerciaux sont chacun membre de l'un des quatre groupes (« Kablinko East », « Kablinko West », « Kablinko South » et « Kablinko Central »), il suffit de relier chaque groupe à une politique s'appliquant à la région appropriée.
+
+Ross accède au Data Center, localise le DataSet pertinent, puis clique sur **Personalized Data Permissions** pour ouvrir l'onglet PDP pour le DataSet. Il saisit un nom de politique (« Région Est »), puis clique sur **Ajouter des données** pour ouvrir la boîte de dialogue **Ajouter un accès aux données**. Il sélectionne la colonne « Région » et la valeur « Est », puis applique les modifications. Pour finir, il sélectionne le groupe « Kablinko East » dans la boîte de dialogue **Ajouter des groupes et des personnes**, puis enregistre la nouvelle politique. Il répète ensuite la même procédure pour la politique « Région Ouest », en sélectionnant la valeur « Ouest » et le groupe « Kablinko West ». Il ne crée pas encore de politique pour les groupes « Kablinko Central » et « Kablinko South ».  
+  
+L'onglet **Personalized Data Permissions** de Ross pour le DataSet s'affiche à présent comme suit :
+
+<Frame>![pdp_example_2.png](/images/kb/fr/0EM5w000005wJEX.png)</Frame>
+
+Les politiques étant maintenant en vigueur, les utilisateurs des trois groupes voient les données de la carte différemment selon la politique de leur groupe. Les utilisateurs membres du groupe « Est » devraient voir la carte comme suit :
+
+<Frame>![pdp_example_3.png](/images/kb/fr/0EM5w000005wJFA.png)</Frame>
+
+Notez que les données s'affichent uniquement pour les États situés dans la « Région Est ». Notez également que le total du tableau a changé pour refléter la politique PDP (il était de 1 453 971,45 dans la version sans politique PDP) et que l'estampille s'affiche à côté du titre pour signaler que la vue est une version des données filtrée par une politique PDP.
+
+De la même façon, les utilisateurs membres du groupe « Ouest » devraient voir la carte comme suit :
+
+<Frame>![pdp_example_4.png](/images/kb/fr/0EM5w000005wJFE.png)</Frame>
+
+Comme Ross n'a pas créé de politique pour les groupes « Kablinko Central » et « Kablinko South », les utilisateurs membres de ces groupes devraient obtenir ceci lorsqu'ils tentent d'accéder à la carte :
+
+<Frame>![pdp_example_5.png](/images/kb/fr/0EM5w000005wJFB.png)</Frame>
+
+Ces utilisateurs peuvent alors cliquer sur le bouton **Demander l'accès** pour envoyer un message Buzz à Ross (le propriétaire du DataSet) et lui demander de créer les politiques nécessaires pour qu'ils puissent afficher les « sections » de données pertinentes. Pour obtenir plus d'informations sur Buzz, consultez la rubrique [Buzz](/s/topic/0TO5w000000ZanCGAS).
+
+## Suppression des politiques PDP
+
+Pour supprimer une politique PDP, vous pouvez utiliser l'onglet **Personalized Data Permissions** pour le DataSet associé à la politique. Une fois supprimée, la politique ne s'applique plus aux cartes, alertes, DataFlows, etc.
+
+**Pour supprimer une politique PDP,**
+
+1. Dans l'onglet **Personalized Data Permissions** du DataSet pour lequel vous souhaitez supprimer des politiques, survolez la ligne de la politique à supprimer avec votre souris.
+2. Cliquez sur l'icône de la corbeille pour supprimer la politique.
+3. Cliquez sur **Supprimer** pour confirmer la suppression.  
+   S'il s'agit de la seule politique appliquée au DataSet, un avertissement vous signale que si vous la supprimez, tous les utilisateurs disposant d'un accès pourront alors voir les données.
+4. Si vous êtes sûr de vouloir supprimer cette politique, cliquez une nouvelle fois sur **Supprimer**.

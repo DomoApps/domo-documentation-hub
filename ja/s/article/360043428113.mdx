@@ -6,63 +6,65 @@ title: "再帰的/スナップショットの古いMagic ETL DataFlowを作成�
 
 DataFlow（SQL型もMagic ETL型も）は、コネクターのようにネイティブにデータを追加できません。ただし、データを追加するDataFlowを作成する必要がある場合は、それを一度実行し、その出力を次の実行のための入力の一部として使用することで可能になります。このようにして、DataFlowが実行されるたびに、その前のデータが追加され、新しいデータもそれ自身に追加されます。
 
-<Warning>
-  **重要：** 再帰的DataFlowの編集に誤りがあると、これまでのデータがすべて失われることがあります。編集中にこれを回避するには、履歴DataSetのコピーである追加のDataSetを作成してください。このDataSetは静的な状態のままになります。これまでのDataSetに何らかの問題が発生した場合に、編集前にコピーしたDataSetをバックアップとして使用できます。
-
-</Warning>
+<Warning>**重要：**再帰的DataFlowの編集に誤りがあると、これまでのデータがすべて失われることがあります。編集中にこれを回避するには、履歴DataSetのコピーである追加のDataSetを作成してください。このDataSetは静的な状態のままになります。これまでのDataSetに何らかの問題が発生した場合に、編集前にコピーしたDataSetをバックアップとして使用できます。</Warning>
 
 **動画 - 再帰的なDataFlowとは？**
 
-<iframe allowfullscreen="" frameborder="0" height="315" src="//www.youtube-nocookie.com/embed/VkM5VznEzi8" width="560"></iframe>
-
 **Magic ETLで再帰的なDataFlowを作成するには：**
 
-1. Magic ETL DataFlowを作成し、実行します。
+1. Magic ETL DataFlowを作成し、実行します。  
      
-   <Frame><img alt="recursive_etl1.png" src="/images/kb/ka0Vq000000GnEU-00N5w00000Ri7BU-0EM5w000005vOw3.png" style={{width: 800, height: 387}}/></Frame>
-2. DataFlowを実行したら、出力DataSetを入力DataSetとして読み込みます。
+
+   <Frame>![recursive_etl1.png](/images/kb/ja/0EM5w000005vOw3.png)</Frame>
+2. DataFlowを実行したら、出力DataSetを入力DataSetとして読み込みます。  
+   出力タイルには出力DataSetの名前の後に「1」が表示されます。  
      
-   出力タイルには出力DataSetの名前の後に「1」が表示されます。
+
+   <Frame>![Screenshot](/images/kb/ja/0EM5w000005vOw2.png)</Frame>
+
      
-   <Frame><img alt="" src="/images/kb/ka0Vq000000GnEU-00N5w00000Ri7BU-0EM5w000005vOw2.png" style={{width: 800, height: 312}}/></Frame>
-   DataFlowに2つのDataSet（更新元の DataSetと履歴のDataSet）がなければなりません。
      
+   DataFlowに2つのDataSet（更新元の DataSetと履歴のDataSet）がなければなりません。  
    次に、制約として使用する列を見つけます。これは、いつ履歴DataSetの中のデータを新しいデータに置換するかを決定する際に役に立ちます。制約列は通常、ID列、日付列、ほかの一意の識別子のいずれかです。この例では、「日付」列を制約として使用します。
-3. **［列を選択］** を使用して、制約列のみを選択します。
+3. **［列を選択］**を使用して、制約列のみを選択します。  
      
-   <Frame><img alt="" src="/images/kb/ka0Vq000000GnEU-00N5w00000Ri7BU-0EM5w000005vOvx.png" style={{width: 800, height: 521}}/></Frame>
-4. **［重複を削除］** を使用して、一意な制約リストを返します。
-     
-   <Frame><img alt="" src="/images/kb/ka0Vq000000GnEU-00N5w00000Ri7BU-0EM5w000005vOvu.png"/></Frame>
-5. **［定数を追加］** を使用して、行をいつ削除する必要があるかを示す新しい列を作成します。
-     
-   <Frame><img alt="" src="/images/kb/ka0Vq000000GnEU-00N5w00000Ri7BU-0EM5w000005vOvz.png" style={{width: 799, height: 503}}/></Frame>
-6. Outer Joinを使用して、削除を識別する列を履歴DataSetの中の一意な制約列にJoinします。Joinの左側にある履歴DataSetを選択した場合、下に示すように、Left Outer Joinを使用します。Joinの右側にある履歴DataSetを選択する場合は、Right Outer Joinを使用します。（データが失われる可能性があるので、 **Inner Join** を選択しないでください。）
-     
-   <Columns>
-     <Frame><img alt="" src="/images/kb/ka0Vq000000GnEU-00N5w00000Ri7BU-0EM5w000005vOw1.png" style={{width: 801, height: 514}}/></Frame>
-     <Frame><img alt="" src="/images/kb/ka0Vq000000GnEU-00N5w00000Ri7BU-0EM5w000005vOv3.png" style={{width: 801, height: 549}}/></Frame>
-   </Columns>
-7. DataSetから、「Delete Me」の値（またはステップ5で作成した識別子）を含む行をフィルターします。
-     
-   これにより、新しい更新DataSetに存在しない履歴DataSetの行のみが返されます。
-     
-   <Frame><img alt="" src="/images/kb/ka0Vq000000GnEU-00N5w00000Ri7BU-0EM5w000005vOvw.png" style={{width: 799, height: 519}}/></Frame>
-8. **［列を選択］** を使用して、追加の一意の制約列（ 「日付（Date）」）と一意の削除を識別する列を削除します。
-     
-   <Frame><img alt="" src="/images/kb/ka0Vq000000GnEU-00N5w00000Ri7BU-0EM5w000005vOvv.png" style={{width: 801, height: 558}}/></Frame>
-9. **［追加］** を使用して、履歴DataSetと新しい更新DataSetをJoinします。
-     
-   すべての手順が正しく実行された場合、両方のDataSetに「変更なし」と表示されます。
-     
-   <Frame><img alt="" src="/images/kb/ka0Vq000000GnEU-00N5w00000Ri7BU-0EM5w000005vOvy.png" style={{width: 801, height: 562}}/></Frame>
-10. **［追加］** タイルを出力に接続します。
 
-完了すると、Magic ETLは以下のように設定されます。
+   <Frame>![Screenshot](/images/kb/ja/0EM5w000005vOvx.png)</Frame>
+4. **［重複を削除］**を使用して、一意な制約リストを返します。<img alt="" src="/images/kb/ja/0EM5w000005vOvu.png" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/>
+5. **［定数を追加］**を使用して、行をいつ削除する必要があるかを示す新しい列を作成します。  
+     
+
+   <Frame>![Screenshot](/images/kb/ja/0EM5w000005vOvz.png)</Frame>
+6. Outer Joinを使用して、削除を識別する列を履歴DataSetの中の一意な制約列にJoinします。Joinの左側にある履歴DataSetを選択した場合、下に示すように、Left Outer Joinを使用します。Joinの右側にある履歴DataSetを選択する場合は、Right Outer Joinを使用します。（データが失われる可能性があるので、**Inner Join**を選択しないでください。）  
+     
+
+   <Frame>![Screenshot](/images/kb/ja/0EM5w000005vOw1.png)</Frame>
+
+     
+     
+
+   <Frame>![Screenshot](/images/kb/ja/0EM5w000005vOv3.png)</Frame>
+7. DataSetから、「Delete Me」の値（またはステップ5で作成した識別子）を含む行をフィルターします。  
+   これにより、新しい更新DataSetに存在しない履歴DataSetの行のみが返されます。  
+     
+
+   <Frame>![Screenshot](/images/kb/ja/0EM5w000005vOvw.png)</Frame>
+8. **［列を選択］**を使用して、追加の一意の制約列（ 「日付（Date）」）と一意の削除を識別する列を削除します。  
+     
+
+   <Frame>![Screenshot](/images/kb/ja/0EM5w000005vOvv.png)</Frame>
+9. **［追加］**を使用して、履歴DataSetと新しい更新DataSetをJoinします。  
+   すべての手順が正しく実行された場合、両方のDataSetに「変更なし」と表示されます。  
+     
+
+   <Frame>![Screenshot](/images/kb/ja/0EM5w000005vOvy.png)</Frame>
+10. **［追加］**タイルを出力に接続します。
+
+完了すると、Magic ETLは以下のように設定されます。  
   
-<Frame><img alt="" src="/images/kb/ka0Vq000000GnEU-00N5w00000Ri7BU-0EM5w000005vOw0.png" style={{width: 801, height: 383}}/></Frame>
-### トラブルシューティング/よくある質問
 
-DataFlowの構築時に見られる一般的な問題とエラーについては、「 DataFlowの使用時にユーザーが最も経験する5つの問題 」を参照してください。
+<Frame>![Screenshot](/images/kb/ja/0EM5w000005vOw0.png)</Frame>
 
-日本語
+## トラブルシューティング/よくある質問
+
+DataFlowの構築時に見られる一般的な問題とエラーについては、「[DataFlowの使用時にユーザーが最も経験する5つの問題](/s/article/360043427913)」を参照してください。

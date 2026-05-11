@@ -1,0 +1,119 @@
+---
+title: "Combiner des DataSets à l'aide d'une DataFusion"
+---
+
+Affichage du résumé de la page
+
+## Introduction
+
+Dans Domo, deux méthodes distinctes permettent d'utiliser des DataFusion pour combiner des données : « Ajouter des colonnes » et « Ajouter des lignes ». La méthode « Ajouter des colonnes » combine plusieurs DataSets en établissant une correspondance avec des colonnes similaires. Avec cette méthode, seules les colonnes correspondantes doivent présenter le même en-tête ou type de données. La méthode « Ajouter des lignes » combine les DataSets à travers les lignes qu'ils contiennent. Avec cette méthode, toutes les colonnes doivent avoir le même en-tête.
+
+<Note>
+**Remarque :** lorsque des DataSets associés à des politiques PDP sont utilisés en tant que DataSets en entrée (parents) dans une DataFusion, ces politiques sont également incorporées dans les DataSets en sortie. Vous ne pouvez pas appliquer de politiques aux DataSets en sortie à partir des DataFusions ; vous devez les appliquer aux DataSets en entrée (parents). Pour obtenir plus d'informations, consultez la rubrique [PDP et DataFusions/DataFlows](/s/article/360043439333).
+</Note>
+
+## Combinaison de DataSets à l'aide de la méthode Combiner les colonnes
+
+Avec cette méthode, sélectionnez des DataSets, contenant chacun au moins une colonne de même type de colonne ou de données qu'une colonne des autres DataSets. Combinez ensuite tous les DataSets dans un même DataSet en faisant correspondre les colonnes similaires. Cette méthode équivaut à utiliser l'instruction JOIN dans SQL.
+
+Dans l'exemple suivant, l'utilisateur charge et combine deux DataSets à l'aide de cette méthode. L'utilisateur associe les colonnes « Order # » et « Order Number », et le second DataSet s'affiche à droite du premier.
+
+<Frame>![combined_columns1.png](/images/kb/fr/0EM5w000005wJL0.png)</Frame>
+
+L'utilisateur aurait pu aller encore plus loin et ajouter un troisième DataSet donnant des informations sur la société.
+
+<Frame>![combined_columns2.png](/images/kb/fr/0EM5w000005wJKs.png)</Frame>
+
+L'utilisateur peut ensuite exclure les colonnes « Order Number » et « Company » en double. Après la fusion, le DataSet final apparaît comme suit :
+
+<Frame>![combined_columns_result.png](/images/kb/fr/0EM5w000005wJKy.png)</Frame>
+
+**Pour combiner des DataSets à l'aide de la méthode Ajouter des colonnes :**
+
+1. Cliquez sur **> Data Center**.
+2. Dans la barre d'outils **Magic Transform** située en haut de la fenêtre, cliquez sur **Fusion**.
+
+   <Tip>
+   **Conseil :** vous pouvez aussi ouvrir l'éditeur de DataFusion où que vous soyez dans Domo en sélectionnant dans la barre d'outils des applis, puis **Données > Fusion**.
+   </Tip>
+3. (Facultatif) Modifiez le titre par défaut du DataSet.  
+   Le titre sert à rechercher ou sélectionner le DataSet lors de l'alimentation de la carte.
+4. Pour ajouter le DataSet « maître » (ou premier DataSet) désiré, procédez comme suit :
+
+   1. Cliquez sur **Sélectionner un DataSet**.
+   2. Sélectionnez le DataSet dans la liste.  
+      Pour filtrer les DataSets affichés dans la liste, sélectionnez le DataSet dans le menu **Tous les types** et/ou entrez le nom de ce DataSet dans le champ **Recherche**.  
+      La liste des noms de colonne présents dans votre DataSet s'affiche.
+5. Pour ajouter un DataSet secondaire, procédez comme suit :
+
+   1. Cliquez sur **Sélectionner un DataSet**.
+   2. Sélectionnez le DataSet dans la liste.  
+      Pour filtrer les DataSets affichés dans la liste, sélectionnez le DataSet dans le menu **Tous les types** ou le propriétaire dans le menu **Tous les utilisateurs** et/ou entrez le nom de ce DataSet dans le champ **Recherche**.  
+      La liste des noms de colonne présents dans votre DataSet s'affiche.
+6. (Facultatif) Ajoutez éventuellement d'autres DataSets à combiner.
+7. (Facultatif) Pour retirer des DataSets sélectionnés, cliquez sur l'icône **X**.
+8. Définissez les paramètres de la combinaison de DataSets.
+
+   1. Dans vos DataSets, identifiez les colonnes contenant les mêmes valeurs et/ou types de données.  
+      Pour ce faire, vous pouvez utiliser la liste des noms de colonne de chaque DataSet.
+   2. Pour chaque combinaison de DataSet souhaitée, sélectionnez les colonnes à associer.
+
+      1. Cliquez sur le premier menu **Sélectionner un champ**, sélectionnez le DataSet maître, puis une colonne.
+      2. Cliquez sur le second menu **Sélectionner un champ**, choisissez le DataSet secondaire, puis sélectionnez la colonne dont le type de valeur ou de données correspond à celui de la première colonne sélectionnée.
+      3. Sélectionnez l'option d'inclusion souhaitée dans le menu.
+
+         | Option | Description |
+         | --- | --- |
+         | Jonction extérieure gauche | Inclut toutes les lignes du premier DataSet sélectionné et ajoute les lignes du second DataSet sélectionné lorsqu'elles contiennent le champ de valeur correspondant spécifié. |
+         | Jonction interne | Inclut les lignes qui contiennent le champ de valeur correspondant spécifié dans les deux DataSets. |
+   3. (Conditionnel) Si vous avez ajouté plusieurs DataSet secondaires, reprenez cette même procédure pour les colonnes correspondantes de chaque paire de menus **Sélectionner un champ** supplémentaires qui s'affiche.
+9. Servez-vous de l'option **Cliquez pour charger l'aperçu** pour afficher un aperçu du DataSet.  
+   Cette option est disponible lorsque des colonnes correspondantes ont bien été sélectionnées pour tous les DataSets sélectionnés.
+10. (Facultatif) Pour définir les options des colonnes, cliquez sur la flèche présente à droite de la colonne en question dans l'aperçu.
+
+    | Option | Description |
+    | --- | --- |
+    | Renommer la colonne | Permet de renommer cette colonne. Vous pouvez uniquement renommer les colonnes avant d'enregistrer la DataFusion. Après l'enregistrement, cette option n'est plus disponible. |
+    | Ignorer la colonne | Exclut cette colonne du DataSet combiné. |
+11. Cliquez sur **Enregistrer** pour enregistrer le DataSet combiné.
+
+Le nouveau DataSet est ajouté dans l'onglet **DataSets** du Data Center. Pour obtenir plus d'informations sur cet onglet, consultez la rubrique [Topologie du Data Center](/s/article/360047553253).
+
+## Combinaison de DataSets à l'aide de la méthode Ajouter des lignes
+
+Avec cette méthode, sélectionnez au moins deux DataSets dont tous les en-têtes de colonne sont identiques. Domo combine ensuite les lignes de chaque DataSet dans un même DataSet. Cette méthode équivaut à utiliser l'instruction UNION dans SQL.
+
+Dans l'exemple suivant, l'utilisateur charge et combine deux DataSets via cette méthode. Le second DataSet est ajouté directement au-dessous du premier.
+
+<Frame>![combine_rows_result.png](/images/kb/fr/0EM5w000005wJKx.png)</Frame>
+
+**Pour combiner des DataSets à l'aide de la méthode Combiner des lignes :**
+
+1. Cliquez sur **> Data Center**.
+2. Dans le menu **Nouveau DataSet**, sélectionnez **Combiner les DataSets**.
+3. (Facultatif) Modifiez le titre par défaut du DataSet.  
+   Le titre sert à rechercher ou sélectionner le DataSet lors de l'alimentation de la carte.
+4. Pour ajouter le premier DataSet, procédez comme suit :
+
+   1. Cliquez sur **Sélectionner un DataSet**.
+   2. Sélectionnez le DataSet dans la liste.  
+      Pour filtrer les DataSets affichés dans la liste, sélectionnez le DataSet dans le menu **Tous les types** ou le propriétaire dans le menu **Tous les utilisateurs** et/ou entrez le nom de ce DataSet dans le champ **Recherche**.  
+      La liste des noms de colonne présents dans votre DataSet s'affiche.
+5. Pour ajouter un second DataSet, cliquez sur **Sélectionner un DataSet**, puis choisissez votre DataSet dans la liste, comme à l'étape précédente.
+
+   <Note>
+   **Remarque :** tous les DataSets ajoutés via cette méthode *doivent* présenter les mêmes en-têtes de colonne, sinon vous ne pouvez pas afficher l'aperçu ou enregistrer la fusion.
+   </Note>
+6. (Facultatif) Ajoutez éventuellement d'autres DataSets à combiner.
+7. Cliquez sur **Combiner les lignes**.  
+   Si vous avez bien sélectionné deux DataSets présentant les mêmes en-têtes de colonne, un lien intitulé **Cliquez pour charger l'aperçu** s'affiche au-dessous.
+8. Servez-vous de l'option **Cliquez pour charger l'aperçu** pour afficher un aperçu du DataSet.
+9. (Facultatif) Pour définir les options des colonnes, cliquez sur la flèche présente à droite de la colonne en question dans l'aperçu.
+
+   | Option | Description |
+   | --- | --- |
+   | Renommer la colonne | Permet de renommer cette colonne. Vous pouvez uniquement renommer les colonnes avant d'enregistrer la DataFusion. Après l'enregistrement, cette option n'est plus disponible. |
+   | Ignorer la colonne | Exclut cette colonne du DataSet combiné. |
+10. Cliquez sur **Enregistrer** pour enregistrer le DataSet combiné.
+
+Le nouveau DataSet est ajouté dans l'onglet **DataSets** du Data Center. Pour obtenir plus d'informations sur cet onglet, consultez la rubrique [Topologie du Data Center](/s/article/360047553253).

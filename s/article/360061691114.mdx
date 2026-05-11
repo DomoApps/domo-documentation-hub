@@ -2,62 +2,224 @@
 title: "Snowflake High Bandwidth With Advanced Partitions Connector"
 ---
 
-<Note>
-**Note:** Snowflake will no longer support the username and password authentication mechanism as of November 2025. As a result, this connector will be retired in November 2025 and will no longer function. Please consider using one of the following connection methods instead:
+<Note>**Note:** Snowflake will no longer support the username and password authentication mechanism as of November 2025. As a result, this connector will be retired in November 2025 and will no longer function. Please consider using one of the following connection methods instead:</Note>
 
-* [Cloud Amplifier](https://domo-support.domo.com/s/article/4402322966807?language=en_US "Cloud Amplifier")
-* [Snowflake Key Pair High Bandwidth With Advanced Partitions](/s/article/000005832 "Snowflake Key Pair High Bandwidth With Advanced Partitions")
-* [Snowflake OAuth High Bandwidth With Advanced Partitions](/s/article/4402638182935 "Snowflake OAuth High Bandwidth With Advanced Partitions")
+- [Cloud Integrations](/s/article/4402322966807)
+- [Snowflake Key Pair High Bandwidth With Advanced Partitions](/s/article/000005832)
+- [Snowflake OAuth High Bandwidth With Advanced Partitions](/s/article/4402638182935)
 
-</Note>
+## Snowflake Connector Migration Walkthrough
+
+As Snowflake is discontinuing username and password authentication, Snowflake connectors using this authentication method will be migrated to the OAuth version. This section helps users walk through the complete process of migrating their existing username and password Snowflake datasets to utilize the OAuth authentication version. Pls refer to the migration video ([https://youtu.be/rlG\_uNZwl\_U](https://youtu.be/rlG_uNZwl_U)) to make the transition smoother and minimize disruptions.
 
 ## Intro
 
-Snowflake is a cloud-based analytic data warehouse system. Use Domo's Snowflake High Bandwidth With Advanced Partitions connector to unload data from your Snowflake database into internal Amazon S3. The files are then downloaded from internal S3 into Domo. This connector should be preferred over the other Snowflake connectors if you are executing very large queries. It allows you to chose whether or not you want to partition your data. Unlike other partition connectors, it allows you to use partitioning on non date columns. To learn more about the Snowflake API, visit their page ([https://docs.snowflake.net/manuals](https://docs.snowflake.net/manuals "https://docs.snowflake.net/manuals") ).
+Snowflake is a cloud-based analytic data warehouse system. Use Domo's Snowflake High Bandwidth With Advanced Partitions connector to unload data from your Snowflake database into internal Amazon S3. The files are then downloaded from internal S3 into Domo. This connector should be preferred over the other Snowflake connectors if you are executing very large queries. It allows you to chose whether or not you want to partition your data. Unlike other partition connectors, it allows you to use partitioning on non date columns. To learn more about the Snowflake API, visit their page ([https://docs.snowflake.net/manuals](https://docs.snowflake.net/manuals)).
 
-You connect to your Snowflake account in the Data Center. This topic discusses the fields and menus that are specific to the Snowflake High Bandwidth With Advanced Partitions connector user interface. General information for adding DataSets, setting update schedules, and editing DataSet information is discussed in [Adding a DataSet Using a Data Connector](https://domo-support.domo.com/s/article/360042926274?language=en_US "Adding a DataSet Using a Data Connector").
+You connect to your Snowflake account in the Data Center. This topic discusses the fields and menus that are specific to the Snowflake High Bandwidth With Advanced Partitions connector user interface. General information for adding DataSets, setting update schedules, and editing DataSet information is discussed in [Adding a DataSet Using a Data Connector](/s/article/360042926274).
 
-**Note:** This connector only supports APPEND mode due to partitions.
+<Note>**Note:** This connector only supports APPEND mode due to partitions.</Note>
 
 ## Prerequisites
 
 To connect to your Snowflake account and create a DataSet, you must have the following:
 
-* The full name of your account (provided by Snowflake). For US West Region
-  **account\_name**, and All other regions **account\_name.region\_id**. This is the portion of your Snowflake URL immediately following https://.
+- The full name of your account (provided by Snowflake). For US West Region **account\_name**, and All other regions **account\_name.region\_id**. This is the portion of your Snowflake URL immediately following https://.  
     
   Note that your full account name may include additional segments that identify the region and cloud platform where your account is hosted. The following table provides account name examples by cloud platform/region. For each row, it assumes your account name is "xy12345."
-* The username and password used to connect to your Snowflake host.
+- The username and password used to connect to your Snowflake host.
 
 ## Connecting to Your Snowflake Account
 
-This section enumerates the options in the Credentials and Details panes in the Snowflake High Bandwidth With Advanced Partitions Connector page. The components of the other panes in this page, **Scheduling** and **Name & Describe Your DataSet**, are universal across most connector types and are discussed in greater length in [Adding a DataSet Using a Data Connector](https://domo-support.domo.com/s/article/360042926274?language=en_US "Adding a DataSet Using a Data Connector").
+This section enumerates the options in the Credentials and Details panes in the Snowflake High Bandwidth With Advanced Partitions Connector page. The components of the other panes in this page, **Scheduling** and **Name & Describe Your DataSet**, are universal across most connector types and are discussed in greater length in [Adding a DataSet Using a Data Connector](/s/article/360042926274).
 
 ## Credentials Pane
 
 This pane contains fields for entering credentials to connect to your Snowflake account. The following table describes what is needed for each field:
 
-<table border="1" cellpadding="1" cellspacing="1" data-aura-rendered-by="33:195;a"><thead><tr><th colspan="1" rowspan="1"><p> Field </p></th><th colspan="1" rowspan="1"><p> Description </p></th></tr></thead><tbody><tr><td colspan="1" rowspan="1"> Account Name </td><td colspan="1" rowspan="1"> Enter your Snowflake account name. For more information, see Prerequisites. </td></tr><tr><td colspan="1" rowspan="1"> Username </td><td colspan="1" rowspan="1"> Enter the username you use to connect to your Snowflake host. </td></tr><tr><td colspan="1" rowspan="1"> Password </td><td colspan="1" rowspan="1"> Enter the password you use to connect to your Snowflake host. </td></tr><tr><td colspan="1" rowspan="1"> Role </td><td colspan="1" rowspan="1"> Enter your role. </td></tr></tbody></table>
+<table border="1" cellpadding="1" cellspacing="1">
+  <thead>
+    <tr>
+      <th colspan="1" rowspan="1"><p>Field</p></th>
+      <th colspan="1" rowspan="1"><p>Description</p></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td colspan="1" rowspan="1"><p>Account Name</p></td>
+      <td colspan="1" rowspan="1"><p>Enter your Snowflake account name. For more information, see Prerequisites.</p></td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1"><p>Username</p></td>
+      <td colspan="1" rowspan="1"><p>Enter the username you use to connect to your Snowflake host.</p></td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1"><p>Password</p></td>
+      <td colspan="1" rowspan="1"><p>Enter the password you use to connect to your Snowflake host.</p></td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1"><p>Role</p></td>
+      <td colspan="1" rowspan="1"><p>Enter your role.</p></td>
+    </tr>
+  </tbody>
+</table>
 
-**Note:** For any role that is used to set up the connector, the **READ**, **WRITE**, **CREATE STAGE**, and **SELECT** privileges must be turned on. For more details on each privileges, see [https://docs.snowflake.com/en/user-guide/security-access-control-privileges](https://docs.snowflake.com/en/user-guide/security-access-control-privileges#table-privileges "https://docs.snowflake.com/en/user-guide/security-access-control-privileges").
+<Note>**Note:** For any role that is used to set up the connector, the **READ**, **WRITE**, **CREATE STAGE**, and **SELECT** privileges must be turned on. For more details on each privileges, see [https://docs.snowflake.com/en/user-guide/security-access-control-privileges](https://docs.snowflake.com/en/user-guide/security-access-control-privileges#table-privileges).</Note>
 
-Once you have entered valid Snowflake credentials, you can use the same account any time you go to create a new Snowflake High Bandwidth With Advanced Partitions DataSet. You can manage Connector accounts in the **Accounts** tab in the Data Center. For more information about this tab, see [Managing User Accounts for Connectors](https://domo-support.domo.com/s/article/360042926054?language=en_US "Managing User Accounts for Connectors").
+Once you have entered valid Snowflake credentials, you can use the same account any time you go to create a new Snowflake High Bandwidth With Advanced Partitions DataSet. You can manage Connector accounts in the **Accounts** tab in the Data Center. For more information about this tab, see [Managing User Accounts for Connectors](/s/article/360042926054).
 
 ## Details Pane
 
 This pane contains a primary **Reports** menu, along with various other menus which may or may not appear depending on the report type you select.
 
-<table border="1" cellpadding="1" cellspacing="1" data-aura-rendered-by="33:195;a"><thead><tr><th colspan="1" rowspan="1"><p> Menu </p></th><th colspan="1" rowspan="1"><p> Description </p></th></tr></thead><tbody><tr><td colspan="1" rowspan="1"><p> Report </p></td><td colspan="1" rowspan="1"><p><span> Select the Query Type. The following query types are available: </span></p><table border="1" cellpadding="1" cellspacing="1"><tbody><tr><td colspan="1" rowspan="1"> Custom Query </td><td colspan="1" rowspan="1"> Enter the SQL query to execute. </td></tr><tr><td colspan="1" rowspan="1"> Query Builder </td><td colspan="1" rowspan="1"> Select a table and fields to auto generate your query. </td></tr></tbody></table></td></tr><tr><td colspan="1" rowspan="1"> Warehouses </td><td colspan="1" rowspan="1"> Select the warehouse containing the data you want to retrieve. The list populates with all of the warehouses you have access to based on your credentials. </td></tr><tr><td colspan="1" rowspan="1"> Databases </td><td colspan="1" rowspan="1"> Select the database containing the data you want to retrieve. The list populates with all of the databases you have access to based on your credentials. </td></tr><tr><td colspan="1" rowspan="1"> Schemas </td><td colspan="1" rowspan="1"> Select the database schema containing the data you want to retrieve. The list populates with all of the schemas you have access to based on your credentials. </td></tr><tr><td colspan="1" rowspan="1"> Database Objects </td><td colspan="1" rowspan="1"> Select the database object. </td></tr><tr><td colspan="1" rowspan="1"> Tables </td><td colspan="1" rowspan="1"> Select the database table you want to retrieve. The list populates with all of the tables you have access to based on your credentials. If you do not select a database table, the connector retrieves your entire database schema. </td></tr><tr><td colspan="1" rowspan="1"> Table Columns </td><td colspan="1" rowspan="1"> Select the table columns you want to retrieve. The list populates with all of the columns you have access to based on your credentials. If you do not select a table column, the connector retrieves your entire selected database table. </td></tr><tr><td colspan="1" rowspan="1"> Table Query Helper </td><td colspan="1" rowspan="1"> This field shows the query that is generated based on the selected fields. </td></tr><tr><td colspan="1" rowspan="1"> Views </td><td colspan="1" rowspan="1"> Select the view. </td></tr><tr><td colspan="1" rowspan="1"> View Columns </td><td colspan="1" rowspan="1"> Select the view columns that you would like to include in your report. </td></tr><tr><td colspan="1" rowspan="1"> View Query Helper </td><td colspan="1" rowspan="1"> This field shows the query that is generated based on the selected fields. </td></tr><tr><td colspan="1" rowspan="1"> Query </td><td colspan="1" rowspan="1"><p> Enter the SQL query to use to retrieve your data. You can use the <b><b><b><b> Query Helper </b></b></b></b> parameter to help you write a usable SQL query. To use the <b><b><b><b> Query Helper </b></b></b></b>, do the following: </p><ol><li><p> Select your desired warehouse, database, database schema, database table, and table columns in each menu. </p></li><li><p> Copy the SQL statement that appears in the <b><b><b><b> Query Helper </b></b></b></b> field. </p></li><li><p> Paste the copied SQL statement into the <b><b><b><b> Query </b></b></b></b> field. </p></li></ol></td></tr><tr><td colspan="1" rowspan="1"> Partition Support </td><td colspan="1" rowspan="1"> Choose whether or not to partition your data. </td></tr><tr><td colspan="1" rowspan="1"> Partition Criteria </td><td colspan="1" rowspan="1"> Select whether you want to partition the data using the date keys, non date keys, or meta query. </td></tr><tr><td colspan="1" rowspan="1"> Partition Query to determine partition tags </td><td colspan="1" rowspan="1"><p> Enter the partition meta query to determine the distinct partition tags (or keys). The column containing the <span></span><b> Date <span></span></b> data is your partition column. </p><p> Example: SELECT DISTINCT(DATE_COLUMN_NAME) FROM TABLENAME </p></td></tr><tr><td colspan="1" rowspan="1"> Partition Support Format </td><td colspan="1" rowspan="1"> Select the partition support format. </td></tr><tr><td colspan="1" rowspan="1"> Partition Column Name </td><td colspan="1" rowspan="1"> Select the partition column name. </td></tr><tr><td colspan="1" rowspan="1"> Past Year </td><td colspan="1" rowspan="1"> Enter the number of past years that you want to get data for. Value can be X, where X is a positive integer. For example: 5. </td></tr><tr><td colspan="1" rowspan="1"> Future Years </td><td colspan="1" rowspan="1"> Enter the number of future years that you want to get data for. Value can be X, where X is a positive integer. For example:5. </td></tr><tr><td colspan="1" rowspan="1"> Past Months </td><td colspan="1" rowspan="1"> Enter the number of past months that you want to get data for. Value can be X, where X is a positive integer. For example:5 </td></tr><tr><td colspan="1" rowspan="1"> Future Months </td><td colspan="1" rowspan="1"> Enter the number of future months that you want to get data for. Value can be X, where X is a positive integer. For example:5. </td></tr><tr><td colspan="1" rowspan="1"> Past Days </td><td colspan="1" rowspan="1"> Enter the number of past days that you want to get data for. Value can be X, where X is a positive integer. For example: 30. </td></tr><tr><td colspan="1" rowspan="1"> Date Format </td><td colspan="1" rowspan="1"> Select the required date format. By default <b><b> yyyy-MM-dd </b></b> will be used. </td></tr><tr><td colspan="1" rowspan="1"> Custom Date Format </td><td colspan="1" rowspan="1"> Enter the custom date format. </td></tr><tr><td colspan="1" rowspan="1"> Partition Non Date Key Column Name </td><td colspan="1" rowspan="1"> Select the partition column name. </td></tr></tbody></table>
+<table border="1" cellpadding="1" cellspacing="1">
+  <thead>
+    <tr>
+      <th colspan="1" rowspan="1"><p>Menu</p></th>
+      <th colspan="1" rowspan="1"><p>Description</p></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td colspan="1" rowspan="1"><p>Report</p></td>
+      <td colspan="1" rowspan="1"><p>Select the Query Type. The following query types are available:</p></td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1"><p>Warehouses</p></td>
+      <td colspan="1" rowspan="1"><p>Select the warehouse containing the data you want to retrieve. The list populates with all of the warehouses you have access to based on your credentials.</p></td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1"><p>Databases</p></td>
+      <td colspan="1" rowspan="1"><p>Select the database containing the data you want to retrieve. The list populates with all of the databases you have access to based on your credentials.</p></td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1"><p>Schemas</p></td>
+      <td colspan="1" rowspan="1"><p>Select the database schema containing the data you want to retrieve. The list populates with all of the schemas you have access to based on your credentials.</p></td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1"><p>Database Objects</p></td>
+      <td colspan="1" rowspan="1"><p>Select the database object.</p></td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1"><p>Tables</p></td>
+      <td colspan="1" rowspan="1"><p>Select the database table you want to retrieve. The list populates with all of the tables you have access to based on your credentials. If you do not select a database table, the connector retrieves your entire database schema.</p></td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1"><p>Table Columns</p></td>
+      <td colspan="1" rowspan="1"><p>Select the table columns you want to retrieve. The list populates with all of the columns you have access to based on your credentials. If you do not select a table column, the connector retrieves your entire selected database table.</p></td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1"><p>Table Query Helper</p></td>
+      <td colspan="1" rowspan="1"><p>This field shows the query that is generated based on the selected fields.</p></td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1"><p>Views</p></td>
+      <td colspan="1" rowspan="1"><p>Select the view.</p></td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1"><p>View Columns</p></td>
+      <td colspan="1" rowspan="1"><p>Select the view columns that you would like to include in your report.</p></td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1"><p>View Query Helper</p></td>
+      <td colspan="1" rowspan="1"><p>This field shows the query that is generated based on the selected fields.</p></td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1"><p>Query</p></td>
+      <td colspan="1" rowspan="1"><p>Enter the SQL query to use to retrieve your data. You can use the <b>Query Helper</b> parameter to help you write a usable SQL query. To use the <b> Query Helper</b>, do the following:   1. Select your desired warehouse, database, database schema, database table, and table columns in each menu. 2. Copy the SQL statement that appears in the <b> Query Helper</b> field. 3. Paste the copied SQL statement into the <b> Query</b> field.</p></td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1"><p>Partition Support</p></td>
+      <td colspan="1" rowspan="1"><p>Choose whether or not to partition your data.</p></td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1"><p>Partition Criteria</p></td>
+      <td colspan="1" rowspan="1"><p>Select whether you want to partition the data using the date keys, non date keys, or meta query.</p></td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1"><p>Partition Query to determine partition tags</p></td>
+      <td colspan="1" rowspan="1"><p>Enter the partition meta query to determine the distinct partition tags (or keys). The column containing the <b>Date</b> data is your partition column.  Example: SELECT DISTINCT(DATE\_COLUMN\_NAME) FROM TABLENAME</p></td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1"><p>Partition Support Format</p></td>
+      <td colspan="1" rowspan="1"><p>Select the partition support format.</p></td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1"><p>Partition Column Name</p></td>
+      <td colspan="1" rowspan="1"><p>Select the partition column name.</p></td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1"><p>Past Year</p></td>
+      <td colspan="1" rowspan="1"><p>Enter the number of past years that you want to get data for. Value can be X, where X is a positive integer. For example: 5.</p></td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1"><p>Future Years</p></td>
+      <td colspan="1" rowspan="1"><p>Enter the number of future years that you want to get data for. Value can be X, where X is a positive integer. For example:5.</p></td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1"><p>Past Months</p></td>
+      <td colspan="1" rowspan="1"><p>Enter the number of past months that you want to get data for. Value can be X, where X is a positive integer. For example:5</p></td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1"><p>Future Months</p></td>
+      <td colspan="1" rowspan="1"><p>Enter the number of future months that you want to get data for. Value can be X, where X is a positive integer. For example:5.</p></td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1"><p>Past Days</p></td>
+      <td colspan="1" rowspan="1"><p>Enter the number of past days that you want to get data for. Value can be X, where X is a positive integer. For example: 30.</p></td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1"><p>Date Format</p></td>
+      <td colspan="1" rowspan="1"><p>Select the required date format. By default <b>yyyy-MM-dd</b> will be used.</p></td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1"><p>Custom Date Format</p></td>
+      <td colspan="1" rowspan="1"><p>Enter the custom date format.</p></td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1"><p>Partition Non Date Key Column Name</p></td>
+      <td colspan="1" rowspan="1"><p>Select the partition column name.</p></td>
+    </tr>
+  </tbody>
+</table>
 
 ## Other Panes
 
-For information about the remaining sections of the Connector interface, including how to configure scheduling, retry, and update options, see [Adding a DataSet Using a Data Connector](https://domo-support.domo.com/s/article/360042926274?language=en_US "Adding a DataSet Using a Data Connector").
+For information about the remaining sections of the Connector interface, including how to configure scheduling, retry, and update options, see [Adding a DataSet Using a Data Connector](/s/article/360042926274).
 
-## FAQs
+## FAQ
+
+<AccordionGroup>
+
+<Accordion title="What kind of credentials do I need to power up this connector?">
+You need the full name of your Snowflake account, and the username and password associated with your Snowflake host. You may also provide your role.
+</Accordion>
+
+<Accordion title="Are there any API limits that I need to be aware of?">
+Limits depend on your server configuration.
+</Accordion>
+
+<Accordion title="How frequently will my data update?">
+Datasets can run as often as every 15 minutes. However, depending on the runtime of the query, datasets may need to run less frequently.
+</Accordion>
+
+<Accordion title="What do I need to be aware of while writing a query?">
+Make sure that all the words, table names and field names are correctly spelled. Refer to the Query Helper field for query help.
+</Accordion>
+
+<Accordion title="Why can't I connect to my Snowflake database? Do I need to whitelist any IP addresses?">
+Before you can connect to a Snowflake database, you must also whitelist a number of IP addresses on your database server on the port you want to connect to. For the full list of IP addresses, see [Whitelisting IP Addresses](/s/article/360043630093).
+</Accordion>
+
+<Accordion title="What's the difference between the Snowflake High Bandwidth With Advanced Partitions and Snowflake Managed Unload connectors?">
+Both connectors support partitioning, but the Snowflake High Bandwidth With Advanced Partitions connector allows to select whether or not you want to use partitioning for your data. Also, unlike the other partition connectors, the Snowflake High Bandwidth With Advanced Partitions connector allows you to use partitioning on non date columns.
+</Accordion>
+
+</AccordionGroup>
 
 ## Troubleshooting
 
-* Make sure your authentication remains valid.
-* Review the configuration to make sure that all required items have been selected.
-* Review the Connector history for error messages.
-* In rare cases, you may be requesting too much information and reaching API limitations or timeouts. If this is the case, you can review the history of the Connector run to see the error message and duration. If this is the case, you can reduce the number of accounts that are being pulled, choose a smaller number of metrics for the report that you are pulling, or reduce the timeframe that you are trying to pull.
+- Make sure your authentication remains valid.
+- Review the configuration to make sure that all required items have been selected.
+- Review the Connector history for error messages.
+- In rare cases, you may be requesting too much information and reaching API limitations or timeouts. If this is the case, you can review the history of the Connector run to see the error message and duration. If this is the case, you can reduce the number of accounts that are being pulled, choose a smaller number of metrics for the report that you are pulling, or reduce the timeframe that you are trying to pull.

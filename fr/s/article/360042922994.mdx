@@ -1,0 +1,85 @@
+---
+title: "Création d'un DataFlow SQL"
+---
+
+Affichage du résumé de la page
+
+## Introduction
+
+Pour créer des DataFlows, vous pouvez utiliser des requêtes SQL. L'opération est plus complexe qu'avec Magic ETL, mais vous disposez d'un plus grand nombre d'options. Pour obtenir plus d'informations sur la création d'un DataFlow Magic ETL, consultez la rubrique [DataFlows Magic ETL](/s/topic/0TO5w000000ZanvGAC).
+
+Pour créer un DataFlow SQL à partir du Data Center, vous devez accéder à l'interface. Pour obtenir plus d'informations sur le Data Center, consultez la rubrique [Topologie du Data Center](/s/article/360047553253).
+
+Création d'un DataFlow SQL
+
+<Note>
+**Remarque :** Redshift ne prend *pas* en charge les procédures stockées, comme indiqué ici : [http://docs.aws.amazon.com/redshift/latest/dg/c\_unsupported-postgresql-features.html](http://docs.aws.amazon.com/redshift/latest/dg/c_unsupported-postgresql-features.html). L'alternative consiste à utiliser un DataFlow MySQL, puisque MySQL prend en charge les procédures stockées.
+</Note>
+
+**Pour créer un DataFlow SQL,**
+
+1. Dans Domo, cliquez sur **> Data Center**.
+2. Dans la barre d'outils **Magic Transform** située en haut de la fenêtre, cliquez sur **SQL**.
+
+   <Tip>
+   **Conseil :** vous pouvez aussi ouvrir l'éditeur de DataFlow SQL où que vous soyez dans Domo en sélectionnant dans la barre d'outils des applis, puis **Données > SQL**.
+   </Tip>
+3. Sélectionnez le type de DataFlow que vous souhaitez créer.  
+   La vue **Créer un DataFlow** s'affiche.
+4. Entrez le nom et la description du DataFlow.
+5. Pour sélectionner les DataSets d'entrée à inclure dans le DataFlow, procédez comme suit :
+
+   1. Cliquez sur **Sélectionner un DataSet**.  
+      La liste des DataSets existants s'affiche.
+
+      <Note>
+      **Remarque :** les DataSets en entrée d'un DataFlow *doivent* déjà exister dans Domo ; la vue **Créer un DataFlow** ne permet pas de charger de nouveaux DataSets. Pour obtenir plus d'informations sur le chargement de nouveaux DataSets dans Domo, consultez la rubrique [Utilisation de connecteurs pour la connexion aux données](/s/topic/0TO5w000000ZanLGAS).
+      </Note>
+   2. Sélectionnez le DataSet souhaité.  
+      Le DataSet sélectionné s'affiche dans une carte. Vous pouvez en afficher un aperçu en cliquant sur la carte, puis sur **Aperçu**, ou le retirer des DataSets d'entrée en cliquant sur .
+   3. Répétez les deux étapes précédentes pour sélectionner autant de DataSets que nécessaire.
+6. (Facultatif) Pour retirer des colonnes inutiles d'un DataSet d'entrée, procédez comme suit :
+
+   1. Cliquez sur la carte du DataSet pour ouvrir la boîte de dialogue d'aperçu ;
+   2. Pour retirer une colonne, cliquez sur le « X » accolé à son nom. Vous pouvez également les supprimer toutes en cliquant sur **Retirer toutes les colonnes**.  
+      Vous pouvez aussi rajouter certaines colonnes dans le DataSet en cliquant sur **Ajouter une colonne** avant de sélectionner des colonnes, ou les rajouter toutes simultanément en cliquant sur **Ajouter toutes les colonnes**.
+   3. Cliquez sur **Appliquer**.
+7. (Facultatif) Pour ajouter des transformations, procédez comme suit :
+
+   1. Cliquez sur **Ajouter transformation**.  
+      La boîte de dialogue **Transformer** qui s'affiche présente diverses options. Pour obtenir plus d'informations sur ces options, consultez la rubrique [Fonctionnement des options Transformer et DataSet en sortie](/s/article/360042922994).
+   2. Pour apporter les transformations souhaitées au(x) DataSet(s) en entrée, entrez le code SQL.  
+      Le nom de tous les DataSets d'entrée sélectionnés s'affiche en haut de la boîte de dialogue **Transformer** et vous permet de créer des instructions SQL.
+   3. Cliquez sur **Terminé**.
+8. Cliquez sur **Ajouter un DataSet de sortie**.  
+   La boîte de dialogue **DataSet en sortie** qui s'affiche présente diverses options. Pour obtenir plus d'informations sur ces options, consultez la rubrique [Fonctionnement des options Transformer et DataSet en sortie](/s/article/360042922994).
+
+   1. Pour préciser comment les DataSets d'entrée doivent être combinés, entrez le code SQL.  
+      Le nom de tous les DataSets d'entrée sélectionnés s'affiche en haut de la boîte de dialogue **DataSets en sortie** et vous permet de créer des instructions SQL. Si vous avez transformé les DataSets d'entrée dans la boîte de dialogue **Transformer**, ces transformations sont appliquées ici.
+   2. (Facultatif) Pour ajouter d'autres DataSets en sortie, répétez les deux étapes précédentes.
+   3. Cliquez sur **Terminé**.
+9. (Conditionnel) Pour enregistrer votre DataFlow, procédez de l'une des manières suivantes :
+
+   - Si vous voulez exécuter le script envoyant ce DataFlow vers un DataSet utilisable dans Domo, cliquez sur **Enregistrer et exécuter**, entrez au besoin une description de cette version, puis cliquez sur **Enregistrer** pour confirmer l'opération.  
+     Cette opération lance le processus de création des DataSets à partir du DataFlow. Selon la taille des DataSets en entrée, ce processus peut prendre une minute ou plus d'une heure. Outre la création des DataSets, une carte est ajoutée pour ce DataFlow dans la liste des **DataFlows** du Data Center.
+   - Pour enregistrer ce DataFlow sans en envoyer le résultat dans les DataSets pour l'instant, cliquez sur **Enregistrer**, entrez au besoin une description de cette version, puis cliquez de nouveau sur **Enregistrer** pour confirmer l'opération. Une carte est alors ajoutée pour ce DataFlow dans la liste des **DataFlows** du Data Center, mais aucun DataSet n'est généré. Vous pouvez à tout moment exécuter le DataFlow pour obtenir les DataSets en sortie en survolant la carte du DataFlow avec votre souris dans la liste **DataFlows**, en cliquant sur et en sélectionnant **Exécuter**. Cette option et les autres options de ce menu sont détaillées dans la suite de cette rubrique.
+
+Lorsque vous enregistrez un DataFlow, une entrée est ajoutée pour cette version dans l'onglet **Versions** de l'affichage des détails de ce DataFlow. Si vous avez entré une description lors de l'enregistrement, celle-ci s'affiche dans l'entrée du DataFlow. Pour obtenir plus d'informations sur les versions, consultez la rubrique [Affichage de l'historique des versions d'un DataFlow](/s/article/360042923074).
+
+### Fonctionnement des options Transformer et DataSet en sortie
+
+Les options disponibles dans les boîtes de dialogue **Transformer** et **DataSet en sortie** sont quasi-identiques, à une différence importante près : l'option **Générer un tableau des résultats** est présente dans la boîte de dialogue **Transformer**, mais pas dans la boîte de dialogue **DataSet en sortie**.
+
+La capture d'écran suivante présente les composants de la boîte de dialogue **Transformer**.
+
+Le tableau suivant vous permet de mieux comprendre ces composants :
+
+| Composant | Description |
+| --- | --- |
+| Entrées disponibles | Contient le nom de tous les DataSets d'entrée sélectionnés pour ce DataFlow pour faciliter la rédaction des instructions SQL. Ces noms s'affichent dans les boîtes de dialogues **Transformer** et **DataSet en sortie**. Si vous transformez un ou plusieurs DataSets d'entrée dans la boîte de dialogue **Transformer**, les transformations s'appliquent à ces DataSets lorsque vous les référencez dans la boîte de dialogue **DataSet en sortie**. |
+| Champ SQL | Ce champ vous permet de créer le code SQL afin de transformer et/ou de combiner vos DataSets d'entrée. Dans ce champ, une fonctionnalité de saisie semi-automatique facilite la rédaction du code. |
+| Générer un tableau des résultats | Lorsque cette option est activée, un tableau temporaire contenant vos transformations est créé lorsque vous cliquez sur **Terminé**. Cette option est uniquement disponible dans la boîte de dialogue **Transformer**. |
+| Bouton Aperçu | Ce bouton vous permet d'afficher un aperçu de votre tableau de données après application de vos transformations SQL. |
+| Exécuter SQL | Cette option vous permet de tester la validité de votre code SQL. |
+
+Menu Délai d'expiration - Ce menu vous permet de préciser la durée d'exécution possible de ce code SQL avant l'expiration automatique. La plage d'options va d'une minute à 24 heures.

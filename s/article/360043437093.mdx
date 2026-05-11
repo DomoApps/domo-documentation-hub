@@ -2,17 +2,21 @@
 title: "Snowflake Writeback Connector"
 ---
 
-**Note:** **Snowflake will no longer support the username and password authentication mechanism as of November 2025. As a result, this connector will be retired in November 2025 and will no longer function. Please consider using one of the following connection methods instead:**
+<Note>**Note:** ** Snowflake will no longer support the username and password authentication mechanism as of November 2025. As a result, this connector will be retired in November 2025 and will no longer function. Please consider using one of the following connection methods instead:**</Note>
 
-- [Cloud Amplifier](https://domo-support.domo.com/s/article/4402322966807?language=en_US "Cloud Amplifier")
-- [Snowflake OAuth Writeback Connector](https://domo-support.domo.com/s/article/1500011338741?language=en_US)"Snowflake OAuth Writeback Connector")
-- [Snowflake Key Pair Authentication Writeback Connector](https://domo-support.domo.com/s/article/360058760154?language=en_US "Snowflake Key Pair Authentication Writeback Connector")
+- [Cloud Integrations](/s/article/4402322966807)
+- [Snowflake OAuth Writeback Connector](/s/article/1500011338741)
+- [Snowflake Key Pair Authentication Writeback Connector](/s/article/360058760154)
+
+## Snowflake Connector Migration Walkthrough
+
+As Snowflake is discontinuing username and password authentication, Snowflake connectors using this authentication method will be migrated to the OAuth version. This section helps users walk through the complete process of migrating their existing username and password Snowflake datasets to utilize the OAuth authentication version. Pls refer to the migration video ([https://youtu.be/rlG\_uNZwl\_U](https://youtu.be/rlG_uNZwl_U)) to make the transition smoother and minimize disruptions.
 
 ## Intro
 
-Snowflake is a data warehouse that makes it easy to bring together all your data and make it available to all of the users and systems that need to analyze it. You can use Domo's Snowflake Writeback connector to push data from a Domo DataSet into a Snowflake database. For more information about the Snowflake API, go to [https://docs.snowflake.net/manuals](https://docs.snowflake.net/manuals "https://docs.snowflake.net/manuals").
+Snowflake is a data warehouse that makes it easy to bring together all your data and make it available to all of the users and systems that need to analyze it. You can use Domo's Snowflake Writeback connector to push data from a Domo DataSet into a Snowflake database. For more information about the Snowflake API, go to [https://docs.snowflake.net/manuals](https://docs.snowflake.net/manuals).
 
-This topic discusses the fields and menus that are specific to the Snowflake Writeback connector user interface. For general information about adding DataSets, setting update schedules, and editing DataSet information, see [Adding a DataSet Using a Data Connector](/s/article/360042926274 "Adding a DataSet Using a Data Connector").
+This topic discusses the fields and menus that are specific to the Snowflake Writeback connector user interface. For general information about adding DataSets, setting update schedules, and editing DataSet information, see [Adding a DataSet Using a Data Connector](/s/article/360042926274).
 
 <Note>**Note:** The owner of a writeback dataset must also be an owner or co-owner of the input dataset.</Note>
 
@@ -20,288 +24,137 @@ This topic discusses the fields and menus that are specific to the Snowflake Wri
 
 To connect to a Snowflake database and create a DataSet, you must have the following:
 
-- The full name of your account (provided by Snowflake). This is the portion of your Snowflake URL immediately following
-  https://.
-
-  Note that your full account name may include additional segments that identify the region and cloud platform where your account is hosted. The following table provides account name examples by cloud platform/region. For each row, it assumes your account name is "xy12345."
-
-  <Frame>
-    <img alt="snowflake_account_names.png" src="/images/kb/ka05w00000123Kt-00N5w00000Ri7BU-0EM5w000005vO5S.png" />
-  </Frame>
-
+- The full name of your account (provided by Snowflake). This is the portion of your Snowflake URL immediately following https://.  
+    
+  Note that your full account name may include additional segments that identify the region and cloud platform where your account is hosted. The following table provides account name examples by cloud platform/region. For each row, it assumes your account name is "xy12345." 
+<Frame>
+![snowflake_account_names.png](/images/kb/0EM5w000005vO9R.png)
+</Frame>
 - The username and password for your Snowflake account.
 - A Domo Client ID and Client Secret. To obtain these credentials, do the following:
 
-  1. Log into your Domo developer account at [https://developer.domo.com/login](https://developer.domo.com/login "https://developer.domo.com/login").
-  2. [Create a new client](https://developer.domo.com/new-client "Domo to S3 Writeback Connector").
+  1. Log into your Domo developer account at [https://developer.domo.com/login](https://developer.domo.com/login).
+  2. [Create a new client](https://developer.domo.com/new-client).
 
-     <Note>
-       **Note:** When creating a new client, if you utilize multiple Domo instances, make sure you're logged into the
-       Developer Portal using the correct instance.
-     </Note>
+     
+<Note>**Note:** When creating a new client, if you utilize multiple Domo instances, make sure you're logged into the Developer Portal using the correct instance.</Note>
 
-  3. When creating the client, select ALL of the scopes. (Account, Audit, Buzz, Data, Dashboard, User, and Workflow.)
+3. When creating the client, select ALL of the scopes. (Account, Audit, Buzz, Data, Dashboard, User, and Workflow.) <img alt="snowflake_writeback_new_client.png" src="/images/kb/0EM5w000005vO9S.png" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/> 4. Click **Create**.
 
-     <Frame>
-       <img alt="snowflake_writeback_new_client.png" src="/images/kb/ka0Vq000000GnBF-00N5w00000Ri7BU-0EM5w000005vO9S.png" />
-     </Frame>
+<Warning>
+**Important**: You will need the following permissions on Snowflake:
 
-  4. Click \***\*Create\*\***.
-
-     <Warning>
-      **Important**: You will need the following permissions on Snowflake:
-
-      - CREATE TABLE
-      - COPY INTO
-      - PUT
-      - CREATE FILE FORMAT
-      - REMOVE
-      - LIST
-      </Warning>
+- CREATE TABLE
+- COPY INTO
+- PUT
+- CREATE FILE FORMAT
+- REMOVE
+- LIST
+</Warning>
 
 ## Configuring the connection
 
-This section enumerates the options in the **Credentials** and **Details** panes in the Snowflake Writeback Connector page. The components of the other panes in this page, **Scheduling** and **Name & Describe Your DataSet**, are universal across most connector types and are discussed in greater length in [Adding a DataSet Using a Data Connector](/s/article/360042926274 "Adding a DataSet Using a Data Connector").
+This section enumerates the options in the **Credentials** and **Details** panes in the Snowflake Writeback Connector page. The components of the other panes in this page, **Scheduling** and **Name & Describe Your DataSet**, are universal across most connector types and are discussed in greater length in [Adding a DataSet Using a Data Connector](/s/article/360042926274).
 
 ### Credentials Pane
 
 This pane contains fields for entering credentials to your Domo developer account as well as your Snowflake account. The following table describes what is needed for each field:
 
-<table border="1" cellpadding="1" cellspacing="1" data-aura-rendered-by="33:195;a">
+<table border="1" cellpadding="1" cellspacing="1">
   <thead>
     <tr>
-      <th colspan="1" rowspan="1">
-        <p> Field </p>
-      </th>
-      <th colspan="1" rowspan="1">
-        <p> Description </p>
-      </th>
+      <th colspan="1" rowspan="1"><p>Field</p></th>
+      <th colspan="1" rowspan="1"><p>Description</p></th>
     </tr>
   </thead>
   <tbody>
     <tr>
-      <td colspan="1" rowspan="1">
-        <p> Account Name </p>
-      </td>
-      <td colspan="1" rowspan="1">
-        <p>
-          {" "}
-          Enter the account name for your Snowflake account. For information about finding your account name, see 
-          <a
-            href="#prerequisites"
-            target="_self"          >
-            {" "}
-            Prerequisites{" "}
-          </a>
-          .{" "}
-        </p>
-      </td>
+      <td colspan="1" rowspan="1"><p>Account Name</p></td>
+      <td colspan="1" rowspan="1"><p>Enter the account name for your Snowflake account. For information about finding your account name, see <a href="#prerequisites">Prerequisites</a>.</p></td>
     </tr>
     <tr>
-      <td colspan="1" rowspan="1">
-        <p> Username </p>
-      </td>
-      <td colspan="1" rowspan="1">
-        <p> Enter the username associated with your Snowflake account. </p>
-      </td>
+      <td colspan="1" rowspan="1"><p>Username</p></td>
+      <td colspan="1" rowspan="1"><p>Enter the username associated with your Snowflake account.</p></td>
     </tr>
     <tr>
-      <td colspan="1" rowspan="1">
-        <p> Password </p>
-      </td>
-      <td colspan="1" rowspan="1">
-        <p> Enter the password associated with your Snowflake account. </p>
-      </td>
+      <td colspan="1" rowspan="1"><p>Password</p></td>
+      <td colspan="1" rowspan="1"><p>Enter the password associated with your Snowflake account.</p></td>
     </tr>
     <tr>
-      <td colspan="1" rowspan="1">
-        <p> Role </p>
-      </td>
-      <td colspan="1" rowspan="1">
-        <p> Enter your role. </p>
-      </td>
+      <td colspan="1" rowspan="1"><p>Role</p></td>
+      <td colspan="1" rowspan="1"><p>Enter your role.</p></td>
     </tr>
     <tr>
-      <td colspan="1" rowspan="1">
-        <p> Domo Client ID </p>
-      </td>
-      <td colspan="1" rowspan="1">
-        <p> Enter your Domo client ID. </p>
-      </td>
+      <td colspan="1" rowspan="1"><p>Domo Client ID</p></td>
+      <td colspan="1" rowspan="1"><p>Enter your Domo client ID.</p></td>
     </tr>
     <tr>
-      <td colspan="1" rowspan="1">
-        <p> Domo Client Secret </p>
-      </td>
-      <td colspan="1" rowspan="1">
-        <p> Enter your Domo client secret. </p>
-      </td>
+      <td colspan="1" rowspan="1"><p>Domo Client Secret</p></td>
+      <td colspan="1" rowspan="1"><p>Enter your Domo client secret.</p></td>
     </tr>
   </tbody>
 </table>
-
-After you have entered valid credentials, you can use the same account in Domo any time you create a Snowflake Writeback DataSet. You can manage connector accounts in the **Accounts** tab in the Data Center. For more information about this tab, see [Managing User Accounts for Connectors](/s/article/360042926054 "Managing User Accounts for Connectors").
+After you have entered valid credentials, you can use the same account in Domo any time you create a Snowflake Writeback DataSet. You can manage connector accounts in the **Accounts** tab in the Data Center. For more information about this tab, see [Managing User Accounts for Connectors](/s/article/360042926054).
 
 ### Details Pane
 
 This pane contains a number of fields and menus for entering your SQL query and specifying the location of the data you want to retrieve.
 
-<table border="1" cellpadding="1" cellspacing="1" data-aura-rendered-by="33:195;a">
+<table border="1" cellpadding="1" cellspacing="1">
   <thead>
     <tr>
-      <th colspan="1" rowspan="1">
-        <p> Parameter </p>
-      </th>
-      <th colspan="1" rowspan="1">
-        <p> Description </p>
-      </th>
+      <th colspan="1" rowspan="1"><p>Parameter</p></th>
+      <th colspan="1" rowspan="1"><p>Description</p></th>
     </tr>
   </thead>
   <tbody>
     <tr>
-      <td colspan="1" rowspan="1">
-        <p> Input DataSet ID </p>
-      </td>
-      <td colspan="1" rowspan="1">
-        <p>
-          {" "}
-          Enter the DataSet ID (GUID) for the DataSet you want to copy to Snowflake. You can find the ID by opening the details
-          view for the DataSet in the Data Center and looking at the portion of the URL following 
-          <span class="mt-font-courier-new">
-            {" "}
-            datasources/{" "}
-          </span>
-          . For example, in the URL 
-          <span class="nowiki">
-            <span class="mt-font-courier-new">
-              <a
-                href="https://mycompany.domo.com/datasources/845305d8-da3d-4107-a9d6-13ef3f86d4a4/details/overview"
-                rel="noopener"
-                target="_blank"
-              >
-                {" "}
-                https://mycompany.domo.com/datasources/845305d8-da3d-4107-a9d6-13ef3f86d4a4/details/overview{" "}
-              </a>
-            </span>
-          </span>
-           , the DataSet ID is 
-           <span class="mt-font-courier-new">
-            {" "}
-            845305d8-da3d-4107-a9d6-13ef3f86d4a4{" "}
-          </span>
-          .{" "}
-        </p>
-      </td>
+      <td colspan="1" rowspan="1"><p>Input DataSet ID</p></td>
+      <td colspan="1" rowspan="1"><p>Enter the DataSet ID (GUID) for the DataSet you want to copy to Snowflake. You can find the ID by opening the details view for the DataSet in the Data Center and looking at the portion of the URL following datasources/. For example, in the URL https://mycompany.domo.com/datasources/845305d8-da3d-4107-a9d6-13ef3f86d4a4/details/overview, the DataSet ID is 845305d8-da3d-4107-a9d6-13ef3f86d4a4.</p></td>
     </tr>
     <tr>
-      <td colspan="1" rowspan="1">
-        <p> Select Table Name </p>
-      </td>
-      <td colspan="1" rowspan="1">
-        <p> Select how you want to name the table where data will be copied. </p>
-        <ul>
-          <li>
-            <p>
-              <b>
-                <b> Use Input DataSet GUID </b>
-              </b>{" "}
-              . The table name will be the number you entered for <b> Input </b>
-              <b>
-                <b> DataSet ID </b>
-              </b>
-              .{" "}
-            </p>
-          </li>
-          <li>
-            <p>
-              <b>
-                <b> Use Input DataSet Name </b>
-              </b>{" "}
-              . The table name will be the same as that of the input DataSet.{" "}
-            </p>
-          </li>
-          <li>
-            <p>
-              <b> Enter Table Name </b>. You will give the table a custom name in the{" "}
-              <b>
-                <b> Custom Table Name </b>
-              </b>{" "}
-              field.{" "}
-            </p>
-          </li>
-        </ul>
-      </td>
+      <td colspan="1" rowspan="1"><p>Select Table Name</p></td>
+      <td colspan="1" rowspan="1"><p>Select how you want to name the table where data will be copied.   - <b>Use Input DataSet GUID</b>. The table name will be the number you entered for <b> Input</b><b>DataSet ID</b>. - <b> Use Input DataSet Name</b>. The table name will be the same as that of the input DataSet. - <b> Enter Table Name</b>. You will give the table a custom name in the <b> Custom Table Name</b> field.</p></td>
     </tr>
     <tr>
-      <td colspan="1" rowspan="1">
-        <p> Enter Table Name </p>
-      </td>
-      <td colspan="1" rowspan="1">
-        <p>
-          {" "}
-          Enter the name of the Snowflake table you want your data copied to (spaces and special characters will be replaced
-          with underscores).{" "}
-        </p>
-      </td>
+      <td colspan="1" rowspan="1"><p>Enter Table Name</p></td>
+      <td colspan="1" rowspan="1"><p>Enter the name of the Snowflake table you want your data copied to (spaces and special characters will be replaced with underscores).</p></td>
     </tr>
     <tr>
-      <td colspan="1" rowspan="1">
-        <p> Warehouses </p>
-      </td>
-      <td colspan="1" rowspan="1">
-        <p> Select the warehouse containing the table you want to send data to. </p>
-      </td>
+      <td colspan="1" rowspan="1"><p>Warehouses</p></td>
+      <td colspan="1" rowspan="1"><p>Select the warehouse containing the table you want to send data to.</p></td>
     </tr>
     <tr>
-      <td colspan="1" rowspan="1">
-        <p> Databases </p>
-      </td>
-      <td colspan="1" rowspan="1">
-        <p> Select the database containing the table you want to send data to. </p>
-      </td>
+      <td colspan="1" rowspan="1"><p>Databases</p></td>
+      <td colspan="1" rowspan="1"><p>Select the database containing the table you want to send data to.</p></td>
     </tr>
     <tr>
-      <td colspan="1" rowspan="1">
-        <p> Database Schema </p>
-      </td>
-      <td colspan="1" rowspan="1">
-        <p> Select the database schema containing the data you want to retrieve. </p>
-      </td>
+      <td colspan="1" rowspan="1"><p>Database Schema</p></td>
+      <td colspan="1" rowspan="1"><p>Select the database schema containing the data you want to retrieve.</p></td>
     </tr>
   </tbody>
 </table>
-
 ### Other Panes
 
-For information about the remaining sections of the connector interface, including how to configure scheduling, retry, and update options, see [Adding a DataSet Using a Data Connector](/s/article/360042926274 "Adding a DataSet Using a Data Connector").
+For information about the remaining sections of the connector interface, including how to configure scheduling, retry, and update options, see [Adding a DataSet Using a Data Connector](/s/article/360042926274).
 
 ### FAQs
 
 <AccordionGroup>
+
 <Accordion title="When should I use this connector?">
-
-
 The Domo Snowflake Writeback connector allows you to write data from a Domo dataset to a Snowflake instance using a local username and password in your Snowflake instance. If you do not already have the connector enabled, please contact your Domo Account Executive.
-
-
 </Accordion>
+
 <Accordion title="What permissions do I need on Snowflake?">
-
-
 You need the CREATE TABLE, COPY INTO, PUT, CREATE FILE FORMAT, REMOVE, and LIST permissions on Snowflake.
-
-
 </Accordion>
+
 <Accordion title="What kind of credentials do I need to power up the Snowflake Writeback connector?">
-
-
 You need the full name of your account (provided by Snowflake), Domo developer account credentials (client id and client secret), and Snowflake credentials (username and password.)
-
-
 </Accordion>
+
 <Accordion title="Where can I find my Domo client id and client secret?">
-
-
 To create a new client:
 
 - Login to [Domo developer account](https://developer.domo.com/login).
@@ -311,42 +164,26 @@ To create a new client:
 - Click **Create**.
 
 Once you have created a client, you can manage the client by clicking on **Manage Client**.
-
-
 </Accordion>
+
 <Accordion title="How frequently will my data update?">
-
-
 As often as needed.
-
-
 </Accordion>
+
 <Accordion title="Are there any API limits that I need to be aware of?">
-
-
 Limits depend on your server configuration.
-
-
 </Accordion>
+
 <Accordion title="Can I use the same Snowflake Writeback account for multiple datasets?">
-
-
 Yes
-
-
 </Accordion>
+
 <Accordion title="Why can't I connect to my Snowflake database? Do I need to whitelist any IP addresses?">
-
-
 Before you can connect to a Snowflake database in Domo, you must also whitelist a number of IP addresses on your database server on the port you want to connect to. For the full list of IP addresses, see [Whitelisting IP Addresses](/s/article/360043630093).
-
-
 </Accordion>
+
 <Accordion title="How do I find the Input Dataset ID?">
-
-
-Your Domo input dataset id is in the URL of the dataset you are exporting data from. For example:
-`https://customer.domo.com/datasources/aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee/details/settings`
-
+Your Domo input dataset id is in the URL of the dataset you are exporting data from. For example: https://customer.domo.com/datasources/aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee/details/settings
 </Accordion>
+
 </AccordionGroup>

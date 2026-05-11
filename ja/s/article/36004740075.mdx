@@ -2,739 +2,683 @@
 title: "Jupyterワークスペース | ユーザーガイド"
 ---
 
-import {InlineImage} from "/snippets/InlineImage.mdx";
-
-### はじめに
+## はじめに
 
 DomoのJupyterワークスペースは、Jupyterメモ、コード、データ向けのウェブベースのインタラクティブな開発環境です。ワークスペースはDomoと緊密に統合されているので、ユーザーは簡単にDomo DataSetを探索して、データサイエンスや機械学習のパイプラインを開発するために即座にコードを実行し、プロセスを記録し、カスタムの可視化を作成し、変換されたデータを再度Domoに書き込むことができます。
 
-JupyterワークスペースはJupyterLabインターフェースを使用します。JupyterLabの詳細については、 [JupyterLabのドキュメント](http://jupyterlab.readthedocs.io/en/latest/) <InlineImage src="/images/kb/ja/ka0Vq000000JFzS-00N5w00000Ri7BU-0EMVq000000KYTl.jpg" /> を参照してください。
+JupyterワークスペースはJupyterLabインターフェースを使用します。JupyterLabの詳細については、[JupyterLabのドキュメント](http://jupyterlab.readthedocs.io/en/latest/)<img alt="external link.png" src="/images/kb/ja/0EMVq000000KYTl.jpg" style={{width: 17, height: 17, display: 'inline', verticalAlign: 'start', margin: '0'}}/>
 
-Jupyterワークスペースは、Domoのプレミアム機能です。アクセスする方法については、Domoアカウントチームにお問い合わせください。サポートが必要な場合は、 [support@domo.com](mailto:support@domo.com) にご連絡ください。
+を参照してください。
+
+Jupyterワークスペースは、Domoのプレミアム機能です。アクセスする方法については、Domoアカウントチームにお問い合わせください。サポートが必要な場合は、[support@domo.com](mailto:support@domo.com)にご連絡ください。
 
 ---
 
 この記事では、JupyterワークスペースをDomoと統合する方法を以下のトピックで説明します。
 
-* [必要な許可](#required_grants)
-* [Jupyterを有効にする](#enable_jupyter)
-* [Jupyterワークスペースにアクセスする](#access_jupyter)
-* [Jupyterワークスペースのタスク](#workspace_tasks)
-  + [ワークスペースを作成する](#create_workspace)
-  + [ワークスペースの共有を有効にする](#enable_workspace_sharing)
-  + [ワークスペースを共有する](#share_workspace)
-  + [共有ワークスペースでインスタンスを表示する](#view_instances_shared_workspace)
-  + [ワークスペースを実行する](#run_workspace)
-  + [ワークスペースを編集する](#edit_workspace)
-  + [ワークスペースを削除する](#delete_workspace)
-* [ファイル共有](#file_sharing)
-  + [ファイル共有を作成する](#create_file_share)
-  + [ファイル共有を使用する](#use_file_share)
-  + [ファイル共有を削除する](#delete_file_share)
-* [Jupyterメモ](#jupyter_notebooks)
-  + [Jupyterメモを編集する](#edit_jupyter_notebooks)
-  + [メモを作成する](#create_notebook)
-  + [メモの名前を変更する](#rename_a_notebook)
-  + [メモを保存する](#save_notebook)
-  + [メモを削除する](#delete_notebook)
-  + [メモをスケジュールする](#schedule_notebook)
-  + [メモの出力をダウンロードする](#download_notebook_output)
-  + [スケジュールが設定されたメモを手動で実行する](#manually_run_scheduled_notebook)
-  + [セル](#cells)
-    - [セルのタイプを変更する](#change_cell_type)
-    - [メモにセルを追加する](#add_cells_to_notebook)
-    - [その他のセルオプション](#other_cell_options)
-    - [セルに入力を追加する](#add_input_to_cells)
-    - [セルを実行する](#execute_cells)
-  + [ワークフロー経由で実行する](#executions_via_workflows)
-* [Jupyterの基本](#jupyter_basics)
-
-  + [データを読み込む](#reading_data)
-  + [データを書き込む](#writing_data)
-  + [Append、Upsert、Partitionを使用する](#append_upsert_partition)
-  + [アカウントを使用する](#use_accounts)
-  + [ライブラリをインストールして使用する](#install_libraries)
-  + [利用状況のモニタリング](#usage_monitoring)
-* [よくある質問](#faq)
-
 ---
 
-### 必要な許可
+## 必要な許可
 
 Jupyterにアクセスするには、「Jupyterワークスペースを作成」または「Jupyterワークスペースを管理」の2つの許可のいずれかを有効にする必要があります。これらの許可は、Domoのカスタマイズされた権限に追加できます。
 
-* **Jupyterワークスペースを作成 —** ユーザーは、自分がアクセス権を持つJupyterワークスペースを作成、編集、削除できます。
-* **Jupyterワークスペースを管理** （Jupyter管理者） **—** ユーザーは、インスタンス内のすべてのJupyterワークスペースを表示、編集、削除できます。ほかのユーザーとワークスペースを共有するには、この許可が必要です。
+- **Jupyterワークスペースを作成 —** ユーザーは、自分がアクセス権を持つJupyterワークスペースを作成、編集、削除できます。
+- **Jupyterワークスペースを管理**（Jupyter管理者） **—** ユーザーは、インスタンス内のすべてのJupyterワークスペースを表示、編集、削除できます。ほかのユーザーとワークスペースを共有するには、この許可が必要です。
 
-Jupyterワークスペースの [ファイル共有](#file_sharing) 機能を使用するには、「Fileshareディレクトリを作成」または「Fileshareディレクトリを管理」の2つの許可のいずれかを有効にする必要があります。これらの許可は、Domoのカスタマイズされた権限に追加できます。
+Jupyterワークスペースのファイル共有機能を使用するには、「Fileshareディレクトリを作成」または「Fileshareディレクトリを管理」の2つの許可のいずれかを有効にする必要があります。これらの許可は、Domoのカスタマイズされた権限に追加できます。
 
-* **Fileshareディレクトリを作成 —** ユーザーは、自分がアクセス権を持つファイル共有ディレクトリを作成、編集、削除できます。
-* **Fileshareディレクトリを管理 —** ユーザーは、このインスタンス内のすべてのファイル共有ディレクトリを表示、編集、削除できます。
+- **Fileshareディレクトリを作成 —** ユーザーは、自分がアクセス権を持つファイル共有ディレクトリを作成、編集、削除できます。
+- **Fileshareディレクトリを管理 —** ユーザーは、このインスタンス内のすべてのファイル共有ディレクトリを表示、編集、削除できます。
 
-### Jupyterを有効にする
+## Jupyterを有効にする
 
 Jupyterの使用を開始するには、Jupyter管理者がユーザーのインスタンスに対して機能を有効にする必要があります。管理者は以下の手順に従います。
 
-1. ナビゲーションヘッダーで、
-**［その他］** > **［管理者］** に進みます。
+1. ナビゲーションヘッダーで、**［その他］**>**［管理者］**に進みます。
 
-2. **［機能］** メニューで **［Jupyter］** を選択します。
+2. **［機能］**メニューで**［Jupyter］**を選択します。
 
-3. **［Jupyter Account Inactive］** の横にあるトグルを調整して機能を有効にします。
+3. **［Jupyter Account Inactive］**の横にあるトグルを調整して機能を有効にします。
 
 アカウントが有効になります。
 
 4. アカウントを有効にしたら、必要なアカウントプランを選択します。
 
-* デフォルトのアカウントプランでは、すべてのユーザーがJupyterにアクセスでき、すべてのユーザーが無制限に利用できます。
-* 手動のアカウントプランでは、特定のユーザーがJupyterにアクセスでき、利用制限を設定できます。
+- デフォルトのアカウントプランでは、すべてのユーザーがJupyterにアクセスでき、すべてのユーザーが無制限に利用できます。
+- 手動のアカウントプランでは、特定のユーザーがJupyterにアクセスでき、利用制限を設定できます。
 
-<Frame><img alt="computetierlimit_2_copy.png" src="/images/kb/ka0Vq000000GnuP-00N5w00000Ri7BU-0EM5w000005vXkK.png" style={{width: 449, height: 214}}/></Frame>
-5. **［ティア制限を計算する］** を選択します。ティア制限の詳細については、Domoアカウントチームにお問い合わせください。
+<Frame>![computetierlimit_2_copy.png](/images/kb/ja/0EM5w000005vXkK.png)</Frame>
 
-6. **［保存］** を選択します。
+5. **［ティア制限を計算する］**を選択します。ティア制限の詳細については、Domoアカウントチームにお問い合わせください。
+
+6. **［保存］**を選択します。
 
 Jupyterが有効になり、ワークスペースを作成できるようになりました。
 
-[このページのトップへ](#intro)
+## Jupyterワークスペースにアクセスする
 
-### Jupyterワークスペースにアクセスする
-
-ナビゲーションヘッダーで **［データ］** を選択します。
-  
+ナビゲーションヘッダーで**［データ］**を選択します。  
 Data Centerが表示されます。
 
-左側のナビゲーションで、 <InlineImage src="/images/kb/ja/ka0Vq000000JFzS-00N5w00000Ri7BU-0EM5w000005vXkP.png" /> **［More］** > **［Jupyterワークスペース］** を選択します。
+左側のナビゲーションで、<img alt="Screen_Shot_2022-06-01_at_11.35.48_AM.png" src="/images/kb/ja/0EM5w000005vXkP.png" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/>
 
-<Frame><img alt="access jupyter workspaces.jpg" src="/images/kb/ka0Vq000000GnuP-00N5w00000Ri7BU-0EM5w000006wQBr.jpg" style={{width: 349, height: 240}}/></Frame>
-### このページのトップへ
+ **［More］**>**［Jupyterワークスペース］**を選択します。
 
-### Jupyterワークスペースのタスク
+<Frame>![access jupyter workspaces.jpg](/images/kb/ja/0EM5w000006wQBr.jpg)</Frame>
+
+## ### Jupyterワークスペースのタスク
 
 次のセクションでは、ワークスペースの作成、ワークスペースの共有の有効化、ワークスペースの共有、共有ワークスペースでのインスタンスの表示、ワークスペースの実行、ワークスペースの編集、ワークスペースの削除など、Jupyterワークスペース内の特定のタスクについて説明します。
 
-# ワークスペースを作成する
+## ワークスペースを作成する
 
-ワークスペースを作成するには、インスタンスでJupyterが有効になっている必要があります。手順については、「 [必要な許可](#required_grants) 」および「 [Jupyterを有効にする](#enable_jupyter) 」を参照してください。
+ワークスペースを作成するには、インスタンスでJupyterが有効になっている必要があります。手順については、「必要な許可」および「[Jupyterを有効にする](#jupyter)」を参照してください。
 
-1. ナビゲーションヘッダーで **［データ］** を選択します。
-2. 左側のレールで、
-   <InlineImage src="/images/kb/ja/ka0Vq000000JFzS-00N5w00000Ri7BU-0EM5w000005vXkP-1.png" /> **［More］** > **［Jupyterワークスペース］** を選択します。
-3. **［+新しいワークスペース］** **を選択します。**
-     
-   **［Jupyterワークスペースを作成］** モーダルが表示されます。
+1. ナビゲーションヘッダーで**［データ］**を選択します。
+2. 左側のレールで、<img alt="Screen_Shot_2022-06-01_at_11.35.48_AM.png" src="/images/kb/ja/0EM5w000005vXkP.png" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/>
+
+    **［More］**>**［Jupyterワークスペース］**を選択します。
+3. **［+新しいワークスペース］****を選択します。**  
+   **［Jupyterワークスペースを作成］**モーダルが表示されます。
 4. ワークスペースをカスタマイズするには、以下の設定を行います。
 
-* **［名前］** および **［説明］** フィールドに、ワークスペース名とオプションの説明を入力します。
-* **［カーネル］** 、 **［ティア制限を計算する］** 、 および **［タイムアウト］** フィールドに値を入力します。
-* （オプション）入力DataSetを選択します。
-* （オプション）出力DataSetを選択します。
-* （オプション）アカウントを追加します。 この手順では、ワークスペースで参照するGoogleアカウントなどのサードパーティアカウントを追加できます。
-* （オプション）ファイル共有を追加します。手順については、「
-  [ファイル共有を作成する](#create_file_share) 」を参照してください。
+- **［名前］**および**［説明］**フィールドに、ワークスペース名とオプションの説明を入力します。
+- **［カーネル］**、**［ティア制限を計算する］**、および**［タイムアウト］**フィールドに値を入力します。
+- （オプション）入力DataSetを選択します。
+- （オプション）出力DataSetを選択します。
+- （オプション）アカウントを追加します。この手順では、ワークスペースで参照するGoogleアカウントなどのサードパーティアカウントを追加できます。
+- （オプション）ファイル共有を追加します。手順については、「ファイル共有を作成する」を参照してください。
 
-  <Note>
-    **注記：** ワークスペースをほかのユーザーと共有すると、ワークスペースで参照されているサードパーティアカウントがほかのユーザーに表示されます。ただし、ほかのユーザーがアカウントキーや値を参照することはできません。 ***ユーザーとアカウントを共有するには、［データ］>［アカウント］に進みます。*** 入力DataSetと出力DataSetは共同所有者とも共有されます。
-
-  </Note>
+<Note>**注記：**ワークスペースをほかのユーザーと共有すると、ワークスペースで参照されているサードパーティアカウントがほかのユーザーに表示されます。ただし、ほかのユーザーがアカウントキーや値を参照することはできません。***ユーザーとアカウントを共有するには、［データ］>［アカウント］に進みます。*** 入力DataSetと出力DataSetは共同所有者とも共有されます。</Note>
 
 新しいワークスペースを作成する際に設定するオプションを以下の表に示します。
 
-<table border="1" cellpadding="1" cellspacing="1" data-aura-rendered-by="33:206;a"><thead><tr><th colspan="1" rowspan="1"><p> オプション </p></th><th colspan="1" rowspan="1"> 説明 </th></tr></thead><tbody><tr><td colspan="1" rowspan="1"><p><b> 名前 </b></p></td><td colspan="1" rowspan="1"><p> Jupyterワークスペースの名前 </p><p> 名前では[:*?\"&lt;&gt;|]"の文字はサポートされていません。 </p></td></tr><tr><td colspan="1" rowspan="1"><p><b> 説明 </b></p></td><td colspan="1" rowspan="1"><p> ワークスペースについての詳細情報など（オプション） </p></td></tr><tr><td colspan="1" rowspan="1"><p><b> ティア制限を計算する </b></p></td><td colspan="1" rowspan="1"><p> ワークスペースに割り当てられているコンピューターのサイズと、このワークスペースに関連付けられているDataFlow </p></td></tr><tr><td colspan="1" rowspan="1"><p><b> タイムアウト </b></p></td><td colspan="1" rowspan="1"><p> Jupyter UIにユーザーアクティビティがないときに、ワークスペースが自動的に停止するまでの時間 </p></td></tr><tr><td colspan="1" rowspan="1"><p><b> カーネル </b></p></td><td colspan="1" rowspan="1"><p> PythonまたはRカーネルが利用可能です。 </p></td></tr><tr><td colspan="1" rowspan="1"><p><b> 問題なく作成されたらワークスペースを開く </b></p></td><td colspan="1" rowspan="1"><p> 作成が完了すると、ワークスペースを開始するプロセスが実行されます。 </p></td></tr><tr><td colspan="1" rowspan="1"><p><b> 入力DataSet </b></p></td><td colspan="1" rowspan="1"><p> Jupyterワークスペースで使用するためのDomoデータソース（オプション） </p></td></tr><tr><td colspan="1" rowspan="1"><p><b> 出力DataSet </b></p></td><td colspan="1" rowspan="1"><p> Jupyter処理の一部としてデータを書き込むためのDataSet（オプション） <a id="enable_workspace_sharing" target="_blank"></a></p></td></tr><tr><td colspan="1" rowspan="1"><p><b> アカウント </b></p></td><td colspan="1" rowspan="1"><p> ワークスペースで参照するサードパーティアカウント（オプション） </p></td></tr><tr><td colspan="1" rowspan="1"><p><b> ファイル共有 </b></p></td><td colspan="1" rowspan="1"><p> ワークスペース内でファイルを共有するためのオプション。詳細については、「 <a href="#create_file_share" target="_self"> ファイル共有を作成する </a> 」および「 <a href="#use_file_share" target="_self"> ファイル共有を使用する </a> 」を参照してください。 </p></td></tr></tbody></table>
+| オプション                    | 説明                                                                                                                  |                    |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------------- | ------------------ |
+| **名前**                   | Jupyterワークスペースの名前  名前では[:\*?\"&lt;&gt;                                                                                    | ]"の文字はサポートされていません。 |
+| **説明**                   | ワークスペースについての詳細情報など（オプション）                                                                                           |                    |
+| **ティア制限を計算する**           | ワークスペースに割り当てられているコンピューターのサイズと、このワークスペースに関連付けられているDataFlow                                                           |                    |
+| **タイムアウト**               | Jupyter UIにユーザーアクティビティがないときに、ワークスペースが自動的に停止するまでの時間                                                                  |                    |
+| **カーネル**                 | PythonまたはRカーネルが利用可能です。                                                                                              |                    |
+| **問題なく作成されたらワークスペースを開く** | 作成が完了すると、ワークスペースを開始するプロセスが実行されます。                                                                                   |                    |
+| **入力DataSet**            | Jupyterワークスペースで使用するためのDomoデータソース（オプション）                                                                             |                    |
+| **出力DataSet**            | Jupyter処理の一部としてデータを書き込むためのDataSet（オプション）                                                                            |                    |
+| **アカウント**                | ワークスペースで参照するサードパーティアカウント（オプション）                                                                                     |                    |
+| **ファイル共有**               | ワークスペース内でファイルを共有するためのオプション。詳細については、「ファイル共有を作成する」および「ファイル共有を使用する」を参照してください。 |                    |
 
-5. **［保存］** を選択します。
+5. **［保存］**を選択します。
 
 新しいワークスペースが作成され、Jupyterのメインページのワークスペースのリストに追加されます。
 
-[このページのトップへ](#intro)
-
-# ワークスペースの共有を有効にする
+## ワークスペースの共有を有効にする
 
 ワークスペースを共有するには、管理者または「Jupyterワークスペースを管理」の許可を持つユーザーが共有を有効にする必要があります。
 
 1. Jupyterワークスペースリストから、共有したいワークスペースに移動します。
 
-2. ワークスペースの右側にマウスポインターを合わせます。
-<InlineImage src="/images/kb/ja/ka0Vq000000JFzS-00N5w00000Ri7BU-0EM5w000005vXkS.png" /> **［Manage Workspace］** メニューが表示されます。
+2. ワークスペースの右側にマウスポインターを合わせます。<img alt="Screen_Shot_2022-09-06_at_2.52.30_PM.png" src="/images/kb/ja/0EM5w000005vXkS.png" style={{width: 32, height: 30, display: 'inline', verticalAlign: 'start', margin: '0'}}/>
 
-3. <InlineImage src="/images/kb/ja/ka0Vq000000JFzS-00N5w00000Ri7BU-0EM5w000005vXkS-1.png" /> **［Manage Workspace］** メニューを選択し、 **［共有を有効にする］** を選択します。
+ **［Manage Workspace］**メニューが表示されます。
 
-**［共有を有効にする］** モーダルが表示されます。
+3.<img alt="Screen_Shot_2022-09-06_at_2.52.30_PM.png" src="/images/kb/ja/0EM5w000005vXkS.png" style={{width: 32, height: 30, display: 'inline', verticalAlign: 'start', margin: '0'}}/>
 
-4. **［続ける］** を選択して **［確認］** を選択します。 **［確認］** を選択すると、 メモやワークスペースの共有に伴うリスク を承諾したことになります。
+ **［Manage Workspace］**メニューを選択し、**［共有を有効にする］**を選択します。
 
-**［ワークスペースの共有］** 列で、ステータスが **［有効］** になります。管理者またはワークスペース所有者が、ワークスペースをほかのユーザーと共有できるようになりました。
+**［共有を有効にする］**モーダルが表示されます。
 
-### このページのトップへ
+4. **［続ける］**を選択して**［確認］**を選択します。**［確認］**を選択すると、メモやワークスペースの共有に伴うリスクを承諾したことになります。
 
-# ワークスペースを共有する
+**［ワークスペースの共有］**列で、ステータスが**［有効］**になります。管理者またはワークスペース所有者が、ワークスペースをほかのユーザーと共有できるようになりました。
 
-ワークスペースを共有するには、管理者または「Jupyterワークスペースを管理」の許可を持つユーザーが共有を有効にする必要があります。「 [ワークスペースの共有を有効にする](#enable_workspace_sharing) 」を参照してください。
+## # ワークスペースを共有する
+
+ワークスペースを共有するには、管理者または「Jupyterワークスペースを管理」の許可を持つユーザーが共有を有効にする必要があります。「ワークスペースの共有を有効にする」を参照してください。
 
 1. Jupyterワークスペースリストから、共有したいワークスペースに移動します。
 
-2. ワークスペースの右側にマウスポインターを合わせます。
-<InlineImage src="/images/kb/ja/ka0Vq000000JFzS-00N5w00000Ri7BU-0EM5w000005vXkS-2.png" /> **［Manage Workspace］** メニューが表示されます。
+2. ワークスペースの右側にマウスポインターを合わせます。<img alt="Screen_Shot_2022-09-06_at_2.52.30_PM.png" src="/images/kb/ja/0EM5w000005vXkS.png" style={{width: 32, height: 30, display: 'inline', verticalAlign: 'start', margin: '0'}}/>
 
-3. <InlineImage src="/images/kb/ja/ka0Vq000000JFzS-00N5w00000Ri7BU-0EM5w000005vXkS-3.png" /> **［Manage Workspace］** メニューを選択し、 **［このワークスペースを共有する］** を選択します。
+ **［Manage Workspace］**メニューが表示されます。
 
-**［共有を管理］** モーダルが表示されます。
+3.<img alt="Screen_Shot_2022-09-06_at_2.52.30_PM.png" src="/images/kb/ja/0EM5w000005vXkS.png" style={{width: 32, height: 30, display: 'inline', verticalAlign: 'start', margin: '0'}}/>
 
-4. 受信者の名前を入力し、適切な権限を選択して、
-**［追加］** を選択します。
+ **［Manage Workspace］**メニューを選択し、**［このワークスペースを共有する］**を選択します。
 
-5. **［保存］** を選択します。
+**［共有を管理］**モーダルが表示されます。
 
-ワークスペースが受信者と共有されます。受信者はワークスペースにインスタンスを追加できるようになり、Jupyterのメインページの **［ステータス］** 列にそのインスタンスのステータスが表示されます。
+4. 受信者の名前を入力し、適切な権限を選択して、**［追加］**を選択します。
 
-<Warning>
-  **重要：**
+5. **［保存］**を選択します。
 
-  * 同時編集はサポートされていません。同じファイルを編集する前にほかのユーザーに確認してください。
-  * ワークスペースをほかのユーザーと共有すると、ワークスペースで参照されているサードパーティアカウントがほかのユーザーに表示されます。ただし、ほかのユーザーがアカウントキーや値を参照することはできません。入力DataSetと出力DataSetは共同所有者とも共有されます。
+ワークスペースが受信者と共有されます。受信者はワークスペースにインスタンスを追加できるようになり、Jupyterのメインページの**［ステータス］**列にそのインスタンスのステータスが表示されます。
 
-</Warning>
+<Warning>**重要：**</Warning>
 
-### このページのトップへ
+- 同時編集はサポートされていません。同じファイルを編集する前にほかのユーザーに確認してください。
+- ワークスペースをほかのユーザーと共有すると、ワークスペースで参照されているサードパーティアカウントがほかのユーザーに表示されます。ただし、ほかのユーザーがアカウントキーや値を参照することはできません。入力DataSetと出力DataSetは共同所有者とも共有されます。
 
-# 共有ワークスペースでインスタンスを表示する
+## # 共有ワークスペースでインスタンスを表示する
 
 ワークスペースを共有すると、ほかのユーザーがワークスペースにインスタンスを追加できます。
 
 下の図では、ワークスペースの共有が有効になっていて、ほかのユーザー1人と共有されています。
 
-<Frame><img alt="Screen_Shot_2022-10-12_at_11.56.21_AM.png" src="/images/kb/ka0Vq000000GnuP-00N5w00000Ri7BU-0EM5w000005vXkR.png" style={{width: 576, height: 105}}/></Frame>
-ワークスペースで実行中のインスタンスを確認するには、 **［他 \<人数>人］** を選択します。
+<Frame>![Screen_Shot_2022-10-12_at_11.56.21_AM.png](/images/kb/ja/0EM5w000005vXkR.png)</Frame>
 
-<Frame><img alt="Screen_Shot_2022-10-12_at_11.56.21_AM.png" src="/images/kb/ka0Vq000000GnuP-00N5w00000Ri7BU-0EM5w000005vXkX.png" style={{width: 576, height: 105}}/></Frame>
+ワークスペースで実行中のインスタンスを確認するには、**［他 \<人数\>人］**を選択します。
+
+**<Frame>![Screen_Shot_2022-10-12_at_11.56.21_AM.png](/images/kb/ja/0EM5w000005vXkX.png)</Frame>**
+
 下の図では、ワークスペースで実行中のインスタンスは1つだけです。
 
-<Frame><img alt="Screen_Shot_2022-10-12_at_12.29.41_PM.png" src="/images/kb/ka0Vq000000GnuP-00N5w00000Ri7BU-0EM5w000005vXkI.png" style={{width: 580, height: 259}}/></Frame>
-[このページのトップへ](#intro)
+<Frame>![Screen_Shot_2022-10-12_at_12.29.41_PM.png](/images/kb/ja/0EM5w000005vXkI.png)</Frame>
 
-# ワークスペースを実行する
+## ワークスペースを実行する
 
-1. **［Jupyterワークスペース］** リストから、実行したいワークスペースを選択します。
+1. **［Jupyterワークスペース］**リストから、実行したいワークスペースを選択します。
 
-**［このワークスペースを開始する］** モーダルが表示されます。
+**［このワークスペースを開始する］**モーダルが表示されます。
 
-2. **［開始］** を選択します。
+2. **［開始］**を選択します。
 
-<Frame><img alt="Screen_Shot_2022-10-12_at_11.52.53_AM.png" src="/images/kb/ka0Vq000000GnuP-00N5w00000Ri7BU-0EM5w000005vXkV.png" style={{width: 446, height: 232}}/></Frame>
+<Frame>![Screen_Shot_2022-10-12_at_11.52.53_AM.png](/images/kb/ja/0EM5w000005vXkV.png)</Frame>
+
 ワークスペースの読み込みには数秒かかります。これは正常な動作です。
 
-<Frame><img alt="Screen_Shot_2022-10-12_at_12.39.17_PM.png" src="/images/kb/ka0Vq000000GnuP-00N5w00000Ri7BU-0EM5w000005vXkH.png" style={{width: 474, height: 153}}/></Frame>
+<Frame>![Screen_Shot_2022-10-12_at_12.39.17_PM.png](/images/kb/ja/0EM5w000005vXkH.png)</Frame>
+
 3. ワークスペースの読み込みが完了したら、ワークスペースのタイトルを選択します。
 
 ワークスペースが開き、メモを編集できます。
 
-<Frame><img alt="Screen_Shot_2022-10-12_at_12.43.30_PM.png" src="/images/kb/ka0Vq000000GnuP-00N5w00000Ri7BU-0EM5w000005vXkZ.png" style={{width: 901, height: 396}}/></Frame>
-2人のユーザーが同じファイルを編集すると、 **［File Changed］** モーダルが表示されます。ほかのユーザーによる変更を上書きしたり、自分が行った変更を元に戻したりできます。
+<Frame>![Screen_Shot_2022-10-12_at_12.43.30_PM.png](/images/kb/ja/0EM5w000005vXkZ.png)</Frame>
 
-<Frame><img alt="Screen_Shot_2022-10-12_at_11.50.37_AM_copy.png" src="/images/kb/ka0Vq000000GnuP-00N5w00000Ri7BU-0EM5w000005vXkU.png" style={{width: 496, height: 190}}/></Frame>
-[このページのトップへ](#intro)
+2人のユーザーが同じファイルを編集すると、**［File Changed］**モーダルが表示されます。ほかのユーザーによる変更を上書きしたり、自分が行った変更を元に戻したりできます。
 
-# ワークスペースを編集する
+<Frame>![Screen_Shot_2022-10-12_at_11.50.37_AM_copy.png](/images/kb/ja/0EM5w000005vXkU.png)</Frame>
 
-1. **［Jupyterワークスペース］** リストから、編集したいワークスペースを見つけます。
+## ワークスペースを編集する
 
-2. ワークスペースの右側にマウスポインターを合わせます。
-<InlineImage src="/images/kb/ja/ka0Vq000000JFzS-00N5w00000Ri7BU-0EM5w000005vXkS-4.png" /> **［Manage Workspace］** メニューが表示されます。
+1. **［Jupyterワークスペース］**リストから、編集したいワークスペースを見つけます。
 
-3. <InlineImage src="/images/kb/ja/ka0Vq000000JFzS-00N5w00000Ri7BU-0EM5w000005vXkS-5.png" /> **［Manage Workspace］** メニューを選択し、 **［編集］** を選択します。
+2. ワークスペースの右側にマウスポインターを合わせます。<img alt="Screen_Shot_2022-09-06_at_2.52.30_PM.png" src="/images/kb/ja/0EM5w000005vXkS.png" style={{width: 32, height: 30, display: 'inline', verticalAlign: 'start', margin: '0'}}/>
 
-**［Jupyterワークスペースを編集］** モーダルが表示されます。
+**［Manage Workspace］**メニューが表示されます。
 
-4. ワークスペースに新しい詳細を追加し、
-**［保存］** を選択します。
+3.<img alt="Screen_Shot_2022-09-06_at_2.52.30_PM.png" src="/images/kb/ja/0EM5w000005vXkS.png" style={{width: 32, height: 30, display: 'inline', verticalAlign: 'start', margin: '0'}}/>
+
+**［Manage Workspace］**メニューを選択し、**［編集］**を選択します。
+
+**［Jupyterワークスペースを編集］**モーダルが表示されます。
+
+4. ワークスペースに新しい詳細を追加し、**［保存］**を選択します。
 
 ワークスペースが新しい詳細で更新されます。
 
-[このページのトップへ](#intro)
-
-# ワークスペースを削除する
+## ワークスペースを削除する
 
 1. Jupyterワークスペースリストから、削除したいワークスペースに移動します。
 
-2. ワークスペースの右側にマウスポインターを合わせます。
-<InlineImage src="/images/kb/ja/ka0Vq000000JFzS-00N5w00000Ri7BU-0EM5w000005vXkS-6.png" /> **［Manage Workspace］** メニューが表示されます。
+2. ワークスペースの右側にマウスポインターを合わせます。<img alt="Screen_Shot_2022-09-06_at_2.52.30_PM.png" src="/images/kb/ja/0EM5w000005vXkS.png" style={{width: 32, height: 30, display: 'inline', verticalAlign: 'start', margin: '0'}}/>
 
-3. <InlineImage src="/images/kb/ja/ka0Vq000000JFzS-00N5w00000Ri7BU-0EM5w000005vXkS-7.png" /> **［Manage Workspace］** メニューを選択し、 **［削除］** を選択します。
+ **［Manage Workspace］**メニューが表示されます。
 
-**［Delete Test?］** モーダルが表示されます。
+3.<img alt="Screen_Shot_2022-09-06_at_2.52.30_PM.png" src="/images/kb/ja/0EM5w000005vXkS.png" style={{width: 32, height: 30, display: 'inline', verticalAlign: 'start', margin: '0'}}/>
 
-4. **［削除］** ボタンを選択して、ワークスペースを削除することを確認します。
+ **［Manage Workspace］**メニューを選択し、**［削除］**を選択します。
+
+**［Delete Test?］**モーダルが表示されます。
+
+4. **［削除］**ボタンを選択して、ワークスペースを削除することを確認します。
 
 ワークスペースが削除されます。この操作を取り消すことはできません。
 
-[このページのトップへ](#intro)
-
-### ファイル共有
+## ファイル共有
 
 ファイル共有を作成して、Jupyterワークスペースに追加できます。以下のトピックでは、ファイル共有の作成方法、ワークスペースへの追加方法、ワークスペースからファイル共有を削除する方法について説明します。
 
-# ファイル共有を作成する
+## ファイル共有を作成する
 
-Jupyterワークスペースで使用するファイル共有を作成するには、以下の手順に従います。ファイル共有をJupyterワークスペースに接続する方法については、「 [ファイル共有を使用する](#use_file_share) 」を参照してください。
+Jupyterワークスペースで使用するファイル共有を作成するには、以下の手順に従います。ファイル共有をJupyterワークスペースに接続する方法については、「ファイル共有を使用する」を参照してください。
 
-1. Domoナビゲーションヘッダーで、 **［データ］** を選択します。
-2. 左側のレールで、
-   <InlineImage src="/images/kb/ja/ka0Vq000000JFzS-00N5w00000Ri7BU-0EM5w000006u2ot.jpg" /> **［More］** > **［ファイル共有］** を選択します。
-3. **［+新しいファイルの共有］** を選択します。
-     
-   **［ファイル共有を作成］** モーダルが表示されます。
+1. Domoナビゲーションヘッダーで、**［データ］**を選択します。
+2. 左側のレールで、<img alt="Screenshot 2023-03-03 at 10.48.19 AM.png" src="/images/kb/ja/0EM5w000006u2ot.jpg" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/>
 
-   <Frame><img alt="create a file share modal.jpg" src="/images/kb/ka0Vq000000GnuP-00N5w00000Ri7BU-0EM5w000006u548.jpg" style={{width: 425, height: 263}}/></Frame>
+   **［More］**>**［ファイル共有］**を選択します。
+3. **［+新しいファイルの共有］**を選択します。  
+   **［ファイル共有を作成］**モーダルが表示されます。
+
+   <Frame>![create a file share modal.jpg](/images/kb/ja/0EM5w000006u548.jpg)</Frame>
 4. ファイル共有をカスタマイズするには、以下の設定を行います。
-   * **［名前］** および **［説明］** フィールドに、ファイル共有の名前とオプションの説明を入力します。
-   * **［デフォルトのマウントポイント］** フィールドに、 ***パス** を入力します。* これは何でも構いません。
-5. **［保存］** を選択して、新しいファイル共有を作成します。
+   - **［名前］**および**［説明］**フィールドに、ファイル共有の名前とオプションの説明を入力します。
+   - **［デフォルトのマウントポイント］**フィールドに、***パス**を入力します。*これは何でも構いません。
+5. **［保存］**を選択して、新しいファイル共有を作成します。
 
-[このページのトップへ](#intro)
+## ファイル共有を使用する
 
-# ファイル共有を使用する
+<Note>**注記：**ワークスペースが既に実行されている状態でファイル共有を追加した場合は、ワークスペースを再起動しないと、リストにファイル共有が表示されません。</Note>
 
-<Note>
-  **注記：** ワークスペースが既に実行されている状態でファイル共有を追加した場合は、ワークスペースを再起動しないと、リストにファイル共有が表示されません。
-
-</Note>
-
-以下の手順で、作成したファイル共有を使用できます。ファイル共有の作成方法の詳細については、「 [ファイル共有を作成する](#create_file_share) 」を参照してください。
+以下の手順で、作成したファイル共有を使用できます。ファイル共有の作成方法の詳細については、「ファイル共有を作成する」を参照してください。
 
 Jupyterワークスペースの作成中または編集中に、作成したファイル共有を追加できます。
 
-**［Jupyterワークスペースを作成］** または **［Jupyterワークスペースを編集］** モーダルでファイル共有を追加するには、以下の手順に従います。これらのモーダルにアクセスする方法については、「 [ワークスペースを作成する](#create_workspace) 」および「 [ワークスペースを編集する](#edit_workspace) 」を参照してください。
+**［Jupyterワークスペースを作成］**または**［Jupyterワークスペースを編集］**モーダルでファイル共有を追加するには、以下の手順に従います。これらのモーダルにアクセスする方法については、「ワークスペースを作成する」および「ワークスペースを編集する」を参照してください。
 
-1. モーダルの **［ファイル共有］** セクションで、 **［ファイル共有を追加］** を選択します。
+1. モーダルの**［ファイル共有］**セクションで、**［ファイル共有を追加］**を選択します。
 2. 検索フィールドで、ワークスペースに追加するファイル共有を検索して特定します。
 3. そのファイル共有を選択します。
-4. 選択したファイル共有がモーダルに表示されます。デフォルトでは、マウントポイントはデフォルトのマウントポイントで、 **［デフォルトを使用］** チェックボックスはオンになっています。別のマウントポイントを使用するには、 **［デフォルトを使用］** チェックボックスをオフにしてリストを展開し、使用するマウントポイントを選択します。
+4. 選択したファイル共有がモーダルに表示されます。デフォルトでは、マウントポイントはデフォルトのマウントポイントで、**［デフォルトを使用］**チェックボックスはオンになっています。別のマウントポイントを使用するには、**［デフォルトを使用］**チェックボックスをオフにしてリストを展開し、使用するマウントポイントを選択します。
 
-   <Columns>
-     <Frame><img alt="file share default.png" src="/images/kb/ka0Vq000000GnuP-00N5w00000Ri7BU-0EM5w000006u54h.jpg" style={{width: 752, height: 299}}/></Frame>
-     <Frame><img alt="mount path.png" src="/images/kb/ka0Vq000000GnuP-00N5w00000Ri7BU-0EM5w000006u54m.jpg" style={{width: 752, height: 299}}/></Frame>
-   </Columns>
-5. **［ワークスペースを保存］** を選択します。
+   <Frame>![file share default.png](/images/kb/ja/0EM5w000006u54h.jpg)</Frame>
 
-ファイル共有がワークスペースに追加され、 [Jupyterメモ](#jupyter_notebooks) の **ファイルブラウザー** でも表示できるようになります。
+   <Frame>![mount path.png](/images/kb/ja/0EM5w000006u54m.jpg)</Frame>
+5. **［ワークスペースを保存］**を選択します。
 
-<Frame><img alt="Screenshot 2023-06-07 at 2.37.54 PM.png" src="/images/kb/ka0Vq0000000Rcv-00N5w00000Ri7BU-0EM5w000006vMcX.jpg" style={{width: 611.982, height: 365.994}}/></Frame>
-[このページのトップへ](#intro)
+ファイル共有がワークスペースに追加され、[Jupyterメモ](#jupyter)の**ファイルブラウザー**でも表示できるようになります。
 
-# ファイル共有を削除する
+<Frame>![Screenshot 2023-06-07 at 2.37.54 PM.png](/images/kb/ja/0EM5w000006uxIa.jpg)</Frame>
 
-1. **［Jupyterワークスペースを作成］ **または** ［Jupyterワークスペースを編集］ **モーダルにアクセスします。**** これらのモーダルにアクセスする方法については、「 [ワークスペースを作成する](#create_workspace) 」および「 [ワークスペースを編集する](#edit_workspace) 」を参照してください。
-2. モーダルの **［ファイル共有］** セクションで、削除するファイル共有を特定し、 <InlineImage src="/images/kb/ja/ka0Vq000000JFzS-00N5w00000Ri7BU-0EM5w000006u54X.jpg" /> 三点メニューを選択します。
-3. **［削除］** を選択します。
+## ファイル共有を削除する
 
-   <Frame><img alt="select kebab menu.png" src="/images/kb/ka0Vq000000GnuP-00N5w00000Ri7BU-0EM5w000006u54c.jpg" style={{width: 544, height: 114}}/></Frame>
+1. **［Jupyterワークスペースを作成］**または**［Jupyterワークスペースを編集］**モーダルにアクセスします。****これらのモーダルにアクセスする方法については、「ワークスペースを作成する」および「ワークスペースを編集する」を参照してください。
+2. モーダルの**［ファイル共有］**セクションで、削除するファイル共有を特定し、<img alt="kebab.png" src="/images/kb/ja/0EM5w000006u54X.jpg" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/>
+
+   三点メニューを選択します。
+3. **［削除］**を選択します。
+
+   <Frame>![select kebab menu.png](/images/kb/ja/0EM5w000006u54c.jpg)</Frame>
+
 ファイル共有がワークスペースから削除されます。
 
-[このページのトップへ](#intro)
-
-### Jupyterメモ
+## Jupyterメモ
 
 Jupyterメモは、1つ以上のセルで構成されるファイルです。これらのセルでは、テキストの記述や書式設定だけでなく、PythonまたはRといったプログラミング言語を使用したコードの記述が可能です。セルの内容を実行すると、テキストやコードに関連付けられた結果の出力がメモに直接表示されます。出力には、テキスト、図、表、画像などの様々な形式を使用できます。メモ内のセルは、自由に追加、編集、移動、複製、再実行、削除することができます。また、セルを順番に実行し、プロジェクトの様々なフェーズを次々に実行することもできます。例えば、メモの最初のセルにDataSetで読み取るコードを含めることができます。2番目のセルには、DataSetで実行する分析を指定するコードを含めることができます。
 
-セルのタイプ、メモに追加する方法、セルの実行方法については、「 [セル](#cells) 」を参照してください。
+セルのタイプ、メモに追加する方法、セルの実行方法については、「[セル](#cells)」を参照してください。  
   
-Jupyterメモのファイルは、実行可能なコードと関連するコード出力を説明テキストや画像とともに表示できるため、対話型セッションの完全な記録として機能します。
+Jupyterメモのファイルは、実行可能なコードと関連するコード出力を説明テキストや画像とともに表示できるため、対話型セッションの完全な記録として機能します。  
   
 JupyterメモをJupyterワークスペースに保存すると、メモとそのコンテンツに後でアクセスできるようになります。Jupyterメモは内部的にはJSONファイルであり、.ipynbという拡張子で保存されます。
 
 ワークスペースからメモをダウンロードして、別の場所に保存したり、共有したりすることもできます。
 
-<Note>
-  **注記：** 1つのJupyterワークスペース内に複数のJupyterメモを作成し、保存することができます。
-
-</Note>
+<Note>**注記：**1つのJupyterワークスペース内に複数のJupyterメモを作成し、保存することができます。</Note>
 
 以下のスクリーンショットは、Jupyterメモの例を示しています。
 
-<Frame><img alt="example jupyter notebook.png" src="/images/kb/ka0Vq000000GnuP-00N5w00000Ri7BU-0EM5w000006uVGb.jpg" style={{width: 675.99, height: 600}}/></Frame>
-Jupyterメモの **ファイルブラウザー** では、メモ間を移動したり、関連するファイル共有を表示したりすることができます。
+<Frame>![example jupyter notebook.png](/images/kb/ja/0EM5w000006uVGb.jpg)</Frame>
 
-<Frame><img alt="Screenshot 2023-06-07 at 2.37.54 PM.png" src="/images/kb/ka0Vq0000000Rcv-00N5w00000Ri7BU-0EM5w000006vMcX.jpg" style={{width: 611.982, height: 365.994}}/></Frame>
-[このページのトップへ](#intro)
+Jupyterメモの**ファイルブラウザー**では、メモ間を移動したり、関連するファイル共有を表示したりすることができます。
 
-# Jupyterメモを編集する
+<Frame>![Screenshot 2023-06-07 at 2.37.54 PM.png](/images/kb/ja/0EM5w000006uxIa.jpg)</Frame>
 
-<Warning>
-  **重要：** メモを編集するには、まずワークスペースを作成してから、ワークスペースを起動（または実行）する必要があります。詳細については、「 [ワークスペースを作成する](#create_workspace) 」および「 [ワークスペースを実行する](#run_workspace) 」を参照してください。
+## Jupyterメモを編集する
 
-</Warning>
+<Warning>**重要：**メモを編集するには、まずワークスペースを作成してから、ワークスペースを起動（または実行）する必要があります。詳細については、「ワークスペースを作成する」および「ワークスペースを実行する」を参照してください。</Warning>
 
-# メモを作成する
+## メモを作成する
 
 メモを作成するには、以下の手順に従います。
 
-1. Jupyterワークスペースで、 **［ファイル］** > **［新規］** > **［メモ］** を選択します。
-     
-   **［カーネルを選択］** モーダルが表示されます。
+1. Jupyterワークスペースで、**［ファイル］**>**［新規］**>**［メモ］**を選択します。  
+   **［カーネルを選択］**モーダルが表示されます。
 
-   <Frame><img alt="file new notebook.png" src="/images/kb/ka0Vq000000GnuP-00N5w00000Ri7BU-0EM5w000006uVHF.jpg" style={{width: 466.997, height: 261.979}}/></Frame>
-2. **［選択］** を選択します。
-     
-   メインの作業領域に、 *Untitled.ipynb* という名前のメモが開きます。無題のメモは、ワークスペースのサイドパネルにある **ファイルブラウザー** にも表示されます。
+   <Frame>![file new notebook.png](/images/kb/ja/0EM5w000006uVHF.jpg)</Frame>
+2. **［選択］**を選択します。  
+   メインの作業領域に、*Untitled.ipynb*という名前のメモが開きます。無題のメモは、ワークスペースのサイドパネルにある**ファイルブラウザー**にも表示されます。 
 
-   <Frame><img alt="untitled notebook.jpeg" src="/images/kb/ka0Vq000000GnuP-00N5w00000Ri7BU-0EM5w000006uWvp.jpg" style={{width: 723.993, height: 385.998}}/></Frame>
-[このページのトップへ](#intro)
+   <Frame>![untitled notebook.jpeg](/images/kb/ja/0EM5w000006uWvp.jpg)</Frame>
 
-# メモの名前を変更する
+## メモの名前を変更する
 
-メモの名前を変更するには、メモが開いているか閉じているかに応じて、メインの作業領域または **ファイルブラウザー** で行います。以下から適切なオプションを選択してください。
+メモの名前を変更するには、メモが開いているか閉じているかに応じて、メインの作業領域または**ファイルブラウザー**で行います。以下から適切なオプションを選択してください。
 
-* **メモが開いている場合 —** メインの作業領域でメモのタイトルを右クリックしてメモのオプションを表示し、 **［Rename Notebook］** を選択します。 **［Rename File］** ダイアログが表示されます。メモの新しい名前を入力し、 **［名前を変更］** を選択します。
+- **メモが開いている場合 —** メインの作業領域でメモのタイトルを右クリックしてメモのオプションを表示し、**［Rename Notebook］**を選択します。**［Rename File］**ダイアログが表示されます。メモの新しい名前を入力し、**［名前を変更］**を選択します。
 
-  <Frame><img alt="rename notebook.png" src="/images/kb/ka0Vq000000GnuP-00N5w00000Ri7BU-0EM5w000006uWxb.jpg" style={{width: 732.995, height: 195.998}}/></Frame>
-* **メモが閉じている場合 —** **ファイルブラウザー** で名前を変更するメモのタイトルを右クリックしてファイルオプションを表示し、 **［名前を変更］** を選択します。メモの新しい名前を入力します。
-    
-  <Frame><img alt="rename notebook file.png" src="/images/kb/ka0Vq000000GnuP-00N5w00000Ri7BU-0EM5w000006uWxl.jpg" style={{width: 740.99, height: 345.998}}/></Frame>
-[このページのトップへ](#intro)
+  <Frame>![rename notebook.png](/images/kb/ja/0EM5w000006uWxb.jpg)</Frame>
+- **メモが閉じている場合 —** **ファイルブラウザー**で名前を変更するメモのタイトルを右クリックしてファイルオプションを表示し、**［名前を変更］**を選択します。メモの新しい名前を入力します。  
 
-# メモを保存する
+  <Frame>![rename notebook file.png](/images/kb/ja/0EM5w000006uWxl.jpg)</Frame>
 
-メモをJupyterワークスペースに保存するには、メインの作業領域で **［保存］** を選択します。
+## メモを保存する
 
-<Frame><img alt="save a notebook.png" src="/images/kb/ka0Vq000000GnuP-00N5w00000Ri7BU-0EM5w000006uVoY.jpg" style={{width: 782.995, height: 138.993}}/></Frame>
-[このページのトップへ](#intro)
+メモをJupyterワークスペースに保存するには、メインの作業領域で**［保存］**を選択します。
 
-# メモを削除する
+<Frame>![save a notebook.png](/images/kb/ja/0EM5w000006uVoY.jpg)</Frame>
 
-メモの削除は、メモが開いているか閉じているかに応じて、メインの作業領域または **ファイルブラウザー** で行います。以下から適切なオプションを選択してください。
+## メモを削除する
 
-* **メモが開いている場合 —** メインの作業領域でメモのタイトルを右クリックしてメモのオプションを表示し、 **［Delete Notebook］** を選択します。ダイアログが表示されます。 **［削除］** を選択します。
+メモの削除は、メモが開いているか閉じているかに応じて、メインの作業領域または**ファイルブラウザー**で行います。以下から適切なオプションを選択してください。
 
-  <Frame><img alt="delete open notebook.png" src="/images/kb/ka0Vq000000GnuP-00N5w00000Ri7BU-0EM5w000006uVsf.jpg" style={{width: 747.995, height: 170.981}}/></Frame>
-* **メモが閉じている場合 —** メインの作業領域でメモのタイトルを右クリックしてメモのオプションを表示し、 **［削除］** を選択します。ダイアログが表示されます。 **［削除］** を選択します。
+- **メモが開いている場合 —** メインの作業領域でメモのタイトルを右クリックしてメモのオプションを表示し、**［Delete Notebook］**を選択します。ダイアログが表示されます。**［削除］**を選択します。
 
-  <Frame><img alt="Picture1.jpg" src="/images/kb/ka0Vq000000GnuP-00N5w00000Ri7BU-0EM5w000006uWyP.jpg" style={{width: 752.995, height: 351.997}}/></Frame>
-[このページのトップへ](#intro)
+  <Frame>![delete open notebook.png](/images/kb/ja/0EM5w000006uVsf.jpg)</Frame>
+- **メモが閉じている場合 —** メインの作業領域でメモのタイトルを右クリックしてメモのオプションを表示し、**［削除］**を選択します。ダイアログが表示されます。**［削除］**を選択します。
 
-# メモをスケジュール設定する
+  <Frame>![Picture1.jpg](/images/kb/ja/0EM5w000006uWyP.jpg)</Frame>
+
+### メモをスケジュール設定する
 
 Jupyterメモは、設定された頻度で自動的に実行されるようにスケジュール設定できます。使用可能な頻度のオプションを以下に示します。
 
-* 設定した時刻で1日1回
-* 設定した時刻で1日に複数回
-* 毎日
-* 特定の曜日
-* 月の特定の日
-* 毎月
-* 特定の月の間
+- 設定した時刻で1日1回
+- 設定した時刻で1日に複数回
+- 毎日
+- 特定の曜日
+- 月の特定の日
+- 毎月
+- 特定の月の間
 
-また、 [スケジュール設定されたメモを手動で実行](#manually_run_scheduled_notebook) することもできます。
+また、スケジュール設定されたメモを手動で実行することもできます。
 
 以下の手順でメモをスケジュール設定すると、関連付けられたJupyter DataFlowが作成され、Jupyterメモが自動的に実行されます。このほかにも、Jupyter DataFlowには、以下で説明するように便利な機能があります。
 
 メモのスケジュールを設定したり、変更したりするには次の手順に従います。
 
-1. スケジュールを設定するメモを開きます。ツールバーで、 **［Schedule Notebook］** を選択します。 **［DataFlowを作成］** モーダルが表示されます。
+1. スケジュールを設定するメモを開きます。ツールバーで、**［Schedule Notebook］**を選択します。**［DataFlowを作成］**モーダルが表示されます。
 
-   <Frame><img alt="schedule notebook.png" src="/images/kb/ka0Vq000000GnuP-00N5w00000Ri7BU-0EM5w000006uVuW.jpg" style={{width: 580.99, height: 148.993}}/></Frame>
-2. モーダルで、 **［名前］** と **［説明］** （オプション）のフィールドを入力します。
-3. **［ティアを計算する］** を選択します。
-4. **［このDataFlowをどのタイミングで実行しますか？］** メニューで、 **［スケジュールに従う］** を選択します。
+   <Frame>![schedule notebook.png](/images/kb/ja/0EM5w000006uVuW.jpg)</Frame>
+2. モーダルで、**［名前］**と**［説明］**（オプション）のフィールドを入力します。
+3. **［ティアを計算する］**を選択します。
+4. **［このDataFlowをどのタイミングで実行しますか？］**メニューで、**［スケジュールに従う］**を選択します。
 5. メモのスケジュールを設定します。
-6. **［保存］** を選択します。
+6. **［保存］**を選択します。
 
-   <Frame><img alt="set run schedule.png" src="/images/kb/ka0Vq000000GnuP-00N5w00000Ri7BU-0EM5w000006uVvK.jpg" style={{width: 569.983, height: 541.997}}/></Frame>
-DataFlowが、Data Centerの **［DataFlow］** セクションに表示されるようになります。表示するには、ナビゲーションヘッダーで **［データ］** を選択し、Data Centerのサイドバーで <InlineImage src="/images/kb/ja/ka0Vq000000JFzS-00N5w00000Ri7BU-0EM5w000006uWz3.jpg" /> **［DataFlow］** を選択します。Jupyter DataFlowを選択すると、詳細ビューが表示されます。
+   <Frame>![set run schedule.png](/images/kb/ja/0EM5w000006uVvK.jpg)</Frame>
 
-<Frame><img alt="jupyter dataflow.png" src="/images/kb/ka0Vq000000GnuP-00N5w00000Ri7BU-0EM5w000006uWzD.jpg" style={{width: 746.997, height: 187.995}}/></Frame>
-詳細ビューの **［履歴］** タブで、DataFlowの詳細な実行履歴を確認できます。 [メモの出力をダウンロード](#download_notebook_output) することもできます。
+DataFlowが、Data Centerの**［DataFlow］**セクションに表示されるようになります。表示するには、ナビゲーションヘッダーで**［データ］**を選択し、Data Centerのサイドバーで<img alt="Screenshot 2023-04-20 at 4.51.05 PM.png" src="/images/kb/ja/0EM5w000006uWz3.jpg" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/>
 
-**［バージョン］** タブでは、DataFlowのバージョンリストを確認できます。
+**［DataFlow］**を選択します。Jupyter DataFlowを選択すると、詳細ビューが表示されます。
 
-**［設定］** タブ、 **［DataSet］** タブ、 **［系統］** タブには情報はありません。
+<Frame>![jupyter dataflow.png](/images/kb/ja/0EM5w000006uWzD.jpg)</Frame>
 
-DataFlowに関連付けられているJupyterメモを開くには、詳細ビューから **［Jupyterで編集］** を選択します。
+詳細ビューの**［履歴］**タブで、DataFlowの詳細な実行履歴を確認できます。メモの出力をダウンロードすることもできます。
 
-<Frame><img alt="edit in jupyter.png" src="/images/kb/ka0Vq000000GnuP-00N5w00000Ri7BU-0EM5w000006uVy9.jpg" style={{width: 796.997, height: 154.991}}/></Frame>
-[このページのトップへ](#intro)
+**［バージョン］**タブでは、DataFlowのバージョンリストを確認できます。
 
-#### メモの出力をダウンロードする
+**［設定］**タブ、**［DataSet］**タブ、**［系統］**タブには情報はありません。
+
+DataFlowに関連付けられているJupyterメモを開くには、詳細ビューから**［Jupyterで編集］**を選択します。
+
+<Frame>![edit in jupyter.png](/images/kb/ja/0EM5w000006uVy9.jpg)</Frame>
+
+#### 
+
+## メモの出力をダウンロードする
 
 以下の手順を実行すると、Jupyter DataFlowの特定の実行用にメモの出力をダウンロードできます。
 
-1. [DataFlowの詳細ビューの **［履歴］** タブに移動](#navigate_to_dataflow) します。
+1. DataFlowの詳細ビューの**［履歴］**タブに移動します。
 
-   <Frame><img alt="history tab.jpg" src="/images/kb/ka0Vq000000GnuP-00N5w00000Ri7BU-0EM5w000006uWzm.jpg" style={{width: 779.991, height: 178.993}}/></Frame>
+   <Frame>![history tab.jpg](/images/kb/ja/0EM5w000006uWzm.jpg)</Frame>
 2. ログで、出力情報を出力する実行を表す行を特定します。
 3. その行の
-   <InlineImage src="/images/kb/ja/ka0Vq000000JFzS-00N5w00000Ri7BU-0EM5w000006uVwD.jpg" /> アクションメニューを選択します。
-4. アクションメニューで **［詳細を表示］** を選択します。
-     
+
+   <Frame>![Screenshot 2023-02-16 at 4.07.28 PM.png](/images/kb/ja/0EM5w000006uVwD.jpg)</Frame>
+
+   アクションメニューを選択します。
+4. アクションメニューで**［詳細を表示］**を選択します。  
    ダイアログが表示され、ダウンロードする出力のファイル形式を、IPYNB、HTML、PDFから選択できます。
 
-   <Frame><img alt="view details.png" src="/images/kb/ka0Vq000000GnuP-00N5w00000Ri7BU-0EM5w000006uX0B.jpg" style={{width: 796.997, height: 154.983}}/></Frame>
+   <Frame>![view details.png](/images/kb/ja/0EM5w000006uX0B.jpg)</Frame>
+
 この例では、メモの出力をPDFファイルでダウンロードしています。
 
-<Frame><img alt="example notebook output.png" src="/images/kb/ka0Vq000000GnuP-00N5w00000Ri7BU-0EM5w000006uVx1.jpg" style={{width: 798.993, height: 90}}/></Frame>
-[このページのトップへ](#intro)
+<Frame>![example notebook output.png](/images/kb/ja/0EM5w000006uVx1.jpg)</Frame>
 
 #### スケジュールが設定されたメモを手動で実行する
 
 スケジュールが設定されているJupyterメモを手動で実行するには、以下の手順に従います。
 
-1. Data Centerの **［DataFlow］** セクションで、スケジュールが設定されているJupyterメモのJupyter DataFlowを見つけます。
-2. Jupyter DataFlowの行で、
-   <InlineImage src="/images/kb/ja/ka0Vq000000JFzS-00N5w00000Ri7BU-0EM5w000006uVxG.jpg" /> **DataFlowのオプション** を選択します。オプションのリストで、 **［実行］** を選択します。
+1. Data Centerの**［DataFlow］**セクションで、スケジュールが設定されているJupyterメモのJupyter DataFlowを見つけます。
+2. Jupyter DataFlowの行で、<img alt="Screenshot 2023-03-30 at 5.25.32 PM.png" src="/images/kb/ja/0EM5w000006uVxG.jpg" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/>
 
-<Frame><img alt="run manually.png" src="/images/kb/ka0Vq000000GnuP-00N5w00000Ri7BU-0EM5w000006uX0G.jpg" style={{width: 790.998, height: 198.993}}/></Frame>
-[このページのトップへ](#intro)
+   **DataFlowのオプション**を選択します。オプションのリストで、**［実行］**を選択します。
 
-# セル
+<Frame>![run manually.png](/images/kb/ja/0EM5w000006uX0G.jpg)</Frame>
+
+### セル
 
 Jupyterメモのファイルは、セルと呼ばれる1つ以上のグレーの長方形フィールドで構成されています。
 
-<Frame><img alt="empty cell.png" src="/images/kb/ka0Vq000000GnuP-00N5w00000Ri7BU-0EM5w000006uXDU.jpg" style={{width: 717.995, height: 209.991}}/></Frame>
+<Frame>![empty cell.png](/images/kb/ja/0EM5w000006uXDU.jpg)</Frame>
+
 セルに様々なタイプの入力を入力し、それを実行して出力を受け取ることができます。セルに入力できる内容や、実行時のセルの出力は、セルのタイプによって決まります。セルには、コードセル、マークダウンセル、未加工セルの3タイプがあります。
 
-* **コードセル —** コードの記述および編集ができます。コードの記述に使用するプログラミング言語は、Jupyterワークスペースを作成する際に選択したカーネルのタイプ（PythonまたはR）によって異なります。コードセルを実行すると、コードセルのすぐ下にコードの出力が表示されます。出力には、テキスト、図、表、画像などの様々な形式を使用できます。
-* **マークダウンセル —** テキストを書き込むことができます。また、マークダウン言語を使用して、斜体や太字、リストの指定、見出しの作成など、テキストのマークアップや書式設定を行うこともできます。マークダウンセルを実行すると、入力したテキストの書式はリッチテキストになります。基本的なマークダウン構文については、 [こちら](https://www.markdownguide.org/basic-syntax/) <InlineImage src="/images/kb/ja/ka0Vq000000JFzS-00N5w00000Ri7BU-0EMVq000000KZ85.jpg" /> を参照してください。
-* **未加工セル —** 出力を直接書き込んだり、実行したくないコードを保存したりすることができます。
+- **コードセル —** コードの記述および編集ができます。コードの記述に使用するプログラミング言語は、Jupyterワークスペースを作成する際に選択したカーネルのタイプ（PythonまたはR）によって異なります。コードセルを実行すると、コードセルのすぐ下にコードの出力が表示されます。出力には、テキスト、図、表、画像などの様々な形式を使用できます。
+- **マークダウンセル —** テキストを書き込むことができます。また、マークダウン言語を使用して、斜体や太字、リストの指定、見出しの作成など、テキストのマークアップや書式設定を行うこともできます。マークダウンセルを実行すると、入力したテキストの書式はリッチテキストになります。基本的なマークダウン構文については、[こちら](https://www.markdownguide.org/basic-syntax/)<img alt="external link.png" src="/images/kb/ja/0EMVq000000KZ85.jpg" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/>
 
-セルのタイプを確認するには、セルを選択してメモの上部にあるツールバーのリストを表示します。この例では、メモにコードセルが含まれています。詳細については、「 [セルのタイプを変更する](#change_cell_type) 」を参照してください。
+  を参照してください。
+- **未加工セル —** 出力を直接書き込んだり、実行したくないコードを保存したりすることができます。
 
-[このページのトップへ](#intro)
+セルのタイプを確認するには、セルを選択してメモの上部にあるツールバーのリストを表示します。この例では、メモにコードセルが含まれています。詳細については、「セルのタイプを変更する」を参照してください。
 
 #### セルのタイプを変更する
 
-セルのタイプを変更するには、セルを選択し、ツールバーでセルタイプのメニューを選択して、コード、マークダウン、未加工のいずれかを選択します。セルのタイプの詳細については、「 [セル](#cells) 」を参照してください。
+セルのタイプを変更するには、セルを選択し、ツールバーでセルタイプのメニューを選択して、コード、マークダウン、未加工のいずれかを選択します。セルのタイプの詳細については、「[セル](#cells)」を参照してください。
 
-<Note>
-  **注記：** デフォルトでは、新しいセルはコードセルです。
+<Note>**注記：**デフォルトでは、新しいセルはコードセルです。</Note>
 
-</Note>
-
-<Frame><img alt="code type menu.png" src="/images/kb/ka0Vq000000GnuP-00N5w00000Ri7BU-0EM5w000006uVJL.jpg" style={{width: 685.998, height: 220.99}}/></Frame>
-### このページのトップへ
+<Frame>![code type menu.png](/images/kb/ja/0EM5w000006uVJL.jpg)</Frame>
 
 #### メモにセルを追加する
 
 メモにセルを追加するには、以下の2つのオプションのいずれかを使用します。
 
-* **追加 —** ツールバーで <InlineImage src="/images/kb/ja/ka0Vq000000JFzS-00N5w00000Ri7BU-0EM5w000006uVKY.jpg" /> **追加** を選択します。メモの最後にセルが追加されます。
-* **セルを挿入 —** 現在選択されているセルの上または下にセルを追加するには、 <InlineImage src="/images/kb/ja/ka0Vq000000JFzS-00N5w00000Ri7BU-0EM5w000006uVKd.jpg" /> **セルを上に追加** または <InlineImage src="/images/kb/ja/ka0Vq000000JFzS-00N5w00000Ri7BU-0EM5w000006uVKi.jpg" /> **セルを下に追加** を選択します。
+- **追加 —** ツールバーで<img alt="add.jpg" src="/images/kb/ja/0EM5w000006uVKY.jpg" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/>
 
-  <Note>
-    **注記：** デフォルトでは、新しいセルはすべてコードセルです。セルのタイプに関する詳細については「 [セル](#cells) 」を、セルのタイプの変更に関する詳細については「 [セルのタイプを変更する](#change_cell_type) 」を参照してください。
+  **追加**を選択します。メモの最後にセルが追加されます。
+- **セルを挿入 —** 現在選択されているセルの上または下にセルを追加するには、<img alt="add cell above.jpg" src="/images/kb/ja/0EM5w000006uVKd.jpg" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/>
 
-  </Note>
+  **セルを上に追加**または<img alt="add cells below.jpg" src="/images/kb/ja/0EM5w000006uVKi.jpg" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/>
 
-<Frame><img alt="add cells COPY.jpg" src="/images/kb/ka0Vq000000GnuP-00N5w00000Ri7BU-0EM5w000006uVKn.jpg" style={{width: 772.986, height: 136.997}}/></Frame>
-[このページのトップへ](#intro)
+  **セルを下に追加**を選択します。
+
+<Note>**注記：**デフォルトでは、新しいセルはすべてコードセルです。セルのタイプに関する詳細については「[セル](#cells)」を、セルのタイプの変更に関する詳細については「セルのタイプを変更する」を参照してください。</Note>
+
+<Frame>![add cells COPY.jpg](/images/kb/ja/0EM5w000006uVKn.jpg)</Frame>
 
 #### その他のセルオプション
 
 削除、移動、コピー、切り取り、貼り付け、結合、分割など、セルに様々な変更を加えることができます。
 
-ワークスペースのツールバーで **［編集］** を選択し、目的のオプションを選択するか、対応するキーボードショートカットを入力します。メモとセルのコントロールを使用して、セルに変更を加えることもできます。
+ワークスペースのツールバーで**［編集］**を選択し、目的のオプションを選択するか、対応するキーボードショートカットを入力します。メモとセルのコントロールを使用して、セルに変更を加えることもできます。
 
-<Frame><img alt="notebook and cell controls.png" src="/images/kb/ka0Vq000000GnuP-00N5w00000Ri7BU-0EM5w000006uXDZ.jpg" style={{width: 786.997, height: 280.99}}/></Frame>
-[このページのトップへ](#intro)
+<Frame>![notebook and cell controls.png](/images/kb/ja/0EM5w000006uXDZ.jpg)</Frame>
 
 #### セルに入力を追加する
 
 セルにテキストやコード（Python、R、Markdown）などの入力を追加するには、メモのセルを選択し、入力内容を入力します。
 
-<Note>
-  **注記：** セルに入力できる内容は、セルのタイプによって異なります。詳細については、「 [セル](#cells) 」を参照してください。
+<Note>**注記：**セルに入力できる内容は、セルのタイプによって異なります。詳細については、「[セル](#cells)」を参照してください。</Note>
 
-</Note>
-
-<Frame><img alt="add input to cells.png" src="/images/kb/ka0Vq000000GnuP-00N5w00000Ri7BU-0EM5w000006uVLb.jpg" style={{width: 784.983, height: 158.993}}/></Frame>
-[このページのトップへ](#intro)
+#### <Frame>![add input to cells.png](/images/kb/ja/0EM5w000006uVLb.jpg)</Frame>
 
 #### セルを実行する
 
-セルの内容を実行すると、入力テキストやコードに関連付けられた結果の出力がメモに直接表示されます。入力とセルのタイプに応じて、テキスト、図、表、画像などの形式で出力できます。詳細については、「 [セル](#cells) 」を参照してください。1つ以上のセルを同時に実行できます。
+セルの内容を実行すると、入力テキストやコードに関連付けられた結果の出力がメモに直接表示されます。入力とセルのタイプに応じて、テキスト、図、表、画像などの形式で出力できます。詳細については、「[セル](#cells)」を参照してください。1つ以上のセルを同時に実行できます。
 
-個々のセルを実行するには、セルを選択して、ツールバーの <InlineImage src="/images/kb/ja/ka0Vq000000JFzS-00N5w00000Ri7BU-0EM5w000006uVLg.jpg" /> **再生** をクリックします。
+個々のセルを実行するには、セルを選択して、ツールバーの<img alt="play.jpg" src="/images/kb/ja/0EM5w000006uVLg.jpg" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/>
+
+**再生**をクリックします。
 
 複数のセルを実行するには、以下の手順を実行します。
 
-1. キーボードの **Esc** キーを押します。
-2. **Shift**
-   + **上/下矢印** キーで、実行するセルを選択します。
+1. キーボードの**Esc**キーを押します。
+2. **Shift**+**上/下矢印**キーで、実行するセルを選択します。
 3. ツールバーの
-   <InlineImage src="/images/kb/ja/ka0Vq000000JFzS-00N5w00000Ri7BU-0EM5w000006uVLg-1.jpg" /> **再生** をクリックします。
+
+   <Frame>![play.jpg](/images/kb/ja/0EM5w000006uVLg.jpg)</Frame>
+
+   **再生**をクリックします。  
      
-   <Frame><img alt="input cell.jpg" src="/images/kb/ka0Vq000000GnuP-00N5w00000Ri7BU-0EM5w000006uXDt.jpg" style={{width: 727.995, height: 147.995}}/></Frame>
-すべてのセルを同時に実行するには、ワークスペースのツールバーから **［実行］** > **［Run All Cells］** を選択します。
+
+   <Frame>![input cell.jpg](/images/kb/ja/0EM5w000006uXDt.jpg)</Frame>
+
+すべてのセルを同時に実行するには、ワークスペースのツールバーから**［実行］**>**［Run All Cells］**を選択します。
 
 セルが正常に実行されると、出力がメモに表示されます。以下は、マークダウンセルとコードセルの例です。
 
-<Columns>
-  <Frame><img alt="markdown cell.png" src="/images/kb/ka0Vq000000GnuP-00N5w00000Ri7BU-0EM5w000006uXCm.jpg" style={{width: 807.995, height: 185}}/></Frame>
-  <Frame><img alt="code cell.png" src="/images/kb/ka0Vq000000GnuP-00N5w00000Ri7BU-0EM5w000006uXDy.jpg" style={{width: 816.997, height: 210}}/></Frame>
-</Columns>
-### — | —
+<Frame>![markdown cell.png](/images/kb/ja/0EM5w000006uXCm.jpg)</Frame>
 
-[このページのトップへ](#intro)
+<Frame>![code cell.png](/images/kb/ja/0EM5w000006uXDy.jpg)</Frame>
 
-# ワークフロー経由で実行する
+## ワークフロー経由で実行する
 
 新しいワークフローを作成して、Domo Jupyter自動関数タスクを追加することにより、ワークフローでJupyterメモを実行できます。
 
-ワークフローの詳細については、 [こちら](/s/article/000005108) を参照してください。
+ワークフローの詳細については、[こちら](/s/article/000005108)を参照してください。
 
 ワークフローでのJupyterメモの実行を設定するには、ワークスペースID、メモへのパス、および実行対象のペイロードが必要です。ワークフローを選択した後、ブラウザーのナビゲーションバーからワークフローIDを取得できます。
 
-<Frame><img alt="Screenshot 2025-02-10 at 2.54.00 PM.png" src="/images/kb/ka0Vq000000GnuP-00N5w00000Ri7BU-0EMVq000005IevQ.jpg" style={{width: 903, height: 185}}/></Frame>
-必要な情報を入手したら、Jupyterメモに移動し、 **domo-jupyter** ライブラリを最新バージョンにアップデートします。
+<Frame>![Screenshot 2025-02-10 at 2.54.00 PM.png](/images/kb/ja/0EMVq000005IevQ.jpg)</Frame>
+
+必要な情報を入手したら、Jupyterメモに移動し、**domo-jupyter**ライブラリを最新バージョンにアップデートします。
 
 ```
 conda install -c https://domo-conda-prod.s3.amazonaws.com/domo domojupyter=1.1.32
 ```
 
-<Frame><img alt="コンピューターのAIで生成されたコンテンツのスクリーンショットは、実際とは異なる可能性があります。" src="/images/kb/ka0Vq000000GnuP-00N5w00000Ri7BU-0EMVq000005IqwX.jpg" style={{width: 897, height: 502}}/></Frame>
-新しいライブラリを正常にインストールした後、 **［Kernel］** > **［Restart Kernel］** を選択してカーネルを再起動します。
+<Frame>![コンピューターのAIで生成されたコンテンツのスクリーンショットは、実際とは異なる可能性があります。](/images/kb/ja/0EMVq000005IqwX.jpg)</Frame>
 
-<Frame><img alt="コンピューターのAIで生成されたコンテンツのスクリーンショットは、実際とは異なる可能性があります。" src="/images/kb/ka0Vq000000GnuP-00N5w00000Ri7BU-0EMVq000005IkWC.jpg" style={{width: 745, height: 296}}/></Frame>
+新しいライブラリを正常にインストールした後、**［Kernel］**>**［Restart Kernel］**を選択してカーネルを再起動します。
+
+<Frame>![コンピューターのAIで生成されたコンテンツのスクリーンショットは、実際とは異なる可能性があります。](/images/kb/ja/0EMVq000005IkWC.jpg)</Frame>
+
 インストールが完了したら、メモで2つの実行方法を使用できるようになります。
 
 ```
 import domojupyter.execution as domo_execution import json payload = domo_execution.get_payload() new_payload = {'newProperty': payload['test'] + 'NEW!'} # write_response - is required to get the output domo_execution.write_response(new_payload)
 ```
 
-[このページのトップへ](#intro)
-
-### Jupyterの基本
+## Jupyterの基本
 
 このセクションでは、Jupyterワークスペースのその他の機能について説明します。
 
-# データを読み込む
+## データを読み込む
 
-Domojupyterライブラリを使ってデータをJupyterメモに読み込むことができます。このライブラリにはJupyter内でDomoとやり取りするのに便利な機能が用意されています。 Domojupyterライブラリを使ってJupyterメモにデータを読み込む前に、ワークスペースに入力データソースが必要です。
+Domojupyterライブラリを使ってデータをJupyterメモに読み込むことができます。このライブラリにはJupyter内でDomoとやり取りするのに便利な機能が用意されています。Domojupyterライブラリを使ってJupyterメモにデータを読み込む前に、ワークスペースに入力データソースが必要です。
 
-新しいワークスペースを作成する場合は、前のセクション「 [ワークスペースを作成する](#create_workspace) 」を参照してください。
+新しいワークスペースを作成する場合は、前のセクション「ワークスペースを作成する」を参照してください。
 
 ワークスペースが既に存在していても、入力データソースがない場合は、以下の手順に従ってください。
 
 1. Jupyterワークスペースで、リストからワークスペースを見つけます。所有者別に検索とフィルターができます。
 
-2. ワークスペースにマウスポインターを合わせます。
-<InlineImage src="/images/kb/ja/ka0Vq000000JFzS-00N5w00000Ri7BU-0EM5w000005vXkS-8.png" /> **［Manage Workspace］** メニューが表示されます。
+2. ワークスペースにマウスポインターを合わせます。<img alt="Screen_Shot_2022-09-06_at_2.52.30_PM.png" src="/images/kb/ja/0EM5w000005vXkS.png" style={{width: 34, height: 32, display: 'inline', verticalAlign: 'start', margin: '0'}}/>
 
-3. <InlineImage src="/images/kb/ja/ka0Vq000000JFzS-00N5w00000Ri7BU-0EM5w000005vXkS-9.png" /> **［Manage Workspace］** メニューを選択し、 **［編集］** を選択します。
+ **［Manage Workspace］**メニューが表示されます。
 
-**［Jupyterワークスペースを編集］** モーダルが表示されます。
+3.<img alt="Screen_Shot_2022-09-06_at_2.52.30_PM.png" src="/images/kb/ja/0EM5w000005vXkS.png" style={{width: 34, height: 32, display: 'inline', verticalAlign: 'start', margin: '0'}}/>
 
-4. **［Jupyterワークスペースを編集］** ビューで、 **［入力DataSetを追加］** を選択し、Jupyterメモに読み込むデータソースを選択します。
+ **［Manage Workspace］**メニューを選択し、**［編集］**を選択します。
 
-5. DataSetを選んだ後、
-**［ワークスペースを保存］** を選択します。
+**［Jupyterワークスペースを編集］**モーダルが表示されます。
 
-ワークスペースに入力DataSetが設定され、Domojupyterライブラリを使ってデータをJupyterメモに読み込めるようになりました。ワークスペースで使用されるすべてのDataSetは **［データ］** > **［DataSet］** にあります。
+4. **［Jupyterワークスペースを編集］**ビューで、**［入力DataSetを追加］**を選択し、Jupyterメモに読み込むデータソースを選択します。
 
-6. `domo.read_dataframe` コマンドを使用して、DomoデータソースからデータをJupyterメモに読み込み、さらに処理と分析を行います。
+5. DataSetを選んだ後、**［ワークスペースを保存］**を選択します。
+
+ワークスペースに入力DataSetが設定され、Domojupyterライブラリを使ってデータをJupyterメモに読み込めるようになりました。ワークスペースで使用されるすべてのDataSetは**［データ］**>**［DataSet］**にあります。
+
+6. `domo.read_dataframe`コマンドを使用して、DomoデータソースからデータをJupyterメモに読み込み、さらに処理と分析を行います。
 
 例：
 
-<Frame><img alt="readingdata.png" src="/images/kb/ka0Vq000000GnuP-00N5w00000Ri7BU-0EM5w000005vXkG.png" style={{width: 901, height: 240}}/></Frame>
-[このページのトップへ](#intro)
+<Frame>![readingdata.png](/images/kb/ja/0EM5w000005vXkG.png)</Frame>
 
-# データを書き込む
+## データを書き込む
 
 Domojupyterライブラリを使ってデータをDomoデータソースに書き戻すことができます。このライブラリはJupyter内でDomoとやり取りするのに便利な機能を提供します。Domojupyterライブラリを使ってJupyterメモにデータを書き込む前に、ワークスペースに出力データソースが必要です。
 
-新しいワークスペースを作成する場合は、前のセクション「 [ワークスペースを作成する](#create_workspace) 」を参照してください。
+新しいワークスペースを作成する場合は、前のセクション「ワークスペースを作成する」を参照してください。
 
 ワークスペースが既に存在していても、出力データソースがない場合は、以下の手順に従ってください。
 
 1. Jupyterワークスペースで、リストからワークスペースを見つけます。所有者別に検索とフィルターができます。
 
-2. ワークスペースにマウスポインターを合わせます。
-<InlineImage src="/images/kb/ja/ka0Vq000000JFzS-00N5w00000Ri7BU-0EM5w000005vXkS-10.png" /> **［Manage Workspace］** メニューが表示されます。
+2. ワークスペースにマウスポインターを合わせます。<img alt="Screen_Shot_2022-09-06_at_2.52.30_PM.png" src="/images/kb/ja/0EM5w000005vXkS.png" style={{width: 24, height: 23, display: 'inline', verticalAlign: 'start', margin: '0'}}/>
 
-3. <InlineImage src="/images/kb/ja/ka0Vq000000JFzS-00N5w00000Ri7BU-0EM5w000005vXkS-11.png" /> **［Manage Workspace］** メニューを選択し、 **［編集］** を選択します。
+ **［Manage Workspace］**メニューが表示されます。
 
-**［Jupyterワークスペースを編集］** モーダルが表示されます。
+3.<img alt="Screen_Shot_2022-09-06_at_2.52.30_PM.png" src="/images/kb/ja/0EM5w000005vXkS.png" style={{width: 24, height: 22, display: 'inline', verticalAlign: 'start', margin: '0'}}/>
 
-4. **［Jupyterワークスペースを編集］** ビューで、 **［出力DataSetを追加］** を選択し、Jupyterメモに書き込むデータソースを選択します。
+ **［Manage Workspace］**メニューを選択し、**［編集］**を選択します。
 
-5. DataSetを選んだ後、
-**［ワークスペースを保存］** を選択します。
+**［Jupyterワークスペースを編集］**モーダルが表示されます。
 
-ワークスペースに出力DataSetが設定され、Domojupyterライブラリを使ってデータをJupyterメモに書き込めるようになりました。ワークスペースで使用されるすべてのDataSetは **［データ］** > **［DataSet］** にあります。
+4. **［Jupyterワークスペースを編集］**ビューで、**［出力DataSetを追加］**を選択し、Jupyterメモに書き込むデータソースを選択します。
 
-<Note>
-  **注記：** 追加された出力ごとに新しいDataSetが作成されます。
+5. DataSetを選んだ後、**［ワークスペースを保存］**を選択します。
 
-</Note>
+ワークスペースに出力DataSetが設定され、Domojupyterライブラリを使ってデータをJupyterメモに書き込めるようになりました。ワークスペースで使用されるすべてのDataSetは**［データ］**>**［DataSet］**にあります。
 
-6. `domo.write_dataframe` コマンドを使って、Jupyterワークスペースに設定されているDomoデータソースに結果を書き戻します。
+<Note>**注記：** 追加された出力ごとに新しいDataSetが作成されます。</Note>
+
+6. `domo.write_dataframe`コマンドを使って、Jupyterワークスペースに設定されているDomoデータソースに結果を書き戻します。
 
 例：
 
-<Frame><img alt="writingdata.png" src="/images/kb/ka0Vq000000GnuP-00N5w00000Ri7BU-0EM5w000005vXkY.png" style={{width: 899, height: 484}}/></Frame>
-[このページのトップへ](#intro)
+<Frame>![writingdata.png](/images/kb/ja/0EM5w000005vXkY.png)</Frame>
 
-# Append、Upsert、Partitionを使用する
+### Append、Upsert、Partitionを使用する
 
 DataSetを更新するには、以下のコマンドを使用します。
 
-* domo.write\_dataframe(df, output\_dataset)
-* domo.write\_dataframe(df, output\_dataset, update\_method="REPLACE")
-* domo.write\_dataframe(df, output\_dataset, update\_method="APPEND")
-* domo.write\_dataframe(df, output\_dataset, update\_method="UPSERT", update\_key=column\_name)
-* domo.write\_dataframe(df, output\_dataset, update\_method="PARTITION", partition\_name=’Example Name’)
+- domo.write\_dataframe(df, output\_dataset)
+- domo.write\_dataframe(df, output\_dataset, update\_method="REPLACE")
+- domo.write\_dataframe(df, output\_dataset, update\_method="APPEND")
+- domo.write\_dataframe(df, output\_dataset, update\_method="UPSERT", update\_key=column\_name)
+- domo.write\_dataframe(df, output\_dataset, update\_method="PARTITION", partition\_name=’Example Name’)
 
-<Note>
-  **注記：** update\_methodが指定されていない場合、デフォルトの機能はREPLACEメソッドです。update\_methodを別のメソッドからREPLACEに戻したい場合は、update\_methodをREPLACEに明示的に設定する必要があります。これにより、Jupyterは最後に設定されたメソッドを上書きします。UPSERT update\_methodを実行する場合、「update\_key」列のデータに重複する値が含まれていない必要があります。重複する値がある場合、UPSERTは失敗します。
+<Note>**注記：**update\_methodが指定されていない場合、デフォルトの機能はREPLACEメソッドです。update\_methodを別のメソッドからREPLACEに戻したい場合は、update\_methodをREPLACEに明示的に設定する必要があります。これにより、Jupyterは最後に設定されたメソッドを上書きします。UPSERT update\_methodを実行する場合、「update\_key」列のデータに重複する値が含まれていない必要があります。重複する値がある場合、UPSERTは失敗します。</Note>
 
-</Note>
+どの更新方法を使用するかについては、「[DataSet更新方法](http://domo-support.domo.com/s/article/360043430733)」の記事を参照してください。
 
-どの更新方法を使用するかについては、「 [DataSet更新方法](/ja/s/article/360043430733) 」の記事を参照してください。
+### アカウントを使用する
 
-[このページのトップへ](#intro)
+Domojupyterライブラリを使ってサードパーティアカウントをJupyterメモで参照することができます。このライブラリはJupyter内でDomoとやり取りするのに便利な機能を提供します。アカウントキーと値にアクセスする前に、ワークスペースにアカウントが必要です。
 
-# アカウントを使用する
-
-Domojupyterライブラリを使ってサードパーティアカウントをJupyterメモで参照することができます。このライブラリはJupyter内でDomoとやり取りするのに便利な機能を提供します。 アカウントキーと値にアクセスする前に、ワークスペースにアカウントが必要です。
-
-新しいワークスペースを作成する場合は、前のセクション「 [ワークスペースを作成する](#create_workspace) 」を参照してください。
+新しいワークスペースを作成する場合は、前のセクション「ワークスペースを作成する」を参照してください。
 
 ワークスペースが既に存在していても、サードパーティアカウントが追加されていない場合は、以下の手順に従ってください。
 
 1. Jupyterワークスペースで、リストからワークスペースを見つけます。所有者別に検索とフィルターができます。
 
-2. ワークスペースにマウスポインターを合わせます。
-<InlineImage src="/images/kb/ja/ka0Vq000000JFzS-00N5w00000Ri7BU-0EM5w000005vXkS-12.png" /> **［Manage Workspace］** メニューが表示されます。
+2. ワークスペースにマウスポインターを合わせます。<img alt="Screen_Shot_2022-09-06_at_2.52.30_PM.png" src="/images/kb/ja/0EM5w000005vXkS.png" style={{width: 34, height: 32, display: 'inline', verticalAlign: 'start', margin: '0'}}/>
 
-3. <InlineImage src="/images/kb/ja/ka0Vq000000JFzS-00N5w00000Ri7BU-0EM5w000005vXkS-13.png" /> **［Manage Workspace］** メニューを選択し、 **［編集］** を選択します。
+**［Manage Workspace］**メニューが表示されます。
 
-**［Jupyterワークスペースを編集］** モーダルが表示されます。
+3.<img alt="Screen_Shot_2022-09-06_at_2.52.30_PM.png" src="/images/kb/ja/0EM5w000005vXkS.png" style={{width: 34, height: 32, display: 'inline', verticalAlign: 'start', margin: '0'}}/>
 
-4. **［Jupyterワークスペースを編集］** ビューで、 **［アカウント］** > **［アカウントを追加］** を選択し、サードパーティアカウントを選択します。
+**［Manage Workspace］**メニューを選択し、**［編集］**を選択します。
 
-5. 選択したら、
-**［ワークスペースを保存］** を選択します。
+**［Jupyterワークスペースを編集］**モーダルが表示されます。
+
+4. **［Jupyterワークスペースを編集］**ビューで、**［アカウント］**>**［アカウントを追加］**を選択し、サードパーティアカウントを選択します。
+
+5. 選択したら、**［ワークスペースを保存］**を選択します。
 
 ワークスペースにはサードパーティアカウントが設定されています。Domojupyterライブラリを使ってキーと値をJupyterメモに読み込むことができます。
 
 6. アカウント情報の取得には以下のコマンドを使用できます。
 
-* `domo.get_account_property_value('account')` は、各自のアカウントのプロパティに割り当てられた特定の値を返します。
-* `domo.get_account_property_value('account',account_properties[0])` は、アカウントに存在するすべてのプロパティを返します。
+- `domo.get_account_property_value('account')` は、各自のアカウントのプロパティに割り当てられた特定の値を返します。
+- `domo.get_account_property_value('account',account_properties[0])`は、アカウントに存在するすべてのプロパティを返します。
 
 参照するアカウントが「S3Account」である以下の例を参照してください。
 
-<Frame><img alt="Screen_Shot_2022-10-17_at_4.03.43_PM.png" src="/images/kb/ka0Vq000000GnuP-00N5w00000Ri7BU-0EM5w000005vXkT.png" style={{width: 903, height: 206}}/></Frame>
-[このページのトップへ](#intro)
+<Frame>![Screen_Shot_2022-10-17_at_4.03.43_PM.png](/images/kb/ja/0EM5w000005vXkT.png)</Frame>
 
-# ライブラリをインストールして使用する
+### ライブラリをインストールして使用する
 
-Jupyterワークスペースにライブラリをインストールするには、ターミナルを開いて必要なコマンドを実行します。Seabornライブラリをインストールするコマンドの例は `conda install seaborn -y` です。インストールが完了すると、Jupyterメモの中でこれらのライブラリをインポートして使用することができます。
+Jupyterワークスペースにライブラリをインストールするには、ターミナルを開いて必要なコマンドを実行します。Seabornライブラリをインストールするコマンドの例は`conda install seaborn -y`です。インストールが完了すると、Jupyterメモの中でこれらのライブラリをインポートして使用することができます。
 
 例：
 
-<Frame><img alt="installingandusinglibraries.png" src="/images/kb/ka0Vq000000GnuP-00N5w00000Ri7BU-0EM5w000005vXkW.png" style={{width: 907, height: 234}}/></Frame>
-[このページのトップへ](#intro)
+<Frame>![installingandusinglibraries.png](/images/kb/ja/0EM5w000005vXkW.png)</Frame>
 
-# 利用状況のモニタリング
+## 利用状況のモニタリング
 
 Domo内でのJupyterの利用状況を監視できます。前提条件として、デフォルトの管理者権限または「使用状況メトリクスを表示」および「Jupyterワークスペースを管理」の許可が有効なカスタマイズされた権限のいずれかが割り当てられている必要があります。
 
@@ -744,105 +688,79 @@ Domo内でのJupyterの利用状況を監視できます。前提条件として
 2. 複製した権限から、課金管理者には不要な許可を削除します。
 3. この権限に、「使用状況メトリクスを表示」および「Jupyterワークスペースを管理」の許可を追加します。
 
-カスタマイズされた権限の作成の詳細については、「 [ユーザーの権限と許可を管理する](/ja/s/article/360043438973) 」を参照してください。
+カスタマイズされた権限の作成の詳細については、「[ユーザーの権限と許可を管理する](http://domo-support.domo.com/s/article/360043438973)」を参照してください。  
   
 権限を作成したら、以下の手順に従って利用状況を表示します。
 
-1. ナビゲーションヘッダーで、 **［その他］** > **［管理者］** に進みます。
-2. **［カンパニー設定］** メニューの **［管理者］** 画面で、 **［利用状況］** を選択します。
-3. **［Jupyterの計算］** タブに進みます。
+1. ナビゲーションヘッダーで、**［その他］**>**［管理者］**に進みます。
+2. **［カンパニー設定］**メニューの**［管理者］**画面で、**［利用状況］**を選択します。
+3. **［Jupyterの計算］**タブに進みます。
 
-   <Frame><img alt="jupyter-compute-usage.png" src="/images/kb/ka0Vq000000GnuP-00N5w00000Ri7BU-0EM5w000005wycQ.jpg" style={{width: 900, height: 582}}/></Frame>
-[このページのトップへ](#intro)
+   <Frame>![jupyter-compute-usage.png](/images/kb/ja/0EM5w000005wycQ.jpg)</Frame>
 
-### よくある質問
+## よくある質問
 
 <AccordionGroup>
 <Accordion title="プラグインをインストールできますか？">
 
-
 プラグインは現在サポートされていません。
-
 
 </Accordion>
 <Accordion title="この機能を試すことはできますか？">
 
-
 Jupyterのトライアルに関する最新情報は、カスタマーサクセスマネージャー（CSM）あるいはアカウントエグゼクティブ（AE）にお問い合わせください。
-
 
 </Accordion>
 <Accordion title="Domoはデータサイエンスサービスを提供していますか？">
 
-
 はい、お客様の必要に応じて経験豊富なデータサイエンスチームがサービスを提供しています。詳細については、アカウントエグゼクティブ（AE）にお問い合わせください。
-
 
 </Accordion>
 <Accordion title="カーネルの変更はどのようにすればよいですか？">
 
-
 まずワークスペースを停止してください。Domoワークスペース編集ビューでカーネルを変更することができます。
-
 
 </Accordion>
 <Accordion title="カーネルをリセットできますか？">
 
-
-はい。ワークスペースにマウスポインターを合わせると、 <InlineImage src="/images/kb/ja/ka0Vq000000JFzS-00N5w00000Ri7BU-0EM5w000005vXkS-14.png" /> **［Manage Workspace］** メニューが表示されます。オプションから **［カーネルのデフォルトを復元］** を選択します。この操作を実行するには、すべてのインスタンスを停止する必要があります。
-
+はい。ワークスペースにマウスポインターを合わせると、 <img src="/images/kb/ja/ka0Vq000000JFzS-00N5w00000Ri7BU-0EM5w000005vXkS-14.png" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/> **［Manage Workspace］** メニューが表示されます。オプションから **［カーネルのデフォルトを復元］** を選択します。この操作を実行するには、すべてのインスタンスを停止する必要があります。
 
 </Accordion>
 <Accordion title="Jupyterメモを使用するには、PythonやRといったプログラミング言語でコーディングできる知識が必要ですか？">
 
-
 何らかのデータ探索や分析（DataSetの読み込み、データサイエンスモデルや機械学習パイプラインの開発、カスタムデータ表や図の作成、変換されたデータのDomoへの書き込みなど）をメモで行う場合は、RまたはPythonの経験が必要です。
-
 
 </Accordion>
 <Accordion title="サードパーティのライブラリの統合に問題が発生しています。">
 
-
 DomoのJupyter統合により、サードパーティのライブラリをインストールすることができます。ただし、Domoはすべてのサードパーティのライブラリをネイティブにサポートしていません。一部のサードパーティのライブラリでは、お客様自身でインストール、設定、トラブルシューティングを行う必要があります。
-
 
 </Accordion>
 <Accordion title="JupyterワークスペースとGitHubを統合できますか？">
 
-
 Domoは、Jupyterワークスペースのインターフェース内でgitリポジトリの統合と維持をサポートしています。統合が完了すると、標準のGit操作を使用して、Jupyterワークスペースから選択したGitHubリポジトリに、更新（更新されたJupyterメモファイルを含む）を繰り返しプッシュできるようになります。詳細については、「 [GitHubでJupyterワークスペースを使用する](/s/article/000005166) 」を参照してください。
-
 
 </Accordion>
 <Accordion title="Pythonの最小バージョンは3.9です。サポートされているバージョンに関するDomoの廃止ポリシーはどのようになっていますか？">
 
-
 現時点では、Pythonのどのバージョンにも廃止予定はありません。
-
 
 </Accordion>
 <Accordion title="ワークスペースに4つのカテゴリーがあり、それぞれに同じ4つのCPUがあります。実稼働環境の各カテゴリーの設定はどのようになりますか？">
 
-
 現在、トライアルのJupyterをご利用のお客様は、4つのティアにしかアクセスできません。コンサンプション契約のお客様の場合は、それぞれ異なるCPU割り当てを持つ9つのJupyterティアがあります。
-
 
 </Accordion>
 <Accordion title="APIとして継続的に実行されるサービスをホストするにはどうすればよいですか？">
 
-
 Jupyterには、継続実行機能がありません。
-
 
 </Accordion>
 <Accordion title="Domoにコードコパイロット/アシスタントはありますか？">
 
-
 現時点では、コパイロットはサポートされていません。現在、その実現可能性とDomoのロードマップのどこに適合するかを判断するために調査中です。
 
 何か問題は発生していませんか？「 [Jupyterのトラブルシューティングガイド](/s/article/7440921035671) 」を参照するか、 [support@domo.com](mailto:support@domo.com) までお問い合わせください。
-
-[このページのトップへ](#intro)
 
 日本語
 

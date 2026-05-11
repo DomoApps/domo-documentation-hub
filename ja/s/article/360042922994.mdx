@@ -2,210 +2,169 @@
 title: "SQL DataFlowを作成する"
 ---
 
-import {InlineImage} from "/snippets/InlineImage.mdx";
-
 ## はじめに
 
-DataFlowを作成し、SQLクエリを使ってデータを結合および変換します。この方法によるDataFlowの操作は、Magic ETLを使用する場合に比べて技術的な知識を必要としますが、オプションはより幅広くなります。Magic ETL DataFlowの作成については、「 [Magic ETL DataFlowを作成する](/s/article/360055259234) 」を参照してください。
+DataFlowを作成し、SQLクエリを使ってデータを結合および変換します。この方法によるDataFlowの操作は、Magic ETLを使用する場合に比べて技術的な知識を必要としますが、オプションはより幅広くなります。Magic ETL DataFlowの作成については、「[Magic ETL DataFlowを作成する](/s/article/360055259234)」を参照してください。
 
-<Warning>
-  **重要：** DataFlowの入力DataSetは、PDPポリシーで制限することはできません。利用可能なすべての行はDataFlowを経由する *必要があります* 。このため、PDPポリシーは、DataFlowが生成する出力DataSetに適用する必要があります。
+<Warning>**重要：**DataFlowの入力DataSetは、PDPポリシーで制限することはできません。利用可能なすべての行はDataFlowを経由する*必要があります*。このため、PDPポリシーは、DataFlowが生成する出力DataSetに適用する必要があります。</Warning>
 
-  PDPポリシーが有効の状態で入力DataSetを使ってDataFlowを作成する場合は、以下の条件が少なくとも1つ満たされていないとDataFlowに不具合が発生します。
+PDPポリシーが有効の状態で入力DataSetを使ってDataFlowを作成する場合は、以下の条件が少なくとも1つ満たされていないとDataFlowに不具合が発生します。
 
-  * 自分自身に「管理者」セキュリティプロフィール、または「DataFlowを管理」の許可が有効なカスタマイズされた権限がある。
-  * 自分自身がDataSetの所有者である。
-  * 「全ての行」ポリシーに自分のユーザーアカウントが追加されている。これにより、DataSetのすべての行にアクセスできます。
+- 自分自身に「管理者」セキュリティプロフィール、または「DataFlowを管理」の許可が有効なカスタマイズされた権限がある。
+- 自分自身がDataSetの所有者である。
+- 「全ての行」ポリシーに自分のユーザーアカウントが追加されている。これにより、DataSetのすべての行にアクセスできます。
 
-  DataFlowでPDPを使用する方法の詳細については、「 PDPとDataFusion/DataFlow 」を参照してください。
+DataFlowでPDPを使用する方法の詳細については、「[PDPとDataFusion/DataFlow](/s/article/360043439333)」を参照してください。
 
-</Warning>
-
-SQL DataFlow を作成するインターフェースには、Data Centerからアクセスします。Data Centerの詳細については、「 [Data Centerのレイアウト](/ja/s/article/360047553253)
-
-」を参照してください。
+SQL DataFlowを作成するインターフェースには、Data Centerからアクセスします。Data Centerの詳細については、「 [Data Centerのレイアウト](/ja/s/article/360047553253)」を参照してください。
 
 **動画 - MySQL DataFlowの概要**
-
 <iframe allowfullscreen="" frameborder="1" height="315" src="//www.youtube-nocookie.com/embed/-S7u5Xoc3-g" width="560"></iframe>
 
 **動画 - DataFlowを使用してDataSetを結合する**
-
 <iframe allowfullscreen="" frameborder="1" height="315" src="//www.youtube-nocookie.com/embed/Tk93oON0fxY" width="560"></iframe>
 
 ## SQL DataFlowを作成する
 
-<Note>
-  **注記：** Redshiftでは、 http://docs.aws.amazon.com/redshift/latest/dg/c_unsupported-postgresql-features.html に記されているように、ストアドプロシージャはサポートされて *いません* 。代替手段として、ストアドプロシージャをサポートするMySQL DataFlowを使用します。
-
-</Note>
+<Note>**注記：**Redshiftでは、[http://docs.aws.amazon.com/redshift/latest/dg/c\_unsupported-postgresql-features.html](http://docs.aws.amazon.com/redshift/latest/dg/c_unsupported-postgresql-features.html)に記されているように、ストアドプロシージャはサポートされて*いません*。代替手段として、ストアドプロシージャをサポートするMySQL DataFlowを使用します。</Note>
 
 **SQL DataFlowを作成するには：**
 
-1. Domoで、画面上部のツールバーの ****［データ］**** をクリックします。
-2. ウィンドウ上部の **［Magic変換］** ツールバーの **［SQL］** をクリックします。
+1. Domoで、画面上部のツールバーの****［データ］****をクリックします。
+2. ウィンドウ上部の**［Magic変換］**ツールバーの**［SQL］**をクリックします。
 
-   <Tip>
-     **ヒント：** SQL DataFlowエディターは、Domoの任意の場所でAppツールバーの
+<Tip>   **ヒント：**SQL DataFlowエディターは、Domoの任意の場所でAppツールバーの</Tip>
 
-     <Frame><img alt="plus_icon.jpg" src="/images/kb/ka0Vq000000GoYn-00N5w00000Ri7BU-0EM5w000005vOv8.jpg"/></Frame>
-     を選択し、 **［データ］>［SQL］** の順に選択することでも開くことができます。
+   <Frame>![plus_icon.jpg](/images/kb/ja/0EM5w000005vOv8.jpg)</Frame>
 
-   </Tip>
-
-3. 作成したいDataFlowのタイプを選択します。
-     
-   **DataFlowを作成する** ビューが開きます。
+   を選択し、**［データ］>［SQL］**の順に選択することでも開くことができます。
+3. 作成したいDataFlowのタイプを選択します。  
+   **DataFlowを作成する**ビューが開きます。
 4. DataFlowの名前と詳細を入力します。
 5. 以下に従って、目的のDataFlow用の入力DataSetを選択します。
 
-   1. 1. **［DataSetを選択］**    をクリックします。
+   1. 1. **［DataSetを選択］**をクリックします。
 
-         <Note>
-           **注記：** DataFlowの入力DataSetは既にDomoに存在するものである *必要があります* 。 **DataFlowを作成する** ビューで新しいDataSetをアップロードすることはできません。新規DataSetのDomoへのアップロード方法については、「 コネクターでデータに接続する 」を参照してください。
+<Note>         **注記：**DataFlowの入力DataSetは既にDomoに存在するものである*必要があります*。**DataFlowを作成する**ビューで新しいDataSetをアップロードすることはできません。新規DataSetのDomoへのアップロード方法については、「コネクターでデータに接続する」を参照してください。</Note>
 
-         </Note>
+<Warning>         **重要：**DataSetの名前とDataSet内の各列の名前は64文字以下である**必要があります**（空白も含む）。これはMySQLエンジンの制限ですが、Magic ETLにはこの制限はありません。
+   2. 目的のDataSetを選択します。  
+       DataSetの所有者、実行履歴や列名など、選択したDataSetの詳細情報が表示されます。  </Warning><img alt="SQL_DataFlow_1.png" src="/images/kb/ja/0EM5w000005vOvE.png" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/>
+   3. **［DataSetを選択］**をクリックします。  
+       選択したDataSetのタイルが画面に表示されます。DataSetタイルをクリックして、プレビューウィンドウを表示することができます。
 
-<Warning>
-  **重要：** DataSetの名前とDataSet内の各列の名前は64文字以下である **必要があります** （空白も含む）。これはMySQLエンジンの制限ですが、Magic ETLにはこの制限はありません。
-
-</Warning>
-
-   2. 目的のDataSetを選択します。
-        
-      DataSetの所有者、実行履歴や列名など、選択したDataSetの詳細情報が表示されます。
-        
-      <Frame><img alt="SQL_DataFlow_1.png" src="/images/kb/ka0Vq000000GoYn-00N5w00000Ri7BU-0EM5w000005vOvE.png"/></Frame>
-   3. **［DataSetを選択］** をクリックします。
-        
-      選択したDataSetのタイルが画面に表示されます。DataSetタイルをクリックして、プレビューウィンドウを表示することができます。
-
-      1. （オプション） **［列を選択］** タブの下で、列名の右側の「x」をクリックすると、DataSetに含めたくない列を削除できます。また、 **［None］** をクリックすると、すべての列を削除できます。
-           
-         **［列を追加］** ボタンをクリックして該当の列を選択することで、DataSetに個々の列を戻すこともできます。また、 **［All］** をクリックすると、DataSetにすべての列を戻すことができます。
-           
-         <Frame><img alt="SQL_DataFlow_2.png" src="/images/kb/ka0Vq000000GoYn-00N5w00000Ri7BU-0EM5w000005vOv5.png"/></Frame>
+      1. （オプション）**［列を選択］**タブの下で、列名の右側の「x」をクリックすると、DataSetに含めたくない列を削除できます。また、**［None］**をクリックすると、すべての列を削除できます。  
+            
+         **［列を追加］**ボタンをクリックして該当の列を選択することで、DataSetに個々の列を戻すこともできます。また、**［All］**をクリックすると、DataSetにすべての列を戻すことができます。<img alt="SQL_DataFlow_2.png" src="/images/kb/ja/0EM5w000005vOv5.png" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/>
       2. DataSetの処理方法を選択します。このメニューでは、すべてのDataSetを処理するか、最後にDataFlowが実行された後に追加された新しい行のみを処理するかを選択できます。
 
-      <Note>
-        **注記：** この機能は現在ベータ版です。ベータ版を利用するには、担当のカスタマーサクセスマネージャー（CSM）に連絡してください。
+<Note>         **注記：**この機能は現在ベータ版です。ベータ版を利用するには、担当のカスタマーサクセスマネージャー（CSM）に連絡してください。</Note>
 
-      </Note>
+         <Frame>![SQL_DataFlow_3.png](/images/kb/ja/0EM5w000005vOv6.png)</Frame>
 
-         <Frame><img alt="SQL_DataFlow_3.png" src="/images/kb/ka0Vq000000GoYn-00N5w00000Ri7BU-0EM5w000005vOv6.png"/></Frame>
-         <Warning>
-           **重要：** 最後のDataFlowの実行後に追加された新しい行のみを処理する方法を使用できるのは、その入力DataSetが追加行のみを処理する方法を使用して更新されるように設定されている場合に限られます。追加タイプの更新を使用したDataSetのスケジュールの詳細については、「 [DataSetの基本スケジュール](/s/article/360042926274) 」を参照してください。
+<Warning>         **重要：**最後のDataFlowの実行後に追加された新しい行のみを処理する方法を使用できるのは、その入力DataSetが追加行のみを処理する方法を使用して更新されるように設定されている場合に限られます。追加タイプの更新を使用したDataSetのスケジュールの詳細については、「[DataSetの基本スケジュール](/s/article/360042926274)」を参照してください。</Warning>
 
-         </Warning>
-
-<Tip>
-  **ヒント：** 入力DataSetに大量の行数が含まれる場合は、追加行のみを処理する方法を使用するようにしてください。新しい行のみを処理することで、DataFlowの実行速度を向上できます。
-
-</Tip>
-
+<Tip>         **ヒント：**入力DataSetに大量の行数が含まれる場合は、追加行のみを処理する方法を使用するようにしてください。新しい行のみを処理することで、DataFlowの実行速度を向上できます。
    4. ステップ5を繰り返すことで、必要な数の入力DataSetをさらに選択できます。
-6. （オプション）以下に従って変換を追加します。
+6. （オプション）以下に従って変換を追加します。</Tip>
 
-   1. **［変換を追加］** をクリックします。
-        
-      様々なオプションとともに、 **［変換］** ダイアログが表示されます。これらのオプションの詳細については、「 [変換および出力DataSetオプションを理解する](#h_52a4a3c9-54f3-4f82-bd0f-19e98e3de89c "SQL DataFlowを作成する") 」を参照してください。
+   1. **［変換を追加］**をクリックします。  
+      様々なオプションとともに、**［変換］**ダイアログが表示されます。これらのオプションの詳細については、「変換および出力DataSetオプションを理解する」を参照してください。
    2. SQLコードを入力し、入力DataSetを変換させます。
-   3. **［適用］** をクリックします。
-7. **［出力DataSetを追加］** をクリックします。
-     
-   様々なオプションとともに、 **［出力DataSet］** ダイアログが表示されます。これらのオプションの詳細については、「 [変換および出力DataSetオプションを理解する](#h_52a4a3c9-54f3-4f82-bd0f-19e98e3de89c "SQL DataFlowを作成する") 」を参照してください。
+   3. **［適用］**をクリックします。
+7. **［出力DataSetを追加］**をクリックします。  
+   様々なオプションとともに、**［出力DataSet］**ダイアログが表示されます。これらのオプションの詳細については、「変換および出力DataSetオプションを理解する」を参照してください。
 
-   1. SQLコードを入力し、入力DataSetをどのように結合させるかを指定します。
-        
-      **［変換］** ダイアログで入力DataSetを変換した場合は、その変換はここで適用されます。
+   1. SQLコードを入力し、入力DataSetをどのように結合させるかを指定します。  
+      **［変換］**ダイアログで入力DataSetを変換した場合は、その変換はここで適用されます。
    2. （オプション）前の2つのステップを繰り返して、出力DataSetを追加します。
-   3. **［終了］** をクリックします。
-8. **［設定］** ペインでDataFlowをスケジュールします。様々なスケジュールオプションの詳細については、「 [Advanced DataFlow Triggering](/ja/s/article/000005216?language=ja) 」を参照してください。
+   3. **［終了］**をクリックします。
+8. **［設定］**ペインでDataFlowをスケジュールします。様々なスケジュールオプションの詳細については、「[Advanced DataFlow Triggering](/ja/s/article/000005216)」を参照してください。
 
-   <Note>
-     **注記：** スケジュールがまだ指定されていない場合は、DataFlowはデフォルトで手動スケジュールに設定されます。
-
-   </Note>
-
-9. （条件付き）DataFlowをStrictモードで実行する場合は、画面上部の **［設定］** ボタンをクリックし、 **［Strictモード］** オプションをオンに切り替えます。
-     
-   このオプションの詳細については、「 [Strictモードを理解する](#h_22fa7019-6ad8-409c-bd7b-9c58c3c06c05 "SQL DataFlowを作成する") 」を参照してください。
-     
-   <Frame><img alt="sql_dataflow_strict_mode.png" src="/images/kb/ka0Vq000000GoYn-00N5w00000Ri7BU-0EM5w000005vOtn.png"/></Frame>
+<Note>   **注記：**スケジュールがまだ指定されていない場合は、DataFlowはデフォルトで手動スケジュールに設定されます。
+9. （条件付き）DataFlowをStrictモードで実行する場合は、画面上部の**［設定］**ボタンをクリックし、**［Strictモード］**オプションをオンに切り替えます。  
+   このオプションの詳細については、「Strictモードを理解する」を参照してください。  </Note><img alt="sql_dataflow_strict_mode.png" src="/images/kb/ja/0EM5w000005vOtn.png" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/>
 10. （条件付き）以下のいずれかを行い、DataFlowを保存します。
 
-    * このDataFlowを出力してDomoで利用できるDataSetにするためのスクリプトを実行する場合は、画面の右上隅にあるオレンジ色の下矢印をクリックし、 **［保存して実行］** を選択し、必要に応じてバージョンの説明を入力してから **［保存］** をクリックして確定します。
-        
-      これで、DataFlowからDataSetが作成されるプロセスが開始されます。入力DataSetのサイズによって、この作成プロセスは1分から1時間、またはそれ以上かかります。DataSetの生成に加え、DataFlowのカードがData Centerの **DataFlow** リストに追加されます。
-    * このDataFlowを今回だけDataSetに出力せずに保存したい場合は、 **［保存］** をクリックし、必要に応じてバージョンの説明を入力してから、 **［保存］** を再びクリックして確定します。DataFlowのカードがData Centerの **DataFlow** リストに追加されますが、DataSetは生成されません。DataFlowを実行してDataSetに出力する操作はいつでも行うことができます。これは、 **DataFlow** リストにあるDataFlowのカードにマウスポインターを合わせ、 <InlineImage src="/images/kb/ja/ka0Vq000000GoYn-00N5w00000Ri7BU-0EM5w000005vOvG.jpg" /> をクリックして **［実行］** を選択することで行います。このオプションおよびこのメニューで利用できるその他のオプションについては、本トピックで後ほど説明します。
+    - このDataFlowを出力してDomoで利用できるDataSetにするためのスクリプトを実行する場合は、画面の右上隅にあるオレンジ色の下矢印をクリックし、**［保存して実行］**を選択し、必要に応じてバージョンの説明を入力してから**［保存］**をクリックして確定します。  
+         
+       これで、DataFlowからDataSetが作成されるプロセスが開始されます。入力DataSetのサイズによって、この作成プロセスは1分から1時間、またはそれ以上かかります。DataSetの生成に加え、DataFlowのカードがData Centerの**DataFlow**リストに追加されます。
+    - このDataFlowを今回だけDataSetに出力せずに保存したい場合は、**［保存］**をクリックし、必要に応じてバージョンの説明を入力してから、**［保存］**を再びクリックして確定します。DataFlowのカードがData Centerの**DataFlow**リストに追加されますが、DataSetは生成されません。DataFlowを実行してDataSetに出力する操作はいつでも行うことができます。これは、**DataFlow**リストにあるDataFlowのカードにマウスポインターを合わせ、<img alt="DataFlow_Gear_Icon.jpg" src="/images/kb/ja/0EM5w000005vOvG.jpg" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/>
 
-DataFlowを保存すると、このバージョンのエントリーがDataFlowの詳細ビュー内の **［バージョン］** タブに追加されます。保存する際に説明を入力した場合は、DataFlowのエントリーにその説明が表示されます。バージョンの詳細については、「 [DataFlowのバージョン履歴を閲覧する](/s/article/360042923074 "DataFlowのバージョン履歴を閲覧する") 」を参照してください。
+      をクリックして**［実行］**を選択することで行います。このオプションおよびこのメニューで利用できるその他のオプションについては、本トピックで後ほど説明します。
 
-<Note>
-  **注記：** DataFlowが正常に実行されたときにDataFlowの出力DataSetが「更新済み」としてマークされないのはなぜかと疑問に思われるユーザーの方が多くいます。これは一般的には、データが実際には変更されていないためです。つまり更新されていません。そのため、DataSetは更新済みとは表示されません。
+DataFlowを保存すると、このバージョンのエントリーがDataFlowの詳細ビュー内の**［バージョン］**タブに追加されます。保存する際に説明を入力した場合は、DataFlowのエントリーにその説明が表示されます。バージョンの詳細については、「[DataFlowのバージョン履歴を閲覧する](/s/article/360042923074)」を参照してください。
 
-</Note>
+<Note>**注記：**DataFlowが正常に実行されたときにDataFlowの出力DataSetが「更新済み」としてマークされないのはなぜかと疑問に思われるユーザーの方が多くいます。これは一般的には、データが実際には変更されていないためです。つまり更新されていません。そのため、DataSetは更新済みとは表示されません。</Note>
 
 ### 変換および出力DataSetオプションを理解する
 
 新しい変換を作成すると、表タイプまたはSQLタイプの変換を作成できます。
 
-* **表変換** では、SELECTステートメントを使用して新しい表が作成され、常に出力表が生成されます。出力表が生成されるため、これらの表にもとづき [簡単なインデックス](#h_37ff9919-86a9-4b5d-b90a-78362ccda2d3 "SQL DataFlowを作成する") を作成できます。
-* **SQL変換** では、ストアドプロシージャといったSELECTステートメントを通常は含まない表が作成されます。この変換タイプでは出力表は作成されません。
+- **表変換**では、SELECTステートメントを使用して新しい表が作成され、常に出力表が生成されます。出力表が生成されるため、これらの表にもとづき簡単なインデックスを作成できます。
+- **SQL変換**では、ストアドプロシージャといったSELECTステートメントを通常は含まない表が作成されます。この変換タイプでは出力表は作成されません。
 
-変換と出力DataSetはどちらも、 **［ここまで実行］** オプションをサポートしています。［ここまで実行］では、選択した変換までに限定してDataFlowを実行できます。数多くの変換や出力がある非常に大規模なDataFlowでは、このオプションを使用するとDataFlowのコードをテストする時間を節約できる可能性があります。このオプションを使用するには、変換または出力DataSetのスパナメニューで **［ここまで実行］** を選択するか、変換または出力DataSetのエディターを開き、 **［SQLを実行］** メニューの隣にある矢印をクリックして **［ここまで実行］** を選択します。
+変換と出力DataSetはどちらも、**［ここまで実行］**オプションをサポートしています。［ここまで実行］では、選択した変換までに限定してDataFlowを実行できます。数多くの変換や出力がある非常に大規模なDataFlowでは、このオプションを使用するとDataFlowのコードをテストする時間を節約できる可能性があります。このオプションを使用するには、変換または出力DataSetのスパナメニューで**［ここまで実行］**を選択するか、変換または出力DataSetのエディターを開き、**［SQLを実行］**メニューの隣にある矢印をクリックして**［ここまで実行］**を選択します。
 
-DataFlowの特定の変換の上または下のいずれかに変換を追加することもできます。これを行うには、変換のスパナメニューで **［上に変換を追加］** または **［下に変換を追加］** を選択し、表タイプまたはSQLタイプのどちらの変換を作成するかを選択します。
+DataFlowの特定の変換の上または下のいずれかに変換を追加することもできます。これを行うには、変換のスパナメニューで**［上に変換を追加］**または**［下に変換を追加］**を選択し、表タイプまたはSQLタイプのどちらの変換を作成するかを選択します。
 
-以下のスクリーンショットは、 **［変換］** ダイアログのコンポーネントを示しています。
+以下のスクリーンショットは、**［変換］**ダイアログのコンポーネントを示しています。
 
-<Frame><img alt="dataflow_transform_ui_new.png" src="/images/kb/ka0Vq000000GoYn-00N5w00000Ri7BU-0EM5w000005vOtl.png"/></Frame>
+<Frame>![dataflow_transform_ui_new.png](/images/kb/ja/0EM5w000005vOtl.png)</Frame>
+
 以下の表で、このコンポーネントに関する詳細を見ることができます。
 
-<table border="1" cellpadding="1" cellspacing="1" data-aura-rendered-by="33:203;a"><thead><tr><th colspan="1" rowspan="1"><p> コンポーネント </p></th><th colspan="1" rowspan="1"><p> 説明 </p></th></tr></thead><tbody><tr><td colspan="1" rowspan="1"><p> 入力/変換リスト </p></td><td colspan="1" rowspan="1"><p> SQLステートメントを作成する際に活用できるよう、このDataFlowで選択したすべての入力DataSetの名前が表示されます。さらに、以前に作成した変換もここに表示されます。これらの名前は <b> ［変換］ </b> および <b> ［出力DataSet］ </b> ダイアログの両方に表示されます。 <b> ［変換］ </b> ダイアログで1つ以上の入力DataSetを変換した場合、 <b> ［出力DataSet］ </b> ダイアログで参照した時にその変換は入力DataSetに適用されます。 </p><p> 入力DataSetをクリックすると、DataSet内のすべての列とそのデータタイプ（DECIMAL、TEXT、DATE/TIMEなど）のリストが表示されます。 </p></td></tr><tr><td colspan="1" rowspan="1"><p> ［SQLを実行］メニュー </p></td><td colspan="1" rowspan="1"><p> 以下のオプションを使用できます。 </p><ul><li><ul><li><p><b> ［SQLを実行］ </b> ：SQLが有効かどうか確認するためのテストを実施することができます。 </p></li><li><p><b> ［ここまで実行］ </b> ：この時点までの以前の変換すべてを実行します。 </p></li><li><p><b> ［EXPLAIN SQL］ </b> ：SQLのEXPLAIN PLANを表示します。これは、クエリの実行時にデータベースが作成するステップの順序付けられたリストです。このオプションを使用するとクエリを最適化できます。ただし、これらのステップは非常に複雑で専門的なため、この機能は上級ユーザーのみに推奨されます。 </p><div class="mdx-embed"><Note><p><b> 注記： </b> 実行時の効率性向上に必要なインデックスはMySQLによって判断されるため、すべてのインデックス変換がEXPLAIN SQLに表示されるわけではありません。インデックスを実行することで、効率性が低下すると判断される場合もあるためです。 </p></Note></div></li></ul></li></ul></td></tr><tr><td colspan="1" rowspan="1"><p> SQLフィールド </p></td><td colspan="1" rowspan="1"><p> 入力DataSetの変換や結合を行うためのSQLコードを作成できます。このフィールドには、コードを書く時に便利な自動入力機能が含まれています。 </p></td></tr><tr><td colspan="1" rowspan="1"> プレビューボタン </td><td colspan="1" rowspan="1"><b> ［SQLを実行］ </b> または <b> ［ここまで実行］ </b> の選択後に、ペイン下部にプレビューエリアを展開または折りたたみます。 </td></tr></tbody></table>
+| コンポーネント  | 説明                                                                                                                                                                                                                                                                                                              |
+| -------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 入力/変換リスト | SQLステートメントを作成する際に活用できるよう、このDataFlowで選択したすべての入力DataSetの名前が表示されます。さらに、以前に作成した変換もここに表示されます。これらの名前は**［変換］**および**［出力DataSet］**ダイアログの両方に表示されます。**［変換］**ダイアログで1つ以上の入力DataSetを変換した場合、**［出力DataSet］**ダイアログで参照した時にその変換は入力DataSetに適用されます。  入力DataSetをクリックすると、DataSet内のすべての列とそのデータタイプ（DECIMAL、TEXT、DATE/TIMEなど）のリストが表示されます。 |
+| ［SQLを実行］メニュー | 以下のオプションを使用できます。   - - **［SQLを実行］**：SQLが有効かどうか確認するためのテストを実施することができます。   - **［ここまで実行］**：この時点までの以前の変換すべてを実行します。   - **［EXPLAIN SQL］**：SQLのEXPLAIN PLANを表示します。これは、クエリの実行時にデータベースが作成するステップの順序付けられたリストです。このオプションを使用するとクエリを最適化できます。ただし、これらのステップは非常に複雑で専門的なため、この機能は上級ユーザーのみに推奨されます。  <Note>**注記：**実行時の効率性向上に必要なインデックスはMySQLによって判断されるため、すべてのインデックス変換がEXPLAIN SQLに表示されるわけではありません。インデックスを実行することで、効率性が低下すると判断される場合もあるためです。</Note> |
+| SQLフィールド | 入力DataSetの変換や結合を行うためのSQLコードを作成できます。このフィールドには、コードを書く時に便利な自動入力機能が含まれています。 |
+| プレビューボタン | **［SQLを実行］**または**［ここまで実行］**の選択後に、ペイン下部にプレビューエリアを展開または折りたたみます。 |
 
 ## データをプレビューする
 
-**［SQLを実行］** または **［ここまで実行］** の選択後に、変換にプレビューが表示されます。プレビューメニュー <InlineImage src="/images/kb/ja/ka0Vq000000GoYn-00N5w00000Ri7BU-0EM5w000005vOvA.png" /> で、プレビュー表での結果の表示方法を変更するオプションを選択して、見やすくすることができます。
+**［SQLを実行］**または**［ここまで実行］**の選択後に、変換にプレビューが表示されます。プレビューメニュー<img alt="Preview_Menu.png" src="/images/kb/ja/0EM5w000005vOvA.png" style={{width: 26, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/>
 
-<Note>
-  **注記：** これらの設定は、変換自体やデータの出力方法には影響しません。プレビュー表での結果の表示方法にのみ影響します。
+で、プレビュー表での結果の表示方法を変更するオプションを選択して、見やすくすることができます。
 
-</Note>
+<Note>**注記：**これらの設定は、変換自体やデータの出力方法には影響しません。プレビュー表での結果の表示方法にのみ影響します。</Note>
 
-<Frame><img alt="SQL_DataFlow.png" src="/images/kb/ka0Vq000000GoYn-00N5w00000Ri7BU-0EM5w000005vOv7.png"/></Frame>
+<Frame>![SQL_DataFlow.png](/images/kb/ja/0EM5w000005vOv7.png)</Frame>
+
 次のコンポーネントを使用できます。
 
-<table class="mt-responsive-table" data-aura-rendered-by="33:203;a"><thead><tr><th colspan="1" rowspan="1"> コンポーネント </th><th colspan="1" rowspan="1"> 説明 </th></tr></thead><tbody><tr><td colspan="1" rowspan="1"> テキストを表示 </td><td colspan="1" rowspan="1"><ul><li><b> ［デフォルト］ </b> - 標準フォントでテキストを表示します。 </li><li><b> ［モノスペース］ </b> - 文字間隔をより広く取ってテキストを表示します。 </li></ul><p class="mt-indent-1 wysiwyg-text-align-center"><img alt="SQL_DataFlow_Display_Text.png" src="/images/kb/ka0Vq000000GoYn-00N5w00000Ri7BU-0EM5w000005vOvI.png"/></p></td></tr><tr><td colspan="1" rowspan="1"> Null値の処理 </td><td colspan="1" rowspan="1"><ul><li><b> ［高度］ </b> - <em> null </em> または <em> 空の文字列 </em> を表示して、列に表示する値のタイプを指定します。 </li><li><b> ［ベーシック］ </b> - 表内の空白セルを表示します（これがデフォルト設定です）。 </li></ul></td></tr><tr><td colspan="1" rowspan="1"> 10進精度 </td><td colspan="1" rowspan="1"><ul><li><b> ［デフォルト］ </b> - DataSetに表示される通りに数値を表示します。 </li><li><b> ［設定］ </b> - 指定した小数点以下の桁数を表示します。 </li></ul><p class="mt-indent-1 wysiwyg-text-align-center"><img alt="SQL_DataFlow_Decimal_Precision.png" src="/images/kb/ka0Vq000000GoYn-00N5w00000Ri7BU-0EM5w000005vOvK.png"/></p></td></tr></tbody></table>
+| コンポーネント  | 説明                                                                                                                                                                   |
+| -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| テキストを表示  | - **［デフォルト］** - 標準フォントでテキストを表示します。 - **［モノスペース］** - 文字間隔をより広く取ってテキストを表示します。   <Frame>![SQL_DataFlow_Display_Text.png](/images/kb/ja/0EM5w000005vOvI.png)</Frame>     |
+| Null値の処理 | - **［高度］** - *null*または*空の文字列*を表示して、列に表示する値のタイプを指定します。 - **［ベーシック］** - 表内の空白セルを表示します（これがデフォルト設定です）。                                                                   |
+| 10進精度    | - **［デフォルト］** - DataSetに表示される通りに数値を表示します。 - **［設定］** - 指定した小数点以下の桁数を表示します。   <Frame>![SQL_DataFlow_Decimal_Precision.png](/images/kb/ja/0EM5w000005vOvK.png)</Frame> |
 
 ## 簡単なインデックス作成
 
-インデックスは、表での操作速度を向上させるデータ構造です。 **簡単なインデックス作成** を使用すると、入力DataSetまたは表の変換で1つ以上の列にすばやくインデックスを作成できます。
+インデックスは、表での操作速度を向上させるデータ構造です。**簡単なインデックス作成**を使用すると、入力DataSetまたは表の変換で1つ以上の列にすばやくインデックスを作成できます。
 
 **入力DataSetまたは変換でインデックスを作成するには：**
 
 1. 入力DataSetまたは変換のエディターを開きます。
-2. **［インデックス作成中］** タブを選択します。
-     
-   <Frame><img alt="" src="/images/kb/ka05w00000123i9-00N5w00000Ri7BU-0EM5w000005vOvB.png"/></Frame>
+2. **［インデックス作成中］**タブを選択します。  
+      
+    
+
+   <Frame>![Screenshot](/images/kb/ja/0EM5w000005vOvC.png)</Frame>
 3. インデックスのタイプを選択します。
 4. インデックスを適用する列を選択します。
-5. **［終了］** をクリックします。
+5. **［終了］**をクリックします。
 
 **動画 - SQL EXPLAIN PLAN**
 
-<iframe allowfullscreen="" frameborder="1" height="315" src="//www.youtube-nocookie.com/embed/JNTAv04HC1Y" width="560"></iframe>
-
 ## Strictモードを理解する
 
-Strictモードは、データ変更ステートメントの無効な値や欠損値をMySQLでどのように処理するかを制御します。また、ゼロによる除算、ゼロの日付、日付内でのゼロ値の処理方法にも影響します。詳細については、 https://dev.mysql.com/doc/refman/5.6/en/sql-mode.html#sql-mode-strict を参照してください。
+Strictモードは、データ変更ステートメントの無効な値や欠損値をMySQLでどのように処理するかを制御します。また、ゼロによる除算、ゼロの日付、日付内でのゼロ値の処理方法にも影響します。詳細については、[https://dev.mysql.com/doc/refman/5.6/en/sql-mode.html#sql-mode-strict](https://dev.mysql.com/doc/refman/5.6/en/sql-mode.html#sql-mode-strict)を参照してください。
 
 ## DataFlow作成のためのベストプラクティス
 
 各DataFlowでは以下の点に注意しましょう。
 
-* 変換における各ステップに、記述的な名前をつけること。
-* 結合または操作される入力DataSet、および作成されるDataSetの説明を含めること。データの所有者を示すことも必要です。
-* 出力DataFlowと同じ名前を付けること（DataFlowの出力はData Center内の独自のDataSetになるため）。これにより、どのDataSetがどのDataFlowによって作成されたかを容易に識別できるようになります。
-
-日本語
+- 変換における各ステップに、記述的な名前をつけること。
+- 結合または操作される入力DataSet、および作成されるDataSetの説明を含めること。データの所有者を示すことも必要です。
+- 出力DataFlowと同じ名前を付けること（DataFlowの出力はData Center内の独自のDataSetになるため）。これにより、どのDataSetがどのDataFlowによって作成されたかを容易に識別できるようになります。

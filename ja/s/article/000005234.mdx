@@ -1,184 +1,198 @@
 ---
-title: "WorkbenchのODBCへのライトバック機能"
+title: 'WorkbenchのODBCへのライトバック機能'
 ---
 
-import { InlineImage } from "/snippets/InlineImage.mdx";
+## はじめに
 
-### はじめに
+この記事では、Workbenchのライトバック機能を使用してDomoのDataSetをオンプレミスデータベースに書き込む方法を説明します。このプロセスを実行すると、オンプレミスシステムにDomoのデータを安全に移動し、標準のWorkbenchと同じセキュリティ機能とメリットのすべてを利用できます。
 
-この記事では、Workbenchのライトバック機能を使用してDomoのDataSetをオンプレミスデータベースに書き込む方法を説明します。このプロセスを実行すると、標準のWorkbenchと同じセキュリティ機能とメリットをすべて備えたオンプレミスシステムにDomoのデータを安全に移動できます。
+---
 
-### オンプレミスデータベースにDataSetを書き込む
+## ODBCライトバックプラグインをインストールする
 
-このプロセスは、いくつかのタスクに分かれています。すべてのタスクを順番に完了します。
+<Warning> **重要：**Workbenchをまだインストールしていない場合は、管理者として最新バージョンのWorkbenchをインストールします。Workbenchは、データベースサーバーにアクセスできるWindowsサーバーまたはラップトップにインストールする必要があります。データベースサーバー自体にインストールする必要はありません。詳細については、「[Workbenchインストールガイド](/s/article/4406022964375)」を参照してください。  </Warning>
 
-* [ODBCライトバックプラグインをインストールする](#install_odbc_writeback_plug-in)
-* [クライアントIDとシークレットを取得する](#get_client_id_and_secret)
-* [DataSet IDを取得する](#get_dataset_id)
-* [DSNを設定する](#set_up_dsn)
-* [Workbenchでアカウントを追加する](#add_account)
-* [Workbenchでジョブを作成する](#create_job)
-* [注記](#notes)
-
-### ODBCライトバックプラグインをインストールする
-
-<Warning>
-**重要：** Workbenchをまだインストールしていない場合は、管理者として最新バージョンのWorkbenchをインストールします。Workbenchは、データベースサーバーにアクセスできるWindowsサーバーまたはラップトップにインストールする必要があります。データベースサーバー自体にインストールする必要はありません。詳細については、「 [Workbenchインストールガイド](/ja/s/article/4406022964375) 」を参照してください。
-
-</Warning>
-
-1. Workbench 5以降をインストールしたら、[https://app.domo.com/workbench/plugins/beta5/OdbcWritebackDataProvider.dwp](https://app.domo.com/workbench/plugins/beta5/OdbcWritebackDataProvider.dwp "https://app.domo.com/workbench/plugins/beta5/OdbcWritebackDataProvider.dwp") を選択してODBCライトバックプラグインをダウンロードします。
-2. プラグインをダウンロードしたら、Workbenchに追加します。この方法については、「 [Workbench 5でプラグインを管理する](/ja/s/article/360043437353) 」を参照してください。
+1. Workbench 5以降をインストールしたら、[https://app.domo.com/workbench/plugins/beta5/OdbcWritebackDataProvider.dwp](https://app.domo.com/workbench/plugins/beta5/OdbcWritebackDataProvider.dwp 'https://app.domo.com/workbench/plugins/beta5/OdbcWritebackDataProvider.dwp')を選択してODBCライトバックプラグインをダウンロードします。
+2. プラグインをダウンロードしたら、Workbenchに追加します。この方法については、「[Workbench 5でプラグインを管理する](/s/article/360043437353)」を参照してください。
 3. Workbenchを再起動します。
 
-### クライアントIDとシークレットを取得する
+## クライアントIDとシークレットを取得する
 
-1. [デベロッパーポータル](https://developer.domo.com/login) に移動し、Domoインスタンスにログインします。
-2. **［Create a client］** を選択します。
+クライアントIDとシークレットの取得方法については、「[APIクライアントの管理](/s/article/000005240#create-api-clients)」を参照してください。
 
-   <Frame><img alt="create a client.jpg" src="/images/kb/ka0Vq0000001Cbp-00N5w00000Ri7BU-0EM5w000006v1vR.jpg" style={{width: 665.98, height: 242.997}}/></Frame>
-
-   **［Create new client］** ページが表示されます。
-
-   <Frame><img alt="create new client page.jpg" src="/images/kb/ka0Vq0000001Cbp-00N5w00000Ri7BU-0EM5w000006v1vq.jpg" style={{width: 663.991, height: 460.994}}/></Frame>
-
-3. 名前（例：「Workbench」）を入力し、該当するフィールドにアプリケーションの説明を入力します。
-4. **［Application Scope］** で適切なオプションを選択します。必要なものにのみチェックを入れます。
-
-   **注記：** スコープは、プログラムが必要とするアクセスのレベルを指定できるようにすることで、ユーザーを保護します。このレベルのセキュリティが必要ない場合は、すべてのスコープボックスにチェックを入れることができます。
-5. **［Create］** を選択します。
-
-   **［Manage Clients］** ページにクライアントIDとシークレットが表示されます。
-
-   <Frame><img alt="manage clients.jpg" src="/images/kb/ka0Vq0000001Cbp-00N5w00000Ri7BU-0EM5w000006v1we.jpg" style={{width: 650.994, height: 260.994}}/></Frame>
-
-6. **クライアントID** と **シークレット** をコピーして、この後のプロセスで使用できるよう任意の場所に保存します。
-
-### DataSet IDを取得する
+## DataSet IDを取得する
 
 1. DomoインスタンスでData Centerに移動し、オンプレミスデータベースに書き戻すDataSetの詳細ビューに移動します。
-2. ウェブページのアドレスバーでDataSet IDを探してコピーし、後で使用できるように保存します。これは、*datasources/* と */details* の間の文字列です。
+2. ウェブページのアドレスバーでDataSet IDを探してコピーし、あとで使用できるように保存します。これは、_datasources/_と_/details_の間の文字列です。
 
-   <InlineImage src="/images/kb/ka0Vq0000001Cbp-00N5w00000Ri7BU-0EM5w000006v1wj.jpg" />
+   <img src="/images/kb/ka0Vq0000001Cbp-00N5w00000Ri7BU-0EM5w000006v1wj.jpg" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/>
 
-### DSNを設定する
+## DSNを設定する
 
 ODBCを使用してサーバーに接続するには、システムデータソース名（DSN）が必要です。DSNを設定するには、次のステップに従います。
 
-1. Workbenchがインストールされているサーバーで、**［スタート］** を選択し、次のように入力します：
+1. Workbenchがインストールされているサーバーで、**［Start］**を選択して以下のように入力します。
 
    ```
    odbc
    ```
 
    ODBCデータソース（64ビット）が必要になる可能性があります。
-2. **［System DSN］** に移動し、 **［Add］** を選択します。
-3. **［SQL Server Native Client］** を選択します。このオプションが表示されない場合は、
-   https://learn.microsoft.com/ja-jp/sql/connect/odbc/download-odbc-driver-for-sql-server?view=sql-server-ver16
-   を選択してダウンロードします。
 
-   **［Microsoft SQL Server DSN Configuration］** ウィザードが表示されます。
+2. **［System DSN］**に移動して**［Add］**を選択します。
+3. **［SQL Server Native Client］**を選択します。このオプションが表示されない場合は、https://learn.microsoft.com/en-us/sql/connect/odbc/download-odbc-driver-for-sql-server?view=sql-server-ver16にアクセスしてダウンロードします。
 
-   <Frame><img alt="select sql server native client.png" src="/images/kb/ka0Vq0000001Cbp-00N5w00000Ri7BU-0EM5w000006v25v.jpg" style={{width: 567.997, height: 295.994}}/></Frame>
+   **［Microsoft SQL Server DSN Configuration］**ウィザードが表示されます。
 
-4. **［Name:］** フィールドにこのDSNの名前を入力します。
-5. **［Server:］** フィールドにSQLサーバーの名前を入力します。
+   <Frame> <img
+   alt="select sql server native client.png"
+   src="/images/kb/ka0Vq0000001Cbp-00N5w00000Ri7BU-0EM5w000006v25v.jpg"
+   style={{ width: 567.997, height: 295.994 }}
+   /> </Frame>
 
-   <Frame><img alt="dsn config wizard.png" src="/images/kb/ka0Vq0000001Cbp-00N5w00000Ri7BU-0EM5w000006v28k.jpg"/></Frame>
+4. **［Name:］**フィールドにこのDSNの名前を入力します。
+5. **［Server:］**フィールドにSQLサーバーの名前を入力します。
 
-6. **［Finish］** を選択します。
+   <Frame> <img
+   alt="dsn config wizard.png"
+   src="/images/kb/ka0Vq0000001Cbp-00N5w00000Ri7BU-0EM5w000006v28k.jpg"
+   /> </Frame>
 
-DSNが **［ODBC Data Source Administrator (64-bit)］** の **［System］** タブに表示されます。
+6. **［Finish］**を選択します。
 
-<Frame><img alt="system dsn tab.png" src="/images/kb/ka0Vq0000001Cbp-00N5w00000Ri7BU-0EM5w000006v294.jpg"/></Frame>
+**［ODBC Data Source Administrator (64-bit)］**の**［System］**タブにDSNが表示されます。
 
-### Workbenchでアカウントを追加する
+<Frame> <img
+ alt="system dsn tab.png"
+ src="/images/kb/ka0Vq0000001Cbp-00N5w00000Ri7BU-0EM5w000006v294.jpg"
+ /> </Frame>
+
+## Workbenchでアカウントを追加する
 
 1. 同じサーバーでWorkbenchを開きます。
 
-   **注記：** DSNの設定中にWorkbenchを開いていた場合は、Workbenchを再起動することを推奨します。
-2. **［スタート］** を選択し、検索バーに次のように入力します：
+   **注記：**DSNの設定中にWorkbenchを開いていた場合は、Workbenchを再起動することを推奨します。
+
+2. **［Start］**を選択して、検索バーに
 
    ```
-   Workbench
+   workbench
    ```
 
    または
 
    ```
-   Domo
+   domo
    ```
 
-3. サイドバーで <InlineImage src="/images/kb/ka05w00000123tU-00N5w00000Ri7BU-0EM5w000005vPQ5.png" /> **［アカウント］** を選択します。
-4. <InlineImage src="/images/kb/ka0Vq0000001Cbp-00N5w00000Ri7BU-0EM5w000006v2Zq.jpg" /> **［追加］** を選択します。
+   と入力します。
 
-   <Frame><img alt="add account.jpg" src="/images/kb/ka0Vq0000001Cbp-00N5w00000Ri7BU-0EM5w000006v5El.jpg" style={{width: 325.994, height: 255.994}}/></Frame>
+3. サイドバーで、 <img src="/images/kb/ka05w00000123tU-00N5w00000Ri7BU-0EM5w000005vPQ5.png" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/> **［アカウント］**を選択します。
+4. 次に <img src="/images/kb/ka0Vq0000001Cbp-00N5w00000Ri7BU-0EM5w000006v2Zq.jpg" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/> **［追加］**を選択します。
 
-5. **［概要］** タブで、 **［Domoドメイン］** フィールドにDomoインスタンスの名前を入力します。
-6. **［認証する］** を選択します。
-7. ブラウザーの認証リンクに従い、コードの入力を求められたら、Workbenchの **［認証コード］** フィールドからコードを貼り付けます。
+   <Frame> <img
+   alt="add account.jpg"
+   src="/images/kb/ka0Vq0000001Cbp-00N5w00000Ri7BU-0EM5w000006v5El.jpg"
+   style={{ width: 325.994, height: 255.994 }}
+   /> </Frame>
+
+5. **［概要］**タブで、**［Domoドメイン］**フィールドにDomoインスタンスの名前を入力します。
+6. **［認証する］**を選択します。
+7. ブラウザーの認証リンクに従い、コードの入力を求められたら、Workbenchの**［認証コード］**フィールドからコードを貼り付けます。
 8. プロンプトが表示されたらブラウザーウィンドウを閉じます。
-9. Workbenchで <InlineImage src="/images/kb/ka05w00000123sv-00N5w00000Ri7BU-0EM5w000005vPOl.png" /> **［保存］** を選択して新しいアカウントを追加します。
+9. Workbenchで、    <img src="/images/kb/ka05w00000123sv-00N5w00000Ri7BU-0EM5w000005vPOl.png" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/>    **［保存］**を選択して新しいアカウントを追加します。
 
-### Workbenchでジョブを作成する
+## Workbenchでジョブを作成する
 
-1. サイドバーで <InlineImage src="/images/kb/ka0Vq0000001Cbp-00N5w00000Ri7BU-0EM5w000006v5Eq.jpg" /> **［ジョブ］** を選択します。
-2. <InlineImage src="/images/kb/ka0Vq0000001Cbp-00N5w00000Ri7BU-0EM5w000006v2Zq.jpg" /> **［追加］** を選択します。
+1. サイドバーで、    <img src="/images/kb/ka0Vq0000001Cbp-00N5w00000Ri7BU-0EM5w000006v5Eq.jpg" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/>    **［ジョブ］**を選択します。
+2. 次に
 
-   <Frame><img alt="add job.jpg" src="/images/kb/ka0Vq0000001Cbp-00N5w00000Ri7BU-0EM5w000006v5F5.jpg" style={{width: 665.966, height: 157.997}}/></Frame>
+   <img src="/images/kb/ka0Vq0000001Cbp-00N5w00000Ri7BU-0EM5w000006v2Zq.jpg" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/>    **［追加］**を選択します。
 
-3. **［ジョブの詳細］** セクションで、Domoドメインを選択し、ジョブ名を入力して、トランスポートタイプを選択し、読み取りタイプを選択します。
-4. **［Domoの詳細］** セクションで、 **［DataSet名］** フィールドに名前を入力します。
-<Frame><img alt="domo details.jpg" src="/images/kb/ka0Vq0000001Cbp-00N5w00000Ri7BU-0EM5w000006v2ae.jpg" /></Frame>
+   <Frame> <img
+   alt="add job.jpg"
+   src="/images/kb/ka0Vq0000001Cbp-00N5w00000Ri7BU-0EM5w000006v5F5.jpg"
+   style={{ width: 665.966, height: 157.997 }}
+   /> </Frame>
 
-   **注記：** 入力したDataSet名は、書き戻すDataSetではありません。Domoが作成するログ表の名前を指します。
+3. **［ジョブの詳細］**セクションで、Domoドメインを選択し、ジョブ名を入力して、トランスポートタイプを選択し、リーダータイプを選択します。
+4. **［Domoの詳細］**セクションで、**［DataSet名］**フィールドに名前を入力します。 <img src="/images/kb/ka0Vq0000001Cbp-00N5w00000Ri7BU-0EM5w000006v2ae.jpg" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/>
 
-   <Frame><img alt="wb log.jpg" src="/images/kb/ka0Vq0000001Cbp-00N5w00000Ri7BU-0EM5w000006v2at.jpg" style={{width: 706.989, height: 186.996}}/></Frame>
+   **注記：**入力したDataSet名は、書き戻されるDataSetではありません。これはDomoが作成するログ表の名前を指します。
 
-5. **［ソース］** で **［編集］** を選択します。
-6. このプロセスの前のステップでコピーした [クライアントIDとシークレット](#get_client_id_and_secret) を **［Domo Client ID］** および **［Domo Client Secret］** フィールドに入力します。
-7. 前のステップでコピーした [DataSet ID](#get_dataset_ID) を **［Domo DataSet ID］** フィールドに入力します。 **［Browse］** を使用することは推奨しません。
+   <Frame> <img
+   alt="wb log.jpg"
+   src="/images/kb/ka0Vq0000001Cbp-00N5w00000Ri7BU-0EM5w000006v2at.jpg"
+   style={{ width: 706.989, height: 186.996 }}
+   /> </Frame>
 
-   <Frame><img alt="generate query.png" src="/images/kb/ka0Vq0000001Cbp-00N5w00000Ri7BU-0EM5w000006v2br.jpg"/></Frame>
+5. **［ソース］**で、**［編集］**を選択します。
+6. このプロセスの前のステップでコピーしたクライアントIDとシークレットを、**［Domo Client Id］**および**［Domo Client Secret］**フィールドにそれぞれ入力します。
+7. 前のステップでコピーした[DataSet ID](#dataset-id)を**［Domo DataSet Id］**フィールドに入力します。**［検索］**を使用することは推奨しません。
 
-8. **［Generate Dataset Query］** を選択します。クエリが生成され、書き戻す列のみを含めるように編集できます。 <InlineImage src="/images/kb/ka0Vq0000001Cbp-00N5w00000Ri7BU-0EM5w000006v2bw.jpg" /> <InlineImage src="/images/kb/ka0Vq0000001Cbp-00N5w00000Ri7BU-0EM5w000006v2c1.jpg" />
+   <Frame> <img
+   alt="generate query.png"
+   src="/images/kb/ka0Vq0000001Cbp-00N5w00000Ri7BU-0EM5w000006v2br.jpg"
+   /> </Frame>
 
-   **注記：** WorkbenchにログインしているユーザーがこのDataSetにアクセスできることを確認します。管理者セキュリティ権限を持っている場合は、DataSetを個別にシェアする必要はありません。DataSetのシェアについては、「 [DataSetをシェアする](/ja/s/article/360043430713) 」を参照してください。
-9. **［ODBC Connection Type］** を選択します。
+8. **［DataSetクエリを生成する］**を選択します。クエリが生成されます。そのクエリを編集して、書き戻す列のみを含めることができます。 <img src="/images/kb/ka0Vq0000001Cbp-00N5w00000Ri7BU-0EM5w000006v2bw.jpg" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/> <img src="/images/kb/ka0Vq0000001Cbp-00N5w00000Ri7BU-0EM5w000006v2c1.jpg" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/>
 
-   <Frame><img alt="odbc connection type.png" src="/images/kb/ka0Vq0000001Cbp-00N5w00000Ri7BU-0EM5w000006v2cB.jpg" style={{width: 308.999, height: 241.996}}/></Frame>
+   **注記：**WorkbenchにログインしているユーザーがこのDataSetにアクセスできることを確認してください。管理者のセキュリティ権限を持っているユーザーには、DataSetを個別にシェアする必要はありません。DataSetのシェアについては、「[DataSetをシェアする](/s/article/360043430713)」を参照してください。
 
-10. **［DataBase Type］** を選択します。
-11. **［Generate Writeback Query］** を選択します。
+9. **［ODBC Connection Type］**を選択します。
 
-    <Frame><img alt="generate writeback query.png" src="/images/kb/ka0Vq0000001Cbp-00N5w00000Ri7BU-0EM5w000006v2cG.jpg" style={{width: 625.987, height: 226.996}}/></Frame>
+   <Frame> <img
+   alt="odbc connection type.png"
+   src="/images/kb/ka0Vq0000001Cbp-00N5w00000Ri7BU-0EM5w000006v2cB.jpg"
+   style={{ width: 308.999, height: 241.996 }}
+   /> </Frame>
 
-    **注記：** デフォルトでは、Domoはすべての列に対してクエリを生成します。上記のクエリを調整した場合は、必ずライトバッククエリ文字列を更新してください。
+10. **［データベースタイプ］**を選択します。
+11. **［ライトバッククエリを生成する］**を選択します。
 
-    <Frame><img alt="adjusted writeback.png" src="/images/kb/ka0Vq0000001Cbp-00N5w00000Ri7BU-0EM5w000006v2cV.jpg" style={{width: 581.996, height: 105.987}}/></Frame>
+    <Frame> <img
+    alt="generate writeback query.png"
+    src="/images/kb/ka0Vq0000001Cbp-00N5w00000Ri7BU-0EM5w000006v2cG.jpg"
+    style={{ width: 625.987, height: 226.996 }}
+    /> </Frame>
 
-    **注記：** Domoはデータベースに表を作成しません。最初に自分で作成する必要があります。SQL Serverで作成された表の例を次に示します。
+    **Note:** By default, Domo generates a query for all columns. If you adjusted the query above, make sure to update the Writeback Query String.
 
+    <Frame> <img
+    alt="adjusted writeback.png"
+    src="/images/kb/ka0Vq0000001Cbp-00N5w00000Ri7BU-0EM5w000006v2cV.jpg"
+    style={{ width: 581.996, height: 105.987 }}
+    /> </Frame>
+
+    **Note:** Domo does not create a table on the database. You need to create it first. Here is an example of a table created in SQL server:
+
+    ```sql
+    create table database1.dbo.domo_widgets
+    (id numeric(18,0)
+    , widget_id numeric (18,0)
+    , qty numeric(18,2)
+    , amount numeric (18,2)
+    )
     ```
-    create table database1.dbo.domo_widgets (id numeric(18,0), widget_id numeric (18,0), qty numeric(18,2), amount numeric (18,2) )
-    ```
 
-    これは、表を作成した後に更新されたクエリです。
+    This is the updated query after creating the table:
 
-    <Frame><img alt="updated wb query.png" src="/images/kb/ka0Vq0000001Cbp-00N5w00000Ri7BU-0EM5w000006v2cu.jpg" style={{width: 577.997, height: 82.9972}}/></Frame>
+    <Frame> <img
+    alt="updated wb query.png"
+    src="/images/kb/ka0Vq0000001Cbp-00N5w00000Ri7BU-0EM5w000006v2cu.jpg"
+    style={{ width: 577.997, height: 82.9972 }}
+    /> </Frame>
 
-12. **［処理］（［編集］）セクション —** このセクションでは何もする必要はありません。Workbenchがデータ接続を開始します。Workbenchは、Domo DataSetに接続してこれをまずCSVとして取得し直し、このCSVファイルを使用してSQLサーバーに読み込みます。
-13. **［更新方法］ —** これは、ターゲットデータベースの更新方法ではありません。Domoインスタンス内で作成されたログ表を追加するか、置き換えるかをDomoに指示します。
-14. [偽装](/ja/s/article/360043437173#impersonation) を設定します。これにより、Workbenchをアクティブディレクトリユーザーとして実行できます。
+12. **［処理］（［編集］）セクション — **このセクションでは何もする必要はありません。Workbenchがデータ接続を開始します。Workbenchは、Domo DataSetに接続してこれをまずCSVとして取得し直し、このCSVファイルを使用してSQLサーバーに読み込みます。
+13. **［更新方法］ — **これは、ターゲットデータベースの更新方法ではありません。Domoインスタンス内で作成されたログ表を追加するか、置き換えるかをDomoに指示します。
+14. [偽装](/s/article/360043437173#impersonation)を設定します。これにより、Workbenchをアクティブディレクトリユーザーとして実行できます。
 15. ジョブを実行します。
 
-### 注記
+## 注記
 
-* **［Writeback Query］** セクションで一度に実行できるステートメントは1つのみです。
-* デフォルト値は25です。Domoは、25件のレコードだけでなく、DataSetのすべてのレコードを書き戻します。これはそのままにしておきます。
-* Workbenchのライトバック機能には、使用されるエンドポイントにより100万行の制限があります。
-* Workbenchのライトバック機能は、一度に1つのクエリのみを実行するように設計されています。複数のデータ操作言語（CML）コマンド（INSERT、DELETE、UPDATE、MERGE）を追加することはできません。複数のコマンドを追加しても、Domoは一度に1つのみ処理します。これにより、ALTERステートメントが許可されます。製品ごとに2つのステートメントを含めても、Domoは2つ目のステートメントの整合性を保証しません。
-* Workbenchは、**［概要］** タブに記載されているDataSet名と同じ名前のログ表を作成します。
-* 通常のライトバック機能では、入力DataSetが更新されたときにライトバックをトリガーするオプションがあります。ただし、Workbenchのライトバック機能では、スケジュール設定のみが可能です。これはセキュリティ機能であり、接続はWorkbenchから開始されます。
-
-[このページのトップへ](#intro)
+- **［ライトバッククエリ］**セクションで一度に実行できるステートメントは1つのみです。
+- デフォルト値は25です。Domoは、25件のレコードだけでなく、DataSetのすべてのレコードを書き戻します。これはそのままにしておきます。
+- Workbenchのライトバック機能には、使用されるエンドポイントにより100万行の制限があります。
+- Workbenchのライトバック機能は、一度に1つのクエリのみを実行するように設計されています。複数のデータ操作言語（CML）コマンド（INSERT、DELETE、UPDATE、MERGE）を追加することはできません。複数のコマンドを追加しても、Domoは一度に1つのみ処理します。これにより、ALTERステートメントが許可されます。製品ごとに2つのステートメントを含めても、Domoは2つ目のステートメントの整合性を保証しません。
+- Workbenchは、**［概要］**タブに記載されているDataSet名と同じ名前のログ表を作成します。
+- 通常のライトバック機能では、入力DataSetが更新されたときにライトバックをトリガーするオプションがあります。ただし、Workbenchのライトバック機能では、スケジュール設定のみが可能です。これはセキュリティ機能であり、接続はWorkbenchから開始されます。

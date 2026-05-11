@@ -2,21 +2,21 @@
 title: "Snowflake Unload V2 Connector"
 ---
 
-**Note:** Snowflake will no longer support the username and password authentication mechanism as of November 2025. As a result, this connector will be retired in November 2025 and will no longer function. Please consider using one of the following connection methods instead:
+<Note>**Note:** Snowflake will no longer support the username and password authentication mechanism as of November 2025. As a result, this connector will be retired in November 2025 and will no longer function. Please consider using one of the following connection methods instead:</Note>
 
-* [Cloud Amplifier](https://domo-support.domo.com/s/article/4402322966807?language=en_US "Cloud Amplifier")
-* [Snowflake Key Pair Unload v2](https://domo.lightning.force.com/s/article/1500000555201 "Snowflake Key Pair Unload v2")
-* [Snowflake OAuth Unload v2](https://domo.lightning.force.com/s/article/000005841 "Snowflake OAuth Unload v2")
+- [Cloud Integrations](/s/article/4402322966807)
+- [Snowflake Key Pair Unload v2](https://domo.lightning.force.com/s/article/1500000555201)
+- [Snowflake OAuth Unload v2](https://domo.lightning.force.com/s/article/000005841)
 
 ## Snowflake Connector Migration Walkthrough
 
-As Snowflake is discontinuing username and password authentication, Snowflake connectors using this authentication method will be migrated to the OAuth version. This section helps users walk through the complete process of migrating their existing username and password Snowflake datasets to utilise the OAuth authentication version. Pls refer to the migration video (https://youtu.be/rlG_uNZwl_U ) to make the transition smoother and minimise disruptions.
+As Snowflake is discontinuing username and password authentication, Snowflake connectors using this authentication method will be migrated to the OAuth version. This section helps users walk through the complete process of migrating their existing username and password Snowflake datasets to utilise the OAuth authentication version. Pls refer to the migration video ([https://youtu.be/rlG\_uNZwl\_U](https://youtu.be/rlG_uNZwl_U)) to make the transition smoother and minimise disruptions.
 
 ## Intro
 
-Snowflake is a data warehouse built for the cloud for all your data and users. Use Domo's Snowflake Unload V2 Connector to unload data from your Snowflake into Amazon S3. Unloaded files are imported from Amazon S3 into Domo. Choose this connector instead of the Snowflake connector if you are executing very large queries. To learn more about the Snowflake API, visit their page ([https://docs.snowflake.net/manuals](https://docs.snowflake.net/manuals "https://docs.snowflake.net/manuals") ).
+Snowflake is a data warehouse built for the cloud for all your data and users. Use Domo's Snowflake Unload V2 Connector to unload data from your Snowflake into Amazon S3. Unloaded files are imported from Amazon S3 into Domo. Choose this connector instead of the Snowflake connector if you are executing very large queries. To learn more about the Snowflake API, visit their page ([https://docs.snowflake.net/manuals](https://docs.snowflake.net/manuals)).
 
-This Connector is the same as the standard [Snowflake Unload](/s/article/360043436313 "Snowflake Unload Connector") connector, except that it allows you to enter your own custom query in addition to using the auto-generate option, whereas the standard version of the connector only includes the auto-generate option.
+This Connector is the same as the standard [Snowflake Unload](/s/article/360043436313) connector, except that it allows you to enter your own custom query in addition to using the auto-generate option, whereas the standard version of the connector only includes the auto-generate option.
 
 You connect to your Snowflake account in the Data Center. This topic discusses the fields and menus that are specific to the Snowflake Unload V2 connector user interface. General information for adding DataSets, setting update schedules, and editing DataSet information is discussed in [Adding a DataSet Using a Data Connector](/s/article/360042926274).
 
@@ -24,47 +24,223 @@ You connect to your Snowflake account in the Data Center. This topic discusses t
 
 To connect to your Snowflake account and create a DataSet, you must have the following:
 
-* The full name of your account (provided by Snowflake). This is the portion of your Snowflake URL immediately following `https://`.
+- The full name of your account (provided by Snowflake). This is the portion of your Snowflake URL immediately following https://.
 
   Note that your full account name may include additional segments that identify the region and cloud platform where your account is hosted. The following table provides account name examples by cloud platform/region. For each row, it assumes your account name is "xy12345."
 
-  <Frame><img alt="snowflake_account_names.png" src="/images/kb/ka05w00000123Kt-00N5w00000Ri7BU-0EM5w000005vO5S.png"/></Frame>
-* The username and password used to connect to your Snowflake host.
-* Your AWS access key. This is available in the AWS Console in the **Security Credentials** section (unless you are using IAM, in which case it is under **Users**).
-* Your AWS secret key. This was provided when you created your access key. You can generate a new key in the AWS Console.
-* The name of the AWS S3 bucket in which Snowflake data will be unloaded.
-* The following Permissions are required:
+  <Frame>![snowflake_account_names.png](/images/kb/0EM5w000005vO5u.png)</Frame>
+- The username and password used to connect to your Snowflake host.
+- Your AWS access key. This is available in the AWS Console in the **Security Credentials** section (unless you are using IAM, in which case it is under **Users**).
+- Your AWS secret key. This was provided when you created your access key. You can generate a new key in the AWS Console.
+- The name of the AWS S3 bucket in which Snowflake data will be unloaded.
+- The following Permissions are required:
 
-  <table border="1"><tbody><tr><td colspan="1" rowspan="1"><b> Permission Field </b></td><td colspan="1" rowspan="1"><b> Description </b></td></tr><tr><td colspan="1" rowspan="1"><p> Create Stage </p></td><td colspan="1" rowspan="1"> Creates a new stage to unload data from tables into files. </td></tr><tr><td colspan="1" rowspan="1"> Copy into &lt;location&gt; </td><td colspan="1" rowspan="1"> Command to unload all the rows from a table into one or more files into the stage. </td></tr><tr><td colspan="1" rowspan="1"> Create file format </td><td colspan="1" rowspan="1"> Create file format. </td></tr><tr><td colspan="1" rowspan="1"> LIST </td><td colspan="1" rowspan="1"> Returns a list of files that have been staged. </td></tr><tr><td colspan="1" rowspan="1"> GET </td><td colspan="1" rowspan="1"> Downloads data files from the above created Snowflake stage. </td></tr><tr><td colspan="1" rowspan="1"> REMOVE </td><td colspan="1" rowspan="1"> Removes files that have been staged - unloaded from a table. </td></tr></tbody></table>
+<table border="1" cellpadding="1" cellspacing="1">
+  <thead>
+    <tr>
+      <th colspan="1" rowspan="1"><p>Permission Field</p></th>
+      <th colspan="1" rowspan="1"><p>Description</p></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td colspan="1" rowspan="1"><p>Create Stage</p></td>
+      <td colspan="1" rowspan="1"><p>Creates a new stage to unload data from tables into files.</p></td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1"><p>Copy into &lt;location&gt;</p></td>
+      <td colspan="1" rowspan="1"><p>Command to unload all the rows from a table into one or more files into the stage.</p></td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1"><p>Create file format</p></td>
+      <td colspan="1" rowspan="1"><p>Create file format.</p></td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1"><p>LIST</p></td>
+      <td colspan="1" rowspan="1"><p>Returns a list of files that have been staged.</p></td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1"><p>GET</p></td>
+      <td colspan="1" rowspan="1"><p>Downloads data files from the above created Snowflake stage.</p></td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1"><p>REMOVE</p></td>
+      <td colspan="1" rowspan="1"><p>Removes files that have been staged - unloaded from a table.</p></td>
+    </tr>
+  </tbody>
+</table>
 
 ## Connecting to your Snowflake account
 
-This section enumerates the options in the **Credentials** and **Details** panes in the Snowflake Unload V2 Connector page. The components of the other panes in this page, **Scheduling** and **Name & Describe Your DataSet**, are universal across most connector types and are discussed in greater length in [Adding a DataSet Using a Data Connector](/s/article/360042926274 "Adding a DataSet Using a Data Connector").
+This section enumerates the options in the **Credentials** and **Details** panes in the Snowflake Unload V2 Connector page. The components of the other panes in this page, **Scheduling** and **Name & Describe Your DataSet**, are universal across most connector types and are discussed in greater length in [Adding a DataSet Using a Data Connector](/s/article/360042926274).
 
 ### Credentials pane
 
 This pane contains fields for entering credentials to connect to your Snowflake account. The following table describes what is needed for each field:
 
-<table border="1" cellpadding="1" cellspacing="1" data-aura-rendered-by="33:203;a"><thead><tr><th colspan="1" rowspan="1"><p><span class="s1"> Field </span></p></th><th colspan="1" rowspan="1"><p><span class="s1"> Description </span></p></th></tr></thead><tbody><tr><td colspan="1" rowspan="1"><p> Account Name </p></td><td colspan="1" rowspan="1"><p> Enter your Snowflake account name. For more information, see "Prerequisites." </p></td></tr><tr><td colspan="1" rowspan="1"><p> Username </p></td><td colspan="1" rowspan="1"><p> Enter the username you use to connect to your Snowflake host. </p></td></tr><tr><td colspan="1" rowspan="1"><p> Password </p></td><td colspan="1" rowspan="1"><p> Enter the password you use to connect to your Snowflake host. </p></td></tr><tr><td colspan="1" rowspan="1"><p> Access Key </p></td><td colspan="1" rowspan="1"><p> Enter your AWS access key. For information about obtaining an access key, see "Prerequisites," above. </p></td></tr><tr><td colspan="1" rowspan="1"><p> Secret Key </p></td><td colspan="1" rowspan="1"><p> Enter your AWS secret key. For information about obtaining a secret key, see "Prerequisites," above. </p></td></tr><tr><td colspan="1" rowspan="1"><p> Bucket </p></td><td colspan="1" rowspan="1"><p> Enter the name of the AWS S3 bucket. </p></td></tr><tr><td colspan="1" rowspan="1"><p> Region </p></td><td colspan="1" rowspan="1"><p> Select your S3 bucket region . </p></td></tr><tr><td colspan="1" rowspan="1"><p> Role </p></td><td colspan="1" rowspan="1"><p> Enter your role. </p></td></tr></tbody></table>
+<table border="1" cellpadding="1" cellspacing="1">
+  <thead>
+    <tr>
+      <th colspan="1" rowspan="1"><p>Field</p></th>
+      <th colspan="1" rowspan="1"><p>Description</p></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td colspan="1" rowspan="1"><p>Account Name</p></td>
+      <td colspan="1" rowspan="1"><p>Enter your Snowflake account name. For more information, see "Prerequisites."</p></td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1"><p>Username</p></td>
+      <td colspan="1" rowspan="1"><p>Enter the username you use to connect to your Snowflake host.</p></td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1"><p>Password</p></td>
+      <td colspan="1" rowspan="1"><p>Enter the password you use to connect to your Snowflake host.</p></td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1"><p>Access Key</p></td>
+      <td colspan="1" rowspan="1"><p>Enter your AWS access key. For information about obtaining an access key, see "Prerequisites," above.</p></td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1"><p>Secret Key</p></td>
+      <td colspan="1" rowspan="1"><p>Enter your AWS secret key. For information about obtaining a secret key, see "Prerequisites," above.</p></td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1"><p>Bucket</p></td>
+      <td colspan="1" rowspan="1"><p>Enter the name of the AWS S3 bucket.</p></td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1"><p>Region</p></td>
+      <td colspan="1" rowspan="1"><p>Select your S3 bucket region.</p></td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1"><p>Role</p></td>
+      <td colspan="1" rowspan="1"><p>Enter your role.</p></td>
+    </tr>
+  </tbody>
+</table>
 
-Once you have entered valid Snowflake credentials, you can use the same account any time you go to create a new Snowflake Unload V2 DataSet. You can manage connector accounts in the **Accounts** tab in the Data Center. For more information about this tab, see [Managing User Accounts for Connectors](/s/article/360042926054 "Managing User Accounts for Connectors").
+Once you have entered valid Snowflake credentials, you can use the same account any time you go to create a new Snowflake Unload V2 DataSet. You can manage connector accounts in the **Accounts** tab in the Data Center. For more information about this tab, see [Managing User Accounts for Connectors](/s/article/360042926054).
 
 ### Details Pane
 
 In this pane you create an SQL query to pull data from your database. You can choose a specific database table and partition column. You can also specify the number of past days you want to get data for.
 
-<table border="1" cellpadding="1" cellspacing="1" data-aura-rendered-by="33:203;a"><thead><tr><th colspan="1" rowspan="1"><p> Menu </p></th><th colspan="1" rowspan="1"><p> Description </p></th></tr></thead><tbody><tr><td colspan="1" rowspan="1"> How would you like to import data into Domo? </td><td colspan="1" rowspan="1"><p> Select whether you want to import your data by using the standard update method (replace/append), by using partition, or upsert mode. </p></td></tr><tr><td colspan="1" rowspan="1"> How would you like to build your Query? </td><td colspan="1" rowspan="1"><table border="1"><thead><tr><td colspan="1" rowspan="1"> Query Type </td><td colspan="1" rowspan="1"> Description </td></tr></thead><tbody><tr><td colspan="1" rowspan="1"> Custom Query </td><td colspan="1" rowspan="1"> Enter the SQL query to execute. </td></tr><tr><td colspan="1" rowspan="1"> Query Builder </td><td colspan="1" rowspan="1"> Select a table and fields to autogenerate your query. </td></tr></tbody></table></td></tr><tr><td colspan="1" rowspan="1"> Warehouses </td><td colspan="1" rowspan="1"> Select the warehouse containing the data you want to retrieve. The list populates all warehouses you have access to based on your credentials. </td></tr><tr><td colspan="1" rowspan="1"> Databases </td><td colspan="1" rowspan="1"> Select the database containing the data you want to retrieve. The list populates all databases you have access to based on your credentials. </td></tr><tr><td colspan="1" rowspan="1"> Schemas </td><td colspan="1" rowspan="1"> Select the database schema containing the data you want to retrieve. The list populates all schemas you have access to based on your credentials. </td></tr><tr><td colspan="1" rowspan="1"> Tables </td><td colspan="1" rowspan="1"> Select the database table you want to retrieve. The list populates all tables you have access to based on your credentials. If you do not select a database table, the connector retrieves your entire database schema. </td></tr><tr><td colspan="1" rowspan="1"> Table Column Name </td><td colspan="1" rowspan="1"> Select the partition column name. </td></tr><tr><td colspan="1" rowspan="1"> Table Query Helper </td><td colspan="1" rowspan="1"><p> A query is generated based on the selected fields. Copy and paste this text into the QUERY field. You may edit this query, if desired. </p></td></tr><tr><td colspan="1" rowspan="1"><p> Query </p></td><td colspan="1" rowspan="1"><p> Enter the SQL query you want to execute. </p></td></tr><tr><td colspan="1" rowspan="1"> Partition Criteria </td><td colspan="1" rowspan="1"> Select whether you want to partition your data using the date keys, non-date keys, or meta query. </td></tr><tr><td colspan="1" rowspan="1"> Select Partition Date Key Column Name </td><td colspan="1" rowspan="1"> Select the partition column name. Only date fields will be shown in this discovery. </td></tr><tr><td colspan="1" rowspan="1"> Past Days </td><td colspan="1" rowspan="1"> Enter the number of past days that you want to get data for. Value can be X, where X is a positive integer. Example: 30. </td></tr><tr><td colspan="1" rowspan="1"> Date Format </td><td colspan="1" rowspan="1"> Please select/enter proper date format according to the date format present in partition column. By default <b> yyyy-MM-dd </b> will be used. </td></tr><tr><td colspan="1" rowspan="1"> Custom Date Format </td><td colspan="1" rowspan="1"> Enter the custom date format. </td></tr><tr><td colspan="1" rowspan="1"> Select Partition Non Date Key Column Name </td><td colspan="1" rowspan="1"> Select a non-date key column name to partition the data. All fields excluding Date fields will appear in this dropdown. </td></tr><tr><td colspan="1" rowspan="1"> Enter Partition Non Date Key Column Name </td><td colspan="1" rowspan="1"> Enter a non-date key column name to partition the data. </td></tr><tr><td colspan="1" rowspan="1"> Partition Query to determine partition tags </td><td colspan="1" rowspan="1"><p> Enter the partition meta query to determine the distinct partition tags (or keys). The column containing the <b> Date </b> data is your partition column. </p><p> Example: SELECT DISTINCT (DATE_COLUMN_NAME) FROM TABLENAME </p></td></tr><tr><td colspan="1" rowspan="1"> Upsert Key Column(s) <br/></td><td colspan="1" rowspan="1"><p> Enter upsert key column name or a comma separated list of upsert key column names. <b> Required only when Update method is Merge </b>. </p></td></tr></tbody></table>
+<table border="1" cellpadding="1" cellspacing="1">
+  <thead>
+    <tr>
+      <th colspan="1" rowspan="1"><p>Menu</p></th>
+      <th colspan="1" rowspan="1"><p>Description</p></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td colspan="1" rowspan="1"><p>How would you like to import data into Domo?</p></td>
+      <td colspan="1" rowspan="1"><p>Select whether you want to import your data by using the standard update method (replace/append), by using partition, or upsert mode.</p></td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1"><p>How would you like to build your Query?</p></td>
+      <td colspan="1" rowspan="1">
+        <table border="1" cellpadding="1" cellspacing="1">
+          <thead>
+            <tr>
+              <th colspan="1" rowspan="1"><p>Query Type</p></th>
+              <th colspan="1" rowspan="1"><p>Description</p></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td colspan="1" rowspan="1"><p>Custom Query</p></td>
+              <td colspan="1" rowspan="1"><p>Enter the SQL query to execute.</p></td>
+            </tr>
+            <tr>
+              <td colspan="1" rowspan="1"><p>Query Builder</p></td>
+              <td colspan="1" rowspan="1"><p>Select a table and fields to autogenerate your query.</p></td>
+            </tr>
+          </tbody>
+        </table>
+      </td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1"><p>Warehouses</p></td>
+      <td colspan="1" rowspan="1"><p>Select the warehouse containing the data you want to retrieve. The list populates all warehouses you have access to based on your credentials.</p></td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1"><p>Databases</p></td>
+      <td colspan="1" rowspan="1"><p>Select the database containing the data you want to retrieve. The list populates all databases you have access to based on your credentials.</p></td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1"><p>Schemas</p></td>
+      <td colspan="1" rowspan="1"><p>Select the database schema containing the data you want to retrieve. The list populates all schemas you have access to based on your credentials.</p></td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1"><p>Tables</p></td>
+      <td colspan="1" rowspan="1"><p>Select the database table you want to retrieve. The list populates all tables you have access to based on your credentials. If you do not select a database table, the connector retrieves your entire database schema.</p></td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1"><p>Table Column Name</p></td>
+      <td colspan="1" rowspan="1"><p>Select the partition column name.</p></td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1"><p>Table Query Helper</p></td>
+      <td colspan="1" rowspan="1"><p>A query is generated based on the selected fields. Copy and paste this text into the QUERY field. You may edit this query, if desired.</p></td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1"><p>Query</p></td>
+      <td colspan="1" rowspan="1"><p>Enter the SQL query you want to execute.</p></td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1"><p>Partition Criteria</p></td>
+      <td colspan="1" rowspan="1"><p>Select whether you want to partition your data using the date keys, non-date keys, or meta query.</p></td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1"><p>Select Partition Date Key Column Name</p></td>
+      <td colspan="1" rowspan="1"><p>Select the partition column name. Only date fields will be shown in this discovery.</p></td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1"><p>Past Days</p></td>
+      <td colspan="1" rowspan="1"><p>Enter the number of past days that you want to get data for. Value can be X, where X is a positive integer. Example: 30.</p></td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1"><p>Date Format</p></td>
+      <td colspan="1" rowspan="1"><p>Please select/enter proper date format according to the date format present in partition column. By default <b>yyyy-MM-dd</b> will be used.</p></td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1"><p>Custom Date Format</p></td>
+      <td colspan="1" rowspan="1"><p>Enter the custom date format.</p></td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1"><p>Select Partition Non Date Key Column Name</p></td>
+      <td colspan="1" rowspan="1"><p>Select a non-date key column name to partition the data. All fields excluding Date fields will appear in this dropdown.</p></td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1"><p>Enter Partition Non Date Key Column Name</p></td>
+      <td colspan="1" rowspan="1"><p>Enter a non-date key column name to partition the data.</p></td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1"><p>Partition Query to determine partition tags</p></td>
+      <td colspan="1" rowspan="1"><p>Enter the partition meta query to determine the distinct partition tags (or keys). The column containing the <b>Date</b> data is your partition column.</p><p>Example: SELECT DISTINCT (DATE_COLUMN_NAME) FROM TABLENAME</p></td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1"><p>Upsert Key Column(s)</p></td>
+      <td colspan="1" rowspan="1"><p>Enter upsert key column name or a comma separated list of upsert key column names. <b>Required only when Update method is Merge</b>.</p></td>
+    </tr>
+  </tbody>
+</table>
 
 ### Selecting the Update Mode
 
 Once you decide how you want to import your data into Domo (by using the standard update method (replace/append), by using partition, or upsert mode), you need to select the relevant update mode in the **Scheduling section** in the Connector.
 
-* If you select 'Partition' in the Details section, then you need to select the 'Append' update mode in the Scheduling section.
+- If you select 'Partition' in the Details section, then you need to select the 'Append' update mode in the Scheduling section.
 
-<Frame><img alt="Partition-Append.png" src="/images/kb/ka0Vq000000BWXd-00N5w00000Ri7BU-0EM5w000005vO8o.png"/></Frame>
-* If you select 'Upsert' in the Details section, then you need to select 'Merge' update mode in the Scheduling section.
+<Frame>![Partition-Append.png](/images/kb/0EM5w000005vO63.png)</Frame>
 
-<Frame><img alt="Upsert-Merge.png" src="/images/kb/ka0Vq000000BWXd-00N5w00000Ri7BU-0EM5w000005vO8n.png"/></Frame>
+- If you select 'Upsert' in the Details section, then you need to select 'Merge' update mode in the Scheduling section.
+
+<Frame>![Upsert-Merge.png](/images/kb/0EM5w000005vO5r.png)</Frame>
+
 ### Other Panes
 
 For information about the remaining sections of the connector interface, including how to configure scheduling, retry, and update options, see [Adding a DataSet Using a Data Connector](/s/article/360042926274).
@@ -72,6 +248,7 @@ For information about the remaining sections of the connector interface, includi
 ## FAQs
 
 <AccordionGroup>
+
 <Accordion title="What is the difference between this connector and the standard Snowflake Unload connector?">
 
 This connector allows you to enter your own custom query in addition to using the auto-generate option, whereas the standard version of the connector only includes the auto-generate option. Additionally, with this Connector, you can import your data by using the standard update mode (replace/append), by using partition, or upsert mode.
@@ -98,6 +275,8 @@ Make sure that all the words, table names, and field names are correctly spelled
 
 <Accordion title="Why can't I connect to my Snowflake database? Do I need to whitelist any IP addresses?">
 
-Before you can connect to a Snowflake database, you must also whitelist a number of IP addresses on your database server on the port you want to connect to. For the full list of IP addresses, see [Whitelisting IP Addresses in Domo](/s/article/360043439173 "Whitelisting IP Addresses in Domo").
+Before you can connect to a Snowflake database, you must also whitelist a number of IP addresses on your database server on the port you want to connect to. For the full list of IP addresses, see [Whitelisting IP Addresses in Domo](/s/article/360043439173).
 
-</Accordion> </AccordionGroup>
+</Accordion>
+
+</AccordionGroup>

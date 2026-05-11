@@ -1,0 +1,313 @@
+---
+title: "Adobe Analytics 1.4 OAuthコネクター"
+---
+
+## はじめに
+
+Adobe Analyticsを使うと、顧客とのインタラクションを実用的なインサイトに変え、ビジネスの全体像を把握できるようになります。DomoのAdobe Analytics Advancedコネクターを使うと、あらかじめ用意されたレポートやカスタマイズされたレポート経由で、またはAdobe Analytics APIにクエリを送信することでデータを取得できます。その後、メトリクスをCRM、POS、ほかのシステムからのデータと組み合わせ、より正確な情報にもとづいてよりスピーディに、ビジネスの意思決定ができるようになります。Adobe Analytics APIの詳細については、ウェブサイト（[https://adobedocs.github.io/analytics-1.4-apis/#/](https://adobedocs.github.io/analytics-1.4-apis/#/)）を参照してください。
+
+Adobe Analytics APIには、Data Centerから接続します。このトピックでは、Adobe Analytics Advancedコネクターのユーザーインターフェースに固有のフィールドとメニューについて説明します。DataSetの追加や更新スケジュールの設定、DataSet情報の編集に関する一般的な情報は、「[コネクターを使用してDataSetを追加する](/ja/s/article/360042926274)」を参照してください。
+
+|                                    |                         |
+| ---------------------------------- | ----------------------- |
+| **主な使用事例**                         | マーケティング、ウェブアナリティクス      |
+| **主なメトリクス**                        | アクセス数、ページ閲覧数、ユニーク訪問者数など |
+| **社内における主な権限**                     | アナリスト、エグゼクティブ           |
+| **平均導入時間**                         | 60時間以内                  |
+| **使いやすさ（1から10のスケールで、1が「最も使いやすい」）** | 8                       |
+
+## APIの制限
+
+- 1つのレポートにつき選択できるレポートスイートは1つのみです。
+- Adobeでは、各リクエストにつき要素が4つまで認められています。
+- 最大30のメトリクスが選択できます。
+- セグメントは相互に排他的です。
+- デフォルトでは、APIは最初に選択されたメトリクスに従い、要素の上位10位の結果のみ返します。
+
+## 必要条件
+
+Adobe Analyticsに接続してDataSetを作成するには、Adobe Analyticsアカウントに関連付けられたクライアントIDとクライアントシークレットが必要です。
+
+クライアントIDとクライアントシークレットの取得方法の詳細については、[Adobe Oauth Connection](https://www.adobe.io/authentication/auth-methods.html#!AdobeDocs/adobeio-auth/master/AuthenticationOverview/OAuthIntegration.md)のドキュメントを参照してください。
+
+### Adobe Developer Consoleで新しいOAuthプロジェクトを作成する
+
+Google Developers Consoleで新しいOAuthプロジェクトを作成するには、次の手順を実行します。
+
+1. [https://console.adobe.io/projects](https://console.adobe.io/projects)にログインします。
+
+2. **［Create new project］**ボタンをクリックします。
+
+<Frame>![New_Project_button.png](/images/kb/ja/0EM5w000005vO1G.png)</Frame>
+
+3. **［Add API］**をクリックしてAdobeサービスを開始します。
+
+<Frame>![Add_API.png](/images/kb/ja/0EM5w000005vO1J.png)</Frame>
+
+4. 利用可能なAPIは**［Add an API］**ウィンドウにリストされます。**［Adobe Analytics］**を選択します。
+
+<Frame>![Add_an_API-Adobe_Analytics.png](/images/kb/ja/0EM5w000005vO1I.png)</Frame>
+
+5. 認証タイプを選択します。ここで**［OAuth］**を選択します。
+
+<Frame>![OAuth-service_account_OAuth.png](/images/kb/ja/0EM5w000005vO1H.png)</Frame>
+
+6. **［Web］**プラットフォームを選択してAPIを設定します。
+
+**［Default redirect URI］**に「**https://oauth.domo.com/api/data/v2/oauth/providers/adobe-analytics-oauth/exchange**  
+」と入力し、**［Redirect URI pattern］**に「**https://oauth/.domo/.com/api/data/v2/oauth/providers/adobe-analytics-oauth/exchange**」と入力します。
+
+7. **［Save configured API］**をクリックします。
+
+## Adobe Analytics OAuthアカウントに接続する
+
+このセクションでは、Adobe Analytics OAuthコネクターページの**［認証情報］**および**［詳細］**ペインのオプションについて説明します。このページのほかのペインの項目である**［スケジュール設定］**や**［DataSetに名前を付け、説明を入力］**に関しては、ほとんどのタイプのコネクターで共通しています。詳細については、「[コネクターを使用してDataSetを追加する](/ja/s/article/360042926274)」を参照してください。
+
+### ［認証情報］ペイン
+
+このペインには、Adobe Analytics APIに接続するための認証情報の入力フィールドが含まれています。下表では、各フィールドに必要なものを説明しています。
+
+| フィールド         | 説明                                                |
+| ------------- | ------------------------------------------------- |
+| Client ID     | Adobe Analyticsアカウントに関連付けられているクライアントIDを入力します。     |
+| Client Secret | Adobe Analyticsアカウントに関連付けられているクライアントシークレットを入力します。 |
+
+有効な認証情報を一度入力しておくと、いつでも同じアカウントを使用して新しいAdobe Analytics 1.4 OAuth DataSetを作成することができます。コネクターのアカウントは、Data Centerの**［アカウント］**タブで管理することができます。このタブの詳細については、「[コネクターアカウントを管理する](/ja/s/article/360042926054)」を参照してください。
+
+### ［詳細］ペイン
+
+このペインには、2つのメインメニューである**［Report Suite］**と**［Report Type］**のほか、選択したレポートタイプに応じて表示または非表示になるその他の様々なメニューがあります。
+
+#### メインメニュー
+
+| メニュー         | 説明                                                                                                                                                                                                                                                                                                                    |     |     |     |     |     |     |                   |                                        |     |                       |                                     |     |                  |                                                                                                                                                                                  |     |
+| ------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --- | --- | --- | --- | --- | --- | ----------------- | -------------------------------------- | --- | --------------------- | ----------------------------------- | --- | ---------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --- |
+| Company      | Adobe Analyticsで設定されている会社名を入力します。ここで入力した会社名が、Company.GetEndpointメソッドのパラメーターとして使用されます（[https://github.com/AdobeDocs/analytics-1.4-apis/blob/master/docs/admin-api/methods/company/r\_GetEndpoint.md](https://github.com/AdobeDocs/analytics-1.4-apis/blob/master/docs/admin-api/methods/company/r_GetEndpoint.md)を参照）。 |     |     |     |     |     |     |                   |                                        |     |                       |                                     |     |                  |                                                                                                                                                                                  |     |
+| Report Suite | データを取得するAdobe Analyticsレポートスイートを選択します。                                                                                                                                                                                                                                                                                |     |     |     |     |     |     |                   |                                        |     |                       |                                     |     |                  |                                                                                                                                                                                  |     |
+| Report Type  | レポートタイプを選択します。レポートタイプは、DataSetの設定に必要な入力を決定します。  レポートタイプは次のとおりです。                                                                                                                                                                                                                                                      |     |     |     | --- | --- |     | Easy - Predefined | 数多くある定義済みのAdobe Analyticsレポートから選択できます。 |     | Intermediate - Custom | レポートの要素、メトリクス、セグメント、日付と時間情報を指定できます。 |     | Advanced - Query | Adobe Analytics Web Service APIエクスプローラークエリを使ってデータを取得します。クエリの詳細については、[https://adobedocs.github.io/analytics-1.4-apis/](https://adobedocs.github.io/analytics-1.4-apis/)を参照してください。 |     |
+
+#### 「Easy - Predefined」レポートタイプのオプション
+
+| オプション             | 説明                                                                                  |     |     |     |     |     |     |              |                                                              |     |                  |                                            |     |                             |                                        |     |                            |                                             |     |                     |                                                   |     |                |                                                                 |     |                           |                                     |     |                       |                                                  |     |                            |                                          |     |                 |                                 |     |                         |                                |     |                      |                                        |     |                      |                                                |     |                            |                                    |     |                    |                                                    |     |              |                                                  |     |                        |                                     |     |                    |                                                  |     |                         |                                    |     |
+| ----------------- | ----------------------------------------------------------------------------------- | --- | --- | --- | --- | --- | --- | ------------ | ------------------------------------------------------------ | --- | ---------------- | ------------------------------------------ | --- | --------------------------- | -------------------------------------- | --- | -------------------------- | ------------------------------------------- | --- | ------------------- | ------------------------------------------------- | --- | -------------- | --------------------------------------------------------------- | --- | ------------------------- | ----------------------------------- | --- | --------------------- | ------------------------------------------------ | --- | -------------------------- | ---------------------------------------- | --- | --------------- | ------------------------------- | --- | ----------------------- | ------------------------------ | --- | -------------------- | -------------------------------------- | --- | -------------------- | ---------------------------------------------- | --- | -------------------------- | ---------------------------------- | --- | ------------------ | -------------------------------------------------- | --- | ------------ | ------------------------------------------------ | --- | ---------------------- | ----------------------------------- | --- | ------------------ | ------------------------------------------------ | --- | ----------------------- | ---------------------------------- | --- |
+| Predefined Report | 実行するレポートを選択します。レポートタイプのリストについては、次のセクションを参照してください。                                   |     |     |     |     |     |     |              |                                                              |     |                  |                                            |     |                             |                                        |     |                            |                                             |     |                     |                                                   |     |                |                                                                 |     |                           |                                     |     |                       |                                                  |     |                            |                                          |     |                 |                                 |     |                         |                                |     |                      |                                        |     |                      |                                                |     |                            |                                    |     |                    |                                                    |     |              |                                                  |     |                        |                                     |     |                    |                                                  |     |                         |                                    |     |
+| Backfill          | 最初にレポートを実行するときに遡るバックフィル日数を選択します。                                                    |     |     |     |     |     |     |              |                                                              |     |                  |                                            |     |                             |                                        |     |                            |                                             |     |                     |                                                   |     |                |                                                                 |     |                           |                                     |     |                       |                                                  |     |                            |                                          |     |                 |                                 |     |                         |                                |     |                      |                                        |     |                      |                                                |     |                            |                                    |     |                    |                                                    |     |              |                                                  |     |                        |                                     |     |                    |                                                  |     |                         |                                    |     |
+| Report            | 定義済みレポートを選択します。これらのレポートは**［Report Type］**で**［Easy - Predefined］**を選択した場合*のみ*利用可能です。 |     |     |     | --- | --- |     | Base Metrics | ページ閲覧数、ウェブサイトでの平均滞在時間、月別、週別、日別のユニーク訪問者数や新規訪問者などに関するデータを返します。 |     | Commerce Metrics | アクセス数、注文、チェックアウト、収益、新規、リピート顧客に関するデータを返します。 |     | Existing Customer Campaigns | アクセス数、注文、収益に関するデータを、既存の顧客キャンペーン別に返します。 |     | Existing Customer Products | 既存の顧客のアクセス数、注文、チェックアウト、収益に関するデータを、製品別に返します。 |     | Mobile Device Types | モバイルの閲覧数、アクセス数、毎日のユニーク訪問者数に関するデータを、デバイスタイプ別に返します。 |     | Mobile Metrics | デバイスタイプ、OS、閲覧数、アクセス数、毎日のユニーク訪問者数など、モバイルデバイスの利用状況に関するメトリクスを返します。 |     | Natural Search Conversion | アクセス数、注文、収益に関するデータを自然検索キーワード別に返します。 |     | Natural Search Visits | アクセス数、ページ閲覧数、毎日のユニーク訪問者数に関するデータを自然検索キーワード別に返します。 |     | New Visitor Best Campaigns | アクセス数、注文、収益、単位に関するデータを新規訪問者キャンペーン別に返します。 |     | New Visitor Geo | アクセス数、注文、収益、単位に関するデータを地域別に返します。 |     | New Visitor Geo Country | アクセス数、注文、収益、単位に関するデータを国別に返します。 |     | New Visitor Keywords | アクセス数、注文、収益、単位に関するデータを有料検索キーワード別に返します。 |     | New Visitor Products | 新規顧客のアクセス数、注文、チェックアウト、収益、単位などに関するデータを製品別に返します。 |     | New Visitor Traffic Source | アクセス数、注文、収益、単位に関するデータをリファラー別に返します。 |     | Page Effectiveness | ページアクセス数、エントリーとエグジット、バウンス数、バウンス率に関するデータをページ別に返します。 |     | Page Metrics | ページ閲覧数、アクセス数、毎日のユニーク訪問者数、エグジットに関するデータをページ別に返します。 |     | Paid Search Conversion | アクセス数、注文、収益に関するデータを有料検索キーワード別に返します。 |     | Paid Search Visits | ページ閲覧数、毎日のユニーク訪問者数、アクセス数に関するデータを有料検索キーワード別に返します。 |     | Products and Categories | アクセス数、注文、収益に関するデータを製品とカテゴリー別に返します。 |     |
+
+#### 「Intermediate - Custom」レポートタイプのオプション
+
+| オプション                          | 説明                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| ------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Elements                       | 最大で4つの要素名を選択できます。  *要素*はレポートのメトリクスデータを分類する構造です。例えば、ページ閲覧数（メトリクス）をページのアクセスに使用されたブラウザー（要素）別に分類したレポートを作成できます。作成されるレポートには、ブラウザーのタイプ別にページ閲覧数が一覧で表示されます。  デフォルトでは、Adobe Analytics APIは、要素の上位10位までの結果のみを返します。11位以降を確認するには、**［Additional Element Information］**フィールドに追加要素の情報を入力します。  要素の詳細については、[https://adobedocs.github.io/analytics-1.4-apis/](https://adobedocs.github.io/analytics-1.4-apis/)を参照してください。                                                                                                                                            |
+| Additional Element Information | APIエクスプローラーで定義されたJSONフォーマットを使って、追加要素の情報を入力します（[https://adobedocs.github.io/analytics-1.4-apis/](https://adobedocs.github.io/analytics-1.4-apis/)）。  例：  `{"top":50, "selected":[], "classifications":[], "id":"page", "name":"Page"}`  このパラメーターについては、「[［Additional Elements］フィールドについて](/ja/s/article/360042929154#Understanding_The_.22Additional_Elements.22_Field)」というトピックで、後ほど詳細に説明します。                                                                                                                                                      |
+| Segments                       | レポートのセグメント定義を選択します。セグメントはいくつでも必要な数を選択できます。セグメントの詳細については、APIエクスプローラーのドキュメント（[https://adobedocs.github.io/analytics-1.4-apis/](https://adobedocs.github.io/analytics-1.4-apis/)）を参照してください。  **注記：**セグメントはいくつでも選択できますが、選択したセグメントがデータ全体に与える影響を考慮する必要があります。セグメントの選択によって、データのグループ化が変更され、想定外の結果が生じる可能性があります。                                                                                                                                                                                                                                           |
+| Inline Segments                | APIエクスプローラーで定義されたJSONフォーマットを使って、インラインセグメントの情報を入力します（[https://adobedocs.github.io/analytics-1.4-apis/](https://adobedocs.github.io/analytics-1.4-apis/)）。  インラインセグメントを使うと、最初にAdobe Analyticsでセグメントを定義することなく、コネクターにセグメントを作成できます。例えば、データをセグメント（フィルター）して、ホームページとショッピングカートのみ表示するには、以下のJSONスニペットでインラインセグメンテーションウィンドウを設定します。  `{ "id": "page", "selected": ["Home Page", "Shopping Cart"] }`  フィルターにロジックを適用することもできます。  インラインセグメントの詳細については、[https://adobedocs.github.io/analytics-1.4-apis/](https://adobedocs.github.io/analytics-1.4-apis/)を参照してください。 |
+| Metrics                        | レポートには最大30メトリクスを選択できます。Adobe Analyticsのメトリクスの詳細については、ウェブサイト（[https://github.com/AdobeDocs/analytics-1.4-apis/blob/master/docs/reporting-api/metrics.md](https://github.com/AdobeDocs/analytics-1.4-apis/blob/master/docs/reporting-api/metrics.md)）を参照してください。  一部のメトリクスの組み合わせでは、エラーが発生します。Adobeは、メトリクスの組み合わせのブラックリスト（ [https://github.com/AdobeDocs/analytics-1.4-apis/blob/master/docs/reporting-api/combinations.md](https://github.com/AdobeDocs/analytics-1.4-apis/blob/master/docs/reporting-api/combinations.md)）を公開しています。                |
+| Date Granularity               | レポートの日付単位を選択します。これによりデータをどの単位（日、週など）で分割するかが決まります。                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| Duration                       | レポートのデータの対象を、単一の日付にするか一定の期間にするかを指定します。                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| Report Date                    | レポートのデータを、選択した**［Date Granularity］**に従い、特定日付とするか相対日付とするかを選択します。例えば、**［Date Granularity］に［Day］**を選択すると、レポートの日付として**［Today］**を選択できます。この場合、データが更新されるたびに、現在の日付のデータが表示されます。                                                                                                                                                                                                                                                                                                                                                                          |
+| Date Offset                    | 相対日付をオフセットするために使用する過去日数を入力します。期間は、選択した［Date Granularity］にもとづきます。  例えば、**［Date Granularity］に［Day］**、**［Report Date］に［Yesterday］**を選択し、**［Date Offset］**に「2」を入力した場合、レポートは過去3日間（昨日の2日前）のデータを取得します。                                                                                                                                                                                                                                                                                                                                                 |
+| Select Specific Date           | データを取得する日付を選択します。                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| Date From                      | 日付範囲の開始日を、特定日付とするか相対日付とするかを指定します。範囲の最後の日付は、**［Date To］**で選択します。これらのメニューのオプションは、選択した**［Date Granularity］**によって決まります。  例えば、**［Date Granularity］に［Week］**を選択すると、**［Date From］に［Last Week］**、**［Date To］に［This Week］**を選択できます。これで、レポートが更新されるたびに、今週と先週のデータが表示されます。                                                                                                                                                                                                                                                                                   |
+| Date To                        | 日付範囲の最終日を、特定日付とするか相対日付とするかを指定します。日付範囲の最初の日付を、**［Date From］**で選択します。これらのメニューのオプションは、選択した**［Date Granularity］**によって決まります。  例えば、**［Date Granularity］に［Week］**を選択すると、**［Date From］に［Last Week］**、**［Date To］に［This Week］**を選択できます。これで、レポートが更新されるたびに、今週と先週のデータが表示されます。                                                                                                                                                                                                                                                                               |
+| Date From Offset               | 日付範囲内の最初の日のオフセットのために遡る日数を入力します。期間は、選択した**［Date Granularity］**にもとづきます。  例えば、**［Date Granularity］に［Week］**、**［Date From］に［Last Week］**を選択し、**［Date From Offset］**に「2」を入力した場合、日付範囲の最初の日付は、3週間前（先週の2週間前）に設定されます。                                                                                                                                                                                                                                                                                                                                    |
+| Date To Offset                 | 日付範囲内の最後の日のオフセットのために遡る日数を入力します。期間は、選択した**［Date Granularity］**にもとづきます。  例えば、**［Date Granularity］に［Week］**、**［Date To］に［This Week］**を選択し、**［Date To Offset］**に「2」を入力した場合、日付範囲の最後の日付は、2週間前（今週の2週間前）に設定されます。                                                                                                                                                                                                                                                                                                                                        |
+| Select Specific Date From      | 日付範囲の最初の日付を選択します。                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| Select Specific Date To        | 日付範囲の最終日を選択します。                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| Time Zone                      | データの協定世界時（UTC）タイムゾーンを選択します。                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| Include All Time Zones         | すべてのタイムゾーンをレポートに含める場合は、このボックスにチェックを入れます。                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| Backfill                       | 最初にレポートを実行するときに遡るバックフィル日数を、選択した**［Date Granularity］**にもとづき、選択します。                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+
+#### 「Advanced - Query」レポートタイプのオプション
+
+| オプション | 説明                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| ----- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Query | Adobe Analytics Web Service APIエクスプローラークエリを使ってレポートのデータを取得します。クエリの詳細については、[https://adobedocs.github.io/analytics-1.4-apis/](https://adobedocs.github.io/analytics-1.4-apis/)を参照してください。  例：  `{"reportDescription":{ "reportSuiteID":"thankyoudev", "dateFrom":"2014-09-07", "dateTo":"2014-09-07", "dateGranularity":"Day", "elements":[ {"top":50, "selected":[], "classifications":[], "id":"page", "name":"Page"}], "metrics":[ {"decimals":0, "id":"pageviews", "name":"Page Views"}, {"decimals":0, "id":"visits", "name":"Visits"}], "segments":[], "locale":"en_US"}}` |
+
+### その他のペイン
+
+スケジュール設定、再試行、更新に関するオプションなど、コネクターインターフェースのその他のペインに表示されるオプションについては、「[コネクターを使用してDataSetを追加する](/ja/s/article/360042926274)[/ja/s/article/360042926274](/ja/s/article/360042926274)」を参照してください。
+
+## ［Additional Elements］フィールドについて
+
+以下のJSONスニペットには、コネクターの**［Additional Elements］**パラメーターで使用する必要のあるコードがすべて含まれています。*string*と*int*のみ、選択した値に置き換える必要があります。このJSONの使用しないセクションは、削除することもできます。この使用例は、この後のセクションで説明します。
+
+```
+{  
+"id":"string",  
+"classification":"string",  
+"top":"int",  
+"startingWith":"int",  
+"search":{  
+"type":"string",  
+"keywords":[  
+"string"  
+],  
+}  
+}
+```
+
+### Additional Elementsを使用して返す上位結果を増やす
+
+デフォルトでは、Adobe Analytics APIは、選択された要素の上位10位までの結果のみ返します。返す結果を増やすには、**［Additional Elements］**を使います。例えば、上位100位までの結果を返すには、**［Additional Elements］**フィールドに以下を追加します。
+
+`{“top”:100,  
+“id”:”page”}`
+
+「*id*」は対象とする要素のIDです。「top」（上位）の結果の数に上限はありませんが、クエリを使って取得する数が少ないほど、効率は上がります。カンマで区切ると、複数の要素を対象にできます。
+
+`{“top”:100, “id”:”page”}, {“top”:100, “id”:”region”}`
+
+### Additional Elementsを使用して要素のキーワード検索を行う
+
+**［Additional Elements］**に正しくフォーマットされたJSONを入力することによって、要素のキーワード検索ができます。AND、OR、NOT演算子を使って検索ができます。以下の表は、これらの演算子を説明したものです。
+
+| 値   | 説明                                   |
+| --- | ------------------------------------ |
+| AND | 複数の検索語を組み合わせ、すべての検索キーワードを含む結果を返します。  |
+| OR  | 複数の検索語を組み合わせ、いずれかの検索キーワードを含む結果を返します。 |
+| NOT | 選択したキーワードを検索結果から除外します。               |
+
+以下の例では、「help」または「faq」がページ名またはURLに含まれるページを、上位3位まで検索しています。「OR」を「AND」に置き換えると、AND検索もできます。
+
+`{  
+"id": "page",  
+"top": 3,  
+"search": {  
+"type": "OR",  
+"keywords": ["help","faq"]  
+}  
+}`
+
+以下のような特殊文字を使うと、より複雑な検索もできます。
+
+| 特殊文字 | 説明                                                                  |
+| ---- | ------------------------------------------------------------------- |
+| \*   | 「ワイルドカード」特殊文字。キーワードの前または後に追加します（例：page\*.html）。                     |
+| ^    | 「で始まる」特殊文字。キーワードまたは文字列の最初に付け、そのキーワードまたは文字列で始まる結果を検索します（例：^http://）。 |
+| $    | 「で終わる」特殊文字。キーワードまたは文字列の最後に付け、そのキーワードまたは文字列で終わる結果を検索します（例：.html$）。   |
+
+以下がこれらの文字を使った検索の例です。
+
+`{  
+"id": "page",  
+"top": 3,  
+"search": {  
+"type": "OR",  
+"keywords": [“help*","^faq"]  
+}  
+}`
+
+完全一致するキーワードを検索するには、「で始まる」と「で終わる」の特殊文字をキーワードの最初と最後に付けます。
+
+`{  
+"id": "page",  
+"top": 3,  
+"search": {  
+"type": "OR",  
+"keywords": ["^faq$"]  
+}  
+}`
+
+### JSON構文に分類を追加する
+
+上記の高度な関数と一緒にSAINT分類を使用する場合には、以下の例で示すように、JSON構文に分類を追加する必要があります。  
+  
+`{  
+ "id": “page",  
+ “classification”:”region”,  
+ "top": 3  
+ }`
+
+## トラブルシューティング
+
+### 固有のメトリクス
+
+Adobe Analyticsコネクターで最もよく発生する問題の1つとして、ユニーク訪問者数やユニークページ閲覧数など、固有のメトリクスに関連するものがあります。固有のメトリクスは加算式ではないため、表示されるときと同じ粒度でコネクターから取得する必要があります。異なる粒度でメトリクスを出力すると、数字がまとめられたときに、不正確になります。例えば、サイトの訪問者である訪問者1が、1週間にわたって1日1回サイトにアクセスしたとします。1週間のサイトアクセス者数のレポートを確認すると、日次の粒度でデータを出力した場合には、訪問者1は7回とカウントされます。一方、週次の粒度でデータを出力した場合には、訪問者1は1回のみカウントされ、1週間でサイトにアクセスされた回数ではなく、ページにアクセスした人数が正確にカウントされます。
+
+### APIエクスプローラー
+
+Adobe AnalyticsにあるAPIエクスプローラーを使って、レポートを実行し、その結果を確認できます。これは[https://adobedocs.github.io/analytics-1.4-apis/](https://adobedocs.github.io/analytics-1.4-apis/)から入手できます。
+
+## ヒントとコツ
+
+- 上記で説明した方法で、［Additional Element Information］フィールドを活用するようにします。
+- 分類は要素リストの「->」で識別されます。
+- データソースごとの要素は少ないほど効率が上がります。
+- 1つのデータソース当たりメトリクスを10未満にするようにします。
+- データソースの実行時間が重ならないようにします。
+- Adobe Analytics APIエクスプローラーの使用方法を習得します。
+- Adobe APIのドキュメントを参照します（URLは[ヘルプリンク](/s/article/360043433593)にあります）。
+- セグメントは実行時間を長引かせます。
+- セグメントはいくつでも選択できますが、選択したセグメントがデータ全体に与える影響を考慮する必要があります。セグメントの選択によって、データのグループ化が変更され、想定外の結果が生じる可能性があります。
+- sPropsとeVarsは同時に出力できません。
+
+## よくある質問
+
+<AccordionGroup>
+
+<Accordion title="Q：このコネクターはいつ使用しますか？">
+A：AdobeのAPI V1.4とOAuthによる認証を使用して、顧客のインサイトデータをDomoに接続します。
+</Accordion>
+
+<Accordion title="Q：Adobe Analytics OAuthアカウントが正しく作成されたにもかかわらず、それから約2週間後に「Account Adobe Analytics OAuth Account has been Deactivated」というアラートが表示されました。このアラートが表示されるのはなぜですか？ この場合はどうすればよいですか？">
+A：Adobe Analytics OAuthには、2週間で期限切れになる更新トークンが付属しています（[Adobeのドキュメント](https://www.adobe.io/authentication/auth-methods.html#!AdobeDocs/adobeio-auth/master/OAuth/OAuth.md#exchanging-refresh-tokens)を参照）。このため、2週間が経過するとAdobe OAuthを認証できなくなります。これは、Adobeによって設定された制約事項です。以前のデータベースでは、WSSE認証方式（ユーザー名として会社名を入力し、パスワードを入力する認証方式）が使用されていましたが、AdobeはこのWSSE認証方式を廃止しました。この問題の解決策については、Adobeのサポート窓口にお問い合わせください。
+
+```
+注記：Adobeが推奨するJWTコネクターは、2週間後に認証する必要はありません。
+```
+</Accordion>
+
+<Accordion title="Q：コネクターを設定するには、データサービスの何らかのアカウントが必要ですか？">
+A：管理者アクセスのあるアカウントが望ましいです。少なくとも、対象とするレポートスイートへのアクセスに加えて、APIから要素、メトリクス、セグメントを取得できるアクセスが必要です。
+</Accordion>
+
+<Accordion title="Q：Adobe Analytics OAuth DataSetで断続的にエラーが発生し、「Unable to complete report at this time. Please try again later.」というエラーメッセージが表示されます。どうすればよいですか？">
+A：これは、Adobe側で発生しているエラーです。残念ながら、Domo側から直接的に関与することはできませんが、Adobeと連携して、こういったタイプのエラーの解消に努めています。しかし、こういったエラーの発生を軽減するステップがあります。例えば、コネクターの数、コネクターがデータを取得する頻度を減らしたり、リクエストのサイズを小さくしたりすることができます。また、リクエストが異なる時間に実行されるようスケジュールを組むことも有効です。別の解決策として、コネクターの「再試行」設定を使うという方法もあります。
+</Accordion>
+
+<Accordion title="Q：Adobe Analytics OAuth DataSetで5つ以上の要素を含める必要がある場合はどうすればよいですか？">
+A：AdobeのData Warehouseレポートを実行します。これはDomoコネクターを使用しない代わりに、スケジュールされたメールを利用して、Domoにデータをインポートします。これらのレポートでは、SFTPが使えます。Adobe Analyticsのフロントエンドとは結果が若干異なる可能性があることに注意してください。
+</Accordion>
+
+<Accordion title="Q：レポート作成に長時間かかります。より速くレポートを作成するにはどうすればよいですか？">
+「中級 - カスタム」レポートの場合、選択した要素の数と、［Additional Element Information］テキストボックスのパラメーターが、レポートのパフォーマンスに大きな影響を与えます。最小限必要な要素を選択するようにします。
+
+Adobe Analyticsのキューに多数のレポートがあるために、レポートを完了できない可能性もあります。キューレポートを使って、現在Adobeで処理中のレポートを確認できます。
+
+DataSetがたくさんある場合には、実行時間をずらすようにして、DataSetがAdobeのキューに一斉に登録されないようにします。
+</Accordion>
+
+<Accordion title="Q：Adobe Analytics APIから返されているデータを確認する方法はありますか？">
+A：Adobe AnalyticsのAPIエクスプローラーを使って、レポートを実行し、その結果を確認できます。これは[https://adobedocs.github.io/analytics-1.4-apis/](https://adobedocs.github.io/analytics-1.4-apis/)から入手できます。
+</Accordion>
+
+<Accordion title="Q：取得できる要素の数に限りはありますか？">
+A：AdobeのAPIでは、最大4つの要素まで、要素当たり50,000行まで取得できます。
+</Accordion>
+
+<Accordion title="Q：Adobeからデータを取得するワークフローはどのようなものですか？">
+A：DomoがAdobeデータ取得に使用しているプロセスは以下のとおりです。
+
+1. **レポートをキューに登録する**：DomoがAdobeに対象とするレポートのパラメーターを送信します。[https://github.com/AdobeDocs/analytics-1.4-apis/blob/master/docs/reporting-api/methods/r\_Queue.md](https://github.com/AdobeDocs/analytics-1.4-apis/blob/master/docs/reporting-api/methods/r_Queue.md)
+2. **レポートIDを取得する**：DomoがレポートIDを受け取ります。
+3. **レポート完了まで待機する**：DomoはAdobeのキューを確認し、レポートが完了するまで待機します。[https://github.com/AdobeDocs/analytics-1.4-apis/blob/master/docs/reporting-api/methods/r\_GetQueue.md](https://github.com/AdobeDocs/analytics-1.4-apis/blob/master/docs/reporting-api/methods/r_GetQueue.md)
+4. **レポートを取得する**：レポートがキューに表示されなくなると、Domoはステップ2で受け取ったレポートIDを使って、レポートのデータを要求します。[https://github.com/AdobeDocs/analytics-1.4-apis/blob/master/docs/reporting-api/methods/r\_Get.md](https://github.com/AdobeDocs/analytics-1.4-apis/blob/master/docs/reporting-api/methods/r_Get.md)
+</Accordion>
+
+</AccordionGroup>
+## ヘルプリンク
+
+以下のリンクから、役に立つ情報が掲載されたAdobeのウェブサイトページにアクセスできます。
+
+APIの概要：[https://adobedocs.github.io/analytics-1.4-apis/](https://adobedocs.github.io/analytics-1.4-apis/)
+
+Adobe Analytics APIエクスプローラー：[https://adobedocs.github.io/analytics-1.4-apis/](https://adobedocs.github.io/analytics-1.4-apis/)
+
+インラインセグメンテーション：[https://adobedocs.github.io/analytics-1.4-apis/](https://adobedocs.github.io/analytics-1.4-apis/)
+
+高レベルのスキーマの概要：[https://adobedocs.github.io/analytics-1.4-apis/](https://adobedocs.github.io/analytics-1.4-apis/)
+
+パスレポートとフォールアウトレポート：[https://adobedocs.github.io/analytics-1.4-apis/](https://adobedocs.github.io/analytics-1.4-apis/)
+
+Data Warehouseレポート：[https://blog.adobe.com/en/publish/2008/10/19/omniture-datawarehouse-inside-omniture-sitecatalyst](https://blog.adobe.com/en/publish/2008/10/19/omniture-datawarehouse-inside-omniture-sitecatalyst)

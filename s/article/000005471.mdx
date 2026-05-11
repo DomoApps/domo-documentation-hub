@@ -1,73 +1,91 @@
 ---
-title: "Domo on Azure SQL (Beta)"
+title: "Domo on Azure SQL"
 ---
 
-import {InlineImage} from "/snippets/InlineImage.mdx";
+## Intro
 
-### Intro
+This article explains how to connect Domo's Cloud Integrations to Azure SQL, allowing you to query and visualize Azure SQL data directly in Domo without moving or duplicating data.
 
-Azure SQL users can connect their data to Domo through Cloud Amplifier native integrations. Get started by providing connection parameters, then select the tables you want to see as Domo DataSets.
+---
 
-### Create an Azure SQL Integration
+## Prerequisites
 
-Follow the steps in this article to configure a read-only Azure SQL–Domo integration:
+You must have an account with access to Azure SQL to move forward.
 
-1. In the Domo Data Center, navigate to the <InlineImage src="/images/kb/ka0Vq000000BCNd-00N5w00000Ri7BU-0EMVq000000uR3y.jpg" /> **Data Warehouse**.
+## Create or Manage Your Azure SQL Integrations
 
-2. Select <InlineImage src="/images/kb/ka0Vq000000BCNd-00N5w00000Ri7BU-0EMVq000000uSeO.jpg" /> **Add New Cloud Account**.
+To access the integration management interface, follow these steps:
+
+1. Navigate to **Data Warehouse**.
+2. Select **Connect Data**.
+3. From the list of Cloud Integrations, choose **Azure SQL**.  
+   The **Domo on Azure SQL** page appears.
+4. Select **Connect Azure SQL** to start creating a new integration (see the [integration setup instructions](#create-an-azure-sql-integration-in-domo)).
+5. Select **Manage Integrations** to modify existing integrations.  
+   A list of available integrations displays.
+6. Select the wrench icon next to an integration to view available options.  
+   The options shown depend on your access level.
+
+<Frame>![Screenshot](/images/kb/0EMVu00000TFVij.jpg)</Frame>
+
+## Create an Azure SQL Integration in Domo
+
+Every Azure SQL integration in Domo requires an authenticated service account. Once created, a single service account can be reused across multiple integrations.
+
+Follow these steps to create your Azure SQL integration in Domo:
+
+1. Provide a name for the integration. This is simply a label to help you identify the integration within Domo. It does not need to match any names in Azure SQL and can be changed later if needed.   
+
    
-   <Frame><img alt="add new cloud account.jpg" src="/images/kb/ka0Vq000000BCNd-00N5w00000Ri7BU-0EMVq000000uRaE.jpg" style={{width: 500, height: 452}}/></Frame>
+<Tip>**Tip:** Multiple Azure SQL integrations can exist in the same Domo instance, created by you or your colleagues. Clear naming helps users select the correct integration later. For example, separate integrations might be created to connect different tables or manage access levels.
+2. (Optional) Add a description to explain the purpose of this integration and who created it. Most users will only see the integration name in menus and lists. The description is visible only when viewing integration details.
+3. Select an existing Azure SQL service account from the drop-down menu or select **Add account** to create a new one.  
+   You can change the service account later, but switching accounts may require remapping DataSets and ETLs if the new account lacks access to previously used tables. User access may also be affected unless privileges are identical.
+4. Enter the name of the Database that contains your Azure SQL tables.</Tip>
 
-   The **Amplify existing cloud warehouses** modal displays.
-3. In the **Native integration** section, choose **See More** to see additional options.
-     
-   <Frame><img alt="see more.jpg" src="/images/kb/ka0Vq000000BCNd-00N5w00000Ri7BU-0EMVq000000uTIf.jpg" style={{width: 500, height: 340}}/></Frame>
+**Understanding the Architecture**
 
-4. Select **Azure SQL**.
-     
-   <Frame><img alt="choose azure sql.jpg" src="/images/kb/ka0Vq000000BCNd-00N5w00000Ri7BU-0EMVq000001JtzW.jpg" style={{width: 500, height: 375}}/></Frame>
+There are three levels in this setup:
 
-5. Select **+ Add New Integration**.
-     
-   <InlineImage src="/images/kb/ka0Vq000000BCNd-00N5w00000Ri7BU-0EMVq000001K1Yr.jpg" /> <InlineImage src="/images/kb/ka0Vq000000BCNd-00N5w00000Ri7BU-0EMVq000001JrL0.jpg" />
-6. Enter the following connection parameters in the provided fields to connect to your Azure SQL database:
-   
-      * **Integration name —**
-      If you need to update your integration in the future, this is the name to search for in the list of integrations.
-      * **Integration description (optional) —**
-      Any additional information about the integration.
-      * **Azure SQL Database connection URL —**
-      The host and port for the Azure SQL instance you are connecting to. Ex. *< [myhost.com](http://myhost.com):3306>*.
-      * **Azure SQL Database database name —**
-      The name of the database containing the tables you want to connect to.
-      * **Azure SQL Database username —**
-      The Azure SQL instance username with access to the data you are connecting to.
-      * **Azure SQL Database password —**
-      The password for the Azure SQL user.
-      
-      <Frame><img alt="azure sql.jpg" src="/images/kb/ka0Vq000000BCNd-00N5w00000Ri7BU-0EMVq000001JwKg.jpg" style={{width: 599, height: 442}}/></Frame>
+- Azure SQL instance – Exists independently of Domo.
+- Azure SQL service account – Defined in Domo and connects to the Azure SQL instance.
+- Azure SQL integration – Uses the service account and adds settings such as connected tables and caching behavior.
 
-7. Configure caching options at the bottom of the form and select **Next**. Learn about Cloud Amplifier [caching rules](https://domo-support.domo.com/s/article/4412849158167?language=en_US#caching_rules).
-   
-   <Frame><img alt="Screenshot 2024-05-07 at 3.24.52 PM.png" src="/images/kb/ka0Vq000000BCNd-00N5w00000Ri7BU-0EMVq000000uWur.jpg" style={{width: 549, height: 156}}/></Frame>
+<Note>**Note:** Multiple service accounts can connect to the same Azure SQL instance. Multiple integrations can share a single service account.</Note>
 
-   A success message displays.
-8. Select **Choose Tables to Connect** to open the table picker.
-     
-   <Frame><img alt="choose tables.jpg" src="/images/kb/ka0Vq000000BCNd-00N5w00000Ri7BU-0EMVq000001K20H.jpg" style={{width: 600, height: 381}}/></Frame>
+**Access and Sharing**
 
-9. Use the table picker to select from schemas and tables. When you're ready, select
-   **Create DataSets**.
-     
-   <Frame><img alt="table picker.jpg" src="/images/kb/ka0Vq000000BCNd-00N5w00000Ri7BU-0EMVq000001L0hB.jpg" style={{width: 600, height: 356}}/></Frame>
+- Initially, only the owner of the service account has access.
+- The owner can share access with individuals or groups.
+- If multiple integrations use the same service account, they inherit the same user privileges.
+- Changes to privileges affect all integrations tied to that account.
 
-10. (Optional)The confirmation modal allows you to share your DataSets with other Domo users. After choosing people to add and choosing their level of access in the dropdown, select
-    **Share**.
-      
-    Or, select **No Thanks** to close the modal without sharing access.
-      
-    <Frame><img alt="share modal.jpg" src="/images/kb/ka0Vq000000BCNd-00N5w00000Ri7BU-0EMVq000000uXZB.jpg" style={{width: 550, height: 313}}/></Frame>
+To review access settings, go to the Accounts Page and select Account sharing next to the relevant Azure SQL service account.
 
-You can now interact with your Azure SQL DataSets in Domo.
+<Tip>**Tip:** You can create multiple service accounts for the same PostgreSQL instance.  
+Reasons for doing this include:  
+Example A: Managing user access separately for different integrations.  
+Example B: Applying different caching TTL settings while sharing user access.</Tip>
 
-<Frame><img alt="interact with azure sql.jpg" src="/images/kb/ka0Vq000000BCNd-00N5w00000Ri7BU-0EMVq000001K2I1.jpg" style={{width: 899, height: 397}}/></Frame>
+<Frame>![Screenshot](/images/kb/0EMVu00000TF8MO.jpg)</Frame>
+
+## Create an Azure SQL Service Account in Domo
+
+Every Azure SQL integration in Domo relies on an authenticated Azure SQL service account. Once created, this account can be reused across multiple Azure SQL integrations.
+
+Domo provides a dedicated Accounts Page where you can create and manage service accounts for various external services, including Azure SQL. After creation, your Azure SQL service account will appear on this page.
+
+<Warning>**Important:** Creating a PostgreSQL service account in Domo allows you, other account owners, Domo admins, and anyone with whom the account is shared, to use its credentials to access PostgreSQL and create connected DataSets in Domo. Users will not have access to sensitive values such as passwords, tokens, or keys used by the service account to connect to PostgreSQL.</Warning>
+
+Follow these steps to create an Azure SQL service account in Domo:
+
+1. Choose a name to identify this Azure SQL service account within Domo.
+
+1. - The name can be changed later.
+   - Use clear, distinctive names to avoid confusion between Azure SQL accounts and integrations.
+   - You can create multiple service accounts even if they all point to the same Azure SQL instance.
+2. Enter the name of your server or its IP address.
+3. Enter your Azure SQL Username.
+4. Enter your Azure SQL Password.
+
+<Frame>![Screenshot](/images/kb/0EMVu00000TFWy9.jpg)</Frame>

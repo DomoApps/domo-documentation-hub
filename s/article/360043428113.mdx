@@ -1,66 +1,69 @@
 ---
-title: "Creating a Recursive/Snapshot Old Magic ETL DataFlow"
+title: "Create a Recursive/Snapshot Old Magic ETL DataFlow"
 ---
 
 A "recursive" or "snapshot" DataFlow is a DataFlow that uses itself as an input.
 
 DataFlows (neither SQL nor Magic ETL types) cannot append data natively like connectors. However, if you need to create a DataFlow that appends data, you can do so by running it once and then using the output as part of the input for the next run. This way, every time the DataFlow runs, it includes the data from before and also appends the new data onto itself.
 
-<Warning>
-  **Important:** If a recursive DataFlow is edited incorrectly, you could lose ALL historical data. To avoid this any time you are editing, create an additional DataSet that is a copy of your historical DataSet. This DataSet will remain static. If anything happens to your historical DataSet, you will have a backup from before you began editing.
-
-</Warning>
+<Warning>**Important:** If a recursive DataFlow is edited incorrectly, you could lose ALL historical data. To avoid this any time you are editing, create an additional DataSet that is a copy of your historical DataSet. This DataSet will remain static. If anything happens to your historical DataSet, you will have a backup from before you began editing.</Warning>
 
 **Video - What is a Recursive DataFlow?**
 
-<iframe allowfullscreen="allowfullscreen" frameborder="0" height="315" src="//www.youtube-nocookie.com/embed/VkM5VznEzi8" width="560"></iframe>
-
 **To create a recursive DataFlow in Magic ETL,**
 
-1. Create and run a Magic ETL DataFlow.
+1. Create and run a Magic ETL DataFlow.  
      
-   <Frame><img alt="recursive_etl1.png" src="/images/kb/ka0Vq000000GnEU-00N5w00000Ri7BU-0EM5w000005vOw3.png" style={{width: 800, height: 387}}/></Frame>
-2. Once the DataFlow has finished running, load the output DataSet as an input DataSet.
+
+   <Frame>![recursive_etl1.png](/images/kb/0EM5w000005vOw3.png)</Frame>
+2. Once the DataFlow has finished running, load the output DataSet as an input DataSet.  
+   The DataSet name will show the output DataSet name followed by "1."  
      
-   The DataSet name will show the output DataSet name followed by "1."
+
+   <Frame>![Screenshot](/images/kb/0EM5w000005vOw2.png)</Frame>
+
      
-   <Frame><img alt="" src="/images/kb/ka0Vq000000GnEU-00N5w00000Ri7BU-0EM5w000005vOw2.png" style={{width: 800, height: 312}}/></Frame>
-   You should now have two DataSets in the DataFlow—the updating original DataSet and the historical DataSet.
      
+   You should now have two DataSets in the DataFlow—the updating original DataSet and the historical DataSet.  
    You now need to find a column to use as a constraint. This helps determine when to replace data in your historical DataSet with new data. Constraint columns are normally ID columns or date columns or have other unique identifiers. In this example we use the `Date` column as a constraint.
-3. Use **Select Columns** to select only the constraint column.
+3. Use **Select Columns** to select only the constraint column.  
      
-   <Frame><img alt="" src="/images/kb/ka0Vq000000GnEU-00N5w00000Ri7BU-0EM5w000005vOvx.png" style={{width: 800, height: 521}}/></Frame>
-4. Use **Remove Duplicates** to return a unique list of constraints.
+
+   <Frame>![Screenshot](/images/kb/0EM5w000005vOvx.png)</Frame>
+4. Use **Remove Duplicates** to return a unique list of constraints. <img alt="" src="/images/kb/0EM5w000005vOvu.png" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/> 5. Use **Add Constants** to create a new column that tells you when a row needs to be deleted.  
      
-   <Frame><img alt="" src="/images/kb/ka0Vq000000GnEU-00N5w00000Ri7BU-0EM5w000005vOvu.png"/></Frame>
-5. Use **Add Constants** to create a new column that tells you when a row needs to be deleted.
+
+   <Frame>![Screenshot](/images/kb/0EM5w000005vOvz.png)</Frame>
+6. Use an Outer Join to join your deletion-identifying column to the unique constraint column in your historical DataSet.  If you selected the historical DataSet on the left side of the join, as shown below, use a left outer join. If you select the historical DataSet on the right side of the join, use a right outer join. (Do not select **Inner Join**, as this could result in a loss of data.)  
      
-   <Frame><img alt="" src="/images/kb/ka0Vq000000GnEU-00N5w00000Ri7BU-0EM5w000005vOvz.png" style={{width: 799, height: 503}}/></Frame>
-6. Use an Outer Join to join your deletion-identifying column to the unique constraint column in your historical DataSet.  If you selected the historical DataSet on the left side of the join, as shown below, use a left outer join. If you select the historical DataSet on the right side of the join, use a right outer join. (Do not select **Inner Join**, as this could result in a loss of data.)
+
+   <Frame>![Screenshot](/images/kb/0EM5w000005vOw1.png)</Frame>
+
      
-   <Columns>
-     <Frame><img alt="" src="/images/kb/ka0Vq000000GnEU-00N5w00000Ri7BU-0EM5w000005vOw1.png" style={{width: 801, height: 514}}/></Frame>
-     <Frame><img alt="" src="/images/kb/ka0Vq000000GnEU-00N5w00000Ri7BU-0EM5w000005vOv3.png" style={{width: 801, height: 549}}/></Frame>
-   </Columns>
-7. Filter any rows from your DataSet that contain the value "Delete Me" (or whatever identifier you came up with in step 5).
      
-   This returns only rows from the historical DataSet that do not exist in the new updating DataSet.
+
+   <Frame>![Screenshot](/images/kb/0EM5w000005vOv3.png)</Frame>
+7. Filter any rows from your DataSet that contain the value "Delete Me" (or whatever identifier you came up with in step 5).  
+   This returns only rows from the historical DataSet that do not exist in the new updating DataSet.  
      
-   <Frame><img alt="" src="/images/kb/ka0Vq000000GnEU-00N5w00000Ri7BU-0EM5w000005vOvw.png" style={{width: 799, height: 519}}/></Frame>
-8. Use **Select Columns** to remove the additional unique constraint column (`Date`) and the unique deletion-identifying column.
+
+   <Frame>![Screenshot](/images/kb/0EM5w000005vOvw.png)</Frame>
+8. Use **Select Columns** to remove the additional unique constraint column (`Date`) and the unique deletion-identifying column.  
      
-   <Frame><img alt="" src="/images/kb/ka0Vq000000GnEU-00N5w00000Ri7BU-0EM5w000005vOvv.png" style={{width: 801, height: 558}}/></Frame>
-9. Use **Append** to join the historical DataSet and new updating DataSet.
+
+   <Frame>![Screenshot](/images/kb/0EM5w000005vOvv.png)</Frame>
+9. Use **Append** to join the historical DataSet and new updating DataSet.  
+   If all steps have been done correctly, both DataSets will show "No changes."  
      
-   If all steps have been done correctly, both DataSets will show "No changes."
-     
-   <Frame><img alt="" src="/images/kb/ka0Vq000000GnEU-00N5w00000Ri7BU-0EM5w000005vOvy.png" style={{width: 801, height: 562}}/></Frame>
+
+   <Frame>![Screenshot](/images/kb/0EM5w000005vOvy.png)</Frame>
 10. Connect the **Append** tile to your output.
 
-Once complete, your Magic ETL should look like the following:
+Once complete, your Magic ETL should look like the following:  
   
-<Frame><img alt="" src="/images/kb/ka0Vq000000GnEU-00N5w00000Ri7BU-0EM5w000005vOw0.png" style={{width: 801, height: 383}}/></Frame>
-### Troubleshooting/FAQ
 
-See [DataFlow Troubleshooting](https://domo-support.domo.com/s/article/360043427953?language=en_US) for resolutions to common issues.
+<Frame>![Screenshot](/images/kb/0EM5w000005vOw0.png)</Frame>
+
+## Troubleshoot
+
+See [DataFlow Troubleshooting](/s/article/360043427953) for resolutions to common issues.

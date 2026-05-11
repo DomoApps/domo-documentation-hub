@@ -15,7 +15,6 @@ All of the feature updates can be divided into four main categories:
 * User Interface
 * Advanced Options
 
-
   ## Why Upgrade?
 
   We wanted to make Magic ETL more internally consistent and more aligned with other Domo features like Beast Mode. One of our goals was to eliminate all cases where Magic ETL resolves column name collisions without the user's input. Joins and Append Rows both deal with name collisions, and Magic ETL now deals with both of them differently. We heard from many customers that this change is important for data cleanliness.
@@ -24,19 +23,15 @@ All of the feature updates can be divided into four main categories:
 
   For the complete list of supported functions available in the new formula system, see [Supported Functions in Magic ETL](/s/article/360044289573).
 
-
-
   ## Notable Behavior Changes
 
   Some changes in Magic ETL might cause transforms to work differently. This could manifest as errors like “Column not found” or “Duplicate column name”, or more subtly as different output data. As such, it is important to be aware of all of these changes before migrating an existing DataFlow to Magic ETL v2 or before writing a new DataFlow if you are already very familiar with Magic ETL's previous behavior.
-
-
 
   #### Filter Rows
 
   Null values are treated differently by the comparison functions. In SQL and Magic ETL v2's DataFlows, the result of any comparison with null is always null, which is treated by the **Filter Rows** tile like a false result. In most contexts in Magic ETL v2, null is not equal to null, but null is also not not equal to null; null is not greater than zero, but it is also not less than zero, nor is it equal to zero. If you have nulls in columns referenced by **Filter Rows** tiles, all of those rows will be dropped, regardless of the function or its other argument. The only functions that can deal with nulls truthfully are “is null” and “is not null”. In Magic ETL v1, a filter might have tested “column = null”. This will no longer have the same result; such filters should be changed to use the “is null” operator.
 
-  If after switching a flow to Magic ETL v2, it runs successfully, but the output seems to be missing rows, this change is a likely culprit. It can be especially surprising with the “is not equal to” function. It might seem like “column \<> 5” should only drop rows where column’s value is 5, but in fact it will also drop rows where column is null, for the reason described above. The table below has additional examples of null behavior in **Filter Rows**.
+  If after switching a flow to Magic ETL v2, it runs successfully, but the output seems to be missing rows, this change is a likely culprit. It can be especially surprising with the “is not equal to” function. It might seem like “column \<> 5” should only drop rows where column's value is 5, but in fact it will also drop rows where column is null, for the reason described above. The table below has additional examples of null behavior in **Filter Rows**.
 
   <table class="mt-responsive-table" data-aura-rendered-by="33:208;a"><thead><tr><th class="mt-column-width-15" colspan="1" rowspan="1"><p> Test </p></th><th class="mt-column-width-35" colspan="1" rowspan="1"><p> Evaluated Result </p></th><th class="mt-column-width-20" colspan="1" rowspan="1"><p> Filter Effect </p></th></tr></thead><tbody><tr><td colspan="1" rowspan="1"><p> 4 &lt;&gt; 5 </p></td><td colspan="1" rowspan="1"><p> true </p></td><td colspan="1" rowspan="1"><p> keep </p></td></tr><tr><td colspan="1" rowspan="1"><p> 5 &lt;&gt; 5 </p></td><td colspan="1" rowspan="1"><p> false </p></td><td colspan="1" rowspan="1"><p> drop </p></td></tr><tr><td colspan="1" rowspan="1"><p> null &lt;&gt; 5 </p></td><td colspan="1" rowspan="1"><p> null </p></td><td colspan="1" rowspan="1"><p> drop </p></td></tr><tr><td colspan="1" rowspan="1"><p> null = null </p></td><td colspan="1" rowspan="1"><p> null </p></td><td colspan="1" rowspan="1"><p> drop </p></td></tr><tr><td colspan="1" rowspan="1"><p> null &lt;&gt; null </p></td><td colspan="1" rowspan="1"><p> null </p></td><td colspan="1" rowspan="1"><p> drop </p></td></tr><tr><td colspan="1" rowspan="1"><p> null is null </p></td><td colspan="1" rowspan="1"><p> true </p></td><td colspan="1" rowspan="1"><p> keep </p></td></tr><tr><td colspan="1" rowspan="1"><p> null is not null </p></td><td colspan="1" rowspan="1"><p> false </p></td><td colspan="1" rowspan="1"><p> drop </p></td></tr><tr><td colspan="1" rowspan="1"><p> 5 is not null </p></td><td colspan="1" rowspan="1"><p> true </p></td><td colspan="1" rowspan="1"><p> keep </p></td></tr><tr><td colspan="1" rowspan="1"><p> 5 is null </p></td><td colspan="1" rowspan="1"><p> false </p></td><td colspan="1" rowspan="1"><p> drop </p></td></tr></tbody></table>
 
@@ -44,23 +39,17 @@ All of the feature updates can be divided into four main categories:
 
   Besides null handling, there are many other scenarios that filter formulas make easier. In Magic ETL v1, the single formula below would have required two separate **Filter Rows** tiles with multiple conditions each.
 
-
-
   #### Date and Time Parsing
 
-  With date and time parsing, the process of converting incoming text into Date or Date & Time values has changed significantly. Generally, it is stricter than it used to be. Some text that parsed successfully in Magic ETL v1 might result in an error in Magic ETL v2. The goal of being stricter is avoiding scenarios where a value is silently misinterpreted, like a month being mixed up with a day. Magic ETL now uses a fixed list of unambiguous date and time formats, plus a locale-specific list of ambiguous formats (e.g. “01/02/2020” is January 2nd in the US and February 1st in most other places). If Magic ETL fails to parse a date, a custom format can now be specified on the **Input DataSet** tile, on a per-column basis. For information on the format specification, refer to [Oracle’s documentation of the Java DateTimeFormatter class](https://docs.oracle.com/javase/8/docs/api/java/time/format/DateTimeFormatter.html).
-
-
+  With date and time parsing, the process of converting incoming text into Date or Date & Time values has changed significantly. Generally, it is stricter than it used to be. Some text that parsed successfully in Magic ETL v1 might result in an error in Magic ETL v2. The goal of being stricter is avoiding scenarios where a value is silently misinterpreted, like a month being mixed up with a day. Magic ETL now uses a fixed list of unambiguous date and time formats, plus a locale-specific list of ambiguous formats (e.g. “01/02/2020” is January 2nd in the US and February 1st in most other places). If Magic ETL fails to parse a date, a custom format can now be specified on the **Input DataSet** tile, on a per-column basis. For information on the format specification, refer to [Oracle's documentation of the Java DateTimeFormatter class](https://docs.oracle.com/javase/8/docs/api/java/time/format/DateTimeFormatter.html).
 
   #### Date and Time Operations
 
-  Date and time operations in Magic ETL are now performed by default in the company timezone specified in the Domo Admin menu. Magic ETL v1 performed these operations in UTC, the international standard time. This means that a company whose timezone is America/Denver that uses the “Month of date” operation on a Date & Time column will get the month of that timestamp from Denver’s perspective, not that of Greenwich (UTC).
+  Date and time operations in Magic ETL are now performed by default in the company timezone specified in the Domo Admin menu. Magic ETL v1 performed these operations in UTC, the international standard time. This means that a company whose timezone is America/Denver that uses the “Month of date” operation on a Date & Time column will get the month of that timestamp from Denver's perspective, not that of Greenwich (UTC).
 
   The WEEK\_OF\_YEAR() function in the Date Operations tile is also now different. Week 1 is the first week with a Sunday in the year. This differs from previous versions of Magic ETL and Beast Mode, where week 1 is the first partial week.
 
-  Using the **Add Formula** tile, week behavior can be adjusted: the WEEK() function accepts a second argument: an integer from 0 to 7, representing the “week mode” to use when calculating the week of a date. These modes are described in [Oracle’s MySQL documentation](https://docs.oracle.com/cd/E17952_01/mysql-8.0-en/date-and-time-functions.html#function_week), and are reflected in the behavior of Beast Mode. Mode 0 (or WEEK() without the mode argument) yields the same result as the WEEK\_OF\_YEAR() function in the **Date Operations** tile.
-
-
+  Using the **Add Formula** tile, week behavior can be adjusted: the WEEK() function accepts a second argument: an integer from 0 to 7, representing the “week mode” to use when calculating the week of a date. These modes are described in [Oracle's MySQL documentation](https://docs.oracle.com/cd/E17952_01/mysql-8.0-en/date-and-time-functions.html#function_week), and are reflected in the behavior of Beast Mode. Mode 0 (or WEEK() without the mode argument) yields the same result as the WEEK\_OF\_YEAR() function in the **Date Operations** tile.
 
   #### Joins
 
@@ -68,15 +57,11 @@ All of the feature updates can be divided into four main categories:
 
   1. It is no longer important to ensure that the table with fewer duplicate join keys is on the left of the join. The issue in Magic ETL manifesting as the error, “The left input cannot include over 10,000 duplicates”, has been eliminated.
   2. Name conflicts are no longer resolved without user input. Instead, we have added a section to the
-  **Join Data** tile’s configuration for describing name conflict resolution. This section can be filled out automatically or manually. In addition to renaming conflicting columns, it is now possible to remove them in the **Join Data** tile’s configuration as well.
-
-
+  **Join Data** tile's configuration for describing name conflict resolution. This section can be filled out automatically or manually. In addition to renaming conflicting columns, it is now possible to remove them in the **Join Data** tile's configuration as well.
 
   #### Append Rows (Union)
 
   Previously, when two or more columns going into an **Append Rows** tile had the same names but different data types, they would not be combined. Instead, two or more new columns would be created, with names like “ID Whole Number” and “ID Text”. Now, the **Append Rows** tile never changes column names. Columns that have different types will have their data converted to the best type possible given the types of all the columns that share a name. For example, if one column had type Whole Number, while another had type Decimal, the columns would be combined into a column with type Decimal. In cases where the types are wholly incompatible, like Dates and Decimals, the resulting column will be Text type. This behavior can be replaced with stricter behavior using a new option in the **Append Rows** tile configuration. The stricter behavior is to throw an error (i.e. fail the execution) if two columns with the same names have different types.
-
-
 
   #### Other Considerations
 
@@ -96,8 +81,6 @@ All of the feature updates can be divided into four main categories:
   <iframe allowfullscreen="allowfullscreen" frameborder="0" height="315" src="//www.youtube-nocookie.com/embed/fSQCz1SbuGg" width="560"></iframe>
 
   ## Feature Updates
-
-
 
   #### Performance
 
@@ -119,8 +102,6 @@ DataSet Views can now be used as inputs in Magic ETL. This allows for easier fil
 **Append Processing**
 
 One of the limitations of the previous version of Magic ETL is that at every DataFlow run, the engine loads all of the input DataSet's data, every time, even if that data is unnecessary for the transformations taking place. Now at the start of each run, the system reviews the state of the DataFlow's inputs and outputs. Where possible, only new rows added to the inputs since the last DataFlow execution will be processed during that DataFlow execution. Those rows will then be auto-appended to the output DataSet(s) resulting in the exact same output data but in a dramatically reduced runtime. To learn more about this optimization, see [New Magic ETL DataFlow Auto Append Processing](/s/article/360051062653).
-
-
 
 #### New/Updated Tiles
 
@@ -160,8 +141,6 @@ Python & R Scripting
 
 Scripting tiles are now much more flexible. Specifying a schema for your output DataSet is now optional. Executing your script provides the needed schema for your output DataSet, saving you time. You can run a preview to generate the schema or specify it when you need it as part of downstream tiles.
 
-
-
 #### User Interface
 
 **Color-Coded, Curved Lines**
@@ -179,8 +158,6 @@ Finding the specific tile you needed in the old Magic ETL could be difficult giv
 **Selectable text in Data Previews**
 
 Easily interact with the preview data in a Magic ETL DataFlow with selectable text. Now you can quickly copy and paste individual cells or a group of cells from the Preview or Data tabs.
-
-
 
 #### Advanced Options
 

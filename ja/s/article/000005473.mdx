@@ -6,89 +6,107 @@ title: "Google BigQuery Workload Identity Federation Dataコネクター"
 
 Google BigQuery Enterpriseは、非常に大きな読み取り専用データを処理するためのクラウドベースのビッグデータ解析ウェブサービスです。DomoのGoogle BigQueryコネクターを使用すると、指定したプロジェクトからデータを取得することができます。Google BigQueryのクエリは、標準的なSQL SELECTステートメントのバリエーションを使って記述されています。
 
-Google BigQuery Workload Identity連携データアカウントにはData Centerから接続できます。このトピックでは、Google BigQuery Workload Identity Federation Dataコネクターのユーザーインターフェースに固有のフィールドとメニューについて説明します。DataSetの追加、更新スケジュールの設定およびDataSet情報の編集を行うには、「 [コネクターを使用してDataSetを追加する](/ja/s/article/360042926274 "コネクターを使用してDataSetを追加する") 」を参照してください。
+Google BigQuery Workload Identity連携データアカウントにはData Centerから接続できます。このトピックでは、Google BigQuery Workload Identity Federation Dataコネクターのユーザーインターフェースに固有のフィールドとメニューについて説明します。DataSetの追加、更新スケジュールの設定およびDataSet情報の編集を行うには、「[コネクターを使用してDataSetを追加する](/ja/s/article/360042926274)」を参照してください。
 
 ## 必要条件
 
-Google BigQuery Workload Identity連携データアカウントに接続してDataSetを作成するには、以下が必要です。
-  
-**注記：** 以下の手順では、特にWIF設定ファイルを作成する方法を説明しています。WIF設定ファイルは、BigQueryへのCloud Amplifier接続を設定するときにも使用できます。
+Google BigQuery Workload Identity連携データアカウントに接続してDataSetを作成するには、以下が必要です。  
+<Note>**注記：**以下の手順では、特にWIF設定ファイルを作成する方法を説明しています。WIF設定ファイルは、BigQueryへのCloud Amplifier接続を設定するときにも使用できます。</Note>
 
-* Google Cloudコンソールで既存のWorkload Identity連携アカウントを設定している場合は、以下の手順に従います。
-  1. ドロップダウンリストから、**［Use an existing Workload Identity Federation］** を選択します。
-  2. ドロップダウンリストから **［Enter configuration values manually］** を選択した場合：
-     1. **［Project Number］** 、 **［Project ID］** 、 **［Pool ID］** 、 **［Provider ID］** 、 **［Service Account Email］** を入力します。
+- Google Cloudコンソールで既存のWorkload Identity連携アカウントを設定している場合は、以下の手順に従います。
+  1. ドロップダウンリストから、**［Use an existing Workload Identity Federation］**を選択します。
+  2. ドロップダウンリストから**［Enter configuration values manually］**を選択した場合：
+     1. **［Project Number］**、**［Project ID］**、**［Pool ID］**、**［Provider ID］**、**［Service Account Email］**を入力します。
      2. 外部IDがサービスアカウントに偽装できるようにするには、サービスアカウントのWorkload Identityユーザー権限（roles/iam.workloadIdentityUser）を付与する必要があります。権限は、特定の外部IDまたは複数の外部IDに付与できます。
 
-        1. Workload Identityプール（ [Workload Identityプールページ](https://console.cloud.google.com/iam-admin/workload-identity-pools?project=undefined "Workload Identityプールページ") ）に移動します。
+- 2. 1. 1. Workload Identityプール（[Workload Identityプールページ](https://console.cloud.google.com/iam-admin/workload-identity-pools?project=undefined)）に移動します。
         2. 作成したプールをクリックします。
-        3. **［grant access］** をクリックします。
+        3. **［grant access］**をクリックします。
         4. 設定したサービスアカウントを選択します。
-        5. ドロップダウンリストから **［Allow access to all identities in the pool］** を選択してプール内のすべてのIDへのアクセス権を付与するか、ドロップダウンリストから **［Filter by user email address］** を選択して、ユーザーのメールアドレスでフィルターをかけるか、ドロップダウンリストから **［Filter by unique code representing your Domo instance and connector］** を選択して、コネクターとDomoインスタンスを表す固有のGUID IDでフィルターをかけることができます。
-  3. ドロップダウンリストから **［Enter the JSON configuration from Google Cloud Consol］** を選択した場合：
+        5. ドロップダウンリストから**［Allow access to all identities in the pool］**を選択してプール内のすべてのIDへのアクセス権を付与するか、ドロップダウンリストから**［Filter by user email address］**を選択して、ユーザーのメールアドレスでフィルターをかけるか、ドロップダウンリストから**［Filter by unique code representing your Domo instance and connector］**を選択して、コネクターとDomoインスタンスを表す固有のGUID IDでフィルターをかけることができます。
+  3. ドロップダウンリストから**［Enter the JSON configuration from Google Cloud Consol］**を選択した場合：
      1. Workload Identity連携のJSON設定を入力します。
-     2. フィルターから以下のいずれかのオプションを選択して、外部IDアクセスを制限できます。
-          
-        + **ユーザーのメールアドレスでフィルターをかける**
-        + **Domoインスタンスとコネクターを表す固有のコードでフィルターをかける**
-        + **プール内のすべてのIDへのアクセス権を付与する**
-* Google Cloudコンソールで既存のWorkload Identity連携アカウントを設定していない場合は、以下の手順に従います。
-  1. ドロップダウンリストから **［Go through prerequisite］** を選択します。
+     2. フィルターから以下のいずれかのオプションを選択して、外部IDアクセスを制限できます。  
+        - **ユーザーのメールアドレスでフィルターをかける**
+        - **Domoインスタンスとコネクターを表す固有のコードでフィルターをかける**
+        - **プール内のすべてのIDへのアクセス権を付与する**
+- Google Cloudコンソールで既存のWorkload Identity連携アカウントを設定していない場合は、以下の手順に従います。
+  1. ドロップダウンリストから**［Go through prerequisite］**を選択します。
   2. Google Cloudプロジェクトを設定する必要があります。
-     1. [Google Cloudダッシュボード](https://console.cloud.google.com/projectselector2/home/dashboard "Google Cloudダッシュボード") に移動します。
-     2. **［Create Project］** をクリックします。
-     3. **［Project Name］** と **［Location］** を入力し、 **［Create］** を選択します。
-     4. [Google Cloudコンソール](https://console.cloud.google.com/welcome "Google Cloudコンソール") に移動すると、作成されたプロジェクト情報が表示されます。
-     5. **［Project Number］** および **［Project ID］** を入力します。
-     6. **Identity and Access Management（IAM）API**、 **Cloud Resource Manager API** 、 **IAM Service Account Credentials API** 、 **Security Token Service API** へのアクセス権をプロジェクトに付与するには、 [［Enable access to APIs］](https://console.cloud.google.com/apis/enableflow?apiid=iam.googleapis.com,cloudresourcemanager.googleapis.com,iamcredentials.googleapis.com,sts.googleapis.com "アクセス権を有効にする") に移動して、 **［Next］** をクリックし、 **［Enable］** をクリックします。
+     1. [Google Cloudダッシュボード](https://console.cloud.google.com/projectselector2/home/dashboard)に移動します。
+     2. **［Create Project］**をクリックします。
+     3. **［Project Name］**と**［Location］**を入力し、**［Create］**を選択します。
+     4. [Google Cloudコンソール](https://console.cloud.google.com/welcome)に移動すると、作成されたプロジェクト情報が表示されます。
+     5. **［Project Number］**および**［Project ID］**を入力します。
+     6. **Identity and Access Management（IAM）API**、**Cloud Resource Manager API**、**IAM Service Account Credentials API**、**Security Token Service API**へのアクセス権をプロジェクトに付与するには、[［Enable access to APIs］](https://console.cloud.google.com/apis/enableflow?apiid=iam.googleapis.com,cloudresourcemanager.googleapis.com,iamcredentials.googleapis.com,sts.googleapis.com)に移動して、**［Next］**をクリックし、**［Enable］**をクリックします。
   3. Workload IdentityプールおよびWorkload Identityプロバイダーを作成するには：
-     1. [Workload Identityプールページ](https://console.cloud.google.com/iam-admin/workload-identity-pools?project=undefined "Workload Identityプールページ") に移動します。
-     2. このリンクが開かない場合は、**［IAM & Admin］** > **［Workload Identity Federation］** に進みます。
-     3. **［Get Started］** をクリックします。
-     4. 作成した **プールID** を入力します。
-     5. プロバイダードロップダウンから **［SAML］** を選択します。
-     6. **プロバイダーID** を入力します。
-     7. メタデータファイルをダウンロードし、[Google](https://app.domo.com/DomoConnectors/DomoWIF/metadata.xml "Google") にアップロードします。
-     8. プロバイダー属性を設定するには、Google 1の場合、**google.subject** がキーで **assertion.subject** が値です。
+     1. [Workload Identityプールページ](https://console.cloud.google.com/iam-admin/workload-identity-pools?project=undefined)に移動します。
+     2. このリンクが開かない場合は、**［IAM & Admin］**>**［Workload Identity Federation］**に進みます。
+     3. **［Get Started］**をクリックします。
+     4. 作成した**プールID**を入力します。
+     5. プロバイダードロップダウンから**［SAML］**を選択します。
+     6. **プロバイダーID**を入力します。
+     7. メタデータファイルをダウンロードし、[Google](https://app.domo.com/DomoConnectors/DomoWIF/metadata.xml)にアップロードします。
+     8. プロバイダー属性を設定するには、Google 1の場合、**google.subject**がキーで**assertion.subject**が値です。
      9. Workload IdentityプールおよびWorkload Identityプロバイダーを保存します。
-  4. サービスアカウントをお持ちでない場合は、アカウントを設定する必要があります。
-       
-     **注記：** サービスアカウントは、Workload IdentityプールおよびWorkload Identityプロバイダーと同じプロジェクトに存在する必要はありません。
-       
-     1. サービスアカウントを作成するには、[サービスアカウント作成ページ](https://console.cloud.google.com/projectselector2/iam-admin/serviceaccounts/create "サービスアカウント作成ページ") に移動します。サービスアカウントを既に持っている場合は、 [サービスアカウントページ](https://console.cloud.google.com/iam-admin/serviceaccounts?project=undefined "サービスアカウントページ") に移動します。
-     2. **サービスアカウントのメール** を入力します。
-     3. Domoがアクセスするリソースへのアクセス権をサービスアカウントに付与します。
-  5. 外部ワークロードがサービスアカウントに偽装できるようにするには：
-       
-     **注記：** 外部IDがサービスアカウントに偽装できるようにするには、サービスアカウントのWorkload Identityユーザー権限（roles/iam.workloadIdentityUser）をユーザーに付与する必要があります。権限は、特定の外部IDまたは複数の外部IDに付与できます。
+  4. サービスアカウントをお持ちでない場合は、アカウントを設定する必要があります。  
+<Note>
 
-      1. Workload Identityプール（ [Workload Identityプールページ](https://console.cloud.google.com/iam-admin/workload-identity-pools?project=undefined "Workload Identityプールページ") ）に移動します。
+**注記：**サービスアカウントは、Workload IdentityプールおよびWorkload Identityプロバイダーと同じプロジェクトに存在する必要はありません。   
+     1. サービスアカウントを作成するには、[サービスアカウント作成ページ](https://console.cloud.google.com/projectselector2/iam-admin/serviceaccounts/create)に移動します。サービスアカウントを既に持っている場合は、[サービスアカウントページ](https://console.cloud.google.com/iam-admin/serviceaccounts?project=undefined)に移動します。
+     2. **サービスアカウントのメール**を入力します。
+     3. Domoがアクセスするリソースへのアクセス権をサービスアカウントに付与します。
+  5. 外部ワークロードがサービスアカウントに偽装できるようにするには：  
+     **注記：**外部IDがサービスアカウントに偽装できるようにするには、サービスアカウントのWorkload Identityユーザー権限（roles/iam.workloadIdentityUser）をユーザーに付与する必要があります。権限は、特定の外部IDまたは複数の外部IDに付与できます。
+
+</Note>
+
+1. 1. 1. Workload Identityプール（[Workload Identityプールページ](https://console.cloud.google.com/iam-admin/workload-identity-pools?project=undefined)）に移動します。
       2. 作成したプールをクリックします。
-      3. **［grant access］** をクリックします。
+      3. **［grant access］**をクリックします。
       4. 既に設定しているサービスアカウントを選択します。
-      5. ドロップダウンリストから **［Allow access to all identities in the pool］** を選択してプール内のすべてのIDへのアクセス権を付与するか、ドロップダウンリストから **［Filter by user email address］** を選択して、ユーザーのメールアドレスでフィルターをかけるか、ドロップダウンリストから **［Filter by unique code representing your Domo instance and connector］** を選択して、コネクターとDomoインスタンスを表す固有のGUID IDでフィルターをかけることができます。
+      5. ドロップダウンリストから**［Allow access to all identities in the pool］**を選択してプール内のすべてのIDへのアクセス権を付与するか、ドロップダウンリストから**［Filter by user email address］**を選択して、ユーザーのメールアドレスでフィルターをかけるか、ドロップダウンリストから**［Filter by unique code representing your Domo instance and connector］**を選択して、コネクターとDomoインスタンスを表す固有のGUID IDでフィルターをかけることができます。
       6. 必要に応じて、設定ファイルをダウンロードします。このファイルは、後でDomoでアカウントを作成する際に使用できます。
 
 ## Google BigQuery Workload Identity連携データアカウントに接続する
 
-このセクションでは、Google BigQuery Workload Identity Federation Dataコネクターページの **［認証情報］** および **［詳細］** ペインのオプションについて説明します。このページのほかのペインの項目である **［スケジュール設定］** や **［DataSetに名前を付け、説明を入力］** に関しては、ほとんどのタイプのコネクターで共通しています。詳細については、「 [コネクターを使用してDataSetを追加する](/ja/s/article/360042926274 "コネクターを使用してDataSetを追加する") 」を参照してください。
+このセクションでは、Google BigQuery Workload Identity Federation Dataコネクターページの**［認証情報］**および**［詳細］**ペインのオプションについて説明します。このページのほかのペインの項目である**［スケジュール設定］**や**［DataSetに名前を付け、説明を入力］**に関しては、ほとんどのタイプのコネクターで共通しています。詳細については、「[コネクターを使用してDataSetを追加する](/ja/s/article/360042926274)」を参照してください。
 
 ## ［認証情報］ペイン
 
 このペインには、Google BigQuery Workload Identity連携データアカウントに接続するための認証情報を入力するフィールドがあります。下表では、各フィールドに必要な内容を説明しています。
 
-<table border="1" cellpadding="1" cellspacing="1" data-aura-rendered-by="33:195;a"><thead><tr><th colspan="1" rowspan="1"><p><span class="s1"> フィールド </span></p></th><th colspan="1" rowspan="1"><p><span class="s1"> 説明 </span></p></th></tr></thead><tbody><tr><td colspan="1" rowspan="1"><p> Project Number </p></td><td colspan="1" rowspan="1"><p> 作成したプロジェクトのプロジェクト番号を入力します。 </p></td></tr><tr><td colspan="1" rowspan="1"><p> Project ID </p></td><td colspan="1" rowspan="1"><p> 作成したプロジェクトのプロジェクトIDを入力します。 </p></td></tr><tr><td colspan="1" rowspan="1"><p> Pool ID </p></td><td colspan="1" rowspan="1"><p> プールIDを入力します。 </p></td></tr><tr><td colspan="1" rowspan="1"><p> Provider ID </p></td><td colspan="1" rowspan="1"><p> プロバイダーIDを入力します。 </p></td></tr><tr><td colspan="1" rowspan="1"><p> Service Account Email </p></td><td colspan="1" rowspan="1"><p> 選択したサービスアカウントIDに対して生成されたサービスアカウントのメールアドレスを入力します。 </p></td></tr></tbody></table>
+| フィールド                 | 説明                                               |
+| --------------------- | ------------------------------------------------ |
+| Project Number        | 作成したプロジェクトのプロジェクト番号を入力します。                       |
+| Project ID            | 作成したプロジェクトのプロジェクトIDを入力します。                       |
+| Pool ID               | プールIDを入力します。                                     |
+| Provider ID           | プロバイダーIDを入力します。                                  |
+| Service Account Email | 選択したサービスアカウントIDに対して生成されたサービスアカウントのメールアドレスを入力します。 |
 
-有効なGoogle BigQuery Workload Identity連携データの認証情報を一度入力しておくと、随時同じアカウントを使用して新しいGoogle BigQuery Workload Identity Federation Data DataSetを作成できます。コネクターのアカウントはData Centerの **［アカウント］** タブで管理できます。このタブの詳細については、「 [コネクターのユーザーアカウントを管理する](/ja/s/article/360042926054 "コネクターのユーザーアカウントを管理する") 」を参照してください。
+有効なGoogle BigQuery Workload Identity連携データの認証情報を一度入力しておくと、随時同じアカウントを使用して新しいGoogle BigQuery Workload Identity Federation Data DataSetを作成できます。コネクターのアカウントはData Centerの**［アカウント］**タブで管理できます。このタブの詳細については、「[コネクターのユーザーアカウントを管理する](/ja/s/article/360042926054)」を参照してください。
 
 ## ［詳細］ペイン
 
-このペインには、メインとなる **［Report］** メニューのほか、選択したレポートタイプに応じて表示/非表示になる様々なメニューが含まれています。
+このペインには、メインとなる**［Report］**メニューのほか、選択したレポートタイプに応じて表示/非表示になる様々なメニューが含まれています。
 
-<table border="1" cellpadding="1" cellspacing="1" data-aura-rendered-by="33:195;a"><thead><tr><th colspan="1" rowspan="1"><p> メニュー </p></th><th colspan="1" rowspan="1"><p> 説明 </p></th></tr></thead><tbody><tr><td colspan="1" rowspan="1"><p> Report </p></td><td colspan="1" rowspan="1"><p> 実行するGoogle BigQuery Workload Identity連携データレポートを選択します。以下のレポートが利用できます。 </p><table border="1"><tbody><tr><td colspan="1" rowspan="1"><b> レポート名 </b></td><td colspan="1" rowspan="1"><b> 説明 </b></td></tr><tr><td colspan="1" rowspan="1"><p> Query </p></td><td colspan="1" rowspan="1"> レガシーSQLまたは標準SQLを実行してデータをBigQueryから返します。 </td></tr><tr><td colspan="1" rowspan="1"><p> Table Information </p></td><td colspan="1" rowspan="1"> テーブルの詳細を返します。 </td></tr></tbody></table></td></tr><tr><td colspan="1" rowspan="1"><p> What Query Type would you like to use? </p></td><td colspan="1" rowspan="1"><p> 使用するクエリタイプを選択します。デフォルトでは、レガシーSQLが選択されています。 </p></td></tr><tr><td colspan="1" rowspan="1"><p> Query </p></td><td colspan="1" rowspan="1"><p> Google BigQueryの完全修飾クエリを入力します。 </p></td></tr><tr><td colspan="1" rowspan="1"><p> Query Parameter </p></td><td colspan="1" rowspan="1"><p> クエリパラメーターの値を入力します。これはクエリパラメーターの初期値になります。最終実行日はオプションです。指定しない場合はデフォルトで「02/01/1700」となります。例：&lt;tt&gt;!`{lastvalue:_id}`!=1,!`{lastrundate:start_date}`!=02/01/1944&lt;/tt&gt; </p></td></tr><tr><td colspan="1" rowspan="1"><p> Project ID </p></td><td colspan="1" rowspan="1"><p> データを取得するプロジェクトのIDを入力します。 </p></td></tr><tr><td colspan="1" rowspan="1"><p> Expect Large Results </p></td><td colspan="1" rowspan="1"><p> 大きい結果を返すクエリの場合、一時的なテーブルが作成され、ジョブが完了すると削除されます。一時的なテーブルを作成するには、DataSet IDが必要です。 </p></td></tr><tr><td colspan="1" rowspan="1"><p> DataSet ID </p></td><td colspan="1" rowspan="1"><p> データを取得するDataSetのIDを入力します。 </p></td></tr><tr><td colspan="1" rowspan="1"><p> Projects </p></td><td colspan="1" rowspan="1"><p> 利用可能なプロジェクトのリストからプロジェクトを選択します。 </p></td></tr><tr><td colspan="1" rowspan="1"><p> DataSet </p></td><td colspan="1" rowspan="1"><p> 利用可能なDataSetリストからDataSetを選択します。 </p></td></tr><tr><td colspan="1" rowspan="1"><p> Tables </p></td><td colspan="1" rowspan="1"><p> 利用可能なテーブルのリストからテーブルを選択します。 </p></td></tr><tr><td colspan="1" rowspan="1"><p> Location </p></td><td colspan="1" rowspan="1"><p> ロケーションを入力します。ロケーション情報については、 <a href="https://cloud.google.com/bigquery/docs/locations" target="_blank" title="https://cloud.google.com/bigquery/docs/locations"> https://cloud.google.com/bigquery/docs/locations </a> を参照してください。 </p></td></tr><tr><td colspan="1" rowspan="1"><p> Selected Fields </p></td><td colspan="1" rowspan="1"><p> フィールドを選択します。 </p></td></tr><tr><td colspan="1" rowspan="1"><p> Max Results </p></td><td colspan="1" rowspan="1"><p> データの1ページ当たりの結果の数です。デフォルトでは、最大の結果は1ページ当たり10,000です。DataSetのメモリー不足エラーが発生した場合は、最大の結果を減らします。 </p></td></tr><tr><td colspan="1" rowspan="1"><p> Use Google BigQuery Schema </p></td><td colspan="1" rowspan="1"><p> Google BigQueryから受け取ったスキーマを使用するには、このチェックボックスを選択します。これは、列のデータタイプがDomoで正しく認識されない場合に役立ちます。例：テーブルの文字列に「123」が含まれている。 </p></td></tr></tbody></table>
+| メニュー | 説明  |
+| ---- | --- |
+| Report | 実行するGoogle BigQuery Workload Identity連携データレポートを選択します。以下のレポートが利用できます。<table><tbody><tr><td>**レポート名**</td><td>**説明**</td></tr><tr><td>Query</td><td>レガシーSQLまたは標準SQLを実行してデータをBigQueryから返します。</td></tr><tr><td>Table Information</td><td>テーブルの詳細を返します。</td></tr></tbody></table> |
+| What Query Type would you like to use? | 使用するクエリタイプを選択します。デフォルトでは、レガシーSQLが選択されています。 |
+| Query | Google BigQueryの完全修飾クエリを入力します。 |
+| Query Parameter | クエリパラメーターの値を入力します。これはクエリパラメーターの初期値になります。最終実行日はオプションです。指定しない場合はデフォルトで「02/01/1700」となります。例：<tt>!&#123;lastvalue:\_id&#125;!=1,!&#123;lastrundate:start\_date&#125;!=02/01/1944</tt> |
+| Project ID | データを取得するプロジェクトのIDを入力します。 |
+| Expect Large Results | 大きい結果を返すクエリの場合、一時的なテーブルが作成され、ジョブが完了すると削除されます。一時的なテーブルを作成するには、DataSet IDが必要です。 |
+| DataSet ID | データを取得するDataSetのIDを入力します。 |
+| Projects | 利用可能なプロジェクトのリストからプロジェクトを選択します。 |
+| DataSet | 利用可能なDataSetリストからDataSetを選択します。 |
+| Tables | 利用可能なテーブルのリストからテーブルを選択します。 |
+| Location | ロケーションを入力します。ロケーション情報については、[https://cloud.google.com/bigquery/docs/locations](https://cloud.google.com/bigquery/docs/locations)を参照してください。 |
+| Selected Fields | フィールドを選択します。 |
+| Max Results | データの1ページ当たりの結果の数です。デフォルトでは、最大の結果は1ページ当たり10,000です。DataSetのメモリー不足エラーが発生した場合は、最大の結果を減らします。 |
+| Use Google BigQuery Schema | Google BigQueryから受け取ったスキーマを使用するには、このチェックボックスを選択します。これは、列のデータタイプがDomoで正しく認識されない場合に役立ちます。例：テーブルの文字列に「123」が含まれている。 |
 
 ## その他のペイン
 
-スケジュール設定、再試行、更新に関するオプションなど、コネクターインターフェースのその他のペインに表示されるオプションについては、「 [コネクターを使用してDataSetを追加する](/ja/s/article/360042926274 "コネクターを使用してDataSetを追加する") 」を参照してください。
-
-
+スケジュール設定、再試行、更新に関するオプションなど、コネクターインターフェースのその他のペインに表示されるオプションについては、「[コネクターを使用してDataSetを追加する](/ja/s/article/360042926274)」を参照してください。

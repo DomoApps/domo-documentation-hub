@@ -25,9 +25,13 @@ env:
 # ============================================================================
 
 on:
-  schedule:
-    - cron: "0 */6 * * *" # Every 6 hours
+  # Triggered by the upstream notifier workflow in domoinc/internal-domo-apis
+  # (.github/workflows/notify-docs-hub.yml) whenever a YAML under
+  # api-docs/public/ changes on master.
+  repository_dispatch:
+    types: [openapi-updated]
 
+  # Manual escape hatch. Supports force_sync for re-syncing unchanged files.
   workflow_dispatch:
     inputs:
       force_sync:
@@ -35,9 +39,6 @@ on:
         required: false
         type: boolean
         default: false
-
-  repository_dispatch:
-    types: [openapi-updated]
 
 jobs:
   detect:

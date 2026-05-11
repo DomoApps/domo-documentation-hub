@@ -2,524 +2,505 @@
 title: "Build Your First Dashboard | Tutorial"
 ---
 
-import {InlineImage} from "/snippets/InlineImage.mdx";
+## Intro
 
+In this tutorial, we'll show you how to use Domo to build a dashboard from start to finish. We'll walk you through connecting data, cleaning it through a simple ETL (Extract, Transform, Load) process, building a dashboard with four to five dynamic cards, setting a Card Alert, and pushing that alert to your email or phone in real time and sharing it with colleagues. This guide serves as a foundation for your journey with Domo, setting the stage for more advanced functionalities and applications.
 
-### Intro
-
- In this tutorial, we’ll show you how to use Domo to build a dashboard from start to finish. We’ll walk you through connecting data, cleaning it through a simple ETL (Extract, Transform, Load) process, building a dashboard with four to five dynamic cards, setting a Card Alert, and pushing that alert to your email or phone in real time and sharing it with colleagues. This guide serves as a foundation for your journey with Domo, setting the stage for more advanced functionalities and applications.
- 
- As we move through the tutorial, you'll gain hands-on experience with Domo's powerful features. We'll provide step-by-step instructions, practical examples, and useful tips to make your learning process smooth and enjoyable.
-
+As we move through the tutorial, you'll gain hands-on experience with Domo's powerful features. We'll provide step-by-step instructions, practical examples, and useful tips to make your learning process smooth and enjoyable.
 
 ---
 
+## Prerequisites
+
+Before beginning the tutorial, make sure you have the following:
+
+- Access to these sample Google Sheets:
+  - [Sales Data](https://docs.google.com/spreadsheets/d/1K8YJxidZkCnc8DjCHLUnKWqm_Gywqoeh6DbamkLJy9w/edit?gid=99140820#gid=99140820) <img alt="" src="/images/kb/0EMVq000008gSmT.jpg" style={{width: 17, height: 17, display: 'inline', verticalAlign: 'start', margin: '0'}}/>
+  - [Marketing Data](https://docs.google.com/spreadsheets/d/1AmnIH1-EbPl0rguDGDLkiVJp1uFsJYzDkh8Ud-OerXw/edit?gid=0#gid=0) <img alt="" src="/images/kb/0EMVq000008gSmT.jpg" style={{width: 17, height: 17, display: 'inline', verticalAlign: 'start', margin: '0'}}/>
+
+  **Identify the spreadsheet IDs:** Notice the spreadsheet IDs in these URLs. These IDs uniquely identify your Google Sheets are one way you can set up the connection in Domo.
+
+  - For the Sales data, the ID is 1K8YJxidZkCnc8DjCHLUnKWqm\_Gywqoeh6DbamkLJy9w
+  - For the Marketing data, the ID is 1AmnIH1-EbPl0rguDGDLkiVJp1uFsJYzDkh8Ud-OerXw
+
+- To stay connected and access your data away from a computer, download the [Domo Mobile](https://www.domo.com/business-intelligence/features/mobile) <img alt="" src="/images/kb/0EMVq000008gSmT.jpg" style={{width: 17, height: 17, display: 'inline', verticalAlign: 'start', margin: '0'}}/>
+
+    app:
+  - **For Android users —** Visit the Google Play Store and search for 'Domo'.
+  - **For iOS users —** Go to the Apple App Store and look up 'Domo'.Download and install the app on your device. After installing, log in to the app with your Domo credentials. If your organization uses Single Sign-On (SSO), you may need to follow a different login procedure.
+
+  
+<Note>**Note:** The mobile app's default screen is the Home dashboard, which displays key pages and metrics. Follow these links to learn more about the Domo mobile app:</Note>
+
+  - [Customize Domo mobile app](/s/article/000005648)
+  - [Mobile Enterprise Security](/s/article/1500007028582)
+  - [Domo Mobile best practices](/s/article/360042923554)
+  - [Edit a dashboard's mobile layout](/s/article/1500010172542)
+- Import Zips to Fips data
+
+  **Optional step to join data later:** The Zips to Fips DataSet is a valuable asset from Domo's connector library. It helps in joining ZIP code data to FIPS codes, which can be used to group zip codes at a larger county level.
+
+  Follow these steps to access this data:
+
+  1. In your Domo instance, use the left navigation to go to **Features** > **Data Warehouse**.
+  2. At the top of the screen, select **Connect Data** > **Connectors**.
+  3. Search for "dimensions" and choose the **Domo Dimensions Connector** to open the configuration modal.
+  4. Use the **Files** dropdown to find and select the "zips\_to\_fips\_latest" DataSet.
+  5. Select **Next** in the top right of the modal and name your DataSet "Zips to Fips."
+  6. Select **Save and Run** to begin importing the data.
+
+## Connect to Sample Google Sheets Data
+
+Domo's connectors can efficiently bring your data into Domo when manual uploads and web forms seem too labor-intensive. This guide describes how to seamlessly integrate the [sample data](#prerequisites) above into Domo for use during this tutorial.
+
+**Why use connectors?** Connectors provide an automated "set it and forget it" method for data integration, contrasting the manual effort needed with other data connection methods.
+
+Follow these steps to use the Google Sheets Connector with the [sample data](#prerequisites) provided above:
+
+**Access the Google Sheets Connector**
+
+1. In your Domo instance, use the left navigation to go to **Features** > **DataSets**.
+2. At the top of the screen, select **Connect Data** > **Connectors**.
+3. Search for the "Google Sheets" connector and select **Use Recommended**.  
+     
+
+   <Frame>![Screenshot](/images/kb/0EMVq000008r9mw.jpg)</Frame>
+
+     
+
+   
+<Warning>**Important:** It's important to understand that Domo offers different connectors for different needs. For instance, there are separate Facebook connectors for organic and paid traffic. Similarly, Domo provides various connectors to Google Sheets, depending on the data integration requirements.</Warning>
+
+**Connect with the Google Sheets Connector**
+
+4. Use the **Connect** option to choose a Google account. If you need to authenticate your Google account, a pop-up window guides you through the process.
+5. In the top right corner of the connector modal, select **Next**.  
+     
+
+   <Frame>![Screenshot](/images/kb/0EMVq000008rfWg.jpg)</Frame>
+6. In the **Spreadsheet URL** field, enter the spreadsheet IDs from the [prerequisites](#prerequisites) section above and select **Next**.  
+   In the next steps, the example uses the Sales Data file and spreadsheet ID. Repeat these steps for the Marketing Data, so we can use both DataSets later in this tutorial.  
+     
+
+   <Frame>![Screenshot](/images/kb/0EMVq000008us7Z.jpg)</Frame>
+
+**Schedule Updates**
+
+After connecting to your data, decide how frequently you want to update it. Remember, data pulls consume credits, so choose a frequency that balances need and resource consumption. The **Advanced** tab allows you choose to pull the data more than once a day or on specific days of the week or month.
+
+7. Use the **Basic** and **Advanced** tabs to set a schedule for data updates. Some options may be unavailable with your current permissions. You can ask your admin to allow the data to update more frequently. When ready, select **Next**.  
+     
+
+   <Frame>![Screenshot](/images/kb/0EMVq000008uue1.jpg)</Frame>
+
+**Finalize Your Connection**
+
+7. Give your DataSet a name and optional description so you can easily identify it later. Select **Save and Run**.  
+     
+
+   <Frame>![Screenshot](/images/kb/0EMVq000008ucED.jpg)</Frame>
+8. Repeat these steps for the Marketing Data with the spreadsheet ID listed [above](#prerequisites).
+
+You've successfully used the Google Sheets connector to add two DataSets to Domo!
+
+## Build a Sample ETL
+
+This guide provides step-by-step instructions for building an ETL (Extract, Transform, Load) process that connects sales data to zip codes and FIPS codes. This enriches the sales data with geographical details like city, state, and county, which are critical for location-based analytics.
+
+<Note>**Note:** It's not always necessary to join data sources and clean them in Domo, but this tutorial is good practice for how to join different systems.</Note>
+
 ### Prerequisites
 
- Before beginning the tutorial, make sure you have the following:
+Make sure you have the following:
+
+- Access to Domo with necessary permissions.
+- The Sales Data and ZIP-to-FIPS DataSets in Domo. If you haven't imported them, see the [prerequisites](#prerequisites) and [Connect to Sample Google Sheets Data](#connect-to-sample-google-sheets-data) sections above.
+
+When you're ready, follow the steps below:
+
+**Examine the Data**
+
+1. Log into Domo and use the left navigation to go to **Features** > **DataSets**.
+2. Make sure both the Samples Sales Transactions and Zips to Fips DataSets are available.  
+     
+
+   <Frame>![Screenshot](/images/kb/0EMVq000008uYSE.jpg)</Frame>
+3. Select **Sample Sales Transactions** and look at the **Data** tab to understand its structure and identify the column it shares with the Zips to Fips data. in this case, the ZIP code. Here, the column is called `Zip Code.`  
+     
+
+   <Frame>![Screenshot](/images/kb/0EMVq000008uzsD.jpg)</Frame>
+4. Make sure the `Zip Code` column is formatted correctly.  
+
+   <Frame>![Screenshot](/images/kb/0EMVq000008v0Mr.jpg)</Frame>
+5. Return to the DataSets interface and select **Zips to Fips**.
+6. In the **Data** tab, use the search columns tool to find potential ZIP codes to match the sales data.  
+     
+
+   <Frame>![Screenshot](/images/kb/0EMVq000008v12n.jpg)</Frame>
+7. Three columns are returned as results. Note that the `ZIP` and `ZIP\_STRING` columns don't retain leading zeroes. We need the leading zeroes to match against our sales data, so we want to use the `ZIP\_STRING\_LEADING\_ZERO` column.   
+     
+   In this image, note the leading zeroes.  
+     
+
+   <Frame>![Screenshot](/images/kb/0EMVq000008v225.jpg)</Frame>
+
+You're now ready to create your first ETL.
+
+**Open Magic ETL**
+
+8. From the Zips to Fips data, select **Open With** > **Magic ETL**.  
+     
+
+   <Frame>![Screenshot](/images/kb/0EMVq000008v2V7.jpg)</Frame>
+9. Review the training pop-ups as needed, then close them.   
+     
+
+   <Frame>![Screenshot](/images/kb/0EMVq000008v2lF.jpg)</Frame>
+
    
-* Access to these sample Google Sheets:
-	+ [Sales Data](https://docs.google.com/spreadsheets/d/1K8YJxidZkCnc8DjCHLUnKWqm_Gywqoeh6DbamkLJy9w/edit?gid=99140820#gid=99140820) <InlineImage src="/images/kb/ka0Vq000000HcYj-00N5w00000Ri7BU-0EMVq000008gSmT.jpg" />
-	+ [Marketing Data](https://docs.google.com/spreadsheets/d/1AmnIH1-EbPl0rguDGDLkiVJp1uFsJYzDkh8Ud-OerXw/edit?gid=0#gid=0) <InlineImage src="/images/kb/ka0Vq000000HcYj-00N5w00000Ri7BU-0EMVq000008gSmT-1.jpg" />
+<Tip>**Tip:** The Magic ETL checklist is great for making sure things are configured properly. Toggle the checklist by selecting **Show Checklist** (checkmark icon) in the toolbar above the Magic ETL canvas.</Tip>
 
-	<Note>
-	  **Identify the spreadsheet IDs:** 
-	  Notice the spreadsheet IDs in these URLs. These IDs uniquely identify your Google Sheets are one way you can set up the connection in Domo.
+   <Frame>![Screenshot](/images/kb/0EMVq000008v3Sn.jpg)</Frame>
 
-	  + For the Sales data, the ID is 1K8YJxidZkCnc8DjCHLUnKWqm\_Gywqoeh6DbamkLJy9w
-	  + For the Marketing data, the ID is 1AmnIH1-EbPl0rguDGDLkiVJp1uFsJYzDkh8Ud-OerXw
-	</Note>
+**Configure ETL Inputs**
 
-* To stay connected and access your data away from a computer, download the
- [Domo Mobile](https://www.domo.com/business-intelligence/features/mobile) <InlineImage src="/images/kb/ka0Vq000000HcYj-00N5w00000Ri7BU-0EMVq000008gSmT-2.jpg" />
- app:
-	+ **For Android users —** 
-	 Visit the Google Play Store and search for 'Domo'.
-	+ **For iOS users —** 
-	 Go to the Apple App Store and look up 'Domo'.
- Download and install the app on your device. After installing, log in to the app with your Domo credentials. If your organization uses Single Sign-On (SSO), you may need to follow a different login procedure.
- 
- <Note>
-   **Note:** 
-   The mobile app's default screen is the Home dashboard, which displays key pages and metrics. Follow these links to learn more about the Domo mobile app:
+10. From the panel to the left of the canvas under **DataSets**, drag an **Input DataSet** tile to the canvas.   
+      
 
-   + [Customize Domo mobile app](https://domo-support.domo.com/s/article/000005648)
-   + [Mobile Enterprise Security](https://domo-support.domo.com/s/article/1500007028582)
-   + [Domo Mobile best practices](https://domo-support.domo.com/s/article/360042923554)
-   + [Edit a dashboard's mobile layout](https://domo-support.domo.com/s/article/1500010172542)
+    <Frame>![Screenshot](/images/kb/0EMVq000008v6P3.jpg)</Frame>
+11. In the tile configuration area below the canvas, select **Choose DataSet** to open the data selection modal.  
+      
 
- </Note>
+    <Frame>![Screenshot](/images/kb/0EMVq000008v5hW.jpg)</Frame>
+12. Find and select `Sample Sales Transactions` and select **Choose DataSet** to return to the canvas.  
+      
 
-* Import Zips to Fips data
- 
-<Note>
-  **Optional step to join data later:** 
-  The Zips to Fips DataSet is a valuable asset from Domo's connector library. It helps in joining ZIP code data to FIPS codes, which can be used to group zip codes at a larger county level.
+    <Frame>![Screenshot](/images/kb/0EMVq000008uzXG.jpg)</Frame>
 
-</Note>
+With the data brought into Magic ETL, we're now ready to transform it.
 
- Follow these steps to access this data:
- 
-	1. In your Domo instance, use the left navigation to go to
-	 **Features** > **Data Warehouse**.
-  2. At the top of the screen, select
-	 **Connect Data** > **Connectors**.
-  3. Search for "dimensions" and choose the
-	 **Domo Dimensions Connector**  to open the configuration modal.
-  4. Use the
-	 **Files**  dropdown to find and select the "zips\_to\_fips\_latest" DataSet.
-  5. Select
-    **Next**  in the top right of the modal and name your DataSet "Zips to Fips."
-  6. Select
-    **Save and Run**  to begin importing the data.
+**Add Transform Tiles**
 
+13. From the left panel under **Utility**, drag a Select Columns tile to the canvas and connect the node for the Sample Sales Transactions data to it by clicking and dragging.   
+      
 
+    <Frame>![Screenshot](/images/kb/0EMVq000008v8qf.jpg)</Frame>
+14. Add a second Select Columns tile and connect it to the Zips to Fips data.  
+      
 
-### Connect to Sample Google Sheets Data
+    <Frame>![Screenshot](/images/kb/0EMVq000008v8ST.jpg)</Frame>
+15. Choose the Select Columns tile connected to the sales data to open the tile configuration area.  
+      
 
- Domo's connectors can efficiently bring your data into Domo when manual uploads and web forms seem too labor-intensive. This guide describes how to seamlessly integrate the [sample data](#prerequisites)  above into Domo for use during this tutorial.
- 
- <Note>
-   **Why use connectors?** 
-  
-   Connectors provide an automated "set it and forget it" method for data integration, contrasting the manual effort needed with other data connection methods.
- </Note>
+    <Frame>![Screenshot](/images/kb/0EMVq000008uqk7.jpg)</Frame>
+16. Select **Add All** **Columns**.  
+      
 
- Follow these steps to use the Google Sheets Connector with the [sample data](#prerequisites)  provided above:
- 
-**Access the Google Sheets Connector** 
-
-1. In your Domo instance, use the left navigation to go to
- **Features** > **DataSets**.
-2. At the top of the screen, select
- **Connect Data** > **Connectors**.
-3. Search for the "Google Sheets" connector and select
- **Use Recommended**.
-   
-<Frame><img alt="" src="/images/kb/ka0Vq000000HcYj-00N5w00000Ri7BU-0EMVq000008r9mw.jpg" style={{width: 749, height: 459}}/></Frame>
-<Warning>
-  **Important:** 
-  It's important to understand that Domo offers different connectors for different needs. For instance, there are separate Facebook connectors for organic and paid traffic. Similarly, Domo provides various connectors to Google Sheets, depending on the data integration requirements.
-
-</Warning>
-
-**Connect with the Google Sheets Connector** 
-
-4. Use the
- **Connect**  option to choose a Google account. If you need to authenticate your Google account, a pop-up window guides you through the process.
-5. In the top right corner of the connector modal, select
- **Next**.
-   
-<Frame><img alt="" src="/images/kb/ka0Vq000000HcYj-00N5w00000Ri7BU-0EMVq000008rfWg.jpg" style={{width: 750, height: 541}}/></Frame>
-6. In the
- **Spreadsheet URL**  field, enter the spreadsheet IDs from the [prerequisites](#prerequisites)  section above and select **Next**.
-   
- In the next steps, the example uses the Sales Data file and spreadsheet ID. Repeat these steps for the Marketing Data, so we can use both DataSets later in this tutorial.
-   
-<Frame><img alt="" src="/images/kb/ka0Vq000000HcYj-00N5w00000Ri7BU-0EMVq000008us7Z.jpg" style={{width: 750, height: 518}}/></Frame>
-**Schedule Updates** 
-
- After connecting to your data, decide how frequently you want to update it. Remember, data pulls consume credits, so choose a frequency that balances need and resource consumption. The **Advanced**  tab allows you choose to pull the data more than once a day or on specific days of the week or month.
- 
-7. Use the
- **Basic**  and **Advanced**  tabs to set a schedule for data updates. Some options may be unavailable with your current permissions. You can ask your admin to allow the data to update more frequently. When ready, select **Next**.
-   
-<Frame><img alt="" src="/images/kb/ka0Vq000000HcYj-00N5w00000Ri7BU-0EMVq000008uue1.jpg" style={{width: 750, height: 298}}/></Frame>
-**Finalize Your Connection** 
-
-7. Give your DataSet a name and optional description so you can easily identify it later. Select
- **Save and Run**.
-   
-<Frame><img alt="" src="/images/kb/ka0Vq000000HcYj-00N5w00000Ri7BU-0EMVq000008ucED.jpg" style={{width: 751, height: 388}}/></Frame>
-8. Repeat these steps for the Marketing Data with the spreadsheet ID listed
- [above](#prerequisites)  .
-
- You've successfully used the Google Sheets connector to add two DataSets to Domo!
- 
-### Build a Sample ETL
-
- This guide provides step-by-step instructions for building an ETL (Extract, Transform, Load) process that connects sales data to zip codes and FIPS codes. This enriches the sales data with geographical details like city, state, and county, which are critical for location-based analytics.
- 
- <Note>
-   **Note:** 
-   It's not always necessary to join data sources and clean them in Domo, but this tutorial is good practice for how to join different systems.
-
- </Note>
-
-# Prerequisites
-
- Make sure you have the following:
- 
-* Access to Domo with necessary permissions.
-* The Sales Data and ZIP-to-FIPS DataSets in Domo. If you haven't imported them, see the
- [prerequisites](#prerequisites)  and [Connect to Sample Google Sheets Data](#connect_to_google_sheets)  sections above.
-
- When you're ready, follow the steps below:
- 
-**Examine the Data** 
-
-1. Log into Domo and use the left navigation to go to
- **Features** > **DataSets**.
-2. Make sure both the Samples Sales Transactions and Zips to Fips DataSets are available.
-   
-<Frame><img alt="" src="/images/kb/ka0Vq000000HcYj-00N5w00000Ri7BU-0EMVq000008uYSE.jpg" style={{width: 850, height: 200}}/></Frame>
-3. Select
- **Sample Sales Transactions**  and look at the **Data**  tab to understand its structure and identify the column it shares with the Zips to Fips data. in this case, the ZIP code. Here, the column is called `Zip Code.`
-   
-<Frame><img alt="" src="/images/kb/ka0Vq000000HcYj-00N5w00000Ri7BU-0EMVq000008uzsD.jpg" style={{width: 850, height: 253}}/></Frame>
-4. Make sure the `Zip Code` column is formatted correctly.
-   
-<Frame><img alt="" src="/images/kb/ka0Vq000000HcYj-00N5w00000Ri7BU-0EMVq000008v0Mr.jpg" style={{width: 649, height: 346}}/></Frame>
-5. Return to the DataSets interface and select
- **Zips to Fips**.
-6. In the
- **Data**  tab, use the search columns tool to find potential ZIP codes to match the sales data.
-   
-<Frame><img alt="" src="/images/kb/ka0Vq000000HcYj-00N5w00000Ri7BU-0EMVq000008v12n.jpg" style={{width: 649, height: 231}}/></Frame>
-7. Three columns are returned as results. Note that the `ZIP` and `ZIP\_STRING` columns don't retain leading zeroes. We need the leading zeroes to match against our sales data, so we want to use the `ZIP\_STRING\_LEADING\_ZERO` column.
-   
- In this image, note the leading zeroes.
-   
-<Frame><img alt="" src="/images/kb/ka0Vq000000HcYj-00N5w00000Ri7BU-0EMVq000008v225.jpg" style={{width: 650, height: 319}}/></Frame>
- You're now ready to create your first ETL.
- 
-**Open Magic ETL** 
-
-8. From the Zips to Fips data, select
- **Open With** > **Magic ETL**.
-   
-<Frame><img alt="" src="/images/kb/ka0Vq000000HcYj-00N5w00000Ri7BU-0EMVq000008v2V7.jpg" style={{width: 501, height: 240}}/></Frame>
-9. Review the training pop-ups as needed, then close them.
-   
-<Frame><img alt="" src="/images/kb/ka0Vq000000HcYj-00N5w00000Ri7BU-0EMVq000008v2lF.jpg" style={{width: 600, height: 400}}/></Frame>
-<Tip>
-  **Tip:** 
-  The Magic ETL checklist is great for making sure things are configured properly. Toggle the checklist by selecting
-  **Show Checklist** 
-  (checkmark icon) in the toolbar above the Magic ETL canvas.
-
-  <Frame><img alt="" src="/images/kb/ka0Vq000000HcYj-00N5w00000Ri7BU-0EMVq000008v3Sn.jpg" style={{width: 449, height: 117}}/></Frame>
-</Tip>
-
-**Configure ETL Inputs** 
-
-10. From the panel to the left of the canvas under
- **DataSets**  , drag an **Input DataSet**  tile to the canvas.
-   
-<Frame><img alt="" src="/images/kb/ka0Vq000000HcYj-00N5w00000Ri7BU-0EMVq000008v6P3.jpg" style={{width: 651, height: 259}}/></Frame>
-11. In the tile configuration area below the canvas, select
- **Choose DataSet**  to open the data selection modal.
-   
-<Frame><img alt="" src="/images/kb/ka0Vq000000HcYj-00N5w00000Ri7BU-0EMVq000008v5hW.jpg" style={{width: 449, height: 228}}/></Frame>
-12. Find and select `Sample Sales Transactions` and select
- **Choose DataSet**  to return to the canvas.
-   
-<Frame><img alt="" src="/images/kb/ka0Vq000000HcYj-00N5w00000Ri7BU-0EMVq000008uzXG.jpg" style={{width: 500, height: 392}}/></Frame>
- With the data brought into Magic ETL, we're now ready to transform it.
- 
-**Add Transform Tiles** 
-
-13. From the left panel under
- **Utility**  , drag a Select Columns tile to the canvas and connect the node for the Sample Sales Transactions data to it by clicking and dragging.
-   
-<Frame><img alt="" src="/images/kb/ka0Vq000000HcYj-00N5w00000Ri7BU-0EMVq000008v8qf.jpg" style={{width: 449, height: 109}}/></Frame>
-14. Add a second Select Columns tile and connect it to the Zips to Fips data.
-   
-<Frame><img alt="" src="/images/kb/ka0Vq000000HcYj-00N5w00000Ri7BU-0EMVq000008v8ST.jpg" style={{width: 500, height: 420}}/></Frame>
-15. Choose the Select Columns tile connected to the sales data to open the tile configuration area.
-   
-<Frame><img alt="" src="/images/kb/ka0Vq000000HcYj-00N5w00000Ri7BU-0EMVq000008uqk7.jpg" style={{width: 201, height: 256}}/></Frame>
-16. Select
- **Add All** 
-**Columns** 
- .
-   
-<Frame><img alt="" src="/images/kb/ka0Vq000000HcYj-00N5w00000Ri7BU-0EMVq000008uzaU.jpg" style={{width: 400, height: 320}}/></Frame>
+    <Frame>![Screenshot](/images/kb/0EMVq000008uzaU.jpg)</Frame>
 17. Repeat these steps to add all columns for the Zips to Fips data. Although we know we only want one of the ZIP code columns, it can be easiest to add all columns at first and then remove the ones we don't want.
-18. Now we can remove the ZIP columns we don't need by using the remove options (X icon) at the far right of every column row in the tile configuration tab.
-   
-<Frame><img alt="" src="/images/kb/ka0Vq000000HcYj-00N5w00000Ri7BU-0EMVq000008vA9J.jpg" style={{width: 650, height: 389}}/></Frame>
-19. (Recommended) To make your DataFlow easier to configure, we recommend renaming your Select Columns tiles. In this example, we rename the first Select Columns tile to Sales Columns. Select the column to view the tile's configuration. Then use the
- **Edit**  option (pencil icon) to rename the tile. We'll rename the other Select Columns tile to Zips Columns.
- 
-<Frame><img alt="" src="/images/kb/ka0Vq000000HcYj-00N5w00000Ri7BU-0EMVq000008vOx3.jpg" style={{width: 548, height: 155}}/></Frame>
-<Tip>
-  **Tip:** 
-  Running a preview is a great way to be confident in your data configuration. After the green checks are present, we can inspect the data.
+18. Now we can remove the ZIP columns we don't need by using the remove options (X icon) at the far right of every column row in the tile configuration tab.  
+      
 
-</Tip>
+    <Frame>![Screenshot](/images/kb/0EMVq000008vA9J.jpg)</Frame>
+19. (Recommended) To make your DataFlow easier to configure, we recommend renaming your Select Columns tiles. In this example, we rename the first Select Columns tile to Sales Columns. Select the column to view the tile's configuration. Then use the **Edit** option (pencil icon) to rename the tile. We'll rename the other Select Columns tile to Zips Columns.
 
-20. (Optional) Select
- **Run Preview**  at the top of the canvas. If the preview is successful, green checkmarks display for each tile.
- 
-<Columns>
-  <Frame><img alt="" src="/images/kb/ka0Vq000000HcYj-00N5w00000Ri7BU-0EMVq000008vBYQ.jpg" style={{width: 330, height: 66}}/></Frame>
-  <Frame><img alt="" src="/images/kb/ka0Vq000000HcYj-00N5w00000Ri7BU-0EMVq000008vPDB.jpg" style={{width: 200, height: 247}}/></Frame>
-</Columns>
-21. Use the
- **Save**  option in the top right corner of the canvas often to preserve your DataFlow. You can make notes about the version or simply save.
-   
-<Frame><img alt="" src="/images/kb/ka0Vq000000HcYj-00N5w00000Ri7BU-0EMVq000008vG9v.jpg" style={{width: 499, height: 237}}/></Frame>
-**Create a Join** 
+    <Frame>![Screenshot](/images/kb/0EMVq000008vOx3.jpg)</Frame>
 
-22. From the left panel under
- **Combine Data**  , drag a Join Data tile to the canvas.
-   
-<Frame><img alt="" src="/images/kb/ka0Vq000000HcYj-00N5w00000Ri7BU-0EMVq000008vCfm.jpg" style={{width: 648, height: 293}}/></Frame>
-23. Drag the right node from the Sales Columns tile to the triangle on the Join Data tile to connect them. Repeat for the Zips Columns tile.
-   
-<Frame><img alt="" src="/images/kb/ka0Vq000000HcYj-00N5w00000Ri7BU-0EMVq000008v9Ji.jpg" style={{width: 350, height: 251}}/></Frame>
-**Configure the Join** 
+     
+
+    
+<Tip>**Tip:** Running a preview is a great way to be confident in your data configuration. After the green checks are present, we can inspect the data.
+20. (Optional) Select **Run Preview** at the top of the canvas. If the preview is successful, green checkmarks display for each tile.</Tip>
+
+    <Frame>![Screenshot](/images/kb/0EMVq000008vBYQ.jpg)</Frame>
+
+      
+      
+      
+
+    <Frame>![Screenshot](/images/kb/0EMVq000008vPDB.jpg)</Frame>
+21. Use the **Save** option in the top right corner of the canvas often to preserve your DataFlow. You can make notes about the version or simply save.  
+      
+
+    <Frame>![Screenshot](/images/kb/0EMVq000008vG9v.jpg)</Frame>
+
+**Create a Join**
+
+22. From the left panel under **Combine Data**, drag a Join Data tile to the canvas.  
+      
+
+    <Frame>![Screenshot](/images/kb/0EMVq000008vCfm.jpg)</Frame>
+23. Drag the right node from the Sales Columns tile to the triangle on the Join Data tile to connect them. Repeat for the Zips Columns tile.  
+      
+
+    <Frame>![Screenshot](/images/kb/0EMVq000008v9Ji.jpg)</Frame>
+
+**Configure the Join**
 
 24. Select the Join Data tile to open the tile configuration area.
-25. Use the
- **Join Type**  dropdown to choose a Left Outer join.
-   
-<Frame><img alt="" src="/images/kb/ka0Vq000000HcYj-00N5w00000Ri7BU-0EMVq000008vDNK.jpg" style={{width: 400, height: 485}}/></Frame>
- Now we will select our first Key. Keys are columns that we match across DataSets to bring data together.
-26. Choose
- **+ Equality condition**  and choose the `Zip Code` column in the **Column from left table**  dropdown.
-   
-<Columns>
-  <Frame><img alt="" src="/images/kb/ka0Vq000000HcYj-00N5w00000Ri7BU-0EMVq000008vQNl.jpg" style={{width: 450, height: 102}}/></Frame>
-  <Frame><img alt="" src="/images/kb/ka0Vq000000HcYj-00N5w00000Ri7BU-0EMVq000008vMGw.jpg" style={{width: 250, height: 451}}/></Frame>
-</Columns>
-27. In the
- **Column from right table**  dropdown, choose the `ZIP\_STRING\_LEADING\_ZERO.`
-28. Select
- **Done**  in the top right corner of the tile configuration area.
-   
-<Frame><img alt="" src="/images/kb/ka0Vq000000HcYj-00N5w00000Ri7BU-0EMVq0000093t1B.jpg" style={{width: 799, height: 318}}/></Frame>
-**Build an Output** 
+25. Use the **Join Type** dropdown to choose a Left Outer join.  
+      
 
-29. From the left panel under
- **DataSets**  , select an Output DataSet tile and drag it to the canvas.
-30. Connect the Join Data tile to the Output DataSet tile.
-   
-<Frame><img alt="" src="/images/kb/ka0Vq000000HcYj-00N5w00000Ri7BU-0EMVq0000093uTV.jpg" style={{width: 500, height: 234}}/></Frame>
-31. Name your DataFlow at the top of the canvas by selecting the name field and entering a name. We recommend naming all your DataFlows and DataSets according to a convention that will help you catalog and manage what you create.
-   
-<Frame><img alt="" src="/images/kb/ka0Vq000000HcYj-00N5w00000Ri7BU-0EMVq0000093qeQ.jpg" style={{width: 700, height: 349}}/></Frame>
-32. Select the Output DataSet tile to open the configuration area and name your Output DataSet tile. We recommend naming the DataSet in a way that describes the data it contains.
-   
-<Frame><img alt="" src="/images/kb/ka0Vq000000HcYj-00N5w00000Ri7BU-0EMVq0000093vXd.jpg" style={{width: 450, height: 528}}/></Frame>
-33. Select
- **Done**  in the tile configuration area.
-   
-<Frame><img alt="" src="/images/kb/ka0Vq000000HcYj-00N5w00000Ri7BU-0EMVq0000093wVJ.jpg" style={{width: 745, height: 102}}/></Frame>
- You've completed the hardest part! Now it's time to schedule how often the DataFlow updates.
- 
-**Schedule Your DataFlow** 
+    <Frame>![Screenshot](/images/kb/0EMVq000008vDNK.jpg)</Frame>
 
-34. Select the dropdown beside
- **Save**  at the top of the canvas and choose **Save and Run**.
-   
-<Frame><img alt="" src="/images/kb/ka0Vq000000HcYj-00N5w00000Ri7BU-0EMVq0000093xUb.jpg" style={{width: 401, height: 182}}/></Frame>
-35. We recommend leaving notes in the version description field to give helpful context for the future.
-   
-<Frame><img alt="" src="/images/kb/ka0Vq000000HcYj-00N5w00000Ri7BU-0EMVq0000093xmL.jpg" style={{width: 800, height: 370}}/></Frame>
-36. (Optional) To add a trigger that will execute your DataFlow, select
- **Add Trigger**.
-   
-<Frame><img alt="" src="/images/kb/ka0Vq000000HcYj-00N5w00000Ri7BU-0EMVq0000093yAX.jpg" style={{width: 799, height: 371}}/></Frame>
-37. Choose the trigger condition and select to which of the available DataSets the trigger should apply.
-   
- Repeat for as many triggers as you want to add.
-   
-<Frame><img alt="" src="/images/kb/ka0Vq000000HcYj-00N5w00000Ri7BU-0EMVq0000094Dnt.jpg" style={{width: 800, height: 299}}/></Frame>
-38. When finished, select
- **Save and Run**. Wait while the DataFlow runs and opens in the **History**  tab of the DataFlow details.
-   
-<Frame><img alt="" src="/images/kb/ka0Vq000000HcYj-00N5w00000Ri7BU-0EMVq0000093rCI.jpg" style={{width: 899, height: 278}}/></Frame>
-39. Hover over the
- **1 Output DataSet**  heading under the DataFlow name to see a link to the DataSet you created. You can use this DataSet to make the cards in the next section of this tutorial.
-   
-<Frame><img alt="" src="/images/kb/ka0Vq000000HcYj-00N5w00000Ri7BU-0EMVq0000094Ewr.jpg" style={{width: 699, height: 161}}/></Frame>
- You have successfully connected your sales data with geographical details, unlocking new insights for location-based analysis. To best use Domo's powerful transformation tools, it's important to understand and carefully prepare your data.
+        
+      
+    Now we will select our first Key. Keys are columns that we match across DataSets to bring data together.
+26. Choose **+ Equality condition** and choose the `Zip Code` column in the **Column from left table** dropdown.  
+      
 
+    <Frame>![Screenshot](/images/kb/0EMVq000008vQNl.jpg)</Frame>
 
- 
-### Build Cards and a Dashboard
+       
 
- Creating insightful and interactive Domo dashboards can be a crucial part of your data strategy. This guide provides step-by-step instructions on how to build cards and a dashboard using our sample data. We'll also cover adding a link card and implementing a page filter to get more from your dashboard.
- 
- There are different ways to access Analyzer, where cards are made. In this tutorial, we'll access it by first building a dashboard.
- 
-**Create a Dashboard** 
+    <Frame>![Screenshot](/images/kb/0EMVq000008vMGw.jpg)</Frame>
+27. In the **Column from right table** dropdown, choose the `ZIP\_STRING\_LEADING\_ZERO.`
+28. Select **Done** in the top right corner of the tile configuration area.  
+      
 
-1. In the left navigation, select
- **Add**  (plus icon) > **Dashboard**.
-   
-<Frame><img alt="" src="/images/kb/ka0Vq000000HcYj-00N5w00000Ri7BU-0EMVq0000094Glm.jpg" style={{width: 349, height: 496}}/></Frame>
-2. Give your dashboard a name. Choose a name that relates to the department, business area, or subject matter. Then select
- **Save**.
-   
-<Frame><img alt="" src="/images/kb/ka0Vq000000HcYj-00N5w00000Ri7BU-0EMVq0000094IpB.jpg" style={{width: 349, height: 197}}/></Frame>
-<Note>
-  **Note:** 
-  After saving your new dashboard, you can find it by going to
-  **Features** > **Dashboards** 
-  in the left navigation.
+    <Frame>![Screenshot](/images/kb/0EMVq0000093t1B.jpg)</Frame>
 
-</Note>
+**Build an Output**
 
-**Create Cards** 
+29. From the left panel under **DataSets**, select an Output DataSet tile and drag it to the canvas.
+30. Connect the Join Data tile to the Output DataSet tile.  
+      
 
-3. Go to your new dashboard and select
- **Add**  (plus icon) > **Create new Card**.
-   
-<Frame><img alt="" src="/images/kb/ka0Vq000000HcYj-00N5w00000Ri7BU-0EMVq0000094L3t.jpg" style={{width: 899, height: 381}}/></Frame>
-4. In the card type modal, select
- **Visualization**  , then **Existing data**.
-   
-<Columns>
-  <Frame><img alt="" src="/images/kb/ka0Vq000000HcYj-00N5w00000Ri7BU-0EMVq00000949E2.jpg" style={{width: 676, height: 407}}/></Frame>
-  <Frame><img alt="" src="/images/kb/ka0Vq000000HcYj-00N5w00000Ri7BU-0EMVq0000094La9.jpg" style={{width: 682, height: 322}}/></Frame>
-</Columns>
-5. Choose the marketing DataSet you created
- [above](#connect_to_google_sheets)  .
-   
-<Frame><img alt="" src="/images/kb/ka0Vq000000HcYj-00N5w00000Ri7BU-0EMVq0000097ORq.jpg" style={{width: 550, height: 428}}/></Frame>
- Your DataSet opens in Analyzer. Watch or close the tour pop-up that displays.
-   
-<Frame><img alt="" src="/images/kb/ka0Vq000000HcYj-00N5w00000Ri7BU-0EMVq0000097azG.jpg" style={{width: 900, height: 350}}/></Frame>
-6. In the
- **Chart types**  panel on the right side of the screen, use the dropdown to go to **Line** > **Multi-line**.
-   
-<Frame><img alt="" src="/images/kb/ka0Vq000000HcYj-00N5w00000Ri7BU-0EMVq0000097bs5.jpg" style={{width: 350, height: 304}}/></Frame>
- When creating a card, Domo fills in the chart with suggested columns from your data. In this example, the `Date` and `Impression` columns are used.
-   
-<Frame><img alt="" src="/images/kb/ka0Vq000000HcYj-00N5w00000Ri7BU-0EMVq0000097ebR.jpg" style={{width: 899, height: 405}}/></Frame>
- To use different columns, you'll need to drag them from the **Columns**  tab on the left side of the screen to the appropriate areas above the chart.
-   
-<Frame><img alt="" src="/images/kb/ka0Vq000000HcYj-00N5w00000Ri7BU-0EMVq0000097dNe.jpg" style={{width: 700, height: 451}}/></Frame>
-7. When finished creating the card, we select the dropdown next to
- **Save**  and choose **Save and Close**.
-   
- Your dashboard displays, with your card in the dashboard's **Appendix**.
-   
-<Frame><img alt="" src="/images/kb/ka0Vq000000HcYj-00N5w00000Ri7BU-0EMVq0000097fZ7.jpg" style={{width: 350, height: 247}}/></Frame>
-* Upon completion, select the wrench, edit your dashboard, and drag your new card from the Appendix into position. Then, hit save.
+    <Frame>![Screenshot](/images/kb/0EMVq0000093uTV.jpg)</Frame>
+31. Name your DataFlow at the top of the canvas by selecting the name field and entering a name. We recommend naming all your DataFlows and DataSets according to a convention that will help you catalog and manage what you create.  
+      
 
-**Create a Spend vs Revenue Card (Easy)** 
+    <Frame>![Screenshot](/images/kb/0EMVq0000093qeQ.jpg)</Frame>
+32. Select the Output DataSet tile to open the configuration area and name your Output DataSet tile. We recommend naming the DataSet in a way that describes the data it contains.  
+      
 
-8. In the
- **Chart types**  panel on the right side of the screen, use the dropdown to go to **Vertical b** 
-**ar** > **Grouped bar**.
-   
-<Frame><img alt="" src="/images/kb/ka0Vq000000HcYj-00N5w00000Ri7BU-0EMVq0000097h33.jpg" style={{width: 300, height: 259}}/></Frame>
-9. From the
- **Columns**  tab on the left side of the screen, drag `Revenue` to the **Value**  area above the chart and `Spend` to the **Series**  area above the chart.
-   
- By default, the `Date` column is already placed in the **Category**  area above the chart, and both the `Revenue` and `Spend` columns are aggregated as a sum.
-   
-<Frame><img alt="" src="/images/kb/ka0Vq000000HcYj-00N5w00000Ri7BU-0EMVq0000097iGr.jpg" style={{width: 749, height: 428}}/></Frame>
-10. Select
- **Save and Close**.
+    <Frame>![Screenshot](/images/kb/0EMVq0000093vXd.jpg)</Frame>
+33. Select **Done** in the tile configuration area.  
+      
 
-**Map (Medium)**
- Now we'll make a map card using our Samples Sales Transaction DataSet, the output of our Magic ETL DataFlow.
- 
-11. Begin by adding a card to your dashboard, as described
- 
- above
- 
- . When you choose an existing DataSet, choose `Sample Sales Transactions v1.1` and select **Choose DataSet**  to open the data in Analyzer.
+    <Frame>![Screenshot](/images/kb/0EMVq0000093wVJ.jpg)</Frame>
+
+You've completed the hardest part! Now it's time to schedule how often the DataFlow updates.
+
+**Schedule Your DataFlow**
+
+34. Select the dropdown beside **Save** at the top of the canvas and choose **Save and Run**.  
+      
+
+    <Frame>![Screenshot](/images/kb/0EMVq0000093xUb.jpg)</Frame>
+35. We recommend leaving notes in the version description field to give helpful context for the future.  
+      
+
+    <Frame>![Screenshot](/images/kb/0EMVq0000093xmL.jpg)</Frame>
+36. (Optional) To add a trigger that will execute your DataFlow, select **Add Trigger**.  
+      
+
+    <Frame>![Screenshot](/images/kb/0EMVq0000093yAX.jpg)</Frame>
+37. Choose the trigger condition and select to which of the available DataSets the trigger should apply.  
+    Repeat for as many triggers as you want to add.  
+      
+
+    <Frame>![Screenshot](/images/kb/0EMVq0000094Dnt.jpg)</Frame>
+38. When finished, select **Save and Run**. Wait while the DataFlow runs and opens in the **History** tab of the DataFlow details.  
+      
+
+    <Frame>![Screenshot](/images/kb/0EMVq0000093rCI.jpg)</Frame>
+39. Hover over the **1 Output DataSet** heading under the DataFlow name to see a link to the DataSet you created. You can use this DataSet to make the cards in the next section of this tutorial.  
+      
+
+    <Frame>![Screenshot](/images/kb/0EMVq0000094Ewr.jpg)</Frame>
+
+You have successfully connected your sales data with geographical details, unlocking new insights for location-based analysis. To best use Domo's powerful transformation tools, it's important to understand and carefully prepare your data.
+
+## Build Cards and a Dashboard
+
+Creating insightful and interactive Domo dashboards can be a crucial part of your data strategy. This guide provides step-by-step instructions on how to build cards and a dashboard using our sample data. We'll also cover adding a link card and implementing a page filter to get more from your dashboard.
+
+There are different ways to access Analyzer, where cards are made. In this tutorial, we'll access it by first building a dashboard.
+
+**Create a Dashboard**
+
+1. In the left navigation, select **Add** (plus icon) > **Dashboard**.  
+     
+
+   <Frame>![Screenshot](/images/kb/0EMVq0000094Glm.jpg)</Frame>
+2. Give your dashboard a name. Choose a name that relates to the department, business area, or subject matter. Then select **Save**.  
+     
+
+   <Frame>![Screenshot](/images/kb/0EMVq0000094IpB.jpg)</Frame>
+
+      
+     
+
    
-<Frame><img alt="" src="/images/kb/ka0Vq000000HcYj-00N5w00000Ri7BU-0EMVq0000097itZ.jpg" style={{width: 600, height: 468}}/></Frame>
-12. Use the
- **Chart types**  dropdown to choose **Maps** > **United States**.
-   
-<Frame><img alt="" src="/images/kb/ka0Vq000000HcYj-00N5w00000Ri7BU-0EMVq0000097jjB.jpg" style={{width: 600, height: 276}}/></Frame>
-13. From the
- **Columns**  tab on the left side of the screen, drag the `State` column to the **State name**  field above the chart.
-   
-<Frame><img alt="" src="/images/kb/ka0Vq000000HcYj-00N5w00000Ri7BU-0EMVq0000097juT.jpg" style={{width: 700, height: 328}}/></Frame>
-14. Under
- **Chart properties**  , to the left of the map, select **General**  and check the box for **Balanced distribution**.
-   
-<Frame><img alt="" src="/images/kb/ka0Vq000000HcYj-00N5w00000Ri7BU-0EMVq0000097kAb.jpg" style={{width: 499, height: 364}}/></Frame>
- This places our values in equal-colored buckets, making our Map Chart tell a more straightforward story.
-   
-<Frame><img alt="" src="/images/kb/ka0Vq000000HcYj-00N5w00000Ri7BU-0EMVq0000097kc1.jpg" style={{width: 650, height: 409}}/></Frame>
-15. Select
- **Save as**  and give the card a descriptive name. Then select **Save**  to return to Analyzer.
-   
-<Frame><img alt="" src="/images/kb/ka0Vq000000HcYj-00N5w00000Ri7BU-0EMVq0000097kvN.jpg" style={{width: 350, height: 371}}/></Frame>
+<Note>**Note:** After saving your new dashboard, you can find it by going to **Features** > **Dashboards** in the left navigation.</Note>
+
+**Create Cards**
+
+3. Go to your new dashboard and select **Add** (plus icon) > **Create new Card**.  
+     
+
+   <Frame>![Screenshot](/images/kb/0EMVq0000094L3t.jpg)</Frame>
+4. In the card type modal, select **Visualization**, then **Existing data**.  
+     
+
+   <Frame>![Screenshot](/images/kb/0EMVq00000949E2.jpg)</Frame>
+
+     
+     
+
+   <Frame>![Screenshot](/images/kb/0EMVq0000094La9.jpg)</Frame>
+5. Choose the marketing DataSet you created [above](#connect-to-sample-google-sheets-data).  
+     
+
+   <Frame>![Screenshot](/images/kb/0EMVq0000097ORq.jpg)</Frame>
+
+      
+     
+   Your DataSet opens in Analyzer. Watch or close the tour pop-up that displays.  
+     
+
+   <Frame>![Screenshot](/images/kb/0EMVq0000097azG.jpg)</Frame>
+6. In the **Chart types** panel on the right side of the screen, use the dropdown to go to **Line** > **Multi-line**.  
+     
+
+   <Frame>![Screenshot](/images/kb/0EMVq0000097bs5.jpg)</Frame>
+
+      
+     
+   When creating a card, Domo fills in the chart with suggested columns from your data. In this example, the `Date` and `Impression` columns are used.   
+     
+
+   <Frame>![Screenshot](/images/kb/0EMVq0000097ebR.jpg)</Frame>
+
+      
+     
+   To use different columns, you'll need to drag them from the **Columns**  tab on the left side of the screen to the appropriate areas above the chart.  
+     
+
+   <Frame>![Screenshot](/images/kb/0EMVq0000097dNe.jpg)</Frame>
+7. When finished creating the card, we select the dropdown next to **Save** and choose **Save and Close**.  
+   Your dashboard displays, with your card in the dashboard's **Appendix**.  
+     
+
+   <Frame>![Screenshot](/images/kb/0EMVq0000097fZ7.jpg)</Frame>
+
+- Upon completion, select the wrench, edit your dashboard, and drag your new card from the Appendix into position. Then, hit save.
+
+**Create a Spend vs Revenue Card (Easy)**
+
+8. In the **Chart types** panel on the right side of the screen, use the dropdown to go to **Vertical b****ar** > **Grouped bar**.  
+     
+
+   <Frame>![Screenshot](/images/kb/0EMVq0000097h33.jpg)</Frame>
+9. From the **Columns** tab on the left side of the screen, drag `Revenue` to the **Value** area above the chart and `Spend` to the **Series** area above the chart.  
+   By default, the `Date` column is already placed in the **Category** area above the chart, and both the `Revenue` and `Spend` columns are aggregated as a sum.  
+     
+
+   <Frame>![Screenshot](/images/kb/0EMVq0000097iGr.jpg)</Frame>
+10. Select **Save and Close**.
+
+**Map (Medium)**Now we'll make a map card using our Samples Sales Transaction DataSet, the output of our Magic ETL DataFlow.
+
+11. Begin by adding a card to your dashboard, as described above. When you choose an existing DataSet, choose `Sample Sales Transactions v1.1` and select **Choose DataSet** to open the data in Analyzer.  
+      
+
+    <Frame>![Screenshot](/images/kb/0EMVq0000097itZ.jpg)</Frame>
+12. Use the **Chart types** dropdown to choose **Maps** > **United States**.  
+      
+
+    <Frame>![Screenshot](/images/kb/0EMVq0000097jjB.jpg)</Frame>
+13. From the **Columns** tab on the left side of the screen, drag the `State` column to the **State name** field above the chart.  
+      
+
+    <Frame>![Screenshot](/images/kb/0EMVq0000097juT.jpg)</Frame>
+14. Under **Chart properties**, to the left of the map, select **General** and check the box for **Balanced distribution**.   
+      
+
+    <Frame>![Screenshot](/images/kb/0EMVq0000097kAb.jpg)</Frame>
+
+        
+      
+    This places our values in equal-colored buckets, making our Map Chart tell a more straightforward story.   
+      
+
+    <Frame>![Screenshot](/images/kb/0EMVq0000097kc1.jpg)</Frame>
+15. Select **Save as** and give the card a descriptive name. Then select **Save** to return to Analyzer.   
+      
+
+    <Frame>![Screenshot](/images/kb/0EMVq0000097kvN.jpg)</Frame>
 16. Close Analyzer to return to the dashboard.
-17. At the top right of the dashboard, select
- **Settings menu**  (wrench icon) > **Edit Dashboard**.
-   
-<Frame><img alt="" src="/images/kb/ka0Vq000000HcYj-00N5w00000Ri7BU-0EMVq00000994lZ.jpg" style={{width: 324, height: 368}}/></Frame>
-18. Drag the `Sales by State` card to the dashboard area. This adds a content frame.
-   
-<Frame><img alt="" src="/images/kb/ka0Vq000000HcYj-00N5w00000Ri7BU-0EMVq000009928g.jpg" style={{width: 899, height: 442}}/></Frame>
-19. Drag the card to the dashboard again to add it to the content frame.
-   
-<Frame><img alt="" src="/images/kb/ka0Vq000000HcYj-00N5w00000Ri7BU-0EMVq00000995OH.jpg" style={{width: 900, height: 442}}/></Frame>
-20. Select
- **Save**  to close the dashboard editor.
-   
-<Frame><img alt="" src="/images/kb/ka0Vq000000HcYj-00N5w00000Ri7BU-0EMVq00000995cn.jpg" style={{width: 350, height: 126}}/></Frame>
-21. On the dashboard, hover over the `Sales by State` card and select
- **Card options**  (wrench icon) > **Edit Drill Path**.
-   
-<Frame><img alt="" src="/images/kb/ka0Vq000000HcYj-00N5w00000Ri7BU-0EMVq00000996CH.jpg" style={{width: 800, height: 477}}/></Frame>
-22. Select
- **Add a view**  to create a layer below the original card. This brings us back into Analyzer.
-   
-<Frame><img alt="" src="/images/kb/ka0Vq000000HcYj-00N5w00000Ri7BU-0EMVq0000097leX.jpg" style={{width: 350, height: 289}}/></Frame>
-23. This time, drag the `ZIP\_STRING\_LEADING\_ZERO` column to the
- **State name**  field.
-   
-<Frame><img alt="" src="/images/kb/ka0Vq000000HcYj-00N5w00000Ri7BU-0EMVq0000097aEU.jpg" style={{width: 500, height: 331}}/></Frame>
+17. At the top right of the dashboard, select **Settings menu** (wrench icon) > **Edit Dashboard**.  
+      
+
+    <Frame>![Screenshot](/images/kb/0EMVq00000994lZ.jpg)</Frame>
+18. Drag the `Sales by State` card to the dashboard area. This adds a content frame.   
+      
+
+    <Frame>![Screenshot](/images/kb/0EMVq000009928g.jpg)</Frame>
+19. Drag the card to the dashboard again to add it to the content frame.  
+      
+
+    <Frame>![Screenshot](/images/kb/0EMVq00000995OH.jpg)</Frame>
+20. Select **Save** to close the dashboard editor.  
+      
+
+    <Frame>![Screenshot](/images/kb/0EMVq00000995cn.jpg)</Frame>
+21. On the dashboard, hover over the `Sales by State` card and select **Card options** (wrench icon) > **Edit Drill Path**.  
+
+    <Frame>![Screenshot](/images/kb/0EMVq00000996CH.jpg)</Frame>
+22. Select **Add a view** to create a layer below the original card. This brings us back into Analyzer.  
+      
+
+    <Frame>![Screenshot](/images/kb/0EMVq0000097leX.jpg)</Frame>
+23. This time, drag the `ZIP\_STRING\_LEADING\_ZERO` column to the **State name** field.  
+      
+
+    <Frame>![Screenshot](/images/kb/0EMVq0000097aEU.jpg)</Frame>
 24. Change the card's name to `Sales by Zip Code,` then save and close the card.
-25. From the
- **Drill Path**  view, return to **Details**.
-   
-<Frame><img alt="" src="/images/kb/ka0Vq000000HcYj-00N5w00000Ri7BU-0EMVq0000098wMc.jpg" style={{width: 500, height: 272}}/></Frame>
+25. From the **Drill Path** view, return to **Details**.  
+      
+
+    <Frame>![Screenshot](/images/kb/0EMVq0000098wMc.jpg)</Frame>
 26. Select a state.
-27. See its ZIP codes.
-   
-<Frame><img alt="" src="/images/kb/ka0Vq000000HcYj-00N5w00000Ri7BU-0EMVq00000992ob.jpg" style={{width: 749, height: 473}}/></Frame>
-28. Navigate back using the breadcrumbs at the top of the chart.
-   
-<Frame><img alt="" src="/images/kb/ka0Vq000000HcYj-00N5w00000Ri7BU-0EMVq00000993UX.jpg" style={{width: 751, height: 302}}/></Frame>
-**Dashboard Functions** 
+27. See its ZIP codes.   
+      
 
- There are a lot of time ranges available when viewing your data on a dashboard.
- 
-29. Use the
- **Choose Date**  dropdown to explore the available time ranges and aggregations.
-   
-<Frame><img alt="" src="/images/kb/ka0Vq000000HcYj-00N5w00000Ri7BU-0EMVq00000997uj.jpg" style={{width: 896, height: 441}}/></Frame>
-### Get Started with Alerts
+    <Frame>![Screenshot](/images/kb/0EMVq00000992ob.jpg)</Frame>
+28. Navigate back using the breadcrumbs at the top of the chart.  
+      
 
- Domo Alerts is a powerful tool that can help you monitor specific conditions within your data and notify you when these conditions are met. This guide describes how to set up effective alerts for the five cards you built using the Marketing DataSet.
- 
-1. From the dashboard or appendix, hover over a card and select
- **Card options**  (wrench icon) > **Alert Me...**.
-   
-<Frame><img alt="" src="/images/kb/ka0Vq000000HcYj-00N5w00000Ri7BU-0EMVq00000999Bl.jpg" style={{width: 651, height: 367}}/></Frame>
-2. Select
- **+ New Alert**  to open the alert modal.
-   
-<Frame><img alt="" src="/images/kb/ka0Vq000000HcYj-00N5w00000Ri7BU-0EMVq0000098sKd.jpg" style={{width: 650, height: 258}}/></Frame>
-3. Use the
- **Metric**  dropdown to choose the metric you want to monitor. We'll choose **Summary number**.
+    <Frame>![Screenshot](/images/kb/0EMVq00000993UX.jpg)</Frame>
+
+**Dashboard Functions**
+
+There are a lot of time ranges available when viewing your data on a dashboard.
+
+29. Use the **Choose Date** dropdown to explore the available time ranges and aggregations.  
+      
+
+    <Frame>![Screenshot](/images/kb/0EMVq00000997uj.jpg)</Frame>
+
+## Get Started with Alerts
+
+Domo Alerts is a powerful tool that can help you monitor specific conditions within your data and notify you when these conditions are met. This guide describes how to set up effective alerts for the five cards you built using the Marketing DataSet. 
+
+1. From the dashboard or appendix, hover over a card and select **Card options** (wrench icon) > **Alert Me...**.  
+     
+
+   <Frame>![Screenshot](/images/kb/0EMVq00000999Bl.jpg)</Frame>
+2. Select **+ New Alert** to open the alert modal.   
+     
+
+   <Frame>![Screenshot](/images/kb/0EMVq0000098sKd.jpg)</Frame>
+3. Use the **Metric** dropdown to choose the metric you want to monitor. We'll choose **Summary number**.
 4. Use the conditions dropdown to choose "Changes by —" and enter the value for that condition.
-5. Select
- **Next**  and compose the message you want to receive when the alert triggers.
-   
-<Frame><img alt="" src="/images/kb/ka0Vq000000HcYj-00N5w00000Ri7BU-0EMVq0000098iJf.jpg" style={{width: 650, height: 406}}/></Frame>
-6. Select
- **Next**  and choose anyone with whom to share the alert, then select **Save**. Close the alert modal.
+5. Select **Next** and compose the message you want to receive when the alert triggers.  
+     
 
- <Tip>
-   **Tip:** 
-   After setting an alert, you can choose how you want to receive the alert from the
-   **See Alerts** 
-   section on the card. Options include via text, email, and mobile app notification.
+   <Frame>![Screenshot](/images/kb/0EMVq0000098iJf.jpg)</Frame>
+6. Select **Next** and choose anyone with whom to share the alert, then select **Save**. Close the alert modal.
 
-   <Frame><img alt="" src="/images/kb/ka0Vq000000HcYj-00N5w00000Ri7BU-0EMVq0000099BWv.jpg" style={{width: 451, height: 160}}/></Frame>
- </Tip>
+<Tip>**Tip:** After setting an alert, you can choose how you want to receive the alert from the **See Alerts** section on the card. Options include via text, email, and mobile app notification.</Tip>
+
+<Frame>![Screenshot](/images/kb/0EMVq0000099BWv.jpg)</Frame>

@@ -4,95 +4,111 @@ title: "Snowflake KeyPair Partition Connector"
 
 ## Intro
 
-The Domo Snowflake KeyPair Partition makes it easy to bring all your data from your Snowflake data warehouse into Domo based on the number of past days provided. If you are already using Snowflake as a data warehousing solution, this connector helps you use Domo in conjunction with it to get the most from your data. To use this connector, you must have your Snowflake account name (domain) and the username and private key for your Snowflake account. Use Domo's Snowflake KeyPair Partition connector to maximize your cloud data strategy by connecting your data to Domo and making it instantly accessible to everyone in your company.
-  
+The Domo Snowflake KeyPair Partition makes it easy to bring all your data from your Snowflake data warehouse into Domo based on the number of past days provided. If you are already using Snowflake as a data warehousing solution, this connector helps you use Domo in conjunction with it to get the most from your data. To use this connector, you must have your Snowflake account name (domain) and the username and private key for your Snowflake account. Use Domo's Snowflake KeyPair Partition connector to maximize your cloud data strategy by connecting your data to Domo and making it instantly accessible to everyone in your company.  
 Once your Snowflake data is in Domo, you can combine it with all your other Domo data to get a centralized view of your most mission-critical data.
+
+---
 
 ## Prerequisites
 
 To connect to a Snowflake database and create a DataSet, you must have the following:
 
-* The full name of your account (provided by Snowflake). This is the portion of your Snowflake URL immediately following https://.
-    
-  Note that your full account name may include additional segments that identify the region and cloud platform where your account is hosted. For US West Region ****account\_name**** and All other regions ****account\_name.region\_id****. The following table provides account name examples by cloud platform/region. For each row, it assumes your account name is "xy12345."
+- The full name of your account (provided by Snowflake). This is the portion of your Snowflake URL immediately following https://.  
+  Note that your full account name may include additional segments that identify the region and cloud platform where your account is hosted. For US West Region **account\_name** and All other regions **account\_name.region\_id**. The following table provides account name examples by cloud platform/region. For each row, it assumes your account name is "xy12345."
 
-<Frame><img alt="snowflake_account_names.png" src="/images/kb/ka05w00000123Kt-00N5w00000Ri7BU-0EM5w000005vO5S.png"/></Frame>
+<Frame>![snowflake_account_names.png](/images/kb/0EM5w000005vO5S.png)</Frame>
 
-* The username used to connect to your Snowflake host.
-* The private key.
-* The passphrase. If you create an encrypted private key, then OpenSSL prompts for a passphrase used to encrypt the private key file.
-* Your role name.
+- The username used to connect to your Snowflake host.
+- The private key.
+- The passphrase. If you create an encrypted private key, then OpenSSL prompts for a passphrase used to encrypt the private key file.
+- Your role name.
 
 ### Configuring the public/private key pair
 
 To configure the public/private key pair, follow these steps:
 
-1. From the command line in a terminal window, generate a private key.
-     
-   You can generate either an encrypted version of the private key or an unencrypted version of the private key.
-     
-   * To generate an unencrypted version, use the following command:
+1. From the command line in a terminal window, generate a private key.  
+   You can generate either an encrypted version of the private key or an unencrypted version of the private key.  
+   - To generate an unencrypted version, use the following command:  
        
-      `$ openssl genrsa -out rsa_key.pem 2048`
-   * To generate an encrypted version, use the following command:
+     `$ openssl genrsa -out rsa_key.pem 2048`
+   - To generate an encrypted version, use the following command:  
        
-      `$ openssl genrsa 2048 | openssl pkcs8 -topk8 -inform PEM -out rsa_key.p8`
-         
-      It is typically safer to generate an encrypted version.
-         
-      If you use the second command to encrypt the private key, then OpenSSL prompts for a passphrase used to encrypt the private key file. We recommend using a strong passphrase to protect the private key. Record this passphrase in a secure location. You will input it when connecting to Snowflake. Note that the passphrase is only used for protecting the private key and will never be sent to Snowflake.
-         
-      The following is a sample PEM private key:
-         
-      ```
-      -----BEGIN ENCRYPTED PRIVATE KEY-----
-      MIIE6TAbBgkqhkiG9w0BBQMwDgQILYPyCppzOwECAggABIIEyLiGSpeeGSe3xHP1
-      wHLjfCYycUPennlX2bd8yX8xOxGSGfvB+99+PmSlex0FmY9ov1J8H1H9Y3lMWXbL
-      ...
-      -----END ENCRYPTED PRIVATE KEY-----
-      ```
+     `$ openssl genrsa 2048 | openssl pkcs8 -topk8 -inform PEM -out rsa_key.p8`  
+       
+     It is typically safer to generate an encrypted version.  
+       
+     If you use the second command to encrypt the private key, then OpenSSL prompts for a passphrase used to encrypt the private key file. We recommend using a strong passphrase to protect the private key. Record this passphrase in a secure location. You will input it when connecting to Snowflake. Note that the passphrase is only used for protecting the private key and will never be sent to Snowflake.  
+       
+     The following is a sample PEM private key:  
+       
+     `-----BEGIN ENCRYPTED PRIVATE KEY-----  
+      MIIE6TAbBgkqhkiG9w0BBQMwDgQILYPyCppzOwECAggABIIEyLiGSpeeGSe3xHP1  
+      wHLjfCYycUPennlX2bd8yX8xOxGSGfvB+99+PmSlex0FmY9ov1J8H1H9Y3lMWXbL  
+      ...  
+      -----END ENCRYPTED PRIVATE KEY-----`
 2. From the command line, generate the public key by referencing the private key. Assuming the private key is encrypted and contained in the file named “rsa\_key.p8”, use the following command:
 
-   `$ openssl rsa -in rsa_key.p8 -pubout -out rsa_key.pub`
-   
-   The following is a sample PEM public key:
-   
-   ```
-   -----BEGIN PUBLIC KEY-----
-   MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAy+Fw2qv4Roud3l6tjPH4
-   zxybHjmZ5rhtCz9jppCV8UTWvEXxa88IGRIHbJ/PwKW/mR8LXdfI7l/9vCMXX4mk
-   ...
-   -----END PUBLIC KEY-----
-   ```
+   `$ openssl rsa -in rsa_key.p8 -pubout -out rsa_key.pub`  
+     
+    The following is a sample PEM public key:  
+     
+   `-----BEGIN PUBLIC KEY-----  
+    MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAy+Fw2qv4Roud3l6tjPH4  
+    zxybHjmZ5rhtCz9jppCV8UTWvEXxa88IGRIHbJ/PwKW/mR8LXdfI7l/9vCMXX4mk  
+    ...  
+    -----END PUBLIC KEY-----`
 3. Copy the public and private key files to a local directory for storage. Record the path to the files. Note that the private key is stored using the PKCS#8 (Public Key Cryptography Standards) format and is encrypted using the passphrase you specified in the previous step; however, the file should still be protected from unauthorized access using the file permission mechanism provided by your operating system. It is your responsibility to secure the file when it is not being used.
 4. Assign the public key to the Snowflake user using ALTER USER. For example:
 
    `alter user jsmith set rsa_public_key='MIIBIjANBgkqh...';`
 
-   <Note>
-   **Notes:**
-   * Only security administrators (i.e. users with the SECURITYADMIN role) or higher can alter a user.
-   * Exclude the public key header and footer in the SQL statement.
-   </Note>
+   **Notes:** 
+   - Only security administrators (i.e. users with the SECURITYADMIN role) or higher can alter a user.
+   - Exclude the public key header and footer in the SQL statement.
+5. Verify the user's public key fingerprint using DESCRIBE USER:  
 
-5. Verify the user’s public key fingerprint using DESCRIBE USER:
-     
-   <table><thead><tr><th colspan="1" rowspan="1"> Property </th><th colspan="1" rowspan="1"> Value </th><th colspan="1" rowspan="1"> Default </th><th colspan="1" rowspan="1"> Description </th></tr></thead><tbody><tr><td colspan="1" rowspan="1"> Name </td><td colspan="1" rowspan="1"> JSMITH </td><td colspan="1" rowspan="1"> null </td><td colspan="1" rowspan="1"> Name </td></tr><tr><td colspan="1" rowspan="1"> RSA_PUBLIC_KEY_FP </td><td colspan="1" rowspan="1"> SHA256:nvnONUsfiuycCLMXIEWG4eTp4FjhVUZQUQbNpbSHXiA= </td><td colspan="1" rowspan="1"> null </td><td colspan="1" rowspan="1"> Fingerprint of user's RSA public key. </td></tr><tr><td colspan="1" rowspan="1"> RSA_PUBLIC_KEY_2_FP </td><td colspan="1" rowspan="1"> null </td><td colspan="1" rowspan="1"> null </td><td colspan="1" rowspan="1"> Fingerprint of user's second RSA public key. </td></tr></tbody></table>
-
-   <Note>
-   **Note:** For more information about the RSA\_PUBLIC\_KEY\_2\_FP property, see Key Rotation.
-
-   </Note>
-
-6. Modify and execute the sample code, below. The code decrypts the private key file and passes it to the Snowflake driver to create a connection:
-   * Update the security parameters:
-      + `<path>` specifies the local path to the private key file you created.
-   * Update the session parameters:
-      + `<user>` specifies your Snowflake login name.
-      + `<account>` specifies the name of your account (provided by Snowflake).
-   * The sample code is as follows:
-
+<table border="1" cellpadding="1" cellspacing="1">
+  <thead>
+    <tr>
+      <th colspan="1" rowspan="1"><p>Property</p></th>
+      <th colspan="1" rowspan="1"><p>Value</p></th>
+      <th colspan="1" rowspan="1"><p>Default</p></th>
+      <th colspan="1" rowspan="1"><p>Description</p></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td colspan="1" rowspan="1"><p>Name</p></td>
+      <td colspan="1" rowspan="1"><p>JSMITH</p></td>
+      <td colspan="1" rowspan="1"><p>null</p></td>
+      <td colspan="1" rowspan="1"><p>Name</p></td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1"><p>RSA\_PUBLIC\_KEY\_FP</p></td>
+      <td colspan="1" rowspan="1"><p>SHA256:nvnONUsfiuycCLMXIEWG4eTp4FjhVUZQUQbNpbSHXiA=</p></td>
+      <td colspan="1" rowspan="1"><p>null</p></td>
+      <td colspan="1" rowspan="1"><p>Fingerprint of user's RSA public key.</p></td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1"><p>RSA\_PUBLIC\_KEY\_2\_FP</p></td>
+      <td colspan="1" rowspan="1"><p>null</p></td>
+      <td colspan="1" rowspan="1"><p>null</p></td>
+      <td colspan="1" rowspan="1"><p>Fingerprint of user's second RSA public key.</p></td>
+    </tr>
+  </tbody>
+</table>
    
+<Note>**Note:** For more information about the RSA\_PUBLIC\_KEY\_2\_FP property, see Key Rotation.
+6. Modify and execute the sample code, below. The code decrypts the private key file and passes it to the Snowflake driver to create a connection:</Note>
+
+- Update the security parameters:
+- `<path>` specifies the local path to the private key file you created.
+- Update the session parameters:
+- `<user>` specifies your Snowflake login name.
+- `<account>` specifies the name of your account (provided by Snowflake).
+- The sample code is as follows:
+
       ```java
       import java.util.Properties;
       import java.sql.Connection;
@@ -157,38 +173,181 @@ Currently, you can use the RSA\_PUBLIC\_KEY and RSA\_PUBLIC\_KEY\_2 parameters f
 
 To rotate your keys,
 
-1. Complete the steps in Using Key Pair Authentication to...
-     
-   * Generate a new private and public key set.
-   * Assign the public key to the user. Set the public key value to either RSA\_PUBLIC\_KEY or RSA\_PUBLIC\_KEY\_2 (whichever key value is not currently in use).
-       
-     For example:
+1. Complete the steps in Using Key Pair Authentication to...  
+   - Generate a new private and public key set.
+   - Assign the public key to the user. Set the public key value to either RSA\_PUBLIC\_KEY or RSA\_PUBLIC\_KEY\_2 (whichever key value is not currently in use).  
+     For example:  
        
      `alter user jsmith set rsa_public_key_2='JERUEHtcve...';`
-2. Update the code to connect to Snowflake. Specify the new private key.
-     
+2. Update the code to connect to Snowflake. Specify the new private key.  
    Snowflake verifies the correct active public key for authentication based on the private key submitted with your connection information.
-3. Remove the old public key from the user profile. For example:
+3. Remove the old public key from the user profile. For example:  
      
    `alter user jsmith unset rsa_public_key;`
 
 ## Connecting to Your Snowflake Account
 
-This section enumerates the options in the **Credentials** and **Details** panes in the Snowflake KeyPair Partition Connector page. The components of the other panes in this page, **Scheduling** and **Name & Describe Your DataSet**, are universal across most connector types and are discussed in greater length in [Adding a DataSet Using a Data Connector](/s/article/360042926274 "Adding a DataSet Using a Data Connector").
+This section enumerates the options in the **Credentials** and **Details** panes in the Snowflake KeyPair Partition Connector page. The components of the other panes in this page, **Scheduling** and **Name & Describe Your DataSet**, are universal across most connector types and are discussed in greater length in [Adding a DataSet Using a Data Connector](/s/article/360042926274).
 
 ### Credentials Pane
 
 This pane contains fields for entering credentials to your Snowflake account. The following table describes what is needed for each field:
 
-<table border="1" cellpadding="1" cellspacing="1" data-aura-rendered-by="33:195;a"><thead><tr><th colspan="1" rowspan="1"><p><span class="s1"> Field </span></p></th><th colspan="1" rowspan="1"><p><span class="s1"> Description </span></p></th></tr></thead><tbody><tr><td colspan="1" rowspan="1"> Account Name </td><td colspan="1" rowspan="1"> Enter the full name of your account (provided by Snowflake.) For US West Region <b><b> account_name </b></b> and All other regions <b><b> account_name.region_id </b></b></td></tr><tr><td colspan="1" rowspan="1"> Username </td><td colspan="1" rowspan="1"> Enter the username used to connect to your Snowflake host. </td></tr><tr><td colspan="1" rowspan="1"> Private Key </td><td colspan="1" rowspan="1"> Enter the private key. </td></tr><tr><td colspan="1" rowspan="1"> Passphrase </td><td colspan="1" rowspan="1"> If you create an encrypted private key, then OpenSSL prompts for a passphrase used to encrypt the private key file. Enter that passphrase here. </td></tr><tr><td colspan="1" rowspan="1"> Role </td><td colspan="1" rowspan="1"> Enter the name for your role. </td></tr></tbody></table>
+<table border="1" cellpadding="1" cellspacing="1">
+  <thead>
+    <tr>
+      <th colspan="1" rowspan="1"><p>Field</p></th>
+      <th colspan="1" rowspan="1"><p>Description</p></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td colspan="1" rowspan="1"><p>Account Name</p></td>
+      <td colspan="1" rowspan="1"><p>Enter the full name of your account (provided by Snowflake.) For US West Region <b>account\_name</b> and All other regions <b> account\_name.region\_id</b></p></td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1"><p>Username</p></td>
+      <td colspan="1" rowspan="1"><p>Enter the username used to connect to your Snowflake host.</p></td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1"><p>Private Key</p></td>
+      <td colspan="1" rowspan="1"><p>Enter the private key.</p></td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1"><p>Passphrase</p></td>
+      <td colspan="1" rowspan="1"><p>If you create an encrypted private key, then OpenSSL prompts for a passphrase used to encrypt the private key file. Enter that passphrase here.</p></td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1"><p>Role</p></td>
+      <td colspan="1" rowspan="1"><p>Enter the name for your role.</p></td>
+    </tr>
+  </tbody>
+</table>
 
-Once you have entered valid credentials, you can use the same account any time you to create a new Snowflake KayPair Partition dataset. You can manage connector accounts in the **Accounts** tab in the Data Center. For more information about this tab, see [Managing User Accounts for Connectors](/s/article/360042926054 "Managing User Accounts for Connectors").
+Once you have entered valid credentials, you can use the same account any time you to create a new Snowflake KayPair Partition dataset. You can manage connector accounts in the **Accounts** tab in the Data Center. For more information about this tab, see [Managing User Accounts for Connectors](/s/article/360042926054).
 
 ### Details Pane
 
 This pane contains a primary **Reports** menu, along with various other menus which may or may not appear depending on the report type you select.
 
-<table border="1" cellpadding="1" cellspacing="1" data-aura-rendered-by="33:195;a"><thead><tr><th colspan="1" rowspan="1"><p> Menu </p></th><th colspan="1" rowspan="1"><p> Description </p></th></tr></thead><tbody><tr><td colspan="1" rowspan="1"><p> Query </p></td><td colspan="1" rowspan="1"><p><span> Enter the query to execute. The query format must be like: select * from </span><span> databaseName </span><span>. </span><span> schemaName </span><span>. </span><span> tableName </span></p></td></tr><tr><td colspan="1" rowspan="1"><p> Warehouses </p></td><td colspan="1" rowspan="1"><p> Select the warehouse containing the data you want to retrieve. The list populates with all warehouses you have access to based on your credentials. </p></td></tr><tr><td colspan="1" rowspan="1"><p> Databases </p></td><td colspan="1" rowspan="1"><p> Select the database containing the data you want to retrieve. The list populates with all databases you have access to based on your credentials. </p></td></tr><tr><td colspan="1" rowspan="1"><p> Schema </p></td><td colspan="1" rowspan="1"><p> Select the database schema containing the data you want to retrieve. The list populates with all schemas you have access to based on your credentials. </p></td></tr><tr><td colspan="1" rowspan="1"><span> Database Objects </span></td><td colspan="1" rowspan="1"><p><span> Select a database object. </span></p></td></tr><tr><td colspan="1" rowspan="1"><p> Tables </p></td><td colspan="1" rowspan="1"><p> Select the database table you want to retrieve. </p></td></tr><tr><td colspan="1" rowspan="1"><p><span> Table Partition Column Name </span></p></td><td colspan="1" rowspan="1"><p><span> Select the partition column name. </span></p></td></tr><tr><td colspan="1" rowspan="1"><p><span> Views </span></p></td><td colspan="1" rowspan="1"><p><span> Select the view. </span></p></td></tr><tr><td colspan="1" rowspan="1"><p><span> View Partition Column Name </span></p></td><td colspan="1" rowspan="1"><p><span> Select the partition column name. </span></p></td></tr><tr><td colspan="1" rowspan="1"> Past Days </td><td colspan="1" rowspan="1"> Enter the number of past days that you want to get data for. Value can be X, where X is a positive integer. Example: 30. </td></tr><tr><td colspan="1" rowspan="1"> Date Format </td><td colspan="1" rowspan="1"> Select the required date format. By default <b><b> yyyy-MM-dd </b></b> will be used. </td></tr><tr><td colspan="1" rowspan="1"> Custom Date Format </td><td colspan="1" rowspan="1"> Enter the custom date format. </td></tr></tbody></table>
+<table border="1" cellpadding="1" cellspacing="1">
+  <thead>
+    <tr>
+      <th colspan="1" rowspan="1"><p>Menu</p></th>
+      <th colspan="1" rowspan="1"><p>Description</p></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td colspan="1" rowspan="1"><p>How would you like to import data into Domo?</p></td>
+      <td colspan="1" rowspan="1"><p>Select how you want to import your data.  The following methods are available:   - Standard Update (Replace/Append) - Use Partition - Use Upsert</p></td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1"><p>How would you like to build your Query?</p></td>
+      <td colspan="1" rowspan="1"><p></p></td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1"><p>Warehouses</p></td>
+      <td colspan="1" rowspan="1"><p>Select the warehouse containing the data you want to retrieve. The list populates with all warehouses you have access to based on your credentials.</p></td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1"><p>Databases</p></td>
+      <td colspan="1" rowspan="1"><p>Select the database containing the data you want to retrieve.  The list populates with all databases you have access to based on your credentials.</p></td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1"><p>Schemas</p></td>
+      <td colspan="1" rowspan="1"><p>Select the database schema containing the data you want to retrieve. The list populates with all schemas you have access to based on your credentials.</p></td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1"><p>Database Objects</p></td>
+      <td colspan="1" rowspan="1"><p>Choose a database object.</p></td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1"><p>Tables</p></td>
+      <td colspan="1" rowspan="1"><p>Select the database table you want to retrieve.</p></td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1"><p>Table Column Names</p></td>
+      <td colspan="1" rowspan="1"><p>Select the table columns that you want to include in your report.</p></td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1"><p>Table Query Helper</p></td>
+      <td colspan="1" rowspan="1"><p>A query is generated based on the selected fields.</p></td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1"><p>Views</p></td>
+      <td colspan="1" rowspan="1"><p>Select the view.</p></td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1"><p>View Column Names</p></td>
+      <td colspan="1" rowspan="1"><p>Select the view columns that you want to include in your report.</p></td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1"><p>View Query Helper</p></td>
+      <td colspan="1" rowspan="1"><p>A query is generated based on the selected fields.</p></td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1"><p>Partition Criteria</p></td>
+      <td colspan="1" rowspan="1"><p>Select whether you want to partition your data using the date keys, non-date keys, or a meta query.</p></td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1"><p>Partition Column Name</p></td>
+      <td colspan="1" rowspan="1"><p>Select the partition column name. Only date fields will be displayed.</p></td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1"><p>Partition Support Format</p></td>
+      <td colspan="1" rowspan="1"><p>Select the partition format.</p></td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1"><p>Partition Non Date Key Column Name</p></td>
+      <td colspan="1" rowspan="1"><p>Select a non-date key column name to partition the data. All the fields, excluding Date fields, will be displayed.</p></td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1"><p>Query</p></td>
+      <td colspan="1" rowspan="1"><p>Enter the query to execute. The query format must be like: select \* from \"databaseName\".\"schemaName\".\"tableName\""</p></td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1"><p>Partition Query to determine partition tags</p></td>
+      <td colspan="1" rowspan="1"><p>Enter the partition meta query to determine the distinct partition tags(or keys). The column containing the <b>Date</b> data is your partition column. Example: SELECT DISTINCT(DATE\_COLUMN\_NAME) FROM TABLENAME</p></td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1"><p>Past Days</p></td>
+      <td colspan="1" rowspan="1"><p>Enter the number of past days for which you want to fetch the data. Value can be X, where X is a positive integer. For example: 30.</p></td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1"><p>Past Years</p></td>
+      <td colspan="1" rowspan="1"><p>Enter the number of past years for which you want to fetch the data. Value can be X, where X is a positive integer. For example: 30.</p></td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1"><p>Future Years</p></td>
+      <td colspan="1" rowspan="1"><p>Enter the number of future years for which you want to fetch the data. Value can be X, where X is a positive integer. For example: 30.</p></td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1"><p>Past Months</p></td>
+      <td colspan="1" rowspan="1"><p>Enter the number of past months for which you want to fetch the data. Value can be X, where X is a positive integer. For example: 30.</p></td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1"><p>Future Months</p></td>
+      <td colspan="1" rowspan="1"><p>Enter the number of future months for which you want to fetch the data. Value can be X, where X is a positive integer. For example: 30.</p></td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1"><p>Data Format</p></td>
+      <td colspan="1" rowspan="1"><p>Select/enter the proper date format according to the date format present in the partition column. By default, <b>yyyy-MM-dd</b> will be used.</p></td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1"><p>Custom Date Format</p></td>
+      <td colspan="1" rowspan="1"><p>Enter the custom date format.</p></td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1"><p>Upsert Key Column(s)</p></td>
+      <td colspan="1" rowspan="1"><p>Enter the upsert key column name or a comma-separated list of upsert key column names. <b>Required only when the Update method is Merge</b>.</p></td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1"><p>Query Tag</p></td>
+      <td colspan="1" rowspan="1"><p>Optional parameter that can be used to tag connector SQL executions in Snowflake as a <b>Query Tag</b>.</p></td>
+    </tr>
+  </tbody>
+</table>
 
 ### Other Panes
 
@@ -197,36 +356,27 @@ For information about the remaining sections of the Connector interface, includi
 ## FAQs
 
 <AccordionGroup>
+
 <Accordion title="Are there any API limits I should be aware of?">
-
 The limits depend on your server configuration.
-
 </Accordion>
 
 <Accordion title="How frequently will my data update?">
-
 DataSets can run as often as every 15 minutes. However, depending on the runtime of the query, DataSets may need to run less frequently.
-
 </Accordion>
 
 <Accordion title="What should I be aware of while writing a query?">
-
 Make sure that all the words, table names, and field names are correctly spelled.
-
 </Accordion>
 
 <Accordion title="Why can't I connect to my Snowflake database? Do I need to whitelist any IP addresses?">
-
-Before you can connect to a Snowflake database, you must also whitelist a number of IP addresses on your database server on the port you want to connect to. For the full list of IP addresses, see
-
-[Whitelisting IP Addresses in Domo](/s/article/360043439173 "Whitelisting IP Addresses in Domo").
-
+Before you can connect to a Snowflake database, you must also whitelist a number of IP addresses on your database server on the port you want to connect to. For the full list of IP addresses, see [Whitelisting IP Addresses in Domo](/s/article/360043439173).
 </Accordion>
-</AccordionGroup>
 
+</AccordionGroup>
 ## Troubleshooting
 
-* Make sure your authentication remains valid.
-* Review the configuration to make sure that all required items have been selected.
-* Review the Connector history for error messages.
-* In rare cases, you may be requesting too much information and reaching API limitations or timeouts. If this is the case, you can review the history of the Connector run to see the error message and duration. If this is the case, you can reduce the number of accounts that are being pulled, choose a smaller number of metrics for the report that you are pulling, or reduce the timeframe that you are trying to pull.
+- Make sure your authentication remains valid.
+- Review the configuration to make sure that all required items have been selected.
+- Review the Connector history for error messages.
+- In rare cases, you may be requesting too much information and reaching API limitations or timeouts. If this is the case, you can review the history of the Connector run to see the error message and duration. If this is the case, you can reduce the number of accounts that are being pulled, choose a smaller number of metrics for the report that you are pulling, or reduce the timeframe that you are trying to pull.

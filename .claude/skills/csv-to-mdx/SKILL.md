@@ -188,6 +188,15 @@ The script cannot reliably fix these. Review every converted article for:
 - [ ] FAQ items that didn't match the bold-Q/paragraph-A or numbered-list patterns are left verbatim and need manual `<AccordionGroup>` conversion
 - [ ] New English articles need `/add-to-nav` run to add them to `docs.json`
 
+**Inline icons (image → font)**
+
+The converter emits image-based inline icons (`<img src="/images/kb/...">`). Both Domo icon fonts cover the full glyph set, so any inline icon that depicts a UI element should be migrated to the font convention. Pick the font that matches the surface the article describes — see `Domo-KB-Style-Guide.mdx` › **Icons** for full guidance.
+
+- [ ] Inline `<img>` icons depicting **current Domo product UI** → migrate to `<i className="icon-{name}" aria-hidden="true" />` (phosphor). If the original image showed a pre-refresh icon, this is also a stale-screenshot upgrade — go to phosphor anyway.
+- [ ] Inline `<img>` icons depicting **legacy surfaces** (release notes describing pre-refresh UI, Workbench, other legacy apps) → migrate to `<i className="legacy-icon-{name}" aria-hidden="true" />`.
+- [ ] After migration, confirm the surrounding prose names the icon (e.g. "click the line chart icon \<icon\>"). If it doesn't, rewrite the prose inline rather than reaching for `aria-label`.
+- [ ] If a file's only `InlineImage` usage was for icons now migrated, remove the orphan `import { InlineImage } from "/snippets/InlineImage.mdx";` line.
+
 **Headings**
 - [ ] All headings use the **imperative mood** — never the gerund. **Correct:** "Connect a DataSet" **Incorrect:** "Connecting a DataSet"
 - [ ] Top-level sections are H2 (`##`), subsections are H3 (`###`) and deeper — never jump levels

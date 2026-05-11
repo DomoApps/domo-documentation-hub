@@ -30,8 +30,9 @@ This skill is **subordinate** to the KB authoring skills. It exists to answer co
 | `<Tabs>`, `<Tab>` | Tabbed content | `references/layout.md` | `/components/tabs` |
 | `<Steps>`, `<Step>` | Numbered procedures | `references/layout.md` | `/components/steps` |
 | `<Frame>` | Screenshot wrapper | `references/media.md` | `/components/frames` |
-| `<i className="icon-{name}" aria-hidden="true" />` | Inline UI icon (preferred) | `references/media.md` | n/a (Domo icon font) |
-| `InlineImage` (snippet) | Inline image at line height — fallback when not in icon font | `references/media.md` + `references/snippets.md` | n/a (local) |
+| `<i className="icon-{name}" aria-hidden="true" />` | Inline UI icon — current Domo UI (phosphor, default) | `references/media.md` | n/a (Domo icon font) |
+| `<i className="legacy-icon-{name}" aria-hidden="true" />` | Inline UI icon — legacy surfaces only (release notes describing pre-refresh UI, Workbench) | `references/media.md` | n/a (legacy Domo icon font) |
+| `InlineImage` (snippet) | Inline image at line height — for glyphs not in either icon font | `references/media.md` + `references/snippets.md` | n/a (local) |
 | Raw `<img>` w/ inline `style` | Inline images — only when `InlineImage` defaults don't fit | `references/media.md` | n/a |
 | `<AccordionGroup>`, `<Accordion>` | Collapsible content / FAQ | `references/interactive.md` | `/components/accordions` |
 | `<CodeGroup>` | Tabbed code blocks | `references/interactive.md` | `/components/code-groups` |
@@ -54,7 +55,7 @@ See `references/snippets.md` before authoring a new snippet.
 ## Domo-specific conventions (always apply)
 
 - **Screenshots** are wrapped in `<Frame>`.
-- **Inline UI icons** use the Domo icon font: `<i className="icon-{name}" aria-hidden="true" />`. Avoid the Mintlify `<Icon>` component pointing at local SVGs — its `color` prop doesn't reach inline-loaded image SVGs, so theme-adaptive coloring breaks. Fall back to `InlineImage` only when the glyph isn't in the font.
+- **Inline UI icons** use a Domo icon font: `<i className="icon-{name}" aria-hidden="true" />` (phosphor) by default, or `<i className="legacy-icon-{name}" aria-hidden="true" />` for release notes describing the pre-refresh UI and legacy applications like Workbench. Both fonts ship the same glyphs — pick the one that matches the UI you're depicting, never based on availability. Avoid the Mintlify `<Icon>` component pointing at local SVGs — its `color` prop doesn't reach inline-loaded image SVGs, so theme-adaptive coloring breaks. Reserve `InlineImage` for glyphs not in either icon font.
 - **Icon accessibility:** the surrounding prose must name the icon (e.g. "click the line chart icon \<icon\>"). If existing prose says "click \<icon\>" with no label, rewrite the prose rather than reaching for `aria-label`. Reserve `role="img"` + `aria-label` for icon-only buttons or links where there is no room for prose. See `references/media.md` for the full convention.
 - **Callout labels** are bolded inline: `<Note>**Note:** ...</Note>`, `<Warning>**Warning:** ...</Warning>`. The label is not separated from the body.
 - **FAQ sections** at the bottom of KB articles use `<AccordionGroup>` with `<Accordion title="...">` children.

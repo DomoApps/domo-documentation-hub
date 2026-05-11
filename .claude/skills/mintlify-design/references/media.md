@@ -16,15 +16,21 @@ Wrap **every screenshot** in `<Frame>`. Frame auto-sizes to content width and re
 - `alt` is required. Describe what the screenshot shows, not "screenshot of X."
 - Optional `caption` prop renders text below the frame.
 
-## Inline UI icons — Domo icon font (preferred)
+## Inline UI icons — Domo icon fonts (preferred)
 
-For UI icons that flow inside a sentence (gear, alert bell, chart-line, etc.), use the Domo icon font. It's wired up in `style.css` and ships ~1,000 glyphs.
+For UI icons that flow inside a sentence (gear, alert bell, chart-line, etc.), use a Domo icon font. Two are wired up in `style.css`, and they share the same glyph set — pick the font that matches the UI you're depicting:
+
+- **`icon-{name}`** — phosphor (the design refresh; ~1,000 glyphs). Browse at [Domo Icons (phosphor)](https://git.empdev.domo.com/pages/Development/DomoIcons/#!/icons/phosphor). **Default for current Domo product surfaces.**
+- **`legacy-icon-{name}`** — the previous-generation Domo icons. Browse at [Domo Icons (domocons)](https://git.empdev.domo.com/pages/Development/DomoIcons/#!/icons/domocons). **Only for surfaces that still ship the older icons** — release notes describing the pre-refresh UI, and legacy applications such as Workbench.
+
+Both fonts cover the same glyph names (it's a design refresh, not a coverage gap), so the choice is about *which UI* the article depicts, never about availability.
 
 ```mdx
 Click <i className="icon-gear" aria-hidden="true" /> **Settings** to open Settings.
+
+In Workbench, click <i className="legacy-icon-database" aria-hidden="true" /> in the left icon bar.
 ```
 
-- The class is `icon-{name}`, where `{name}` matches Domo's design system. Browse names at [Domo Icons](https://git.empdev.domo.com/pages/Development/DomoIcons/#!/icons/domocons).
 - Icons inherit text color and size automatically — they adapt to light/dark mode without any extra props.
 - Override size only when needed: `<i className="icon-gear" style={{fontSize: 24}} aria-hidden="true" />`.
 
@@ -55,7 +61,7 @@ In flowing KB prose, the inline-label rewrite is always preferable to `aria-labe
 
 ## `InlineImage` snippet — fallback for non-icon glyphs
 
-When the inline glyph you need isn't in the icon font (e.g. a small UI screenshot, brand mark, or product-specific marker captured as an image), use the `InlineImage` snippet at `/snippets/InlineImage.mdx`:
+When the inline glyph you need isn't in either Domo icon font (e.g. a small UI screenshot, brand mark, or product-specific marker captured as an image), use the `InlineImage` snippet at `/snippets/InlineImage.mdx`:
 
 ```mdx
 import { InlineImage } from '/snippets/InlineImage.mdx';
@@ -80,7 +86,8 @@ Mintlify supports `<iframe>` for YouTube/Loom and a `<video>` tag for self-hoste
 ## Common mistakes
 
 - Using `<Icon icon="/images/icons/*.svg" />` for inline UI icons — Mintlify loads local SVGs via `<img>`, so `color`/`currentColor` can't reach the paths and dark mode breaks. Use the Domo icon font instead (see "Inline UI icons" above).
-- Using an `InlineImage` or raw `<img>` for an icon that exists in the Domo icon font — the font version inherits color and theme, the image doesn't.
+- Using an `InlineImage` or raw `<img>` for a UI icon — the font versions (`icon-*` for current UI, `legacy-icon-*` for legacy surfaces) inherit color and theme automatically; images don't.
+- Using `legacy-icon-*` for a current Domo product surface, or `icon-*` for a legacy surface like Workbench — pick the font that matches the UI being depicted.
 - Wrapping inline icons in `<Frame>` — `<Frame>` is only for full screenshots that stand on their own.
 - Using Markdown `![alt](src)` inside `<Frame>` — use raw `<img>` instead.
 - Forgetting `alt` — required for accessibility and required by lint.

@@ -154,7 +154,7 @@ For inline glyphs and small UI fragments that flow with surrounding text, use th
 Inline UI icons should use the Domo icon font, not images. The font ships ~1,000 glyphs and is wired up in `style.css` — every article can use it without any imports.
 
 ```mdx
-Click <i className="icon-gear" aria-hidden="true" /> **Settings** to open Settings.
+Click <i className="icon-gear sm" aria-hidden="true" /> **Settings** to open Settings.
 ```
 
 - The class name is always `icon-{name}`, where `{name}` matches the Domo design system. Browse available icons at [Domo Icons](https://git.empdev.domo.com/pages/Development/DomoIcons/#!/icons/phosphor?size=xl).
@@ -166,20 +166,20 @@ Click <i className="icon-gear" aria-hidden="true" /> **Settings** to open Settin
 The icon font uses Unicode Private Use Area codepoints, which screen readers announce as garbage if not handled. The default pattern hides the icon from the accessibility tree and lets surrounding prose carry the meaning:
 
 ```mdx
-Click <i className="icon-gear" aria-hidden="true" /> **Settings** to open Settings.
+Click <i className="icon-gear sm" aria-hidden="true" /> **Settings** to open Settings.
 ```
 
 If the existing prose doesn't already name the icon (e.g. "click \<icon\>"), **rewrite the prose to include the label inline** rather than relying on `aria-label`. This helps every reader, not just screen-reader users — sighted users also benefit from being told what the glyph represents instead of having to recognize it cold.
 
-- **Don't:** "Click <i className="icon-chart-line" aria-hidden="true" /> to view the chart."
-- **Do:** "Click the line chart icon <i className="icon-chart-line" aria-hidden="true" /> to view the chart."
+- **Don't:** "Click <i className="icon-chart-line sm" aria-hidden="true" /> to view the chart."
+- **Do:** "Click the line chart icon <i className="icon-chart-line sm" aria-hidden="true" /> to view the chart."
 
 **Narrow exception — icon-only controls with no room for prose**
 
 When the icon truly stands alone with no surrounding text (icon-only button, icon as the only content of a link, glyph in a tight UI table cell), use `role="img"` and `aria-label` instead of `aria-hidden`:
 
 ```mdx
-<i className="icon-gear" role="img" aria-label="Settings" />
+<i className="icon-gear sm" role="img" aria-label="Settings" />
 ```
 
 Use this exception sparingly — in flowing prose, the inline-label rewrite above is always preferable.
@@ -188,9 +188,22 @@ Use this exception sparingly — in flowing prose, the inline-label rewrite abov
 
 If the UI element you need to depict isn't in Domo's icon set, fall back to the `InlineImage` snippet (see *Inline images*). The icon font is preferred whenever a matching glyph exists.
 
+**Legacy Domo icons (`legacy-icon-*`)**
+
+Domo's previous-generation icon font is also wired up, under the `legacy-icon-*` class prefix. It carries the same glyph set as the default `icon-*` (phosphor) font — phosphor is the design refresh, `legacy-icon-*` matches the older Domo UI. Pick the font that matches the UI you're depicting:
+
+- **Use `legacy-icon-*`** when the surface still ships the older icons — i.e. release notes describing the pre-refresh UI, and legacy applications such as **Workbench**.
+- **Use `icon-*`** (phosphor) for everything else, since current Domo product surfaces use the refreshed icons, including articles where the current images depict the legacy icons, because Domo's UI no longer does and we want to avoid confusion by showing outdated icons in our documentation.
+
+```mdx
+In Workbench, click <i className="legacy-icon-database sm" aria-hidden="true" /> in the left icon bar.
+```
+
 **Migrating legacy image-based icons**
 
-Many older articles use `<img>` or `InlineImage` for icons that now exist in the font. These will be migrated to the font convention over time. When you're already updating an article that contains image-based icons, swap them to the font version if a matching glyph exists.
+Many older articles use `<img>` or `InlineImage` for icons that now exist in the font. These will be migrated to the font convention over time. When you're already updating an article that contains image-based icons, swap them to the font version.
+
+If the article describes the current Domo UI but the original screenshot showed a legacy-style icon, that screenshot is out of date — migrate it to the phosphor `icon-*` version (not `legacy-icon-*`) so the article matches what users see today. Reserve `legacy-icon-*` for surfaces that genuinely still use the old icons (release notes, Workbench, etc.).
 
 ## Inline images
 
@@ -336,6 +349,34 @@ Do not use `<br/>` between multiple callout elements (`<Note>`, `<Warning>`, `<T
 **Nested tables**
 
 For a table within a table, write the inner table as HTML and embed it inside the outer table cell. This renders correctly when published.
+
+**HTML tables**
+
+Prefer pipe tables. Use raw HTML tables only when pipe tables can't express what you need (rowspan/colspan, multi-line cell content with block elements, nested tables, or content migrated from a source that already shipped HTML).
+
+When an article does contain an HTML table, keep each `<tr>` on its own line, and put `<table>`, `<thead>`, `<tbody>`, and their closing tags on their own lines too. Many migrated articles collapse the entire table onto one line — this exceeds VS Code's default syntax-highlighting threshold (20,000 chars per line), so the table renders as a single unhighlighted blob and is hard to diff. When you touch one of these tables, normalize it.
+
+Also place data rows inside `<tbody>`. If the data rows are left inside `<thead>` (another migration artifact), browsers vertically center-align the cells, breaking the visual rhythm of the surrounding tables.
+
+**Correct:**
+
+```
+<table border="1" cellpadding="1" cellspacing="1">
+<thead>
+<tr><th><p> Column 1 </p></th><th><p> Column 2 </p></th></tr>
+</thead>
+<tbody>
+<tr><td><p> Row 1 cell 1 </p></td><td><p> Row 1 cell 2 </p></td></tr>
+<tr><td><p> Row 2 cell 1 </p></td><td><p> Row 2 cell 2 </p></td></tr>
+</tbody>
+</table>
+```
+
+**Incorrect (single line, data rows in `<thead>`):**
+
+```
+<table border="1" cellpadding="1" cellspacing="1"><thead><tr><th><p> Column 1 </p></th><th><p> Column 2 </p></th></tr><tr><td><p> Row 1 cell 1 </p></td><td><p> Row 1 cell 2 </p></td></tr></thead></table>
+```
 
 **Images in table cells**
 

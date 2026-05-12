@@ -231,6 +231,16 @@ After delivery, give the user a one-paragraph summary:
 - **Pathway A/C** — total features in source copy, count linked, count flagged for follow-up. For C, confirm the file was saved.
 - **Pathway B/D** — number of features re-checked, number updated, number unchanged, number still without a match. For D, confirm the file was saved.
 
+### 7. Clean up the PMM draft `.txt` (pathways A & B only)
+
+The PMM source `.txt` is a working snapshot of the shared Word doc — once link sentences are generated, the user is done with it and it shouldn't linger in the repo.
+
+After step 6, in PMM Article pathways (A or B) only:
+
+1. Ask the user for confirmation before deleting, naming the exact file. Use **AskUserQuestion** with a yes/no question — e.g. *"Delete `<source-copy.txt>` from the repo now that the link sentences are generated?"* Default the recommended option to "Yes, delete it." Mention the user can decline if they want to keep it for reference.
+2. On confirmation, use `Bash` to `rm <source-copy.txt>` (or `git rm` if it's already tracked). Note: deletion is destructive, so this confirmation step is non-negotiable.
+3. Skip this step entirely for pathways C and D (Current Release Notes targets) — the source `.txt` may still be in active use for the PMM doc.
+
 ## Important reminders
 
 - **Never edit the source `.txt` file.** It's a reference snapshot of the marketing doc, not the canonical version.

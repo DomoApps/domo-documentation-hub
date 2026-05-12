@@ -224,22 +224,37 @@ User pastes each updated link sentence into the corresponding feature section of
 6. After approval, use **Edit** to insert each sentence one feature at a time.
 7. If a section already has a weaker link sentence that's being replaced (not just supplemented), make that explicit in the preview and use **Edit**'s `old_string` → `new_string` to swap the sentence cleanly.
 
-### 6. Final summary
+### 6. Save the link sentences as a `.txt` artifact (pathways A & B only)
+
+In addition to displaying the list in chat, write the same content to a `.txt` file at the repo root so the user has a persistent, shareable artifact (handy when they come back later to paste the rest of the links, or when running an update pass against the previous output).
+
+1. **Filename** — derive from the source PMM `.txt`: replace `-copy.txt` with `-link-sentences.txt`. Example: source `may-2026-pmm-copy.txt` → artifact `may-2026-pmm-link-sentences.txt`. If the source doesn't end in `-copy.txt`, fall back to `<source-stem>-link-sentences.txt`.
+2. **Path** — repo root, alongside the source `.txt`.
+3. **Format** — plain text (no markdown headers needed for the file, but keep the bracketed-markdown link syntax intact since the user pastes that into Word). Include:
+   - A short header with the release name, source filename, and generation date.
+   - One block per feature, separated by a `---` divider, with the feature name as a plain label and the link sentence (or "no match" note) underneath.
+4. **Update mode (pathway B)** — name the artifact with an `-update-<YYYYMMDD>.txt` suffix instead, so it doesn't overwrite the initial net-new artifact. Example: `may-2026-pmm-link-sentences-update-20260603.txt`. Include only the features whose links changed in this update pass.
+5. After writing, tell the user the artifact path in the final summary so they can find it.
+
+Skip this step entirely for pathways C and D — the Current Release Notes file *is* the artifact in those cases.
+
+### 7. Final summary
 
 After delivery, give the user a one-paragraph summary:
 
-- **Pathway A/C** — total features in source copy, count linked, count flagged for follow-up. For C, confirm the file was saved.
-- **Pathway B/D** — number of features re-checked, number updated, number unchanged, number still without a match. For D, confirm the file was saved.
+- **Pathway A/C** — total features in source copy, count linked, count flagged for follow-up. For A, name the artifact path saved in step 6. For C, confirm the file was saved.
+- **Pathway B/D** — number of features re-checked, number updated, number unchanged, number still without a match. For B, name the artifact path saved in step 6. For D, confirm the file was saved.
 
-### 7. Clean up the PMM draft `.txt` (pathways A & B only)
+### 8. Clean up the PMM draft `.txt` (pathways A & B only)
 
-The PMM source `.txt` is a working snapshot of the shared Word doc — once link sentences are generated, the user is done with it and it shouldn't linger in the repo.
+The PMM source `.txt` is a working snapshot of the shared Word doc — once link sentences are generated and saved to the artifact, the user is done with it and it shouldn't linger in the repo.
 
-After step 6, in PMM Article pathways (A or B) only:
+After step 7, in PMM Article pathways (A or B) only:
 
-1. Ask the user for confirmation before deleting, naming the exact file. Use **AskUserQuestion** with a yes/no question — e.g. *"Delete `<source-copy.txt>` from the repo now that the link sentences are generated?"* Default the recommended option to "Yes, delete it." Mention the user can decline if they want to keep it for reference.
+1. Ask the user for confirmation before deleting, naming the exact file. Use **AskUserQuestion** with a yes/no question — e.g. *"Delete `<source-copy.txt>` from the repo now that the link sentences are generated and saved to `<artifact.txt>`?"* Default the recommended option to "Yes, delete it." Mention the user can decline if they want to keep it for reference.
 2. On confirmation, use `Bash` to `rm <source-copy.txt>` (or `git rm` if it's already tracked). Note: deletion is destructive, so this confirmation step is non-negotiable.
-3. Skip this step entirely for pathways C and D (Current Release Notes targets) — the source `.txt` may still be in active use for the PMM doc.
+3. Do **not** delete the artifact `.txt` from step 6 — that's the user-facing output and should remain in the repo.
+4. Skip this step entirely for pathways C and D (Current Release Notes targets) — the source `.txt` may still be in active use for the PMM doc.
 
 ## Important reminders
 

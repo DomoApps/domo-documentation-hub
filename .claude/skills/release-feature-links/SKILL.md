@@ -55,7 +55,7 @@ Then verify each hit by reading the frontmatter and a snippet of the body to con
 Tips for tricky cases:
 
 - **Rebranded features** — search the old name too. Example: *Domo Documents* was formerly *FileSets*.
-- **Feature umbrella articles** — multiple new tiles can share one article (e.g. *"Magic ETL Tiles: AI Services"* covers Text Generation, Classification, and Sentiment). Use the same article for all sub-features and flag in your output that the sub-section may not yet be live.
+- **Feature umbrella articles** — multiple new tiles can share one article (e.g. *"Magic ETL Tiles: AI Services"* covers Text Generation, Classification, and Sentiment). Use the same article for all sub-features and **deep-link to the sub-section's header anchor** (see "Header anchors" below). If the sub-section may not yet be published, flag that in your output.
 - **Newly added articles** — recently-added KB content for this release will likely show up here:
 
   ```bash
@@ -91,9 +91,21 @@ Use root-relative paths only:
 
 (This matches the existing internal-link convention in the repo per `CLAUDE.md`.)
 
-**Sentence style** — keep it short and conversational. Prefer "Learn more about..." or "Learn more about how to..." patterns, but vary if the feature name doesn't slot naturally. The example template the user gave is:
+**Header anchors for sub-features** — if the matched article is an umbrella article and the feature is documented as a sub-section within it, **append the section's Mintlify anchor** to the URL so the link jumps straight to that section. Anchors are the rendered section header converted to lowercase, with spaces and most punctuation replaced by hyphens, and inline `<Badge>` content (e.g. `Beta`) included as a trailing hyphenated word.
+
+To find the anchor, read the matched article and locate the `##` / `###` header that names the sub-feature. Then derive:
+
+- `## Text Generation Tile <Badge ...>Beta</Badge>` → `#text-generation-tile-beta`
+- `## AI Classification Tile` → `#ai-classification-tile`
+- `### Admin Notification Setting` → `#admin-notification-setting`
+
+When in doubt, run a quick spot-check by reading the article in the Mintlify preview, or verify against the section header text precisely. Apply the anchor to both PMM mode and Current Release Notes mode URLs.
+
+**Sentence style** — keep it short and conversational. Prefer "Learn more about..." or "Learn more about how to..." patterns, but vary if the feature name doesn't slot naturally. Examples:
 
 > Learn more about [Domo Essentials MCP](https://www.domo.com/docs/s/article/Connect-AI-Tools-to-Domo-Using-MCP).
+
+> Learn more about the [Text Generation DataFlow Tile in Magic ETL](https://www.domo.com/docs/s/article/000005741#text-generation-tile-beta).
 
 ### 5. Deliver based on mode
 

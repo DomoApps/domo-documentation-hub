@@ -1,6 +1,6 @@
 # Domo Documentation Hub
 
-Domo's public documentation site — Getting Started guides, the Knowledge Base (~1,700 articles), API Reference, and topic pages. Content is authored in MDX, navigation is defined in `docs.json`, and the site is built and hosted by [Mintlify](https://mintlify.com).
+Domo's public documentation site — Getting Started guides, the Knowledge Base (\~1,700 articles), API Reference, and topic pages. Content is authored in MDX, navigation is defined in `docs.json`, and the site is built and hosted by [Mintlify](https://mintlify.com).
 
 ## Repository layout
 
@@ -14,15 +14,21 @@ Domo's public documentation site — Getting Started guides, the Knowledge Base 
 
 ## Preview changes locally
 
-Uses the [`mintlify`](https://www.npmjs.com/package/mintlify) npm package for a local dev server against this repo's content.
+Uses the [`mint`](https://www.npmjs.com/package/mint) npm package (pinned as a devDependency, so `yarn install` is all you need) for a local dev server against this repo's content.
 
 ```bash
-npm i -g mintlify       # once per machine — see https://www.npmjs.com/package/mintlify
 git checkout <branch>   # any branch with changes you want to preview
-mintlify dev            # run from the repo root (where docs.json lives)
+yarn dev                # run from the repo root (where docs.json lives)
 ```
 
-Open <http://localhost:3000>. Most edits hot-reload; `docs.json` schema changes may need a server restart.
+Open [http://localhost:3000](http://localhost:3000). Most edits hot-reload; `docs.json` schema changes may need a server restart.
+
+Other handy scripts:
+
+```bash
+yarn broken-links   # scan internal links and flag broken ones
+yarn validate       # strict build check — fails on any warning or error
+```
 
 For a faster, but less robust preview experience, VS Code has several extenstions offering an MDX preview. For example: [Modern MDX Preview](https://marketplace.visualstudio.com/items?itemName=ggfincke.vsc-mdx-preview).
 
@@ -30,7 +36,7 @@ For a faster, but less robust preview experience, VS Code has several extenstion
 
 #### "Client not built" error
 
-If `mintlify dev` fails with:
+If `yarn dev` fails with:
 
 ```text
 Error: Client not built. Run: cd <path>/apps/client && STANDALONE_BUILD=true NEXT_PUBLIC_ENV=cli yarn build
@@ -50,9 +56,41 @@ tar -xzf /tmp/mint.tar.gz -C ~/.mintlify
 echo "$VERSION" > ~/.mintlify/mint/mint-version.txt
 rm /tmp/mint.tar.gz
 
-# 3. Run as normal — mintlify will see the version file and skip the re-download
-mintlify dev
+# 3. Run as normal — mint will see the version file and skip the re-download
+yarn dev
 ```
+
+## Editor setup & formatting
+
+MDX is formatted and linted with [remark](https://github.com/remarkjs/remark) + plugins (config in [.remarkrc.mjs](.remarkrc.mjs)). Format-on-save in VS Code shells out to the same pipeline, so editor and CLI produce identical output.
+
+### One-time setup
+
+1. **Install Node 20+** via [nvm](https://github.com/nvm-sh/nvm) (recommended), [fnm](https://github.com/Schniz/fnm), or [volta](https://volta.sh). The format-on-save wrapper at [scripts/format-mdx.sh](scripts/format-mdx.sh) currently sources nvm — if you use a different manager, add the equivalent block.
+2. **Enable Yarn 4** (the repo pins `yarn@4.14.1` via `packageManager`):
+   ```bash
+   corepack enable
+   ```
+3. **Install dependencies** from the repo root:
+   ```bash
+   yarn install
+   ```
+4. **Install the recommended VS Code extensions.** When you open the repo, VS Code will prompt for the ones listed in [.vscode/extensions.json](.vscode/extensions.json):
+   - [`unifiedjs.vscode-mdx`](https://marketplace.visualstudio.com/items?itemName=unifiedjs.vscode-mdx) — MDX language support (syntax highlighting, JSX-aware parsing).
+   - [`jkillian.custom-local-formatters`](https://marketplace.visualstudio.com/items?itemName=jkillian.custom-local-formatters) — runs `scripts/format-mdx.sh` as the MDX formatter so format-on-save uses our remark pipeline.
+
+[.vscode/settings.json](.vscode/settings.json) wires `formatOnSave` for `[mdx]` to the local-formatters extension — no per-user config needed.
+
+### Manual formatting & linting
+
+```bash
+yarn format         # split wide table rows, then run remark --output across all .mdx
+yarn format:remark  # remark only (skip the table-row splitter)
+yarn format:tables  # table-row splitter only
+yarn check          # lint without writing — exits non-zero on any remark warning
+```
+
+Run `yarn check` before opening a PR if you've made bulk changes outside the editor.
 
 ## Deployment
 

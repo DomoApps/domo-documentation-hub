@@ -10,7 +10,9 @@ import remarkLintMaximumHeadingLength from "remark-lint-maximum-heading-length";
 import remarkLintMaximumLineLength from "remark-lint-maximum-line-length";
 import remarkLintNoDuplicateHeadings from "remark-lint-no-duplicate-headings";
 import remarkLintNoFileNameIrregularCharacters from "remark-lint-no-file-name-irregular-characters";
+import remarkLintEmphasisMarker from "remark-lint-emphasis-marker";
 import remarkLintNoFileNameMixedCase from "remark-lint-no-file-name-mixed-case";
+import remarkLintOrderedListMarkerValue from "remark-lint-ordered-list-marker-value";
 import remarkMdx from "remark-mdx";
 import remarkPresetLintConsistent from "remark-preset-lint-consistent";
 import remarkPresetLintMarkdownStyleGuide from "remark-preset-lint-markdown-style-guide";
@@ -30,7 +32,7 @@ const config = {
   // save.
   settings: {
     bullet: "-",
-    emphasis: "*",
+    emphasis: "_",
     listItemIndent: "one",
     rule: "-",
   },
@@ -65,11 +67,17 @@ const config = {
     [remarkLintMaximumHeadingLength, false],
     [remarkLintNoDuplicateHeadings, false],
     [remarkLintListItemSpacing, false],
+    // Authors number ordered lists explicitly (1./2./3.); the style-guide
+    // default ("1.") forces every item to `1.` which is noisy in source.
+    [remarkLintOrderedListMarkerValue, false],
+    // Mintlify-style: italics use `_` (the style-guide preset enforces `*`).
+    // Strong stays `**` via the preset default.
+    [remarkLintEmphasisMarker, "_"],
     // KB articles use numeric IDs (e.g. 000005784.mdx) and snake_case asset
     // names, both of which trip this rule.
     [remarkLintNoFileNameIrregularCharacters, false],
-    // Mintlify uses `.mdx`, not `.md`.
-    [remarkLintFileExtension, "mdx"],
+    // Mintlify supports both `.md` and `.mdx`.
+    [remarkLintFileExtension, ["md", "mdx"]],
     // KB filenames like `Domo-KB-Style-Guide.mdx` and `New-Article-Template.mdx`
     // are intentionally Title-Case-Kebab.
     [remarkLintNoFileNameMixedCase, false],

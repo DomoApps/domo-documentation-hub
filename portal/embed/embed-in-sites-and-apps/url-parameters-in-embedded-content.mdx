@@ -76,17 +76,63 @@ example.domo.com/embed/pages/private/ABCDE
 
 ### Operands
 
-The operands you can use when writing code with Pfilters are as follows. Note that the values always need square brackets for the array, even when only a single value is included.
+The operands you can use when writing Pfilters are listed below. The `values` field is always an array (square brackets), even when only a single value is provided.
 
-- IN
-- CONTAINS
-- EQUALS
-- NOT_EQUALS
-- GREATER_THAN
-- LESS_THAN
-- GREAT_THAN_EQUALS_TO
-- LESS_THAN_EQUALS_TO
-- BETWEEN
+#### String operands
+
+| Operand | Values | Description |
+|---|---|---|
+| `IN` | Array of strings | Matches any of the provided values (exact match) |
+| `NOT_IN` | Array of strings | Excludes all of the provided values |
+| `IN_IGNORE_CASE` | Array of strings | Same as `IN` but case-insensitive |
+| `CONTAINS` | Single string | Matches rows where the column contains the substring |
+| `NOT_CONTAINS` | Single string | Matches rows where the column does not contain the substring |
+| `STARTS_WITH` | Single string | Matches rows where the column value begins with the string |
+| `NOT_STARTS_WITH` | Single string | Matches rows where the column value does not begin with the string |
+| `ENDS_WITH` | Single string | Matches rows where the column value ends with the string |
+| `NOT_ENDS_WITH` | Single string | Matches rows where the column value does not end with the string |
+| `EQUALS` | Single string | Exact match (also works for numeric columns) |
+| `NOT_EQUALS` | Single string | Excludes exact match (also works for numeric columns) |
+| `EQUALS_IGNORE_CASE` | Single string | Case-insensitive exact match |
+| `LIKE` | Single string | SQL-style pattern match — use `%` as a wildcard (e.g. `%revenue%`) |
+| `NOT_LIKE` | Single string | Excludes rows matching the SQL-style pattern |
+
+#### Numeric operands
+
+| Operand | Values | Description |
+|---|---|---|
+| `GREATER_THAN` | Single number | Matches rows where the column value is greater than the provided number |
+| `GREAT_THAN_EQUALS_TO` | Single number | Matches rows where the column value is greater than or equal to the provided number |
+| `LESS_THAN` | Single number | Matches rows where the column value is less than the provided number |
+| `LESS_THAN_EQUALS_TO` | Single number | Matches rows where the column value is less than or equal to the provided number |
+| `BETWEEN` | Two numbers `[min, max]` | Matches rows where the column value falls within the range (inclusive) |
+| `NOT_BETWEEN` | Two numbers `[min, max]` | Matches rows where the column value falls outside the range |
+
+### Operand examples
+
+**CONTAINS** — filter to rows where a column contains a substring:
+
+```url
+?pfilters=[{"column":"testName","operand":"CONTAINS","values":["OAuth"]}]
+```
+
+**BETWEEN** — filter to a numeric range (note: two values in the array):
+
+```url
+?pfilters=[{"column":"Revenue","operand":"BETWEEN","values":[1000,5000]}]
+```
+
+**LIKE** — SQL-style wildcard match (`%` matches any sequence of characters):
+
+```url
+?pfilters=[{"column":"Description","operand":"LIKE","values":["%revenue%"]}]
+```
+
+**Multiple filters** — combine operands in the same `pfilters` array:
+
+```url
+?pfilters=[{"column":"Status","operand":"IN","values":["Active","Pending"]},{"column":"Score","operand":"GREATER_THAN","values":[50]}]
+```
 
 ### Persistence of Pfilters across Pages
 

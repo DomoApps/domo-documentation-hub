@@ -159,8 +159,12 @@ The following user endpoints are supported in Domo:
 		"customAttributes": [
 			{
 				"key": "building",
+				"values": "Building A"
+			},{
+				"key": "alternateBuildings",
 				"values": [
-					"Building A"
+					"Building B",
+					"Building C"
 				]
 			}
 		]
@@ -274,7 +278,7 @@ These schemas and their elements are mapped to various Domo user and group attri
 | **Group** | `urn:ietf:params:scim:schemas:core:2.0:User` | `groups / {value, display}`<br/>Where **value** is the ID of the group in Domo and **display** is the group name as defined in the IdP. | |
 | **Organization** | `urn:ietf:params:scim:schemas:extension:enterprise:2.0:User` | `organization` | |
 | **Manager** | `urn:ietf:params:scim:schemas:extension:enterprise:2.0:User` | `manager {value, display}`<br/>*Complex of value (Domo user ID) and display (optional, manager name, ignored by Domo).* | |
-| **All custom attributes**<Tip>**Tip:** Learn more about [Domo custom attributes](/s/article/000005164#create-a-custom-attribute).</Tip> | `urn:ietf:params:scim:schemas:extension:custom:2.0:User` | `customAttributes [{key, values}]`<br/>*Array of complex of key (the attribute key as defined in Domo) and values (the user attribute values). Values must be provided as a list of strings, regardless of the data type of the attribute or whether the attribute is single-valued or a list.* | Custom attributes must be defined in Domo before they can be populated via SCIM, and the key in the SCIM must match the attribute key in Domo exactly (case-sensitive). |
+| **All custom attributes**<Tip>**Tip:** Learn more about [Domo custom attributes](/s/article/000005164#create-a-custom-attribute).</Tip> | `urn:ietf:params:scim:schemas:extension:custom:2.0:User` | `customAttributes: [{key, values}]`<br/>*Array of complex of key (the attribute key as defined in Domo) and values (the user attribute values).* | Custom attributes must be defined in Domo before they can be populated via SCIM, and the key in the SCIM must match the attribute key in Domo exactly (case-sensitive). For example, a Domo attribute of `building` is defined:<br/><br/>**For Okta** - *External name*: `customAttributes.^[key == building].values`<br/>**For Entra** - *User attribute name*: `urn:ietf:params:scim:schemas:extension:custom:2.0:User:customAttributes[key eq "building"].value` |
 
 ### Map Group Attributes
 
@@ -284,3 +288,12 @@ These schemas and their elements are mapped to various Domo user and group attri
 | **Domo Group Display Name**<br/>The group name in Domo that is most readily accessible to Domo users and is presented to users throughout the product, such as when sharing content or viewing card ownership. | `urn:ietf:params:scim:schemas:extension:domo:2.0:Group` | `domoDisplayName` | |
 | **Description** | `urn:ietf:params:scim:schemas:extension:domo:2.0:Group` | `description` | |
 | **Group Membership** | `urn:ietf:params:scim:schemas:core:2.0:Group` | `members`<br/>*An array of complex of value (the group member Domo user ID) and display (optional, group member name, ignored by Domo).* | |
+
+### FAQs
+
+1. Why does Okta's SCIM sync for groups sometimes remove all members or change membership unexpectedly?
+		- Okta requires different groups for assignment and membership. See Okta's [support site](https://support.okta.com/help/s/article/Using-the-Same-Group-for-Application-Assignment-and-Group-Push?language=en_US) for details on this limitation.
+2. Why is Okta's SCIM sync not working reliably after pointing my Okta app at a different Domo instance?
+		- Okta stores the "external id" (ID of the user in Domo, for example) within the Okta app.
+		If the Okta app is pointed to a different Domo instance where the ID's of your users and groups are different, Okta can no longer reconcile those which may result in unexpected behavior.
+		This is a known limitation with Okta's SCIM implementation. Because of that, we recommend creating a new Okta app for each Domo instance and not changing the target instance URL after creation.

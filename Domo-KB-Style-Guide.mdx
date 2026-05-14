@@ -147,7 +147,7 @@ Block-level screenshots should be wrapped in a `<Frame>` component. Frame styles
 
 Do not add explicit `width` or `height` styles to the `<img>` — they override Frame's auto-sizing and often distort the image. If a screenshot needs to render smaller than the column width, crop the source image rather than scaling it down with inline styles.
 
-For inline glyphs and small UI fragments that flow with surrounding text, use the icon font or the `InlineImage` snippet instead — see *Icons* and *Inline images* below.
+For inline glyphs and small UI fragments that flow with surrounding text, use the icon font or a native inline `<img>` instead — see *Icons* and *Inline images* below.
 
 ## Icons
 
@@ -186,7 +186,7 @@ Use this exception sparingly — in flowing prose, the inline-label rewrite abov
 
 **When the glyph isn't in the font**
 
-If the UI element you need to depict isn't in Domo's icon set, fall back to the `InlineImage` snippet (see *Inline images*). The icon font is preferred whenever a matching glyph exists.
+If the UI element you need to depict isn't in Domo's icon set, fall back to a native inline `<img>` (see *Inline images*). The icon font is preferred whenever a matching glyph exists.
 
 **Legacy Domo icons (`legacy-icon-*`)**
 
@@ -201,16 +201,25 @@ In Workbench, click <i className="legacy-icon-database sm" aria-hidden="true" />
 
 **Migrating legacy image-based icons**
 
-Many older articles use `<img>` or `InlineImage` for icons that now exist in the font. These will be migrated to the font convention over time. When you're already updating an article that contains image-based icons, swap them to the font version.
+Many older articles use `<img>` for icons that now exist in the font. These will be migrated to the font convention over time. When you're already updating an article that contains image-based icons, swap them to the font version.
 
 If the article describes the current Domo UI but the original screenshot showed a legacy-style icon, that screenshot is out of date — migrate it to the phosphor `icon-*` version (not `legacy-icon-*`) so the article matches what users see today. Reserve `legacy-icon-*` for surfaces that genuinely still use the old icons (release notes, Workbench, etc.).
 
 ## Inline images
 
-For inline glyphs that aren't in the icon font (small UI fragments captured as screenshots), use the `InlineImage` snippet from `/snippets/InlineImage.mdx`. Recommended display heights:
+For inline glyphs that aren't in the icon font (small UI fragments captured as screenshots), use a native `<img>` with an inline `style` block so the image flows with surrounding text instead of breaking onto its own line:
 
-- **1.2em–1.6em —** matches surrounding body text
-- **2em —** for header-level inline images
+```mdx
+<img src="/images/kb/example-glyph.png" alt="Example glyph" style={{height: '1.2em', display: 'inline', verticalAlign: 'start', margin: '0'}}/>
+```
+
+Recommended `height` values:
+
+- **`'1.2em'`–`'1.6em'`** — matches surrounding body text
+- **`'2em'`** — for header-level inline images or icons that stand alone as a row label in a table cell
+- A bare number (e.g. `111`) — for fixed-pixel screenshots embedded in a table cell
+
+Keep `display: 'inline'`, `verticalAlign: 'start'`, and `margin: '0'` consistent across inline images so they all sit on the baseline of the surrounding text without injecting vertical space.
 
 ## Callouts
 
@@ -380,7 +389,7 @@ Also place data rows inside `<tbody>`. If the data rows are left inside `<thead>
 
 **Images in table cells**
 
-Do not use `<Frame>` inside table cells — its block-level chrome and auto-sizing fight the cell width and break the layout. Use the `InlineImage` snippet (see *Inline images*) instead, regardless of the image size. If a screenshot is too large to read at inline sizes, link out to a separate article or place the screenshot outside the table.
+Do not use `<Frame>` inside table cells — its block-level chrome and auto-sizing fight the cell width and break the layout. Use a native inline `<img>` (see *Inline images*) instead, regardless of the image size. If a screenshot is too large to read at inline sizes, link out to a separate article or place the screenshot outside the table.
 
 ## Code
 

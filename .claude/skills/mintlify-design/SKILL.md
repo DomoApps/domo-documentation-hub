@@ -32,8 +32,7 @@ This skill is **subordinate** to the KB authoring skills. It exists to answer co
 | `<Frame>` | Screenshot wrapper | `references/media.md` | `/components/frames` |
 | `<i className="icon-{name}" aria-hidden="true" />` | Inline UI icon — current Domo UI (phosphor, default) | `references/media.md` | n/a (Domo icon font) |
 | `<i className="legacy-icon-{name}" aria-hidden="true" />` | Inline UI icon — legacy surfaces only (release notes describing pre-refresh UI, Workbench) | `references/media.md` | n/a (legacy Domo icon font) |
-| `InlineImage` (snippet) | Inline image at line height — for glyphs not in either icon font | `references/media.md` + `references/snippets.md` | n/a (local) |
-| Raw `<img>` w/ inline `style` | Inline images — only when `InlineImage` defaults don't fit | `references/media.md` | n/a |
+| Inline `<img>` w/ inline `style` | Inline image at line height — for glyphs not in either icon font, or for small UI-fragment screenshots that need to flow with prose | `references/media.md` | n/a |
 | `<AccordionGroup>`, `<Accordion>` | Collapsible content / FAQ | `references/interactive.md` | `/components/accordions` |
 | `<CodeGroup>` | Tabbed code blocks | `references/interactive.md` | `/components/code-groups` |
 | `<Expandable>` | Inline collapsible | `references/interactive.md` | `/components/expandables` |
@@ -46,7 +45,7 @@ If the user asks "is there a component for X" and X isn't in this table, WebFetc
 ## When to recommend a snippet vs. inline composition
 
 - **Inline composition** — the page is the only place this layout appears, or the layout is bespoke for that page.
-- **Extract a snippet** — the same block (more than ~3 lines of structured MDX/JSX) appears, or is about to appear, in 3+ places. Existing examples: `InlineImage.mdx`, `ColorTable.jsx`, `TypographyTable.jsx`.
+- **Extract a snippet** — the same block (more than ~3 lines of structured MDX/JSX) appears, or is about to appear, in 3+ places. Existing examples: `ColorTable.jsx`, `TypographyTable.jsx`.
 
 See `references/snippets.md` before authoring a new snippet.
 
@@ -55,7 +54,7 @@ See `references/snippets.md` before authoring a new snippet.
 ## Domo-specific conventions (always apply)
 
 - **Screenshots** are wrapped in `<Frame>`.
-- **Inline UI icons** use a Domo icon font: `<i className="icon-{name}" aria-hidden="true" />` (phosphor) by default, or `<i className="legacy-icon-{name}" aria-hidden="true" />` for release notes describing the pre-refresh UI and legacy applications like Workbench. Both fonts ship the same glyphs — pick the one that matches the UI you're depicting, never based on availability. Avoid the Mintlify `<Icon>` component pointing at local SVGs — its `color` prop doesn't reach inline-loaded image SVGs, so theme-adaptive coloring breaks. Reserve `InlineImage` for glyphs not in either icon font.
+- **Inline UI icons** use a Domo icon font: `<i className="icon-{name}" aria-hidden="true" />` (phosphor) by default, or `<i className="legacy-icon-{name}" aria-hidden="true" />` for release notes describing the pre-refresh UI and legacy applications like Workbench. Both fonts ship the same glyphs — pick the one that matches the UI you're depicting, never based on availability. Avoid the Mintlify `<Icon>` component pointing at local SVGs — its `color` prop doesn't reach inline-loaded image SVGs, so theme-adaptive coloring breaks. For glyphs not in either icon font, fall back to a native inline `<img>` (see `references/media.md`).
 - **Icon accessibility:** the surrounding prose must name the icon (e.g. "click the line chart icon \<icon\>"). If existing prose says "click \<icon\>" with no label, rewrite the prose rather than reaching for `aria-label`. Reserve `role="img"` + `aria-label` for icon-only buttons or links where there is no room for prose. See `references/media.md` for the full convention.
 - **Callout labels** are bolded inline: `<Note>**Note:** ...</Note>`, `<Warning>**Warning:** ...</Warning>`. The label is not separated from the body.
 - **FAQ sections** at the bottom of KB articles use `<AccordionGroup>` with `<Accordion title="...">` children.

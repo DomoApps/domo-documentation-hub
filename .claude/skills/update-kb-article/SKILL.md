@@ -155,7 +155,7 @@ Update the `src` attribute in the `<Frame>` or `<img>` tag. Update `alt` text if
 
 ### Image-based icon → icon font swap
 
-Many older articles use `<img>`, `InlineImage`, or `<Icon icon="/images/icons/*.svg" />` for inline UI icons that now exist in the Domo icon fonts. The font versions inherit text color and adapt to light/dark mode automatically; image-based icons don't.
+Many older articles use `<img>` or `<Icon icon="/images/icons/*.svg" />` for inline UI icons that now exist in the Domo icon fonts. The font versions inherit text color and adapt to light/dark mode automatically; image-based icons don't.
 
 Two icon fonts are wired up, and they ship the **same glyph set** — the choice is about which UI the article depicts, not glyph availability:
 

@@ -59,25 +59,15 @@ In flowing KB prose, the inline-label rewrite is always preferable to `aria-labe
 
 **Avoid** `<Icon icon="/images/icons/gear.svg" />` (Mintlify's component pointing at a local SVG). Mintlify loads the SVG via `<img>`, so the `color` prop and `currentColor` don't reach the paths — the icon stays black in dark mode. Use the icon font instead.
 
-## `InlineImage` snippet — fallback for non-icon glyphs
+## Inline `<img>` — fallback for non-icon glyphs
 
-When the inline glyph you need isn't in either Domo icon font (e.g. a small UI screenshot, brand mark, or product-specific marker captured as an image), use the `InlineImage` snippet at `/snippets/InlineImage.mdx`:
-
-```mdx
-import { InlineImage } from '/snippets/InlineImage.mdx';
-
-Click <InlineImage src="/images/kb/some-ui-fragment.png" /> to continue.
-```
-
-Defaults: `height='1.6em'`, `display: inline`, `verticalAlign: start`, `noZoom`. Prefer `InlineImage` over hand-rolled inline `<img>` styles when the result fits the defaults.
-
-## Raw `<img>` with inline style — last resort
-
-For inline images that need custom dimensions or styling beyond the `InlineImage` defaults:
+When the inline glyph you need isn't in either Domo icon font (e.g. a small UI screenshot, brand mark, or product-specific marker captured as an image), use a native `<img>` with an inline `style` block so the image flows with surrounding text instead of breaking onto its own line:
 
 ```mdx
-Click the gear icon <img src="/images/kb/gear.png" alt="" style={{display: 'inline', height: '1.2em', verticalAlign: 'middle'}} /> to open settings.
+Click <img src="/images/kb/some-ui-fragment.png" alt="UI fragment" style={{height: '1.2em', display: 'inline', verticalAlign: 'start', margin: '0'}}/> to continue.
 ```
+
+Use `height: '1.2em'` (or `'1.6em'`) to match body text, `height: '2em'` when the icon stands alone as a row label in a table cell, or a bare number (e.g. `111`) for fixed-pixel screenshots embedded in a table cell. Keep `display: 'inline'`, `verticalAlign: 'start'`, and `margin: '0'` consistent so the image sits on the baseline of the surrounding text without injecting vertical space.
 
 ## Video / embeds
 
@@ -86,7 +76,7 @@ Mintlify supports `<iframe>` for YouTube/Loom and a `<video>` tag for self-hoste
 ## Common mistakes
 
 - Using `<Icon icon="/images/icons/*.svg" />` for inline UI icons — Mintlify loads local SVGs via `<img>`, so `color`/`currentColor` can't reach the paths and dark mode breaks. Use the Domo icon font instead (see "Inline UI icons" above).
-- Using an `InlineImage` or raw `<img>` for a UI icon — the font versions (`icon-*` for current UI, `legacy-icon-*` for legacy surfaces) inherit color and theme automatically; images don't.
+- Using a raw `<img>` for a UI icon when the glyph is in the icon font — the font versions (`icon-*` for current UI, `legacy-icon-*` for legacy surfaces) inherit color and theme automatically; images don't.
 - Using `legacy-icon-*` for a current Domo product surface, or `icon-*` for a legacy surface like Workbench — pick the font that matches the UI being depicted.
 - Wrapping inline icons in `<Frame>` — `<Frame>` is only for full screenshots that stand on their own.
 - Using Markdown `![alt](src)` inside `<Frame>` — use raw `<img>` instead.

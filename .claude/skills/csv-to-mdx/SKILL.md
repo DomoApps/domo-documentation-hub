@@ -195,7 +195,7 @@ The converter emits image-based inline icons (`<img src="/images/kb/...">`). Bot
 - [ ] Inline `<img>` icons depicting **current Domo product UI** → migrate to `<i className="icon-{name}" aria-hidden="true" />` (phosphor). If the original image showed a pre-refresh icon, this is also a stale-screenshot upgrade — go to phosphor anyway.
 - [ ] Inline `<img>` icons depicting **legacy surfaces** (release notes describing pre-refresh UI, Workbench, other legacy apps) → migrate to `<i className="legacy-icon-{name}" aria-hidden="true" />`.
 - [ ] After migration, confirm the surrounding prose names the icon (e.g. "click the line chart icon \<icon\>"). If it doesn't, rewrite the prose inline rather than reaching for `aria-label`.
-- [ ] If a file's only `InlineImage` usage was for icons now migrated, remove the orphan `import { InlineImage } from "/snippets/InlineImage.mdx";` line.
+- [ ] Remove any leftover `import { InlineImage } from "/snippets/InlineImage.mdx";` line — the snippet is no longer in use anywhere in the repo. Inline images should always be a native `<img>` with an inline `style` block (see `Domo-KB-Style-Guide.mdx` › **Inline images**).
 
 **Headings**
 - [ ] All headings use the **imperative mood** — never the gerund. **Correct:** "Connect a DataSet" **Incorrect:** "Connecting a DataSet"

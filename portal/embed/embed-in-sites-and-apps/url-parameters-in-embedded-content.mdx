@@ -84,17 +84,17 @@ The operands you can use when writing Pfilters are listed below. The `values` fi
 
 | Operand | Description | Example |
 |---|---|---|
-| `IN` | Matches any of the provided values (exact match); also works with numeric columns | `?pfilters=[{"column":"Status","operand":"IN","values":["Active","Pending","Closed"]}]` |
-| `NOT_IN` | Excludes all of the provided values; also works with numeric columns | `?pfilters=[{"column":"Status","operand":"NOT_IN","values":["Deleted","Archived"]}]` |
+| `IN` | Matches any of the provided values (**case-sensitive**); also works with numeric columns | `?pfilters=[{"column":"Status","operand":"IN","values":["Active","Pending","Closed"]}]` |
+| `NOT_IN` | Excludes all of the provided values (**case-sensitive**); also works with numeric columns | `?pfilters=[{"column":"Status","operand":"NOT_IN","values":["Deleted","Archived"]}]` |
 | `IN_IGNORE_CASE` | Same as `IN` but case-insensitive | `?pfilters=[{"column":"Region","operand":"IN_IGNORE_CASE","values":["north america"]}]` — also matches "North America" and "NORTH AMERICA" |
-| `CONTAINS` | Matches rows where the column contains the substring | `?pfilters=[{"column":"Title","operand":"CONTAINS","values":["Q4"]}]` — matches "Q4 Report", "TORQ4MOTORS" |
-| `NOT_CONTAINS` | Matches rows where the column does not contain the substring | `?pfilters=[{"column":"Title","operand":"NOT_CONTAINS","values":["draft"]}]` |
-| `STARTS_WITH` | Matches rows where the column value begins with the string | `?pfilters=[{"column":"Message","operand":"STARTS_WITH","values":["Error"]}]` — matches "Error 404", "Error: timeout" |
-| `NOT_STARTS_WITH` | Matches rows where the column value does not begin with the string | `?pfilters=[{"column":"Name","operand":"NOT_STARTS_WITH","values":["test_"]}]` |
-| `ENDS_WITH` | Matches rows where the column value ends with the string | `?pfilters=[{"column":"Market","operand":"ENDS_WITH","values":["_US"]}]` |
-| `NOT_ENDS_WITH` | Matches rows where the column value does not end with the string | `?pfilters=[{"column":"Config","operand":"NOT_ENDS_WITH","values":["_old"]}]` |
-| `EQUALS` | Exact match (also works for numeric columns) | `?pfilters=[{"column":"Region","operand":"EQUALS","values":["North America"]}]` — "north america" would not match |
-| `NOT_EQUALS` | Excludes exact match (also works for numeric columns) | `?pfilters=[{"column":"Status","operand":"NOT_EQUALS","values":["N/A"]}]` |
+| `CONTAINS` | Matches rows where the column contains the substring (**case-insensitive**) | `?pfilters=[{"column":"Title","operand":"CONTAINS","values":["Q4"]}]` — matches "Q4 Report", "TORQ4MOTORS", and "q4 summary" |
+| `NOT_CONTAINS` | Matches rows where the column does not contain the substring (**case-insensitive**) | `?pfilters=[{"column":"Title","operand":"NOT_CONTAINS","values":["draft"]}]` — also excludes "Draft" and "DRAFT" |
+| `STARTS_WITH` | Matches rows where the column value begins with the string (**case-insensitive**) | `?pfilters=[{"column":"Message","operand":"STARTS_WITH","values":["error"]}]` — matches "Error 404", "ERROR: timeout", and "error occurred" |
+| `NOT_STARTS_WITH` | Matches rows where the column value does not begin with the string (**case-insensitive**) | `?pfilters=[{"column":"Name","operand":"NOT_STARTS_WITH","values":["test_"]}]` — also excludes "TEST_user" |
+| `ENDS_WITH` | Matches rows where the column value ends with the string (**case-insensitive**) | `?pfilters=[{"column":"Market","operand":"ENDS_WITH","values":["_us"]}]` — matches "_US", "_Us", and "_us" |
+| `NOT_ENDS_WITH` | Matches rows where the column value does not end with the string (**case-insensitive**) | `?pfilters=[{"column":"Config","operand":"NOT_ENDS_WITH","values":["_old"]}]` — also excludes values ending in "_OLD" or "_Old" |
+| `EQUALS` | **Case-sensitive** exact match (also works for numeric columns) | `?pfilters=[{"column":"Region","operand":"EQUALS","values":["North America"]}]` — "north america" and "NORTH AMERICA" do not match |
+| `NOT_EQUALS` | Excludes **case-sensitive** exact match (also works for numeric columns) | `?pfilters=[{"column":"Status","operand":"NOT_EQUALS","values":["N/A"]}]` — "n/a" and "N/a" are not excluded |
 | `EQUALS_IGNORE_CASE` | Case-insensitive exact match | `?pfilters=[{"column":"Status","operand":"EQUALS_IGNORE_CASE","values":["active"]}]` — matches "active", "Active", and "ACTIVE" |
 | `LIKE` | SQL-style pattern match (`%` = zero or more characters, `_` = exactly one character); **matching is case-insensitive** | `?pfilters=[{"column":"Region","operand":"LIKE","values":["US-__"]}]` — matches "US-CA" and "US-TX" but not "US-C" (too short) or "US-CAL" (too long) |
 | `NOT_LIKE` | Excludes rows matching the SQL-style pattern (same wildcards and case-insensitive behavior as `LIKE`) | `?pfilters=[{"column":"Title","operand":"NOT_LIKE","values":["%25archived%25"]}]` — excludes any value containing "archived" |

@@ -82,8 +82,8 @@ The operands you can use when writing Pfilters are listed below. The `values` fi
 
 | Operand | Description | Example |
 |---|---|---|
-| `IN` | Matches any of the provided values (exact match) | `?pfilters=[{"column":"Status","operand":"IN","values":["Active","Pending","Closed"]}]` |
-| `NOT_IN` | Excludes all of the provided values | `?pfilters=[{"column":"Status","operand":"NOT_IN","values":["Deleted","Archived"]}]` |
+| `IN` | Matches any of the provided values (exact match); also works with numeric columns | `?pfilters=[{"column":"Status","operand":"IN","values":["Active","Pending","Closed"]}]` |
+| `NOT_IN` | Excludes all of the provided values; also works with numeric columns | `?pfilters=[{"column":"Status","operand":"NOT_IN","values":["Deleted","Archived"]}]` |
 | `IN_IGNORE_CASE` | Same as `IN` but case-insensitive | `?pfilters=[{"column":"Region","operand":"IN_IGNORE_CASE","values":["north america"]}]` — also matches "North America" and "NORTH AMERICA" |
 | `CONTAINS` | Matches rows where the column contains the substring | `?pfilters=[{"column":"Title","operand":"CONTAINS","values":["Q4"]}]` — matches "Q4 Report", "TORQ4MOTORS" |
 | `NOT_CONTAINS` | Matches rows where the column does not contain the substring | `?pfilters=[{"column":"Title","operand":"NOT_CONTAINS","values":["draft"]}]` |
@@ -94,12 +94,23 @@ The operands you can use when writing Pfilters are listed below. The `values` fi
 | `EQUALS` | Exact match (also works for numeric columns) | `?pfilters=[{"column":"Region","operand":"EQUALS","values":["North America"]}]` — "north america" would not match |
 | `NOT_EQUALS` | Excludes exact match (also works for numeric columns) | `?pfilters=[{"column":"Status","operand":"NOT_EQUALS","values":["N/A"]}]` |
 | `EQUALS_IGNORE_CASE` | Case-insensitive exact match | `?pfilters=[{"column":"Status","operand":"EQUALS_IGNORE_CASE","values":["active"]}]` — matches "active", "Active", and "ACTIVE" |
-| `LIKE` | SQL-style pattern match (`%` = any characters, `_` = exactly one character) | `?pfilters=[{"column":"Region","operand":"LIKE","values":["US-__"]}]` — matches "US-CA", "US-TX" but not "US-CAL" |
-| `NOT_LIKE` | Excludes rows matching the SQL-style pattern | `?pfilters=[{"column":"Title","operand":"NOT_LIKE","values":["%25archived%25"]}]` — excludes any value containing "archived" |
+| `LIKE` | SQL-style pattern match (`%` = zero or more characters, `_` = exactly one character); **matching is case-insensitive** | `?pfilters=[{"column":"Region","operand":"LIKE","values":["US-__"]}]` — matches "US-CA" and "US-TX" but not "US-C" (too short) or "US-CAL" (too long) |
+| `NOT_LIKE` | Excludes rows matching the SQL-style pattern (same wildcards and case-insensitive behavior as `LIKE`) | `?pfilters=[{"column":"Title","operand":"NOT_LIKE","values":["%25archived%25"]}]` — excludes any value containing "archived" |
 
 <Warning>
   **URL-encode special characters in `LIKE` and `NOT_LIKE` patterns.** Because pfilters are passed as URL query parameters, the `%` wildcard must be encoded as `%25` — a raw `%` will be misinterpreted as the start of a percent-encoded character and the filter will not work.
 </Warning>
+
+<Note>
+  **LIKE and NOT_LIKE pattern matching details**
+
+  | Feature | Behavior |
+  |---|---|
+  | `%` wildcard | Matches **zero or more** characters. `Apple%` matches "Apple" exactly (zero trailing characters); `%an%` matches any value containing "an"; `%` alone matches every row. |
+  | `_` wildcard | Matches **exactly one** character. `US-__` matches "US-CA" but not "US-C" (too short) or "US-CAL" (too long). Use one `_` per required character. |
+  | Case sensitivity | Matching is **case-insensitive**. `B%` and `b%` return the same results. |
+  | Bracket notation | `[charlist]` syntax (e.g. `[AB]%`) is **not supported**. The brackets are treated as literal characters — `[AB]%` only matches values that literally start with `[AB]`, not values starting with A or B. |
+</Note>
 
 <Tip>
   **Special characters in the `pfilters` value can be mangled by text tools.** Characters like `[`, `]`, `{`, `}`, `"`, `%`, and `+` appear throughout every pfilter and are meaningful in URLs. Email clients, Markdown renderers, CMS fields, Slack, and spreadsheet tools can silently strip, escape, or re-encode them — producing a URL that looks correct but fails at runtime.

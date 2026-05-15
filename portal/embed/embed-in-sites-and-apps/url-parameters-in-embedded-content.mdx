@@ -80,55 +80,37 @@ The operands you can use when writing Pfilters are listed below. The `values` fi
 
 #### String operands
 
-| Operand | Values | Description |
+| Operand | Description | Example |
 |---|---|---|
-| `IN` | Array of strings | Matches any of the provided values (exact match) |
-| `NOT_IN` | Array of strings | Excludes all of the provided values |
-| `IN_IGNORE_CASE` | Array of strings | Same as `IN` but case-insensitive |
-| `CONTAINS` | Single string | Matches rows where the column contains the substring |
-| `NOT_CONTAINS` | Single string | Matches rows where the column does not contain the substring |
-| `STARTS_WITH` | Single string | Matches rows where the column value begins with the string |
-| `NOT_STARTS_WITH` | Single string | Matches rows where the column value does not begin with the string |
-| `ENDS_WITH` | Single string | Matches rows where the column value ends with the string |
-| `NOT_ENDS_WITH` | Single string | Matches rows where the column value does not end with the string |
-| `EQUALS` | Single string | Exact match (also works for numeric columns) |
-| `NOT_EQUALS` | Single string | Excludes exact match (also works for numeric columns) |
-| `EQUALS_IGNORE_CASE` | Single string | Case-insensitive exact match |
-| `LIKE` | Single string | SQL-style pattern match — use `%` as a wildcard (e.g. `%revenue%`) |
-| `NOT_LIKE` | Single string | Excludes rows matching the SQL-style pattern |
+| `IN` | Matches any of the provided values (exact match) | `?pfilters=[{"column":"Status","operand":"IN","values":["Active","Pending","Closed"]}]` |
+| `NOT_IN` | Excludes all of the provided values | `?pfilters=[{"column":"Status","operand":"NOT_IN","values":["Deleted","Archived"]}]` |
+| `IN_IGNORE_CASE` | Same as `IN` but case-insensitive | `?pfilters=[{"column":"Region","operand":"IN_IGNORE_CASE","values":["north america"]}]` — also matches "North America" and "NORTH AMERICA" |
+| `CONTAINS` | Matches rows where the column contains the substring | `?pfilters=[{"column":"Title","operand":"CONTAINS","values":["Q4"]}]` — matches "Q4 Report", "TORQ4MOTORS" |
+| `NOT_CONTAINS` | Matches rows where the column does not contain the substring | `?pfilters=[{"column":"Title","operand":"NOT_CONTAINS","values":["draft"]}]` |
+| `STARTS_WITH` | Matches rows where the column value begins with the string | `?pfilters=[{"column":"Message","operand":"STARTS_WITH","values":["Error"]}]` — matches "Error 404", "Error: timeout" |
+| `NOT_STARTS_WITH` | Matches rows where the column value does not begin with the string | `?pfilters=[{"column":"Name","operand":"NOT_STARTS_WITH","values":["test_"]}]` |
+| `ENDS_WITH` | Matches rows where the column value ends with the string | `?pfilters=[{"column":"Market","operand":"ENDS_WITH","values":["_US"]}]` |
+| `NOT_ENDS_WITH` | Matches rows where the column value does not end with the string | `?pfilters=[{"column":"Config","operand":"NOT_ENDS_WITH","values":["_old"]}]` |
+| `EQUALS` | Exact match (also works for numeric columns) | `?pfilters=[{"column":"Region","operand":"EQUALS","values":["North America"]}]` — "north america" would not match |
+| `NOT_EQUALS` | Excludes exact match (also works for numeric columns) | `?pfilters=[{"column":"Status","operand":"NOT_EQUALS","values":["N/A"]}]` |
+| `EQUALS_IGNORE_CASE` | Case-insensitive exact match | `?pfilters=[{"column":"Status","operand":"EQUALS_IGNORE_CASE","values":["active"]}]` — matches "active", "Active", and "ACTIVE" |
+| `LIKE` | SQL-style pattern match (`%` = any characters, `_` = exactly one character) | `?pfilters=[{"column":"Region","operand":"LIKE","values":["US-__"]}]` — matches "US-CA", "US-TX" but not "US-CAL" |
+| `NOT_LIKE` | Excludes rows matching the SQL-style pattern | `?pfilters=[{"column":"Title","operand":"NOT_LIKE","values":["%archived%"]}]` — excludes any value containing "archived" |
 
 #### Numeric operands
 
-| Operand | Values | Description |
+| Operand | Description | Example |
 |---|---|---|
-| `GREATER_THAN` | Single number | Matches rows where the column value is greater than the provided number |
-| `GREAT_THAN_EQUALS_TO` | Single number | Matches rows where the column value is greater than or equal to the provided number |
-| `LESS_THAN` | Single number | Matches rows where the column value is less than the provided number |
-| `LESS_THAN_EQUALS_TO` | Single number | Matches rows where the column value is less than or equal to the provided number |
-| `BETWEEN` | Two numbers `[min, max]` | Matches rows where the column value falls within the range (inclusive) |
-| `NOT_BETWEEN` | Two numbers `[min, max]` | Matches rows where the column value falls outside the range |
+| `GREATER_THAN` | Matches rows where the column value is greater than the provided number | `?pfilters=[{"column":"Revenue","operand":"GREATER_THAN","values":[100]}]` |
+| `GREAT_THAN_EQUALS_TO` | Matches rows where the column value is greater than or equal to the provided number | `?pfilters=[{"column":"Score","operand":"GREAT_THAN_EQUALS_TO","values":[0]}]` — matches zero and all positive values |
+| `LESS_THAN` | Matches rows where the column value is less than the provided number | `?pfilters=[{"column":"Revenue","operand":"LESS_THAN","values":[1000]}]` |
+| `LESS_THAN_EQUALS_TO` | Matches rows where the column value is less than or equal to the provided number | `?pfilters=[{"column":"Score","operand":"LESS_THAN_EQUALS_TO","values":[100]}]` |
+| `BETWEEN` | Matches rows where the column value falls within the range (inclusive) — requires two values | `?pfilters=[{"column":"Revenue","operand":"BETWEEN","values":[1000,5000]}]` — matches 1000, 2500, and 5000 but not 999 or 5001 |
+| `NOT_BETWEEN` | Matches rows where the column value falls outside the range — requires two values | `?pfilters=[{"column":"Score","operand":"NOT_BETWEEN","values":[0,10]}]` — matches anything below 0 or above 10 |
 
-### Operand examples
+### Combining multiple operands
 
-**CONTAINS** — filter to rows where a column contains a substring:
-
-```url
-?pfilters=[{"column":"testName","operand":"CONTAINS","values":["OAuth"]}]
-```
-
-**BETWEEN** — filter to a numeric range (note: two values in the array):
-
-```url
-?pfilters=[{"column":"Revenue","operand":"BETWEEN","values":[1000,5000]}]
-```
-
-**LIKE** — SQL-style wildcard match (`%` matches any sequence of characters):
-
-```url
-?pfilters=[{"column":"Description","operand":"LIKE","values":["%revenue%"]}]
-```
-
-**Multiple filters** — combine operands in the same `pfilters` array:
+To apply more than one filter at once, add multiple objects to the `pfilters` array:
 
 ```url
 ?pfilters=[{"column":"Status","operand":"IN","values":["Active","Pending"]},{"column":"Score","operand":"GREATER_THAN","values":[50]}]

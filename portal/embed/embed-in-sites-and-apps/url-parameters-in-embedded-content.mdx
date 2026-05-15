@@ -103,17 +103,6 @@ The operands you can use when writing Pfilters are listed below. The `values` fi
   **URL-encode special characters in `LIKE` and `NOT_LIKE` patterns.** Because pfilters are passed as URL query parameters, the `%` wildcard must be encoded as `%25` — a raw `%` will be misinterpreted as the start of a percent-encoded character and the filter will not work.
 </Warning>
 
-<Note>
-  **LIKE and NOT_LIKE pattern matching details**
-
-  | Feature | Behavior |
-  |---|---|
-  | `%` wildcard | Matches **zero or more** characters. `Apple%` matches "Apple" exactly (zero trailing characters); `%an%` matches any value containing "an"; `%` alone matches every row. |
-  | `_` wildcard | Matches **exactly one** character. `US-__` matches "US-CA" but not "US-C" (too short) or "US-CAL" (too long). Use one `_` per required character. |
-  | Case sensitivity | Matching is **case-insensitive**. `B%` and `b%` return the same results. |
-  | Bracket notation | `[charlist]` syntax (e.g. `[AB]%`) is **not supported**. The brackets are treated as literal characters — `[AB]%` only matches values that literally start with `[AB]`, not values starting with A or B. |
-</Note>
-
 <Tip>
   **Special characters in the `pfilters` value can be mangled by text tools.** Characters like `[`, `]`, `{`, `}`, `"`, `%`, and `+` appear throughout every pfilter and are meaningful in URLs. Email clients, Markdown renderers, CMS fields, Slack, and spreadsheet tools can silently strip, escape, or re-encode them — producing a URL that looks correct but fails at runtime.
 

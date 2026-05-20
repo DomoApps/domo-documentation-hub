@@ -28,7 +28,7 @@ Key Mintlify components in use:
 - `<Frame>` — wraps screenshots (auto-sizes to content width)
 - `<Note>`, `<Warning>`, `<Tip>` — callout blocks (always bold the label: `**Note:**`)
 - `<AccordionGroup>` + `<Accordion title="...">` — FAQ sections
-- Inline images use raw `<img>` with inline `style={{}}` props
+- Inline UI icons use the Domo icon font: `<i className="icon-{name}" aria-hidden="true" />`. Avoid Mintlify's `<Icon>` component for local SVGs — color/dark-mode breaks. When a glyph isn't in either icon font, fall back to a native `<img>` with inline `style={{display: 'inline', verticalAlign: 'start', height: '1.2em', margin: '0'}}` (use `'2em'` if the icon stands alone as a row label in a table cell). See `Domo-KB-Style-Guide.mdx` › **Icons**.
 
 Internal links use root-relative paths: `[text](/s/article/Article-Title)`
 
@@ -69,4 +69,4 @@ Use `New-Article-Template.mdx` as the starting point for new KB articles.
 |add-to-nav|Adding a page to docs.json navigation or moving an existing page to a different location in docs.json|
 |update-kb-article|Any update to an existing KB article: renames, content edits, image swaps, content removal, file path updates, cross-file changes, step/process edits, navigation moves, merges, or splits|
 |mintlify-design|Mintlify component/page-design expert: choosing components, composing custom layouts, building rich pages, "is there a component for X" questions, or authoring reusable snippets in `/snippets/`|
-|fix-ja-formatting|Fixing structural formatting issues in queued Japanese articles: inline image placement, Frame vs. InlineImage mismatches, callout wrapping, and redundant blank lines|
+|fix-ja-formatting|Fixing structural formatting issues in queued Japanese articles: inline image placement, block vs. inline `<img>` mismatches, callout wrapping, and redundant blank lines|

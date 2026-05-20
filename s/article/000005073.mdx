@@ -5,29 +5,28 @@ title: "Flex Map v2 | Implementation Guide"
 ## Intro
 
 <Warning>
-**Important:** This guide helps you implement the Flex Map v2 app. This guide does not help you implement the [Flex Map v1](http://domo-support.domo.com/s/article/360043438353?language=en_US) app. To implement the Flex Map v1 app, see the [Flex Map v1 Implementation Guide](http://domo-support.domo.com/s/article/360043884674?language=en_US).
-
+  **Important:** This guide helps you implement the Flex Map v2 app. This guide does not help you implement the [Flex Map v1](http://domo-support.domo.com/s/article/360043438353?language=en_US) app. To implement the Flex Map v1 app, see the [Flex Map v1 Implementation Guide](http://domo-support.domo.com/s/article/360043884674?language=en_US).
 </Warning>
 
 Flex Map v2 is a premium app you can use to map locations and territories and get geographical insights into your data. You can also discover relationships between locations and important locations.
-  
+
 ---
 
 ## Prerequisites
 
 Before you can use Flex Map v2, you need to create the following groups in your Domo instance:
 
-* \_FlexMap\_Admins
-* \_FlexMap\_ViewOnly
+- \_FlexMap\_Admins
+- \_FlexMap\_ViewOnly
 
 ## Configuring Required DataSets
 
 Before you can configure the app, you need to create two DataSets to power the four main parts of its functionality:
 
-* Pin Layers
-* Heatmaps
-* Map Layers
-* Uploading custom KML or GEOJSON layer files to display
+- Pin Layers
+- Heatmaps
+- Map Layers
+- Uploading custom KML or GEOJSON layer files to display
 
 The details for the two DataSets are as follows:
 
@@ -41,11 +40,24 @@ Prepare each DataSet as detailed below.
 The app requires the following fields for the Locations DataSet.
 
 <Warning>
-**Important:** The required fields are case sensitive, so make sure to add these columns to your data with the names as shown.
-
+  **Important:** The required fields are case sensitive, so make sure to add these columns to your data with the names as shown.
 </Warning>
 
-<table border="1" cellpadding="1" cellspacing="1" data-aura-rendered-by="33:208;a"><thead><tr><th colspan="1" rowspan="1"><p> Column Name </p></th><th colspan="1" rowspan="1"><p> Description </p></th></tr></thead><tbody><tr><td colspan="1" rowspan="1"><p> Location Id </p></td><td colspan="1" rowspan="1"><p> A unique number/letter combination for a location. </p></td></tr><tr><td colspan="1" rowspan="1"><p> Latitude </p></td><td colspan="1" rowspan="1"><p> The latitude of a location. </p></td></tr><tr><td colspan="1" rowspan="1"><p> Longitude </p></td><td colspan="1" rowspan="1"><p> The longitude of a location. </p></td></tr><tr><td colspan="1" rowspan="1"><p> Location Name </p></td><td colspan="1" rowspan="1"><p> The name of the location. <br/> This value should be a 1:1 relation with the Location Id for the location. You can have multiple rows for a single location and the app groups the data for the location together by the ID and name. </p></td></tr><tr><td colspan="1" rowspan="1"><p> Address </p></td><td colspan="1" rowspan="1"><p> The address of a location. </p></td></tr><tr><td colspan="1" rowspan="1"><p> SearchCache </p></td><td colspan="1" rowspan="1"><p> A comma separated list of terms you want the app to use to find the location when searching using the main search bar of the app. </p></td></tr><tr><td colspan="1" rowspan="1"><p><em> Additional Columns </em></p></td><td colspan="1" rowspan="1"><p> Any additional columns for data and metrics for the locations you want to display with the mapped pins. </p><p> Possible values include: Region, other address data, other metrics </p></td></tr></tbody></table>
+<table border="1" cellpadding="1" cellspacing="1" data-aura-rendered-by="33:208;a">
+  <thead>
+    <tr><th colspan="1" rowspan="1"><p> Column Name </p></th><th colspan="1" rowspan="1"><p> Description </p></th></tr>
+  </thead>
+
+  <tbody>
+    <tr><td colspan="1" rowspan="1"><p> Location Id </p></td><td colspan="1" rowspan="1"><p> A unique number/letter combination for a location. </p></td></tr>
+    <tr><td colspan="1" rowspan="1"><p> Latitude </p></td><td colspan="1" rowspan="1"><p> The latitude of a location. </p></td></tr>
+    <tr><td colspan="1" rowspan="1"><p> Longitude </p></td><td colspan="1" rowspan="1"><p> The longitude of a location. </p></td></tr>
+    <tr><td colspan="1" rowspan="1"><p> Location Name </p></td><td colspan="1" rowspan="1"><p> The name of the location. <br /> This value should be a 1:1 relation with the Location Id for the location. You can have multiple rows for a single location and the app groups the data for the location together by the ID and name. </p></td></tr>
+    <tr><td colspan="1" rowspan="1"><p> Address </p></td><td colspan="1" rowspan="1"><p> The address of a location. </p></td></tr>
+    <tr><td colspan="1" rowspan="1"><p> SearchCache </p></td><td colspan="1" rowspan="1"><p> A comma separated list of terms you want the app to use to find the location when searching using the main search bar of the app. </p></td></tr>
+    <tr><td colspan="1" rowspan="1"><p><em> Additional Columns </em></p></td><td colspan="1" rowspan="1"><p> Any additional columns for data and metrics for the locations you want to display with the mapped pins. </p><p> Possible values include: Region, other address data, other metrics </p></td></tr>
+  </tbody>
+</table>
 
 ### Heatmap Data
 
@@ -60,17 +72,29 @@ The app supports the following region codes/types: CBSA for the USA, CMA for Can
 The app requires the following fields for the Heatmap DataSet.
 The three required fields are case sensitive, so add them to your data with the names as shown:
 
-<table border="1" cellpadding="1" cellspacing="1" data-aura-rendered-by="33:208;a"><thead><tr><th colspan="1" rowspan="1"><p> Column Name </p></th><th colspan="1" rowspan="1"><p> Description </p></th></tr></thead><tbody><tr><td colspan="1" rowspan="1"><p> RegionCode </p></td><td colspan="1" rowspan="1"><p> The code for the area that corresponds to the value in the RegionType column. </p><p> Example: RegionCode: 30030; RegionType: CBSA </p></td></tr><tr><td colspan="1" rowspan="1"><p> RegionName </p></td><td colspan="1" rowspan="1"><p> (Optional) The name of the region, if applicable. </p></td></tr><tr><td colspan="1" rowspan="1"><p> RegionType </p></td><td colspan="1" rowspan="1"><p> The value corresponds to the value in the RegionCode. </p><p> Possible values include: CBSA, CMA, NUTS 2, and SA3. </p></td></tr><tr><td colspan="1" rowspan="1"><p><i> Your Metric Columns </i></p></td><td colspan="1" rowspan="1"><p> Any columns with the metrics that you want to use to build your heat maps. You can add as many as you want, but at least one is required for heat map functionality. </p></td></tr><tr><td colspan="1" rowspan="1"><p><em> Additional Metadata Columns </em></p></td><td colspan="1" rowspan="1"><p> Optional columns with metadata about the regions you want to map that use Domo Page filters to filter through the data. </p></td></tr></tbody></table>
+<table border="1" cellpadding="1" cellspacing="1" data-aura-rendered-by="33:208;a">
+  <thead>
+    <tr><th colspan="1" rowspan="1"><p> Column Name </p></th><th colspan="1" rowspan="1"><p> Description </p></th></tr>
+  </thead>
+
+  <tbody>
+    <tr><td colspan="1" rowspan="1"><p> RegionCode </p></td><td colspan="1" rowspan="1"><p> The code for the area that corresponds to the value in the RegionType column. </p><p> Example: RegionCode: 30030; RegionType: CBSA </p></td></tr>
+    <tr><td colspan="1" rowspan="1"><p> RegionName </p></td><td colspan="1" rowspan="1"><p> (Optional) The name of the region, if applicable. </p></td></tr>
+    <tr><td colspan="1" rowspan="1"><p> RegionType </p></td><td colspan="1" rowspan="1"><p> The value corresponds to the value in the RegionCode. </p><p> Possible values include: CBSA, CMA, NUTS 2, and SA3. </p></td></tr>
+    <tr><td colspan="1" rowspan="1"><p><i> Your Metric Columns </i></p></td><td colspan="1" rowspan="1"><p> Any columns with the metrics that you want to use to build your heat maps. You can add as many as you want, but at least one is required for heat map functionality. </p></td></tr>
+    <tr><td colspan="1" rowspan="1"><p><em> Additional Metadata Columns </em></p></td><td colspan="1" rowspan="1"><p> Optional columns with metadata about the regions you want to map that use Domo Page filters to filter through the data. </p></td></tr>
+  </tbody>
+</table>
 
 ## Configuring Domo User Groups
 
 Flex Map v2 supports three different user levels—Admin, Standard, and View-only.
-  
+
 To have admin or view-only privileges within the app, users must be added to a Domo Group. Standard users aren't added to a group and receive the standard app privileges and functionality. The following list describes the differences between the three user levels:
 
-* Admin users can share items they create in the app with members of Domo Groups, and configure a default map and a default center.
-* Standard users can create their own items and see things that admin users share with them, but can't share items or set defaults.
-* View-only users can't create anything in the app. They can only view items that admin users share with them.
+- Admin users can share items they create in the app with members of Domo Groups, and configure a default map and a default center.
+- Standard users can create their own items and see things that admin users share with them, but can't share items or set defaults.
+- View-only users can't create anything in the app. They can only view items that admin users share with them.
 
 To add admin and view-only users, a Domo admin must navigate to the Domo admin portal and create two Domo Groups: \_FlexMap\_Admins and \_FlexMap\_ViewOnly.
 
@@ -80,50 +104,67 @@ Add a user to either group to give them admin or view-only privileges, or do not
 
 After you configure the required DataSets and user groups, you can deploy the app and connect your data.
 
-* If you have access to the app card inside the
+- If you have access to the app card inside the
   **Asset Library**, deploy the app to a dashboard in Domo and follow the numbered steps below.
-* If the app card has been deployed for you with sample data, navigate to the app, then follow the numbered steps below.
+- If the app card has been deployed for you with sample data, navigate to the app, then follow the numbered steps below.
 
 Follow these steps to connect your data to the app:
 
 1. Hover over the top right corner of the app until
-   <img src="/images/kb/ka05w00000127Q7-00N5w00000Ri7BU-0EM5w000005vsLM.jpg" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/> **Card options** displays floating over the other map controls.
+   <i className="icon-wrench-fill sm" aria-hidden="true" /> **Card options** displays floating over the other map controls.
 
-   <Frame><img alt="card options over controls.png" src="/images/kb/ka05w0000012A9f-00N5w00000Ri7BU-0EM5w000006wFwI.jpg" style={{width: 328.999, height: 339.986}}/></Frame>
+   <Frame>
+     <img alt="card options over controls.png" src="/images/kb/ka05w0000012A9f-00N5w00000Ri7BU-0EM5w000006wFwI.jpg" />
+   </Frame>
 
-2. Select <img src="/images/kb/ka05w00000127Q7-00N5w00000Ri7BU-0EM5w000005vsLM.jpg" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/> **Card options** > **Edit Card**. The card editor opens.
+2. Select <i className="icon-wrench-fill sm" aria-hidden="true" /> **Card options** > **Edit Card**. The card editor opens.
 
 3. (Optional) Check the box for
    **Fullpage** if you want to see the full page of the app as you edit.
 
-   <Frame><img alt="fullpage.jpeg" src="/images/kb/ka05w00000127Q7-00N5w00000Ri7BU-0EM5w000005vsM0.jpg" style={{width: 376.996, height: 218.999}}/></Frame>
+   <Frame>
+     <img alt="fullpage.jpeg" src="/images/kb/ka05w00000127Q7-00N5w00000Ri7BU-0EM5w000005vsM0.jpg" />
+   </Frame>
 
 4. At the bottom of the card editor screen, locate the data
-   **Mapping** area. (If it is not visible, select <img src="/images/kb/ka05w0000012Aee-00N5w00000Ri7BU-0EM5w000005w8c8.jpg" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/> **Expand** to view it.) There are two tabs in this area: <img src="/images/kb/ka05w0000012Aee-00N5w00000Ri7BU-0EM5w000005w8bZ.jpg" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/> **DataSets** and <img src="/images/kb/ka05w0000012Aee-00N5w00000Ri7BU-0EM5w000005w8bP.jpg" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/> **Collections**. You can select the hamburger menu to view the mapping navigation drawer.
+   **Mapping** area. (If it is not visible, select <img src="/images/kb/ka05w0000012Aee-00N5w00000Ri7BU-0EM5w000005w8c8.jpg" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}} /> **Expand** to view it.) There are two tabs in this area: <img src="/images/kb/ka05w0000012Aee-00N5w00000Ri7BU-0EM5w000005w8bZ.jpg" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}} /> **DataSets** and <img src="/images/kb/ka05w0000012Aee-00N5w00000Ri7BU-0EM5w000005w8bP.jpg" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}} /> **Collections**. You can select the hamburger menu to view the mapping navigation drawer.
 
-   <Frame><img alt="hamburger menu mapping.png" src="/images/kb/ka05w0000012A9f-00N5w00000Ri7BU-0EM5w000006wFwr.jpg" style={{width: 1208.95, height: 257.997}}/></Frame>
+   <Frame>
+     <img alt="hamburger menu mapping.png" src="/images/kb/ka05w0000012A9f-00N5w00000Ri7BU-0EM5w000006wFwr.jpg" />
+   </Frame>
 
-   <Frame><img alt="mapping menu open.png" src="/images/kb/ka05w0000012A9f-00N5w00000Ri7BU-0EM5w000006wFww.jpg" style={{width: 215, height: 303.999}}/></Frame>
+   <Frame>
+     <img alt="mapping menu open.png" src="/images/kb/ka05w0000012A9f-00N5w00000Ri7BU-0EM5w000006wFww.jpg" />
+   </Frame>
 
 5. In the
-   <img src="/images/kb/ka05w0000012Aee-00N5w00000Ri7BU-0EM5w000005w8bZ.jpg" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/> **DataSets** tab (default), select the DataSet list at the top of the tab and choose **locations**.
+   <img src="/images/kb/ka05w0000012Aee-00N5w00000Ri7BU-0EM5w000005w8bZ.jpg" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}} /> **DataSets** tab (default), select the DataSet list at the top of the tab and choose **locations**.
 
-   <Frame><img alt="datasets tab_dataset list.png" src="/images/kb/ka05w0000012A9f-00N5w00000Ri7BU-0EM5w000006wFx6.jpg" style={{width: 335.994, height: 189.993}}/></Frame>
+   <Frame>
+     <img alt="datasets tab_dataset list.png" src="/images/kb/ka05w0000012A9f-00N5w00000Ri7BU-0EM5w000006wFx6.jpg" />
+   </Frame>
 
 6. Under
    **Select DataSet**, click the button to open the **Select and DataSet** modal.
+
 7. In the modal, search for and select the prepared Locations DataSet.
 
-   <Frame><img alt="Screen Shot 2022-12-05 at 5.29.35 AM.png" src="/images/kb/ka05w0000012A9f-00N5w00000Ri7BU-0EM5w000006wFxB.jpg" style={{width: 470.994, height: 365.994}}/></Frame>
+   <Frame>
+     <img alt="Screen Shot 2022-12-05 at 5.29.35 AM.png" src="/images/kb/ka05w0000012A9f-00N5w00000Ri7BU-0EM5w000006wFxB.jpg" />
+   </Frame>
 
 8. When you find and select your DataSet, select
    **Choose DataSet** to close the modal.
+
 9. Repeat steps 5–8 for the
    **heatmap** DataSet.
-10. Go to the
-    <img src="/images/kb/ka05w0000012Aee-00N5w00000Ri7BU-0EM5w000005w8bP.jpg" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/> **Collections** tab and toggle the switch to **Automatically create un-configured collections with app defaults**.
 
-    <Frame><img alt="Screen Shot 2022-12-08 at 2.12.19 PM.png" src="/images/kb/ka05w0000012A9f-00N5w00000Ri7BU-0EM5w000006wFxL.jpg" style={{width: 455, height: 114}}/></Frame>
+10. Go to the
+    <img src="/images/kb/ka05w0000012Aee-00N5w00000Ri7BU-0EM5w000005w8bP.jpg" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}} /> **Collections** tab and toggle the switch to **Automatically create un-configured collections with app defaults**.
+
+    <Frame>
+      <img alt="Screen Shot 2022-12-08 at 2.12.19 PM.png" src="/images/kb/ka05w0000012A9f-00N5w00000Ri7BU-0EM5w000006wFxL.jpg" />
+    </Frame>
 
 11. Select
     **Save and Finish** at the top of the card editor to save your configuration.

@@ -24,6 +24,14 @@ import retextSentenceSpacing from "retext-sentence-spacing";
 import retextSyntaxUrls from "retext-syntax-urls";
 import { unified } from "unified";
 
+import {
+  remarkDomoForbiddenTerms,
+  remarkDomoImgAlt,
+  remarkDomoNoBetaParenthetical,
+  remarkDomoNoExclamation,
+  remarkDomoNoH1,
+} from "./scripts/remark-domo-style.mjs";
+
 // Transformer: normalize a list's `spread` to match its items. CommonMark says
 // a list is loose iff any item has internal blank-line block separation, but
 // remark only sets list-level `spread` from sibling spacing in the source. On
@@ -111,6 +119,13 @@ const config = {
     // KB filenames like `Domo-KB-Style-Guide.mdx` and `New-Article-Template.mdx`
     // are intentionally Title-Case-Kebab.
     [remarkLintNoFileNameMixedCase, false],
+    // Domo KB Style Guide enforcement (see scripts/remark-domo-style.mjs).
+    // Lint-only; never auto-fix.
+    remarkDomoForbiddenTerms,
+    remarkDomoNoExclamation,
+    remarkDomoNoBetaParenthetical,
+    remarkDomoNoH1,
+    remarkDomoImgAlt,
   ],
 };
 

@@ -24,6 +24,30 @@ import retextSentenceSpacing from "retext-sentence-spacing";
 import retextSyntaxUrls from "retext-syntax-urls";
 import { unified } from "unified";
 
+// Transformer: normalize a list's `spread` to match its items. CommonMark says
+// a list is loose iff any item has internal blank-line block separation, but
+// remark only sets list-level `spread` from sibling spacing in the source. On
+// save, `remark-stringify` writes blank lines between items only when
+// `list.spread === true`, so we promote it whenever any child item is spread,
+// and demote it when none are. Result: tight by default, loose only when an
+// item contains sub-blocks (continuation paragraph, sub-list, Note, code, etc.).
+function remarkNormalizeListSpread() {
+  return (tree) => {
+    const walk = (node) => {
+      if (!node || typeof node !== "object") return;
+      if (node.type === "list" && Array.isArray(node.children)) {
+        node.spread = node.children.some(
+          (child) => child && child.spread === true,
+        );
+      }
+      if (Array.isArray(node.children)) {
+        for (const child of node.children) walk(child);
+      }
+    };
+    walk(tree);
+  };
+}
+
 const config = {
   // `settings` configures remark-stringify (the formatter that
   // `unified-prettier` runs on format-on-save) to match the lint rules
@@ -47,6 +71,8 @@ const config = {
     // Without this, `- [ ] item` parses as a plain list item and the
     // stringifier escapes the `[` to `\[` on every format-on-save.
     remarkGfm,
+    // Must run before stringify so the corrected `spread` flag drives output.
+    remarkNormalizeListSpread,
     [
       remarkRetext,
       unified().use({
@@ -66,7 +92,11 @@ const config = {
     [remarkLintMaximumLineLength, false],
     [remarkLintMaximumHeadingLength, false],
     [remarkLintNoDuplicateHeadings, false],
-    [remarkLintListItemSpacing, false],
+    // Enforce CommonMark loose/tight list convention: lists stay tight unless
+    // any item has multi-block content (continuation paragraph, sub-list,
+    // Note/Frame/code block, etc.), in which case every sibling needs a blank
+    // line between it and the next.
+    [remarkLintListItemSpacing, { checkBlanks: true }],
     // Authors number ordered lists explicitly (1./2./3.); the style-guide
     // default ("1.") forces every item to `1.` which is noisy in source.
     [remarkLintOrderedListMarkerValue, false],

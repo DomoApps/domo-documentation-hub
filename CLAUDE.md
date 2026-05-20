@@ -14,17 +14,18 @@ A [Mintlify](https://mintlify.com)-based documentation hub for Domo. Content is 
 - **`s/article/`** — 1,700+ flat KB article files, referenced by numeric ID (e.g. `000005874.mdx`) or slug
 - **`s/topic/`** — topic grouping files
 - **`de/`, `es/`, `fr/`, `ja/`** — localized content, each mirrors the `s/` structure
-- **`images/kb/`** — screenshots and diagrams (~7,100 files)
+- **`images/kb/`** — screenshots and diagrams (\~7,100 files)
 
 ### Navigation
 
-All navigation is defined in **`docs.json`** (large file, ~307KB). The schema is `https://mintlify.com/docs.json`. Navigation is organized into tabs → groups → pages. The OpenAPI sync workflow auto-updates this file when YAML specs change.
+All navigation is defined in **`docs.json`** (large file, \~307KB). The schema is `https://mintlify.com/docs.json`. Navigation is organized into tabs → groups → pages. The OpenAPI sync workflow auto-updates this file when YAML specs change.
 
 ## MDX Content Conventions
 
 All articles use YAML frontmatter with at minimum a `title` field.
 
 Key Mintlify components in use:
+
 - `<Frame>` — wraps screenshots (auto-sizes to content width)
 - `<Note>`, `<Warning>`, `<Tip>` — callout blocks (always bold the label: `**Note:**`)
 - `<AccordionGroup>` + `<Accordion title="...">` — FAQ sections
@@ -35,14 +36,16 @@ Internal links use root-relative paths: `[text](/s/article/Article-Title)`
 ## Domo Release Cadence
 
 Domo releases monthly. Branches are named by the date the branch is cut. From branch cut:
-- Code ships ~5 weeks later
-- Feature release (feature switches enabled, customers see new features) is ~1 week after code ships
+
+- Code ships \~5 weeks later
+- Feature release (feature switches enabled, customers see new features) is \~1 week after code ships
 
 Internally, releases are always identified by the **branch cut date** (the branch name). Customers and client-facing teams only care about when features appear in their environments, so they talk in terms of the feature release date — PMs translate between the two. For tracking feature availability and mapping KB articles to releases, always use the **branch cut date** as the canonical identifier.
 
 ## Finding Existing Articles
 
 To find an article by title keyword, search frontmatter across all KB articles:
+
 ```bash
 grep -r "title:.*keyword" s/article/ s/topic/
 ```
@@ -54,6 +57,7 @@ Both `s/article/` and `s/topic/` should be searched — topics are grouping page
 ## Style Standards
 
 See `Domo-KB-Style-Guide.mdx` for full standards. Key points:
+
 - Article structure: Intro → Required Grants → Access Feature → Tasks (CRUD order) → FAQ
 - FAQ sections go at the bottom, coded as `<AccordionGroup>`
 - For technical style questions not in the guide, follow the [Google developer documentation style guide](https://developers.google.com/style)
@@ -61,8 +65,8 @@ See `Domo-KB-Style-Guide.mdx` for full standards. Key points:
 
 Use `New-Article-Template.mdx` as the starting point for new KB articles.
 
-
 ## Skills
+
 ||SKILL||ALWAYS USE FOR||
 |kb-intake|Interviewing the user to gather information that is important to writing a good KB document|
 |new-kb-article|Drafting a new KB article following Domo's style guide and template. This skill calls the kb-intake skill|

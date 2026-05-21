@@ -188,6 +188,12 @@ The script cannot reliably fix these. Review every converted article for:
 - [ ] FAQ items that didn't match the bold-Q/paragraph-A or numbered-list patterns are left verbatim and need manual `<AccordionGroup>` conversion
 - [ ] New English articles need `/add-to-nav` run to add them to `docs.json`
 
+**Image paths — case collisions**
+
+Salesforce image IDs are case-sensitive (`…vPFA.png` and `…vPFa.png` are different images in Salesforce), but macOS APFS and Windows NTFS are case-insensitive by default. Two filenames that differ only by case collapse to one file on disk for most contributors, silently breaking articles. CI now blocks merging case-colliding paths (see `.github/workflows/case-collision-check.yml`).
+
+- [ ] For every new image the conversion writes under `images/kb/`, check whether its lowercase form matches an already-tracked path (`git ls-files images/kb/ | tr A-Z a-z | sort | uniq -d` against the new basenames). If it collides, rename the new file by inserting `-2` before the extension (e.g., `…vPFa.png` → `…vPFa-2.png`) and update every reference the script wrote.
+
 **Inline icons (image → font)**
 
 The converter emits image-based inline icons (`<img src="/images/kb/...">`). Both Domo icon fonts cover the full glyph set, so any inline icon that depicts a UI element should be migrated to the font convention. Pick the font that matches the surface the article describes — see `Domo-KB-Style-Guide.mdx` › **Icons** for full guidance.
@@ -272,7 +278,8 @@ When invoked, do the following:
 1. **Read the file** at the path provided in `$ARGUMENTS`. If a title is given instead, find the file with `grep -r "title:.*<title>" s/article/`.
 2. **Scan for human-review items** from Section B above.
 3. **Check image placeholders** — search for `<!-- TODO: embed image` comments and flag them.
-4. **Check for leftover Salesforce artifacts** — any remaining `— | —`, bare Salesforce URLs, or raw HTML tags that markdownify didn't convert.
-5. **Apply fixes** to items from Section B that are clearly wrong (e.g., incorrect Domo terminology, `whitelist` → `allowlist`).
-6. **List items requiring editorial judgment** (e.g., gerund headings, passive-voice sentences) with line numbers so the user can decide.
-7. **Write the corrected file** and report what was changed vs. what needs the user's review.
+4. **Check image-path case collisions** — for any image path the article references under `images/kb/`, run `git ls-files images/kb/ | grep -i "<basename>"` to confirm no case-sibling exists. If one does, rename the new file with a `-2` suffix and update the article's references.
+5. **Check for leftover Salesforce artifacts** — any remaining `— | —`, bare Salesforce URLs, or raw HTML tags that markdownify didn't convert.
+6. **Apply fixes** to items from Section B that are clearly wrong (e.g., incorrect Domo terminology, `whitelist` → `allowlist`).
+7. **List items requiring editorial judgment** (e.g., gerund headings, passive-voice sentences) with line numbers so the user can decide.
+8. **Write the corrected file** and report what was changed vs. what needs the user's review.

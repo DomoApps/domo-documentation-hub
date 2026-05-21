@@ -663,7 +663,7 @@ Older content-record eids the live page no longer uses. Many were replaced by ca
 - `images/kb/ka0Vq0000000zTJ-00N5w00000Ri7BU-0EM5w000005vPUW.png` (35.5 KB)
 - `images/kb/ka0Vq0000000zTJ-00N5w00000Ri7BU-0EM5w000005vPUX.png` (14.1 KB)
 - `images/kb/ka0Vq0000000zTJ-00N5w00000Ri7BU-0EM5w000005vPUY.png` (49.7 KB)
-- `images/kb/ka0Vq0000000zTJ-00N5w00000Ri7BU-0EM5w000005vPUa.png` (13.8 KB)
+- `images/kb/ka0Vq0000000zTJ-00N5w00000Ri7BU-0EM5w000005vPUa-2.png` (13.8 KB)
 - `images/kb/ka0Vq00000010pB-00N5w00000Ri7BU-0EM5w000005vOCM.png` (420.0 B)
 - `images/kb/ka0Vq00000010pB-00N5w00000Ri7BU-0EM5w000005vOCq.png` (5.6 KB)
 - `images/kb/ka0Vq00000010pB-00N5w00000Ri7BU-0EM5w000005vOCs.png` (6.1 KB)
@@ -855,18 +855,18 @@ Older content-record eids the live page no longer uses. Many were replaced by ca
 - `images/kb/ka0Vq000000CqxJ-00N5w00000Ri7BU-0EM5w000005vPFX.png` (626.0 B)
 - `images/kb/ka0Vq000000CqxJ-00N5w00000Ri7BU-0EM5w000005vPFY.png` (141.0 B)
 - `images/kb/ka0Vq000000CqxJ-00N5w00000Ri7BU-0EM5w000005vPFZ.png` (590.0 B)
-- `images/kb/ka0Vq000000CqxJ-00N5w00000Ri7BU-0EM5w000005vPFa.png` (454.0 B)
-- `images/kb/ka0Vq000000CqxJ-00N5w00000Ri7BU-0EM5w000005vPFb.png` (718.0 B)
-- `images/kb/ka0Vq000000CqxJ-00N5w00000Ri7BU-0EM5w000005vPFc.png` (524.0 B)
-- `images/kb/ka0Vq000000CqxJ-00N5w00000Ri7BU-0EM5w000005vPFe.png` (161.0 B)
-- `images/kb/ka0Vq000000CqxJ-00N5w00000Ri7BU-0EM5w000005vPFf.png` (836.0 B)
-- `images/kb/ka0Vq000000CqxJ-00N5w00000Ri7BU-0EM5w000005vPFj.png` (139.0 B)
-- `images/kb/ka0Vq000000CqxJ-00N5w00000Ri7BU-0EM5w000005vPFq.png` (115.0 B)
-- `images/kb/ka0Vq000000CqxJ-00N5w00000Ri7BU-0EM5w000005vPFr.png` (440.0 B)
-- `images/kb/ka0Vq000000CqxJ-00N5w00000Ri7BU-0EM5w000005vPFt.png` (160.0 B)
-- `images/kb/ka0Vq000000CqxJ-00N5w00000Ri7BU-0EM5w000005vPFu.png` (402.0 B)
-- `images/kb/ka0Vq000000CqxJ-00N5w00000Ri7BU-0EM5w000005vPFv.png` (176.0 B)
-- `images/kb/ka0Vq000000CqxJ-00N5w00000Ri7BU-0EM5w000005vPFy.png` (909.0 B)
+- `images/kb/ka0Vq000000CqxJ-00N5w00000Ri7BU-0EM5w000005vPFa-2.png` (454.0 B)
+- `images/kb/ka0Vq000000CqxJ-00N5w00000Ri7BU-0EM5w000005vPFb-2.png` (718.0 B)
+- `images/kb/ka0Vq000000CqxJ-00N5w00000Ri7BU-0EM5w000005vPFc-2.png` (524.0 B)
+- `images/kb/ka0Vq000000CqxJ-00N5w00000Ri7BU-0EM5w000005vPFe-2.png` (161.0 B)
+- `images/kb/ka0Vq000000CqxJ-00N5w00000Ri7BU-0EM5w000005vPFf-2.png` (836.0 B)
+- `images/kb/ka0Vq000000CqxJ-00N5w00000Ri7BU-0EM5w000005vPFj-2.png` (139.0 B)
+- `images/kb/ka0Vq000000CqxJ-00N5w00000Ri7BU-0EM5w000005vPFq-2.png` (115.0 B)
+- `images/kb/ka0Vq000000CqxJ-00N5w00000Ri7BU-0EM5w000005vPFr-2.png` (440.0 B)
+- `images/kb/ka0Vq000000CqxJ-00N5w00000Ri7BU-0EM5w000005vPFt-2.png` (160.0 B)
+- `images/kb/ka0Vq000000CqxJ-00N5w00000Ri7BU-0EM5w000005vPFu-2.png` (402.0 B)
+- `images/kb/ka0Vq000000CqxJ-00N5w00000Ri7BU-0EM5w000005vPFv-2.png` (176.0 B)
+- `images/kb/ka0Vq000000CqxJ-00N5w00000Ri7BU-0EM5w000005vPFy-2.png` (909.0 B)
 - `images/kb/ka0Vq000000CqxJ-00N5w00000Ri7BU-0EM5w000005vPG0.png` (756.0 B)
 - `images/kb/ka0Vq000000CqxJ-00N5w00000Ri7BU-0EM5w000005vPG2.png` (135.0 B)
 - `images/kb/ka0Vq000000CqxJ-00N5w00000Ri7BU-0EM5w000005vPG3.png` (445.0 B)
@@ -949,7 +949,7 @@ Older content-record eids the live page no longer uses. Many were replaced by ca
 - `images/kb/ka0Vq000000DYAL-00N5w00000Ri7BU-0EM5w000005vPDU.png` (1.5 KB)
 - `images/kb/ka0Vq000000DYAL-00N5w00000Ri7BU-0EM5w000005vPDX.png` (976.0 B)
 - `images/kb/ka0Vq000000DYAL-00N5w00000Ri7BU-0EM5w000005vPDY.png` (1.0 KB)
-- `images/kb/ka0Vq000000DYAL-00N5w00000Ri7BU-0EM5w000005vPDm.png` (443.0 B)
+- `images/kb/ka0Vq000000DYAL-00N5w00000Ri7BU-0EM5w000005vPDm-2.png` (443.0 B)
 - `images/kb/ka0Vq000000DaiP-00N5w00000Ri7BU-0EM5w000005vP4o.png` (272.6 KB)
 - `images/kb/ka0Vq000000DaiP-00N5w00000Ri7BU-0EMVq000007dDcT.jpg` (12.5 KB)
 - `images/kb/ka0Vq000000EFC5-00N5w00000Ri7BU-0EM5w000006vXNU.jpg` (28.3 KB)
@@ -2012,9 +2012,9 @@ Files where BOTH a base name and a `-N` / ` copy` variant exist. At least one is
 | `images/kb/ka0Vq000000CqxJ-00N5w00000Ri7BU-0EM5w000005vPFW-1.png` | `images/kb/ka0Vq000000CqxJ-00N5w00000Ri7BU-0EM5w000005vPFW.png` | 47.1 KB | 47.1 KB | ✓ |
 | `images/kb/ka0Vq000000CqxJ-00N5w00000Ri7BU-0EM5w000005vPFX copy.png` | `images/kb/ka0Vq000000CqxJ-00N5w00000Ri7BU-0EM5w000005vPFX.png` | 626.0 B | 626.0 B | ✓ |
 | `images/kb/ka0Vq000000CqxJ-00N5w00000Ri7BU-0EM5w000005vPFZ copy.png` | `images/kb/ka0Vq000000CqxJ-00N5w00000Ri7BU-0EM5w000005vPFZ.png` | 590.0 B | 590.0 B | ✓ |
-| `images/kb/ka0Vq000000CqxJ-00N5w00000Ri7BU-0EM5w000005vPFc copy.png` | `images/kb/ka0Vq000000CqxJ-00N5w00000Ri7BU-0EM5w000005vPFc.png` | 524.0 B | 524.0 B | ✓ |
-| `images/kb/ka0Vq000000CqxJ-00N5w00000Ri7BU-0EM5w000005vPFf copy.png` | `images/kb/ka0Vq000000CqxJ-00N5w00000Ri7BU-0EM5w000005vPFf.png` | 836.0 B | 836.0 B | ✓ |
-| `images/kb/ka0Vq000000CqxJ-00N5w00000Ri7BU-0EM5w000005vPFs copy.png` | `images/kb/ka0Vq000000CqxJ-00N5w00000Ri7BU-0EM5w000005vPFs.png` | 43.4 KB | 43.4 KB | ✓ |
+| `images/kb/ka0Vq000000CqxJ-00N5w00000Ri7BU-0EM5w000005vPFc copy.png` | `images/kb/ka0Vq000000CqxJ-00N5w00000Ri7BU-0EM5w000005vPFc-2.png` | 524.0 B | 524.0 B | ✓ |
+| `images/kb/ka0Vq000000CqxJ-00N5w00000Ri7BU-0EM5w000005vPFf copy.png` | `images/kb/ka0Vq000000CqxJ-00N5w00000Ri7BU-0EM5w000005vPFf-2.png` | 836.0 B | 836.0 B | ✓ |
+| `images/kb/ka0Vq000000CqxJ-00N5w00000Ri7BU-0EM5w000005vPFs copy.png` | `images/kb/ka0Vq000000CqxJ-00N5w00000Ri7BU-0EM5w000005vPFs-2.png` | 43.4 KB | 43.4 KB | ✓ |
 | `images/kb/ka0Vq000000CqxJ-00N5w00000Ri7BU-0EM5w000005vPG5 copy.png` | `images/kb/ka0Vq000000CqxJ-00N5w00000Ri7BU-0EM5w000005vPG5.png` | 32.2 KB | 32.2 KB | ✓ |
 | `images/kb/ka0Vq000000CqxJ-00N5w00000Ri7BU-0EM5w000005vPG8 copy.png` | `images/kb/ka0Vq000000CqxJ-00N5w00000Ri7BU-0EM5w000005vPG8.png` | 30.3 KB | 30.3 KB | ✓ |
 | `images/kb/ka0Vq000000CqxJ-00N5w00000Ri7BU-0EM5w000005vPG9 copy.png` | `images/kb/ka0Vq000000CqxJ-00N5w00000Ri7BU-0EM5w000005vPG9.png` | 36.8 KB | 36.8 KB | ✓ |

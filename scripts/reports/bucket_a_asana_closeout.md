@@ -1,6 +1,6 @@
 # Bucket A — Asana Closeout List
 
-These 38 Asana tasks were triaged as **meta/audit/tracker** items, not concrete article edits. They should be reviewed in Asana and closed (or recategorized).
+These 37 Asana tasks were triaged as **meta/audit/tracker** items, not concrete article edits. They should be reviewed in Asana and closed (or recategorized).
 
 Generated from `scripts/backlog_manifest.json` (bucket=A).
 
@@ -10,7 +10,6 @@ Generated from `scripts/backlog_manifest.json` (bucket=A).
 | 1210100748718961 | Backlog — Non-Release | Connector FAQs and Troubleshooting | empty notes | https://app.asana.com/0/0/1210100748718961/f |
 | 1210977870840326 | Backlog — Non-Release | DRAFTS to save | meta | https://app.asana.com/0/0/1210977870840326/f |
 | 1207565391463052 | Backlog — Non-Release | Finish auditing Get Started with Dashboards | meta | https://app.asana.com/0/0/1207565391463052/f |
-| 1211130033183873 | Backlog — Non-Release | Go through remaining drafts in KB "Draft Articles" in SF, and decide whether to publish in new KB | meta | https://app.asana.com/0/0/1211130033183873/f |
 | 1208150980969217 | Backlog — Non-Release | Table Chart & Properties for Tables | meta | https://app.asana.com/0/0/1208150980969217/f |
 | 1209742834701392 | Backlog — Non-Release | Workbench AUDIT | meta | https://app.asana.com/0/0/1209742834701392/f |
 | 1209368242561344 | Backlog — Release Content | Audit Add a DataSet with a Connector | meta | https://app.asana.com/0/0/1209368242561344/f |

@@ -20,6 +20,37 @@ When complete, check the box.
 
 ## Outstanding
 
+### Workflows: Design Your Workflow — `s/article/000005331.mdx`
+
+[Asana task](https://app.asana.com/0/0/1212438657897940/f) · Two refreshed screenshots needed for the Workflows canvas docs. Text and section structure are publishable as-is.
+
+- [ ] **AddingShapeToCanvas** — `images/kb/workflows-adding-shape-to-canvas.png`
+  - Describes: The Workflows canvas with the Add-shape action menu open, showing the available shape options.
+  - Source: needs new screenshot.
+  - Marker in article: `{/* TODO[screenshot]: AddingShapetoCanvas`
+- [ ] **ConnectingSteps** — `images/kb/workflows-connecting-steps.png`
+  - Describes: Hovering on a workflow step tile to reveal the circular ports, with a connecting line being dragged from one port to another step's port.
+  - Source: needs new screenshot.
+  - Marker in article: `{/* TODO[screenshot]: ConnectingSteps`
+
+### Access Scheduled Reports dropdown — `s/article/360043437773.mdx`
+
+[Asana task](https://app.asana.com/0/0/1211443299710978/f) · Feature is already deployed to all customers. Surrounding prose describes the dropdown generically because the option names were not confirmed in the task body.
+
+- [ ] **Scheduled Reports navigation dropdown** — `images/kb/scheduled-reports-navigation-dropdown.png`
+  - Describes: The Scheduled Reports screen with the new navigation dropdown open, showing the available views (e.g., subscribed reports, owned reports, send history, settings).
+  - Source: needs new screenshot.
+  - Marker in article: `{/* TODO[screenshot]: Scheduled Reports`
+
+### Snowflake Account Identifier — `s/article/4402322966807.mdx`
+
+[Asana task](https://app.asana.com/0/0/1209313933155042/f) · Surfaced because both Snowflake and Domo docs leave users hunting for where to find the account identifier. Body text now lists three locations; the screenshot is supplemental.
+
+- [ ] **Snowflake Account Identifier locations** — `images/kb/snowflake-account-identifier.png`
+  - Describes: Annotated example showing where the Snowflake account identifier appears (in the Snowsight URL and/or the Admin > Accounts page).
+  - Source: needs new screenshot.
+  - Marker in article: `{/* TODO[screenshot]: Snowflake Account Identifier`
+
 ### Properties for Bar Charts — `s/article/360043429813.mdx`
 
 [Asana task](https://app.asana.com/0/0/1206247708235860/f) · Existing PNGs (dated 2024-09-05) showed separator lines between bars that no longer appear in the current Vertical Bar UI. Replace with fresh captures of the **Hints > Style** option.

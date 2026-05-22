@@ -33,23 +33,17 @@ When complete, check the box.
   - Source: needs new screenshot.
   - Marker in article: `{/* TODO[screenshot]: ConnectingSteps`
 
-### Access Scheduled Reports dropdown — `s/article/360043437773.mdx`
+### ✅ Access Scheduled Reports dropdown — `s/article/360043437773.mdx`
 
 [Asana task](https://app.asana.com/0/0/1211443299710978/f) · Feature is already deployed to all customers. Surrounding prose describes the dropdown generically because the option names were not confirmed in the task body.
 
-- [ ] **Scheduled Reports navigation dropdown** — `images/kb/scheduled-reports-navigation-dropdown.png`
-  - Describes: The Scheduled Reports screen with the new navigation dropdown open, showing the available views (e.g., subscribed reports, owned reports, send history, settings).
-  - Source: needs new screenshot.
-  - Marker in article: `{/* TODO[screenshot]: Scheduled Reports`
+- [x] **Scheduled Reports navigation dropdown** — `images/kb/scheduled-reports-navigation-dropdown.png` *(embedded; sourced from .asana-cache/1211443299710978/Screenshot_2025-09-23_at_10.11.47_AM.png — shows the Dashboard/Card/Report dropdown options)*
 
-### Snowflake Account Identifier — `s/article/4402322966807.mdx`
+### ✅ Snowflake Account Identifier — `s/article/4402322966807.mdx`
 
-[Asana task](https://app.asana.com/0/0/1209313933155042/f) · Surfaced because both Snowflake and Domo docs leave users hunting for where to find the account identifier. Body text now lists three locations; the screenshot is supplemental.
+[Asana task](https://app.asana.com/0/0/1209313933155042/f) · Surfaced because both Snowflake and Domo docs leave users hunting for where to find the account identifier. Body text lists three locations; the screenshot illustrates one of them.
 
-- [ ] **Snowflake Account Identifier locations** — `images/kb/snowflake-account-identifier.png`
-  - Describes: Annotated example showing where the Snowflake account identifier appears (in the Snowsight URL and/or the Admin > Accounts page).
-  - Source: needs new screenshot.
-  - Marker in article: `{/* TODO[screenshot]: Snowflake Account Identifier`
+- [x] **Snowflake Account Identifier locations** — `images/kb/snowflake-account-identifier.png` *(embedded; sourced from .asana-cache/1209313933155042/Screenshot_2025-02-03_at_3.36.28_PM.png — shows the Snowsight account details popover with identifier, organization, region, and locator)*
 
 ### Properties for Bar Charts — `s/article/360043429813.mdx`
 

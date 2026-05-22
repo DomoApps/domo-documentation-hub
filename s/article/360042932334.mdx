@@ -120,7 +120,28 @@ This section enumerates the options in the **Credentials** and **Details** panes
 
 This pane contains fields for entering credentials to connect to your Domo developer account as well as your Google Sheet. The following table describes what is needed for each field:
 
-<table border="1" cellpadding="1" cellspacing="1" data-aura-rendered-by="33:195;a"><thead><tr><th colspan="1" rowspan="1"><p><span class="s1"> Field </span></p></th><th colspan="1" rowspan="1"><p><span class="s1"> Description </span></p></th></tr></thead><tbody><tr><td colspan="1" rowspan="1"><p> Service Token JSON </p></td><td colspan="1" rowspan="1"><p> Paste the JSON Service Token you generated in Step 3: Creating a Service Account, in the "Prerequisites," above. </p></td></tr></tbody></table>
+<table border="1" cellpadding="1" cellspacing="1" data-aura-rendered-by="33:195;a"><thead><tr><th colspan="1" rowspan="1"><p><span class="s1"> Field </span></p></th><th colspan="1" rowspan="1"><p><span class="s1"> Description </span></p></th></tr></thead><tbody><tr><td colspan="1" rowspan="1"><p> Service Token JSON </p></td><td colspan="1" rowspan="1"><p> Paste the <strong>entire JSON object</strong> from the service-account key file you downloaded in Step 3: Creating a Service Account, in the "Prerequisites," above. Paste the file contents as-is, including the surrounding curly braces and every field (<code>type</code>, <code>project_id</code>, <code>private_key_id</code>, <code>private_key</code>, <code>client_email</code>, <code>client_id</code>, and so on). Do not paste only the <code>private_key</code> value or any other single field on its own. </p></td></tr></tbody></table>
+
+<Warning>
+**Warning:** A common cause of connection failures is pasting only the `private_key` value (or another single field) from the downloaded key file. The connector requires the complete JSON object exactly as Google generated it.
+</Warning>
+
+The downloaded key file looks similar to the following. Paste the whole block, including the outer `{ ... }`:
+
+```json
+{
+  "type": "service_account",
+  "project_id": "your-project-id",
+  "private_key_id": "abcdef1234567890abcdef1234567890abcdef12",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqh...\n-----END PRIVATE KEY-----\n",
+  "client_email": "your-service-account@your-project-id.iam.gserviceaccount.com",
+  "client_id": "123456789012345678901",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/your-service-account%40your-project-id.iam.gserviceaccount.com"
+}
+```
 
 Once you have entered valid credentials, you can use the same account any time you go to set up a new Domo-Google Sheets connection. You can manage connector accounts in the **Accounts** tab in the Data Center. For more information about this tab, see [Managing User Accounts for Connectors](https://domo-support.domo.com/s/article/360042926054?language=en_US "Managing User Accounts for Connectors").
 

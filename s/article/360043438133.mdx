@@ -2,90 +2,60 @@
 title: "Enabling SSO with Okta"
 ---
 
-Follow the steps in this topic to set up Okta in Domo. You must have an "Admin" default security role or a custom role with "Manage All Company Settings" enabled to set up SAML. For more information about default roles, see [Managing Custom Roles](/s/article/360043438973 "Default Security Role Reference").
+Follow the steps in this topic to set up Okta as a SAML 2.0 identity provider for Domo. You must have an "Admin" default security role or a custom role with "Manage All Company Settings" enabled to set up SAML. For more information about default roles, see [Managing Custom Roles](/s/article/360043438973 "Default Security Role Reference").
 
 **To set up Okta in Domo,**
 
-1. Navigate to
-   [okta.com](http://okta.com) /domo.
-2. Fill out the fields in the **Give Okta a spin** form and submit it.
+1. If you don't already have an Okta tenant, sign up for one at [okta.com](https://www.okta.com) and complete the activation email Okta sends you.
+2. Sign in to the Okta Admin Console at `https://<your-org>-admin.okta.com`.
      
-   You should receive an email from Okta with a temporary password.
-3. Finish the initial creation of your Okta account from the email sent.
-4. In your Okta account, click **Admin** in the top right.
-5. Click the **Applications** tab.
-6. Click **Add Application**.
+   {/* TODO[screenshot]: Okta Admin Console home page showing the left-hand navigation with Applications expanded */}
+3. In the left navigation, go to **Applications** > **Applications**, then click **Create App Integration**.
      
-   <Frame><img alt="" src="/images/kb/ka05w000001230t-00N5w00000Ri7BU-0EM5w000005vNrp.png"/></Frame>
-7. In the **Application label** field, enter `Domo`.
-8. In the **Subdomain** field, enter your Domo domain.
+   {/* TODO[screenshot]: Applications list page with the Create App Integration button highlighted */}
+4. In the **Create a new app integration** dialog, select **SAML 2.0**, then click **Next**.
      
-   For example, if your Domo URL was " [videotraining.domo.com](http://videotraining.domo.com)," you would enter `videotraining` as your subdomain.
-     
-   <Frame><img alt="okta_setup_step3.png" src="/images/kb/ka05w000001230t-00N5w00000Ri7BU-0EM5w000005vNrt.png"/></Frame>
-9. Click **Next** to proceed to the **Sign-On Options** screen.
-10. Select **SAML 2.0** from the list of sign-on methods.
-      
-    <Frame><img alt="" src="/images/kb/ka05w000001230t-00N5w00000Ri7BU-0EM5w000005vNre.png"/></Frame>
-11. Complete your SAML 2.0 configuration by clicking **View Setup Instructions** and following the instructions.
-12. Click **Save**.
-13. Click the **Directory** tab.
-14. (Conditional) If you need to import groups from Okta, do the following:
+   {/* TODO[screenshot]: Create a new app integration dialog with SAML 2.0 selected */}
+5. On the **General Settings** step, enter `Domo` in the **App name** field, optionally upload an app logo, and click **Next**.
+6. On the **Configure SAML** step, complete the SAML fields using the values from Domo's SAML setup page in **Admin Settings** > **Security** > **SAML**. At a minimum, set the following:
 
-    1. Check the box for **Import groups from identity provider**.
-    2. In Okta, select the **Sign On** tab for the Domo app.
-    3. Click **Edit**.
-    4. Select your preferred **Group** filter from the dropdown list. Use the Regex rule with the value " `.*` " to send all groups to the Domo instance.
-    5. Click **Save**.
-         
-       For more information, see [http://saml-doc.okta.com/SAML\_Docs/How-to-Configure-SAML-2.0-for-Domo-Groups.html.](http://saml-doc.okta.com/SAML_Docs/How-to-Configure-SAML-2.0-for-Domo-Groups.html)
-15. Add groups by clicking **Add Group** and entering a name and group description into the form.
+   * **Single sign-on URL** — the Domo Assertion Consumer Service (ACS) URL from Domo.
+   * **Audience URI (SP Entity ID)** — the entity ID from Domo (typically your Domo subdomain, for example `videotraining`).
+   * **Name ID format** — **EmailAddress**.
+   * **Application username** — **Email**.
+
+   <Note>
+     **Note:** Your Domo URL determines the subdomain value. For example, if your Domo URL is `videotraining.domo.com`, your subdomain is `videotraining`.
+   </Note>
+7. (Optional) To send Okta group memberships to Domo, scroll to **Group Attribute Statements** and add an attribute. Set **Name** to `groups`, **Name format** to **Unspecified**, **Filter** to **Regex**, and the filter value to `.*` to send all groups. Click **Next**.
+     
+   For additional context, see Okta's documentation on configuring SAML group attributes.
+8. On the **Feedback** step, select **I'm an Okta customer adding an internal app**, then click **Finish**. Okta opens the new Domo app's **Sign On** tab.
+9. On the **Sign On** tab, click **View SAML setup instructions** (in the **SAML Signing Certificates** section on the right) and copy the **Identity Provider Single Sign-On URL**, **Identity Provider Issuer**, and **X.509 Certificate** into the matching fields on Domo's SAML setup page. Save the SAML configuration in Domo.
+     
+   {/* TODO[screenshot]: Okta Sign On tab for the Domo app with the View SAML setup instructions link visible */}
+10. (Conditional) If you configured the `groups` attribute statement in step 7 and want Domo to import those groups, in Domo's SAML setup page check **Import groups from identity provider** and save.
+11. Back in the Okta Admin Console, open the Domo app and click the **Assignments** tab to grant access to users and groups.
       
-    <Frame><img alt="" src="/images/kb/ka05w000001230t-00N5w00000Ri7BU-0EM5w000005vNro.png"/></Frame>
+    {/* TODO[screenshot]: Assignments tab of the Domo app in Okta showing the Assign dropdown */}
+12. To assign users, click **Assign** > **Assign to People**, find each user, click **Assign**, confirm the user attributes, and click **Save and Go Back**. Click **Done** when finished.
+13. To assign groups, click **Assign** > **Assign to Groups**, then click **Assign** next to each group that should have access to Domo. Click **Done** when finished.
+      
     <Note>
-      **Note:** A good best practice is to have a group set up for each client. You can add people from each client into those groups to gain access to their cards. If an employee is no longer affiliated with the client, you can remove him from the group, and his access will be revoked.
-
+      **Note:** A good best practice is to maintain one Okta group per client or team and assign that group to the Domo app. Adding or removing a user from the group grants or revokes their Domo access automatically.
     </Note>
-
-16. Add people by clicking **Add Person** and filling in the fields in the form.
+14. (Optional) To create a new group in Okta, go to **Directory** > **Groups**, click **Add group**, enter a name and description, and click **Save**. Then open the group, click the **Applications** tab, and click **Assign applications** to give the group access to the Domo app.
       
-    You can add people into groups by entering the group names into the **Groups** field.
+    {/* TODO[screenshot]: Directory > Groups page with the Add group button visible */}
+15. (Optional) To create a new user in Okta, go to **Directory** > **People**, click **Add person**, complete the form (including any groups the user should belong to in the **Groups** field), and click **Save**. New users receive an Okta activation email; their status changes to **Active** after they set a password.
       
-    <Frame><img alt="" src="/images/kb/ka05w000001230t-00N5w00000Ri7BU-0EM5w000005vNrv.png"/></Frame>
-17. (Optional) Manage groups by doing the following:
+    {/* TODO[screenshot]: Directory > People page with the Add person dialog open */}
 
-    1. Click the group in the **Groups** list.
-         
-       <Frame><img alt="" src="/images/kb/ka05w000001230t-00N5w00000Ri7BU-0EM5w000005vNrd.png"/></Frame>
-    2. Use **Manage People** to grant access to new users and remove old users from the group.
-         
-      
-         <Frame><img alt="okta_setup_step10.png" src="/images/kb/ka05w000001230t-00N5w00000Ri7BU-0EM5w000005vNrr.png"/></Frame>
-         <Frame><img alt="okta_setup_step11.png" src="/images/kb/ka05w000001230t-00N5w00000Ri7BU-0EM5w000005vNrs.png"/></Frame>
-       
-    3. Use **Manage Apps** to grant access to Domo for new groups.
-         
-       When Domo access is granted, you should see it under the **Apps** tab of the group, as shown below:
-         
-       <Frame><img alt="" src="/images/kb/ka05w000001230t-00N5w00000Ri7BU-0EM5w000005vNrl.png"/></Frame>
-18. Add new people to Domo by doing the following:
+Once the SSO setup is complete, a new option appears in the publication groups configuration in Domo. In the **Add Group** section you can enter an individual user email that has Domo access in Okta, or an Okta group that has access to the Domo app.
 
-    1. Click on the person in the **People** subpage you want to add to Domo.
-    2. Click **Assign Applications**.
-    3. Grant Domo access to the individual or to the group the individual belongs to.
-         
-       <Frame><img alt="okta_setup_step12.png" src="/images/kb/ka05w000001230t-00N5w00000Ri7BU-0EM5w000005vNrk.png"/></Frame>
-       <Note>
-         **Note:** In the **People** tab in Okta, you can see the current status of all users. When a person is added as a user, they are sent an email from Okta to create a unique password. Once they do this, the status is marked "Active" and access is granted.
+Users can then access Domo in either of the following ways:
 
-       </Note>
-
-Once the SSO setup is complete, a new box appears in the publication groups configuration in Domo. In the **Add Group** section you can now enter the individual user email with Domo application access from Okta OR the group with access to Domo.
-
-<Frame><img alt="" src="/images/kb/ka05w000001230t-00N5w00000Ri7BU-0EM5w000005vNrq.png"/></Frame>
-Clients can now get access by doing either of the following:
-
-* Visiting the Okta instance (URL will reflect the company name you entered during the setup) and clicking the Domo application. They are then taken to the prepared view of Domo.
+* Sign in to Okta at `https://<your-org>.okta.com` and click the **Domo** tile on their dashboard. They are taken directly into Domo.
     
-  <Frame><img alt="" src="/images/kb/ka05w000001230t-00N5w00000Ri7BU-0EM5w000005vNru.png"/></Frame>
-* Log in to the Domo instance. They would then select Single Sign-On. They will then be prompted to enter Okta credentials (the email and password they created for Okta), or they will be logged in automatically through the portal.
+  {/* TODO[screenshot]: Okta end-user dashboard showing the Domo app tile */}
+* Sign in at the Domo instance URL and choose **Single Sign-On**. They are prompted for their Okta credentials (or signed in automatically if they already have an active Okta session).

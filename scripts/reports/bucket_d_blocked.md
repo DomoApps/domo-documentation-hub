@@ -4,7 +4,7 @@ Net-new article requests where the Asana ticket either provides only a one-line 
 
 To unblock any of these for Claude, drop source material (`.docx`, redlined PDF, exported Dojo HTML, screenshots) into `.asana-cache/<task_id>/` and ping me with the task ID.
 
-Of the 12 Bucket D items, 2 were Claude-doable from the description alone and were completed in commit history (Fiscal Calendar Note on Cloud Integrations Overview; Oracle Architectural Overview prose). The remaining 10 are listed here.
+Of the 12 Bucket D items, 2 were Claude-doable from the description alone and were completed in commit history (Fiscal Calendar Note on Cloud Integrations Overview; Oracle Architectural Overview prose), and 1 was removed from the local to-do list at the submitter's discretion (1211982452048634 — L1 troubleshooting article). The remaining 9 are listed here.
 
 ---
 
@@ -51,13 +51,6 @@ Of the 12 Bucket D items, 2 were Claude-doable from the description alone and we
 - **What's needed:** Which models? Which differences? Where does the "DOMO AI section" live in the KB? Possibly the `s/article/000005544` (AI Prompts in Jupyter) area, or a parent AI/Domo.AI overview.
 - **Asana:** https://app.asana.com/0/0/1211916967943002/f
 
-### 1211982452048634 — Troubleshooting cards & dashboards for L1 support
-
-- **Submitter:** bhagyashree.shukla@domo.com
-- **Description:** General "help article for L1 support group, useful reference for new hires"
-- **What's needed:** A list of the specific failure modes / FAQ items L1 wants documented. Without a starter list, this is open-ended and would invent content.
-- **Asana:** https://app.asana.com/0/0/1211982452048634/f
-
 ### 1206468170605978 — Beta AI adapters article
 
 - **Submitter:** mckenna.payne@domo.com
@@ -99,7 +92,6 @@ Of the 12 Bucket D items, 2 were Claude-doable from the description alone and we
 | 1209805688338018 | Snowflake Pass-Through SQL BETA | Attachment missing from export |
 | 1204262218316263 | Window Functions in Beast Mode | External Dojo post |
 | 1211916967943002 | Model differences in DOMO AI | 44-char description |
-| 1211982452048634 | L1 troubleshooting article | Open scope |
 | 1206468170605978 | Beta AI adapters | No source content |
 | 1209294086210254 | Brand Kit remove email footer | Submitter has document not attached |
 | 1208975689727859 | Instance Template | Term/scope unclear |

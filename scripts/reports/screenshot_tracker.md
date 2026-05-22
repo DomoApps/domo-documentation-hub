@@ -20,18 +20,12 @@ When complete, check the box.
 
 ## Outstanding
 
-### Workflows: Design Your Workflow — `s/article/000005331.mdx`
+### ✅ Workflows: Design Your Workflow — `s/article/000005331.mdx`
 
-[Asana task](https://app.asana.com/0/0/1212438657897940/f) · Two refreshed screenshots needed for the Workflows canvas docs. Text and section structure are publishable as-is.
+[Asana task](https://app.asana.com/0/0/1212438657897940/f) · Both refreshed screenshots embedded in EN and JA siblings on 2026-05-22.
 
-- [ ] **AddingShapeToCanvas** — `images/kb/workflows-adding-shape-to-canvas.png`
-  - Describes: The Workflows canvas with the Add-shape action menu open, showing the available shape options.
-  - Source: needs new screenshot.
-  - Marker in article: `{/* TODO[screenshot]: AddingShapetoCanvas`
-- [ ] **ConnectingSteps** — `images/kb/workflows-connecting-steps.png`
-  - Describes: Hovering on a workflow step tile to reveal the circular ports, with a connecting line being dragged from one port to another step's port.
-  - Source: needs new screenshot.
-  - Marker in article: `{/* TODO[screenshot]: ConnectingSteps`
+- [x] **AddingShapeToCanvas** — `images/kb/workflows-adding-shape-to-canvas.png` *(embedded; shows the Add-action menu with Automated Tasks / User Task / Flow Controls / AI Agent Task categories)*
+- [x] **ConnectingSteps** — `images/kb/workflows-connecting-steps.png` *(embedded; shows ports and a connecting line being drawn between Forecasting Data and Send Email Notification)*
 
 ### ✅ Access Scheduled Reports dropdown — `s/article/360043437773.mdx`
 

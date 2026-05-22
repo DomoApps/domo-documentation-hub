@@ -109,25 +109,6 @@ When complete, check the box.
 - [ ] **Confirm field name** — Source draft used "# of Parallel Loads"; the team planned to rename to "# of Loads". The article currently uses "# of Loads". Verify the live UI matches.
 - [ ] **Specimen error messages** — Two error strings were stubbed in the Intro (socket timeout; "Exceeds maximum heap size of 16 GB"). Joseph Peterson was to provide the actual strings. Replace the bullets and remove the `TODO[content]` marker once supplied.
 
-[Asana task](https://app.asana.com/0/0/1206394488536337/f) · New beta Cloud Integration article. Prose is self-sufficient; four screenshots from the original Pinot_Integration.docx are embedded in that .docx but were not extracted to `images/kb/` — pull them from `.asana-cache/1206394488536337/Pinot_Integration.docx` (media files `imageb.png`–`imagef.png`) or take fresh captures.
-
-- [ ] **Pinot tile under Native integration** — `images/kb/pinot-kb-01.png`
-  - Describes: Manage Cloud Connections modal, Native integration section, with the Pinot logo tile visible.
-  - Source: `.asana-cache/1206394488536337/` (one of imageb.png–imagef.png) or fresh capture.
-  - Marker in article: `{/* TODO[screenshot]: Pinot tile under Native integration`
-- [ ] **Existing Pinot integrations list** — `images/kb/pinot-kb-02.png`
-  - Describes: Pinot integrations list showing the columns for integration name, number of DataSets, permissions, and owner.
-  - Source: `.asana-cache/1206394488536337/` or fresh capture.
-  - Marker in article: `{/* TODO[screenshot]: Existing Pinot integrations list`
-- [ ] **Add New Integration form** — `images/kb/pinot-kb-03.png`
-  - Describes: Pinot Add New Integration form showing Integration Name, Description, connection URL, Username, and Password fields.
-  - Source: `.asana-cache/1206394488536337/` or fresh capture.
-  - Marker in article: `{/* TODO[screenshot]: Add New Integration form`
-- [ ] **Pinot integrations list after creation** — `images/kb/pinot-kb-04.png`
-  - Describes: Pinot integrations list with the newly created integration alongside any existing ones.
-  - Source: `.asana-cache/1206394488536337/` or fresh capture.
-  - Marker in article: `{/* TODO[screenshot]: Pinot integrations list after creation`
-
 ### Wire an App — `s/article/Wiring-an-App.mdx`
 
 [Asana task](https://app.asana.com/0/0/1204896213998141/f) · New article on wiring custom Apps to DataSets and AppDB Collections. The .docx draft embedded six screenshots (`image.png` through `image6.png`) inside `.asana-cache/1204896213998141/Wiring_an_App.docx`. Extract them into `images/kb/` to use; otherwise replace with fresh captures.

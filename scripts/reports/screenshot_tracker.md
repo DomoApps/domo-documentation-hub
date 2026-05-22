@@ -127,3 +127,32 @@ When complete, check the box.
   - Describes: Pinot integrations list with the newly created integration alongside any existing ones.
   - Source: `.asana-cache/1206394488536337/` or fresh capture.
   - Marker in article: `{/* TODO[screenshot]: Pinot integrations list after creation`
+
+### Wire an App — `s/article/Wiring-an-App.mdx`
+
+[Asana task](https://app.asana.com/0/0/1204896213998141/f) · New article on wiring custom Apps to DataSets and AppDB Collections. The .docx draft embedded six screenshots (`image.png` through `image6.png`) inside `.asana-cache/1204896213998141/Wiring_an_App.docx`. Extract them into `images/kb/` to use; otherwise replace with fresh captures.
+
+- [ ] **Wiring screen overview** — `images/kb/wiring-app-screen-overview.png`
+  - Describes: App Wiring screen with the DataSets and Collections tabs visible in the lower half of the page.
+  - Source: `.asana-cache/1204896213998141/Wiring_an_App.docx` (embedded image.png) or fresh capture.
+  - Marker in article: `{/* TODO[screenshot]: Wiring screen overview`
+- [ ] **DataSet dropdown and alias-to-column mapping** — `images/kb/wiring-app-dataset-alias-mapping.png`
+  - Describes: Wiring screen DataSets tab showing the alias dropdown open and the field-to-column mapping rows below it.
+  - Source: `.asana-cache/1204896213998141/Wiring_an_App.docx` (embedded image2.png) or fresh capture.
+  - Marker in article: `{/* TODO[screenshot]: DataSet dropdown and alias-to-column mapping`
+- [ ] **Collections tab with create/existing toggle** — `images/kb/wiring-app-collections-toggle.png`
+  - Describes: Wiring screen Collections tab showing the toggle between creating a new Collection and selecting an existing one.
+  - Source: `.asana-cache/1204896213998141/Wiring_an_App.docx` (embedded image3.png) or fresh capture.
+  - Marker in article: `{/* TODO[screenshot]: Collections tab with create/existing toggle`
+- [ ] **Example App displaying wired DataSet** — `images/kb/wiring-app-example-dataset-display.png`
+  - Describes: Demo App tab showing the rows of the wired DataSet rendered in a table.
+  - Source: `.asana-cache/1204896213998141/Wiring_an_App.docx` (embedded image4.png) or fresh capture.
+  - Marker in article: `{/* TODO[screenshot]: Example App displaying wired DataSet`
+- [ ] **Example App writing to and reading from a Collection** — `images/kb/wiring-app-example-collection-form.png`
+  - Describes: Demo App tab showing the product/SKU form, the Submit button, and the table below the form populated with submitted rows.
+  - Source: `.asana-cache/1204896213998141/Wiring_an_App.docx` (embedded image5.png) or fresh capture.
+  - Marker in article: `{/* TODO[screenshot]: Example App writing to and reading from a Collection`
+- [ ] **Sample manifest.json** — `images/kb/wiring-app-manifest-sample.png`
+  - Describes: A manifest.json file open in an editor showing the name, version, collections, and datasetsMapping properties.
+  - Source: `.asana-cache/1204896213998141/Wiring_an_App.docx` (embedded image6.png) or fresh capture.
+  - Marker in article: `{/* TODO[screenshot]: Sample manifest.json`

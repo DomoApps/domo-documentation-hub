@@ -45,16 +45,12 @@ When complete, check the box.
 
 - [x] **Snowflake Account Identifier locations** — `images/kb/snowflake-account-identifier.png` *(embedded; sourced from .asana-cache/1209313933155042/Screenshot_2025-02-03_at_3.36.28_PM.png — shows the Snowsight account details popover with identifier, organization, region, and locator)*
 
-### Properties for Bar Charts — `s/article/360043429813.mdx`
+### ⏭️ Properties for Bar Charts — `s/article/360043429813.mdx`
 
-[Asana task](https://app.asana.com/0/0/1206247708235860/f) · Existing PNGs (dated 2024-09-05) showed separator lines between bars that no longer appear in the current Vertical Bar UI. Replace with fresh captures of the **Hints > Style** option.
+[Asana task](https://app.asana.com/0/0/1206247708235860/f) · **Skipped per user direction on 2026-05-22.** Body prose self-describes Plain vs. Tooltip behavior; TODO markers removed from both EN and JA files. Asana ticket closed.
 
-- [ ] **Hints Style — Plain** — `images/kb/bar-chart-hints-style-plain.png`
-  - Describes: A Vertical Bar chart in Details view with **Style = Plain** so value hints appear as bare text on/above each bar.
-  - Source: needs new screenshot.
-- [ ] **Hints Style — Tooltip** — `images/kb/bar-chart-hints-style-tooltip.png`
-  - Describes: The same Vertical Bar chart in Details view with **Style = Tooltip** so each value hint appears inside a callout box with a pointer to the bar.
-  - Source: needs new screenshot.
+- [x] ~~Hints Style — Plain~~ (skipped)
+- [x] ~~Hints Style — Tooltip~~ (skipped)
 
 ### AUDIT | Enable SSO with Okta — `s/article/360043438133.mdx`
 

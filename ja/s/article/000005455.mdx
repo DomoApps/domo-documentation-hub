@@ -4,7 +4,7 @@ title: "Snowflake上のMagic ETL（ベータ版）"
 
 ## はじめに
 
-Snowflake上のMagic ETLを使用すると、SnowflakeのユーザーはSnowflakeとCloud Amplifierの統合を利用して、データを転送したりデータエンジニアに手助けを求めたりすることなく、Magic ETL変換のパワーを活用することができます。Snowflake上のMagic ETLは、データを既存のデータ構造内で安全に保ちながら、ローコードユーザーに対してセルフサービスの変換を可能にし、エンジニアリングリソースへの負担を軽減します。
+Snowflake上のMagic ETLを使用すると、SnowflakeのユーザーはSnowflakeのCloud Integrationsを利用して、データを転送したりデータエンジニアに手助けを求めたりすることなく、Magic ETL変換のパワーを活用することができます。Snowflake上のMagic ETLは、データを既存のデータ構造内で安全に保ちながら、ローコードユーザーに対してセルフサービスの変換を可能にし、エンジニアリングリソースへの負担を軽減します。
 
 <Note>
   **注記：** この機能はベータ版です。有効化するには、Domoアカウントチームにお問い合わせください。Snowflake上のMagic ETLは、Domoコンサンプション契約を締結されたお客様のみが利用できます。
@@ -19,20 +19,20 @@ Snowflake上のMagic ETLを使用すると、SnowflakeのユーザーはSnowflak
 
 Domoで以下の手順を実行します。
 
-* Cloud AmplifierでSnowflakeの
+* Cloud IntegrationsでSnowflakeの
   [書き込み機能](/ja/s/article/4402322966807) を設定します。
 * 少なくとも1つのSnowflakeウェアハウスで、操作として **［変換］** を選択します。
-  + これは、書き込み機能が設定されたのと同じCloud Amplifier統合上にある必要があります。
+  + これは、書き込み機能が設定されたのと同じCloud Integrations上にある必要があります。
       
     <Frame><img alt="transform operation.jpg" src="/images/kb/ka0Vq000000AMQf-00N5w00000Ri7BU-0EMVq000000w6eX.jpg"/></Frame>
-* すべての入力DataSetは、同じSnowflake - Cloud Amplifier統合の一部である必要があります。Domoクラウドからの入力が含まれているMagic ETL DataFlowは、Snowflakeクラウド上では実行できません。
+* すべての入力DataSetは、同じSnowflake Cloud Integrationsの一部である必要があります。Domoクラウドからの入力が含まれているMagic ETL DataFlowは、Snowflakeクラウド上では実行できません。
   + 複数のSnowflakeクラウドからの入力はサポートされていません。
 
 ### Snowflakeの必要条件
 
 Snowflakeで以下を完了します。
 
-* Snowflake - Cloud Amplifier統合で使用するサービスアカウントのSnowflakeロールでは、入力として参照する表のSELECT、MODIFY、USAGE、CREATE権限が必要です。これは、書き込み機能を設定する際に実行するコマンドで対処する必要があります。
+* Snowflake Cloud Integrationsで使用するサービスアカウントのSnowflakeロールでは、入力として参照する表のSELECT、MODIFY、USAGE、CREATE権限が必要です。これは、書き込み機能を設定する際に実行するコマンドで対処する必要があります。
 
 ## 必要な許可
 
@@ -42,7 +42,7 @@ Snowflake上のMagic ETLを使用するためには、ユーザーの権限で�
 
 ## Snowflake上のMagic ETLにアクセスする
 
-この機能は、Snowflake - Cloud Amplifier変換統合の完了後に、Magic ETLインターフェースで使用できます。
+この機能は、Snowflake Cloud Integrationsの変換設定の完了後に、Magic ETLインターフェースで使用できます。
 
 Magic ETLにアクセスするには、任意のDataSetの詳細ページで、 **［開く：］** > **［Magic ETL］** を選択します。
 
@@ -52,10 +52,10 @@ Magic ETLにアクセスするには、任意のDataSetの詳細ページで、 
 
 Snowflake上のMagic ETLでは、Magic ETLのインターフェースでデータ変換を *定義* できますが、変換はSnowflake上で *実行* されます。
 
-Snowflake - Cloud Amplifier統合を設定して変換操作を許可すると、Magic ETLエディターにドロップダウンが表示され、ETLを実行する場所を選択できます。ドロップダウンには、利用可能なSnowflakeクラウドごとにオプションが用意されています。
+Snowflake Cloud Integrationsを設定して変換操作を許可すると、Magic ETLエディターにドロップダウンが表示され、ETLを実行する場所を選択できます。ドロップダウンには、利用可能なSnowflakeクラウドごとにオプションが用意されています。
 
 <Frame><img alt="dropdown.jpg" src="/images/kb/ka0Vq000000AMQf-00N5w00000Ri7BU-0EMVq000000w4o1.jpg"/></Frame>
-SnowflakeのDataflow上でMagic ETLを初めて実行すると、Snowflake - Cloud Amplifier統合の書き込み設定の一部として構成されたSnowflakeデータベースに新しい表が作成されます。デフォルトでは、Magic ETLのDataFlowのそれ以降の実行はすべて、更新方法がReplaceメソッドで設定されますが、Appendメソッドを選択することもできます。DataSetの更新方法については、 [こちら](/ja/s/article/360043430733) をご覧ください。
+SnowflakeのDataflow上でMagic ETLを初めて実行すると、Snowflake Cloud Integrationsの書き込み設定の一部として構成されたSnowflakeデータベースに新しい表が作成されます。デフォルトでは、Magic ETLのDataFlowのそれ以降の実行はすべて、更新方法がReplaceメソッドで設定されますが、Appendメソッドを選択することもできます。DataSetの更新方法については、 [こちら](/ja/s/article/360043430733) をご覧ください。
 
 <Tip>
   **ヒント：** Snowflake上のMagic ETLを使用すると、Magic ETLでSnowflake SQLパススルーSQLを使用して、Snowflakeデータに直接SQLクエリを記述して実行できます。詳細については、 [こちら](/s/article/000005815) を参照してください。

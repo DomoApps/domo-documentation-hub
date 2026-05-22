@@ -46,9 +46,9 @@ When complete, check the box.
 - [x] ~~Hints Style — Plain~~ (skipped)
 - [x] ~~Hints Style — Tooltip~~ (skipped)
 
-### AUDIT | Enable SSO with Okta — `s/article/360043438133.mdx`
+### ⏸️ AUDIT | Enable SSO with Okta — `s/article/360043438133.mdx`
 
-[Asana task](https://app.asana.com/0/0/1204480786007423/f) · Submitter has a test Okta instance available — coordinate via the task.
+[Asana task](https://app.asana.com/0/0/1204480786007423/f) · **On hold pending submitter verification (2026-05-22).** The EN procedure rewrite (commit c9efe77b) and its JA parity port (commit cedb995e) were both done from training-data knowledge of the Okta Admin Console flow — no live Okta access, no docs lookup, and the submitter's offered test instance / Zoom walkthrough was never used. Confirm the field labels, dialog flow, and Directory paths against the live UI **before** capturing screenshots; the captures will lock in whatever wording the article currently uses.
 
 - [ ] **Okta Admin Console home** — `images/kb/okta-sso-admin-console-home.png`
   - Describes: Admin Console home with left-hand navigation, Applications expanded.

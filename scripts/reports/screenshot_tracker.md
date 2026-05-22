@@ -20,6 +20,17 @@ When complete, check the box.
 
 ## Outstanding
 
+### Properties for Bar Charts — `s/article/360043429813.mdx`
+
+[Asana task](https://app.asana.com/0/0/1206247708235860/f) · Existing PNGs (dated 2024-09-05) showed separator lines between bars that no longer appear in the current Vertical Bar UI. Replace with fresh captures of the **Hints > Style** option.
+
+- [ ] **Hints Style — Plain** — `images/kb/bar-chart-hints-style-plain.png`
+  - Describes: A Vertical Bar chart in Details view with **Style = Plain** so value hints appear as bare text on/above each bar.
+  - Source: needs new screenshot.
+- [ ] **Hints Style — Tooltip** — `images/kb/bar-chart-hints-style-tooltip.png`
+  - Describes: The same Vertical Bar chart in Details view with **Style = Tooltip** so each value hint appears inside a callout box with a pointer to the bar.
+  - Source: needs new screenshot.
+
 ### AUDIT | Enable SSO with Okta — `s/article/360043438133.mdx`
 
 [Asana task](https://app.asana.com/0/0/1204480786007423/f) · Submitter has a test Okta instance available — coordinate via the task.

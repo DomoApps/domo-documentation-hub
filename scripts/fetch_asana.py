@@ -38,12 +38,33 @@ import argparse
 import json
 import os
 import re
+import ssl
 import sys
 import time
 import urllib.error
 import urllib.parse
 import urllib.request
 from pathlib import Path
+
+
+def make_ssl_context() -> ssl.SSLContext:
+    """Build an SSL context that actually has a CA bundle on macOS Python.org
+    builds (which ship without linked system certs). Falls back through:
+    certifi → system /etc/ssl/cert.pem → default (with a warning)."""
+    try:
+        import certifi
+        return ssl.create_default_context(cafile=certifi.where())
+    except ImportError:
+        pass
+    for candidate in ("/etc/ssl/cert.pem", "/usr/local/etc/openssl/cert.pem"):
+        if os.path.exists(candidate):
+            return ssl.create_default_context(cafile=candidate)
+    print("warning: no CA bundle found; TLS verification may fail. "
+          "Try: python3 -m pip install certifi", file=sys.stderr)
+    return ssl.create_default_context()
+
+
+SSL_CTX = make_ssl_context()
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 MANIFEST = REPO_ROOT / "scripts" / "backlog_manifest.json"
@@ -78,7 +99,7 @@ def asana_get(path: str, token: str, params: dict | None = None) -> dict:
         "Authorization": f"Bearer {token}",
         "Accept": "application/json",
     })
-    with urllib.request.urlopen(req, timeout=30) as resp:
+    with urllib.request.urlopen(req, timeout=30, context=SSL_CTX) as resp:
         return json.loads(resp.read())
 
 
@@ -88,7 +109,7 @@ def download(url: str, dest: Path) -> None:
         return
     dest.parent.mkdir(parents=True, exist_ok=True)
     req = urllib.request.Request(url)
-    with urllib.request.urlopen(req, timeout=60) as resp, dest.open("wb") as f:
+    with urllib.request.urlopen(req, timeout=60, context=SSL_CTX) as resp, dest.open("wb") as f:
         while chunk := resp.read(64 * 1024):
             f.write(chunk)
 
@@ -225,8 +246,14 @@ def write_report(reports: list[dict], rebucket_notes: list[str]) -> Path:
     external_only = [r for r in reports
                      if r["attachments_external"] and not r["attachments_downloaded"]]
     errors = [r for r in reports if r["errors"]]
+    # "Needs a manual brief" only applies to bucket M items — those have
+    # substantive notes we couldn't parse, and an Asana attachment was our
+    # last hope. For C/E items the form description IS the brief; absence
+    # of an Asana attachment just means the source lives elsewhere (likely
+    # SharePoint), which is already flagged via external_only.
     empty = [r for r in reports
-             if not r["asana_completed"]
+             if r["bucket"] == "M"
+             and not r["asana_completed"]
              and not r["attachments_downloaded"]
              and not r["attachments_external"]
              and not r["errors"]]

@@ -90,3 +90,40 @@ When complete, check the box.
 - [ ] **Okta end-user dashboard with Domo tile** — `images/kb/okta-sso-end-user-dashboard-domo-tile.png`
   - Describes: Okta end-user dashboard showing the Domo app tile.
   - Source: needs new screenshot.
+
+### Query DataSet Tile — `s/article/Query-DataSet-Tile.mdx`
+
+[Asana task](https://app.asana.com/0/0/1210394972306471/f) · New Databricks-only Magic ETL tile article. Asana status was **On Hold/Blocked** pending two unresolved items below — call out to Andrea Henderson / Joseph Peterson before publishing.
+
+- [ ] **Query DataSet tile in Actions pane** — `images/kb/query-dataset-tile-action-rail.png`
+  - Describes: Magic ETL Actions pane with the **DataSets** section expanded and the **Query DataSet** tile highlighted.
+  - Source: needs new screenshot — original draft predated the field rename below.
+  - Marker in article: `{/* TODO[screenshot]: Magic ETL Actions pane`
+- [ ] **Query DataSet tile configuration panel** — `images/kb/query-dataset-tile-config.png`
+  - Describes: Query DataSet tile configuration with **Input DataSet**, **Query partition key**, and **# of Loads** fields populated.
+  - Source: needs new screenshot — the original screenshot still shows the old label "# of Parallel Loads"; confirm in-UI label is now "# of Loads" before capturing.
+  - Marker in article: `{/* TODO[screenshot]: Query DataSet tile configuration panel`
+
+**Outstanding content items (not screenshot work, but tracked here so they don't fall through):**
+
+- [ ] **Confirm field name** — Source draft used "# of Parallel Loads"; the team planned to rename to "# of Loads". The article currently uses "# of Loads". Verify the live UI matches.
+- [ ] **Specimen error messages** — Two error strings were stubbed in the Intro (socket timeout; "Exceeds maximum heap size of 16 GB"). Joseph Peterson was to provide the actual strings. Replace the bullets and remove the `TODO[content]` marker once supplied.
+
+[Asana task](https://app.asana.com/0/0/1206394488536337/f) · New beta Cloud Integration article. Prose is self-sufficient; four screenshots from the original Pinot_Integration.docx are embedded in that .docx but were not extracted to `images/kb/` — pull them from `.asana-cache/1206394488536337/Pinot_Integration.docx` (media files `imageb.png`–`imagef.png`) or take fresh captures.
+
+- [ ] **Pinot tile under Native integration** — `images/kb/pinot-kb-01.png`
+  - Describes: Manage Cloud Connections modal, Native integration section, with the Pinot logo tile visible.
+  - Source: `.asana-cache/1206394488536337/` (one of imageb.png–imagef.png) or fresh capture.
+  - Marker in article: `{/* TODO[screenshot]: Pinot tile under Native integration`
+- [ ] **Existing Pinot integrations list** — `images/kb/pinot-kb-02.png`
+  - Describes: Pinot integrations list showing the columns for integration name, number of DataSets, permissions, and owner.
+  - Source: `.asana-cache/1206394488536337/` or fresh capture.
+  - Marker in article: `{/* TODO[screenshot]: Existing Pinot integrations list`
+- [ ] **Add New Integration form** — `images/kb/pinot-kb-03.png`
+  - Describes: Pinot Add New Integration form showing Integration Name, Description, connection URL, Username, and Password fields.
+  - Source: `.asana-cache/1206394488536337/` or fresh capture.
+  - Marker in article: `{/* TODO[screenshot]: Add New Integration form`
+- [ ] **Pinot integrations list after creation** — `images/kb/pinot-kb-04.png`
+  - Describes: Pinot integrations list with the newly created integration alongside any existing ones.
+  - Source: `.asana-cache/1206394488536337/` or fresh capture.
+  - Marker in article: `{/* TODO[screenshot]: Pinot integrations list after creation`

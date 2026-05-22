@@ -1,0 +1,192 @@
+---
+title: "Query DataSet Tile"
+---
+
+{/* TODO[content]: Two unresolved items from Asana 1210394972306471 — (1) confirm the in-UI field label is "# of Loads" (was previously "# of Parallel Loads"). The original screenshot still showed the old label and the team had planned a new capture. (2) Specimen error messages for socket timeout and "exceeds maximum heap size of 16 GB" were not provided in the source draft and are stubbed below — replace once Joseph Peterson supplies the exact strings. See scripts/reports/screenshot_tracker.md. */}
+
+## Intro
+
+The **Query DataSet** tile lets you write a SQL query against a Databricks DataSet as the first step of a Magic ETL DataFlow, in place of the standard **Input DataSet** tile. It loads only the rows your query returns and can split the result into smaller batches, which improves performance and can prevent timeout and out-of-memory errors when working with large Cloud Amplifier DataSets.
+
+Although the **Input DataSet** tile is the most common first step in Magic ETL, other tiles can be used in its place. The **SQL** tile, for example, lets you write a custom `SELECT` statement. The **Query DataSet** tile goes further by also subdividing the result set into smaller loads — useful when a single load would exceed the underlying Cloud Data Warehouse's resource limits.
+
+Although the **Query DataSet** tile can be used with various data sources, it is strongly recommended for Databricks. Proper use of this tile can resolve large-DataSet errors such as:
+
+- Socket timeout errors when the underlying query takes too long to return.
+- "Exceeds maximum heap size of 16 GB" errors when a single load is too large for the CDW to process.
+
+{/* TODO[content]: Replace the two bullets above with the exact error strings once provided. */}
+
+In addition to the custom `SELECT` statement, the tile exposes two configuration fields:
+
+- **Query partition key** — the column used to split the result set into batches.
+- **# of Loads** — the number of batches to process.
+
+<Warning>
+  **Important:** The column you choose as the **Query partition key** must not contain `NULL` values. Rows whose partition-key value is `NULL` are ignored. Only choose a column that is guaranteed to be non-null for every row.
+</Warning>
+
+---
+
+## Required Grants
+
+You need the same grants required to author Magic ETL DataFlows on Databricks — no additional grants are required for the **Query DataSet** tile itself.
+
+## Access the Query DataSet Tile
+
+On the Magic ETL authoring canvas, the **Query DataSet** tile is in the left Actions pane under the **DataSets** section.
+
+{/* TODO[screenshot]: Magic ETL Actions pane with the DataSets section expanded and the Query DataSet tile highlighted — see scripts/reports/screenshot_tracker.md */}
+
+<Note>**Note:** The **Query DataSet** tile is only available to Databricks users.</Note>
+
+## Use the Query DataSet Tile
+
+To configure the tile:
+
+1. Drag the **Query DataSet** tile from the left Actions pane onto the authoring canvas.
+2. Select a Databricks DataSet from the **Input DataSet** menu.
+3. Write the `SELECT` statement that identifies the rows you want to load into the DataFlow.
+
+   <Note>**Note:** The query must be a single `SELECT`. Common Table Expressions (CTEs) are not supported.</Note>
+
+4. Configure the **Query partition key** — select the column the tile uses to split the result set into batches.
+
+   <Warning>**Important:** The partition-key column must not contain `NULL` values. See [Choose a Partition Key](#choose-a-partition-key) for guidance.</Warning>
+
+5. Configure **# of Loads** — the number of batches into which the result set is divided. See [Size Your Loads](#size-your-loads) for the recommended ceiling.
+
+   {/* TODO[screenshot]: Query DataSet tile configuration panel with Query partition key and # of Loads fields populated. Confirm the in-UI label is "# of Loads" (was previously "# of Parallel Loads"). See scripts/reports/screenshot_tracker.md */}
+
+## How Partitioning Works
+
+The result set from your `SELECT` statement is partitioned by the distinct values in your **Query partition key** column and then divided into the number of batches you specify in **# of Loads**.
+
+To avoid bottlenecks, the largest batch must be small enough to fit within your Cloud Data Warehouse's resource limits. Batches are not guaranteed to be of equal size by row count or by data volume — the distribution depends on the partition-key column you choose.
+
+**Example.** Suppose the column you choose as **Query partition key** has 317 distinct values and you set **# of Loads** to 30. The first 30 distinct values form the first batch, the next 30 form the second batch, and so on — yielding 11 batches total (since 317 ÷ 30 is between 10 and 11).
+
+In practice, the number of rows per partition-key value is rarely uniform. Data is often skewed — for example, 50% of all rows might be associated with just 10% of partition-key values — so batches containing those high-row-count values will be disproportionately large. Choosing the right column as partition key matters: the more evenly distributed the row count per value, the better the partitioning behaves.
+
+## Size Your Loads
+
+For Databricks, choose the **Query partition key** and set **# of Loads** so the largest batch is no larger than **4 GB**. The following procedure produces a minimum **# of Loads** that satisfies the 4 GB ceiling for a given partition-key candidate.
+
+1. **Find the total size of the table.** Use Databricks' UI or run:
+
+   ```sql
+   DESCRIBE DETAIL <catalog>.<schema>.<table>;
+   ```
+
+2. **Convert `sizeInBytes` to GB and divide by 4 GB** to estimate a preliminary number of divisions:
+
+   ```
+   divisions = (sizeInBytes / 2^30) / 4
+   ```
+
+   This is an intermediate value — it would equal the desired **# of Loads** only if rows were perfectly evenly distributed across all partition-key values, which is rarely the case.
+
+3. **Get the total row count for the table.**
+
+4. **Estimate the row ceiling for a single 4 GB batch:**
+
+   ```
+   max_rows = row_count / divisions
+   ```
+
+5. **Pick a candidate column for the partition key.** It must not contain `NULL` values.
+
+6. **Count distinct values in the candidate column:**
+
+   ```sql
+   SELECT COUNT(DISTINCT <column>) AS distinct_count
+   FROM <table>;
+   ```
+
+7. **Examine the row-count distribution across the candidate column** to see how skewed the table is along that column:
+
+   ```sql
+   SELECT <column>, COUNT(*) AS row_count
+   FROM <table>
+   GROUP BY <column>
+   ORDER BY row_count DESC;
+   ```
+
+8. **Compute a worst-case running total** — the cumulative row count assuming a batch is filled from the largest partition-key values down:
+
+   ```sql
+   WITH grouped_counts AS (
+     SELECT <column>, COUNT(*) AS row_count
+     FROM <table>
+     GROUP BY <column>
+   )
+   SELECT
+     <column>,
+     row_count,
+     SUM(row_count) OVER (
+       ORDER BY row_count DESC
+       ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
+     ) AS cumulative_row_count
+   FROM grouped_counts
+   ORDER BY row_count DESC;
+   ```
+
+   For example, suppose a date column is being evaluated as a candidate partition key:
+
+   | `<column>` | `row_count` | `cumulative_row_count` |
+   |---|---:|---:|
+   | 2024-10-13 | 100 | 100 |
+   | 2024-02-21 | 80 | 180 |
+   | 2024-05-17 | 60 | 240 |
+   | 2024-08-19 | 50 | 290 |
+   | 2024-03-06 | 30 | 320 |
+   | 2024-02-10 | 20 | 340 |
+   | 2024-11-30 | 10 | 350 |
+
+9. **Determine how many distinct values fit under the `max_rows` ceiling** from step 4:
+
+   ```sql
+   WITH grouped_counts AS (
+     SELECT <column>, COUNT(*) AS row_count
+     FROM <table>
+     GROUP BY <column>
+   ),
+   ranked_counts AS (
+     SELECT
+       <column>,
+       row_count,
+       SUM(row_count) OVER (
+         ORDER BY row_count DESC
+         ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
+       ) AS cumulative_row_count
+     FROM grouped_counts
+   )
+   SELECT COUNT(*) AS max_column_values
+   FROM ranked_counts
+   WHERE cumulative_row_count < max_rows;
+   ```
+
+   Replace `max_rows` with the value calculated in step 4.
+
+10. **Compute the minimum `# of Loads`** required to keep the largest batch under 4 GB (round up):
+
+    ```
+    # of Loads ≥ distinct_count / max_column_values
+    ```
+
+The required **# of Loads** depends on the column you choose as the partition key. To reduce **# of Loads**, choose a column whose values are more uniformly distributed across the table.
+
+## Choose a Partition Key
+
+A good partition-key column:
+
+- Contains no `NULL` values (required — rows with `NULL` partition-key values are skipped).
+- Has many distinct values, so the result set can be divided into enough batches to keep each one within CDW limits.
+- Has a relatively even distribution of row counts per distinct value, so batch sizes are predictable.
+
+Highly skewed columns — where a small number of values account for most of the rows — produce very uneven batches and reduce the effectiveness of the tile.
+
+## Related Articles
+
+- [Domo on Databricks](/s/article/000005289)
+- [Cloud Integrations Overview](/s/article/4412849158167)

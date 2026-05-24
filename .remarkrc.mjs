@@ -31,6 +31,8 @@ import {
   remarkDomoNoExclamation,
   remarkDomoNoH1,
 } from "./scripts/remark-domo-style.mjs";
+import { remarkSplitTableRows } from "./scripts/remark-split-table-rows.mjs";
+import { remarkStripRedundantLinkTitle } from "./scripts/remark-strip-redundant-link-title.mjs";
 
 // Transformer: normalize a list's `spread` to match its items. CommonMark says
 // a list is loose iff any item has internal blank-line block separation, but
@@ -81,6 +83,12 @@ const config = {
     remarkGfm,
     // Must run before stringify so the corrected `spread` flag drives output.
     remarkNormalizeListSpread,
+    // Drop `[Text](/url "Text")` redundant titles — leftover from CMS
+    // migration; the title duplicates the visible label.
+    remarkStripRedundantLinkTitle,
+    // Wraps the stringifier to put each <tr> on its own line. Source
+    // readability only — no effect on the rendered HTML.
+    remarkSplitTableRows,
     [
       remarkRetext,
       unified().use({

@@ -6,6 +6,20 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 A [Mintlify](https://mintlify.com)-based documentation hub for Domo. Content is written in MDX, navigation is defined in `docs.json`, and the site auto-deploys on push to `main`.
 
+## Audience and Tooling Policy
+
+This repo is edited by a mix of technical and non-technical contributors. Non-technical writers update KB articles directly in VS Code with no local setup — no Node, no yarn, no extensions, no remark.
+
+All local tooling — `.remarkrc.mjs`, the `scripts/` directory, the `yarn` scripts, format-on-save, the lint rules in `scripts/remark-domo-style.mjs` — is **optional**. Treat it as a quality-of-life layer for technical contributors, not a requirement.
+
+Consequences for what you write into the repo:
+
+- Keep `README.md`, `Domo-KB-Style-Guide.mdx`, and any in-article guidance non-technical. No references to yarn, remark, lint rules, scripts, or VS Code extensions in these files. Use plain language a writer would understand.
+- Tooling setup and developer-facing guidance belongs in a separate technical-contributor doc (to be added). Until that file exists, default to leaving tooling docs out of repo-level files entirely.
+- When in doubt, ask whether a non-technical writer would need to read the change you're about to write. If not, it doesn't belong in a writer-facing file.
+
+CLAUDE.md is AI-facing, so it's fine to discuss tooling here.
+
 ## Architecture
 
 ### Content Layout

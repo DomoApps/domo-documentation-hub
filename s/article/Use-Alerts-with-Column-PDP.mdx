@@ -1,0 +1,126 @@
+---
+title: "Use Alerts with Column PDP"
+tag: "Beta"
+---
+
+<Note>
+  **Note:** This feature is in beta. Beta Program participants can enable
+  features [here](https://embed.domo.com/embed/pages/DQ8Ek). To join the Beta
+  Program, fill out [this form](https://embed.domo.com/embed/pages/K8GMx). For beta questions or feedback, email
+  [beta.admin@domo.com](mailto:beta.admin@domo.com).
+</Note>
+
+## Intro
+
+This article explains how column PDP masking policies apply to alerts, how to create and subscribe to alerts on PDP-controlled DataSets, and how to troubleshoot alerts affected by column masking.
+
+---
+
+## Required Grants
+
+To configure column masking on a DataSet, you must be the DataSet owner, co-owner, or have a role that includes the **Manage DataSet** grant.
+
+To create or subscribe to alerts on a PDP-controlled DataSet, you must have unmasked access to any PDP-controlled columns used in the alert's evaluation criteria.
+
+## Prerequisites
+
+Column PDP must be enabled on your DataSet before you can use the features described in this article. Learn how to [set up column masking policies](/s/article/360042934614#column-policies).
+
+## Understand How Column PDP Affects Alerts
+
+Column PDP lets DataSet owners and admins apply masking policies to individual columns in a DataSet, controlling how each user sees data in those columns. Masking policies are enforced throughout the entire alert lifecycle—from creation to delivery.
+
+The following rules apply to alerts on a PDP-controlled DataSet:
+
+- **Create an alert —** A user can create an alert that uses a PDP-controlled column in the evaluation criteria only if they have unmasked access to that column. Evaluation criteria include the metric being evaluated, any Filters applied to the alert, and any columns that identify a unique row (in DataSet row-added alerts).
+- **Subscribe to an alert —** A user can subscribe to an alert only if they have unmasked access to all PDP-controlled columns used in the alert's evaluation criteria.
+- **Receive an alert —** When an alert triggers, Domo evaluates it only for subscribers who have unmasked access to the PDP-controlled columns in the evaluation criteria. Alert notification content—including chart images in card alerts—reflects each recipient's column masking policies.
+
+### Unmasked access
+
+A user has unmasked access to a PDP-controlled column if any of the following is true:
+
+- The user is the DataSet owner or co-owner.
+- The user has a role that includes the **Manage DataSet** grant.
+- The user is assigned to a column policy rule with the **Unmasked** masking method.
+- The column has no masking applied.
+
+Learn more about [masking methods](/s/article/360042934614#masking-methods).
+
+## Create an Alert on a PDP-Controlled DataSet
+
+You can create an alert on a DataSet with column masking enabled if you have unmasked access to any PDP-controlled columns in the evaluation criteria. If the evaluation criteria include a PDP-controlled column, a warning appears to let you know that only users with unmasked access to those columns can subscribe to and receive the alert.
+
+1. Navigate to the card or DataSet where you want to create an alert.
+
+2. Open the alert creation options and configure the evaluation criteria.
+
+   If any column in the evaluation criteria is PDP-controlled and you do not have unmasked access to it, you cannot proceed.
+
+3. (Conditional) If a warning appears indicating that only users with unmasked access can receive the alert, review the message and select **Continue** to confirm.
+
+   <Frame>![Warning message shown when creating an alert that uses a PDP-controlled column](/images/kb/column-pdp-alert-warning.png)</Frame>
+
+4. Complete the remaining alert configuration and save.
+
+## Subscribe to an Alert on a PDP-Controlled DataSet
+
+You can subscribe to an alert on a PDP-controlled DataSet only if you have unmasked access to all PDP-controlled columns in the alert's evaluation criteria.
+
+1. In the Alerts Center, locate the alert you want to subscribe to.
+
+2. Select **Subscribe**.
+
+   If you do not have unmasked access to one or more PDP-controlled columns in the alert's evaluation criteria, the option to subscribe is unavailable.
+
+## Understand Alert Evaluation and Delivery
+
+When an alert triggers, Domo evaluates it only for subscribers who have unmasked access to the PDP-controlled columns in the evaluation criteria. Subscribers who lack unmasked access are skipped and do not receive a notification for that trigger.
+
+Alert notification content reflects each recipient's column masking policies. For example, if a recipient has a partial masking rule applied to a column (such as **Show first N**), any chart images in their notification reflect that masking. Two users subscribed to the same alert may receive notifications with different data representations, depending on their column PDP policy assignments.
+
+## FAQ
+
+<AccordionGroup>
+
+<Accordion title="What counts as unmasked access?">
+  A user has unmasked access to a PDP-controlled column if they are the DataSet owner or co-owner, have a role that includes the **Manage DataSet** grant, are assigned to a column policy rule with the **Unmasked** masking method, or the column has no masking applied.
+</Accordion>
+
+<Accordion title="Can I create an alert that uses a PDP-controlled column?">
+  Yes, but only if you have unmasked access to that column. When you create the alert, a warning message appears noting that only users with unmasked access can subscribe to and receive it.
+</Accordion>
+
+<Accordion title="Why do two users subscribed to the same alert see different data in their notifications?">
+  Alert notifications reflect each recipient's column masking policies. If two users have different masking rules applied to a column used in the alert, they receive notifications with different data—including different chart images—based on their respective policy assignments.
+</Accordion>
+
+<Accordion title="Why did my existing alert stop working after I enabled column PDP on a DataSet?">
+  When column PDP is enabled on a DataSet, existing alerts that use a PDP-controlled column in their evaluation criteria may be placed in an error state. Recreate the alert after confirming you have unmasked access to the relevant columns. Contact your Domo account team for additional assistance.
+</Accordion>
+
+</AccordionGroup>
+
+## Troubleshoot
+
+### I can't create an alert on a DataSet
+
+If you cannot create an alert that uses a PDP-controlled column in the evaluation criteria, confirm that you have unmasked access to that column. Contact your DataSet owner or admin to review your column policy assignment.
+
+### I can't subscribe to an alert
+
+If the option to subscribe is unavailable, the alert's evaluation criteria likely include one or more PDP-controlled columns to which you do not have unmasked access. Contact your DataSet owner or admin to review your column policy assignment.
+
+### My alert stopped working after I enabled column PDP
+
+When column PDP is enabled on a DataSet, existing alerts that use a PDP-controlled column in their evaluation criteria may be placed in an error state.
+
+<Note>**Note:** Whether alerts in an error state are automatically restored when this update ships is currently being confirmed. If your alert remains in an error state, recreate it. Contact your Domo account team for assistance.</Note>
+
+### I'm not receiving notifications for an alert I'm subscribed to
+
+If you are subscribed to an alert but not receiving notifications, confirm that you still have unmasked access to all PDP-controlled columns in the alert's evaluation criteria. Changes to your column policy assignment after subscribing can prevent you from receiving future notifications. Contact your DataSet owner or admin to review your policy assignment.
+
+## Related Articles
+
+- [Personalized Data Permissions (PDP)](/s/article/360042934614)

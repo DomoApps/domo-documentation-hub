@@ -254,6 +254,53 @@ The `height` value controls how big the image appears relative to the surroundin
 
 Keep the other three style values — `display: 'inline'`, `verticalAlign: 'start'`, and `margin: '0'` — the same across every inline image. They're what keep the image aligned with the text baseline and prevent extra vertical space from creeping in.
 
+## Videos
+
+Articles can include two kinds of video. Pick the one that matches what the reader needs from the clip.
+
+- **Inline looping video** — a short, silent clip that plays automatically on loop, like an animated screenshot. Use this when you want to show a small interaction in motion (a drag, a hover state, a connect-the-dots gesture) without making the reader stop and watch a full video. There are no playback controls, no audio, and no progress bar — the clip just plays.
+- **Embedded video** — a full video player from YouTube (or another host) that the reader presses play on. Use this for narrated walkthroughs, longer demos, or any clip with audio. The reader sees a standard video window with play/pause, volume, fullscreen, and a progress bar.
+
+When in doubt, prefer the inline looping video — it gives the reader the visual without interrupting their reading flow. Reserve embedded videos for content that genuinely needs audio or runs longer than ~30 seconds.
+
+### Inline Looping Video
+
+Wrap an HTML5 `<video>` element in a `<Frame>`. The `autoPlay`, `muted`, `loop`, and `playsInline` attributes are all required — together they let the clip play automatically on every browser, including mobile Safari, without prompting the reader.
+
+```mdx
+<Frame>
+  <video
+    autoPlay
+    muted
+    loop
+    playsInline
+    className="w-full aspect-video rounded-xl"
+    src="/images/kb/example-clip.mp4"
+  ></video>
+</Frame>
+```
+
+Keep clips short — 5 to 15 seconds is usually enough — and store them under `/images/kb/` alongside screenshots.
+
+### Embedded Video
+
+Wrap a YouTube (or other host) embed `<iframe>` in a `<Frame>`. Use the host's standard embed URL — for YouTube, that's `https://www.youtube.com/embed/VIDEO_ID`.
+
+```mdx
+<Frame>
+  <iframe
+    allowfullscreen=""
+    frameborder="0"
+    height="315"
+    width="560"
+    src="https://www.youtube.com/embed/VIDEO_ID"
+    title="YouTube video player"
+  ></iframe>
+</Frame>
+```
+
+Always include a descriptive `title` attribute — screen readers announce it, and it's what appears if the embed fails to load.
+
 ## Callouts
 
 Use React callout elements for notes, warnings, and tips — not plain text or HTML. Always bold the label and its colon, for example `**Note:**`.

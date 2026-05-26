@@ -41,7 +41,7 @@ Once the file(s) are identified, ask the user what type of change they need — 
 
 1. **Rename** — change the article title, filename, or both
 2. **Content update** — edit body text, callouts, or other prose
-3. **Image/screenshot swap** — replace one or more images
+3. **Image/screenshot swap** — replace one or more images, or swap a legacy image-based UI icon for the Domo icon font
 4. **Content removal** — delete a section, step, or block
 5. **File path update** — rename a file and update all references to it
 6. **Cross-file change** — the same change needs to appear in multiple articles
@@ -152,6 +152,36 @@ Use the Edit tool with enough surrounding context (2–3 lines) to make `old_str
 ### Image/screenshot swap
 
 Update the `src` attribute in the `<Frame>` or `<img>` tag. Update `alt` text if appropriate. Do not move or delete image files — note to the user that the image asset itself must be updated separately in `images/kb/`.
+
+### Image-based icon → icon font swap
+
+Many older articles use `<img>` or `<Icon icon="/images/icons/*.svg" />` for inline UI icons that now exist in the Domo icon fonts. The font versions inherit text color and adapt to light/dark mode automatically; image-based icons don't.
+
+Two icon fonts are wired up, and they ship the **same glyph set** — the choice is about which UI the article depicts, not glyph availability:
+
+- **`icon-{name}`** — phosphor, the design refresh. **Default for current Domo product surfaces.** Browse at [Domo Icons (phosphor)](https://git.empdev.domo.com/pages/Development/DomoIcons/#!/icons/phosphor).
+- **`legacy-icon-{name}`** — the previous-generation Domo icons. **Only for release notes describing the pre-refresh UI and legacy applications like Workbench.** Browse at [Domo Icons (domocons)](https://git.empdev.domo.com/pages/Development/DomoIcons/#!/icons/domocons).
+
+When you're already updating an article and notice an image-based icon, propose swapping it to the font convention. **Pick the font based on the UI surface the article describes:**
+
+```mdx
+<i className="icon-{name}" aria-hidden="true" />              {/* current Domo UI */}
+<i className="legacy-icon-{name}" aria-hidden="true" />       {/* release notes / Workbench */}
+```
+
+**Stale-screenshot upgrade case.** If the article describes the *current* Domo UI but the original `<img>` showed a legacy-style glyph, that screenshot is just out of date — swap to the phosphor `icon-*` version (not `legacy-icon-*`) so the article reflects what users see today.
+
+Don't open a wholesale icon migration as a side effect of an unrelated update; only swap icons in the section the user asked you to change, plus any that read awkwardly inconsistent next to the change.
+
+**Check the surrounding prose for an inline label.** When swapping (or auditing existing font icons), confirm the icon is named in the surrounding prose. If the prose says "click \<icon\>" with no inline label, propose rewriting it to "click the {name} icon \<icon\>". The inline-label rewrite is preferred over `aria-label` in flowing prose because it helps every reader, not just screen-reader users. Reserve `role="img"` + `aria-label="..."` for the narrow case where the icon truly stands alone with no room for prose (icon-only button, sole content of a link). See `Domo-KB-Style-Guide.mdx` › **Icons** for the full convention.
+
+### HTML table normalization
+
+Many migrated articles ship HTML tables collapsed onto a single line, often with data rows wrapped inside `<thead>` instead of `<tbody>`. Both are migration artifacts: the single-line form blows past VS Code's syntax-highlighting threshold (so the table renders as one unhighlighted blob), and the misplaced data rows cause browsers to vertically center-align the cells.
+
+When you're already editing a section that touches one of these tables, normalize it: put `<table>`, `<thead>`, `<tbody>`, each `<tr>`, and their closing tags on their own lines, and move data rows into `<tbody>`. See `Domo-KB-Style-Guide.mdx` › **Tables** › **HTML tables** for the canonical form.
+
+As with icon migrations, don't reformat every HTML table you encounter — only the tables in the section the user asked you to change, plus any directly adjacent ones that would look inconsistent.
 
 ### Navigation move
 

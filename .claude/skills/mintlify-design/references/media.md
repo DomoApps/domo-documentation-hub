@@ -16,25 +16,58 @@ Wrap **every screenshot** in `<Frame>`. Frame auto-sizes to content width and re
 - `alt` is required. Describe what the screenshot shows, not "screenshot of X."
 - Optional `caption` prop renders text below the frame.
 
-## Inline images — raw `<img>` with inline style
+## Inline UI icons — Domo icon fonts (preferred)
 
-For images that flow inside a sentence (icons, button glyphs at line height), do **not** use `<Frame>`. Use a raw `<img>` with inline `style={{}}`:
+For UI icons that flow inside a sentence (gear, alert bell, chart-line, etc.), use a Domo icon font. Two are wired up in `style.css`, and they share the same glyph set — pick the font that matches the UI you're depicting:
 
-```mdx
-Click the gear icon <img src="/images/kb/gear.png" alt="" style={{display: 'inline', height: '1.2em', verticalAlign: 'middle'}} /> to open settings.
-```
+- **`icon-{name}`** — phosphor (the design refresh; ~1,000 glyphs). Browse at [Domo Icons (phosphor)](https://git.empdev.domo.com/pages/Development/DomoIcons/#!/icons/phosphor). **Default for current Domo product surfaces.**
+- **`legacy-icon-{name}`** — the previous-generation Domo icons. Browse at [Domo Icons (domocons)](https://git.empdev.domo.com/pages/Development/DomoIcons/#!/icons/domocons). **Only for surfaces that still ship the older icons** — release notes describing the pre-refresh UI, and legacy applications such as Workbench.
 
-## `InlineImage` snippet — preferred for inline images
-
-The repo has a snippet at `/snippets/InlineImage.mdx` that wraps the inline-image pattern with sane defaults:
+Both fonts cover the same glyph names (it's a design refresh, not a coverage gap), so the choice is about *which UI* the article depicts, never about availability.
 
 ```mdx
-import { InlineImage } from '/snippets/InlineImage.mdx';
+Click <i className="icon-gear" aria-hidden="true" /> **Settings** to open Settings.
 
-Click the gear icon <InlineImage src="/images/kb/gear.png" /> to open settings.
+In Workbench, click <i className="legacy-icon-database" aria-hidden="true" /> in the left icon bar.
 ```
 
-Defaults: `height='1.6em'`, `display: inline`, `verticalAlign: start`, `noZoom`. Prefer `InlineImage` over hand-rolled inline `<img>` styles when the result fits the defaults.
+- Icons inherit text color and size automatically — they adapt to light/dark mode without any extra props.
+- Override size only when needed: `<i className="icon-gear" style={{fontSize: 24}} aria-hidden="true" />`.
+
+**Accessibility: pair every icon with an inline text label**
+
+Icon-font glyphs use Unicode Private Use Area codepoints — screen readers announce them as garbage if not handled. The default pattern hides the icon from the a11y tree and relies on surrounding prose to carry the meaning:
+
+```mdx
+Click <i className="icon-gear" aria-hidden="true" /> **Settings** to open Settings.
+```
+
+If the existing prose doesn't name the icon (e.g. "click \<icon\>"), rewrite the prose to label it inline. This helps every reader, not just screen-reader users:
+
+- ❌ "Click <i className="icon-chart-line" aria-hidden="true" /> to view the chart."
+- ✅ "Click the line chart icon <i className="icon-chart-line" aria-hidden="true" /> to view the chart."
+
+**Narrow exception — `aria-label` for standalone icons**
+
+Use `role="img"` + `aria-label` instead of `aria-hidden` only when the icon truly stands alone with no surrounding prose (icon-only button, icon as a link's sole content, tight table-cell glyph):
+
+```mdx
+<i className="icon-gear" role="img" aria-label="Settings" />
+```
+
+In flowing KB prose, the inline-label rewrite is always preferable to `aria-label`.
+
+**Avoid** `<Icon icon="/images/icons/gear.svg" />` (Mintlify's component pointing at a local SVG). Mintlify loads the SVG via `<img>`, so the `color` prop and `currentColor` don't reach the paths — the icon stays black in dark mode. Use the icon font instead.
+
+## Inline `<img>` — fallback for non-icon glyphs
+
+When the inline glyph you need isn't in either Domo icon font (e.g. a small UI screenshot, brand mark, or product-specific marker captured as an image), use a native `<img>` with an inline `style` block so the image flows with surrounding text instead of breaking onto its own line:
+
+```mdx
+Click <img src="/images/kb/some-ui-fragment.png" alt="UI fragment" style={{height: '1.2em', display: 'inline', verticalAlign: 'start', margin: '0'}}/> to continue.
+```
+
+Use `height: '1.2em'` (or `'1.6em'`) to match body text, `height: '2em'` when the icon stands alone as a row label in a table cell, or a bare number (e.g. `111`) for fixed-pixel screenshots embedded in a table cell. Keep `display: 'inline'`, `verticalAlign: 'start'`, and `margin: '0'` consistent so the image sits on the baseline of the surrounding text without injecting vertical space.
 
 ## Video / embeds
 
@@ -42,6 +75,9 @@ Mintlify supports `<iframe>` for YouTube/Loom and a `<video>` tag for self-hoste
 
 ## Common mistakes
 
+- Using `<Icon icon="/images/icons/*.svg" />` for inline UI icons — Mintlify loads local SVGs via `<img>`, so `color`/`currentColor` can't reach the paths and dark mode breaks. Use the Domo icon font instead (see "Inline UI icons" above).
+- Using a raw `<img>` for a UI icon when the glyph is in the icon font — the font versions (`icon-*` for current UI, `legacy-icon-*` for legacy surfaces) inherit color and theme automatically; images don't.
+- Using `legacy-icon-*` for a current Domo product surface, or `icon-*` for a legacy surface like Workbench — pick the font that matches the UI being depicted.
 - Wrapping inline icons in `<Frame>` — `<Frame>` is only for full screenshots that stand on their own.
 - Using Markdown `![alt](src)` inside `<Frame>` — use raw `<img>` instead.
 - Forgetting `alt` — required for accessibility and required by lint.

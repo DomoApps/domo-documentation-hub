@@ -109,7 +109,7 @@ The table of contents renders through H4. If you find yourself going three or mo
 
 Often our articles contain one or more ordered lists of process instructions. These should always be done in a numbered list of steps.
 
-If there is more than one way to do something or get to a certain place, always describe the easiest/simplest (fewest clicks) way. If the user finds another way, that's fine, but we won't tell them how, as it clutters the documentation and makes things more confusing than helpful.
+If there is more than one way to do something or get to a certain place, always describe the easiest/simplest (fewest selections or clicks) way. If the user finds another way, that's fine, but we won't tell them how, as it clutters the documentation and makes things more confusing than helpful.
 
 The proper way to construct a process in steps is described below:
 
@@ -156,13 +156,103 @@ As much as possible, screenshots should be taken in Modocorp or another demo ins
 
 Take as many high-quality screenshots as possible. Not all may make it into the final draft of the article, but it's better to have too many than too few. Take them at as high a resolution as possible and do not compress them for sending to another machine—if necessary you can add them to a Sharepoint folder to preserve quality and share the link to the folder with another individual.
 
-**Inline images (UI icons)**
+**Wrap screenshots in `<Frame>`**.
 
-For small Domo UI icons that appear within body text, recommended sizes are:
+Block-level screenshots should be wrapped in a `<Frame>` component. Frame styles the image consistently across the site and auto-sizes it to fit the available column width while preserving the image's aspect ratio.
 
-- **20×20 —** matches the size of surrounding display text
-- **30×30 —** slightly larger; good for most inline icons
-- **40×40 —** best for header-level icons
+```mdx
+<Frame>
+  <img src="/images/kb/example.png" alt="Descriptive alt text" />
+</Frame>
+```
+
+Do not add explicit `width` or `height` styles to the `<img>`, since they override Frame's auto-sizing and often distort the image. **If a screenshot needs to render smaller than the column width, crop the source image rather than scaling it down with inline styles**.
+
+For inline glyphs and small UI fragments that flow with surrounding text, use the icon font or a native inline `<img>` instead. See *Icons* and *Inline images* below.
+
+## Icons
+
+When you need to show a Domo UI icon inside an article — like a gear, a chart, or an arrow — use the **Domo icon font** rather than uploading an image. The font already contains about a thousand icons and is built into every article automatically, so there's nothing to install or import. Using the font keeps icons crisp at any size, lets them match the surrounding text color (including in dark mode), and saves you from hunting down a screenshot.
+
+Here's what a typical icon reference looks like in an article:
+
+```mdx
+Select <i className="icon-gear sm" aria-hidden="true" /> **Settings** to open Settings.
+```
+
+A few things worth knowing:
+
+- The name after `icon-` always matches the name in the Domo design system. You can browse the full set at [Domo Icons](https://git.empdev.domo.com/pages/Development/DomoIcons/#!/icons/phosphor?size=xl).
+- Icons automatically pick up the color and size of the text around them, so they'll look right in both light and dark mode without any extra work.
+- If a particular icon ever looks off — too small or too large next to its label — you can resize just that one with `style={{fontSize: 24}}`. Don't reach for this unless the default genuinely looks wrong.
+
+### Always Pair an Icon with a Text Label
+
+The icon font uses a set of special Unicode characters that screen readers can't interpret. Without help, a screen reader won't be able to read the icon aloud. To prevent this, every icon should be hidden from screen readers (using `aria-hidden="true"`), and the surrounding sentence should name what the icon is.
+
+Here's the pattern again, with the screen-reader-friendly attribute called out:
+
+```mdx
+Select <i className="icon-gear sm" aria-hidden="true" /> **Settings** to open Settings.
+```
+
+If the sentence around the icon doesn't already name it — for example, "select [icon]" with nothing else — **rewrite the sentence to include the icon's name in the prose**. Don't try to fix it with a hidden `aria-label`. Naming the icon out loud helps everyone, not just screen-reader users; sighted readers benefit too, because they don't have to recognize an unfamiliar glyph at a glance.
+
+- **Don't:** "Select <i className="icon-chart-line sm" aria-hidden="true" /> to view the chart."
+- **Do:** "Select the line chart icon <i className="icon-chart-line sm" aria-hidden="true" /> to view the chart."
+
+Occasionally an icon has no surrounding sentence to lean on — for example, an icon-only button, an icon used as the entire content of a link, or a glyph squeezed into a tight table cell where there's no room for a label. In those rare cases, use `role="img"` together with `aria-label` to give the icon its own accessible name:
+
+```mdx
+<i className="icon-gear sm" role="img" aria-label="Settings" />
+```
+
+Treat this as a last resort. Whenever the icon sits inside normal prose, the rewrite-the-sentence approach above is always the better choice.
+
+### Icons Not Included in the Font
+
+Domo's icon font is large but not exhaustive. If the UI element you're trying to depict isn't represented in the font, fall back to a regular inline image — see *Inline images* below for how to format it. Just remember that the font version is preferred whenever a matching icon exists.
+
+### Legacy Icons (`legacy-icon-*`)
+
+Domo also has a second icon font available, called `legacy-icon-*`. It contains the same set of icons as the standard `icon-*` font, but is styled to match Domo's older UI. The current font (`icon-*`) uses Phosphor icons, which are part of the design refresh.
+
+Use whichever font matches the UI you're describing:
+
+- **Use `legacy-icon-*`** when the screen you're documenting still uses the older icons. The two most common cases are release notes that describe the pre-refresh UI and legacy applications such as **Workbench**.
+- **Use `icon-*`** (Phosphor) everywhere else. The current Domo product uses the refreshed icons, so articles about today's UI should match. This holds even when an article's existing screenshots still show legacy icons — the screenshots are out of date, and pairing them with legacy-icon references would only reinforce the confusion.
+
+```mdx
+In Workbench, select <i className="legacy-icon-database sm" aria-hidden="true" /> in the left icon bar.
+```
+
+### Icons in Migrated Articles
+
+Plenty of older articles still use uploaded images for icons that now exist in the font. We're swapping these over to the font version gradually. The rule of thumb: if you're already in an article making other edits and you notice image-based icons, take a moment to convert them.
+
+One subtlety to watch for: if the article describes the current Domo UI but an old screenshot shows a legacy-style icon, the screenshot itself is out of date. In that case, migrate to the standard `icon-*` (Phosphor) version, *not* `legacy-icon-*` — the goal is to match what users see today. Save `legacy-icon-*` for surfaces that genuinely still ship the old icons, like release notes and Workbench.
+
+For reference, the previous code for inline "icons" looks like this: 
+
+```mdx
+<img src="/images/kb/worksheets-icon-1.png" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/>
+```
+
+## Inline Images
+
+Sometimes you need to show a small piece of the UI — a tiny button, a badge, a glyph — that isn't available in the icon font. In those cases, use a regular image, but with a small bit of inline styling so the image sits naturally inside the sentence instead of jumping to its own line:
+
+```mdx
+<img src="/images/kb/example-glyph.png" alt="Example glyph" style={{height: '1.2em', display: 'inline', verticalAlign: 'start', margin: '0'}}/>
+```
+
+The `height` value controls how big the image appears relative to the surrounding text. Use these defaults:
+
+- **`'1.2em'` to `'1.6em'`** — matches the size of normal body text. This is the right choice most of the time.
+- **`'2em'`** — for inline images that sit inside a header, or that serve as a row label in a table cell.
+- **A plain number, such as `111`** — for screenshots inside a table cell where you want a specific pixel size.
+
+Keep the other three style values — `display: 'inline'`, `verticalAlign: 'start'`, and `margin: '0'` — the same across every inline image. They're what keep the image aligned with the text baseline and prevent extra vertical space from creeping in.
 
 ## Callouts
 
@@ -302,6 +392,38 @@ Do not use `<br/>` between multiple callout elements (`<Note>`, `<Warning>`, `<T
 
 For a table within a table, write the inner table as HTML and embed it inside the outer table cell. This renders correctly when published.
 
+**HTML tables**
+
+Prefer pipe tables. Use raw HTML tables only when pipe tables can't express what you need (rowspan/colspan, multi-line cell content with block elements, nested tables, or content migrated from a source that already shipped HTML).
+
+When an article does contain an HTML table, keep each `<tr>` on its own line, and put `<table>`, `<thead>`, `<tbody>`, and their closing tags on their own lines too. Many migrated articles collapse the entire table onto one line — this exceeds VS Code's default syntax-highlighting threshold (20,000 chars per line), so the table renders as a single unhighlighted blob and is hard to diff. When you touch one of these tables, normalize it.
+
+Also place data rows inside `<tbody>`. If the data rows are left inside `<thead>` (another migration artifact), browsers vertically center-align the cells, breaking the visual rhythm of the surrounding tables.
+
+**Correct:**
+
+```
+<table border="1" cellpadding="1" cellspacing="1">
+<thead>
+<tr><th><p> Column 1 </p></th><th><p> Column 2 </p></th></tr>
+</thead>
+<tbody>
+<tr><td><p> Row 1 cell 1 </p></td><td><p> Row 1 cell 2 </p></td></tr>
+<tr><td><p> Row 2 cell 1 </p></td><td><p> Row 2 cell 2 </p></td></tr>
+</tbody>
+</table>
+```
+
+**Incorrect (single line, data rows in `<thead>`):**
+
+```
+<table border="1" cellpadding="1" cellspacing="1"><thead><tr><th><p> Column 1 </p></th><th><p> Column 2 </p></th></tr><tr><td><p> Row 1 cell 1 </p></td><td><p> Row 1 cell 2 </p></td></tr></thead></table>
+```
+
+**Images in table cells**
+
+Do not use `<Frame>` inside table cells — its block-level chrome and auto-sizing fight the cell width and break the layout. Use a native inline `<img>` (see *Inline images*) instead, regardless of the image size. If a screenshot is too large to read at inline sizes, link out to a separate article or place the screenshot outside the table.
+
 ## Code
 
 Inline code: wrap with a single backtick — `` `your code here` ``
@@ -326,7 +448,7 @@ Use this sparingly. Hidden comments accumulate over time and clutter the reposit
 | --------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
 | Bold            | Use bold when referring to static interface elements such as fields, menus, static menu options (in other words, those not dynamically populated based on user settings or selections), buttons and icons, and the like. If referring to a series of items to select, separate items with “>” and do not bold the >. | Select **Admin Settings** > **Security** > **Whitelist**.                                                                   |
 | Italics         | Use italics when referring to variables that users will fill in with their own data.                                                                                                                                                                                                                                 | Enter the URL as _mydomo_.domo.com, in which _mydomo_ refers to your company Domo instance.                                 |
-| Quotation Marks | Use quotation marks to reference on-screen text not used specifically as an interface element. Also used to reference DataSet columns and ETL actions.                                                                                                                                                               | Select the orange button to the right of the text reading "Click here to save your progress."                               |
+| Quotation Marks | Use quotation marks to reference on-screen text not used specifically as an interface element. Also used to reference DataSet columns and ETL actions.                                                                                                                                                               | Select the orange button to the right of the text reading "Select here to save your progress."                               |
 | Code Style      | Use a Code style to set apart code snippets on their own line.                                                                                                                                                                                                                                                       | Enter the file path of the Microsoft Word file you want to import on the SFTP server. For example: `/home/user/MyFile.docx` |
 
 **Punctuation and bold: two exceptions**

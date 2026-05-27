@@ -27,6 +27,13 @@ When complete, check the box.
 - [x] **AddingShapeToCanvas** — `images/kb/workflows-adding-shape-to-canvas.png` *(embedded; shows the Add-action menu with Automated Tasks / User Task / Flow Controls / AI Agent Task categories)*
 - [x] **ConnectingSteps** — `images/kb/workflows-connecting-steps.png` *(embedded; shows ports and a connecting line being drawn between Forecasting Data and Send Email Notification)*
 
+### ✅ Workflows: Add Comments — `s/article/000005331.mdx`
+
+[Asana task](https://app.asana.com/0/0/1212495691952901/f) · New sub-section added under Design Your Workflow › Add Comments (EN + JA) on 2026-05-27. Source docx + screenshots provided by Ryan Despain.
+
+- [x] **Add Comment button location** — `images/kb/workflows-add-comment-button.png` *(embedded; sourced from .asana-cache/1212495691952901/Comment_Option_Location.png — shows the canvas with a green arrow pointing at the Add Comment icon above the zoom controls)*
+- [x] **Comment box with formatting toolbar** — `images/kb/workflows-comment-box.png` *(embedded; sourced from .asana-cache/1212495691952901/CommentBox.png — shows an example comment box on the canvas with formatting toolbar and a visual connection to a Get Execution Details step)*
+
 ### ✅ Access Scheduled Reports dropdown — `s/article/360043437773.mdx`
 
 [Asana task](https://app.asana.com/0/0/1211443299710978/f) · Feature is already deployed to all customers. Surrounding prose describes the dropdown generically because the option names were not confirmed in the task body.

@@ -76,6 +76,7 @@ This activates a `post-merge` hook that warns you when a `git pull` leaves track
 ||SKILL||ALWAYS USE FOR||
 |kb-intake|Interviewing the user to gather information that is important to writing a good KB document|
 |new-kb-article|Drafting a new KB article following Domo's style guide and template. This skill calls the kb-intake skill|
+|new-overview-article|Drafting a product or feature Overview article (the "What is X" landing page that explains a feature conceptually and clusters links to deeper how-tos). Distinct from `new-kb-article` — handles title-collision checks against legacy "X Overview" articles, link-cluster structure, and nav placement|
 |add-to-nav|Adding a page to docs.json navigation or moving an existing page to a different location in docs.json|
 |update-kb-article|Any update to an existing KB article: renames, content edits, image swaps, content removal, file path updates, cross-file changes, step/process edits, navigation moves, merges, or splits|
 |mintlify-design|Mintlify component/page-design expert: choosing components, composing custom layouts, building rich pages, "is there a component for X" questions, or authoring reusable snippets in `/snippets/`|

@@ -1,6 +1,6 @@
 ---
 name: release-notes
-description: Generate user-friendly release notes by diffing the latest git tag against the previous tag and summarizing the changes. Use when the user asks to "generate release notes", "write release notes for the latest release", "summarize the latest release", or similar. Saves a shareable text file to `releaseNotes/`.
+description: Generate user-friendly release notes by diffing the latest git tag against the previous tag and summarizing the changes. Use when the user asks to "generate release notes", "write release notes for the latest release", "summarize the latest release", or similar. Saves a shareable MDX file to `releaseNotes/`.
 ---
 
 # Release Notes Generator
@@ -89,33 +89,45 @@ Worked example (Cloud Integrations Overhaul, v2.4.0):
 
 ### 6. Write the file
 
-Save to `releaseNotes/v<version>.txt` (plain text, not MDX — this is meant to be copy/pasted into email or Slack).
+Save to `releaseNotes/v<version>.mdx`. The file is MDX so it renders cleanly when viewed in the repo or pasted into Mintlify, but it's also written to read well when copy/pasted into email or Slack — keep prose plain and avoid Mintlify-only components (no `<Frame>`, `<Note>`, `<Accordion>`, etc.).
 
 Follow this structure:
 
-```
+````mdx
+---
+title: "Domo Documentation Hub v<X.Y.Z> Release Notes"
+---
+
 Hello everyone!
 
-We're excited to announce that version <X.Y.Z> of the Domo Documentation Hub is now available! <one-sentence framing of the release's overall theme> You can view these changes in our knowledge base at www.domo.com/docs.
+We're excited to announce that version <X.Y.Z> of the Domo Documentation Hub is now available! <one-sentence framing of the release's overall theme> You can view these changes in our knowledge base at [www.domo.com/docs](https://www.domo.com/docs).
 
+## 🌟 What's New
 
-🌟 What's New
+### <emoji> <Theme Title>
 
-<emoji> <Theme Title>
 <1–3 sentences describing the change and its value.>
+
 Thanks to <Contributor> for <brief reason>.
 
-<repeat for each theme>
+<repeat `###` block for each theme>
 
-
-🙏 Thank You
+## 🙏 Thank You
 
 A heartfelt thank you to everyone who contributed to this release. <one warm closing sentence>
 
 If you have questions or feedback, please reach out — we're always happy to help!
-```
+````
 
-Keep tone warm and appreciative. Use bullets (`  •`) for sub-lists inside a theme when listing many discrete items.
+Formatting rules:
+
+- YAML frontmatter with a `title` field is required.
+- Top-level sections use `##`; per-theme headings use `###`. The emoji stays inline in the heading.
+- Use markdown `-` bullets (not `•`) for sub-lists inside a theme.
+- Links use markdown syntax `[anchor](https://www.domo.com/docs/...)` — never bare URLs in prose (the intro `www.domo.com/docs` mention is the one exception and should also be linkified).
+- Leave a blank line between paragraphs, between a paragraph and a list, and between consecutive headings — MDX rendering needs the breathing room.
+
+Keep tone warm and appreciative.
 
 ### 7. Confirm
 

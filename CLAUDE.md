@@ -79,6 +79,16 @@ See `Domo-KB-Style-Guide.mdx` for full standards. Key points:
 
 Use `New-Article-Template.mdx` as the starting point for new KB articles.
 
+## Local Setup
+
+After cloning, run this once to enable the repo's git hooks:
+
+```bash
+git config core.hooksPath .githooks
+```
+
+This activates a `post-merge` hook that warns you when a `git pull` leaves tracked files missing from your working tree — a known failure mode on case-insensitive filesystems (macOS APFS, Windows NTFS) after commits that rename case-colliding files. The hook prints the one-liner needed to restore them; it does not mutate your working tree.
+
 ## Skills
 
 ||SKILL||ALWAYS USE FOR||

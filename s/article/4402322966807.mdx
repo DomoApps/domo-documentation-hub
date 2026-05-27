@@ -5,283 +5,364 @@ excerpt: "Set up Cloud Amplifier to connect Domo directly to Snowflake with read
 
 ## Intro
 
-Cloud Amplifier enables you to connect Domo directly to your Snowflake data—without requiring data movement. Your data remains governed and secure in Snowflake, while Domo provides you with powerful tools to explore, transform, and visualize it. This guide walks you through setting up the integration, including read/write access and [OAuth configuration](#configure-oauth).
+Cloud Integrations let you connect Domo directly to your Snowflake data—without moving it. Your data stays governed and secure in Snowflake, while Domo gives you powerful tools to explore, transform, and visualize it. Use this guide to set up the integration, including read/write access and OAuth configuration.
 
----
-
-<Note>**Note:** Magic ETL leverages the Snowflake Cloud Amplifier integration, allowing you to effortlessly transform your data within Snowflake. Learn about [Magic ETL on Snowflake](/s/article/000005455).</Note>
-
----
+<Note>**Note:** Magic ETL uses the Snowflake Cloud Integration, allowing you to transform your data directly in Snowflake. Learn about [Magic ETL on Snowflake](/s/article/000005455).</Note>
 
 ## Architectural Overview
-
-This image represents the integration between Cloud Amplifier and Snowflake.
 
 <Frame>![Screenshot](/images/kb/0EMVq00000DTRAD.jpg)</Frame>
 
 ## Prerequisites
 
-Cloud Amplifier setup consists of two parts: Read-only or Read/Write.
+A Snowflake Cloud Integration setup consists of two parts: read-only or read/write.
 
-After the Read-only setup is complete, you may begin using virtual tables that read from Snowflake to create cards, set up Alerts, or serve as inputs in Magic ETL flows. You can set up read-only and return later to set up the Write portion.
+After the read-only setup is complete, you may begin using virtual tables that read from Snowflake to create cards, set up Alerts, or serve as inputs in Magic ETL flows. You can set up read-only and return later to set up the write portion.
 
-Before setting up the Snowflake connection, we strongly recommend that you complete the following:
+Before setting up the Snowflake connection, complete the following:
 
-- **Create a Snowflake service account** **—** We recommend creating a new Snowflake account specifically for this integration. You can use any account with read access in Snowflake, but a service account is best practice. This account must have read access to your default Snowflake environment in order to create virtual Snowflake tables in Domo.
-- **(Recommended) Create a Domo service account —** We recommend creating a new Domo account specifically for this integration. The account role must have the **Manage Cloud Accounts** and **Manage DataSet** grants enabled.
+1. **Create a Snowflake service account** — Create a new Snowflake account specifically for this integration. This account must have read access to your default Snowflake environment in order to create virtual Snowflake tables in Domo. For the required permissions, see [Snowflake Minimum Permissions for Domo](/s/article/Snowflake-Minimum-Permissions-for-Domo).
+2. (Optional) **Create a Domo service account** — Create a new Domo account specifically for this integration. The account role must have the **Manage Cloud Accounts** and **Manage DataSet** grants enabled.
 
-For more information about roles and grants, refer to our article on [Managing Custom Roles](/s/article/360043438973).
+For more information about roles and grants, see [Managing Custom Roles](/s/article/360043438973).
 
-## Account Creation — Write
+### Account Creation — Write
 
-Before registering with Cloud Amplifier for the Write portion of the setup, you must complete the following:
+Before registering a Snowflake Cloud Integration for the write portion of the setup, you must complete the following:
 
-- **(Required) Create a default Snowflake database —** You need a Snowflake database that is exclusively for Domo to write Domo-managed tables. During setup, this database is the default.
+1. **Create a default Snowflake database** — You need a Snowflake database that is exclusively for Domo to write Domo-managed tables. During setup, this database is the default.
 
-<Note>**Note:** You can configure access to multiple databases if needed, either now or later.</Note>
+   <Note>**Note:** Any tables not managed by Domo in this database will not be seen by the Snowflake Cloud Integration.</Note>
 
-- **(Conditional) Place IP Addresses on an allowlist —** If your Snowflake environment restricts access based on IP address, you may need to place Domo IPs on an allowlist.
+2. (Conditional) **Place IP Addresses on an allowlist** — If your Snowflake environment restricts access based on IP address, place Domo IPs on an allowlist.
 
-For more information, see our article about [Allow Domo IP Addresses for Network Connections](/s/article/360043630093).
+For more information, see [Allow Domo IP Addresses for Network Connections](/s/article/360043630093).
 
-<Warning>**Important:** During the write setup process, you are provided with SQL statements to create the integration. These statements must be executed against your Snowflake environment by a Snowflake administrator with the ACCOUNTADMIN role.</Warning>
+<Warning>
+  **Important:** During the write setup process, Domo provides SQL statements to create the integration. These statements must be executed against your Snowflake environment by a Snowflake administrator with the `ACCOUNTADMIN` role.
 
-This is a Snowflake requirement and prevents the need to manage your Snowflake administrator credentials within Domo, which is especially important in larger organizations where your Snowflake administrator may not have Domo access. After the integration is established, you no longer need a Snowflake administrator account.
+  This is a Snowflake requirement that removes the need to store your Snowflake administrator credentials in Domo, which is especially important in larger organizations where your Snowflake administrator may not have Domo access. After the integration is established, you no longer need a Snowflake administrator account.
+</Warning>
 
-## Create or Manage your Snowflake Integrations
+## Create or Manage Your Snowflake Integrations
 
-To access the integration management interface, please follow these steps:
+To access the integration management interface:
 
-1. Navigate to the "**Data Warehouse**"
-2. Select "**Connect Data**"
-3. Choose "**Snowflake**" from the list of Cloud Integrations.
-4. The Domo on Snowflake page appears. Selecting **Connect Snowflake** initiates the process to create a new integration (refer to Integration Setup instructions on this page), while choosing **Manage Integrations** allows for modifications to existing integrations.
-5. A list of available integrations will be displayed. By clicking the wrench icon, you will see different options based on your access level.
+1. Navigate to **Data Warehouse**.
+2. Select **Connect Data**.
+3. Select **Snowflake** from the list of Cloud Integrations.
 
-<Frame>![Screenshot](/images/kb/0EMVq00000DTR8b.jpg)</Frame>
+<Frame>
+  <img src="/images/kb/domo-on-snowflake-01.png" alt="Screenshot" />
+</Frame>
 
-## Create a Snowflake Integration
+4. The Domo on Snowflake page appears.
+   - To create a new integration, select **Connect Snowflake** and continue to [Create a Snowflake Integration](#create-a-snowflake-integration).
+   - To modify an existing integration, select **Manage Integrations**. The Snowflake cloud integrations list appears. Select the wrench icon next to an integration to see management options based on your access level.
 
-1. **Name your integration**  
-   Choose a label to identify this Snowflake integration in Domo. It doesn't need to match anything in Snowflake and can be changed later.
-2. **Add a description (optional)**  
-   Helps others understand the purpose of the integration. This is only visible in the integration details.
-3. **Select or create a Snowflake service account**  
-   Choose an existing account or click “Add account” to create a new one. This account authenticates to Snowflake and determines access to tables.
+<Frame>
+  <img src="/images/kb/domo-on-snowflake-23.png" alt="Screenshot" />
+</Frame>
 
-<Note>**Note:** Changing the service account later may require remapping DataSets or ETLs if access differs.</Note>
+<Frame>
+  <img src="/images/kb/domo-on-snowflake-19.png" alt="Screenshot" />
+</Frame>
 
-<Frame>![Screenshot](/images/kb/0EMVq00000DTR29.jpg)</Frame>
+### Create a Snowflake Integration
 
-4. **Choose a Snowflake warehouse**  
-   Select the warehouse to use for querying data. You can assign multiple warehouses later for optimization or specific use cases.
+<Frame>
+  <img src="/images/kb/domo-on-snowflake-04.png" alt="Screenshot" />
+</Frame>
 
-<Frame>![Screenshot](/images/kb/0EMVq00000DTR0X.jpg)</Frame>
+1. In the **Name** field, enter a label to identify this Snowflake integration in Domo.\
+   The name doesn't need to match anything in Snowflake and can be changed later.
 
-## Create a Snowflake Account
+2. (Optional) In the **Description** field, enter a description to help others understand the purpose of the integration.\
+   This is only visible in the integration details.
 
-Every Snowflake integration in Domo relies on an authenticated Snowflake service account. Once created, a single service account can be reused across multiple integrations.
+3. Select an existing Snowflake service account, or select **Add account** to create a new one.\
+   This account authenticates to Snowflake and determines access to tables. For guidance on creating a service account, see [Creating a Snowflake Account](#creating-a-snowflake-account).
+
+<Frame>
+  <img src="/images/kb/domo-on-snowflake-05.png" alt="Screenshot" />
+</Frame>
+
+4. Select the warehouse to use for querying data.\
+   You can assign multiple warehouses later for optimization or specific use cases.
+
+<Frame>
+  <img src="/images/kb/domo-on-snowflake-06.png" alt="Screenshot" />
+</Frame>
+
+5. Select **Finish Setup**. When the integration is created successfully, a confirmation screen appears.
+
+<Frame>
+  <img src="/images/kb/domo-on-snowflake-07.png" alt="Screenshot" />
+</Frame>
+
+## Creating a Snowflake Account
+
+Every Snowflake integration in Domo relies on an authenticated Snowflake service account. After you create a service account, you can reuse it across multiple integrations.
 
 To create a Snowflake service account in Domo:
 
-1. **Name the Account**  
-   Choose a name to identify the Snowflake service account within Domo. This name can be changed later.
+1. In the **Name** field, enter a name to identify the Snowflake service account within Domo.\
+   This name can be changed later.
 
 <Tip>**Tip:** Use a clear and distinct name to differentiate between multiple service accounts and integrations.</Tip>
 
-2. **Enter the Snowflake Account Identifier**  
-   This is typically a subdomain of snowflakecomputing.com. You can find it in Snowflake under **Account > View Account Details**. Refer to [https://docs.snowflake.com/en/user-guide/admin-account-identifier](https://docs.snowflake.com/en/user-guide/admin-account-identifier) for help.
-3. **Choose an Authentication Method**  
-   Select one of the following:
-   - Add the public key to your Snowflake user:  
-       
-     `ALTER USER "<username>" SET RSA_PUBLIC_KEY='<public_key>'`  
-     `Replace <username> and <public_key> with your actual values.`
+2. In the **Account Identifier** field, enter your Snowflake account identifier.\
+   This is typically a subdomain of snowflakecomputing.com. You can find it in Snowflake under **Account > View Account Details**. See the [Snowflake account identifier documentation](https://docs.snowflake.com/en/user-guide/admin-account-identifier) for help.
 
-- **Key Pair (Recommended)**  
-  Snowflake is phasing out single-factor password sign-ins. Key-pair authentication is more secure and future-proof. See their [security MFA rollout](https://docs.snowflake.com/en/user-guide/security-mfa-rollout) and [key pair auth](https://docs.snowflake.com/en/user-guide/key-pair-auth)documentation.
+3. Select your authentication method:
 
-- Upload your private key file (.p8 format).
-- Optionally, enter the passphrase if your key pair includes one.
+   * **Key Pair (Recommended)**\
+     Snowflake is phasing out single-factor password sign-ins. Key-pair authentication is more secure and future-proof. See their [security MFA rollout](https://docs.snowflake.com/en/user-guide/security-mfa-rollout) and [key pair auth](https://docs.snowflake.com/en/user-guide/key-pair-auth) documentation.
 
-- **Username & Password**  
-  Enter your Snowflake username and password.
+     Add the public key to your Snowflake user:
 
-3. **Set the Snowflake Role (Optional)**  
-   You may override the default role assigned to this service account.
+     ```sql
+     ALTER USER "<username>" SET RSA_PUBLIC_KEY='<public_key>'
+     ```
 
-<Frame>![Screenshot](/images/kb/0EMVq00000DTR6z.jpg)</Frame>
+     Replace *username* and *public_key* with your actual values.
 
-## Enable Snowflake Writeback
+     In the **Private Key** field, upload your private key file (.p8 format).
 
-If your goal is to use Domo to write data back to Snowflake—for example, as a Magic ETL output—then enabling writeback is the right step. This configuration allows Domo to create and update tables in your Snowflake instance using the associated Snowflake service account.
+     Optionally, enter the passphrase if your key pair includes one.
 
-<Note>**Note:** Writeback is optional. Many integrations are read-only. Even when writeback is enabled, access must be explicitly granted to individuals or groups. Basic access does not automatically include write-back privileges.</Note>
+<Frame>
+  <img src="/images/kb/domo-on-snowflake-08.png" alt="Screenshot" />
+</Frame>
 
-You can manage access levels on the accounts page by selecting “Account sharing” next to the relevant Snowflake service account.
+   * **Username & Password**\
+     Enter your Snowflake username and password.
 
-**Prerequisites**
+<Frame>
+  <img src="/images/kb/domo-on-snowflake-09.png" alt="Screenshot" />
+</Frame>
 
-A Snowflake administrator (or someone with equivalent privileges) must be available to execute SQL queries that create a dedicated database and grant access to the service account.
+4. (Optional) In the **Default Role** field, enter the Snowflake role to assign to this service account.\
+   If left blank, Snowflake applies the default role configured for the user in Snowflake.
 
-**Step-by-Step Setup**
+## Configure Write & Native Transform
 
-1. **Specify the Snowflake Database**  
-   Choose the default database where Domo will write data.
-2. **Specify the Snowflake Schema**  
-   Define the default schema for data output. If it doesn't exist, Domo will create it when selected in Magic ETL.
+To write data from Domo connectors to Snowflake, or run Magic ETL DataFlows directly in Snowflake, enable one or both of the following capabilities:
 
-<Tip>**Tip:** Users can select other databases/schemas in Magic ETL, but the service account must have the necessary grants.</Tip>
+* **Write to Snowflake from connectors** — Allows Domo to create and update tables in Snowflake using data loaded through connectors.
+* **Execute Magic ETL transformations natively** — Runs Magic ETL DataFlows directly in Snowflake rather than in Domo's execution environment.
 
-3. **Enter the Default Role**  
-   Provide the name of the Snowflake role assigned to the service account.
+Both capabilities are optional. Many integrations are read-only. Even when write or transform is enabled, access must be explicitly granted to individuals or groups. Basic access does not automatically include write or transform privileges.
 
-<Frame>![Screenshot](/images/kb/0EMVq00000DTR5N.jpg)</Frame>
+You can manage access levels on the accounts page by selecting **Account sharing** next to the relevant Snowflake service account.
 
-4. **Generate and Execute SQL**  
-   A Snowflake user with the ACCOUNTADMIN role should run the generated SQL to:
+### Prerequisites
+
+A Snowflake administrator (or someone with equivalent privileges) must be available to execute SQL queries that create a dedicated database and grant access to the service account. For the minimum permissions required and the SQL to configure them, see [Snowflake Minimum Permissions for Domo](/s/article/Snowflake-Minimum-Permissions-for-Domo).
+
+### Setup
+
+From your integration's settings page, navigate to **Write & transform** and select **Set up write & transform**.
+
+<Frame>
+  <img src="/images/kb/domo-on-snowflake-10.png" alt="Screenshot" />
+</Frame>
+
+The Configure Write & Native Transform dialog appears.
+
+1. Toggle on the capabilities you want to enable:
+   * **Write to Snowflake from connectors**
+   * **Execute Magic ETL transformations natively**
+
+2. Select the default **Database** and **Schema** where Domo will write data.\
+   If the schema doesn't exist, Domo creates it when selected in Magic ETL.
+
+<Tip>**Tip:** You can select other databases and schemas in Magic ETL, but the service account must have the necessary grants.</Tip>
+
+<Frame>
+  <img src="/images/kb/domo-on-snowflake-24.png" alt="Screenshot" />
+</Frame>
+
+3. In the **Default Role** field, enter the Snowflake role Domo will use for write and transform operations.\
+   Domo uses this role to generate the SQL in the next step.
+
+<Frame>
+  <img src="/images/kb/domo-on-snowflake-25.png" alt="Screenshot" />
+</Frame>
+
+4. Have a Snowflake user with the `ACCOUNTADMIN` role run the generated SQL to:
+   * Create the write-back database
+   * Grant access to the service account
+   * Create a DOMO\_UTIL schema for Domo-managed resources
 
 <Note>**Note:** You can configure access to multiple databases if needed, either now or later.</Note>
 
-- - Create the write-back database
-  - Grant access to the service account
-  - Create a DOMO\_UTIL schema for Domo-managed resources (e.g., fiscal calendar)
+5. In the **Temporary artifact storage** field, specify the database Domo will use for temporary storage during native transform execution.\
+   This can be the same database selected in step 2, or a separate database if you prefer to isolate temporary artifacts.
 
-5. **Confirm Authorization**  
-   Finalize the setup by confirming that Domo is authorized to create, alter, and delete objects in Snowflake using the service account.
+<Frame>
+  <img src="/images/kb/domo-on-snowflake-26.png" alt="Screenshot" />
+</Frame>
 
-<Frame>![Screenshot](/images/kb/0EMVq00000DTR3l.jpg)</Frame>
+6. On the **Finalize Write & Native Transform Integration** page, review the permissions Domo requires.\
+   Select **I understand that Domo can make changes to my Snowflake environment**, then select **Done**.
+
+<Frame>
+  <img src="/images/kb/domo-on-snowflake-28.png" alt="Screenshot" />
+</Frame>
+
+Once setup is complete, the integration's settings page shows **Write** and **Native Transform** as enabled.
+
+<Frame>
+  <img src="/images/kb/domo-on-snowflake-29.png" alt="Screenshot" />
+</Frame>
 
 ## Configure OAuth
 
-OAuth allows Domo to query Snowflake data in the context of individual users rather than a shared service account. When enabled, users accessing cards or previewing DataSets connected via OAuth will be prompted to authenticate with their Snowflake credentials.
+OAuth allows Domo to query Snowflake data in the context of individual users rather than a shared service account, and is optional. When enabled, users accessing cards or previewing DataSets connected via OAuth will be prompted to authenticate with their Snowflake credentials.
 
-<Note>**Note:** OAuth applies only to reading data from Snowflake. Operations like Magic ETL, write-back, and native transform continue to use the Snowflake service account.</Note>
+<Note>**Note:** OAuth applies only to reading data from Snowflake. Other operations — including Magic ETL, write-back, and native transform — continue to use the Snowflake service account regardless of OAuth configuration.</Note>
 
-OAuth is optional. Without it, Domo can still read from and write to Snowflake using the service account.
-
-**Prerequisites**
+### Prerequisites
 
 A Snowflake administrator (or someone with equivalent privileges) must first configure a security integration in Snowflake.
 
-**Configure OAuth in Snowflake**
+### Configure OAuth in Snowflake
 
-1. **Define the Security Integration** Modify and run the following query in Snowflake:  
-     
-   `create or replace security integration <name_goes_here>`  
-   `type = oauth`  
-   `enabled = true`  
-   `oauth_client = custom`  
-   `oauth_client_type = 'CONFIDENTIAL'`  
-   `oauth_redirect_uri = 'https://oauth.domo.com/api/data/v1/oauth/providers/snowflake-oauth/exchange'`  
-   `oauth_issue_refresh_tokens = true`  
-   `oauth_refresh_token_validity = 86400;`
-2. **Set Integration Name** Replace `<name_goes_here>` with a meaningful name. This name is used in subsequent queries.
-3. **Set Token Duration** Choose how long refresh tokens remain valid:
-   - 1 day = 86400 seconds
-   - Max = 7776000 seconds (90 days)
-   - Min = 3600 seconds (1 hour)
+1. In Snowflake, modify and run the following query to define the security integration.\
+   Replace *name_goes_here* with a meaningful name — this name is used in subsequent queries.
 
-4. **Verify Integration** Run: `desc security integration <name_goes_here>;`
-5. **Retrieve Client ID and Secret** Run: `select system$show_oauth_client_secrets('<name_goes_here>');`
-6. **Copy Values** Save the client ID and secret for use in Domo.
+   ```sql
+   create or replace security integration <name_goes_here>
+   type = oauth
+   enabled = true
+   oauth_client = custom
+   oauth_client_type = 'CONFIDENTIAL'
+   oauth_redirect_uri = 'https://oauth.domo.com/api/data/v1/oauth/providers/snowflake-oauth/exchange'
+   oauth_issue_refresh_tokens = true
+   oauth_refresh_token_validity = 86400;
+   ```
 
-**Configure OAuth in Domo**
+2. Update `oauth_refresh_token_validity` to set how long refresh tokens remain valid:
+   * 1 day = 86400 seconds
+   * Max = 7776000 seconds (90 days)
+   * Min = 3600 seconds (1 hour)
 
-7. **Enter Snowflake Account Identifier** Typically a subdomain of snowflakecomputing.com. You can find it under **Account** > **View Account Details** in Snowflake.
-8. **Enter Client ID and Secret** Paste the values retrieved in Step 6.
-9. **Set Primary Role** Choose the Snowflake role to apply to all Domo users.
-10. **Connect** Select “Connect” and sign in using your Snowflake credentials.
-11. **Allow Access** Review the requested permissions and click “Allow” to complete the setup.
+3. Run the following query to verify the integration:
 
-<Frame>![Screenshot](/images/kb/0EMVq00000DTQyv.jpg)</Frame>
+   ```sql
+   desc security integration <name_goes_here>;
+   ```
 
-## Troubleshoot
+4. Run the following query to retrieve the client ID and secret:
 
-If you experience a problem with your Cloud Amplifier/Snowflake integration, the following information may help resolve the issue. You can also submit a request to [Domo Support](https://domo-support.domo.com/)[<img alt="" src="/images/kb/0EMVq00000DTPJi.jpg" style={{width: 14, height: 14, display: 'inline', verticalAlign: 'start', margin: '0'}}/>](https://docs.snowflake.com/en/user-guide/key-pair-auth).
+   ```sql
+   select system$show_oauth_client_secrets('<name_goes_here>');
+   ```
 
-**Missing Tables**
+5. Copy the client ID and secret for use in Domo.
 
-If you cannot find tables that your account has access to, ensure the table is materialized. Transient or Temporary tables on the Snowflake side cannot be used to create DataSets through Cloud Amplifier.
+### Configure OAuth in Domo
 
-**Setup Problems**
+From your integration's settings page, navigate to **OAuth** and select **Set up OAuth**. Select **Add OAuth Config...** to create a new OAuth configuration.
 
-If you have problems setting up your Cloud Amplifier/Snowflake integration, follow the steps below:
+<Frame>
+  <img src="/images/kb/domo-on-snowflake-12.png" alt="Screenshot" />
+</Frame>
 
-**Check Snowflake Service Account**
+1. In the **Name** field, enter a name to identify this OAuth configuration within Domo.
 
-1. Log in to Snowflake with the service account credentials.
-2. Ensure you can view the default Snowflake Database and query the tables you expect to import.
+2. In the **Account Identifier** field, enter your Snowflake account identifier.\
+   You can find it under **Account** > **View Account Details** in Snowflake.
 
-**Assign Correct Role**
+3. In the **Client ID** and **Client Secret** fields, paste the values retrieved from Snowflake.
 
-Ensure that a Snowflake administrator with the ACCOUNTADMIN role executes the SQL provided by Domo in Snowflake.
+4. In the **Primary Role** field, select the Snowflake role to apply to all Domo users.
 
-**Use the Correct URL**
+<Frame>
+  <img src="/images/kb/domo-on-snowflake-13.png" alt="Screenshot" />
+</Frame>
 
-Make sure that the Snowflake connection URL in Domo matches the Snowflake login URL.
+5. Select **Connect**, then sign in using your Snowflake credentials.
 
-You can find the URL on the Snowflake login page. The URL will be in this format: *instancename.region.*snowflakecomputing.com.
+6. Review the requested permissions and select **Allow** to complete the setup.
 
 ## FAQ
 
 <AccordionGroup>
+  <Accordion title="What is the guidance around warehouse configuration in Snowflake for Cloud Integrations?">
+    Domo performs different activities within the Snowflake account, such as data loading, querying, and data transformation. For most use cases, a small-sized multi-cluster warehouse (multi-purpose for load, query, and transformation) set to scale up automatically is recommended. You can choose the max cluster size to put an upper bound on scaling and limit the cost envelope.
 
-<Accordion title="How do I use data transformation on my Snowflake data?">
+    When you are ready for production workloads and are considering whether to use existing functional warehouses or set up new warehouses for the Domo integration, see the [Domo blog post on optimizing a Snowflake Cloud Integration](https://www.domo.com/blog/how-to-optimize-data-warehouse-strategy-with-cloud-amplifier).
+  </Accordion>
 
-With your data in Snowflake, Domo supports two different mechanisms for transforming data:
+  <Accordion title="How do I use data transformation on my Snowflake data?">
+    With your data in Snowflake, Domo supports two different mechanisms for transforming data:
 
-1. **DataSet Views** — DataSet Views provide the Views Explorer tool to create data transformations on your Snowflake DataSets. You can perform operations such as filtering, grouping/aggregation, JOINs, UNIONs, and creating calculated columns from a graphic user interface. DataSet Views are created as virtual DataSets, with queries sent back to the parent DataSets.
+    1. **DataSet Views** — DataSet Views provide the Views Explorer tool to create data transformations on your Snowflake DataSets. You can perform operations such as filtering, grouping, aggregation, `JOIN`s, `UNION`s, and creating calculated columns from a graphic user interface. DataSet Views are created as virtual DataSets, with queries sent back to the parent DataSets.
 
-   <Note>**Note:** Creating a DataSet View in Domo does not create a View (normal or materialized) in Snowflake. The View definition is stored in Domo, and the resulting query is sent to Snowflake table(s) when needed.</Note>
+       <Note>**Note:** Creating a DataSet View in Domo does not create a View (normal or materialized) in Snowflake. The View definition is stored in Domo, and the resulting query is sent to Snowflake table(s) when needed.</Note>
 
-2. **Magic ETL DataFlows** — Magic ETL is supported with Domo running on Snowflake Cloud Data Warehouse (CDW). Using Magic ETL with Snowflake data results in data being exported from Snowflake to Magic ETL in a transient state, processed, and written back to Snowflake. Note that Domo only operates on this data in a transient fashion and does not store DataFlow outputs in Domo. (They are sent to the Snowflake warehouse.)
+    2. **Magic ETL DataFlows** — Magic ETL is supported with Domo running on a Snowflake Cloud Integration. Using Magic ETL with Snowflake data results in data being exported from Snowflake to Magic ETL in a transient state, processed, and written back to Snowflake. Domo only operates on this data in a transient fashion and does not store DataFlow outputs in Domo. (They are sent to the Snowflake warehouse.)
 
-   <Note>**Note:** Data is cached in the Magic ETL execution environment for seven days, or the two most recent data versions from that Magic ETL execution.</Note>
+       <Note>**Note:** Data is cached in the Magic ETL execution environment for seven days, or the two most recent data versions from that Magic ETL execution.</Note>
+  </Accordion>
 
-</Accordion>
+  <Accordion title="What is the difference between Domo-managed and customer-managed Snowflake DataSets?">
+    When you connect Domo to your Snowflake account, Domo operates over two classes of databases and underlying tables. Tables you create and update directly through independent pipelines or ingestion mechanisms can be explored and registered in Domo, accessible in a read-only fashion. Domo can read and directly query these customer-managed databases.
 
-<Accordion title="What is the difference between Domo-managed and customer-managed Snowflake DataSets?">
+    Domo recommends creating a new database for read/write access. Domo uses this Domo-managed database to write data that comes in through the Domo ingestion pipeline, using the thousands of connectors available to bring data into Snowflake. Domo also uses this Domo-managed database to create outputs of data transformations (DataFlow outputs).
+  </Accordion>
 
-When you connect Domo to your Snowflake account, Domo operates over two classes of databases and underlying tables. Tables you create and update directly through independent pipelines or ingestion mechanisms can be explored and registered in Domo, accessible in a read-only fashion. Domo can read and directly query these customer-managed databases.
+  <Accordion title="How are permissions configured between Domo and Snowflake?">
+    Permissions originating in Snowflake are not programmatically passed into Domo. However, you can use Domo's native permission model and Personalized Data Permissions (PDP) for data security to manage data access to underlying assets in Snowflake.
+  </Accordion>
 
-Additionally, we recommend creating a new database in Domo for Read/Write access. Domo uses this Domo-managed database to write data that comes in through the Domo ingestion pipeline, such as with the thousands of connectors available to bring data into Snowflake. Domo also uses this Domo-managed database to create outputs of data transformations (DataFlow outputs).
+  <Accordion title="What are the differences between using connectors to create DataSets from Snowflake and using a Snowflake Cloud Integration to create DataSets?">
+    * **Leaving data in Snowflake** — The key difference is that all Snowflake connectors copy data from Snowflake into Domo, while a Snowflake Cloud Integration leaves the data in Snowflake.
+    * **Bulk create** — A Snowflake Cloud Integration lets you look up and bulk select multiple tables to immediately create multiple unique DataSets. To do this with connectors, you would have to configure each DataSet individually with a connector.
+  </Accordion>
 
-</Accordion>
+  <Accordion title="My Snowflake view DataSet shows 0 rows, and the Last update remains unchanged, even though there are rows and updates have been made. What could be causing this?">
+    This is the standard behavior for Snowflake views. Snowflake endpoints do not provide the number of rows unless the data is explicitly queried.
+  </Accordion>
 
-<Accordion title="How are permissions configured between Domo and Snowflake?">
+  <Accordion title="Snowflake is not allowing me to execute the ALTER USER statement. What am I missing?">
+    Make sure that you own the user or have the `SECURITY/ADMIN` Snowflake role.
+  </Accordion>
 
-Permissions originating in Snowflake are not programmatically passed into Domo. However, you can use Domo's native permission model and Personalized Data Permisssons (PDP) for data security to manage data access to underlying assets in Snowflake.
-
-</Accordion>
-
-<Accordion title="What are the differences between using connectors to create DataSets from Snowflake and using Cloud Amplifier to create DataSets?">
-
-- **Leaving data in Snowflake** — Perhaps the biggest difference is that all Snowflake connectors import/duplicate data from Snowflake to Domo, while Cloud Amplifier leaves the data in Snowflake.
-- **Bulk create** — Cloud Amplifier allows you to look up and bulk select up multiple tables to immediately create multiple unique DataSets. To do this with connectors, you would have to configure each DataSet individually with a connector.
-
-</Accordion>
-
-<Accordion title="My Snowflake view DataSet shows 0 rows, and the Last update remains unchanged, even though there are rows and updates have been made. What could be causing this?">
-
-This is the standard behavior for Snowflake views. Snowflake endpoints do not provide the number of rows unless the data is explicitly queried.
-
-</Accordion>
-
-<Accordion title="Snowflake is not allowing me to execute the ALTER USER statement. What am I missing?">
-
-Make sure that you own the user or have the SECURITY/ADMIN Snowflake role.
-
-</Accordion>
-
-<Accordion title="I have uploaded my private key and provided its passphrase, but I am unable to establish a connection. What could be wrong?">
-
-Follow every instruction provided in this [Snowflake documentation <img alt="" src="/images/kb/0EMVq00000DT9wU.jpg" style={{width: 14, height: 14, display: 'inline', verticalAlign: 'start', margin: '0'}}/>](https://docs.snowflake.com/en/user-guide/key-pair-auth).  Make sure that the passphrase matches the one you used to create your key-pair and that you have executed the ALTER USER statement successfully.
-
-</Accordion>
-
+  <Accordion title="I have uploaded my private key and provided its passphrase, but I am unable to establish a connection. What could be wrong?">
+    Follow the instructions in the [Snowflake key pair authentication documentation](https://docs.snowflake.com/en/user-guide/key-pair-auth). Make sure that the passphrase matches the one you used to create your key pair and that you have executed the ALTER USER statement successfully.
+  </Accordion>
 </AccordionGroup>
+
+## Troubleshooting
+
+If you experience a problem with your Snowflake Cloud Integration, the following information may help resolve the issue. You can also submit a request to [Domo Support](https://domo-support.domo.com/).
+
+### Missing Tables
+
+If you cannot find tables that your account has access to, ensure the table is materialized. Transient or Temporary tables on the Snowflake side cannot be used to create DataSets through a Snowflake Cloud Integration.
+
+### Setup Problems
+
+If you have problems setting up your Snowflake Cloud Integration, follow the steps below:
+
+#### Check Snowflake Service Account
+
+1. Log in to Snowflake with the service account credentials.
+2. Ensure you can view the default Snowflake Database and query the tables you expect to import.
+
+#### Assign Correct Role
+
+Ensure that a Snowflake administrator with the `ACCOUNTADMIN` role executes the SQL provided by Domo in Snowflake.
+
+#### Use the Correct URL
+
+Make sure that the Snowflake connection URL in Domo matches the Snowflake login URL.
+
+You can find the URL on the Snowflake login page. The URL is in this format: *instancename*.*region*.snowflakecomputing.com.
 
 ## Next Steps
 
-Now that you're integrated, learn how to use [Magic ETL on Snowflake](/s/article/000005455) or how to [create a Magic ETL DataFlow](/s/article/360055259234).
+Now that you're integrated, learn how to use [Magic ETL on Snowflake](/s/article/000005455) or how to [Create a Magic ETL DataFlow](/s/article/360055259234).

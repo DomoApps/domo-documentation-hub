@@ -335,3 +335,246 @@ After the Text Generation tile executes, it adds a column to your DataSet named 
 </Accordion>
 
 </AccordionGroup>
+
+## AI Classification Tile <Badge className="text-primary bg-primary/10 font-bold">Beta</Badge>
+
+<Note>
+  **Note:** This feature is in beta. Beta Program participants can enable
+  features [here](https://embed.domo.com/embed/pages/DQ8Ek). To join the Beta
+  Program, fill out [this form](https://embed.domo.com/embed/pages/K8GMx). For beta questions or feedback, email
+  [beta.admin@domo.com](mailto:beta.admin@domo.com).
+</Note>
+
+<Frame>![Screenshot](/images/kb/classifyTile.jpg)</Frame>
+
+Categorizes data (text, images, files) into predefined classes.
+
+Providing a tile pre-configured for Classification enables the user to
+focus on their classification entities and less on the configuration
+details.
+
+Faster and easier to configure & use than Text Generation for classification.
+
+### Required Grants
+
+To access the Text Generation tile in Magic ETL, the following grants must be enabled for your role:  
+(Learn more about [grants](/s/article/360043438973).)
+
+- Execute AutoML
+- Create AI Service Models
+- Use AI Services
+
+<Warning>
+  **Important:** You must also have AI Services enabled and the ability to
+  create a DataFlow. Learn how to [create a DataFlow](/s/article/360055259234).
+</Warning>
+
+### Configure the Classification Tile
+
+1. Open the Magic ETL canvas and choose an input DataSet that contains a text column you want to analyze. 
+
+<Warning>
+  **Important:** Due to an AWS limitation - If the DataSet you choose has less than 100 rows, the
+  system will automatically switch to non-batch mode. 
+</Warning>
+
+<Frame>![Screenshot](/images/kb/etl_classification1.jpg)</Frame>
+2. Under **AI Services** in the left drawer, drag a Classification tile to the
+canvas. The tile editor expands below the canvas.
+
+<Frame>![Screenshot](/images/kb/etl_classification2.jpg)</Frame>
+3. In the tile editor, choose the input data; Data Column or Documents.
+
+If the data you want to classify is already in a data column, select the column from the selector.
+<Frame>![Screenshot](/images/kb/etl_classification3.jpg)</Frame>
+
+If the data you want to classify is in a Document Collection, select the Document Collection ID and File Path from the selectors.
+<Frame>![Screenshot](/images/kb/etl_classification4.jpg)</Frame>
+
+4. In the tile editor, choose the AI model you want to use with the Text
+Generation tile.
+
+<Frame>![Screenshot](/images/kb/etl_classification5.jpg)</Frame>
+5. Then choose the Execution Preference.
+
+<Frame>![Screenshot](/images/kb/etl_classification6.jpg)</Frame>
+
+<Note>
+  **Note:** Batch vs. non-batch processing differ primarily in latency, cost, and use case.
+
+Batch is designed for high-volume, asynchronous processing, execution times will vary.
+Batch processing is generally more cost-effective.
+
+Non-batch is intended for more consistent execution times for a small number of rows.
+Non batch is always used when processing less than 100 rows of data.
+</Note>
+
+6. Provide the model with any additional instructions on how to analyze the column. Be very
+specific; describe exactly what you want the model to do (and not to do).
+
+<Tip>
+  **Tip:** Constructing a prompt that returns the results you need is a skill
+  that takes time and practice.
+</Tip>
+
+<Frame>![Screenshot](/images/kb/etl_classification7.jpg)</Frame>
+7. Then configure the desired output; Single Label/Multi Label. 
+Single label example: Fabric Type = Corduroy, Denim, Leather
+    Fabric Type = Denim
+
+Multiple Label example; Corduroy, Denim, Leather, Skinny, Flare one-hot encoded Boolean values
+    Corduroy=True
+    Denim=False
+    Leather=False
+    Skinny=False
+    Flare=True
+
+<Frame>![Screenshot](/images/kb/etl_classification8.jpg)</Frame>
+<Frame>![Screenshot](/images/kb/etl_classification9.jpg)</Frame>
+
+
+After the Classification tile executes, it adds a classification column or columns to your DataSet. You can use tiles farther downstream in the DataFlow to rename that column(s).
+
+**Consumption Ramifications:**
+
+- AI Operations, 1 operation per tile
+- Tokens, Input/Output tokens vary based on Prompt & Data volume processed
+
+**Notes:**
+- You can include multiple Classification tiles in the same DataFlow, tasking them with different aspects of analysis for the column (or analysis of different columns).
+
+## FAQ
+
+<AccordionGroup>
+
+<Accordion title="Can I use my own model in the Classification tile?">
+  Not currently, but this capability is on the roadmap.
+</Accordion>
+
+<Accordion title="Can you output multiple columns from a single Classification tile?">
+  Yes, you can enable Multi Label output.
+</Accordion>
+
+</AccordionGroup>
+
+## AI Sentiment Analysis Tile <Badge className="text-primary bg-primary/10 font-bold">Beta</Badge>
+
+<Note>
+  **Note:** This feature is in beta. Beta Program participants can enable
+  features [here](https://embed.domo.com/embed/pages/DQ8Ek). To join the Beta
+  Program, fill out [this form](https://embed.domo.com/embed/pages/K8GMx). For beta questions or feedback, email
+  [beta.admin@domo.com](mailto:beta.admin@domo.com).
+</Note>
+
+<Frame>![Screenshot](/images/kb/sentimentTile.jpg)</Frame>
+
+Automatically classify text (reviews, social media, surveys) as positive,
+negative, or neutral. It enables businesses to monitor brand
+reputation in real-time, improve customer service by identifying
+frustrated users, and analyze trends for better decision-making.
+
+Supported Values
+Positive, Negative, Neutral, Not Applicable
+
+Providing a tile pre-configured for Sentiment Analysis enables the
+user to focus on their topics and less on the configuration details.
+
+Faster and easier to configure & use than Text Generation for sentiment analysis.
+
+### Required Grants
+
+To access the Text Generation tile in Magic ETL, the following grants must be enabled for your role:  
+(Learn more about [grants](/s/article/360043438973).)
+
+- Execute AutoML
+- Create AI Service Models
+- Use AI Services
+
+<Warning>
+  **Important:** You must also have AI Services enabled and the ability to
+  create a DataFlow. Learn how to [create a DataFlow](/s/article/360055259234).
+</Warning>
+
+### Configure the Sentiment Analysis Tile
+
+1. Open the Magic ETL canvas and choose an input DataSet that contains a text column you want to analyze. 
+
+<Warning>
+  **Important:** Due to an AWS limitation - If the DataSet you choose has less than 100 rows, the
+  system will automatically switch to non-batch mode. 
+</Warning>
+
+<Frame>![Screenshot](/images/kb/etl_sentimentAnalysis1.jpg)</Frame>
+2. Under **AI Services** in the left drawer, drag a Sentiment Analysis tile to the
+canvas. The tile editor expands below the canvas.
+
+<Frame>![Screenshot](/images/kb/etl_sentimentAnalysis2.jpg)</Frame>
+3. In the tile editor, choose the input data; Data Column or Documents.
+
+If the data you want to analyze is already in a data column, select the column from the selector.
+If the data you want to classify is in a Document Collection, select the Document Collection ID and File Path from the selectors.
+
+<Frame>![Screenshot](/images/kb/etl_sentimentAnalysis3.jpg)</Frame>
+4. In the tile editor, choose the AI model you want to use with the Text
+Generation tile.
+
+<Frame>![Screenshot](/images/kb/etl_sentimentAnalysis4.jpg)</Frame>
+5. Then choose the Execution Preference.
+
+<Frame>![Screenshot](/images/kb/etl_sentimentAnalysis5.jpg)</Frame>
+
+<Note>
+  **Note:** Batch vs. non-batch processing differ primarily in latency, cost, and use case.
+
+Batch is designed for high-volume, asynchronous processing, execution times will vary.
+Batch processing is generally more cost-effective.
+
+Non-batch is intended for more consistent execution times for a small number of rows.
+Non batch is always used when processing less than 100 rows of data.
+</Note>
+
+6. Provide the model with any additional instructions on how to analyze the column. Be very
+specific; describe exactly what you want the model to do (and not to do).
+
+<Tip>
+  **Tip:** Constructing a prompt that returns the results you need is a skill
+  that takes time and practice.
+</Tip>
+
+<Frame>![Screenshot](/images/kb/etl_sentimentAnalysis6.jpg)</Frame>
+7. Then configure the desired output; Overall sentiment or Targeted Sentiment. 
+Overall Sentiment = Positive
+Targeted Sentiment over multiple Topics; overall, fit, durability, customer service
+
+Overall Sentiment=Positive
+Fit=Neutral
+Durability=Positive
+Customer Service=Positive
+
+<Frame>![Screenshot](/images/kb/etl_sentimentAnalysis7.jpg)</Frame>
+<Frame>![Screenshot](/images/kb/etl_sentimentAnalysis8.jpg)</Frame>
+
+
+After the Sentiment Analysis tile executes, it adds a sentiment column or columns to your DataSet. You can use tiles farther downstream in the DataFlow to rename that column(s).
+
+**Consumption Ramifications:**
+
+- AI Operations, 1 operation per tile
+- Tokens, Input/Output tokens vary based on Prompt & Data volume processed
+
+**Notes:**
+- You can include multiple Sentiment Analysis tiles in the same DataFlow, tasking them with different aspects of analysis for the column (or analysis of different columns).
+
+## FAQ
+
+<AccordionGroup>
+
+<Accordion title="Can I use my own model in the Sentiment Analysis tile?">
+  Not currently, but this capability is on the roadmap.
+</Accordion>
+
+<Accordion title="Can you output multiple columns from a single Sentiment Analysis tile?">
+  Yes, you can enable Targeted Sentiment.
+</Accordion>
+
+</AccordionGroup>

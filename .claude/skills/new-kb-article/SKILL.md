@@ -91,8 +91,24 @@ Drafting always introduces style drift. Before finalizing, do an explicit pass a
 
 ---
 
+## Step 6: Add the new article to navigation
+
+A new article file does not appear on the site until it is registered in `docs.json`. As the final step, invoke the `add-to-nav` skill to place the article in the navigation — do not edit `docs.json` by hand:
+
+- **Page path:** `s/article/Article-Title-Here`
+- **Operation:** Insert
+- **Target:** the group or subgroup that best fits the article's topic. If you are unsure where it belongs, let `add-to-nav` surface the placement options and use AskUserQuestion to confirm the location with the user.
+
+After `add-to-nav` edits `docs.json`, confirm it is still valid JSON:
+
+```bash
+python3 -c "import json; json.load(open('docs.json')); print('docs.json is valid JSON')"
+```
+
+---
+
 ## Output
 
-1. Write the completed MDX file to `s/article/Article-Title-Here.mdx`.
-2. Tell the user the file path and suggest running `/add-to-nav` to register it in `docs.json` navigation if they want it to appear on the site.
+1. Tell the user the file path of the new MDX article (`s/article/Article-Title-Here.mdx`).
+2. Confirm the article was added to `docs.json` navigation and state where it was placed.
 3. Note any sections left as placeholders (screenshots, specific grant names, etc.) that the user will need to fill in.

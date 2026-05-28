@@ -17,6 +17,7 @@ This skill is **subordinate** to the KB authoring skills. It exists to answer co
 3. **Load only the reference file(s) you need** via Read. Do not load all of them.
 4. **For prop signatures or components not listed here**, WebFetch `https://mintlify.com/docs/components` (or the specific component page) to get current syntax. Mintlify ships changes; do not trust your training data for exact prop names.
 5. **Apply Domo conventions** from this skill and from `Domo-KB-Style-Guide.mdx`.
+6. **Register any net-new page in navigation.** If your work created a brand-new standalone page file (a landing, hub, or overview page under `s/article/`, `portal/`, etc. — *not* a snippet in `/snippets/`, which is never a nav entry), invoke the `add-to-nav` skill as the final step so the page appears on the site. Do not edit `docs.json` by hand. Skip this when you only modified an existing page or authored a snippet.
 
 ---
 

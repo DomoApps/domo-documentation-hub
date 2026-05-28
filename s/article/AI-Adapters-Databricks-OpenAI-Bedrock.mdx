@@ -5,56 +5,50 @@ excerpt: "Set up Databricks, OpenAI, and Amazon Bedrock adapter accounts in the 
 
 ## Intro
 
-The Databricks, OpenAI, and Amazon Bedrock adapters let you bring models from these third-party providers into the Domo.AI solution. Each adapter requires different credentials from the original provider to set up the account in Domo, all of which you configure in the Data Center under **Accounts**.
-
-Before you can create a new AI model from one of these providers, you must first set up the account you want to bring models in from. Once your account is connected, the adapter is available when you create a new model. You can then use your models to visualize data, create AI Projects, and use the endpoints in other apps and throughout Domo.
-
-This article explains how to set up an adapter account and the credentials required for each provider.
+This article explains how to set up a Databricks, OpenAI, or Amazon Bedrock adapter account in the Data Center, enter the credentials each provider requires, and make the adapter available when you create a new AI model.
 
 ---
 
 ## Set Up an Adapter Account
 
-Follow these steps to set up an AI model adapter account:
+You set up each adapter account in the Data Center under **Accounts**. Each provider requires different credentials, described in the sections below.
 
-1. In the Domo navigation, select **Data** to open the Data Center.
-2. Select **Accounts** in the left sidebar.
-3. Select **Add New** > **Account**. The **Add Account** modal opens.
+1. In the navigation header, select **Data** to open the Data Center.
+   The Data Center opens to your accounts and DataSets.
+2. In the left sidebar, select **Accounts**.
+3. Select **Add New** > **Account**.
+   The **Add Account** modal opens.
 4. From the dropdown, select the adapter you want to connect: Databricks, OpenAI, or Amazon Bedrock.
-5. Enter the credentials required for the provider you selected. See the provider-specific sections below for the required fields.
+5. Enter the credentials required for the provider you selected. See the provider sections below for the required fields.
 
-   <Note>
-     **Note:** You can use the **Assign Someone** option in the modal to ask someone else to connect. Find the user in Domo or invite them to your Domo instance.
-   </Note>
+   <Note>**Note:** To ask someone else to connect the account, select **Assign Someone**, then find the user in Domo or invite them to your Domo instance.</Note>
 
 6. Select **Connect**.
 
-Once you have connected your account, it appears in the available account list when you create a new model. Learn how to [add and test new models](/s/article/000005502).
+After you connect your account, it appears in the available account list when you create a new model. Learn how to [add and test new models](/s/article/000005502).
 
-<Tip>
-  **Tip:** Need to learn how to edit, share, or delete an existing account? See [Manage Connector/Adapter Accounts](/s/article/360042926054).
-</Tip>
+<Tip>**Tip:** To edit, share, or delete an existing account, see [Manage Connector/Adapter Accounts](/s/article/360042926054).</Tip>
 
-After you add a model, it appears in the list of AI Models in the scrollable, searchable sidebar. Select **Endpoint** to see the **Test Endpoint** input and output. To test your model, fill out the input accordingly, then select **Test Model**.
+After you add a model, it appears in the list of AI Models in the scrollable, searchable sidebar. Select **Endpoint** to see the **Test Endpoint** input and output. To test your model, enter the input, then select **Test Model**.
 
-## Databricks
+## Connect Databricks
 
-Build models and workspaces in Databricks and bring them into Domo as ML flow models.
+Build models and workspaces in Databricks and bring them into Domo as MLflow models.
 
 To add your Databricks account and make it available as a model, you need the following:
 
 - **Host name —** Your Databricks host name.
 - **Personal access token —** Your Databricks personal access token.
 
-Once you have connected your Databricks account, you can add your Databricks models into Domo in the Domo.AI section. Learn how to [add new models](/s/article/000005502).
+After you connect your Databricks account, you can add your Databricks models into Domo in the Domo.AI section. Learn how to [add new models](/s/article/000005502).
 
-## OpenAI
+## Connect OpenAI
 
 To add your OpenAI account and make it available as a model, you need the following:
 
 - **API key —** Your OpenAI API key.
 
-## Amazon Bedrock
+## Connect Amazon Bedrock
 
 Domo uses Amazon Bedrock's authorizing and versioning when bringing a model into Domo.
 
@@ -64,15 +58,15 @@ To add your Amazon Bedrock account and make it available as a model, you need th
 - **Region —** The region your AWS account resides in.
 - **Secret key —** Your AWS secret key.
 
-### Amazon Bedrock Assume Role
+### Connect with Amazon Bedrock Assume Role
 
-To add an Amazon Bedrock Assume Role account, configure an AWS IAM role in your AWS account with an external ID that allows Domo to assume that role.
+To add an Amazon Bedrock Assume Role account, configure an AWS IAM role in your AWS account with an external ID that lets Domo assume that role.
 
-Enter the following fields when adding the account:
+Enter the following fields when you add the account:
 
 - **Region —** The region your AWS account resides in.
-- **External Id —** The external ID used to verify the account that Domo will assume. This provides an added security measure. Use the **Generate Code** button to generate a random external ID, then paste it into your AWS security policy for the assumed role.
-- **Role Session Name —** Used to identify the session while the role is being assumed. You can set this to whatever you want.
+- **External Id —** The external ID that verifies the account Domo assumes, which provides an added security measure. Select **Generate Code** to generate a random external ID, then paste it into your AWS security policy for the assumed role.
+- **Role Session Name —** Identifies the session while Domo assumes the role. You can set this to any value.
 - **Role ARN —** The ARN of the role you want Domo to assume. It looks something like this:
 
   ```
@@ -98,12 +92,10 @@ The role you assume needs a policy configuration that includes the following:
 
 In this policy:
 
-- `chosenExternalId` is your generated ID that Domo uses to verify that the correct role is being assumed. Use the **Generate Code** option in the Domo account menu and copy and paste it here. The value here must match the value in the Domo account.
-- `domoAccountId` is the account ID for Domo that will be assuming the role, based on your region.
+- `chosenExternalId` is your generated ID that Domo uses to verify that the correct role is assumed. Select **Generate Code** in the Domo account menu, then copy and paste the value here. The value here must match the value in the Domo account.
+- `domoAccountId` is the account ID for Domo that assumes the role, based on your region.
 
-<Warning>
-  **Important:** The value in the `sts:ExternalId` condition must exactly match the external ID you entered in the Domo account. If the values do not match, Domo cannot assume the role.
-</Warning>
+<Warning>**Important:** The value in the `sts:ExternalId` condition must exactly match the external ID you entered in the Domo account. If the values do not match, Domo cannot assume the role.</Warning>
 
 The account IDs for Domo environments are as follows:
 

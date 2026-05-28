@@ -3,35 +3,46 @@ title: "Enabling SSO with Okta"
 excerpt: "Set up Okta as a SAML 2.0 identity provider for Domo, including configuring the Domo app, group imports, and SSO sign-on options."
 ---
 
+## Intro
+
 Follow the steps in this topic to set up Okta as a SAML 2.0 identity provider for Domo. You must have an "Admin" default security role or a custom role with "Manage All Company Settings" enabled to set up SAML. For more information about default roles, see [Managing Custom Roles](/s/article/360043438973 "Default Security Role Reference").
 
-This article assumes a working knowledge of Okta and focuses on the configuration parameters specific to setting up SAML with Domo. For general guidance on creating and configuring app integrations in Okta, see [Okta's documentation](https://help.okta.com/).
+<Note>
+   **Note:** This article assumes a working knowledge of Okta and focuses on the configuration parameters specific to setting up SAML with Domo. For general guidance on creating and configuring app integrations in Okta, see [Okta's documentation](https://help.okta.com/).
+</Note>
+
+---
 
 ## Prerequisites
 
 If you don't already have an Okta tenant, sign up for one at [okta.com](https://www.okta.com) and complete the activation email Okta sends you.
 
-**To set up Okta in Domo,**
+## Set Up Okta in Domo
 
 1. In the Okta Admin Console, create a new SAML 2.0 app integration for Domo.
 
    <Note>
      **Note:** A prebuilt Domo app is available in the Okta App Integration Catalog and can be used instead of creating a new app integration. However, the catalog app may not support all the current capabilities of Domo SSO.
    </Note>
+
 2. Configure the SAML settings using the values from Domo's SAML setup page (**Admin Settings** > **Security** > **SAML**). At minimum, set the [SAML Assertion Endpoint URL](/s/article/000005827#information-your-idp-may-need) and [Domo Entity ID](/s/article/000005827#information-your-idp-may-need), with **Name ID format** set to **EmailAddress** and **Application username** set to **Email**.
 3. (Optional) Configure additional settings.
    - Learn more about [configuring additional settings in Domo](/s/article/000005827#configure-sso-settings).
    - Learn more about [sending user group membership to Domo](https://help.okta.com/en-us/content/topics/apps/define-group-attribute-statements.htm).
 4. After you've created your app, [obtain the metadata URL out of Okta](https://support.okta.com/help/s/article/how-to-download-okta-identity-provider-metadata-and-saml-signing-certificates?language=en_US). 
+   
    <Tip>
-   **Tip:** Domo supports the metadata URL. If it does not work, you can obtain the Sign on URL, the Issuer, and the Signing Certificate to do a manual set up. See [documentation]() to learn how to configure your SAML manually.
+      **Tip:** Domo supports metadata upload, which is the recommended method to configure your SAML SSO in Domo. However, you can also configure your SAML in Domo manually using the Sign on URL, the Issuer, and the Signing Certificate from Okta.
    </Tip>
-5. (Conditional) If you configured a `groups` attribute statement in step 3, in Domo's SAML setup page check **Import groups from identity provider** and save.
+
+5. Now that you have the Okta SAML information, [configure SAML SSO in Domo](https://www.domo.com/docs/s/article/000005827#metadata-upload-or-manual-entry).
+
 6. In Okta, assign users and groups to the Domo app on its **Assignments** tab.
 
    <Note>
      **Note:** A good best practice is to maintain one Okta group per client or team and assign that group to the Domo app. Adding or removing a user from the group grants or revokes their Domo access automatically.
    </Note>
+
 7. (Optional) Create new users or groups in Okta as needed under **Directory**, and assign them to the Domo app.
 
 Once SSO setup is complete, users can access Domo in either of the following ways:

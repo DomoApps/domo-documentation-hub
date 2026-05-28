@@ -149,6 +149,16 @@ Edit the `title:` field in the article's frontmatter. The filename and all links
 
 Use the Edit tool with enough surrounding context (2–3 lines) to make `old_string` unique. Never rewrite more than what was approved.
 
+### Writing or editing a Required Grants section
+
+When an edit adds or changes a **Required Grants** section, use the grant's canonical wording — don't invent a description. Most grants are already described in the standard format elsewhere in the KB; search for and reuse the existing wording so the grant reads consistently across articles:
+
+```bash
+grep -rn "Grant Name —" s/article/
+```
+
+Reuse the existing description verbatim (adjusting only to fit the em-dash format). If no article describes the grant, write a concise one-sentence description and flag it to the user as newly authored rather than presenting it as canonical. See `Domo-KB-Style-Guide.mdx` › **Required Grants** › _Use canonical grant wording_.
+
 ### Image/screenshot swap
 
 Update the `src` attribute in the `<Frame>` or `<img>` tag. Update `alt` text if appropriate. Do not move or delete image files — note to the user that the image asset itself must be updated separately in `images/kb/`.

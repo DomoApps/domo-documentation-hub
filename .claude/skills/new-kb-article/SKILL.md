@@ -45,6 +45,16 @@ Create a new MDX file in `s/article/` using the filename format `Article-Title-H
 
 Follow the structure from `New-Article-Template.mdx` and apply all style rules from `Domo-KB-Style-Guide.mdx` exactly.
 
+### Use canonical grant wording in Required Grants
+
+When writing the **Required Grants** section, do not invent grant descriptions. Most grants are already described in the standard format elsewhere in the KB — search for and reuse the existing wording so the grant reads consistently across articles:
+
+```bash
+grep -rn "Grant Name —" s/article/
+```
+
+Reuse the existing description verbatim (adjusting only to fit the em-dash format). If no article describes the grant, write a concise one-sentence description and flag it to the user as newly authored. See `Domo-KB-Style-Guide.mdx` › **Required Grants** › _Use canonical grant wording_.
+
 ### Apply the beta convention (if applicable)
 
 Use the release-status answer from Step 2 to decide which beta treatment, if any, to apply. The full convention lives in `Domo-KB-Style-Guide.mdx` › **Beta Features** — read it before writing.

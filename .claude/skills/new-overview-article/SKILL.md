@@ -159,6 +159,8 @@ To <verb describing the primary action — open Analyzer, install DomoStats, cre
 
 Learn more about [grants](/s/article/360043438973).
 
+> **Use canonical grant wording.** Don't invent grant descriptions. Search the KB for an existing description in the standard format — `grep -rn "Grant Name —" s/article/` — and reuse it verbatim. If none exists, write a concise description and flag it as newly authored. See `Domo-KB-Style-Guide.mdx` › **Required Grants** › _Use canonical grant wording_.
+
 ## What You Can Do With <Product>
 
 <Product> covers <one sentence framing the scope>. Common questions it answers / things you can do with it:

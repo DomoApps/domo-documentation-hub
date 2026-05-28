@@ -217,6 +217,111 @@ function hoistInlineWhitespace(html) {
 // stays valid after the swap (a different length would misalign the table).
 const CELL_BREAK = "zzBRz";
 
+// rehype (hast) transform: when an <ol>/<ul> contains a stray <ul>/<ol> as a
+// direct child (a sibling of <li>, not nested inside one), fold it into the
+// preceding <li>. This is invalid HTML but common in hand-authored content —
+// the writer indented a sublist visually without wrapping it in the parent
+// <li>. Without this fix, hast-util-to-mdast pulls the *following* <li> into
+// the sublist's last item, scrambling the numbering downstream.
+function rehypeFoldStrayNestedLists() {
+  const isLi = (n) => n && n.type === "element" && n.tagName === "li";
+  const isList = (n) =>
+    n && n.type === "element" && (n.tagName === "ol" || n.tagName === "ul");
+  const walk = (node) => {
+    if (!node || typeof node !== "object") return;
+    if (isList(node) && Array.isArray(node.children)) {
+      const out = [];
+      for (const child of node.children) {
+        if (isList(child)) {
+          // Whitespace text nodes from source indentation sit between siblings
+          // in hast; scan past them to find the actual preceding <li>.
+          let i = out.length - 1;
+          while (i >= 0 && out[i].type === "text" && !out[i].value.trim()) i--;
+          const prev = i >= 0 ? out[i] : null;
+          if (isLi(prev)) {
+            (prev.children ||= []).push(child);
+            continue;
+          }
+        }
+        out.push(child);
+      }
+      node.children = out;
+    }
+    if (Array.isArray(node.children)) node.children.forEach(walk);
+  };
+  return (tree) => walk(tree);
+}
+
+// remark (mdast) transform: align list spread with Prettier's preference for
+// nested lists. rehype-remark emits items containing a paragraph plus a nested
+// list as listItem.spread=true / list.spread=false — producing a blank line
+// between the parent text and its sublist, but none between sibling items.
+// Prettier formats the inverse on save: no blank within the item, blank
+// between siblings. Match Prettier so it doesn't have to rewrite our output.
+//
+// Only touches items whose children are a leading paragraph followed by
+// nested lists. Items with multiple paragraphs keep spread=true because
+// CommonMark requires a blank line between paragraphs in a list item.
+function remarkPrettierListSpread() {
+  const tightenable = (item) => {
+    if (!Array.isArray(item.children) || item.children.length < 2) return false;
+    const [first, ...rest] = item.children;
+    return first?.type === "paragraph" && rest.every((c) => c.type === "list");
+  };
+  const walk = (node) => {
+    if (!node || typeof node !== "object") return;
+    if (node.type === "list" && Array.isArray(node.children)) {
+      let anyNested = false;
+      for (const item of node.children) {
+        if (item.type !== "listItem") continue;
+        if (tightenable(item)) {
+          item.spread = false;
+          anyNested = true;
+        } else if (
+          Array.isArray(item.children) &&
+          item.children.some((c) => c.type === "list")
+        ) {
+          anyNested = true;
+        }
+      }
+      if (anyNested) node.spread = true;
+    }
+    if (Array.isArray(node.children)) node.children.forEach(walk);
+  };
+  return (tree) => walk(tree);
+}
+
+// remark (mdast) transform: merge two adjacent ordered lists when the second's
+// `start` continues exactly from the first. Source HTML often fragments one
+// logical list into multiple <ol start="N"> blocks; without merging, the
+// fragments stringify with mismatched markers ("1." then "2)") because
+// remark-stringify uses an alternate marker (bulletOrderedOther) to keep
+// adjacent same-marker ordered lists from collapsing into one. Conservative:
+// only merges when the numbering is a perfect continuation, so two independent
+// lists that happen to both start at 1 are left alone.
+function remarkMergeContinuingOrderedLists() {
+  const walk = (node) => {
+    if (!Array.isArray(node.children)) return;
+    const out = [];
+    for (const child of node.children) {
+      const prev = out[out.length - 1];
+      const continues =
+        prev &&
+        prev.type === "list" && prev.ordered &&
+        child.type === "list" && child.ordered &&
+        child.start === (prev.start ?? 1) + prev.children.length;
+      if (continues) {
+        prev.children.push(...child.children);
+      } else {
+        out.push(child);
+      }
+    }
+    node.children = out;
+    node.children.forEach(walk);
+  };
+  return (tree) => walk(tree);
+}
+
 // rehype (hast) transform: within <td>/<th>, insert CELL_BREAK between adjacent
 // <p> children so their boundaries survive into the pipe table.
 function rehypeTableCellParagraphBreaks() {
@@ -321,8 +426,11 @@ async function buildProcessor() {
     ]);
   return unified()
     .use(rehypeParse.default, { fragment: true })
+    .use(rehypeFoldStrayNestedLists)
     .use(rehypeTableCellParagraphBreaks)
     .use(rehypeRemark.default)
+    .use(remarkMergeContinuingOrderedLists)
+    .use(remarkPrettierListSpread)
     .use(remarkGfm.default)
     .use(remarkCollapseJsxSpace)
     .use(remarkEscapeDollar)

@@ -1,0 +1,245 @@
+---
+title: "Content Governance Hub"
+excerpt: "Use the Content Governance Hub app and its archiving workflows to identify and automatically archive unused cards and dashboards, keeping your Domo environment clean and relevant."
+---
+
+## Intro
+
+Managing your Domo landscape efficiently is critical to ensuring that decision-making is based on timely, relevant, and clean data. The Content Governance Hub (CGH) helps you achieve this. The app serves as a centralized control panel that surfaces which objects are candidates for archiving based on predefined criteria such as age, usage, and relevance.
+
+After content is identified, a set of separate archiving workflows automate the cleanup of your BI environment. These workflows systematically archive content, significantly reducing manual oversight and the potential for error, while helping you maintain your data governance standards. Used together, these features help your organization improve data quality and foster a more agile, informed decision-making process.
+
+The Content Governance Hub is most useful for the following:
+
+- **Businesses with large data volumes** that need to streamline their data resources.
+- **Teams that update strategies regularly** based on the latest data and want to remove outdated information.
+- **Organizations with compliance requirements** (such as GDPR or HIPAA) that need to manage data retention policies effectively.
+- **Companies seeking operational efficiency** by maintaining a lean and relevant BI environment.
+
+---
+
+## How It Works
+
+The cleanup process is divided into two phases: **Preparation** and **Execution**.
+
+<Frame>![Content Governance Hub process architecture, showing the Preparation phase feeding the Execution phase](/images/kb/content-governance-hub-process-architecture.png)</Frame>
+
+- **Preparation —** DomoStats, Domo Governance datasets, and an Exceptions dataset feed into a cleanup dataflow, which is visualized in the CGH app. This dashboard lets you identify what content needs attention before you initiate any cleanup tasks.
+- **Execution —** The archiving workflows take over, automatically archiving dashboards and cards based on the criteria set in the cleanup dataflow.
+
+The cleanup dataflow uses predefined conditions to determine which content should be archived, but you can customize it to meet your organization's specific requirements.
+
+---
+
+## Install the Content Governance Hub
+
+To deploy the Content Governance Hub, contact your account team.
+
+---
+
+## Identify Content to Archive
+
+After the archiving dataflow runs once, it populates the CGH app. The **Content Summary** tab clearly identifies content that is eligible for archiving based on the criteria described in [Cleanup Dataflow Architecture](#cleanup-dataflow-architecture).
+
+<Frame>![Content Summary tab of the CGH app, showing content type, archiving candidates, and content counts](/images/kb/content-governance-hub-content-summary.png)</Frame>
+
+<Note>
+**Note:** Although the dashboard highlights datasets, dataflows, and connector datasets as archiving candidates, archiving these asset types is not currently supported. Only cards and dashboards are archived by the workflows.
+</Note>
+
+---
+
+## Launch and Operate the Workflows
+
+You launch the archiving and restoration workflows from the **Launch Workflows** tab. After deployment, the workflows must be triggered from within the CGH app.
+
+<Frame>![Archiving Workflow Launch screen, showing estimated credit consumption and the list of content to be archived](/images/kb/content-governance-hub-workflow-launch.png)</Frame>
+
+This screen shows the number of credits that will be consumed when archiving, as well as the objects that will be archived.
+
+<Tip>
+**Tip:** Review the content that will be archived before you run the workflows to make sure no critical content is archived accidentally. If you change the archiving criteria, run the dataflow again before archiving so that the freshest data is used.
+</Tip>
+
+To modify which content is archived, see [Customize the Archiving Criteria](#customize-the-archiving-criteria) and [Exceptions](#exceptions).
+
+---
+
+## Cleanup Dataflow Architecture
+
+The cleanup dataflow identifies which content in Domo will be archived by the workflows. It combines multiple DomoStats sources to determine whether a piece of content is unused and should be archived.
+
+The Content Governance Hub is comprised of four dataflows along with the app:
+
+- **Master | CGH**
+- **Customization | CGH**
+- **Restoration | CGH**
+- **Dataset Tagging | CGH**
+
+<Frame>![Lineage of the four CGH dataflows feeding the CGH app](/images/kb/content-governance-hub-dataflow-architecture.png)</Frame>
+
+### Archiving Criteria
+
+The criteria for archiving each type of content varies, though the last-used date is generally the prime factor for determining whether content is active. The following table lists the default criteria. For content to be archived, every criterion must be met unless indicated otherwise.
+
+| Content | Default archiving criteria |
+| --- | --- |
+| **Card** | Last-used date is derived from the activity log. No action (of any type) for the card has occurred in the last 90 days, **and** no action (of any type) for the dashboards the card exists on has occurred in the last 90 days. |
+| **Dashboard** | Last-used date is derived from the activity log. No action (of any type) for the dashboard has occurred in the last 90 days. |
+| **Dataset + Dataflow / Dataset View** | Last-used date is derived from the activity log. No action except `UPDATED` for the dataset has occurred in the last 90 days, **and** the dataset has no unarchived child cards, dataset views, or dataflows. For an input dataflow, the same criteria apply to all of its output (linked) datasets. |
+| **Dataset Connector** | No action except `UPDATED` for the dataset has occurred in the last 90 days, **and** the dataset has no child cards, dataset views, or dataflows. |
+
+<Note>
+**Note:** Although these are the default criteria, the dataflow can be customized to modify them and already includes many additional attributes that can be used. See [Customize the Archiving Criteria](#customize-the-archiving-criteria).
+</Note>
+
+### Additional Available Attributes
+
+The dataflow loads additional metadata for each content type that is not used to determine whether the content should be archived. You can modify the dataflow to include these attributes in the archiving criteria. These attributes are prefixed with `[E]` to indicate they are extra.
+
+| Content | Additional attributes |
+| --- | --- |
+| **Card** | Page ID, Page Name, Scheduled Report, Sandbox Repository, Certified, Alerts |
+| **Dashboard** | Scheduled Report, Sandbox Repository, Publish |
+| **Dataset + Dataflow** | Sandbox Repository, Certified, Alerts, Import Type, Rows, Archived children, Linked archived children, Children |
+| **Dataset Connector** | Import Type, Archived children, Linked archived children, Children |
+
+### Archiving Dataset Dictionary
+
+The fields below are available in the archiving dataset. The granularity of the dataset is at the object level with zero duplicates, so some fields are aggregated or refer to the last time the object was used. This is particularly relevant for cards that exist on multiple dashboards or datasets with multiple children.
+
+| Field name | Description |
+| --- | --- |
+| Type | Content type (Card, Dashboard, Dataset + Dataflow, Connector). |
+| Object ID | Domo ID for the content. |
+| Object Name | Domo name for the content. |
+| Action | Last type of action from the activity log. |
+| Last used date | Last date the content was used. |
+| Dataflow ID | ID of the source dataflow for datasets. |
+| Linked Dataset Last used date | Last-used date of any linked datasets. |
+| Linked Dataset Count | Count of linked datasets. |
+| Unarchived | Count of unarchived children. |
+| Linked Unarchived | Count of linked unarchived children. |
+| Archiving period | Period of time, defined by the user, after which content is considered unused. |
+
+The following extra attribute fields are also available:
+
+| Field name | Description |
+| --- | --- |
+| Page ID | For card objects only — ID of the dashboard the card was on when last used. |
+| Page Name | For card objects only — name of the dashboard the card was on when last used. |
+| Scheduled Report | Indicates whether the content is used in a scheduled report. |
+| Sandbox Repository | Indicates whether the content is used in a Sandbox repository. |
+| Certified | Indicates whether the content is certified. |
+| Alerts | Indicates the count of alerts on the content. |
+| Publish | Indicates whether the content is used by Domo Publish. |
+| Import Type | Type of data source. |
+| Rows | Row count. |
+| Archived | Count of archived children. |
+| Linked Archived | Count of linked archived children. |
+| Children | Comma-separated list of dataset children. |
+
+### Linking
+
+The concept of *linking* comes up several times in the archiving dataset. The following diagram illustrates what linking means.
+
+<Frame>![Linking diagram, showing an input dataflow producing three datasets with their child cards and datasets](/images/kb/content-governance-hub-linking-diagram.png)</Frame>
+
+In this example, an input dataflow produces three output datasets, all currently unarchived:
+
+- Dataset 1 has two child cards.
+- Dataset 2 has one child card.
+- Dataset 3 has a child card and a child dataset.
+
+Because all three datasets share the same input dataflow, each dataset's *linked unarchived children* count includes the children of all datasets produced by that dataflow:
+
+| Dataset | Dataflow | Unarchived children | Linked unarchived children |
+| --- | --- | --- | --- |
+| Dataset 1 | Input Dataflow | 2 | 5 |
+| Dataset 2 | Input Dataflow | 1 | 5 |
+| Dataset 3 | Input Dataflow | 2 | 5 |
+
+---
+
+## Customize the Archiving Criteria
+
+You configure the archiving criteria in the **Customization** dataflow. The logic is defined within the formula tile for each content type, and you can adjust the criteria as needed.
+
+<Frame>![Customization dataflow showing archiving criteria and exclusions formula tiles for each content type](/images/kb/content-governance-hub-archiving-criteria-tiles.png)</Frame>
+
+<Warning>
+**Important:** Copy any adjustments to the archiving criteria into the matching exclusions formula tile so that users understand why content is, or is not, an archiving candidate.
+</Warning>
+
+To specify custom criteria that apply to all content, use the final formula tile (the archiving pre-step).
+
+<Frame>![Archiving pre-step formula tiles, including Change Null Owners to No Owner, Rank & Window, and Add Formula](/images/kb/content-governance-hub-archiving-prestep-tiles.png)</Frame>
+
+### Input Webforms
+
+There are four webforms you can use to enter parameters into the archiving process:
+
+- **Archiving Parameters | Archiving —** Adjust the period of time after which content is considered unused. The default is 90 days.
+- **Override | Archiving —** Indicate content you want archived even when it does not meet the criteria in the dataflow.
+- **Exclusions | Archiving —** Specify objects that should never be archived.
+- **Restoration Input | Archiving —** Specify objects that should be restored by the restoration workflows.
+
+<Note>
+**Note:** Customers confident in their dataflow skills can adjust any of the CGH dataflows to meet their archiving needs. As future enhancements are made to the CGH, they are pushed out using Sandbox, so any changes you make may be overridden. You are notified beforehand and can decline.
+</Note>
+
+---
+
+## Exceptions
+
+Although the dataflow can determine most cases in which an object is used, there are several exceptions to be aware of:
+
+| Content | Recommended alternative |
+| --- | --- |
+| Datasets accessed directly by API (may not always be detected) | Include in the Exclusions list. |
+| Periodic content (such as financial reports used once per year) | Include in the Exclusions list. |
+| Published content | DomoStats data for published content can occasionally be unreliable. Include in the Exclusions list. |
+| DataFusions | Not included — there is currently no data source for their metadata. |
+| Domo packaged apps | Any datasets or cards used in a Domo packaged app should be certified. |
+| Incremental loads (upserts and partitions) | If the source data does not exist anywhere else, include in the Exclusions list. |
+
+---
+
+## How Content Is Archived
+
+Unlike the dataflow, the workflows are simple and direct. There are two archiving workflows, one for each supported content type.
+
+### Card Archiving
+
+Card archiving follows this process:
+
+1. The archiving group is added to the card as an owner. (This group is a preconfigured parameter of the process.)
+2. The card is removed from all dashboards.
+3. The card is added to the archiving dashboard. (This dashboard is a preconfigured parameter.)
+4. All owners except the archiving group are removed.
+5. The card title is changed to include `[Archiving]`.
+6. All other users are removed.
+
+### Dashboard Archiving
+
+Dashboard archiving follows this process:
+
+1. The archiving group is added to the dashboard as an owner. (This group is a preconfigured parameter.)
+2. The dashboard is moved to be a sub-dashboard of the archiving dashboard. (This dashboard is a preconfigured parameter.)
+3. The dashboard title is changed to include `[Archiving]`.
+4. All owners except the archiving group are removed.
+5. All other users are removed.
+
+---
+
+## Restore Archived Content
+
+You can restore archived content using the restoration workflows.
+
+### Card Restoration
+
+Card restoration restores the card's name, owners, and groups.
+
+### Dashboard Restoration
+
+Dashboard restoration moves the dashboard back to its original parent dashboard and restores its name, owners, and groups.

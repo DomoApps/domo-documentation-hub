@@ -59,6 +59,17 @@ Workbench stores access credentials for ODBC DataSets. To properly protect these
 Workbench is configured by the client from an access control perspective. Workbench allows users to upload DataSets into Domo to enable KPI card creation and automated updates. Users select DataSets (System DSNs, flat files, Microsoft Excel spreadsheets, JIRA, QuickBooks, JSON, XML namespaces) to which they already have access. Workbench can connect to DataSets only if the Microsoft Windows system running the software can reach the DataSet, and if the machine has access to read the DataSet files or databases.
 </Accordion>
 
+<Accordion title="Can I run the Workbench service under a Windows service account while individual users run the Workbench client with their own logins?">
+
+Yes, and this is a recommended setup. Have an IT administrator (or whoever manages the server) install Workbench on the machine and authenticate it with a Domo service account so that it isn't tied to an individual user.
+
+Then add each user who needs to use Workbench to the **Workbench Users** local security group. For more information, see [Active Directory security groups](https://learn.microsoft.com/en-us/windows-server/identity/ad-ds/manage/understand-security-groups) on Microsoft Learn. After a user is added to the group, they can access Workbench to create, run, and monitor jobs.
+
+<Note>
+**Note:** This works well as long as multiple users aren't editing the same things at the same time. When that happens, Workbench displays **Live updates are not available** in red text at the top of the window.
+</Note>
+</Accordion>
+
 <Accordion title="Is any of the data transmitted by Workbench cached on the local machine?">
 
 Workbench uses a temp directory (%PROGRAMDATA%\Domo\Workbench\DomoCache) to stage incoming data. If you have many DataSet Jobs with a large number of rows, this temp directory can fill up with a large amount of data. Make sure the C:\ drive has a reasonable amount of free space for these files. These files are cleared when the job is complete and are not permanently stored.

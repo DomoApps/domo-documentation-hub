@@ -1,0 +1,235 @@
+============================================================================
+ASANA BACKLOG UPDATE — HANDOFF NOTES, SESSION 3
+Branch: update/asanaBacklog
+Session paused: Wednesday 2026-05-27 evening
+Resume: Thursday 2026-05-28
+============================================================================
+
+
+WHERE WE LEFT OFF
+=========================================================================
+
+Manifest count: 13 open (was 16 at session start, 64 at branch start)
+Tickets closed THIS SESSION: 54
+Tickets closed across ALL sessions on this branch: 105+
+
+
+KEY DISCOVERY THIS SESSION
+=========================================================================
+
+When you stalled out on "blocked on submitter source" tickets in earlier
+sessions, the manifest was stale. Asana attachments had landed AFTER
+fetch_asana.py was last run. A live re-query found that 10 of 15 then-open
+tickets had usable .docx (and sometimes .png) attachments — most of them
+unattached at manifest time.
+
+If you ever hit a "blocked on source content" wall again, before
+batch-closing as won't-do, do this first:
+
+  python3 -c "..."  # see scripts/check_fresh_attachments.py pattern in this session
+
+(I ran an inline script; if you want it as a permanent tool, save the
+pattern from the assistant turn that listed the 10 fresh-attachment hits.)
+
+The pattern is:
+  GET /tasks/{gid}/attachments → compare count to manifest.attachments
+  If live > manifest → fetch with fetch_asana.download() into
+  .asana-cache/<gid>/
+
+
+FRESHLY-ATTACHED TICKETS — 8 LEFT TO WORK
+=========================================================================
+
+All have one .docx attachment except where noted. All cached.
+
+  1204262218316263  Window Functions in Beast Mode
+                    Source: Window Functions in Beast Mode.docx
+                    Likely a net-new article. HANDOFF.txt notes this was
+                    previously blocked on a Dojo post reference.
+
+  1206884501713115  Workflows Cleanup                                 (High)
+                    Source: Knowledge Base article v2.docx
+                    HANDOFF.txt notes this was blocked on a SharePoint draft
+                    owned by an ex-employee. The submitter has now attached
+                    a v2 docx.
+
+  1208810692509537  Athena read only
+                    Source: DOMO-411883 Athena read-only support KB.docx
+                    HANDOFF.txt notes this needed a check with Felipe about
+                    whether existing Athena articles cover it.
+
+  1206468170605978  Beta AI adapters article
+                    Source: Adapters - Databricks- OpenAI- and Amazon
+                    Bedrock.docx
+                    HANDOFF.txt notes this needed setup steps from McKenna
+                    Payne. The docx may now contain them.
+
+  1208975689727859  Instance Template (Domo Everywhere)
+                    Source: Instance Templates - master switch.docx
+                    HANDOFF.txt notes term/scope was unclear; the docx may
+                    clarify.
+
+  1209805688338018  Snowflake Pass-Through SQL BETA
+                    Source: KB Article - DOMO-440298 - Snowflake
+                    Pass-Through SQL.docx
+                    HANDOFF.txt notes this needed Andrea Henderson's
+                    attachment. JIRA ticket referenced in filename.
+
+  1203746810309077  API Accounts FAQ?
+                    Source: API Accounts.docx
+                    HANDOFF.txt notes the original external Dojo post was
+                    not captured; this docx is now the source.
+
+  1203792916508121  Update Workbench FAQs
+                    Source: Workbench Account.docx
+                    HANDOFF.txt notes the original external Dojo post was
+                    not captured; this docx is now the source.
+
+  1211010139043740  Add "Summ. Text Prompt" to AI Prompt Jupyter article
+                    Bucket C; manifest had 1 attachment already. Not
+                    surfaced as "fresh" in the diff but the attachment was
+                    present at manifest time. Target article:
+                    s/article/000005544.mdx.
+
+
+TICKETS WITHOUT FRESH ATTACHMENTS — 4 LEFT
+=========================================================================
+
+These had no attachment in either the manifest or the live re-query.
+Still blocked unless you can pry source from the submitter.
+
+  1211798417293948  Update SQL instructions for data segments not DataSet
+                    HANDOFF.txt: target article was renamed/repurposed.
+
+  1209333935683461  Hidden videos | Vimeo WB 4
+                    HANDOFF.txt: target text doesn't exist in the article
+                    anymore.
+
+  1210060928091162  Usage Reporting
+                    HANDOFF.txt: SharePoint draft, not exported.
+
+  1210394972306471  NEW | Query DataSet tile (Bucket E)
+                    Article already authored at
+                    s/article/Query-DataSet-Tile.mdx with TODO[content]
+                    markers. Needs PM ping to Andrea Henderson + Joseph
+                    Peterson for field-label confirmation and error
+                    message strings.
+
+
+VERIFICATION-BLOCKED (still HANDOFF.txt items)
+=========================================================================
+
+  1204480786007423  Okta SSO
+                    *** Status update: Jared has been making commits on
+                    this branch about Okta SSO (lots of "docs(kb): clarify
+                    SAML..." commits sit on top of my session work). The
+                    Okta ticket may now be ready to close — check
+                    s/article/360043438133.mdx state and the most recent
+                    commits before assuming it's still open. ***
+
+  1211529720711393  SCIM Schema (active=false EN/JA conflict)
+                    Needs Jared's canonical-behavior decision.
+
+  1210394972306471  Query DataSet tile (also in "no fresh attachments" above)
+
+
+CLOSED THIS SESSION
+=========================================================================
+
+By category:
+
+  HANDOFF-2 cleanups (3):
+    - 1208693640056137 PUBLISH Migrate from Federated to Cloud Amplifier
+    - 1205295264301383 Missing required role - Achievements
+    - 1208496418472569 Update Group Ownership of accounts
+
+  Bucket A aggressive close (37):
+    See commit e0cb651a.
+
+  Bucket M aggressive close (9):
+    8 in one batch + 1209622077811472 Beast Mode Overview separately.
+    See commits in close_bucket_m_subset.py path.
+
+  Bucket M resolved with article work (2):
+    - 1205980130684558 Analyzer Overview — new article authored;
+      legacy 360043428673 renamed to "Save a Visualization Card in
+      Analyzer" (EN + JA); added to nav.
+    - 1209815237834256 DomoStats project with Dan — new DomoStats
+      Overview authored; DomoStats group promoted out of
+      Admin > Administrate Domo > Governance to be peer of
+      Administrate Domo under Admin (EN + JA); DomoStats Connector
+      also added to Connectors > Data Providers C-F > Domo.
+
+  Already-shipped freebies (2):
+    - 1211916967943002 Add Model differences to the DOMO AI section
+      (content already in s/article/AI-Model-Version-Differences.mdx,
+      superset of submitted docx)
+    - 1209294086210254 Brand Kit - Remove Email Footer (section
+      already existed; refreshed 4 screenshots from docx + improved
+      alt text + consolidated 2 steps into 1)
+
+  Article work from fresh attachments (1):
+    - 1212495691952901 KB Content Request: Adding Comments to Workflows
+      (new sub-section in s/article/000005331.mdx, EN + JA, with 2
+      screenshots embedded; 3rd was redundant close-up)
+
+
+NEW REUSABLE TOOLING
+=========================================================================
+
+scripts/close_handoff2_tickets.py  — small one-off for the 3 HANDOFF-2 closes
+scripts/close_bucket_a.py          — pattern for batch close with uniform comment
+scripts/close_bucket_m_subset.py   — same pattern but with a KEEP_OPEN set
+.claude/skills/new-overview-article/SKILL.md
+                                   — new skill codifying the Overview-article
+                                     process used for Analyzer + DomoStats:
+                                     mandatory title-collision check,
+                                     repo+web inventory, canonical Overview
+                                     structure, per-link verification step,
+                                     legacy-rename handling (EN+JA),
+                                     nav placement options. Listed in
+                                     CLAUDE.md skills table.
+
+
+SUGGESTED THURSDAY KICKOFF
+=========================================================================
+
+1. Read this file (HANDOFF-3.txt).
+2. Run a state check:
+     python3 scripts/triage_backlog.py --summary
+     (or just re-count manifest with the inline 3-liner used this session)
+3. Verify whether Jared closed the Okta SSO ticket on his own — check the
+   recent Okta-SAML commits and whether 1204480786007423 is still open in
+   Asana. If still open and Jared wants it closed, close via the script
+   pattern.
+4. Pick from the 8 remaining freshly-attached tickets and continue the
+   same flow used today for Workflows-Add-Comments and Brand-Kit-Remove-
+   Email-Footer:
+     - fetch_asana.py to refresh attachments
+     - unzip the .docx, extract document.xml, parse paragraphs
+     - read any embedded media (extracted/word/media/imageN.png)
+     - find target article (per the ticket's referenced URL) and the
+       JA sibling
+     - draft the change following style guide + parse-the-docx text
+     - JA parity update
+     - update screenshot_tracker.md
+     - close Asana via inline urllib script (see prior closes)
+     - commit
+
+
+HOUSEKEEPING
+=========================================================================
+
+- Branch is up to date with origin/update/asanaBacklog as of session end.
+  No PR open. When you do open one, the body should summarize all 105+
+  closures + the new skill, not just this session's work.
+- 5 session commits today (HANDOFF-2 closes, Bucket A, Bucket M + work
+  articles, new skill, Workflows-Comments, Brand-Kit-Remove-Footer)
+  plus Jared's parallel Okta commits.
+- .asana-cache/ has fresh attachments for the 8 queued tickets. They
+  do not need to be re-fetched.
+
+
+============================================================================
+END OF HANDOFF-3
+============================================================================

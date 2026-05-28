@@ -234,7 +234,29 @@ For a step-by-step walkthrough, see [Opening <Product>](/s/article/...).
 
 ---
 
-## Step 7: Verify every internal link
+## Step 7: Style-guide revision pass
+
+Drafting always introduces style drift. Before verifying links or finalizing, do an explicit pass against the style guide and revise the article in place. **Do not skip this even if the draft looks right** — the most common misses (intro framing, imperative cluster headings, unpadded tables, lowercase Domo terms, future tense) are easy to introduce and easy to miss without a deliberate re-read.
+
+1. **Re-read `Domo-KB-Style-Guide.mdx` now, in full** — not from memory. Step 5's "pay special attention to" list is a primer, not a substitute for the re-read.
+2. **Audit the Overview against this checklist** and fix every violation:
+   - **Frontmatter** — `title` plus a single-sentence `excerpt`; never a `description` field.
+   - **Intro** — opens with "This article explains…" / "This article covers…", states only what the Overview covers, and is followed by a `---` horizontal rule.
+   - **Headings** — imperative mood at every level (link-cluster headings included — "Build Cards", not "Building Cards"; "Manage Access", not "Management"); structural labels (Intro, Required Grants, FAQ, Related Articles) are exempt. Top-level sections H2, subsections H3+.
+   - **Required Grants** — exact format and canonical grant wording, with the em-dash inside the bold and a space on each side (`**Grant —** description`).
+   - **Callouts** — `<Note>`/`<Warning>`/`<Tip>` with the label and its colon bolded (`**Note:**`), and a blank line before the callout (except inside table cells).
+   - **Tables** — every pipe table padded so columns align. Run `python3 scripts/pad_md_tables.py <file>` to do this mechanically. Normalize any HTML tables (one tag per line, data rows in `<tbody>`).
+   - **Links** — internal links use the file path with no `.mdx` extension and no full URL; every link still carries its one-sentence description.
+   - **Em-dashes** — no spaces in prose; spaces only in the bolded-term list exception.
+   - **Voice and word choice** — present tense, not "will"; active voice; "after", not causal "once"; no "utilize"; spell out numbers under 10; "allowlist"/"blocklist"; "select", not "click"; Oxford comma; no exclamation points.
+   - **Domo terms** — apply the Step 4 treatment for the product name consistently, plus `DataSet`, `DataFlow`, `DataFusion`, `Beast Mode`, `Workbench`; `dashboard` lowercase except at the start of a sentence or with a type; never "Page". Verify against the **Domo-Specific Terms and Usage** table.
+   - **Beta** — correct convention applied (frontmatter `tag` + verbatim Note for a whole-article beta; Badge + single verbatim Note for section-level).
+   - **Images** — if you included the optional hero screenshot, it is wrapped in `<Frame>` with a native `<img>` and descriptive `alt`, no inline `width`/`height`; never `<Frame>` inside a table cell.
+3. **Revise the Overview in place** to resolve every issue found, then re-run the table normalizer if you changed any tables.
+
+---
+
+## Step 8: Verify every internal link
 
 Each `/s/article/<slug>` link must resolve to an article whose title matches what the link text claims. This is the second-biggest failure mode for Overview drafts.
 
@@ -263,7 +285,7 @@ Fix every mismatch before finalizing. If a referenced article truly does not exi
 
 ---
 
-## Step 8: Handle the legacy collision (if Step 2 selected "New file + rename legacy")
+## Step 9: Handle the legacy collision (if Step 2 selected "New file + rename legacy")
 
 If Step 2 chose to rename the legacy article (option 2), do it now:
 
@@ -281,7 +303,7 @@ If Step 2 chose to rename the legacy article (option 2), do it now:
 
 ---
 
-## Step 9: Add the new article to navigation
+## Step 10: Add the new article to navigation
 
 Invoke the `add-to-nav` skill with:
 
@@ -305,7 +327,7 @@ node -e "JSON.parse(require('fs').readFileSync('docs.json', 'utf8')); console.lo
 
 ---
 
-## Step 10: Output
+## Step 11: Output
 
 Tell the user:
 

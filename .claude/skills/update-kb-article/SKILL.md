@@ -229,7 +229,28 @@ The Badge `className` must be exactly `text-primary bg-primary/10 font-bold`. Th
 
 ---
 
-## Step 5: Verify
+## Step 5: Style-guide revision pass
+
+Editing introduces style drift just as drafting does. After making the approved changes, do an explicit pass against the style guide over the content you changed and revise it in place.
+
+1. **Re-read `Domo-KB-Style-Guide.mdx` now, in full** — not from memory.
+2. **Audit the content you added or rewrote** against this checklist and fix every violation. Scope this to what you changed: fix style errors in your edited content and any clearly broken style directly adjacent to it, but do not silently rewrite untouched sections. If you spot broader pre-existing violations outside your edit, note them to the user rather than rewriting them (consistent with this skill's conservative-execution principle). This pass is EN-only — never touch the localized directories.
+   - **Intro** (if touched) — opens with "This article explains…" or "This article covers…", states only what the article covers, and is followed by a `---` horizontal rule.
+   - **Headings** — imperative mood at every level; the structural labels (Intro, Required Grants, Prerequisites, FAQ, Troubleshoot, Related Articles) are exempt. Top-level sections H2, subsections H3+.
+   - **Required Grants** — exact format and canonical grant wording, with the em-dash inside the bold and a space on each side (`**Grant —** description`).
+   - **Callouts** — `<Note>`/`<Warning>`/`<Tip>` with the label and its colon bolded (`**Note:**`), and a blank line before the callout (except inside table cells).
+   - **Tables** — every pipe table you touched padded so columns align. Run `python3 scripts/pad_md_tables.py <file>` to do this mechanically. Normalize any HTML table you edited (one tag per line, data rows in `<tbody>`).
+   - **Links** — internal links use the file path with no `.mdx` extension and no full URL.
+   - **Em-dashes** — no spaces in prose; spaces only in the bolded-term list exception.
+   - **Voice and word choice** — present tense, not "will"; active voice; "after", not causal "once"; no "utilize"; spell out numbers under 10; "allowlist"/"blocklist"; "select", not "click"; Oxford comma; no exclamation points.
+   - **Domo terms** — `DataSet`, `DataFlow`, `DataFusion`, `Beast Mode`, `Workbench`; `dashboard` lowercase except at the start of a sentence or with a type; never "Page" (use "dashboard"). Verify any product term against the **Domo-Specific Terms and Usage** table.
+   - **Frontmatter** — if the article still has a `description` field, replace it with a single-sentence `excerpt`.
+   - **Images** — block screenshots wrapped in `<Frame>` with a native `<img>` and descriptive `alt`, no inline `width`/`height`; inline glyphs use the icon font or the inline `<img>` style; never `<Frame>` inside a table cell.
+3. **Revise in place.** Run `python3 scripts/pad_md_tables.py <file>` on any file whose tables you touched.
+
+---
+
+## Step 6: Verify
 
 After all edits:
 
@@ -247,7 +268,7 @@ Report any remaining references to the user.
 
 ---
 
-## Step 6: Output
+## Step 7: Output
 
 Tell the user:
 - What was changed, created, or deleted

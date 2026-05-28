@@ -94,7 +94,10 @@ def process(text: str) -> str:
                     block.append(lines[j])
                     j += 1
                 rows = [_split_row(b) for b in block]
-                out.extend(_format_table(rows))
+                # preserve the block's leading indentation (e.g. a table
+                # nested inside an ordered-list item) on every rebuilt row
+                indent = line[: len(line) - len(line.lstrip())]
+                out.extend(indent + r for r in _format_table(rows))
                 i = j
                 continue
         out.append(line)

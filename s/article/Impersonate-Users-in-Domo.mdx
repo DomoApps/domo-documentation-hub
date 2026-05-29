@@ -1,0 +1,202 @@
+---
+title: "Impersonate Users in Domo"
+tag: "Beta"
+---
+
+import { BetaNote } from '/snippets/BetaNote.mdx';
+
+<BetaNote />
+
+## Intro
+
+This article explains how to manage authorized impersonators, impersonate users in Domo, and review impersonation activity.
+
+With User Impersonation, Domo users with the necessary admin-level grant can impersonate other users who have authorized them. User Impersonation allows Domo administrator-type users to better support their users and stakeholders by troubleshooting user-reported issues, verifying users have access to the right data and content, and even setting up Domo on behalf of their stakeholders.
+
+---
+
+## Required Grants
+
+The Impersonate Users grant is required to start an impersonation session. By default, this grant is included only in the Admin system role, but it can be added to custom roles. Learn more about [User Roles and Grants](/s/article/360043438973).
+
+All Domo users can manage their own authorized impersonators regardless of role or grants.
+
+<Warning>**Important:** The Impersonate Users grant allows the holder to log in as another user and see content or take action in Domo as that user. This is a highly-privileged grant: Assign it only to roles and users who genuinely require it.</Warning>
+
+<Note>**Note:** Roles that include the Impersonate Users grant cannot be added to the Roles Allowlist. If a role is already in the Roles Allowlist, the Impersonate Users grant cannot be added to it. Learn more about the [Roles Allowlist](/s/article/000005839).</Note>
+
+## Manage Authorized Impersonators
+
+Before a user with the Impersonate Users grant can start an impersonation session, the target user must explicitly authorize them. Each user controls their own list of authorized impersonators from their user settings.
+
+An authorization can have an optional expiration date set by the target user. Authorizations without an expiration date remain active until revoked. The Authorized Impersonators list shows each authorization's current status:
+
+- **Active:** The authorization is valid and has not expired or been revoked.
+- **Expired:** The expiration date has passed.
+- **Revoked:** The authorization was manually revoked.
+
+<Note>**Note:** Expired and revoked records remain visible in the list. Records cannot be edited. To change an expiration date, revoke the existing authorization and add a new one.</Note>
+
+### Add an Authorized Impersonator
+
+1. In the navigation bar, select your profile icon, then select **Settings**.
+
+2. Select the **Impersonation** tab.
+
+3. Select **Add Authorized Impersonator**.
+
+4. Select a user to authorize and optionally set an expiration date. Then, select **Add**.
+
+  The authorization is saved and the event is logged in the Activity Log.
+
+   <Note>**Note:** You can only authorize users who have the Impersonate Users grant.</Note>   
+
+### Revoke an Authorization
+
+1. In the navigation bar, select your profile icon, then select **Settings**.
+
+2. Select the **Impersonation** tab.
+
+3. In the Authorized Impersonators list, locate the authorization you want to revoke.
+
+4. Select the options menu for that authorization, then select **Revoke** and confirm
+
+   The authorization status changes to Revoked and the event is logged in the Activity Log.
+
+   <Warning>**Important:** Revoking an authorization means that user will no longer be allowed to start sessions impersonating you. However, any active sessions in which that user is impersonating you will continue until the impersonator ends the session or the session expires.</Warning>
+
+## Impersonate a User
+
+Starting an impersonation session requires two conditions to be met: the requestor must have the Impersonate Users grant, and the target user must have an active authorization for the requestor. Both conditions are evaluated when you attempt to start the session.
+
+The **Impersonate** button is shown to any user with the Impersonate Users grant. If no active authorization exists for the requestor, the button is disabled.
+
+### Start an Impersonation Session
+
+1. Navigate to **Admin** > **Governance** > **People**.
+
+2. Select the name of the user you want to impersonate.
+
+   The user details page loads.
+
+3. Select **Impersonate**.
+
+   Starting an impersonation may require an active elevation. Learn more about [Elevation for Sensitive Changes](/s/article/000005831).
+
+   <Note>**Note:** If the **Impersonate** button is disabled, the target user has not authorized you to impersonate them. Ask them to add you as an authorized impersonator in their user settings as described in [Manage Authorized Impersonators](/s/article/Impersonate-Users-in-Domo#manage-authorized-impersonators).</Note>
+
+4. In the modal that appears, enter your reason for impersonating.
+
+<Frame>![Initiate an impersonation](/images/kb/initiate-impersonation.jpg)</Frame>
+
+5. Select **Impersonate**.
+
+   Your current session ends and an impersonation session begins. The start of the impersonation session, including the target user identity, your identity, and your stated reason for impersonating are logged in the Activity Log. You are now logged in as the target user.
+
+### Use Domo During an Impersonation Session
+
+When in an impersonation session, a banner is displayed at the top of the screen indicating that you are impersonating another user. The banner includes the target user's name, a countdown timer showing the remaining session time, and an **End** button to end the impersonation session. Logging out also ends the impersonation session.
+
+<Frame>![Banner indicates you are impersonating another user](/images/kb/you-are-impersonating-banner.png)</Frame>
+
+#### Allowed During an Impersonation Session
+
+During an impersonation session, you see all dashboards, data, apps, and features exactly as the target user sees them. You can navigate Domo and take most actions available to the target user, including:
+
+- Viewing content and data the target user has access to
+- Creating, editing, and deleting cards, dashboards, DataSets, and other content
+- Configuring settings, favorites, alerts, and subscriptions on the target user's behalf
+
+#### Disallowed During an Impersonation Session
+
+The following are some of the features and functionality not available during an impersonation session:
+
+- **Support Portal, DomoU, and Community Forums**: You cannot log into those systems using the target user's identity.
+- **Cloud Integration OAuth tokens**: You cannot view or use the target user's OAuth tokens. DataSets that use OAuth for Cloud Integrations will not provide data during the session.
+- **Accounts**: You cannot use Accounts to create, edit, or save Connector or Cloud Integration configurations.
+- **Instance Management**: You cannot use Instance Management to log in to other managed instances.
+- **Nested impersonation**: You cannot start a second impersonation session from within an active session.
+- **Authorized Impersonators settings**: You cannot view or modify authorized impersonator settings.
+- **Access Tokens and API Clients**: You cannot create access tokens or API clients.
+
+### End an Impersonation Session
+
+An impersonation session ends when any of the following occurs, whichever comes first:
+
+- You select **End** in the impersonation banner or manually log out.
+- The maximum impersonation session duration (60 minutes) is reached.
+- The maximum session duration or session idle timeout for the instance is reached. Learn more about [Session Settings](/s/article/000005431).
+- An administrator terminates the session from Session Management.
+
+After the session ends, you are redirected to the login page and must log in with your own credentials.
+
+## Review the Activity Log
+
+The Domo Activity Log records the start and end of every impersonation session. The following details are captured for each event.
+
+**Session start:**
+
+- Impersonator identity
+- Target user identity
+- Stated reason for impersonating
+
+**Session end:**
+
+- Impersonator identity
+- Target user identity
+- How the session ended
+
+<Note>**Note:** Impersonation session expiration/timeout is not logged in the Activity Log.</Note>
+
+<Frame>![Activity Log shows start of user impersonation session](/images/kb/activity-log-start-user-impersonation.jpg)</Frame>
+
+Authorization events are also logged. When a user adds or revokes an authorized impersonator, the following are recorded:
+
+- Target user identity
+- Authorized impersonator identity
+- Expiration date, or "no expiration" if none was set
+
+<Note>**Note:** Actions taken during an impersonation session are logged as actions of the target user, not the impersonator. Only session start and end events identify the impersonator separately.</Note>
+
+Learn more about the [Activity Log](/s/article/360042934574).
+
+## Manage Impersonation Sessions
+
+Administrators can view all active sessions, including impersonation sessions, in Session Management. To open Session Management, in the navigation bar, select **Admin** > **Authentication** > **Session Management**. Impersonation sessions are clearly labeled with the impersonator's identity. Any user with session management permissions can terminate any active session, including impersonation sessions. Learn more about [Session Management](/s/article/000005432).
+
+Additional session constraints:
+
+- An impersonator can have only one active impersonation session at any time.
+- Only one impersonation session per target user can be active at any time.
+- Your other active sessions (such as in the Domo mobile app or in another browser window) are not affected when you start an impersonation session. The impersonation session is separate from any other session belonging to you or the target user.
+
+Each impersonation session lasts a maximum of 60 minutes. A session also expires when any of the following is reached, whichever comes first:
+
+- The instance maximum session duration
+- The instance idle timeout
+
+## FAQ
+
+<AccordionGroup>
+
+<Accordion title="Will the target user know I impersonated them?">
+  Domo does not notify the target user when an impersonation session starts or ends. However, every session start is recorded in the Activity Log, including the impersonator's identity, the target user's identity, and the stated reason for impersonating.
+</Accordion>
+
+<Accordion title="Are my actions during an impersonation session logged under my name or the target user's name?">
+  Actions taken during an impersonation session are logged as actions of the target user. The session start and end events are the only Activity Log entries that identify the impersonator separately.
+</Accordion>
+
+<Accordion title="Can the user I'm impersonating log in while I'm impersonating them?">
+  Yes. Your impersonation session and the target user's own session are completely independent. The target user can continue using Domo normally.
+</Accordion>
+
+<Accordion title="Can I edit or extend the expiration date on an authorization I've granted?">
+  No. Authorization records cannot be edited. To change the expiration date, revoke the existing authorization and create a new one.
+</Accordion>
+
+<Accordion title="What happens if an authorized impersonator loses the Impersonate Users grant?">
+  Their authorization record remains in your Authorized Impersonators list, but they cannot start a new impersonation session. Both the Impersonate Users grant and an active authorization are required to impersonate.
+</Accordion>
+
+</AccordionGroup>

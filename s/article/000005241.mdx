@@ -219,7 +219,7 @@ The following group endpoints are supported in Domo:
 | Get Group     | Get a group by ID.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       | `GET /Groups/{groupID}`    |
 | Post Group    | Create a group in Domo.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  | `POST /Groups`             |
 | Put Group     | Update a group—group definition in Domo is completely replaced by the new group definition.                                                                                                                                                                                                                                                                                                                                                                                                                                              | `PUT /Groups/{groupId}`    |
-| Patch Group   | Partially updates a group's attributes. <Note>**Note:** Unlike PATCH for users, PATCH for groups supports only the following operation structure: <br/>`{ "op": "Replace\|Add\|Remove", "path": "attributePath", "value": value }`. <br/>"path" is always required and its value is case-sensitive. Removing group attributes is not supported, except for members. <br/><br/>The "value" for the members path must be an array of objects each containing a "value" property with the Domo user ID (for example, `[{"value": 84173534}]`). <br/><br/>The `$ref` attribute is ignored.</Note> | `PATCH /Groups/{groupID}`  |
+| Patch Group   | Partially updates a group's attributes.<br/><br/>**Note:** Unlike PATCH for users, PATCH for groups only supports the following structure: <br/>`{ "op": "Replace\|Add\|Remove", "path": "attributePath", "value": value }`.<br/><br/>`path` is always required and its value is case-sensitive. Removing group attributes is not supported, except for members.<br/><br/>`value` is optional for the `members` path in a "Remove" op. If provided, must be an array of objects each containing a "value" property with the Domo user ID (for example, `[{"value": 84173534}]`). <br/><br/>For the Remove op, if the `value` property is not provided, **all members** will be removed from the group.<br/><br/>The `$ref` attribute is ignored. | `PATCH /Groups/{groupID}`  |
 | Delete Group  | Delete a group.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          | `DELETE /Groups/{groupID}` |
 
 #### Examples
@@ -242,6 +242,33 @@ The following group endpoints are supported in Domo:
 		"domoDisplayName": "Marketing",
 		"description": "Members of the US-based marketing team."
 	}
+}
+```
+
+`PATCH /Groups/{GROUP_ID}`
+
+*This removes all members from a group*
+
+```json
+{
+	"op": "Remove",
+	"path": "members",
+}
+```
+
+`PATCH /Groups/{GROUP_ID}`
+
+*This replaces all members of a group with those provided*
+
+```json
+{
+	"op": "Replace",
+	"path": "members",
+	"value": [
+		{
+			"value": "1201764328"
+		}
+	]
 }
 ```
 

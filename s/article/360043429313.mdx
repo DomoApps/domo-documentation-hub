@@ -40,7 +40,14 @@ Learn about the other Filter Card types:
 In Analyzer, Slicer, Checkbox Selector, and Radio Button Selector cards each require two columns/rows of data from your DataSet. One column/row contains the category values you want to use as filters. Drag this column/row to the **Items** field.
 
 <Frame><img alt="slicer_items_column.png" src="/images/kb/ka0Vq00000017yj-00N5w00000Ri7BU-0EM5w000005vP7c.png"/></Frame>
-The other field is called **Optional group by**. Though this field is required to power up the card, in general, it doesn't matter what column/row you drop here. If you need to aggregate the data, you can use this column/row to do so. For example, if the column/row with the filter names is duplicated in your DataSet, you can make the filter names unique by aggregating.
+
+The other field is called **Optional group by**. Though this field is required to power up the card, in many cases the column you drop here only affects deduplication: if the column with the filter names is duplicated in your DataSet, you can make the filter names unique by aggregating.
+
+<Warning>
+  **Critical for large DataSets (300K+ rows):** Always map a column to **Optional group by** when powering a Slicer, Checkbox Selector, or Radio Button Selector Card from a large DataSet. Without this mapping, the card downloads and processes *every* row in the DataSet — even when only a handful of unique filter values exist — which can cause severe performance issues and unresponsive dashboards.
+
+  Map the same column you applied to **Items** (or another appropriate dimension) to **Optional group by** so the data is aggregated before processing. For example, a **Brand** slicer with 10 unique values backed by a 334K-row DataSet will process only 10 values, not 334K rows, when **Optional group by** is set.
+</Warning>
 
 Learn about [choosing data columns](/s/article/360043428713 "Applying DataSet Columns to Your Chart").
 

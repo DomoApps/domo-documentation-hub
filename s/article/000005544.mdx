@@ -34,9 +34,7 @@ The generate\_text prompt provides answers to questions. In the example, the pro
 The output prompt is provided at the bottom.
 
 <Frame><img alt="Screenshot 2024-09-18 at 2.04.56 PM.png" src="/images/kb/ka0Vq00000051WX-00N5w00000Ri7BU-0EMVq000002moSn.jpg"/></Frame>
-You can modify the standard generate\_text template by providing a new prompt to the input\_str — the prompt\_template overrides the input\_str.
-
-To use input\_str, the prompt\_template and prompt\_parameters must be deleted.
+When a prompt\_template is included, it will ignore the input\_str unless you include the placeholder `${input}` within your prompt template text. If you include the `${input}` placeholder, then the input\_str will automatically be inserted for that placeholder.
 
 The following parameters are available in the generate\_text function. All of the parameters are optional except `input_str`.
 
@@ -195,4 +193,104 @@ def summarize(input_str: str,
   Returns:          
     response: summarized text      
   """
+```
+
+<Note>**Note:** The parameter behavior described below should be confirmed against the current product. This content was submitted for PM review.</Note>
+
+The `summarize()` function generates a summary from a long block of text using an AI model. It supports optional configurations that control the style, structure, and length of the summary. The only required parameter is `input_str`.
+
+```python
+summarize(input_str="Paste your text here...")
+```
+
+### Optional Parameters
+
+#### prompt_template
+
+**`prompt_template` (Optional) —** The `PromptTemplate` class helps structure reusable prompt strings for AI tasks. In this implementation, it is lightweight, requiring only a single input: the full prompt text.
+
+```python
+from domojupyter.ai.models.PromptTemplate import PromptTemplate
+
+template_text = "Summarize the following text:\n{text}"
+prompt = PromptTemplate(template=template_text)
+```
+
+#### parameters
+
+**`parameters` (Optional) —** A dictionary used to replace placeholders in the `prompt_template`.
+
+```python
+parameters = {
+    "topic": "monthly sales report",
+    "audience": "executive leadership"
+}
+```
+
+#### model and model_configuration
+
+* **`model` (Optional) —** Name or ID of the language model to be used for summarization.
+* **`model_configuration` (Optional) —** A dictionary with custom configuration parameters for a selected language model.
+
+#### chunking_configuration
+
+**`chunking_configuration` (Optional) —** Use this when summarizing large blocks of text. It splits the text into smaller, manageable chunks before summarization.
+
+```python
+from domojupyter.ai.models.ChunkingConfiguration import ChunkingConfiguration
+from domojupyter.ai.models.SeparatorType import SeparatorType
+
+chunking_configuration = ChunkingConfiguration(
+    max_chunk_size=1000,
+    chunk_overlap=100,
+    separators=["\n\n", "\n", " "],
+    separator_type=SeparatorType.TEXT,
+    disallow_intermediate_chunks=False
+)
+```
+
+Available `SeparatorType` options: `CPP`, `GO`, `HTML`, `JAVA`, `JAVASCRIPT`, `LATEX`, `MARKDOWN`, `PROTO`, `PYTHON`, `RST`, `RUBY`, `SCALA`, `SOL`, `SWIFT`, `TEXT`.
+
+#### output_style
+
+**`output_style` (Optional) —** Determines the design, structuring, and organization of the summarization's output.
+
+```python
+from domojupyter.ai.models.SummarizationOutputStyle import SummarizationOutputStyle
+
+output_style = SummarizationOutputStyle.BULLETED  # Options: BULLETED, NUMBERED, PARAGRAPH
+```
+
+#### output_word_length
+
+**`output_word_length` (Optional) —** Defines a size boundary to limit the length of the output summary, based on number of words.
+
+```python
+from domojupyter.ai.models.SizeBoundary import SizeBoundary
+
+output_word_length = SizeBoundary(min_bound=75, max_bound=150)
+```
+
+### Example
+
+The following example combines several optional parameters.
+
+```python
+from domojupyter.ai.models.ChunkingConfiguration import ChunkingConfiguration
+from domojupyter.ai.models.SeparatorType import SeparatorType
+from domojupyter.ai.models.SummarizationOutputStyle import SummarizationOutputStyle
+from domojupyter.ai.models.SizeBoundary import SizeBoundary
+
+summary = summarize(
+    input_str=long_text,
+    output_style=SummarizationOutputStyle.BULLETED,
+    output_word_length=SizeBoundary(min_bound=75, max_bound=150),
+    chunking_configuration=ChunkingConfiguration(
+        max_chunk_size=1200,
+        chunk_overlap=100,
+        separators=["\n", ".", " "],
+        separator_type=SeparatorType.MARKDOWN,
+        disallow_intermediate_chunks=False
+    )
+)
 ```

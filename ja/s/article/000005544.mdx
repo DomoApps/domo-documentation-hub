@@ -32,9 +32,7 @@ generate\_textプロンプトは、質問に対する回答を提供します。
 出力プロンプトは下部に指定されます。
 
 <Frame><img alt="Screenshot 2024-09-18 at 2.04.56 PM.png" src="/images/kb/ka0Vq00000051WX-00N5w00000Ri7BU-0EMVq000002moSn.jpg"/></Frame>
-input\_strに新しいプロンプトを指定することで、標準のgenerate\_textテンプレートを変更できます。prompt\_templateはinput\_strよりも優先されます。
-
-input\_strを使用するには、prompt\_templateおよびprompt\_parametersを削除する必要があります。
+`prompt_template` が指定されている場合、プロンプトテンプレートのテキスト内にプレースホルダー `${input}` を含めない限り、 `input_str` は無視されます。 `${input}` プレースホルダーを含めると、 `input_str` がそのプレースホルダーに自動的に挿入されます。
 
 generate\_text関数では、以下のパラメータを使用できます。 `input_str` を除くすべてのパラメータはオプションです。
 
@@ -193,6 +191,106 @@ def summarize(input_str: str,
  戻り値:          
  response: 要約されたテキスト      
  """
+```
+
+<Note>**注意:** 以下で説明するパラメータの動作は、現在の製品で確認する必要があります。このコンテンツはPMによるレビューのために提出されました。</Note>
+
+`summarize()` 関数は、AIモデルを使用して長いテキストブロックから要約を生成します。要約のスタイル、構造、および長さを制御するオプション設定をサポートしています。必須パラメータは `input_str` のみです。
+
+```python
+summarize(input_str="Paste your text here...")
+```
+
+### オプションパラメータ
+
+#### prompt_template
+
+**`prompt_template` （オプション） —** `PromptTemplate` クラスは、AIタスク用に再利用可能なプロンプト文字列を構造化するのに役立ちます。この実装は軽量であり、入力としてプロンプトテキスト全体という1つの値のみを必要とします。
+
+```python
+from domojupyter.ai.models.PromptTemplate import PromptTemplate
+
+template_text = "Summarize the following text:\n{text}"
+prompt = PromptTemplate(template=template_text)
+```
+
+#### parameters
+
+**`parameters` （オプション） —** `prompt_template` 内のプレースホルダーを置き換えるために使用される辞書。
+
+```python
+parameters = {
+    "topic": "monthly sales report",
+    "audience": "executive leadership"
+}
+```
+
+#### model および model_configuration
+
+* **`model` （オプション） —** 要約に使用する言語モデルの名前またはID。
+* **`model_configuration` （オプション） —** 選択した言語モデルのカスタム構成パラメータを持つ辞書。
+
+#### chunking_configuration
+
+**`chunking_configuration` （オプション） —** 大きなテキストブロックを要約する場合に使用します。要約の前に、テキストをより小さく扱いやすいチャンクに分割します。
+
+```python
+from domojupyter.ai.models.ChunkingConfiguration import ChunkingConfiguration
+from domojupyter.ai.models.SeparatorType import SeparatorType
+
+chunking_configuration = ChunkingConfiguration(
+    max_chunk_size=1000,
+    chunk_overlap=100,
+    separators=["\n\n", "\n", " "],
+    separator_type=SeparatorType.TEXT,
+    disallow_intermediate_chunks=False
+)
+```
+
+使用可能な `SeparatorType` オプション: `CPP`、`GO`、`HTML`、`JAVA`、`JAVASCRIPT`、`LATEX`、`MARKDOWN`、`PROTO`、`PYTHON`、`RST`、`RUBY`、`SCALA`、`SOL`、`SWIFT`、`TEXT`。
+
+#### output_style
+
+**`output_style` （オプション） —** 要約の出力のデザイン、構造化、および構成を決定します。
+
+```python
+from domojupyter.ai.models.SummarizationOutputStyle import SummarizationOutputStyle
+
+output_style = SummarizationOutputStyle.BULLETED  # Options: BULLETED, NUMBERED, PARAGRAPH
+```
+
+#### output_word_length
+
+**`output_word_length` （オプション） —** ワード数にもとづいて出力要約の長さを制限するサイズ境界を定義します。
+
+```python
+from domojupyter.ai.models.SizeBoundary import SizeBoundary
+
+output_word_length = SizeBoundary(min_bound=75, max_bound=150)
+```
+
+### 例
+
+次の例では、複数のオプションパラメータを組み合わせています。
+
+```python
+from domojupyter.ai.models.ChunkingConfiguration import ChunkingConfiguration
+from domojupyter.ai.models.SeparatorType import SeparatorType
+from domojupyter.ai.models.SummarizationOutputStyle import SummarizationOutputStyle
+from domojupyter.ai.models.SizeBoundary import SizeBoundary
+
+summary = summarize(
+    input_str=long_text,
+    output_style=SummarizationOutputStyle.BULLETED,
+    output_word_length=SizeBoundary(min_bound=75, max_bound=150),
+    chunking_configuration=ChunkingConfiguration(
+        max_chunk_size=1200,
+        chunk_overlap=100,
+        separators=["\n", ".", " "],
+        separator_type=SeparatorType.MARKDOWN,
+        disallow_intermediate_chunks=False
+    )
+)
 ```
 
 日本語

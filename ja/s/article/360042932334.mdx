@@ -116,7 +116,28 @@ Google Developers Consoleでプロジェクトを作成するには、次の手�
 
 このペインには、DomoデベロッパーアカウントとGoogleスプレッドシートに接続するための認証情報の入力フィールドが含まれています。下表では、各フィールドに必要な内容を説明しています。
 
-<table border="1" cellpadding="1" cellspacing="1" data-aura-rendered-by="33:195;a"><thead><tr><th colspan="1" rowspan="1"><p><span class="s1"> フィールド </span></p></th><th colspan="1" rowspan="1"><p><span class="s1"> 説明 </span></p></th></tr></thead><tbody><tr><td colspan="1" rowspan="1"><p> Service Token JSON </p></td><td colspan="1" rowspan="1"><p> 上述の「必要条件」セクションの「ステップ3：サービスアカウントを作成する」で生成したJSON Service Tokenを貼り付けます。 </p></td></tr></tbody></table>
+<table border="1" cellpadding="1" cellspacing="1" data-aura-rendered-by="33:195;a"><thead><tr><th colspan="1" rowspan="1"><p><span class="s1"> フィールド </span></p></th><th colspan="1" rowspan="1"><p><span class="s1"> 説明 </span></p></th></tr></thead><tbody><tr><td colspan="1" rowspan="1"><p> Service Token JSON </p></td><td colspan="1" rowspan="1"><p> 上述の「必要条件」の「ステップ3：サービスアカウントを作成する」でダウンロードしたサービスアカウントキーファイルから、 <strong>JSONオブジェクト全体</strong> を貼り付けます。外側の波括弧と、すべてのフィールド（ <code>type</code> 、 <code>project_id</code> 、 <code>private_key_id</code> 、 <code>private_key</code> 、 <code>client_email</code> 、 <code>client_id</code> など）を含め、ファイルの内容をそのまま貼り付けてください。 <code>private_key</code> の値だけ、またはほかの単一のフィールドだけを貼り付けないでください。 </p></td></tr></tbody></table>
+
+<Warning>
+**重要：** 接続失敗のよくある原因は、ダウンロードしたキーファイルから `private_key` の値（またはほかの単一フィールド）のみを貼り付けることです。コネクターには、Googleが生成したとおりの完全なJSONオブジェクトが必要です。
+</Warning>
+
+ダウンロードしたキーファイルは次のような形式です。外側の `{ ... }` を含め、ブロック全体を貼り付けてください。
+
+```json
+{
+  "type": "service_account",
+  "project_id": "<your-project-id>",
+  "private_key_id": "<your-private-key-id>",
+  "private_key": "<your-full-PEM-encoded-private-key-block-here>",
+  "client_email": "<your-service-account>@<your-project-id>.iam.gserviceaccount.com",
+  "client_id": "<your-client-id>",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/<your-service-account>%40<your-project-id>.iam.gserviceaccount.com"
+}
+```
 
 有効な認証情報を一度入力しておくと、随時同じアカウントを使用して新しいDomo-Google Sheets接続を設定できます。コネクターアカウントは、Data Centerの **［アカウント］** タブで管理できます。このタブの詳細は、「 [コネクターのユーザーアカウントを管理する](/ja/s/article/360042926054 "コネクターのユーザーアカウントを管理する") 」を参照してください。
 

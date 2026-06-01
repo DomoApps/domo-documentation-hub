@@ -17,9 +17,9 @@ Cloud Integrations addresses the following common data challenges:
 
 After Cloud Integrations is enabled for your Domo environment, you can assign the following Cloud Integrations grants to manage access to these features:
 
-- **Manage Cloud Accounts** — Allows you to add or remove cloud accounts and tables from a cloud account, and change the default storage cloud. Requires the Manage DataSet grant.
+- **Manage Cloud Accounts** — Allows you to add or remove cloud accounts, manage the tables exposed by a cloud account, and choose which cloud integration a new DataSet uses (selected from Domo or any cloud integration that has been shared with you). This grant does **not** allow you to change the instance-wide default storage cloud in **Admin** > **Features** > **Cloud Integrations**. Requires the Manage DataSet grant.
 
-- **Override Default Cloud** — Allows you to use any shared storage cloud account instead of the default cloud. If you do not have this grant, you cannot use any other cloud besides the default cloud. Requires the Edit DataSet or Manage DataSet grant.
+- **Override Default Cloud** — Allows you to change the instance-wide default storage cloud in **Admin** > **Features** > **Cloud Integrations**. This grant does **not** allow you to change which cloud integration an individual new DataSet uses. Requires the Edit DataSet or Manage DataSet grant.
 
 ## Setup
 
@@ -85,7 +85,7 @@ The table below compares federated data to Cloud Integrations read and read/writ
 | Get updated metadata from source tables — last updated time, updated row count    | ❌                             | ✅ (Every 15 minutes, Configurable) | ✅ (Every 15 minutes, Configurable)     |
 | Card Alerts                                                                       | Scheduled only                 | ✅ (Every 15 minutes, Configurable) | ✅ (Every 15 minutes, Configurable)     |
 | DataSet Alerts                                                                    | ❌                             | ✅ (Every 15 minutes, Configurable) | ✅ (Every 15 minutes, Configurable)     |
-| DataSet Views                                                                     | ✅                             | ✅                                  | ✅                                      |
+| DataSet Views                                                                     | ✅                             | △ (See note below)                  | △ (See note below)                      |
 | Use data from existing tables in Magic ETL as inputs                              | ❌                             | ✅                                  | ✅                                      |
 | Use data updates from existing tables to trigger other DataFlows                  | ❌                             | ✅                                  | ✅                                      |
 | Custom fiscal calendar for source table data (one per instance)                   | ❌                             | ❌                                  | ✅                                      |
@@ -95,6 +95,19 @@ The table below compares federated data to Cloud Integrations read and read/writ
 | Domo App Support                                                                  | ✅                             | ✅                                  | ✅                                      |
 | Jupyter Workspace Support                                                         | ✅                             | ✅                                  | ✅                                      |
 | Domo auto-caching of card loads                                                   | Set static TTL on each DataSet | ✅                                  | ✅                                      |
+
+<Note>
+  **Note:** DataSet View support for Cloud Integrations DataSets is limited:
+
+  - ✅ Supported: DataSet Views (Standard Views and SQL Views) that join Cloud Integrations DataSets from the **same** cloud connection.
+  - ❌ Not supported: DataSet Views that join a Cloud Integrations DataSet with a Domo DataSet (a standard Domo DataSet) or with a Cloud Integrations DataSet from a different cloud connection.
+
+  When creating a DataSet View, make sure every DataSet in the join is a Cloud Integrations DataSet from the same cloud connection.
+</Note>
+
+<Note>
+  **Note:** Custom fiscal calendars are not loaded automatically when you add a new Cloud Integration. If your instance uses a custom fiscal calendar, contact Domo Support to have it loaded on the new integration.
+</Note>
 
 ## Share a Cloud Integrations Account
 

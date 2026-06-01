@@ -1,0 +1,127 @@
+---
+title: "Wire an App"
+---
+
+## Intro
+
+This article explains how to wire a custom Domo App to DataSets and AppDB Collections on the Wiring screen, how the `manifest.json` file controls which DataSets and Collections the App expects, and how rewiring an App to different data changes its layout and behavior.
+
+Wiring is the link between an App and the data that powers it. A well-wired App reads the right DataSet columns, writes to the correct AppDB Collection, and stays in sync with the field definitions declared in its manifest.
+
+---
+
+## Definitions
+
+Before you wire an App, it helps to be clear on the terms used on the Wiring screen and in the manifest.
+
+- **AppDB —** A wrapper around a MongoDB database that adds document-level security Filters and ensures tight integration with Domo instances. You can use AppDB as your web application's database. It enables real-time, read/write functionality in your App.
+- **Collection —** An AppDB container that stores the documents an App reads and writes at runtime. Unlike a DataSet, a Collection is dynamic and updates as users interact with the App.
+- **DataSet —** The data extracted from a data source and stored in Domo, used to power your App. DataSets are static from the App's perspective — the App reads from them but does not write back to them.
+- **Manifest —** The `manifest.json` file declares the App's name, version, properties, default Collections, and DataSet field mappings. The manifest must be placed in the base directory of the App and named `manifest.json`.
+- **Mapping —** The list of DataSet mappings the App uses. Each mapping defines an alias and the fields the App expects to find in the DataSet wired to that alias.
+- **Name —** The name of the App as it appears in Domo.
+- **Version —** The current version of your App.
+- **Wiring —** The screen where you map your App to data in Domo.
+
+For the full list of manifest properties and example JSON, see [The Manifest File](/portal/Apps/App-Framework/Guides/manifest).
+
+## Access the Wiring Screen
+
+1. Open the dashboard containing your App card.
+
+2. On the App card, select **Card options** > **Edit Card**.
+   The App Wiring screen opens. The bottom half of the page displays the **DataSets** and **Collections** tabs — this is where you map the App to data in Domo based on the aliases and Collections declared in its `manifest.json`.
+
+   <Frame>![App Wiring screen showing the App preview on top and, in the lower half, the SELECT DATASET panel with the DataSet/Collections tab icons on the left rail and a DataSet table preview on the right.](/images/kb/wiring-app-screen-overview.png)</Frame>
+
+## Wire a DataSet
+
+The **DataSet** dropdown lists the aliases declared in the App's manifest. For each alias, you select a DataSet in Domo and map the alias's expected fields to columns on that DataSet.
+
+1. On the Wiring screen, open the **DataSets** tab.
+
+2. Select an alias from the dropdown.
+   The alias name comes from the `datasetsMapping` entry in the App's `manifest.json`.
+
+3. Choose the Domo DataSet you want to wire to the alias.
+
+4. For each field the App expects, select the matching column in the DataSet.
+
+   <Frame>![Wiring screen DataSets tab with the Example Sales Data DataSet selected and three alias rows — col1, col2, col3 — mapped to the date_ymd, revenue, and sales_rep columns, with a live table preview on the right.](/images/kb/wiring-app-dataset-alias-mapping.png)</Frame>
+
+5. Repeat for any additional aliases declared in the manifest.
+
+<Note>**Note:** If you later update field mappings in the manifest, return to the Wiring screen and re-map the DataSet so the App continues to read the fields it expects.</Note>
+
+## Wire a Collection
+
+In the **Collections** tab you can either create a new AppDB Collection for the App or wire it to a pre-existing Collection. In most cases, you'll want to create a new Collection so the App has its own dedicated storage.
+
+1. On the Wiring screen, open the **Collections** tab.
+
+2. Use the toggle to choose between creating a new Collection and wiring to an existing one.
+   - To create a new Collection, leave the toggle on the new-Collection option. Domo provisions the Collection for the App when you save.
+   - To wire to an existing Collection, switch the toggle and select the Collection from the list.
+
+   <Frame>![Wiring screen Collections tab showing the appDBFormExampleCollection selected with Sync enabled, the product/SKU schema, App Permissions (Create/Read/Update/Delete Content), and a JSON Data Preview pane on the right.](/images/kb/wiring-app-collections-toggle.png)</Frame>
+
+3. Save the wiring.
+
+<Warning>**Important:** To wire an App to a pre-existing Collection, the Collection must have the **Share with New App** option turned on. Without this setting, the Collection won't appear in the existing-Collection list.</Warning>
+
+To change which Collection an App is wired to later, return to the Wiring screen and either create a new Collection or switch to a different pre-existing Collection.
+
+## Use Wired Data in the App
+
+After an App is wired, the DataSet and Collection serve different roles at runtime. A typical demo App illustrates the difference:
+
+- The App displays the wired DataSet in a table tab. Because DataSets are static from the App's perspective, this view reflects whatever the DataSet currently contains.
+
+  <Frame>![Demo App's Dataset Wiring Demo tab displaying the wired DataSet as a table with date_ymd, revenue, sales_rep, department, and state columns.](/images/kb/wiring-app-example-dataset-display.png)</Frame>
+
+- The App also exposes a small form with two fields, "product" and "SKU." After you fill the fields and select **Submit**, the values are written to the wired Collection and immediately displayed below in a table that reads from the same Collection.
+
+  <Frame>![Demo App's Collections Wiring Demo tab showing the Product and SKU fields, the Submit button, and a table below populated with submitted rows (Super Cool Domo App / 12345, Domo AI Services Layer / 8765, New Product / 1230000).](/images/kb/wiring-app-example-collection-form.png)</Frame>
+
+The takeaway: the DataSet is static and the Collection is dynamic. Read-only reference data belongs in a DataSet; data the App needs to create or update belongs in a Collection.
+
+## Configure Wiring in manifest.json
+
+The App's `manifest.json` file declares the data the App expects to be wired to. The Wiring screen surfaces these declarations as the aliases and Collections you map to actual DataSets and AppDB Collections in your Domo instance.
+
+The properties most relevant to wiring are:
+
+- **`name` —** The name of the App as it appears in Domo.
+- **`version` —** The current version of the App.
+- **`collections` —** The default Collection or Collections the App expects. Each entry becomes a row in the Collections tab on the Wiring screen.
+- **`datasetsMapping` —** The list of DataSet aliases the App expects, each with the fields the App reads. Each entry becomes an alias in the DataSet dropdown on the Wiring screen.
+
+You can declare multiple Collections and multiple DataSet mappings in a single manifest — each one shows up as a separate slot to wire on the Wiring screen.
+
+<Frame>![Sample manifest.json open in an editor showing the name "Wiring Screen Tutorial", version, size, fullpage, datasetsMapping (with the dataset alias and col1/col2/col3 → date_ymd/revenue/sales_rep field mappings), collections (with appDBFormExampleCollection's product/SKU schema and syncEnabled: true), id, and proxyId properties.](/images/kb/wiring-app-manifest-sample.png)</Frame>
+
+<Note>**Note:** If you change the field mapping for a DataSet in the manifest, you also need to update the App's wiring so the DataSet you're using exposes the columns the App now expects.</Note>
+
+For the complete list of manifest properties, value types, and a full example file, see [The Manifest File](/portal/Apps/App-Framework/Guides/manifest).
+
+## FAQ
+
+<AccordionGroup>
+
+<Accordion title="What's the difference between a DataSet and a Collection in an App?">
+  A DataSet is static read-only data extracted into Domo from a data source. A Collection is an AppDB container the App can write to and read from at runtime. Use a DataSet for reference data the App displays and a Collection for data the App creates or updates.
+</Accordion>
+
+<Accordion title="Can I change which Collection an App is wired to after I publish it?">
+  Yes. Return to the Wiring screen for the App card and either create a new Collection or wire to a different pre-existing Collection. The pre-existing Collection must have **Share with New App** turned on.
+</Accordion>
+
+<Accordion title="Why doesn't my existing Collection appear in the Collections tab?">
+  The Collection most likely doesn't have **Share with New App** turned on. Enable that option on the Collection, then return to the Wiring screen.
+</Accordion>
+
+<Accordion title="Can one App use multiple DataSets and Collections?">
+  Yes. Declare each DataSet alias under `datasetsMapping` and each Collection under `collections` in the App's `manifest.json`. Every entry shows up as a separate slot on the Wiring screen.
+</Accordion>
+
+</AccordionGroup>

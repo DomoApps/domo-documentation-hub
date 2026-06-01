@@ -349,23 +349,34 @@ Beta features must be marked using one of two conventions, depending on whether 
 
 ### Standard Beta Note
 
-Use this exact callout — verbatim — wherever a beta Note is required. Do not paraphrase, shorten, or change the links.
+The standard beta Note is stored once as a reusable snippet at `/snippets/BetaNote.mdx`, so its wording, links, and feedback email stay identical in every article and only ever change in one place. Don't paste the Note text into an article — import the snippet instead.
+
+Add this import line once, on its own line directly below the frontmatter (the closing `---`):
 
 ```mdx
-<Note>
-  **Note:** This feature is in beta. Beta Program participants can enable
-  features [here](https://embed.domo.com/embed/pages/DQ8Ek). To join the Beta
-  Program, fill out [this form](https://embed.domo.com/embed/pages/K8GMx). For beta questions or feedback, email
-  [beta.admin@domo.com](mailto:beta.admin@domo.com).
-</Note>
+import { BetaNote } from '/snippets/BetaNote.mdx';
 ```
+
+Then write this wherever the beta Note should appear:
+
+```mdx
+<BetaNote />
+```
+
+For a Note that introduces a **group** of beta features rather than one specific feature — typically a release-notes roundup, where the Note sits above a list of beta items — add the `generic` prop. This drops the leading "This feature is in beta." sentence, which doesn't fit that context:
+
+```mdx
+<BetaNote generic />
+```
+
+The snippet renders a Note about enabling beta features, with links to enable beta features, to join the Beta Program, and an address for beta questions or feedback (and, unless `generic` is set, a leading "This feature is in beta." sentence). To see or change the exact text, open `/snippets/BetaNote.mdx` — remember that a change there updates every article that imports it.
 
 ### Whole-Article Beta Features
 
 When the entire article covers a beta feature:
 
 1. Add `tag: "Beta"` to the frontmatter. This renders a Beta badge next to the article title in the sidebar.
-2. Place the standard beta Note immediately after the frontmatter, above the Intro section.
+2. Add the `import { BetaNote } from '/snippets/BetaNote.mdx';` line directly below the frontmatter, then place `<BetaNote />` immediately after it, above the Intro section.
 3. Do not append `(Beta)` to the article title.
 
 ```mdx
@@ -375,16 +386,32 @@ tag: "Beta"
 sidebarTitle: "MCP Server"
 ---
 
-<Note>
-  **Note:** This feature is in beta. Beta Program participants can enable
-  features [here](https://embed.domo.com/embed/pages/DQ8Ek). To join the Beta
-  Program, fill out [this form](https://embed.domo.com/embed/pages/K8GMx). For beta questions or feedback, email
-  [beta.admin@domo.com](mailto:beta.admin@domo.com).
-</Note>
+import { BetaNote } from '/snippets/BetaNote.mdx';
+
+<BetaNote />
 
 ## Intro
 
 ...
+```
+
+### Whole-Section Beta Features
+
+When an entire multi-page section is in beta — typically an API reference that appears as a dropdown group in the sidebar — tag the group heading instead of each page:
+
+1. Add `"tag": "Beta"` to the group's object in the navigation file (`docs.json`). This renders the Beta badge next to the dropdown heading.
+2. Do not also add `tag: "Beta"` to that group's Overview (landing) page — the badge would then appear twice in the same expanded section. Tag the heading only.
+3. Still place `<BetaNote />` on the Overview page (and any other beta pages in the group) per the rules above.
+
+```json
+{
+  "group": "FileSets API",
+  "tag": "Beta",
+  "pages": [
+    "portal/b939448cde9d5-file-sets-api",
+    ...
+  ]
+}
 ```
 
 ### Section-Level Beta Features
@@ -392,18 +419,21 @@ sidebarTitle: "MCP Server"
 When only a section of an otherwise-GA article covers a beta feature:
 
 1. Append a Badge to the section heading: `<Badge className="text-primary bg-primary/10 font-bold">Beta</Badge>`. The `className` is required — it matches the styling of the sidebar `tag` badge so the two are visually consistent.
-2. Place the standard beta Note immediately under the **first** beta section in the article. Do not repeat the Note for any additional beta sections in the same article — one Note per article is enough.
+2. Add the `import { BetaNote } from '/snippets/BetaNote.mdx';` line directly below the frontmatter, then place `<BetaNote />` immediately under the **first** beta section in the article. Don't repeat it for additional beta sections in the same article — one Note per article is enough.
 3. Do not append `(Beta)` or `(BETA)` to the heading text.
 
 ```mdx
+---
+title: "..."
+---
+
+import { BetaNote } from '/snippets/BetaNote.mdx';
+
+...
+
 ### PDP—Row Policies <Badge className="text-primary bg-primary/10 font-bold">Beta</Badge>
 
-<Note>
-  **Note:** This feature is in beta. Beta Program participants can enable
-  features [here](https://embed.domo.com/embed/pages/DQ8Ek). To join the Beta
-  Program, fill out [this form](https://embed.domo.com/embed/pages/K8GMx). For beta questions or feedback, email
-  [beta.admin@domo.com](mailto:beta.admin@domo.com).
-</Note>
+<BetaNote />
 
 This report lists all PDP row policies by ID...
 

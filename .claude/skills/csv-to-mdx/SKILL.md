@@ -200,6 +200,7 @@ The converter emits image-based inline icons (`<img src="/images/kb/...">`). Bot
 
 - [ ] Inline `<img>` icons depicting **current Domo product UI** → migrate to `<i className="icon-{name}" aria-hidden="true" />` (phosphor). If the original image showed a pre-refresh icon, this is also a stale-screenshot upgrade — go to phosphor anyway.
 - [ ] Inline `<img>` icons depicting **legacy surfaces** (release notes describing pre-refresh UI, Workbench, other legacy apps) → migrate to `<i className="legacy-icon-{name}" aria-hidden="true" />`.
+- [ ] Inline `<img>` icons that are **third-party brand logos** (AWS, OpenAI, Anthropic, GitHub, …) → these aren't in the Domo icon font, and a monochrome logo image breaks in dark mode. Migrate to a coded icon: `<Icon icon="{slug}" iconType="brands" aria-hidden="true" />` (Font Awesome brands), or an inline `<svg fill="currentColor">` (e.g. a [Simple Icons](https://simpleicons.org) path) when FA's free set lacks the brand. See `Domo-KB-Style-Guide.mdx` › **Brand and Third-Party Logos**.
 - [ ] After migration, confirm the surrounding prose names the icon (e.g. "click the line chart icon \<icon\>"). If it doesn't, rewrite the prose inline rather than reaching for `aria-label`.
 - [ ] Remove any leftover `import { InlineImage } from "/snippets/InlineImage.mdx";` line — the snippet is no longer in use anywhere in the repo. Inline images should always be a native `<img>` with an inline `style` block (see `Domo-KB-Style-Guide.mdx` › **Inline images**).
 

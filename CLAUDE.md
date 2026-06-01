@@ -44,6 +44,7 @@ Key Mintlify components in use:
 - `<Note>`, `<Warning>`, `<Tip>` — callout blocks (always bold the label: `**Note:**`)
 - `<AccordionGroup>` + `<Accordion title="...">` — FAQ sections
 - Inline UI icons use the Domo icon font: `<i className="icon-{name}" aria-hidden="true" />`. Avoid Mintlify's `<Icon>` component for local SVGs — color/dark-mode breaks. When a glyph isn't in either icon font, fall back to a native `<img>` with inline `style={{display: 'inline', verticalAlign: 'start', height: '1.2em', margin: '0'}}` (use `'2em'` if the icon stands alone as a row label in a table cell). See `Domo-KB-Style-Guide.mdx` › **Icons**.
+- Third-party brand logos (AWS, OpenAI, Anthropic, GitHub, …) are not in the Domo icon font. Prefer a coded icon over an `<img>` — a monochrome logo image disappears in dark mode. First choice: Font Awesome's brands set via `<Icon icon="{slug}" iconType="brands" aria-hidden="true" />` (this is the one case where `<Icon>` is correct — it's a font glyph, not a local SVG). When the free FA set lacks it (e.g. Anthropic), inline raw `<svg fill="currentColor" …>` with a path from a source like Simple Icons. See `Domo-KB-Style-Guide.mdx` › **Brand and Third-Party Logos**.
 
 Internal links use root-relative paths: `[text](/s/article/Article-Title)`
 

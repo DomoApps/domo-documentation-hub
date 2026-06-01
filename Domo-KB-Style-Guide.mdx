@@ -229,6 +229,34 @@ Treat this as a last resort. Whenever the icon sits inside normal prose, the rew
 
 Domo's icon font is large but not exhaustive. If the UI element you're trying to depict isn't represented in the font, fall back to a regular inline image — see *Inline images* below for how to format it. Just remember that the font version is preferred whenever a matching icon exists.
 
+One special case: if what you need is a third-party brand logo — AWS, OpenAI, Anthropic, GitHub, and the like — don't reach for an uploaded image right away. Those usually have a *coded* option too. See *Brand and Third-Party Logos* below.
+
+### Brand and Third-Party Logos
+
+Company and product logos aren't part of the Domo icon font, but you usually don't need to upload an image for them either — and you shouldn't if you can avoid it. A logo saved as an image is almost always a solid-color mark, so it vanishes against a dark background. Prefer a *coded* icon that inherits the surrounding text color, the same way the Domo icon font does, so it stays visible in both light and dark mode.
+
+There are two ways to do this. Try them in order:
+
+1. **Font Awesome brand icon.** Most major company logos are built into Font Awesome's *brands* set, which is available in every article. Reference one with the `<Icon>` component and `iconType="brands"`:
+
+   ```mdx
+   See the [OpenAI guide](https://platform.openai.com/docs/guides/text) <Icon icon="openai" iconType="brands" aria-hidden="true" />.
+   ```
+
+   The icon name is the brand's slug — `aws`, `openai`, `github`, and so on. Browse the set at [Font Awesome Brands](https://fontawesome.com/search?f=brands). This is the one case where `<Icon>` is the right tool: it's pulling a font glyph, not loading an uploaded image, so the dark-mode problem described under *Inline images* doesn't apply.
+
+2. **Inline SVG with `fill="currentColor"`.** A few brands — Anthropic is one — aren't in the free Font Awesome set. For those, paste the logo's SVG straight into the article and set `fill="currentColor"` so it picks up the text color. Vector logo libraries such as [Simple Icons](https://simpleicons.org) provide ready-to-paste paths:
+
+   ```mdx
+   See the [Anthropic guide](https://docs.anthropic.com) <svg aria-hidden="true" viewBox="0 0 24 24" fill="currentColor" style={{height: '1.1em', width: '1.1em', display: 'inline', verticalAlign: '-0.15em', margin: '0'}}><path d="M17.3041 3.541h-3.6718l6.696 16.918H24Zm-10.6082 0L0 20.459h3.7442l1.3693-3.5527h7.0052l1.3693 3.5528h3.7442L10.5363 3.5409Zm-.3712 10.2232 2.2914-5.9456 2.2914 5.9456Z" /></svg>.
+   ```
+
+   This is raw inline SVG, *not* the `<Icon>` component pointing at an uploaded file. The `fill="currentColor"` is what makes it adapt to the theme, which is why the dark-mode caveat under *Inline images* doesn't apply here either.
+
+Only fall back to an uploaded image (see *Inline images*) if a logo exists in neither place and you can't get its SVG — and if you do, pick a version that's legible on both light and dark backgrounds.
+
+For accessibility, follow the same rule as *Always Pair an Icon with a Text Label*: when the logo sits next to text that already names the brand — a link reading "OpenAI," for example — hide the icon from screen readers with `aria-hidden="true"` so it isn't announced twice. Reserve `role="img"` with `aria-label` for a logo that stands completely alone with nothing else naming it.
+
 ### Legacy Icons (`legacy-icon-*`)
 
 Domo also has a second icon font available, called `legacy-icon-*`. It contains the same set of icons as the standard `icon-*` font, but is styled to match Domo's older UI. The current font (`icon-*`) uses Phosphor icons, which are part of the design refresh.

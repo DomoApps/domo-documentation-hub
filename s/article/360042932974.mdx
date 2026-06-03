@@ -221,7 +221,13 @@ Your agent must be authorized to accept connections.
 
 <Accordion title="How does caching work?">
 
-Results are cached at a DataSet & SQL query level. Every card, Custom App, and DataFlow produces SQL used to select results from an underlying DataSet. The combination of the produced SQL and the DataSet serves as a cache key. If multiple cards produce the same SQL to retrieve data from the same DataSet, they may utilize the same cache. The same goes for multiple users that access a card or cards producing the same SQL against the same DataSet.
+Results are cached at a DataSet & SQL query level. Every card, Custom App, and DataFlow produces SQL used to select results from an underlying DataSet. The combination of the produced SQL and the DataSet serves as a cache key. If multiple cards produce the same SQL to retrieve data from the same DataSet, they may utilize the same cache.
+
+<Note>
+**Note:** Queries that contain dynamic functions — such as NOW(), CURRENT_DATE(), or CURRENT_TIMESTAMP() — produce a different SQL string on every card load. Because the cache key is the exact SQL text paired with the DataSet, these queries generate a new cache key each time and effectively bypass caching. If cache efficiency matters, consider filtering by a date column in a Beast Mode formula instead of using dynamic functions directly in SQL.
+</Note>
+
+The same goes for multiple users that access a card or cards producing the same SQL against the same DataSet.
 </Accordion>
 
 <Accordion title="How is caching impacted by filtering and/or PDP?">

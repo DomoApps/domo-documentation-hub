@@ -50,6 +50,7 @@ jobs:
         run: python scripts/build_video_library.py
 
       - name: Commit, push, and open/update PR
+        id: push
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -59,6 +60,7 @@ jobs:
 
           if [ -z "$(git status --porcelain -- $PATHS)" ]; then
             echo "No changes from the latest DataSet — nothing to sync."
+            echo "changed=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
 
@@ -69,10 +71,12 @@ jobs:
           git add -- $PATHS
           git commit -m "chore: sync Domo Video Library ($(date -u +%F))"
           git push --force origin "$BRANCH"
+          echo "changed=true" >> "$GITHUB_OUTPUT"
 
           EXISTING=$(gh pr list --head "$BRANCH" --state open --json number --jq '.[0].number // empty')
           if [ -n "$EXISTING" ]; then
             echo "Updated existing PR #$EXISTING (push refreshed it)."
+            PR_NUMBER="$EXISTING"
           else
             gh pr create \
               --base main \
@@ -80,4 +84,47 @@ jobs:
               --title "Sync Domo Video Library" \
               --body "Automated rebuild of the Domo Video Library from the source DataSet. Review the diff (article copy + thumbnails) and merge to publish." \
               --label "automated"
+            PR_NUMBER=$(gh pr list --head "$BRANCH" --state open --json number --jq '.[0].number // empty')
           fi
+          echo "pr_number=$PR_NUMBER" >> "$GITHUB_OUTPUT"
+
+      # Auto-PRs opened with GITHUB_TOKEN don't trigger the standard preview
+      # workflow, so trigger a Mintlify preview for the branch directly here.
+      - name: Trigger Mintlify preview
+        id: preview
+        if: steps.push.outputs.changed == 'true'
+        env:
+          MINTLIFY_TOKEN: ${{ secrets.MINTLIFY_KEY }}
+          MINTLIFY_PROJECT_ID: ${{ secrets.MINTLIFY_PROJECT_ID }}
+        run: |
+          set -euo pipefail
+          if [ -z "${MINTLIFY_TOKEN:-}" ] || [ -z "${MINTLIFY_PROJECT_ID:-}" ]; then
+            echo "::warning::MINTLIFY_KEY / MINTLIFY_PROJECT_ID not set — skipping preview."
+            exit 0
+          fi
+          HTTP_STATUS=$(curl --silent --show-error \
+            --write-out '%{http_code}' --output /tmp/mint-response.json \
+            -X POST "https://api.mintlify.com/v1/project/preview/${MINTLIFY_PROJECT_ID}" \
+            -H "Authorization: Bearer ${MINTLIFY_TOKEN}" \
+            -H "Content-Type: application/json" \
+            -d '{"branch": "auto/video-library"}')
+          echo "HTTP $HTTP_STATUS"; cat /tmp/mint-response.json || true; echo ""
+          if [ "$HTTP_STATUS" != "202" ]; then
+            echo "::warning::Mintlify preview trigger returned HTTP $HTTP_STATUS."
+            exit 0
+          fi
+          PREVIEW_URL=$(jq -r '.previewUrl // empty' /tmp/mint-response.json)
+          echo "preview_url=$PREVIEW_URL" >> "$GITHUB_OUTPUT"
+
+      - name: Comment preview URL on PR
+        if: steps.push.outputs.changed == 'true' && steps.preview.outputs.preview_url != '' && steps.push.outputs.pr_number != ''
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          number: ${{ steps.push.outputs.pr_number }}
+          header: mintlify-preview
+          message: |
+            ### Mintlify preview
+
+            **[Open preview](${{ steps.preview.outputs.preview_url }})** — built from `auto/video-library`.
+
+            <sub>Updated on each automated sync. Preview deploys can take a minute or two — refresh if it shows a build-in-progress splash.</sub>

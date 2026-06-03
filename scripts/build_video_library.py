@@ -193,7 +193,7 @@ def render_article(rows):
         "",
         INTRO,
         "",
-        "<CardGroup cols={3}>",
+        "<CardGroup cols={2}>",
         "",
     ]
     for r in ordered:

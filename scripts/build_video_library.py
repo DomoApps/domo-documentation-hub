@@ -1,34 +1,32 @@
 #!/usr/bin/env python3
 """Rebuild the Domo Video Library directory article from a Domo DataSet.
 
-Pulls video rows from a Domo DataSet via the Domo API, downloads each
-thumbnail into images/kb/, and regenerates s/article/Domo-Video-Library.mdx
-as a flat, alphabetical CardGroup. Output is deterministic, so a run with
-unchanged data produces no git diff.
+Queries the DataSet through the Domo instance API using a developer access
+token, downloads each thumbnail into images/kb/, and regenerates
+s/article/Domo-Video-Library.mdx as a flat, alphabetical CardGroup. Output is
+deterministic, so a run with unchanged data produces no git diff.
 
 Run locally or from CI. Required environment variables:
 
-  DOMO_CLIENT_ID         Domo OAuth client id   (developer.domo.com, scope "data")
-  DOMO_CLIENT_SECRET     Domo OAuth client secret
+  DOMO_DEVELOPER_TOKEN   Domo developer access token
+                         (instance: Admin → Authentication → Access Tokens)
   DOMO_VIDEO_DATASET_ID  GUID of the DataSet backing the library
 
 Optional:
 
-  DOMO_API_HOST          API host (default: api.domo.com)
+  DOMO_INSTANCE          Domo instance host (default: domo.domo.com)
 
 The DataSet must expose these columns (header row, any order):
   description, title, tags, thumbnail_url, date_added, share_url
-(`tags` is read but not currently rendered.)
+Extra columns are ignored.
 """
 
-import base64
 import csv
 import io
 import json
 import os
 import re
 import sys
-import urllib.parse
 import urllib.request
 from datetime import datetime
 
@@ -59,42 +57,27 @@ def log(msg):
 
 
 # --------------------------------------------------------------------------- #
-# Domo API
+# Domo API (instance query API + developer access token)
 # --------------------------------------------------------------------------- #
-def get_access_token(host, client_id, client_secret):
-    creds = base64.b64encode(f"{client_id}:{client_secret}".encode()).decode()
-    url = f"https://{host}/oauth/token?" + urllib.parse.urlencode(
-        {"grant_type": "client_credentials", "scope": "data"}
-    )
-    req = urllib.request.Request(url, method="GET")
-    req.add_header("Authorization", f"Basic {creds}")
-    with urllib.request.urlopen(req, timeout=60) as resp:
-        body = json.load(resp)
-    token = body.get("access_token")
-    if not token:
-        raise RuntimeError(f"No access_token in Domo OAuth response: {body}")
-    return token
-
-
-def export_dataset_csv(host, token, dataset_id):
-    url = f"https://{host}/v1/datasets/{dataset_id}/data?includeHeader=true"
-    req = urllib.request.Request(url, method="GET")
-    req.add_header("Authorization", f"Bearer {token}")
+def query_dataset_csv(instance, token, dataset_id):
+    url = f"https://{instance}/api/query/v1/execute/{dataset_id}?includeHeader=true"
+    body = json.dumps({"sql": "SELECT * FROM table"}).encode()
+    req = urllib.request.Request(url, data=body, method="POST")
+    req.add_header("X-DOMO-Developer-Token", token)
+    req.add_header("Content-Type", "application/json")
     req.add_header("Accept", "text/csv")
     with urllib.request.urlopen(req, timeout=120) as resp:
         return resp.read().decode("utf-8-sig")
 
 
 def load_rows():
-    host = os.environ.get("DOMO_API_HOST") or "api.domo.com"
-    client_id = os.environ.get("DOMO_CLIENT_ID")
-    client_secret = os.environ.get("DOMO_CLIENT_SECRET")
+    instance = os.environ.get("DOMO_INSTANCE") or "domo.domo.com"
+    token = os.environ.get("DOMO_DEVELOPER_TOKEN")
     dataset_id = os.environ.get("DOMO_VIDEO_DATASET_ID")
     missing = [
         n
         for n, v in [
-            ("DOMO_CLIENT_ID", client_id),
-            ("DOMO_CLIENT_SECRET", client_secret),
+            ("DOMO_DEVELOPER_TOKEN", token),
             ("DOMO_VIDEO_DATASET_ID", dataset_id),
         ]
         if not v
@@ -102,10 +85,8 @@ def load_rows():
     if missing:
         raise SystemExit(f"Missing required env var(s): {', '.join(missing)}")
 
-    log(f"Authenticating to Domo ({host}) ...")
-    token = get_access_token(host, client_id, client_secret)
-    log(f"Exporting DataSet {dataset_id} ...")
-    csv_text = export_dataset_csv(host, token, dataset_id)
+    log(f"Querying DataSet {dataset_id} on {instance} ...")
+    csv_text = query_dataset_csv(instance, token, dataset_id)
 
     reader = csv.DictReader(io.StringIO(csv_text))
     cols = set(reader.fieldnames or [])

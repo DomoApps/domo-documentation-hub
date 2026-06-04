@@ -1,12 +1,13 @@
 ---
 title: "Textbox"
+excerpt: "Create Textbox cards in Domo to display formatted text from a DataSet, including dynamic values referenced through column macros."
 ---
 
 ## Intro
 
 A Textbox is used to represent a piece of text. The text can be as long as needed if it fits in a single cell of a DataSet, and can contain any character. You can format text to be centered, left-aligned, or right-aligned, and can set the space of the margins. You can also specify text to override the text from your DataSet or reference a value column using a macro.
 
-<Frame><img alt="Screenshot 2024-11-20 at 2.11.17 PM.png" src="/images/kb/ka0Vq0000004rwz-00N5w00000Ri7BU-0EMVq000003vyQj.jpg" style={{width: 800, height: 367}}/></Frame>
+<Frame><img alt="Screenshot 2024-11-20 at 2.11.17 PM.png" src="/images/kb/ka0Vq0000004rwz-00N5w00000Ri7BU-0EMVq000003vyQj.jpg"/></Frame>
 ---
 
 ## Power Textboxes
@@ -22,6 +23,23 @@ For more information about formatting charts in the Analyzer, see [Visualization
 The following graphic shows how the data from a typical column-based spreadsheet is converted into a Textbox:
 
 <Frame><img alt="textbox_spreadsheet_example_new.png" src="/images/kb/ka0Vq0000004rwz-00N5w00000Ri7BU-0EM5w000005vP3j.png"/></Frame>
+
+## Use HTML in a Textbox Beast Mode
+
+When a Textbox card's text comes from a Beast Mode `CONCAT`, you can embed HTML tags directly in the string to control formatting. The most common use is `<br>` to insert a line break between values.
+
+For example, the following Beast Mode renders two metrics on separate lines in the same Textbox:
+
+```sql
+CONCAT(
+  'Total Order Quantity is: ', SUM(`Order Quantity`),
+  '<br>',
+  'Max item price is: ', MAX(`Item Price`)
+)
+```
+
+Other inline HTML tags (such as `<b>`, `<i>`, and `<u>`) also render inside the Textbox, so you can mix bold or italic emphasis into the same `CONCAT` string. Keep tags simple — block-level layout tags are not supported.
+
 ## Customize a Textbox
 
 You can customize the appearance of a chart in a number of ways. Many customizations are possible by setting **Chart Properties**. For information about all chart properties, see [Chart Properties](/s/topic/0TO5w000000ZaodGAC "Chart Properties"). Unique properties of Textboxes include the following:

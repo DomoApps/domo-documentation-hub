@@ -1,5 +1,6 @@
 ---
 title: "Creating a Recursive/Snapshot SQL DataFlow"
+excerpt: "Create a recursive SQL DataFlow that uses its own output as an input so each run appends new rows to a growing historical DataSet."
 ---
 
 A "recursive" or "snapshot" DataFlow is a DataFlow that uses itself as an input.
@@ -21,23 +22,23 @@ DataFlows (neither SQL nor ETL types) cannot append data natively like connector
      
    The query for the output DataSet will be SELECT \* FROM *your-input-DataSet*
      
-   <Frame><img alt="recursive_sql1.png" src="/images/kb/ka05w00000123jI-00N5w00000Ri7BU-0EM5w000005vOvj.png" style={{width: 801, height: 726}}/></Frame>
+   <Frame><img alt="recursive_sql1.png" src="/images/kb/ka05w00000123jI-00N5w00000Ri7BU-0EM5w000005vOvj.png"/></Frame>
 2. Once the DataFlow has finished running, load the output DataSet as an input DataSet.
      
    The DataSet name will show the output DataSet name followed by "1."
      
-   <Frame><img alt="recursive_sql2.png" src="/images/kb/ka05w00000123jI-00N5w00000Ri7BU-0EM5w000005vOvo.png" style={{width: 800, height: 698}}/></Frame>
+   <Frame><img alt="recursive_sql2.png" src="/images/kb/ka05w00000123jI-00N5w00000Ri7BU-0EM5w000005vOvo.png"/></Frame>
    You should now have two DataSets in the DataFlow—the updating original DataSet and the historical DataSet.
 3. Locate a column to use as a constraint. This helps determine when to replace data in your historical DataSet with new data. Constraint columns are normally ID columns or date columns or have other unique identifiers. In this example we use the `Date` column as a constraint.
      
    Your query should look similar to the following:
      
-   <Frame><img alt="" src="/images/kb/ka05w00000123jI-00N5w00000Ri7BU-0EM5w000005vOvi.png" style={{width: 799, height: 395}}/></Frame>
+   <Frame><img alt="" src="/images/kb/ka05w00000123jI-00N5w00000Ri7BU-0EM5w000005vOvi.png"/></Frame>
 4. Filter your data so you are pulling historical data where it does not exist in the original DataSet.
 5. Combine your new and historical DataSets.
      
-   <Frame><img alt="" src="/images/kb/ka05w00000123jI-00N5w00000Ri7BU-0EM5w000005vOvl.png" style={{width: 799, height: 401}}/></Frame>
+   <Frame><img alt="" src="/images/kb/ka05w00000123jI-00N5w00000Ri7BU-0EM5w000005vOvl.png"/></Frame>
 6. Append the new data with the historical DataSet.
 7. Output the data using the same output you created back in Step 1. You don't need to create a brand new output.
      
-   <Frame><img alt="" src="/images/kb/ka05w00000123jI-00N5w00000Ri7BU-0EM5w000005vOvk.png" style={{width: 801, height: 411}}/></Frame>
+   <Frame><img alt="" src="/images/kb/ka05w00000123jI-00N5w00000Ri7BU-0EM5w000005vOvk.png"/></Frame>

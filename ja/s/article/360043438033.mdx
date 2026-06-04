@@ -1,5 +1,6 @@
 ---
 title: "Azure Active DirectoryでSSOを有効にする"
+excerpt: "Azure AD で Domo アプリケーションを追加し、SAML を構成して Azure AD と Domo の間でシングルサインオンを有効にします。"
 ---
 
 MicrosoftのAzure Active Directoryアプリケーションギャラリーは、「AppStore」です。ユーザーはMicrosoftによりテストされ認証されたAppを検索して導入することができます。PremiumもStandardのユーザーも、Domo for Single Sign-On（SSO）と統合させることができます。SSOを有効にするには、「管理者」のデフォルトセキュリティ権限、または［全てのカンパニー設定を管理］が有効になっているカスタム権限が必要です。デフォルト権限の詳細については「 [カスタム権限を管理する](/s/article/360043438973 "デフォルトのセキュリティ権限リファレンス") 」を参照してください。
@@ -71,6 +72,11 @@ MicrosoftのAzure Active Directoryアプリケーションギャラリーは、�
       
     Domoでは以下の属性名が利用できます。また、Azureでは値を割り当てることができます。
 
+    <Warning>
+      **重要：** 属性名は `SAML\_SUBJECT` 属性を除き、すべて小文字にする必要があります。値を正しくマッピングできるよう、Domoの属性キーの値はSSOプロバイダー側の属性名と完全に一致している必要があります。
+
+    </Warning>
+
     <table border="1" cellpadding="1" cellspacing="1" class="mt-responsive-table"><thead><tr><th colspan="1" rowspan="1"><p> 属性 </p></th><th colspan="1" rowspan="1"><p> 説明 </p></th></tr></thead><tbody><tr><td colspan="1" rowspan="1"><p> name </p></td><td colspan="1" rowspan="1"><p> ユーザーのフルネーム </p></td></tr><tr><td colspan="1" rowspan="1"><p> name.personal </p></td><td colspan="1" rowspan="1"><p> ユーザーの名 </p></td></tr><tr><td colspan="1" rowspan="1"><p> name.family </p></td><td colspan="1" rowspan="1"><p> ユーザーの姓 </p></td></tr><tr><td colspan="1" rowspan="1"><p> email </p></td><td colspan="1" rowspan="1"><p> ユーザーのメールアドレス </p></td></tr><tr><td colspan="1" rowspan="1"><p> email.secondary </p></td><td colspan="1" rowspan="1"><p> ユーザーの2次メールアドレス </p></td></tr><tr><td colspan="1" rowspan="1"><p> title </p></td><td colspan="1" rowspan="1"><p> ユーザーの役職名 </p></td></tr><tr><td colspan="1" rowspan="1"><p> user.phone </p></td><td colspan="1" rowspan="1"><p> ユーザーの電話番号。通常は、携帯電話の番号 </p></td></tr><tr><td colspan="1" rowspan="1"><p> desk.phone </p></td><td colspan="1" rowspan="1"><p> ユーザーの固定電話の番号 </p></td></tr><tr><td colspan="1" rowspan="1"><p> group </p></td><td colspan="1" rowspan="1"><p> ユーザーが属するグループ、通常は部署 </p></td></tr><tr><td colspan="1" rowspan="1"><p> role </p></td><td colspan="1" rowspan="1"><p> 会社におけるユーザーのロール </p></td></tr><tr><td colspan="1" rowspan="1"><p><a href="http://employee.id" rel="noopener" target="_blank"> employee.id </a></p></td><td colspan="1" rowspan="1"><p> ユーザーの社員ID </p></td></tr><tr><td colspan="1" rowspan="1"><p> hire.date </p></td><td colspan="1" rowspan="1"><p> ユーザーの雇用日 </p></td></tr><tr><td colspan="1" rowspan="1"><p> title </p></td><td colspan="1" rowspan="1"><p> ユーザーの役職名 </p></td></tr><tr><td colspan="1" rowspan="1"><p> department </p></td><td colspan="1" rowspan="1"><p> 会社におけるユーザーの部署 </p></td></tr><tr><td colspan="1" rowspan="1"><p> location </p></td><td colspan="1" rowspan="1"><p> ユーザーの会社の所在地 </p></td></tr><tr><td colspan="1" rowspan="1"><p> locale </p></td><td colspan="1" rowspan="1"><p> ユーザーのロケール。数値の書式、測定値などの設定を決定します。 </p></td></tr><tr><td colspan="1" rowspan="1"><p> timezone </p></td><td colspan="1" rowspan="1"><p> ユーザーのタイムゾーン </p></td></tr></tbody></table>
 
     「email」以外の属性はすべて任意です（ただし、「name」の使用は強く推奨します）。実際には、メールはSAMLアサーションの2つの場所（件名と電子メール属性）に表示されます。一方だけでも許可されます。
@@ -120,11 +126,21 @@ MicrosoftのAzure Active Directoryアプリケーションギャラリーは、�
 29. 画面下の **［Apply Changes］** ボタンをクリックします。
       
     以上が、Azure内でのSSOの設定手順です。
-30. Domoで接続をテストします。 **［シングルサインオン（SSO）］** タブの下にある **［設定をテスト］** ボタンをクリックします。
-      
-    Azureで設定が適用されるまで5分ほどかかることもあるため、接続テストがすぐ実行できない場合があります。
-      
-    これまでの手順を正しく実行しているなら、成功のメッセージが表示されるはずです。表示されない場合は、手順を確認するか、Domoのサポートにご連絡ください。
-31. オレンジ色の **［設定を保存］** ボタンをクリックして、SSO設定を保存します。
+30. Domoで **［設定を保存］** をクリックします。
+31. Azureに戻り、 **［Complete successfully saved SSO user claim］** の確認メッセージが表示されたら、 **［Attributes & Claims］** ペインの **［x］** をクリックしてペインを閉じます。
+32. 左側のパネルの **［Manage］** セクションで **［Users and groups］** を選択します。このエンタープライズアプリケーションを通じてDomoにサインインできるユーザーとグループを割り当てます。
+33. SSOの構成を手動でテストします。
+    1. Domoで、現在のユーザーが直接サインオンリストに登録されていることを確認します。ユーザーを追加するには、 **［その他］>［管理者］** に進み、 **［セキュリティ］** の下にある **［シングルサインオン］** を選択し、 **［直接サインオンリスト］** タブを開いてユーザーを追加します（URLは `https://<your-instance>.domo.com/admin/security/sso` です）。
+    2. **［シングルサインオン（SSO）］** ページの上部で、 **［SSOを有効化］** のトグルをオンに切り替えます。
+    3. 現在のブラウザーウィンドウは開いたままサインインしておきます。シークレットウィンドウまたはプライベートウィンドウを開き、Domoインスタンスのお客様のURLに移動します。
+    4. **［サインイン］** を選択し、Azure ADで認証します。サインインに成功すれば、SSOが機能していることが確認できます。エラーが発生した場合は、「 [一般的なSSOサインオンエラー](/s/article/360043438213) 」を参照し、トラブルシューティング中は元の（サインイン状態の）ブラウザーウィンドウから **［SSOを有効化］** をオフに切り替えてください。
+
+## Domoへの接続のテスト
+
+Domoで接続をテストするには、 **［シングルサインオン（SSO）］** ページの上部にある **［設定をテスト］** ボタンをクリックします。
+  
+**注記：** Azureで設定が適用されるまで5分ほどかかることもあるため、接続テストがすぐ実行できない場合があります。
+  
+これまでの実装手順を正しく実行しているなら、成功のメッセージが表示されるはずです。表示されない場合は、上記の手順を確認するか、 [Domoサポート <i className="icon-arrow-square-out sm" aria-hidden="true" />](https://domo-support.domo.com/s/) にお問い合わせください。
 
 日本語

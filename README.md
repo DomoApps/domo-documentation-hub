@@ -1,6 +1,6 @@
 # Domo Documentation Hub
 
-Domo's public documentation site — Getting Started guides, the Knowledge Base (~1,700 articles), API Reference, and topic pages. Content is authored in MDX, navigation is defined in `docs.json`, and the site is built and hosted by [Mintlify](https://mintlify.com).
+Domo's public documentation site — Getting Started guides, the Knowledge Base (\~1,700 articles), API Reference, and topic pages. Content is authored in MDX, navigation is defined in `docs.json`, and the site is built and hosted by [Mintlify](https://mintlify.com).
 
 ## Repository layout
 
@@ -22,7 +22,7 @@ git checkout <branch>   # any branch with changes you want to preview
 mintlify dev            # run from the repo root (where docs.json lives)
 ```
 
-Open <http://localhost:3000>. Most edits hot-reload; `docs.json` schema changes may need a server restart.
+Open [http://localhost:3000](http://localhost:3000). Most edits hot-reload; `docs.json` schema changes may need a server restart.
 
 For a faster, but less robust preview experience, VS Code has several extenstions offering an MDX preview. For example: [Modern MDX Preview](https://marketplace.visualstudio.com/items?itemName=ggfincke.vsc-mdx-preview).
 

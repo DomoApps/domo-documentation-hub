@@ -1,5 +1,6 @@
 ---
 title: "Domo KB Style Guide"
+excerpt: "Standards and conventions for writing clear, consistent Domo Knowledge Base documentation."
 ---
 
 ## Intro
@@ -16,6 +17,21 @@ If you can't find an answer in any of these sources, consult with the Knowledge 
 ## Article Design
 
 This section includes content and page design standards for creating Knowledge Base content. These standards are not exhaustive and can be added to as needed.
+
+### Frontmatter
+
+Every article must include an `excerpt` field in its YAML frontmatter, directly below the `title`. The excerpt is a single sentence summarizing what the article covers — think of it as the "what's in this file" hint for future writers, PMs scanning the repo, and AI tools that need quick, accurate context without parsing the full article body. A well-written excerpt vastly improves how AI tools use the article in context and significantly boosts search engine optimization, since both rely on a concise, accurate summary to surface the article appropriately.
+
+````mdx
+---
+title: "Create and Use Data Models"
+excerpt: "Define relationships between DataSets once and reuse them across Domo for consistent metrics and faster analysis."
+---
+````
+
+Keep the excerpt to a single sentence and use the same terminology as the article body, so the summary stays accurate as the article evolves.
+
+Do not use a `description` field in place of `excerpt`. Mintlify renders `description` on the published page, which duplicates the Intro section. The `excerpt` field, by contrast, is invisible on the rendered site and exists purely as repo-level metadata.
 
 ### Article Structure
 
@@ -43,6 +59,39 @@ Do not explain why the skills matter — focus only on what the article covers. 
 **Correct:** "This article explains how to connect a DataSet to a card, schedule a DataFlow refresh, and configure row-level security."
 
 **Incorrect:** "Understanding your data pipeline is key to getting the most out of Domo. This article introduces several concepts and walks you through the basics."
+
+### Required Grants
+
+The **Required Grants** section must always follow this exact format:
+
+1. The heading: `## Required Grants`
+2. A lead-in sentence: `To access [Feature], the following grants must be enabled for your role:`
+3. A bulleted list of grants. Bold the grant name and include the em-dash inside the bold formatting, with a space on either side of the em-dash. Follow with a one-sentence description of what the grant allows. Use the grant's **canonical wording** — see _Use canonical grant wording_ below.
+4. A closing line linking to the general grants article: `Learn more about [grants](/s/article/360043438973).`
+
+```mdx
+## Required Grants
+
+To access Documents, the following grants must be enabled for your role:
+
+- **Manage Documents —** View, edit, and delete any Document Collections in this instance.
+- **Edit Documents —** Create and edit Document Collections to which you have access.
+- **View Documents —** View only for any Document Collections to which you have access.
+
+Learn more about [grants](/s/article/360043438973).
+```
+
+#### Use canonical grant wording
+
+Don't invent a grant description. Most grants are already described in the standard format somewhere in the Knowledge Base — reuse that wording so the same grant reads consistently across articles. Search for an existing description before writing your own:
+
+```bash
+grep -rn "Grant Name —" s/article/
+```
+
+For example, [Brand Kit](/s/article/5428851518999) describes **Manage All Company Settings** as "Manage company metadata, security rules and SSO, publishing, and licenses." Reuse wording like this verbatim (adjusting only to fit the em-dash format) rather than paraphrasing.
+
+If no existing article describes the grant, write a concise one-sentence description, and flag it to the user as newly authored rather than presenting it as canonical.
 
 ### FAQ
 
@@ -88,7 +137,7 @@ The table of contents renders through H4. If you find yourself going three or mo
 
 Often our articles contain one or more ordered lists of process instructions. These should always be done in a numbered list of steps.
 
-If there is more than one way to do something or get to a certain place, always describe the easiest/simplest (fewest clicks) way. If the user finds another way, that's fine, but we won't tell them how, as it clutters the documentation and makes things more confusing than helpful.
+If there is more than one way to do something or get to a certain place, always describe the easiest/simplest (fewest selections or clicks) way. If the user finds another way, that's fine, but we won't tell them how, as it clutters the documentation and makes things more confusing than helpful.
 
 The proper way to construct a process in steps is described below:
 
@@ -135,13 +184,178 @@ As much as possible, screenshots should be taken in Modocorp or another demo ins
 
 Take as many high-quality screenshots as possible. Not all may make it into the final draft of the article, but it's better to have too many than too few. Take them at as high a resolution as possible and do not compress them for sending to another machine—if necessary you can add them to a Sharepoint folder to preserve quality and share the link to the folder with another individual.
 
-**Inline images (UI icons)**
+**Wrap screenshots in `<Frame>`**.
 
-For small Domo UI icons that appear within body text, recommended sizes are:
+Block-level screenshots should be wrapped in a `<Frame>` component. Frame styles the image consistently across the site and auto-sizes it to fit the available column width while preserving the image's aspect ratio.
 
-- **20×20 —** matches the size of surrounding display text
-- **30×30 —** slightly larger; good for most inline icons
-- **40×40 —** best for header-level icons
+```mdx
+<Frame>
+  <img src="/images/kb/example.png" alt="Descriptive alt text" />
+</Frame>
+```
+
+Do not add explicit `width` or `height` styles to the `<img>`, since they override Frame's auto-sizing and often distort the image. **If a screenshot needs to render smaller than the column width, crop the source image rather than scaling it down with inline styles**.
+
+For inline glyphs and small UI fragments that flow with surrounding text, use the icon font or a native inline `<img>` instead. See *Icons* and *Inline images* below.
+
+## Icons
+
+When you need to show a Domo UI icon inside an article — like a gear, a chart, or an arrow — use the **Domo icon font** rather than uploading an image. The font already contains about a thousand icons and is built into every article automatically, so there's nothing to install or import. Using the font keeps icons crisp at any size, lets them match the surrounding text color (including in dark mode), and saves you from hunting down a screenshot.
+
+Here's what a typical icon reference looks like in an article:
+
+```mdx
+Select <i className="icon-gear sm" aria-hidden="true" /> **Settings** to open Settings.
+```
+
+A few things worth knowing:
+
+- The name after `icon-` always matches the name in the Domo design system. You can browse the full set at [Domo Icons](https://git.empdev.domo.com/pages/Development/DomoIcons/#!/icons/phosphor?size=xl).
+- Icons automatically pick up the color and size of the text around them, so they'll look right in both light and dark mode without any extra work.
+- If a particular icon ever looks off — too small or too large next to its label — you can resize just that one with `style={{fontSize: 24}}`. Don't reach for this unless the default genuinely looks wrong.
+
+### Always Pair an Icon with a Text Label
+
+The icon font uses a set of special Unicode characters that screen readers can't interpret. Without help, a screen reader won't be able to read the icon aloud. To prevent this, every icon should be hidden from screen readers (using `aria-hidden="true"`), and the surrounding sentence should name what the icon is.
+
+Here's the pattern again, with the screen-reader-friendly attribute called out:
+
+```mdx
+Select <i className="icon-gear sm" aria-hidden="true" /> **Settings** to open Settings.
+```
+
+If the sentence around the icon doesn't already name it — for example, "select [icon]" with nothing else — **rewrite the sentence to include the icon's name in the prose**. Don't try to fix it with a hidden `aria-label`. Naming the icon out loud helps everyone, not just screen-reader users; sighted readers benefit too, because they don't have to recognize an unfamiliar glyph at a glance.
+
+- **Don't:** "Select <i className="icon-chart-line sm" aria-hidden="true" /> to view the chart."
+- **Do:** "Select the line chart icon <i className="icon-chart-line sm" aria-hidden="true" /> to view the chart."
+
+Occasionally an icon has no surrounding sentence to lean on — for example, an icon-only button, an icon used as the entire content of a link, or a glyph squeezed into a tight table cell where there's no room for a label. In those rare cases, use `role="img"` together with `aria-label` to give the icon its own accessible name:
+
+```mdx
+<i className="icon-gear sm" role="img" aria-label="Settings" />
+```
+
+Treat this as a last resort. Whenever the icon sits inside normal prose, the rewrite-the-sentence approach above is always the better choice.
+
+### Icons Not Included in the Font
+
+Domo's icon font is large but not exhaustive. If the UI element you're trying to depict isn't represented in the font, fall back to a regular inline image — see *Inline images* below for how to format it. Just remember that the font version is preferred whenever a matching icon exists.
+
+One special case: if what you need is a third-party brand logo — AWS, OpenAI, Anthropic, GitHub, and the like — don't reach for an uploaded image right away. Those usually have a *coded* option too. See *Brand and Third-Party Logos* below.
+
+### Brand and Third-Party Logos
+
+Company and product logos aren't part of the Domo icon font, but you usually don't need to upload an image for them either — and you shouldn't if you can avoid it. A logo saved as an image is almost always a solid-color mark, so it vanishes against a dark background. Prefer a *coded* icon that inherits the surrounding text color, the same way the Domo icon font does, so it stays visible in both light and dark mode.
+
+There are two ways to do this. Try them in order:
+
+1. **Font Awesome brand icon.** Most major company logos are built into Font Awesome's *brands* set, which is available in every article. Reference one with the `<Icon>` component and `iconType="brands"`:
+
+   ```mdx
+   See the [OpenAI guide](https://platform.openai.com/docs/guides/text) <Icon icon="openai" iconType="brands" aria-hidden="true" />.
+   ```
+
+   The icon name is the brand's slug — `aws`, `openai`, `github`, and so on. Browse the set at [Font Awesome Brands](https://fontawesome.com/search?f=brands). This is the one case where `<Icon>` is the right tool: it's pulling a font glyph, not loading an uploaded image, so the dark-mode problem described under *Inline images* doesn't apply.
+
+2. **Inline SVG with `fill="currentColor"`.** A few brands — Anthropic is one — aren't in the free Font Awesome set. For those, paste the logo's SVG straight into the article and set `fill="currentColor"` so it picks up the text color. Vector logo libraries such as [Simple Icons](https://simpleicons.org) provide ready-to-paste paths:
+
+   ```mdx
+   See the [Anthropic guide](https://docs.anthropic.com) <svg aria-hidden="true" viewBox="0 0 24 24" fill="currentColor" style={{height: '1.1em', width: '1.1em', display: 'inline', verticalAlign: '-0.15em', margin: '0'}}><path d="M17.3041 3.541h-3.6718l6.696 16.918H24Zm-10.6082 0L0 20.459h3.7442l1.3693-3.5527h7.0052l1.3693 3.5528h3.7442L10.5363 3.5409Zm-.3712 10.2232 2.2914-5.9456 2.2914 5.9456Z" /></svg>.
+   ```
+
+   This is raw inline SVG, *not* the `<Icon>` component pointing at an uploaded file. The `fill="currentColor"` is what makes it adapt to the theme, which is why the dark-mode caveat under *Inline images* doesn't apply here either.
+
+Only fall back to an uploaded image (see *Inline images*) if a logo exists in neither place and you can't get its SVG — and if you do, pick a version that's legible on both light and dark backgrounds.
+
+For accessibility, follow the same rule as *Always Pair an Icon with a Text Label*: when the logo sits next to text that already names the brand — a link reading "OpenAI," for example — hide the icon from screen readers with `aria-hidden="true"` so it isn't announced twice. Reserve `role="img"` with `aria-label` for a logo that stands completely alone with nothing else naming it.
+
+### Legacy Icons (`legacy-icon-*`)
+
+Domo also has a second icon font available, called `legacy-icon-*`. It contains the same set of icons as the standard `icon-*` font, but is styled to match Domo's older UI. The current font (`icon-*`) uses Phosphor icons, which are part of the design refresh.
+
+Use whichever font matches the UI you're describing:
+
+- **Use `legacy-icon-*`** when the screen you're documenting still uses the older icons. The two most common cases are release notes that describe the pre-refresh UI and legacy applications such as **Workbench**.
+- **Use `icon-*`** (Phosphor) everywhere else. The current Domo product uses the refreshed icons, so articles about today's UI should match. This holds even when an article's existing screenshots still show legacy icons — the screenshots are out of date, and pairing them with legacy-icon references would only reinforce the confusion.
+
+```mdx
+In Workbench, select <i className="legacy-icon-database sm" aria-hidden="true" /> in the left icon bar.
+```
+
+### Icons in Migrated Articles
+
+Plenty of older articles still use uploaded images for icons that now exist in the font. We're swapping these over to the font version gradually. The rule of thumb: if you're already in an article making other edits and you notice image-based icons, take a moment to convert them.
+
+One subtlety to watch for: if the article describes the current Domo UI but an old screenshot shows a legacy-style icon, the screenshot itself is out of date. In that case, migrate to the standard `icon-*` (Phosphor) version, *not* `legacy-icon-*` — the goal is to match what users see today. Save `legacy-icon-*` for surfaces that genuinely still ship the old icons, like release notes and Workbench.
+
+For reference, the previous code for inline "icons" looks like this: 
+
+```mdx
+<img src="/images/kb/worksheets-icon-1.png" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/>
+```
+
+## Inline Images
+
+Sometimes you need to show a small piece of the UI — a tiny button, a badge, a glyph — that isn't available in the icon font. In those cases, use a regular image, but with a small bit of inline styling so the image sits naturally inside the sentence instead of jumping to its own line:
+
+```mdx
+<img src="/images/kb/example-glyph.png" alt="Example glyph" style={{height: '1.2em', display: 'inline', verticalAlign: 'start', margin: '0'}}/>
+```
+
+The `height` value controls how big the image appears relative to the surrounding text. Use these defaults:
+
+- **`'1.2em'` to `'1.6em'`** — matches the size of normal body text. This is the right choice most of the time.
+- **`'2em'`** — for inline images that sit inside a header, or that serve as a row label in a table cell.
+- **A plain number, such as `111`** — for screenshots inside a table cell where you want a specific pixel size.
+
+Keep the other three style values — `display: 'inline'`, `verticalAlign: 'start'`, and `margin: '0'` — the same across every inline image. They're what keep the image aligned with the text baseline and prevent extra vertical space from creeping in.
+
+## Videos
+
+Articles can include two kinds of video. Pick the one that matches what the reader needs from the clip.
+
+- **Inline looping video** — a short, silent clip that plays automatically on loop, like an animated screenshot. Use this when you want to show a small interaction in motion (a drag, a hover state, a connect-the-dots gesture) without making the reader stop and watch a full video. There are no playback controls, no audio, and no progress bar — the clip just plays.
+- **Embedded video** — a full video player from YouTube (or another host) that the reader presses play on. Use this for narrated walkthroughs, longer demos, or any clip with audio. The reader sees a standard video window with play/pause, volume, fullscreen, and a progress bar.
+
+When in doubt, prefer the inline looping video — it gives the reader the visual without interrupting their reading flow. Reserve embedded videos for content that genuinely needs audio or runs longer than ~30 seconds.
+
+### Inline Looping Video
+
+Wrap an HTML5 `<video>` element in a `<Frame>`. The `autoPlay`, `muted`, `loop`, and `playsInline` attributes are all required — together they let the clip play automatically on every browser, including mobile Safari, without prompting the reader.
+
+```mdx
+<Frame>
+  <video
+    autoPlay
+    muted
+    loop
+    playsInline
+    className="w-full aspect-video rounded-xl"
+    src="/images/kb/example-clip.mp4"
+  ></video>
+</Frame>
+```
+
+Keep clips short — 5 to 15 seconds is usually enough — and store them under `/images/kb/` alongside screenshots.
+
+### Embedded Video
+
+Wrap a YouTube (or other host) embed `<iframe>` in a `<Frame>`. Use the host's standard embed URL — for YouTube, that's `https://www.youtube.com/embed/VIDEO_ID`.
+
+```mdx
+<Frame>
+  <iframe
+    allowfullscreen=""
+    frameborder="0"
+    height="315"
+    width="560"
+    src="https://www.youtube.com/embed/VIDEO_ID"
+    title="YouTube video player"
+  ></iframe>
+</Frame>
+```
+
+Always include a descriptive `title` attribute — screen readers announce it, and it's what appears if the embed fails to load.
 
 ## Callouts
 
@@ -163,23 +377,34 @@ Beta features must be marked using one of two conventions, depending on whether 
 
 ### Standard Beta Note
 
-Use this exact callout — verbatim — wherever a beta Note is required. Do not paraphrase, shorten, or change the links.
+The standard beta Note is stored once as a reusable snippet at `/snippets/BetaNote.mdx`, so its wording, links, and feedback email stay identical in every article and only ever change in one place. Don't paste the Note text into an article — import the snippet instead.
+
+Add this import line once, on its own line directly below the frontmatter (the closing `---`):
 
 ```mdx
-<Note>
-  **Note:** This feature is in beta. Beta Program participants can enable
-  features [here](https://embed.domo.com/embed/pages/DQ8Ek). To join the Beta
-  Program, fill out [this form](https://embed.domo.com/embed/pages/K8GMx). For beta questions or feedback, email
-  [beta.admin@domo.com](mailto:beta.admin@domo.com).
-</Note>
+import { BetaNote } from '/snippets/BetaNote.mdx';
 ```
+
+Then write this wherever the beta Note should appear:
+
+```mdx
+<BetaNote />
+```
+
+For a Note that introduces a **group** of beta features rather than one specific feature — typically a release-notes roundup, where the Note sits above a list of beta items — add the `generic` prop. This drops the leading "This feature is in beta." sentence, which doesn't fit that context:
+
+```mdx
+<BetaNote generic />
+```
+
+The snippet renders a Note about enabling beta features, with links to enable beta features, to join the Beta Program, and an address for beta questions or feedback (and, unless `generic` is set, a leading "This feature is in beta." sentence). To see or change the exact text, open `/snippets/BetaNote.mdx` — remember that a change there updates every article that imports it.
 
 ### Whole-Article Beta Features
 
 When the entire article covers a beta feature:
 
 1. Add `tag: "Beta"` to the frontmatter. This renders a Beta badge next to the article title in the sidebar.
-2. Place the standard beta Note immediately after the frontmatter, above the Intro section.
+2. Add the `import { BetaNote } from '/snippets/BetaNote.mdx';` line directly below the frontmatter, then place `<BetaNote />` immediately after it, above the Intro section.
 3. Do not append `(Beta)` to the article title.
 
 ```mdx
@@ -189,16 +414,32 @@ tag: "Beta"
 sidebarTitle: "MCP Server"
 ---
 
-<Note>
-  **Note:** This feature is in beta. Beta Program participants can enable
-  features [here](https://embed.domo.com/embed/pages/DQ8Ek). To join the Beta
-  Program, fill out [this form](https://embed.domo.com/embed/pages/K8GMx). For beta questions or feedback, email
-  [beta.admin@domo.com](mailto:beta.admin@domo.com).
-</Note>
+import { BetaNote } from '/snippets/BetaNote.mdx';
+
+<BetaNote />
 
 ## Intro
 
 ...
+```
+
+### Whole-Section Beta Features
+
+When an entire multi-page section is in beta — typically an API reference that appears as a dropdown group in the sidebar — tag the group heading instead of each page:
+
+1. Add `"tag": "Beta"` to the group's object in the navigation file (`docs.json`). This renders the Beta badge next to the dropdown heading.
+2. Do not also add `tag: "Beta"` to that group's Overview (landing) page — the badge would then appear twice in the same expanded section. Tag the heading only.
+3. Still place `<BetaNote />` on the Overview page (and any other beta pages in the group) per the rules above.
+
+```json
+{
+  "group": "FileSets API",
+  "tag": "Beta",
+  "pages": [
+    "portal/b939448cde9d5-file-sets-api",
+    ...
+  ]
+}
 ```
 
 ### Section-Level Beta Features
@@ -206,18 +447,21 @@ sidebarTitle: "MCP Server"
 When only a section of an otherwise-GA article covers a beta feature:
 
 1. Append a Badge to the section heading: `<Badge className="text-primary bg-primary/10 font-bold">Beta</Badge>`. The `className` is required — it matches the styling of the sidebar `tag` badge so the two are visually consistent.
-2. Place the standard beta Note immediately under the **first** beta section in the article. Do not repeat the Note for any additional beta sections in the same article — one Note per article is enough.
+2. Add the `import { BetaNote } from '/snippets/BetaNote.mdx';` line directly below the frontmatter, then place `<BetaNote />` immediately under the **first** beta section in the article. Don't repeat it for additional beta sections in the same article — one Note per article is enough.
 3. Do not append `(Beta)` or `(BETA)` to the heading text.
 
 ```mdx
+---
+title: "..."
+---
+
+import { BetaNote } from '/snippets/BetaNote.mdx';
+
+...
+
 ### PDP—Row Policies <Badge className="text-primary bg-primary/10 font-bold">Beta</Badge>
 
-<Note>
-  **Note:** This feature is in beta. Beta Program participants can enable
-  features [here](https://embed.domo.com/embed/pages/DQ8Ek). To join the Beta
-  Program, fill out [this form](https://embed.domo.com/embed/pages/K8GMx). For beta questions or feedback, email
-  [beta.admin@domo.com](mailto:beta.admin@domo.com).
-</Note>
+<BetaNote />
 
 This report lists all PDP row policies by ID...
 
@@ -281,6 +525,38 @@ Do not use `<br/>` between multiple callout elements (`<Note>`, `<Warning>`, `<T
 
 For a table within a table, write the inner table as HTML and embed it inside the outer table cell. This renders correctly when published.
 
+**HTML tables**
+
+Prefer pipe tables. Use raw HTML tables only when pipe tables can't express what you need (rowspan/colspan, multi-line cell content with block elements, nested tables, or content migrated from a source that already shipped HTML).
+
+When an article does contain an HTML table, keep each `<tr>` on its own line, and put `<table>`, `<thead>`, `<tbody>`, and their closing tags on their own lines too. Many migrated articles collapse the entire table onto one line — this exceeds VS Code's default syntax-highlighting threshold (20,000 chars per line), so the table renders as a single unhighlighted blob and is hard to diff. When you touch one of these tables, normalize it.
+
+Also place data rows inside `<tbody>`. If the data rows are left inside `<thead>` (another migration artifact), browsers vertically center-align the cells, breaking the visual rhythm of the surrounding tables.
+
+**Correct:**
+
+```
+<table border="1" cellpadding="1" cellspacing="1">
+<thead>
+<tr><th><p> Column 1 </p></th><th><p> Column 2 </p></th></tr>
+</thead>
+<tbody>
+<tr><td><p> Row 1 cell 1 </p></td><td><p> Row 1 cell 2 </p></td></tr>
+<tr><td><p> Row 2 cell 1 </p></td><td><p> Row 2 cell 2 </p></td></tr>
+</tbody>
+</table>
+```
+
+**Incorrect (single line, data rows in `<thead>`):**
+
+```
+<table border="1" cellpadding="1" cellspacing="1"><thead><tr><th><p> Column 1 </p></th><th><p> Column 2 </p></th></tr><tr><td><p> Row 1 cell 1 </p></td><td><p> Row 1 cell 2 </p></td></tr></thead></table>
+```
+
+**Images in table cells**
+
+Do not use `<Frame>` inside table cells — its block-level chrome and auto-sizing fight the cell width and break the layout. Use a native inline `<img>` (see *Inline images*) instead, regardless of the image size. If a screenshot is too large to read at inline sizes, link out to a separate article or place the screenshot outside the table.
+
 ## Code
 
 Inline code: wrap with a single backtick — `` `your code here` ``
@@ -289,13 +565,23 @@ Fenced code block: open and close with three backticks, with your code in betwee
 
 Tabbed code blocks are also supported when you need to show the same code in multiple languages (such as JavaScript, Python, or Node). See the documentation for that syntax.
 
+## MDX Comments
+
+If you need to leave a placeholder or comment in the Markdown source that should not render on the site, wrap it in `{/* ... */}`:
+
+```
+{/* This is a comment inside MDX and won't be rendered. */}
+```
+
+Use this sparingly. Hidden comments accumulate over time and clutter the repository — prefer resolving the underlying note (finishing the placeholder, removing the stale text, or capturing the context outside the article) over leaving a comment behind.
+
 ## Text Emphasis
 
 | Style           | Usage                                                                                                                                                                                                                                                                                                                | Example(s)                                                                                                                  |
 | --------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
 | Bold            | Use bold when referring to static interface elements such as fields, menus, static menu options (in other words, those not dynamically populated based on user settings or selections), buttons and icons, and the like. If referring to a series of items to select, separate items with “>” and do not bold the >. | Select **Admin Settings** > **Security** > **Whitelist**.                                                                   |
 | Italics         | Use italics when referring to variables that users will fill in with their own data.                                                                                                                                                                                                                                 | Enter the URL as _mydomo_.domo.com, in which _mydomo_ refers to your company Domo instance.                                 |
-| Quotation Marks | Use quotation marks to reference on-screen text not used specifically as an interface element. Also used to reference DataSet columns and ETL actions.                                                                                                                                                               | Select the orange button to the right of the text reading "Click here to save your progress."                               |
+| Quotation Marks | Use quotation marks to reference on-screen text not used specifically as an interface element. Also used to reference DataSet columns and ETL actions.                                                                                                                                                               | Select the orange button to the right of the text reading "Select here to save your progress."                               |
 | Code Style      | Use a Code style to set apart code snippets on their own line.                                                                                                                                                                                                                                                       | Enter the file path of the Microsoft Word file you want to import on the SFTP server. For example: `/home/user/MyFile.docx` |
 
 **Punctuation and bold: two exceptions**

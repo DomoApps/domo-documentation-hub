@@ -1,5 +1,6 @@
 ---
 title: "DataSet Update Methods in Magic ETL"
+excerpt: "Choose between Replace, Append, Partition, and Upsert update methods in the Magic ETL Output DataSet tile based on your DataFlow needs."
 ---
 
 ## Intro
@@ -17,17 +18,17 @@ To learn more about update methods, see our article on general [DataSet Update M
 
 Replace is the default update method for Magic ETL. It removes all existing data in the DataSet and replaces it with the new batch of data from the execution of a Magic ETL DataFlow. This method is good if your output DataSet is relatively small or if all the data needs to be updated every time the DataFlow executes.
 
-<Frame><img alt="Replace (1).gif" src="/images/kb/ka0Vq0000002DkL-00N5w00000Ri7BU-0EM5w000006vuq4.jpg" style={{width: 710.994, height: 400}}/></Frame>
+<Frame><img alt="Replace (1).gif" src="/images/kb/ka0Vq0000002DkL-00N5w00000Ri7BU-0EM5w000006vuq4.jpg"/></Frame>
 ## Append
 
 Append takes all data resulting from the execution of a Magic ETL DataFlow and appends it to the output DataSet. This method doesn't take into account any of the existing data in the output DataSet and appends the new data without considering potential duplication. Append is a good choice if each execution of your DataFlow results in net new rows that need to be added to the existing output DataSet.  However, this update method can be brittle and result in duplicated or missing data.
 
-<Frame><img alt="Screenshot 2023-09-19 at 12.42.43 PM.png" src="/images/kb/ka0Vq0000002DkL-00N5w00000Ri7BU-0EM5w000006vubZ.jpg" style={{width: 710, height: 453.999}}/></Frame>
+<Frame><img alt="Screenshot 2023-09-19 at 12.42.43 PM.png" src="/images/kb/ka0Vq0000002DkL-00N5w00000Ri7BU-0EM5w000006vubZ.jpg"/></Frame>
 ## Partition
 
 Partitioning is a way of organizing your data into groups to make data updates faster and more efficient. The graphic below demonstrates replacing and appending data with partitions.
 
-<Frame><img alt="partition graphic.jpg" src="/images/kb/ka0Vq0000002DkL-00N5w00000Ri7BU-0EM5w000006vuj3.jpg" style={{width: 710, height: 453.999}}/></Frame>
+<Frame><img alt="partition graphic.jpg" src="/images/kb/ka0Vq0000002DkL-00N5w00000Ri7BU-0EM5w000006vuj3.jpg"/></Frame>
 ### Partition Basics
 
 A common way to understand partitions is to think of a physical encyclopedia — a collection of books that are part of the same set but individually different. If an update is made to one book and it is republished, you can buy a new copy of that book without replacing the entire set of books.  Partitions divide your data into separate collections, or subsets, so that when you replace some data, you do not need to replace all of it. Appending data when using partitions is like buying a new volume of the encyclopedia and adding it to the end of your collection.
@@ -62,13 +63,13 @@ Follow the steps below to configure partitioning as the update method for your D
 2. In the **Configuration** tab of the editor, choose **Partition** as the update method.
 3. From the **Partition name column** dropdown, select the column you want to use to divide the data.
      
-   <Frame><img alt="Screenshot 2024-09-05 at 3.18.34 PM.png" src="/images/kb/ka0Vq0000008Ym5-00N5w00000Ri7BU-0EMVq000002ZgKz.jpg" style={{width: 799, height: 474}}/></Frame>
+   <Frame><img alt="Screenshot 2024-09-05 at 3.18.34 PM.png" src="/images/kb/ka0Vq0000008Ym5-00N5w00000Ri7BU-0EMVq000002ZgKz.jpg"/></Frame>
 4. (Optional) If you want to configure a retention policy for which partitions should be kept in your output DataSet on an ongoing basis, toggle the switch labeled **Specify which partitions to keep**.
 5. (Conditional) If you enable the **Specify which partitions to keep** option, a field displays where you can enter an expression. This expression keeps any specified partitions; all other partitions are deleted.
      
    **Note:** This field only validates the ` [partition.name](http://partition.name) ` expression.
      
-   <Frame><img alt="Screenshot 2024-09-05 at 3.21.06 PM.png" src="/images/kb/ka0Vq0000008Ym5-00N5w00000Ri7BU-0EMVq000002ZgXt.jpg" style={{width: 798, height: 451}}/></Frame>
+   <Frame><img alt="Screenshot 2024-09-05 at 3.21.06 PM.png" src="/images/kb/ka0Vq0000008Ym5-00N5w00000Ri7BU-0EMVq000002ZgXt.jpg"/></Frame>
    <Tip>
      **Tip:** Learn how to [add subset processing to your DataFlow](/s/article/000005150).
    </Tip>
@@ -77,7 +78,7 @@ Follow the steps below to configure partitioning as the update method for your D
 
 Upsert allows you to update rows in your output DataSet without reprocessing the full DataSet based on a unique row-level key. The graphic below demonstrates replacing and appending data with Upsert.
 
-<Frame><img alt="merge graphic.jpg" src="/images/kb/ka0Vq0000002DkL-00N5w00000Ri7BU-0EM5w000006vuff.jpg" style={{width: 710, height: 453.999}}/></Frame>
+<Frame><img alt="merge graphic.jpg" src="/images/kb/ka0Vq0000002DkL-00N5w00000Ri7BU-0EM5w000006vuff.jpg"/></Frame>
 ### Upsert Basics
 
 With Upsert, rather than replacing the entire DataSet with each DataFlow execution or appending all incoming rows of a DataFlow execution, data can be either appended or replaced, depending on whether the incoming rows are new or updates to rows that already exist in the output DataSet.
@@ -100,4 +101,4 @@ Follow these steps to configure upsert as the update method for your DataSet in 
 2. In the **Configuration** tab of the editor, choose Upsert from the **Update Method** dropdown.
 3. From the **Upsert Key** dropdown, select the column(s) you want to use to identify the Upsert key for your data.
      
-   <Frame><img alt="upsert output.jpg" src="/images/kb/ka0Vq0000008Ym5-00N5w00000Ri7BU-0EMVq000002Zipp.jpg" style={{width: 800, height: 422}}/></Frame>
+   <Frame><img alt="upsert output.jpg" src="/images/kb/ka0Vq0000008Ym5-00N5w00000Ri7BU-0EMVq000002Zipp.jpg"/></Frame>

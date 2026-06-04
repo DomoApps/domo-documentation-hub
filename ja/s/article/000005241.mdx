@@ -1,5 +1,6 @@
 ---
 title: "DomoのSCIM（System for Cross-domain Identity Management）"
+excerpt: "Domo の SCIM エンドポイントを使用して、アイデンティティープロバイダーから Domo へのユーザーとグループの作成・更新を自動化する方法を説明します。"
 ---
 
 ## はじめに
@@ -68,16 +69,18 @@ IdPとDomoの間のSCIM統合は、IdP側で設定されています。開始す
 
 設定の間、IdPからDomoに同期するユーザー属性を設定する必要があります。DomoのSCIMエンドポイントは、以下の6つのSCIMスキーマの要素をマップします。
 
-### ユーザーエンドポイント
+### ユーザー
 
 * ``` コア（urn:ietf:params:scim:schemas:core:2.0:User） ```
 * ``` エンタープライズ（urn:ietf:params:scim:schemas:extension:enterprise:2.0:User） ```
-
 * ``` カスタム（urn:ietf:params:scim:schemas:extension:custom:2.0:User） ```
-
-### グループエンドポイント
-
 * ``` Domo （urn:ietf:params:scim:schemas:extension:domo:2.0:User） ```
+
+<Warning>
+  **重要：** `active` 属性は、ユーザーがDomoでアクティブかどうかを示します。PUTまたはPATCHリクエストで `active` 属性をfalseに設定すると、Domoユーザーが削除されます。この削除は、ユーザーがDataSetまたはDataFlowを所有している場合は失敗するという、ユーザーの削除と同じ制限を受けます。
+</Warning>
+
+### グループ
 
 * ``` グループ（urn:ietf:params:scim:schemas:core:2.0:Group） ```
 * ``` Domoグループ（urn:ietf:params:scim:schemas:extension:domo:2.0:Group） ```
@@ -121,10 +124,10 @@ DomoのSCIM統合は、SCIM統合で使用されるDomoアクセストークン�
 1. **［管理者］** ＞ **［ガバナンス］** ＞ **［グループ］** の順に移動します。
 2. <img src="/images/kb/ja/ka0Vq000000CdP0-00N5w00000Ri7BU-0EMVq000007742s.jpg" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/> **［グループ設定］** （歯車のアイコン）を選択します。
 
-   <Frame><img alt="" src="/images/kb/ka0Vq000000CdP0-00N5w00000Ri7BU-0EMVq00000776cX.jpg" style={{width: 300, height: 118}}/></Frame>
+   <Frame><img alt="" src="/images/kb/ka0Vq000000CdP0-00N5w00000Ri7BU-0EMVq00000776cX.jpg"/></Frame>
 3. 表示されるモーダルでドロップダウンを使用してSCIM統合ユーザーを選択し、変更を保存します。
      
-   <Frame><img alt="" src="/images/kb/ka0Vq000000CdP0-00N5w00000Ri7BU-0EMVq00000772p4.jpg" style={{width: 451, height: 250}}/></Frame>
+   <Frame><img alt="" src="/images/kb/ka0Vq000000CdP0-00N5w00000Ri7BU-0EMVq00000772p4.jpg"/></Frame>
 Domoでは、以下のグループエンドポイントがサポートされています。
 
 <table border="1"><tbody><tr><td colspan="1" rowspan="1"><b> エンドポイント名 </b></td><td colspan="1" rowspan="1"><b> 説明 </b></td><td colspan="1" rowspan="1"><b> エンドポイント </b></td></tr><tr><td colspan="1" rowspan="1"> グループを取得する </td><td colspan="1" rowspan="1"> IDでグループを取得します。 </td><td colspan="1" rowspan="1"><pre class="language-markup"><code>GET /Groups/{groupID}</code></pre></td></tr><tr><td colspan="1" rowspan="1"> グループをPOSTする </td><td colspan="1" rowspan="1"> Domoでグループを作成します。 </td><td colspan="1" rowspan="1"><pre class="language-markup"><code>POST /Groups</code></pre></td></tr><tr><td colspan="1" rowspan="1"> グループをPUTする </td><td colspan="1" rowspan="1"> グループを更新します。Domoのグループ定義は、新しいグループ定義に完全に置き換えられます。 </td><td colspan="1" rowspan="1"><pre class="language-markup"><code>PUT /Groups{groupId}</code></pre></td></tr><tr><td colspan="1" rowspan="1"> グループをPatchする </td><td colspan="1" rowspan="1"> グループを更新します。 <a id="scim_status" target="_blank"></a></td><td colspan="1" rowspan="1"><pre class="language-markup"><code>PATCH /Groups/{groupID}</code></pre></td></tr><tr><td colspan="1" rowspan="1"> グループを削除する </td><td colspan="1" rowspan="1"> グループを削除します。 </td><td colspan="1" rowspan="1"><pre class="language-markup"><code>DELETE /Groups/{groupID}</code></pre></td></tr></tbody></table>

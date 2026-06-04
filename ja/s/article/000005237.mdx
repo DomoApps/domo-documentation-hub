@@ -1,30 +1,19 @@
 ---
 title: "Domo on Google BigQuery（推奨）"
+excerpt: "Google BigQuery を Cloud Amplifier に登録し、読み取り、書き込み、OAuth 認証を設定する手順を説明します。"
 ---
 
 ## はじめに
 
-Cloud Amplifierでは、Google BigQueryを使用してDomoインスタンスを稼働させることができます。このガイドでは、BigQueryに精通しているユーザー向けに、読み取り/書き込み機能の設定やOAuthの設定方法など、BigQueryをCloud Amplifierに登録する方法を説明します。
+Cloud Integrationsでは、Google BigQueryを使用してDomoインスタンスを稼働させることができます。このガイドでは、BigQueryに精通しているユーザー向けに、読み取り/書き込み機能の設定やOAuthの設定方法など、BigQueryをCloud Integrationsに登録する方法を説明します。
 
 設定プロセスが完了したら、BigQueryから読み込まれた仮想テーブルを使用して、カードを作成したり、アラートを設定したり、Magic ETL DataFlowで入力として使用したりすることが可能になります。
 
 <Note>
-**注記：** Magic ETLはBigQueryとCloud Amplifierの統合を活用するため、ユーザーはBigQuery内のデータを簡単に変換することができます。Magic ETL on BigQueryについては、 [こちら](/ja/s/article/000005557) を参照してください。
+**注記：** Magic ETLはBigQueryとCloud Integrationsを活用するため、ユーザーはBigQuery内のデータを簡単に変換することができます。Magic ETL on BigQueryについては、 [こちら](/ja/s/article/000005557) を参照してください。
 
 </Note>
 
----
-
-この記事では、BigQueryをCloud Amplifierに登録する方法について、次のトピックで説明します。
-
-* 構造的な概要
-* [必要条件](#prerequisites)
-* 読み取り設定
-* 書き込み設定
-  + [Google BigQueryでDataSetを準備する](#google-bigquerydataset)
-  + [DomoでBigQueryの書き込みアクセスを設定する](#domoでbigqueryの書き込みアクセスを設定する)
-* [BigQueryから供給されたDataSetをDataFlowで使用する](#domoでbigqueryの書き込みアクセスを設定する)
-* [BigQuery OAuthを設定する](#bigquery-oauth)
 
 ---
 
@@ -34,16 +23,58 @@ Cloud Amplifierでは、Google BigQueryを使用してDomoインスタンスを�
 
 ## 必要条件
 
-Cloud Amplifier—BigQuery接続を設定する前に、次の手順を完了することを強く推奨します。
+BigQuery統合を設定する前に、次の手順を完了してください。
 
-* **（推奨）BigQueryサービスアカウントを作成する —** この統合専用の新しいBigQueryアカウントを作成することを推奨します。BigQueryでは、読み取りアクセス権を持つ任意のアカウントを使用できますが、サービスアカウントを使用するのがベストプラクティスです。DomoでBigQuery仮想テーブルを作成するには、このアカウントにデフォルトのBigQuery環境への読み取りアクセス権が必要です。このアカウントを作成すると、 [設定](#setup) に必要なBigQueryサービスアカウントキーファイルが生成されます。
-* **（推奨）Domoサービスアカウントを作成する —** この統合専用の新しいDomoアカウントを作成することを推奨します。アカウントのカスタマイズされた権限で、「クラウドアカウントを管理」および「DataSetを管理」の許可が有効になっている必要があります。
+**（推奨）Domoサービスアカウントを作成する。** 任意のDomoアカウントを使用できますが、専用のアカウントを作成するのがベストプラクティスです。次の許可を割り当てます。
 
-  権限と許可の詳細については、「 [カスタマイズされた権限を管理する](/ja/s/article/360043438973) 」を参照してください。
+- クラウドアカウントを管理
+- DataSetを管理
+
+詳細については、 [カスタマイズされた権限を管理する](/ja/s/article/360043438973) を参照してください。
+
+**Google Cloud Consoleでサービスアカウントを作成する。** 次の認証方法のいずれかを選択します。
+
+- **オプション1 —** キーファイル。BigQueryサービスアカウントを作成し、必要なロールと許可を付与し（下記の [ロールと許可](#ロールと許可) を参照）、サービスアカウントにキーを追加して、認証用のJSONキーファイルをダウンロードします。
+- **オプション2 —** Workload Identity Federation（WIF）。Domoサポートにチケットを送信し、プロバイダータイプ（AWSまたはOIDC）を指定して、WIFを使用するBigQuery統合をリクエストします。Domoは、AWSの場合はAccount ID、OIDCの場合はIssuer URLとAllowed Audiencesを提供します。Google Cloud IAMでWorkload Identity Poolを作成し、Domoサポートから提供された詳細を使用してプロバイダーを追加し、 `assertion.sub` を `google.subject` にマッピングするように更新します。BigQueryサービスアカウントを作成し、Workload Identity Userを含む必要なロールと許可を付与し（下記の [ロールと許可](#ロールと許可) を参照）、Connected Service AccountsパネルからJSON設定ファイルをダウンロードします。設定をエクスポートする際は、Domoサポートから提供されたaudienceを使用します。
+
+### ロールと許可
+
+BigQueryサービスアカウントには、次のロールが必要です。
+
+**読み取り専用統合**
+
+- ロール：BigQuery Data Viewer
+- 読み取り専用アクセスには、追加の許可は必要ありません。
+
+**書き込みおよびネイティブ変換**
+
+- ロール：
+    - BigQuery Job User
+    - Service Account Token Creator（WIFを使用する場合のみ）
+- 追加の許可：
+    - `bigquery.datasets.create`
+    - `bigquery.datasets.delete`
+    - `bigquery.datasets.get`
+    - `bigquery.tables.create`
+    - `bigquery.tables.delete`
+    - `bigquery.tables.get`
+    - `bigquery.tables.getData`
+    - `bigquery.tables.list`
+    - `bigquery.tables.update`
+    - `bigquery.tables.updateData`
+    - `resourcemanager.projects.get`
+    - `bigquery.jobs.create`
+    - `bigquery.jobs.get`
+    - `bigquery.jobs.update`
+
+<Note>
+**注記：** Domoは、一時的なステージング用に作成したBigQueryのテーブルとデータセットのみを削除します。Domoが作成していないオブジェクトや、永続化することを目的としたオブジェクトを削除することはありません。
+
+</Note>
 
 ## 読み取り設定
 
-Cloud Amplifierを使用してDomo内からBigQueryテーブルへの読み取りアクセス権を設定するには、次の手順に従います。
+Cloud Integrationsを使用してDomo内からBigQueryテーブルへの読み取りアクセス権を設定するには、次の手順に従います。
 
 1. Domoサービスアカウントにログインします。
 2. ナビゲーションヘッダーで **［データ］** を選択します。
@@ -54,47 +85,47 @@ Cloud Amplifierを使用してDomo内からBigQueryテーブルへの読み取�
 
    分子を選択すると、分子がフォーカスされます。
 
-   <Frame><img alt="select molecule.png" src="/images/kb/ka0Vq000000BCKP-00N5w00000Ri7BU-0EM5w000006wDev.jpg" style={{width: 663.999, height: 457.997}}/></Frame>
+   <Frame><img alt="select molecule.png" src="/images/kb/ka0Vq000000BCKP-00N5w00000Ri7BU-0EM5w000006wDev.jpg"/></Frame>
 
-   <Frame><img alt="molecule in focus.jpeg" src="/images/kb/ka0Vq000000BCKP-00N5w00000Ri7BU-0EM5w000006wDdZ.jpg" style={{width: 287.99, height: 316.996}}/></Frame>
+   <Frame><img alt="molecule in focus.jpeg" src="/images/kb/ka0Vq000000BCKP-00N5w00000Ri7BU-0EM5w000006wDdZ.jpg"/></Frame>
 
 5. **<img src="/images/kb/ka0Vq000000BCKP-00N5w00000Ri7BU-0EM5w000005vNtv.png" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/>** **［新しいクラウドを追加］** を選択します。
 
    ［新しい統合を追加］モーダルが表示されます。
 6. モーダルの **［ネイティブ統合］** で **［BigQuery］** を選択します。
 
-   <Frame><img alt="bigquery.jpg" src="/images/kb/ka0Vq000000BER3-00N5w00000Ri7BU-0EM5w000006v4Ro.jpg" style={{width: 531.989, height: 356.996}}/></Frame>
+   <Frame><img alt="bigquery.jpg" src="/images/kb/ka0Vq000000BER3-00N5w00000Ri7BU-0EM5w000006v4Ro.jpg"/></Frame>
 
    **［BigQueryクラウドの統合］** ページが表示されます。
 7. **［+新しい統合を追加］** を選択します。
 
-   <Frame><img alt="bq cloud integrations.jpg" src="/images/kb/ka0Vq000000BER3-00N5w00000Ri7BU-0EM5w000006v4Rt.jpg" style={{width: 531.989, height: 356.996}}/></Frame>
+   <Frame><img alt="bq cloud integrations.jpg" src="/images/kb/ka0Vq000000BER3-00N5w00000Ri7BU-0EM5w000006v4Rt.jpg"/></Frame>
 
 8. **［統合名］** および **［統合の説明］** フィールドに名前とオプションの説明を入力します。
 9. ここにBigQueryサービスアカウントキーファイルをアップロードします。このファイルは、BigQueryの統合用に作成したサービスアカウントのGoogle Consoleで生成されます。
 
-   <Frame><img alt="upload file.jpg" src="/images/kb/ka0Vq000000BER3-00N5w00000Ri7BU-0EM5w000006v4S3.jpg" style={{width: 535, height: 373.999}}/></Frame>
+   <Frame><img alt="upload file.jpg" src="/images/kb/ka0Vq000000BER3-00N5w00000Ri7BU-0EM5w000006v4S3.jpg"/></Frame>
 
 10. **［次へ］** を選択します。
 
-BigQueryからCloud Amplifierへの読み取り専用統合の設定が完了しました。
+BigQueryからCloud Integrationsへの読み取り専用統合の設定が完了しました。
 
 ## 書き込み設定
 
-BigQueryの書き込み設定を行うには、Domoに接続できる既存のBigQuery DataSetが必要です。この図はプロセスの一般的なフローを示しています。BigQuery管理者はBigQueryプロジェクトとBigQuery DataSetを作成し、「 [クラウドアカウントを管理](/ja/s/article/4412849158167) 」の許可を使用して必要なIDとプロビジョニング地域をDomoユーザーに提供します。その後、Domoユーザーは、提供された情報を使用してBigQueryの書き込み設定を行います。次のタスクでは、BigQueryでDataSetを準備し、Cloud Amplifierを使用してBigQueryの書き込み設定を行う方法について説明します。
+BigQueryの書き込み設定を行うには、Domoに接続できる既存のBigQuery DataSetが必要です。この図はプロセスの一般的なフローを示しています。BigQuery管理者はBigQueryプロジェクトとBigQuery DataSetを作成し、「 [クラウドアカウントを管理](/ja/s/article/4412849158167) 」の許可を使用して必要なIDとプロビジョニング地域をDomoユーザーに提供します。その後、Domoユーザーは、提供された情報を使用してBigQueryの書き込み設定を行います。次のタスクでは、BigQueryでDataSetを準備し、Cloud Integrationsを使用してBigQueryの書き込み設定を行う方法について説明します。
 
-<Frame><img alt="Screenshot 2024-02-13 at 2.07.54 PM.png" src="/images/kb/ka0Vq000000BER3-00N5w00000Ri7BU-0EMVq000000LlGr.jpg" style={{width: 500, height: 485}}/></Frame>
+<Frame><img alt="Screenshot 2024-02-13 at 2.07.54 PM.png" src="/images/kb/ka0Vq000000BER3-00N5w00000Ri7BU-0EMVq000000LlGr.jpg"/></Frame>
 
 ### Google BigQueryでDataSetを準備する
 
-1. Google BigQueryで、既存のスタジオプロジェクトを選択するか、新しいスタジオプロジェクトを作成します。プロジェクトにアクセスしたり、プロジェクトを作成したりする方法については、[BigQueryのドキュメント](https://cloud.google.com/bigquery/docs) <img src="/images/kb/ka0Vq00000001FR-00N5w00000Ri7BU-0EMVq0000000XDh.jpg" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/> を参照してください。
+1. Google BigQueryで、既存のスタジオプロジェクトを選択するか、新しいスタジオプロジェクトを作成します。プロジェクトにアクセスしたり、プロジェクトを作成したりする方法については、[BigQueryのドキュメント <i className="icon-arrow-square-out sm" aria-hidden="true" />](https://cloud.google.com/bigquery/docs) を参照してください。
 2. プロジェクトで、Domoのテーブルを書き込む新しいDataSetを追加します。この例では、BigQueryのDataSet IDとして「data\_from\_domo」を使用します。
 
-   <Frame><img alt="Screenshot 2024-02-13 at 2.17.43 PM.png" src="/images/kb/ka0Vq000000BER3-00N5w00000Ri7BU-0EMVq000000LlIU.jpg" style={{width: 901, height: 441}}/></Frame>
+   <Frame><img alt="Screenshot 2024-02-13 at 2.17.43 PM.png" src="/images/kb/ka0Vq000000BER3-00N5w00000Ri7BU-0EMVq000000LlIU.jpg"/></Frame>
 
 3. BigQueryでDataSetを作成した後、DataSetの詳細でDataSetのデータの場所（プロビジョニング地域）を見つけます。
 
-   <Frame><img alt="dataset location.jpg" src="/images/kb/ka0Vq000000BER3-00N5w00000Ri7BU-0EMVq000000Llbp.jpg" style={{width: 902, height: 440}}/></Frame>
+   <Frame><img alt="dataset location.jpg" src="/images/kb/ka0Vq000000BER3-00N5w00000Ri7BU-0EMVq000000Llbp.jpg"/></Frame>
 
 4. クラウド管理者の許可を持つDomoユーザーに、BigQueryから次の情報を提供します。
    * プロジェクトID
@@ -106,43 +137,43 @@ BigQueryの書き込み設定を行うには、Domoに接続できる既存のBi
 1. Domoナビゲーションヘッダーで **［データ］** を選択してData Centerを開きます。
 2. Data Warehouseページが表示されない場合は、左レールの <img src="/images/kb/ka0Vq000000BCNd-00N5w00000Ri7BU-0EMVq000000uR3y.jpg" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/> **［Data Warehouse］** を選択して、Data Warehouseを開きます。
 
-   <Frame><img alt="warehouse.jpg" src="/images/kb/ka0Vq000000BER3-00N5w00000Ri7BU-0EMVq000000LllW.jpg" style={{width: 899, height: 409}}/></Frame>
+   <Frame><img alt="warehouse.jpg" src="/images/kb/ka0Vq000000BER3-00N5w00000Ri7BU-0EMVq000000LllW.jpg"/></Frame>
 
 3. 既存のBigQueryの統合を選択します。
 
    **［既存のクラウドウェアハウスを拡大する］** モーダルが表示されます。
 
-   <Frame><img alt="Screenshot 2024-02-13 at 2.52.01 PM.png" src="/images/kb/ka0Vq000000BER3-00N5w00000Ri7BU-0EMVq000000LmmP.jpg" style={{width: 502, height: 342}}/></Frame>
+   <Frame><img alt="Screenshot 2024-02-13 at 2.52.01 PM.png" src="/images/kb/ka0Vq000000BER3-00N5w00000Ri7BU-0EMVq000000LmmP.jpg"/></Frame>
 
 4. モーダルで **［Google BigQuery］** ネイティブ統合を選択します。
 
-   <Frame><img alt="select bigquery.jpg" src="/images/kb/ka0Vq000000BER3-00N5w00000Ri7BU-0EMVq000000Ln5l.jpg" style={{width: 503, height: 343}}/></Frame>
+   <Frame><img alt="select bigquery.jpg" src="/images/kb/ka0Vq000000BER3-00N5w00000Ri7BU-0EMVq000000Ln5l.jpg"/></Frame>
 
 5. リストで、書き込み機能を追加するBigQueryの統合を見つけます。その統合にマウスポインターを合わせ、<img src="/images/kb/ka0Vq0000000Qyb-00N5w00000Ri7BU-0EMVq000000K39p.jpg" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/> **オプション** を選択してオプションメニューを表示します。
 
-   <Frame><img alt="bigquery cloud integrations.jpg" src="/images/kb/ka0Vq000000BER3-00N5w00000Ri7BU-0EMVq000000LnAb.jpg" style={{width: 605, height: 404}}/></Frame>
+   <Frame><img alt="bigquery cloud integrations.jpg" src="/images/kb/ka0Vq000000BER3-00N5w00000Ri7BU-0EMVq000000LnAb.jpg"/></Frame>
 
 6. メニューで **［書き込みアクセスを設定］** を選択し、 **［BigQueryクラウドの統合を接続］** ウィザードを開きます。
 
-   <Frame><img alt="configure write access.jpg" src="/images/kb/ka0Vq000000BER3-00N5w00000Ri7BU-0EMVq000000LoY5.jpg" style={{width: 605, height: 404}}/></Frame>
+   <Frame><img alt="configure write access.jpg" src="/images/kb/ka0Vq000000BER3-00N5w00000Ri7BU-0EMVq000000LoY5.jpg"/></Frame>
 
 7. **［宛先プロジェクト］** フィールドに BigQueryプロジェクトの名前を入力します。 **［宛先DataSet］** フィールドにBigQuery DataSetの名前を入力します。 **［次へ］** を選択します。
 
-   <Frame><img alt="Screenshot 2024-02-13 at 4.13.03 PM.png" src="/images/kb/ka0Vq000000BER3-00N5w00000Ri7BU-0EMVq000000LobJ.jpg" style={{width: 604, height: 405}}/></Frame>
+   <Frame><img alt="Screenshot 2024-02-13 at 4.13.03 PM.png" src="/images/kb/ka0Vq000000BER3-00N5w00000Ri7BU-0EMVq000000LobJ.jpg"/></Frame>
 
 8. 表示された情報を確認し、指定されたDataSetにDomoが書き込みを行うことができるようになることを確認するボックスをオンにします。
 
-   <Frame><img alt="Screenshot 2024-02-13 at 4.17.26 PM.png" src="/images/kb/ka0Vq000000BER3-00N5w00000Ri7BU-0EMVq000000Lohl.jpg" style={{width: 601, height: 400}}/></Frame>
+   <Frame><img alt="Screenshot 2024-02-13 at 4.17.26 PM.png" src="/images/kb/ka0Vq000000BER3-00N5w00000Ri7BU-0EMVq000000Lohl.jpg"/></Frame>
 
 9. **［次へ］** を選択して、接続が正常に確立されたことを確認します。
 
-   <Frame><img alt="select next to finalize.jpg" src="/images/kb/ka0Vq000000BER3-00N5w00000Ri7BU-0EMVq000000Os2T.jpg" style={{width: 604, height: 404}}/></Frame>
+   <Frame><img alt="select next to finalize.jpg" src="/images/kb/ka0Vq000000BER3-00N5w00000Ri7BU-0EMVq000000Os2T.jpg"/></Frame>
 
-   <Frame><img alt="Screenshot 2024-02-13 at 4.21.11 PM.png" src="/images/kb/ka0Vq000000BER3-00N5w00000Ri7BU-0EMVq000000LmXv.jpg" style={{width: 603, height: 402}}/></Frame>
+   <Frame><img alt="Screenshot 2024-02-13 at 4.21.11 PM.png" src="/images/kb/ka0Vq000000BER3-00N5w00000Ri7BU-0EMVq000000LmXv.jpg"/></Frame>
 
 BigQueryの統合をDomoの出力として使用できるようになりました。次の例では、 **［Data from Domo］** がMagic ETL出力のオプションになっています。
 
-<Frame><img alt="data from domo in magic.jpg" src="/images/kb/ka0Vq000000BER3-00N5w00000Ri7BU-0EMVq000000LooD.jpg" style={{width: 900, height: 449}}/></Frame>
+<Frame><img alt="data from domo in magic.jpg" src="/images/kb/ka0Vq000000BER3-00N5w00000Ri7BU-0EMVq000000LooD.jpg"/></Frame>
 
 ## BigQueryから供給されたDataSetをDataFlowで使用する
 
@@ -150,7 +181,7 @@ BigQueryから供給されたDataSetをDataFlowで使用すると、フローの
 
 ## BigQuery OAuthを設定する
 
-BigQuery-Cloud AmplifierのOAuthオプションを使用すると、BigQueryで既に確立されているガバナンスと権限を再利用できます。OAuthがクラウドの統合用に設定されている場合、その統合を使用して確立されるすべてのDataSetでOAuthが使用されるようになりました。
+BigQuery-Cloud IntegrationsのOAuthオプションを使用すると、BigQueryで既に確立されているガバナンスと権限を再利用できます。OAuthがクラウドの統合用に設定されている場合、その統合を使用して確立されるすべてのDataSetでOAuthが使用されるようになりました。
 
 ユーザーがOAuth設定による統合を使用して作成されたカードの表示またはDataSetのプレビューを試行するたびに、DomoはそのユーザーにBigQuery認証情報の入力を求めます。その後、Domoは認証されたユーザーのコンテキストでBigQueryデータをクエリします。
 
@@ -172,29 +203,29 @@ DomoでOAuthとのBigQueryの統合を設定するには、以下が必要です
 
 1. Domo Data Warehouseに移動し、**追加** ノードを選択します。
 
-   <Frame><img alt="add node.jpg" src="/images/kb/ka0Vq000000BER3-00N5w00000Ri7BU-0EMVq000000or2k.jpg" style={{width: 901, height: 316}}/></Frame>
+   <Frame><img alt="add node.jpg" src="/images/kb/ka0Vq000000BER3-00N5w00000Ri7BU-0EMVq000000or2k.jpg"/></Frame>
 
 2. ネイティブ統合オプションから、**［BigQuery］**
 
    を選択します。
 
-   <Frame><img alt="select bigquery.jpg" src="/images/kb/ka0Vq000000BER3-00N5w00000Ri7BU-0EMVq000000ouqE.jpg" style={{width: 651, height: 446}}/></Frame>
+   <Frame><img alt="select bigquery.jpg" src="/images/kb/ka0Vq000000BER3-00N5w00000Ri7BU-0EMVq000000ouqE.jpg"/></Frame>
 
 3. **［+新しい統合を追加］** を選択します。
 
-   <Frame><img alt="add new integration.jpg" src="/images/kb/ka0Vq000000BER3-00N5w00000Ri7BU-0EMVq000000oxL3.jpg" style={{width: 651, height: 462}}/></Frame>
+   <Frame><img alt="add new integration.jpg" src="/images/kb/ka0Vq000000BER3-00N5w00000Ri7BU-0EMVq000000oxL3.jpg"/></Frame>
 
 4. 表示されたフィールドに、統合名とオプションの説明を入力し、BigQueryサービスアカウントキーファイルをJSONフォーマットでアップロードして、この統合に使用するプロビジョニング地域を選択します。プロビジョニング地域は、設定後は変更できません。
 
-   <Frame><img alt="Screenshot 2024-04-24 at 3.11.53 PM.png" src="/images/kb/ka0Vq000000BER3-00N5w00000Ri7BU-0EMVq000000oxbB.jpg" style={{width: 651, height: 458}}/></Frame>
+   <Frame><img alt="Screenshot 2024-04-24 at 3.11.53 PM.png" src="/images/kb/ka0Vq000000BER3-00N5w00000Ri7BU-0EMVq000000oxbB.jpg"/></Frame>
 
 5. **［OAuthのユーザーごとの認証を使用］** スイッチを有効にします。次に、デフォルトの請求プロジェクトIDを入力し、 **［認証］** を選択します。
 
-   <Frame><img alt="authenticate.jpg" src="/images/kb/ka0Vq000000BER3-00N5w00000Ri7BU-0EMVq000000oxrJ.jpg" style={{width: 650, height: 458}}/></Frame>
+   <Frame><img alt="authenticate.jpg" src="/images/kb/ka0Vq000000BER3-00N5w00000Ri7BU-0EMVq000000oxrJ.jpg"/></Frame>
 
 6. IdPに対して認証情報を検証します。検証に成功すると、メッセージが表示されます。接続モーダルで、**［次へ］** を選択します。
 
 BigQueryからDomoへのOAuthの設定が正常に完了しました。この統合を使用して確立されたDataSetのカードクエリまたはデータプレビューでは、クエリ結果が返される前に、BigQueryでの認証を求めるプロンプトが表示されるようになりました。
 
-<Frame><img alt="Screenshot 2024-04-24 at 3.18.32 PM.png" src="/images/kb/ka0Vq000000BER3-00N5w00000Ri7BU-0EMVq000000oy0z.jpg" style={{width: 605, height: 401}}/></Frame>
+<Frame><img alt="Screenshot 2024-04-24 at 3.18.32 PM.png" src="/images/kb/ka0Vq000000BER3-00N5w00000Ri7BU-0EMVq000000oy0z.jpg"/></Frame>
 

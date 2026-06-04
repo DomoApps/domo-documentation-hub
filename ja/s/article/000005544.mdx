@@ -1,5 +1,6 @@
 ---
 title: "JupyterでAIプロンプトを使用する"
+excerpt: "Jupyter ワークスペースでメモ内に AI プロンプトを記述し、Domo. AI プレイグラウンドと同じプロンプトを使用する方法を説明します。"
 ---
 
 ## はじめに
@@ -21,7 +22,7 @@ Jupyterにアクセスするには、以下のいずれかの許可が有効に�
 
 左側のナビゲーションで、 <img src="/images/kb/ja/ka0Vq0000005FKz-00N5w00000Ri7BU-0EM5w000005vXkP.png" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/> **［More］** （水平の三点リーダー）> **［Jupyterワークスペース］** を選択します。
 
-<Frame><img alt="jupyter workspaces.jpg" src="/images/kb/ka0Vq00000051WX-00N5w00000Ri7BU-0EMVq0000040sfd.jpg" style={{width: 280, height: 512}}/></Frame>
+<Frame><img alt="jupyter workspaces.jpg" src="/images/kb/ka0Vq00000051WX-00N5w00000Ri7BU-0EMVq0000040sfd.jpg"/></Frame>
 ワークスペースの作成の詳細については、 [こちら](/ja/s/article/36004740075) を参照してください。
 
 ## テキスト生成プロンプトを使用する
@@ -30,10 +31,8 @@ generate\_textプロンプトは、質問に対する回答を提供します。
 
 出力プロンプトは下部に指定されます。
 
-<Frame><img alt="Screenshot 2024-09-18 at 2.04.56 PM.png" src="/images/kb/ka0Vq00000051WX-00N5w00000Ri7BU-0EMVq000002moSn.jpg" style={{width: 903, height: 110}}/></Frame>
-input\_strに新しいプロンプトを指定することで、標準のgenerate\_textテンプレートを変更できます。prompt\_templateはinput\_strよりも優先されます。
-
-input\_strを使用するには、prompt\_templateおよびprompt\_parametersを削除する必要があります。
+<Frame><img alt="Screenshot 2024-09-18 at 2.04.56 PM.png" src="/images/kb/ka0Vq00000051WX-00N5w00000Ri7BU-0EMVq000002moSn.jpg"/></Frame>
+`prompt_template` が指定されている場合、プロンプトテンプレートのテキスト内にプレースホルダー `${input}` を含めない限り、 `input_str` は無視されます。 `${input}` プレースホルダーを含めると、 `input_str` がそのプレースホルダーに自動的に挿入されます。
 
 generate\_text関数では、以下のパラメータを使用できます。 `input_str` を除くすべてのパラメータはオプションです。
 
@@ -71,7 +70,7 @@ text\_to\_sqlプロンプトは質問にもとづいてSQLクエリを提供し�
 
 関数SQLクエリは下部の出力で指定されます。
 
-<Frame><img alt="text to sql.png" src="/images/kb/ka0Vq00000051WX-00N5w00000Ri7BU-0EMVq000002lNpd.jpg" style={{width: 901, height: 358}}/></Frame>
+<Frame><img alt="text to sql.png" src="/images/kb/ka0Vq00000051WX-00N5w00000Ri7BU-0EMVq000002lNpd.jpg"/></Frame>
 標準のtext\_to\_sqlテンプレートを変更するには、新しいDataSourceSchemaと、AIプロンプトの記述内容を指定するinput\_strを指定します。
 
 ワークスペースに接続されている既存のDataSetにworkspace\_data\_source\_aliasを指定することもできます。workspace\_data\_source\_aliasを指定すると、ワークスペースはSQLクエリの列名を生成するときにスキーマを使用できます。
@@ -127,7 +126,7 @@ def text_to_sql(input_str: str,
 
 Beast Mode関数は下部の出力で指定されます。
 
-<Frame><img alt="text to beast mode.png" src="/images/kb/ka0Vq00000051WX-00N5w00000Ri7BU-0EMVq000002lQab.jpg" style={{width: 897, height: 322}}/></Frame>
+<Frame><img alt="text to beast mode.png" src="/images/kb/ka0Vq00000051WX-00N5w00000Ri7BU-0EMVq000002lQab.jpg"/></Frame>
 text\_to\_beast\_mode関数では、以下のパラメータを使用できます。 `input_str` を除くすべてのパラメータはオプションです。
 
 ```
@@ -161,7 +160,7 @@ summarize\_textプロンプトは質問にもとづいてテキスト要約を�
 
 出力プロンプトは下部に表示されます。
 
-<Frame><img alt="Screenshot 2024-09-18 at 11.30.03 AM.png" src="/images/kb/ka0Vq00000051WX-00N5w00000Ri7BU-0EMVq000002mmsQ.jpg" style={{width: 898, height: 449}}/></Frame>
+<Frame><img alt="Screenshot 2024-09-18 at 11.30.03 AM.png" src="/images/kb/ka0Vq00000051WX-00N5w00000Ri7BU-0EMVq000002mmsQ.jpg"/></Frame>
 summarize\_text関数では、以下のパラメータを使用できます。 `input_str` を除くすべてのパラメータはオプションです。
 
 ```
@@ -192,6 +191,106 @@ def summarize(input_str: str,
  戻り値:          
  response: 要約されたテキスト      
  """
+```
+
+<Note>**注意:** 以下で説明するパラメータの動作は、現在の製品で確認する必要があります。このコンテンツはPMによるレビューのために提出されました。</Note>
+
+`summarize()` 関数は、AIモデルを使用して長いテキストブロックから要約を生成します。要約のスタイル、構造、および長さを制御するオプション設定をサポートしています。必須パラメータは `input_str` のみです。
+
+```python
+summarize(input_str="Paste your text here...")
+```
+
+### オプションパラメータ
+
+#### prompt_template
+
+**`prompt_template` （オプション） —** `PromptTemplate` クラスは、AIタスク用に再利用可能なプロンプト文字列を構造化するのに役立ちます。この実装は軽量であり、入力としてプロンプトテキスト全体という1つの値のみを必要とします。
+
+```python
+from domojupyter.ai.models.PromptTemplate import PromptTemplate
+
+template_text = "Summarize the following text:\n{text}"
+prompt = PromptTemplate(template=template_text)
+```
+
+#### parameters
+
+**`parameters` （オプション） —** `prompt_template` 内のプレースホルダーを置き換えるために使用される辞書。
+
+```python
+parameters = {
+    "topic": "monthly sales report",
+    "audience": "executive leadership"
+}
+```
+
+#### model および model_configuration
+
+* **`model` （オプション） —** 要約に使用する言語モデルの名前またはID。
+* **`model_configuration` （オプション） —** 選択した言語モデルのカスタム構成パラメータを持つ辞書。
+
+#### chunking_configuration
+
+**`chunking_configuration` （オプション） —** 大きなテキストブロックを要約する場合に使用します。要約の前に、テキストをより小さく扱いやすいチャンクに分割します。
+
+```python
+from domojupyter.ai.models.ChunkingConfiguration import ChunkingConfiguration
+from domojupyter.ai.models.SeparatorType import SeparatorType
+
+chunking_configuration = ChunkingConfiguration(
+    max_chunk_size=1000,
+    chunk_overlap=100,
+    separators=["\n\n", "\n", " "],
+    separator_type=SeparatorType.TEXT,
+    disallow_intermediate_chunks=False
+)
+```
+
+使用可能な `SeparatorType` オプション: `CPP`、`GO`、`HTML`、`JAVA`、`JAVASCRIPT`、`LATEX`、`MARKDOWN`、`PROTO`、`PYTHON`、`RST`、`RUBY`、`SCALA`、`SOL`、`SWIFT`、`TEXT`。
+
+#### output_style
+
+**`output_style` （オプション） —** 要約の出力のデザイン、構造化、および構成を決定します。
+
+```python
+from domojupyter.ai.models.SummarizationOutputStyle import SummarizationOutputStyle
+
+output_style = SummarizationOutputStyle.BULLETED  # Options: BULLETED, NUMBERED, PARAGRAPH
+```
+
+#### output_word_length
+
+**`output_word_length` （オプション） —** ワード数にもとづいて出力要約の長さを制限するサイズ境界を定義します。
+
+```python
+from domojupyter.ai.models.SizeBoundary import SizeBoundary
+
+output_word_length = SizeBoundary(min_bound=75, max_bound=150)
+```
+
+### 例
+
+次の例では、複数のオプションパラメータを組み合わせています。
+
+```python
+from domojupyter.ai.models.ChunkingConfiguration import ChunkingConfiguration
+from domojupyter.ai.models.SeparatorType import SeparatorType
+from domojupyter.ai.models.SummarizationOutputStyle import SummarizationOutputStyle
+from domojupyter.ai.models.SizeBoundary import SizeBoundary
+
+summary = summarize(
+    input_str=long_text,
+    output_style=SummarizationOutputStyle.BULLETED,
+    output_word_length=SizeBoundary(min_bound=75, max_bound=150),
+    chunking_configuration=ChunkingConfiguration(
+        max_chunk_size=1200,
+        chunk_overlap=100,
+        separators=["\n", ".", " "],
+        separator_type=SeparatorType.MARKDOWN,
+        disallow_intermediate_chunks=False
+    )
+)
 ```
 
 日本語

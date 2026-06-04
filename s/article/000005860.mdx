@@ -1,5 +1,6 @@
 ---
 title: "Use the Meta Select and Get Schema Tiles"
+excerpt: "Use the Meta Select and Get Schema tiles in Magic ETL to rename columns, change data types, and calculate new columns that adapt to schema changes."
 ---
 
 ## Intro
@@ -14,7 +15,7 @@ The Meta Select tile's operations include, but are not limited to:
 
 Most of the tile's required configuration comes from one of its two input tables, called the Configuration Input. The Meta Select tile interacts with its Configuration Input in precisely the same way as the Add Formula tile operates. The Add Formula tile has the shape of a table with two "columns"—the name and the formula—and each “row” is a column to be added. The rows of data in the Configuration Input are treated as descriptions of columns to calculate from the Meta Select tile's other input table, the Data Input.
 
-<Frame><img alt="" src="/images/kb/ka0Vq000000Dwsb-00N5w00000Ri7BU-0EMVq000007ZwWX.jpg" style={{width: 851, height: 237}}/></Frame>
+<Frame><img alt="" src="/images/kb/ka0Vq000000Dwsb-00N5w00000Ri7BU-0EMVq000007ZwWX.jpg"/></Frame>
 This article provides four examples of how to use the Meta Select tile, including in conjunction with the Get Schema tile. You can follow along with the examples in Magic ETL, referring to the provided graphs frequently and looking at the intermediate result tables of all the tiles.
 
 In each example, code blocks and images display the DataFlow and the tile configuration. Unless otherwise mentioned, all Meta Select tiles are configured to use the columns `name`, `expr`, and `type` from their Configuration Input, and all Get Schema tiles are configured with those same column names.
@@ -25,7 +26,7 @@ In each example, code blocks and images display the DataFlow and the tile config
 
 The first example of Meta Select's capabilities will demonstrate it doing nothing at all. Rather, we will use the Get Schema tile to select every column from our original input unchanged.
 
-<Frame><img alt="" src="/images/kb/ka0Vq000000Dwsb-00N5w00000Ri7BU-0EMVq000007ZtTp.jpg" style={{width: 401, height: 255}}/></Frame>
+<Frame><img alt="" src="/images/kb/ka0Vq000000Dwsb-00N5w00000Ri7BU-0EMVq000007ZtTp.jpg"/></Frame>
 The Get Schema tile exists primarily to support the Meta Select tile, but it does have other applications. The Get Schema tile accepts one input and uses it to create a table that describes that input's columns or schema.
 
 <Note>
@@ -40,17 +41,17 @@ The Get Schema tile's result table has three columns, which contain the followin
 
 In this example, the output of the Get Schema tile becomes the Configuration Input of the Meta Select tile, and the same initial input to the Get Schema tile is also passed as input to the Meta Select tile. This pattern appears in almost all of our examples.
 
-<Frame><img alt="" src="/images/kb/ka0Vq000000Dwsb-00N5w00000Ri7BU-0EMVq000007ZseE.jpg" style={{width: 653, height: 189}}/></Frame>
+<Frame><img alt="" src="/images/kb/ka0Vq000000Dwsb-00N5w00000Ri7BU-0EMVq000007ZseE.jpg"/></Frame>
 Here, the Get Schema tile's output is unchanged, which causes the Meta Select tile to produce an output table identical to its Data Input. In the rest of the examples, we will add tiles that modify the Get Schema tile's output, which will change the output for the Meta Select tile.
 
-<Frame><img alt="" src="/images/kb/ka0Vq000000Dwsb-00N5w00000Ri7BU-0EMVq000007ZubB.jpg" style={{width: 702, height: 111}}/></Frame>
+<Frame><img alt="" src="/images/kb/ka0Vq000000Dwsb-00N5w00000Ri7BU-0EMVq000007ZubB.jpg"/></Frame>
 ### How the Meta Select Tile Interprets Its Configuration Input
 
 This example focuses on how the Meta Select tile interprets its Configuration Input, which in this case is the output table of the Get Schema tile.
 
 The Meta Select tile's Configuration Input requires two columns: one column containing the column names to be produced from the Data Input, and the other containing the expressions that will be used to calculate them. You can have a third, optional column containing the desired data types of the result columns. This image displays an example of a Get Schema output DataSet with these three columns.
 
-<Frame><img alt="" src="/images/kb/ka0Vq000000Dwsb-00N5w00000Ri7BU-0EMVq000007Zwhp.jpg" style={{width: 700, height: 179}}/></Frame>
+<Frame><img alt="" src="/images/kb/ka0Vq000000Dwsb-00N5w00000Ri7BU-0EMVq000007Zwhp.jpg"/></Frame>
 You can see the relationship between the tiles this way: the Get Schema tile produces a “meta” table describing its input, and the Meta Select tile applies the same sort of “meta” table to its Data Input.
 
 In the next example, we'll modify the Get Schema tile's results before connecting it to the Meta Select tile.
@@ -71,7 +72,7 @@ We have three goals:
      
    **The goal —** Remove all of these columns from the DataSet.
 
-<Frame><img alt="" src="/images/kb/ka0Vq000000Dwsb-00N5w00000Ri7BU-0EMVq000007Zx61.jpg" style={{width: 799, height: 174}}/></Frame>
+<Frame><img alt="" src="/images/kb/ka0Vq000000Dwsb-00N5w00000Ri7BU-0EMVq000007Zx61.jpg"/></Frame>
 It is possible to do all of these things with other tiles in Magic ETL, such as with a single Alter Columns tile. However, only the Meta Select tile allows us to do these tasks without spending as much time as there are columns to change.
 
 For example, if the input table had 400 columns instead of 4, configuring an Alter Columns tile to make all these changes would take about 100 times as long (assuming the web browser doesn't crash in the process).
@@ -80,7 +81,7 @@ The Meta Select tile uses the same configuration regardless of column count. Add
 
 We can complete our first two goals—changing the column names and changing the data type—by adding an Add Formula tile after the Get Schema tile. We'll write a formula that restates the name column and another that restates type.
 
-<Frame><img alt="" src="/images/kb/ka0Vq000000Dwsb-00N5w00000Ri7BU-0EMVq000007ZxM9.jpg" style={{width: 499, height: 183}}/></Frame>
+<Frame><img alt="" src="/images/kb/ka0Vq000000Dwsb-00N5w00000Ri7BU-0EMVq000007ZxM9.jpg"/></Frame>
 To reformat column names, use this formula:
 
 `` INITCAP (REPLACE (REPLACE (`name`, 'odbc_', '' ), '_', ' ' )) ``
@@ -93,7 +94,7 @@ To change the data type, use this one:
   **Note:** Keep in mind that columns restated in an Add Formula tile are restated before the evaluation of subsequent formulas in the same tile. This is why we are looking for `'Date'` instead of `'_date'`.
 </Note>
 
-<Frame><img alt="" src="/images/kb/ka0Vq000000Dwsb-00N5w00000Ri7BU-0EMVq000007ZxPN.jpg" style={{width: 701, height: 190}}/></Frame>
+<Frame><img alt="" src="/images/kb/ka0Vq000000Dwsb-00N5w00000Ri7BU-0EMVq000007ZxPN.jpg"/></Frame>
 To complete our third goal—removing the columns whose names began with `'odbc_0'` —we'll use a Filter Rows tile. (After using the Add Formula tile, the name begins with only `0`.)
 
 Placing the Filter Rows tile after the Add Formula tile and before the Meta Select tile, the Filter Rows tile has just one expression condition:
@@ -108,7 +109,7 @@ We have successfully completed our three goals:
 2. The `type` column now contains the correct data types.
 3. The `expr` column contains valid references to the columns from the original input that correspond to our desired names.
 
-<Frame><img alt="" src="/images/kb/ka0Vq000000Dwsb-00N5w00000Ri7BU-0EMVq000007ZxQz.jpg" style={{width: 700, height: 214}}/></Frame>
+<Frame><img alt="" src="/images/kb/ka0Vq000000Dwsb-00N5w00000Ri7BU-0EMVq000007ZxQz.jpg"/></Frame>
 Now that we have our configuration table, we can connect both our original input tile and the Filter Rows tile to the Meta Select tile.
 
 As you configure the Meta Selec tile, make sure that **Filter Rows** is selected as the Configuration Input while the input data tile is the Data Input. To see the results, run a preview of the DataFlow.
@@ -170,8 +171,8 @@ Here we have an input data table with a variety of numeric columns (integers, fl
 
 For our purposes, these nulls are unwanted and disruptive, and we would rather replace them with zeroes. We could accomplish this with a simple Add Formula tile, but by using the Meta Select tile, we avoid repeating ourselves across what might be dozens of columns and create a solution that is robust against input schema changes.
 
-  <Frame><img alt="" src="/images/kb/ka0Vq000000Dwsb-00N5w00000Ri7BU-0EMVq000007b31L.jpg" style={{width: 697, height: 200}}/></Frame>
-  <Frame><img alt="" src="/images/kb/ka0Vq000000Dwsb-00N5w00000Ri7BU-0EMVq000007b9rV.jpg" style={{width: 500, height: 226}}/></Frame>
+  <Frame><img alt="" src="/images/kb/ka0Vq000000Dwsb-00N5w00000Ri7BU-0EMVq000007b31L.jpg"/></Frame>
+  <Frame><img alt="" src="/images/kb/ka0Vq000000Dwsb-00N5w00000Ri7BU-0EMVq000007b9rV.jpg"/></Frame>
 
 This graph is identical to the graph from Example #2, except that we don't need the Filter Rows tile. The only tile we need to change is the Add Formula tile, which will consist of just one formula, which restates the `expr` column:
 
@@ -207,8 +208,8 @@ The goal is to transform the categorical column into multiple columns, as many a
   **What is one-hot encoding?** One-hot encoding is a method where categorical data is converted into a binary format. For each row, only one column is true or "hot," as in "one-hot."
 </Tip>
 
-  <Frame><img alt="" src="/images/kb/ka0Vq000000Dwsb-00N5w00000Ri7BU-0EMVq000007bJin.jpg" style={{width: 500, height: 233}}/></Frame>
-  <Frame><img alt="" src="/images/kb/ka0Vq000000Dwsb-00N5w00000Ri7BU-0EMVq000007bIbS.jpg" style={{width: 697, height: 175}}/></Frame>
+  <Frame><img alt="" src="/images/kb/ka0Vq000000Dwsb-00N5w00000Ri7BU-0EMVq000007bJin.jpg"/></Frame>
+  <Frame><img alt="" src="/images/kb/ka0Vq000000Dwsb-00N5w00000Ri7BU-0EMVq000007bIbS.jpg"/></Frame>
 
 Our approach involves branching the input in three directions.
 
@@ -218,14 +219,14 @@ Our approach involves branching the input in three directions.
 
 The first two branches are combined with an Append Rows tile to produce the completed Configuration Input for the Meta Select tile.
 
-<Frame><img alt="" src="/images/kb/ka0Vq000000Dwsb-00N5w00000Ri7BU-0EMVq000007bJsT.jpg" style={{width: 450, height: 239}}/></Frame>
+<Frame><img alt="" src="/images/kb/ka0Vq000000Dwsb-00N5w00000Ri7BU-0EMVq000007bJsT.jpg"/></Frame>
 Let's focus on the second branch, which begins with the Remove Duplicates tile. The purpose of the Remove Duplicates tile here is to reduce the input data to one row per unique value of `country\_code`. We configure the Remove Duplicates to use `country\_code` alone as the unique key.
 
 Next, we need to generate our three Configuration Input columns, using names that will match those from the Get Schema tile: `name`, `expr`, and `type`. We'll use an Add Formula tile with the following formula for `name`:
 
 `` CONCAT ('country_code_', `country_code`) ``
 
-<Frame><img alt="" src="/images/kb/ka0Vq000000Dwsb-00N5w00000Ri7BU-0EMVq000007bJvh.jpg" style={{width: 525, height: 208}}/></Frame>
+<Frame><img alt="" src="/images/kb/ka0Vq000000Dwsb-00N5w00000Ri7BU-0EMVq000007bJvh.jpg"/></Frame>
 For `expr`:
 
 `` EXPRESS(`country_code` = @ 1, EXPR_VALUE(`country_code`)) ``
@@ -234,14 +235,14 @@ And for `type`:
 
 `'BOOLEAN'`
 
-<Frame><img alt="" src="/images/kb/ka0Vq000000Dwsb-00N5w00000Ri7BU-0EMVq000007bHsI.jpg" style={{width: 700, height: 197}}/></Frame>
+<Frame><img alt="" src="/images/kb/ka0Vq000000Dwsb-00N5w00000Ri7BU-0EMVq000007bHsI.jpg"/></Frame>
 The formulas for `name` and `type` don't contain anything we haven't seen before, but `expr` involves a new function: `EXPR_VALUE()`. Consider the result table at this point in the graph (Add Formula). Note how the reference to `country\_code` from the template has remained unchanged; the result expression still references that column on the left side of the equals.
   
 However, the *placeholder* has been populated with the value of `country\_code` in the Add Formula tile's input. `EXPR_VALUE()` is another function that produces an expression, like `EXPRESS()`.
 
 It takes only one argument, which is evaluated immediately. This result is then converted into an expression *literal*. A literal is another fundamental type of expression, like a column reference. A literal is an expression that always evaluates to the same value. All of these expressions are literals: `'US'`, `0`, `1.5`, and `NULL`.
 
-<Frame><img alt="" src="/images/kb/ka0Vq000000Dwsb-00N5w00000Ri7BU-0EMVq000007bK0X.jpg" style={{width: 750, height: 144}}/></Frame>
+<Frame><img alt="" src="/images/kb/ka0Vq000000Dwsb-00N5w00000Ri7BU-0EMVq000007bK0X.jpg"/></Frame>
 It doesn't matter how the Append Rows tile is configured, but “Only include shared columns” might make the most sense (since this will reduce the table down to just the three columns that matter: `name`, `expr`, and `type`). As always, preview the whole flow and probe the output at every tile to ensure you understand what is happening at every stage.
 
 ## Other Functions for Working With Expressions

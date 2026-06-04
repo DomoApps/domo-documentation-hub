@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+# Detects "phantom deletions" after a pull/merge.
+#
+# On case-insensitive filesystems (macOS APFS, Windows NTFS), when a recent
+# commit renames case-colliding files (e.g. foo.png and foo.PNG), git
+# sometimes fails to materialize one side of the pair on disk during
+# checkout. The blobs are intact in HEAD; git status just reports them as
+# deleted on every subsequent pull until someone restores them.
+#
+# This hook surfaces the situation with a one-liner recovery command. It
+# does not mutate the working tree — if you genuinely deleted files mid-
+# merge, ignore the message.
+
+set -e
+
+cd "$(git rev-parse --show-toplevel)"
+
+missing=$(git ls-files --deleted)
+[ -z "$missing" ] && exit 0
+
+count=$(printf '%s\n' "$missing" | wc -l | tr -d ' ')
+
+{
+  printf '\n\033[33m⚠  %s tracked file(s) are missing from your working tree after this merge.\033[0m\n\n' "$count"
+  printf 'This often happens on case-insensitive filesystems (macOS APFS, Windows NTFS)\n'
+  printf 'when a recent commit renamed case-colliding files. The blobs are intact in\n'
+  printf 'git; they just were not written to disk during checkout.\n\n'
+  printf 'To restore them, run:\n\n'
+  printf '    git ls-files --deleted -z | xargs -0 git checkout HEAD --\n\n'
+  printf 'If you deleted any of these files intentionally, ignore this message.\n\n'
+} >&2

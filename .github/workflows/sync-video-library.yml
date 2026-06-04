@@ -6,15 +6,15 @@ name: Sync Video Library
 #
 # Runs Monday and Wednesday mornings (13:00 UTC ≈ 6–7am Mountain) and on demand.
 #
-# Required repo secrets (Settings → Secrets and variables → Actions → Secrets):
-#   DOMO_CLIENT_ID       Domo OAuth client id  (developer.domo.com, scope "data")
-#   DOMO_CLIENT_SECRET   Domo OAuth client secret
+# Required repo secret (Settings → Secrets and variables → Actions → Secrets):
+#   DOMO_DEVELOPER_TOKEN   Domo developer access token
+#                          (instance: Admin → Authentication → Access Tokens)
 #
 # Required repo variable (… → Variables):
 #   DOMO_VIDEO_DATASET_ID  GUID of the DataSet backing the library
 #
 # Optional repo variable:
-#   DOMO_API_HOST        Domo API host (default: api.domo.com)
+#   DOMO_INSTANCE          Domo instance host (default: domo.domo.com)
 
 on:
   schedule:
@@ -43,10 +43,9 @@ jobs:
 
       - name: Rebuild Video Library from Domo
         env:
-          DOMO_CLIENT_ID: ${{ secrets.DOMO_CLIENT_ID }}
-          DOMO_CLIENT_SECRET: ${{ secrets.DOMO_CLIENT_SECRET }}
+          DOMO_DEVELOPER_TOKEN: ${{ secrets.DOMO_DEVELOPER_TOKEN }}
           DOMO_VIDEO_DATASET_ID: ${{ vars.DOMO_VIDEO_DATASET_ID }}
-          DOMO_API_HOST: ${{ vars.DOMO_API_HOST }}
+          DOMO_INSTANCE: ${{ vars.DOMO_INSTANCE }}
         run: python scripts/build_video_library.py
 
       - name: Commit, push, and open/update PR

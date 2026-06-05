@@ -1,0 +1,199 @@
+---
+title: "Google Drive Connector"
+description: "Connect your personal Google Drive to Domo Documents using OAuth 2.0 credentials."
+---
+
+This article will walk you through setting up a connection to your
+personal Google Drive. If you have an Enterprise Account, the steps may
+vary.
+
+To get a Google Drive Client ID and Client Secret Key, you need to
+generate them through the Google Cloud Console by enabling the Drive API
+and creating OAuth 2.0 credentials.
+
+The setup process has three main stages:
+
+1. Create a project and enable the Google Drive API
+2. Configure the OAuth consent screen
+3. Generate the Client ID and secret key
+
+If you already have a Google Drive Client ID and Client Secret, skip to [Create a Google Drive Connection](#create-a-google-drive-connection).
+
+<Note>**Note:** If you make any changes to the 'scopes' of your OAuth client, you will be required to re-auth your Google Drive connector</Note>
+
+## Create a Project and Enable the Google Drive API
+
+1. Open the [Google Cloud Console](https://console.cloud.google.com/)
+
+<Frame><img alt="GoogleCloud1" src="/images/kb/GoogleCloud1.png" style={{width: 624, height: 316}}/></Frame>
+
+2. Log in with your Google account, then click Create Project (or
+select an existing one).
+
+<Frame><img alt="GoogleCloud2" src="/images/kb/GoogleCloud2.png" style={{width: 624, height: 315}}/></Frame>
+
+<Frame><img alt="GoogleCloud3" src="/images/kb/GoogleCloud3.png" style={{width: 624, height: 316}}/></Frame>
+
+3. Select your new Project
+
+<Frame><img alt="GoogleCloud4" src="/images/kb/GoogleCloud4.png" style={{width: 624, height: 316}}/></Frame>
+
+<Frame><img alt="GoogleCloud5" src="/images/kb/GoogleCloud5.png" style={{width: 624, height: 316}}/></Frame>
+
+<Frame><img alt="GoogleCloud6" src="/images/kb/GoogleCloud6.png" style={{width: 624, height: 316}}/></Frame>
+
+4. In the top search bar, type "**Google Drive API**", select
+"**Google Drive API**" from the list
+
+<Frame><img alt="GoogleCloud7" src="/images/kb/GoogleCloud7.png" style={{width: 624, height: 316}}/></Frame>
+
+<Frame><img alt="GoogleCloud8" src="/images/kb/GoogleCloud8.png" style={{width: 624, height: 316}}/></Frame>
+
+5. **Enable** the Google Drive API
+
+<Frame><img alt="GoogleCloud9" src="/images/kb/GoogleCloud9.png" style={{width: 624, height: 316}}/></Frame>
+
+6. To call this API from your own applications, you may need to create
+credentials
+
+<Frame><img alt="GoogleCloud10" src="/images/kb/GoogleCloud10.png" style={{width: 624, height: 317}}/></Frame>
+
+7. Choose the **Create Credentials** button, choose **User Data** to
+create an OAuth client.
+
+<Frame><img alt="GoogleCloud11" src="/images/kb/GoogleCloud11.png" style={{width: 624, height: 317}}/></Frame>
+
+8. Set the OAuth credentials Name, Support email & Developer contact.
+
+<Frame><img alt="GoogleCloud12" src="/images/kb/GoogleCloud12.png" style={{width: 624, height: 316}}/></Frame>
+
+9. Set Scopes, choose **Add or Remove Scopes**
+
+<Frame><img alt="GoogleCloud13" src="/images/kb/GoogleCloud13.png" style={{width: 624, height: 317}}/></Frame>
+
+<Note>**Note:** If you add **sensitive** or **restricted** scopes, like scopes that let you access a user's emails or contacts, you will need to submit your app for verification.</Note>
+
+10. Filter by **Google Drive API** and select the 3 non-restricted
+scopes, then choose **Update**.
+
+| Scope | Description |
+|---|---|
+| `.../auth/drive.install` | Connect itself to your Google Drive |
+| `.../auth/drive.file` | See, edit, create, and delete only the specific Google Drive files you use with this app |
+| `.../auth/drive.appdata` | See, create, and delete its own configuration data in your Google Drive |
+
+There are two options when adding Scopes.
+
+   1 -- Filter to the Google Drive API and add all 17 scopes, then in the
+   next step remove the sensitive and restricted scopes (unless you plan
+   to submit your app for verification).
+>
+   2 -- Scan the list of 17 scopes and find and enable the 3 from the
+   table above.
+
+<Frame><img alt="GoogleCloud15" src="/images/kb/GoogleCloud15.png" style={{width: 624, height: 316}}/></Frame>
+
+11. Scroll to the bottom of the setup wizard and choose "**Save and
+Continue**"
+
+<Frame><img alt="GoogleCloud16" src="/images/kb/GoogleCloud16.png" style={{width: 624, height: 316}}/></Frame>
+
+12. Set the **Name** and **Type** of the OAuth Client
+
+<Frame><img alt="GoogleCloud17" src="/images/kb/GoogleCloud17.png" style={{width: 624, height: 316}}/></Frame>
+
+13. Set the Authorized Redirect URI's
+
+- `https://oauth.domo.com/api/data/v1/oauth/providers/google-drive-oauth-enterprise/exchange`
+- `https://oauth.domo.com/api/data/v1/oauth/providers/google-drive-oauth-enterprise/exchange?flowName=GeneralOAuthFlow`
+
+<Frame><img alt="GoogleCloud18" src="/images/kb/GoogleCloud18.png" style={{width: 624, height: 316}}/></Frame>
+
+14. Choose **Create** to finish creating the OAuth Client
+
+<Frame><img alt="GoogleCloud19" src="/images/kb/GoogleCloud19.png" style={{width: 624, height: 316}}/></Frame>
+
+15. A pop-up box will instantly display your unique Client ID and
+Client Secret. You can copy them directly or click Download JSON to save
+them to a file for your application to read. Download your new Client ID
+(so you'll have it for use later) and choose **Done**
+
+<Frame><img alt="GoogleCloud19a" src="/images/kb/GoogleCloud19a.png" style={{width: 624, height: 316}}/></Frame>
+
+<Frame><img alt="GoogleCloud20" src="/images/kb/GoogleCloud20.png" style={{width: 624, height: 316}}/></Frame>
+
+16. Navigate to Audience, under **Publishing Status**, Publish your
+app
+
+<Frame><img alt="GoogleCloud21" src="/images/kb/GoogleCloud21.png" style={{width: 624, height: 317}}/></Frame>
+
+## Create a Google Drive Connection
+
+1. Navigate to **Domo Documents**
+
+<Frame><img alt="GoogleDrive1" src="/images/kb/GoogleDrive1.png" style={{width: 624, height: 315}}/></Frame>
+
+2. Choose **Create Collection, Connectors**
+
+<Frame><img alt="GoogleDrive2" src="/images/kb/GoogleDrive2.png" style={{width: 624, height: 315}}/></Frame>
+
+3. Choose **Google Drive**
+
+<Frame><img alt="GoogleDrive3" src="/images/kb/GoogleDrive3.png" style={{width: 624, height: 315}}/></Frame>
+
+4. Select an existing Google Drive Account or create a new one.
+
+<Frame><img alt="GoogleDrive4" src="/images/kb/GoogleDrive4.png" style={{width: 624, height: 316}}/></Frame>
+
+5. Choose the **Google Drive OAuth Enterprise** connector
+
+<Frame><img alt="GoogleDrive5" src="/images/kb/GoogleDrive5.png" style={{width: 624, height: 316}}/></Frame>
+
+6. Add your **Client ID** and **Client** **Secret** you downloaded
+previously after creating your Google Drive OAuth client.
+
+<Frame><img alt="GoogleDrive6" src="/images/kb/GoogleDrive6.png" style={{width: 624, height: 316}}/></Frame>
+
+7. Choose the appropriate Google Account
+
+<Frame><img alt="GoogleDrive7" src="/images/kb/GoogleDrive7.png" style={{width: 624, height: 360}}/></Frame>
+
+8. If this is your personal Google Drive & your OAuth app is not fully
+verified (Testing Mode), you will need to show the Advanced options and
+continue to domo.com.
+
+<Frame><img alt="GoogleDrive8" src="/images/kb/GoogleDrive8.png" style={{width: 624, height: 360}}/></Frame>
+
+9. Allow Domo to have access to Google
+
+<Frame><img alt="GoogleDrive9" src="/images/kb/GoogleDrive9.png" style={{width: 624, height: 359}}/></Frame>
+
+10. Select All of the access privileges & choose **Continue**
+
+<Frame><img alt="GoogleDrive10" src="/images/kb/GoogleDrive10.png" style={{width: 624, height: 346}}/></Frame>
+
+11. Choose Next and choose the content you want to load from Google
+Drive
+
+<Frame><img alt="GoogleDrive11" src="/images/kb/GoogleDrive11.png" style={{width: 624, height: 318}}/></Frame>
+
+12. Type 'root' for root directory. Otherwise enter the Drive ID
+
+<Frame><img alt="GoogleDrive12" src="/images/kb/GoogleDrive12.png" style={{width: 624, height: 316}}/></Frame>
+
+<Frame><img alt="GoogleDrive13" src="/images/kb/GoogleDrive13.png" style={{width: 624, height: 345}}/></Frame>
+
+13. Set the Update schedule
+
+<Frame><img alt="GoogleDrive14" src="/images/kb/GoogleDrive14.png" style={{width: 624, height: 319}}/></Frame>
+
+14. Set the Name and Description of this Document Collection, then
+choose **Save**
+
+<Frame><img alt="GoogleDrive15" src="/images/kb/GoogleDrive15.png" style={{width: 624, height: 315}}/></Frame>
+
+15. Give the Collection some time to load the files. Choose the
+**Files** tab to view a listing of the referenced files. Choose the
+**Overview** tab to enable **Agent Knowledge**.
+
+<Frame><img alt="GoogleDrive16" src="/images/kb/GoogleDrive16.png" style={{width: 624, height: 319}}/></Frame>

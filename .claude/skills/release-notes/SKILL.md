@@ -1,6 +1,6 @@
 ---
 name: release-notes
-description: Generate user-friendly release notes by diffing the latest git tag against the previous tag and summarizing the changes. Use when the user asks to "generate release notes", "write release notes for the latest release", "summarize the latest release", or similar. Saves a shareable MDX file to `releaseNotes/`.
+description: Generate user-friendly release notes by diffing the latest git tag against the previous tag and summarizing the changes. Use when the user asks to "generate release notes", "write release notes for the latest release", "summarize the latest release", or similar. Saves a shareable MDX file to `releaseNotes/` and a sanitized external version to `releaseNotesExternal/`.
 ---
 
 # Release Notes Generator
@@ -12,10 +12,21 @@ Produce a friendly, email/Slack-ready release notes summary for the most recent 
 ### 1. Identify the release range
 
 ```bash
-git tag --sort=-creatordate | head -5
+git tag --sort=-creatordate | head -10
 ```
 
-The top tag is the **latest release**; the next tag is the **previous release**. Confirm with the user only if the intended target is ambiguous (e.g. multiple tags on the same day, or user mentions a specific version).
+The top tag is the **latest release**. The **base** for the diff is **not** simply the previous tag — it is the tag that corresponds to the most recent version for which release notes have already been generated.
+
+**Finding the base tag:**
+
+1. List the files already in `releaseNotes/` to see which versions have notes:
+   ```bash
+   ls releaseNotes/
+   ```
+2. The highest version with an existing release notes file is the base. For example, if `releaseNotes/` contains `v2.6.0.mdx` and the tags are `v2.7.0 → v2.6.2 → v2.6.1 → v2.6.0`, the diff range is `v2.6.0..v2.7.0` — spanning all three intervening patch tags.
+3. If every tag already has release notes (i.e., the previous tag is also the base), use the previous tag as normal.
+
+Confirm with the user only if the intended target is ambiguous (e.g. multiple tags on the same day, or the user mentions a specific version).
 
 Also grab tag dates for context:
 
@@ -129,12 +140,30 @@ Formatting rules:
 
 Keep tone warm and appreciative.
 
-### 7. Confirm
+### 7. Generate the external version
 
-Tell the user the file path and offer to adjust tone, detail, or framing.
+After saving the internal file, produce a sanitized copy for external audiences (customers, partners, public-facing channels) and save it to `releaseNotesExternal/v<version>.mdx`.
+
+**What to strip or omit:**
+
+- **Contributor attribution** — remove every "Thanks to [Name] for…" sentence. The closing "Thank You" section may be kept but must not name individuals; replace with a generic warm sign-off (e.g., "A heartfelt thank you to everyone who helped make this release possible.").
+- **Internal-only themes** — drop entire `###` sections whose subject matter is not visible to or useful for Domo customers. Examples of internal-only content:
+  - New or updated Claude AI skills, slash commands, or documentation-team workflows
+  - GitHub Actions or CI/CD pipeline changes
+  - Internal scripts, tooling, or developer-experience improvements that don't affect the public docs site
+  - Changes to `CLAUDE.md`, `.claude/`, or other repo-meta files
+- **Everything else stays** — all customer-facing article additions and updates remain, including links.
+
+**Title and intro:** Keep the same version number and framing. The title field does not need to change. Adjust the intro only if it references themes you've dropped.
+
+**File location:** `releaseNotesExternal/v<version>.mdx` — the `Write` tool creates the directory automatically.
+
+### 8. Confirm
+
+Tell the user both file paths and offer to adjust tone, detail, or framing for either version.
 
 ## Notes
 
-- Always create `releaseNotes/` if it doesn't exist — `Write` handles this automatically.
-- Do **not** include internal ticket IDs (DOMO-XXXXXX) in the final notes unless the user asks; parenthetical attribution is fine.
-- Do **not** commit the file unless the user asks.
+- Always create `releaseNotes/` and `releaseNotesExternal/` if they don't exist — `Write` handles this automatically.
+- Do **not** include internal ticket IDs (DOMO-XXXXXX) in either version unless the user asks; parenthetical attribution is fine in the internal version.
+- Do **not** commit either file unless the user asks.

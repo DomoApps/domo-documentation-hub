@@ -1,6 +1,6 @@
 ---
 name: release-notes
-description: Generate user-friendly release notes by diffing the latest git tag against the previous tag and summarizing the changes. Use when the user asks to "generate release notes", "write release notes for the latest release", "summarize the latest release", or similar. Saves a shareable MDX file to `releaseNotes/`.
+description: Generate user-friendly release notes by diffing the latest git tag against the previous tag and summarizing the changes. Use when the user asks to "generate release notes", "write release notes for the latest release", "summarize the latest release", or similar. Saves a shareable MDX file to `releaseNotes/` and a sanitized external version to `releaseNotesExternal/`.
 ---
 
 # Release Notes Generator
@@ -129,12 +129,30 @@ Formatting rules:
 
 Keep tone warm and appreciative.
 
-### 7. Confirm
+### 7. Generate the external version
 
-Tell the user the file path and offer to adjust tone, detail, or framing.
+After saving the internal file, produce a sanitized copy for external audiences (customers, partners, public-facing channels) and save it to `releaseNotesExternal/v<version>.mdx`.
+
+**What to strip or omit:**
+
+- **Contributor attribution** — remove every "Thanks to [Name] for…" sentence. The closing "Thank You" section may be kept but must not name individuals; replace with a generic warm sign-off (e.g., "A heartfelt thank you to everyone who helped make this release possible.").
+- **Internal-only themes** — drop entire `###` sections whose subject matter is not visible to or useful for Domo customers. Examples of internal-only content:
+  - New or updated Claude AI skills, slash commands, or documentation-team workflows
+  - GitHub Actions or CI/CD pipeline changes
+  - Internal scripts, tooling, or developer-experience improvements that don't affect the public docs site
+  - Changes to `CLAUDE.md`, `.claude/`, or other repo-meta files
+- **Everything else stays** — all customer-facing article additions and updates remain, including links.
+
+**Title and intro:** Keep the same version number and framing. The title field does not need to change. Adjust the intro only if it references themes you've dropped.
+
+**File location:** `releaseNotesExternal/v<version>.mdx` — the `Write` tool creates the directory automatically.
+
+### 8. Confirm
+
+Tell the user both file paths and offer to adjust tone, detail, or framing for either version.
 
 ## Notes
 
-- Always create `releaseNotes/` if it doesn't exist — `Write` handles this automatically.
-- Do **not** include internal ticket IDs (DOMO-XXXXXX) in the final notes unless the user asks; parenthetical attribution is fine.
-- Do **not** commit the file unless the user asks.
+- Always create `releaseNotes/` and `releaseNotesExternal/` if they don't exist — `Write` handles this automatically.
+- Do **not** include internal ticket IDs (DOMO-XXXXXX) in either version unless the user asks; parenthetical attribution is fine in the internal version.
+- Do **not** commit either file unless the user asks.

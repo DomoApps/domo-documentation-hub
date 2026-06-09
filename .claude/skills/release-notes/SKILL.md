@@ -12,10 +12,21 @@ Produce a friendly, email/Slack-ready release notes summary for the most recent 
 ### 1. Identify the release range
 
 ```bash
-git tag --sort=-creatordate | head -5
+git tag --sort=-creatordate | head -10
 ```
 
-The top tag is the **latest release**; the next tag is the **previous release**. Confirm with the user only if the intended target is ambiguous (e.g. multiple tags on the same day, or user mentions a specific version).
+The top tag is the **latest release**. The **base** for the diff is **not** simply the previous tag — it is the tag that corresponds to the most recent version for which release notes have already been generated.
+
+**Finding the base tag:**
+
+1. List the files already in `releaseNotes/` to see which versions have notes:
+   ```bash
+   ls releaseNotes/
+   ```
+2. The highest version with an existing release notes file is the base. For example, if `releaseNotes/` contains `v2.6.0.mdx` and the tags are `v2.7.0 → v2.6.2 → v2.6.1 → v2.6.0`, the diff range is `v2.6.0..v2.7.0` — spanning all three intervening patch tags.
+3. If every tag already has release notes (i.e., the previous tag is also the base), use the previous tag as normal.
+
+Confirm with the user only if the intended target is ambiguous (e.g. multiple tags on the same day, or the user mentions a specific version).
 
 Also grab tag dates for context:
 

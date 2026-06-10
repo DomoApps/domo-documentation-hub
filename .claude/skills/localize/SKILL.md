@@ -170,7 +170,7 @@ Following all rules in `Localization-Style-Guide.mdx`:
 - Translate all prose, headings, list items, and callout body text
 - Apply language-specific term translations from the style guide glossary
 - For images: check whether localized images exist; fall back to English paths if not and flag as TODO
-- Check all internal links: update `/s/article/` links to `/{lang}/s/article/` only if the target article exists in that language directory (see style guide for the verification command)
+- Internal links: always keep as English paths (`/s/article/...`) — do not prefix with a language code
 - Preserve all MDX components, code blocks, import statements, and formatting exactly
 
 ### 3. Write the translated files
@@ -220,5 +220,4 @@ Tell the user:
 1. **Files created or updated** — list each new or modified file path
 2. **Navigation entries added** — list each `docs.json` insertion (language, tab, group, position)
 3. **Archived files** (Current Release Notes flow only) — what was archived, where, and any languages where the archive was skipped because it already existed
-4. **Link TODOs** — list any internal links that could not be updated to localized paths because the target article has not yet been localized
-5. **docs.json validation** — confirm it passed or report the error
+4. **docs.json validation** — confirm it passed or report the error

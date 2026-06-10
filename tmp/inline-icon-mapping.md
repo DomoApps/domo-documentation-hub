@@ -25,9 +25,9 @@ Mapping of every inline-icon `<img>` reference (images embedded in articles with
 | Confidence | Entries | Refs covered |
 |---|---:|---:|
 | `high` | 647 | 1603 |
-| `medium` | 147 | 226 |
+| `medium` | 146 | 222 |
 | `low` | 1 | 2 |
-| `not-icon` | 272 | 408 |
+| `not-icon` | 273 | 412 |
 | `needs-review` | 9 | 11 |
 | **Total** | **1076** | **2250** |
 
@@ -179,7 +179,7 @@ _(274 distinct target glyphs total)_
 | 80 | 4 | en, ja | [ja/0EM5w000006vr00.jpg](../images/kb/ja/0EM5w000006vr00.jpg)<br />[0EM5w000006vr00.jpg](../images/kb/0EM5w000006vr00.jpg) | eye outline (unhide) | `icon-eye` | high | alt: unhide.jpg |
 | 81 | 4 | en | [ka05w0000012Aef-00N5w00000Ri7BU-0EM5w000005wEqf.jpg](../images/kb/ka05w0000012Aef-00N5w00000Ri7BU-0EM5w000005wEqf.jpg) | flag/bookmark outline shape | `icon-flag-outline` | medium | Appears to be a flag or bookmark icon |
 | 82 | 4 | en | [ka05w00000128TW-00N5w00000Ri7BU-0EM5w000006ufdc.jpg](../images/kb/ka05w00000128TW-00N5w00000Ri7BU-0EM5w000006ufdc.jpg) |  | `legacy-icon-save` | high |  |
-| 83 | 4 | en, ja | [ja/0EM5w000005vODJ.png](../images/kb/ja/0EM5w000005vODJ.png)<br />[0EM5w000005vODJ.png](../images/kb/0EM5w000005vODJ.png) | share arrow on blue (card share) | `icon-sub-arrow` | medium | alt: group_management_card_share.png - blue card-share arrow |
+| 83 | 4 | en, ja | [ja/0EM5w000005vODJ.png](../images/kb/ja/0EM5w000005vODJ.png)<br />[0EM5w000005vODJ.png](../images/kb/0EM5w000005vODJ.png) | Share Card or Page dialog screenshot | — | not-icon | False positive - 'Share Card or Page' dialog screenshot (card search results), not an icon; remove from articles, do not convert |
 | 84 | 4 | en, ja | [ja/0EMVq000005KDFx.jpg](../images/kb/ja/0EMVq000005KDFx.jpg)<br />[ja/0EMVq000005KDW5.jpg](../images/kb/ja/0EMVq000005KDW5.jpg)<br />[0EMVq000005KDFx.jpg](../images/kb/0EMVq000005KDFx.jpg)<br />[0EMVq000005KDW5.jpg](../images/kb/0EMVq000005KDW5.jpg) | wrench (legacy card edit) | `legacy-icon-wrench` | high | Legacy card-edit wrench icon |
 | 85 | 4 | en, ja | [ka05w00000128SJ-00N5w00000Ri7BU-0EM5w000005vOch.png](../images/kb/ka05w00000128SJ-00N5w00000Ri7BU-0EM5w000005vOch.png)<br />[ja/0EM5w000005vObp.png](../images/kb/ja/0EM5w000005vObp.png) | small zigzag line chart (alert icon) | `icon-chart-line` | medium | alt: alert_icon.png - appears to be a small line chart used as an alert indicator |
 | 86 | 4 | en | [ka0Vq00000010qn-00N5w00000Ri7BU-0EM5w000005vOFT.png](../images/kb/ka0Vq00000010qn-00N5w00000Ri7BU-0EM5w000005vOFT.png) | closed padlock | `legacy-icon-lock-closed` | high | Lock icon |

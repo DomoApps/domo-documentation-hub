@@ -112,3 +112,14 @@ python3 -c "import json; json.load(open('docs.json')); print('docs.json is valid
 1. Tell the user the file path of the new MDX article (`s/article/Article-Title-Here.mdx`).
 2. Confirm the article was added to `docs.json` navigation and state where it was placed.
 3. Note any sections left as placeholders (screenshots, specific grant names, etc.) that the user will need to fill in.
+
+---
+
+## Step 7: Offer localization
+
+After delivering the output above, ask the user:
+
+> "Would you like to localize this article into Spanish, French, and German? (Note: Japanese localization is handled on a separate pipeline — no action needed there.)"
+
+- **If yes:** invoke the `localize` skill, passing the new article's file path as the argument.
+- **If no:** the skill ends here.

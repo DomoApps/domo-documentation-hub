@@ -276,3 +276,14 @@ Tell the user:
 - What was changed, created, or deleted
 - Any follow-up actions they need to handle manually (e.g., uploading new image assets, updating absolute links on the live Salesforce support site)
 - Any files that were intentionally left unchanged and why
+
+---
+
+## Step 8: Offer localization
+
+After delivering the output above, ask the user:
+
+> "Would you like to localize this article (or your changes to it) into Spanish, French, and German? (Note: Japanese localization is handled on a separate pipeline — no action needed there.)"
+
+- **If yes:** invoke the `localize` skill, passing the updated article's file path as the argument.
+- **If no:** the skill ends here.

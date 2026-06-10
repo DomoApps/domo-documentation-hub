@@ -1,0 +1,402 @@
+---
+title: "Localization Style Guide"
+excerpt: "Translation and localization standards for Spanish, French, and German Domo documentation."
+---
+
+This guide governs all localization work for Domo documentation into Spanish (`es/`), French (`fr/`), and German (`de/`). Japanese is localized on a separate pipeline and is **not** covered here.
+
+This guide was built by reverse-engineering the approved translator work in the existing Release Notes archives across all three language directories. It is the authoritative reference for any localization task.
+
+**Read this guide in full before translating anything.** Do not rely on memory.
+
+---
+
+## Universal Rules
+
+These rules apply to all three languages without exception.
+
+### Translation scope
+
+Localization is **translation only**. Do not:
+
+- Add content that is not in the English source
+- Remove any content from the English source
+- Restructure or reorder sections
+- Revise, improve, or editorialize
+- Correct errors you notice in the English source (flag them separately to the user instead)
+
+Every sentence, callout, list item, heading, and paragraph in the English source must appear in the localized version.
+
+### What is NEVER translated
+
+Keep the following in English exactly as they appear in the source, regardless of the target language:
+
+**Domo brand and product names:**
+- Domo
+- DataSet / DataSets
+- DataFlow / DataFlows
+- DataFusion
+- Beast Mode
+- Analyzer
+- Buzz
+- Cloud Amplifier
+- Jupyter Notebook / Jupyter Workspace
+- Embed
+- Appstore
+- Workbench
+- DomoStats
+- Domo Bricks / DDX Bricks
+- AppDB
+- Domo AI
+- Domo Documents
+- Domo Schema
+- Flex Table
+- Magic ETL (**exception: Spanish expands this — see the Spanish section**)
+
+**Technical acronyms and standards:**
+- ETL
+- OAuth
+- SQL
+- API
+- SAML / SSO / MFA / 2FA
+- JSON / XML / CSV / YAML / MDX
+- SDK / CLI / REST / HTTP / HTTPS
+- PDP (Policy Data Policy)
+- M2M (Machine to Machine)
+
+**Third-party product and brand names:**
+- Snowflake, BigQuery, Azure, AWS, Google, Microsoft, Databricks, Salesforce, MySQL, PostgreSQL, etc.
+- All third-party product names (Slack, GitHub, etc.)
+
+### MDX structure and components
+
+Never translate or modify:
+
+- Import statements (`import { ... } from '...'`)
+- Component names (`<Frame>`, `<Note>`, `<Warning>`, `<Tip>`, `<AccordionGroup>`, `<Accordion>`, `<Columns>`, `<CodeGroup>`, `<Badge>`, `<BetaNote />`, etc.)
+- Component attribute names and values (`title=`, `className=`, `src=`, `alt=`, `href=`, `autoPlay`, `muted`, etc.) — **exception: translate `title=` values on `<Accordion>` components and `alt=` text on images only when the alt text is descriptive prose, not a filename or placeholder**
+- Code blocks (content inside ` ``` ` fences and `<CodeGroup>`)
+- Inline code (content inside backticks)
+- HTML tag names
+- `aria-hidden="true"` and similar accessibility attributes
+
+Preserve the exact whitespace, blank lines, and indentation from the English source. Do not collapse or add blank lines between MDX components.
+
+### Frontmatter
+
+Translate the `title` and `excerpt` fields. Never add or remove frontmatter fields. Keep the `tag` field unchanged if present.
+
+```mdx
+---
+title: "[translated title]"
+excerpt: "[translated excerpt — single sentence matching the English]"
+---
+```
+
+### Image paths
+
+For existing localized articles, each language has its own image directory (`/images/kb/es/`, `/images/kb/fr/`, `/images/kb/de/`). The localized image files share the same filename as the English originals, just stored in the language subdirectory.
+
+When translating an article that has images:
+- Use the localized image path if a localized version of the image exists (e.g., `/images/kb/de/filename.jpg`)
+- If localized images have not yet been provided, use the English image path (`/images/kb/filename.jpg`) and flag this to the user as a TODO
+
+Do not modify any other part of `<Frame>`, `<img>`, or `<video>` components.
+
+### Internal link translation
+
+When a localized article is linked inside a translated article, update the path to use the language prefix:
+
+- English: `/s/article/Article-Title`
+- Spanish: `/es/s/article/Article-Title`
+- French: `/fr/s/article/Article-Title`
+- German: `/de/s/article/Article-Title`
+
+**Only update a link to the localized path if the linked article actually exists in the target language directory.** If the linked article has not been localized, keep the English path (`/s/article/Article-Title`). Linking to a non-existent file will break the site.
+
+To check whether a localized version exists:
+```bash
+ls {es,fr,de}/s/article/Article-Title.mdx 2>/dev/null
+```
+
+External links (`https://...`) are never modified.
+
+### Callout labels
+
+Each language has a standard label for the three callout types. Use these exactly:
+
+| Component | English label | Spanish | French | German |
+|-----------|--------------|---------|--------|--------|
+| `<Note>` | `**Note:**` | `**Nota:**` | `**Remarque :**` | `**Hinweis:**` |
+| `<Warning>` | `**Important:**` | `**Importante:**` | `**Important :**` | `**Wichtig:**` |
+| `<Tip>` | `**Tip:**` | `**Sugerencia:**` | `**Conseil :**` | `**Tipp:**` |
+
+Note the French typographic rule: a space is required before `:` in French text. This applies inside callout labels and everywhere else colons appear in French prose.
+
+### Accordion titles
+
+The `title=` attribute of `<Accordion>` components contains user-facing question text and **must be translated**. Example:
+
+```mdx
+<Accordion title="¿Qué permisos necesito?">
+```
+
+---
+
+## Spanish Rules (es/)
+
+### Tone and register
+
+- Use formal register throughout: address the reader as **usted** (never **tú**)
+- Use second-person singular formal verb forms: "Puede", "Tiene", "Seleccione", "Haga clic"
+- Use imperative mood for instructional text: "Seleccione el icono", "Haga clic en Guardar"
+
+### Standard section headers
+
+| English | Spanish |
+|---------|---------|
+| New Features and Enhancements | Nuevas funciones y mejoras |
+| Support & Feedback | Soporte y comentarios |
+| Note | Nota |
+| Important | Importante |
+| Tip | Sugerencia |
+
+### Magic ETL (Spanish only)
+
+Spanish uniquely expands Magic ETL in most contexts:
+
+- **Section heading:** "Magic - Extracción, transformación y carga"
+- **In-body reference:** "Magic - Extracción, transformación y carga" on first mention; "Magic ETL" is acceptable on subsequent mentions within the same section
+- **In compound constructions** (e.g., "Magic ETL on BigQuery"): "Magic - Extracción, transformación y carga en BigQuery"
+
+### Core term glossary — Spanish
+
+| English term | Spanish translation | Notes |
+|-------------|---------------------|-------|
+| Workflows | Flujos de trabajo | Always translated |
+| workflow (generic) | flujo de trabajo | Lowercase when not a product reference |
+| Connector / Connectors | Conector / Conectores | Always translated |
+| Cloud Integration | Integración en la nube | Always translated |
+| Dashboard | Tablero | Translated in most contexts; "dashboard" is acceptable when used as a modifier |
+| Alert / Alerts | Alerta / Alertas | |
+| Chart | Gráfico | |
+| Table (UI) | Tabla | |
+| Database table | tabla de base de datos | Lowercase |
+| Filter | Filtro | |
+| Group | Grupo | |
+| Card | Tarjeta | |
+| Page | Página | |
+| Query | Consulta | |
+| Section | Sección | |
+| Report | Informe | |
+| Role | Función / Rol | "Función" preferred; "rol" accepted |
+| Permission | Permiso | |
+| Grant | Concesión / Permiso | Context-dependent |
+| Setting | Configuración / Ajuste | |
+| Update | Actualización | As noun; "actualizar" as verb |
+| Enhancement | Mejora | |
+| Feature | Función / Característica | "Función" preferred in release notes |
+| User | Usuario | |
+| Admin | Administrador | |
+| Instance | Instancia | |
+| Account | Cuenta | |
+| Dataset tile (Magic ETL) | Icono de DataSet | Note: tile = icono in ETL context |
+| Workspace | Espacio de trabajo | |
+| Template | Plantilla | |
+| Widget | Widget | Kept in English |
+| Read-only | Solo lectura | |
+| Pushdown | En pushdown | Kept as technical term with Spanish article |
+
+---
+
+## French Rules (fr/)
+
+### Tone and register
+
+- Use formal register throughout: address the reader as **vous** (never **tu**)
+- Use second-person plural verb forms: "Vous pouvez", "Vous avez", "Sélectionnez", "Cliquez"
+- Use imperative mood for instructional text: "Sélectionnez l'icône", "Cliquez sur Enregistrer"
+
+### French typographic rules
+
+These are mandatory, not stylistic preferences:
+
+- **Space before** `:`  `:` `!` `?` `;` — e.g., "Remarque :" not "Remarque:"
+- **Non-breaking space** before `:`, `!`, `?`, `;` is ideal but a regular space is acceptable in MDX
+- **Guillemets** (`« »`) are French quotation marks, but the English double-quote style (`"`) used in MDX attribute values is always correct and should not be changed
+
+### Standard section headers
+
+| English | French |
+|---------|--------|
+| New Features and Enhancements | Nouvelles fonctionnalités et optimisations |
+| Support & Feedback | Support technique et commentaires |
+| Note | Remarque |
+| Important | Important |
+| Tip | Conseil |
+
+Note: French uses "optimisations" (not "améliorations") for "Enhancements" in release note headers. This is a deliberate stylistic choice from the approved translators.
+
+### Core term glossary — French
+
+| English term | French translation | Notes |
+|-------------|-------------------|-------|
+| Workflows | flux de travail | Lowercase unless used as a proper product name; capitalize as "Flux de travail" in headings |
+| workflow (generic) | flux de travail | |
+| Connector / Connectors | connecteur / connecteurs | Lowercase |
+| Cloud Integration | Intégration dans le cloud | "dans le cloud" not "en nuage" |
+| Dashboard | tableau de bord | Always translated |
+| Alert / Alerts | alerte / alertes | Lowercase |
+| Chart | graphique | |
+| Table (UI element) | tableau | Note: "tableau" also = spreadsheet; "table" = database table |
+| Database table | table | Keep English "table" for database context |
+| Filter | filtre | |
+| Group | groupe | |
+| Card | carte | |
+| Page | page | |
+| Query | requête | |
+| Section | section | |
+| Report | rapport | |
+| Role | rôle | |
+| Permission / Permissions | autorisation / autorisations | |
+| Grant | droit / autorisation | Context-dependent |
+| Setting | paramètre | |
+| Update | mise à jour | As noun; "mettre à jour" as verb |
+| Enhancement | optimisation | "amélioration" is also acceptable |
+| Feature | fonctionnalité | |
+| User | utilisateur | |
+| Admin | administrateur | |
+| Instance | instance | |
+| Account | compte | |
+| Magic ETL | Magic ETL | Kept in English (unlike Spanish) |
+| App Studio | Studio d'applications | Translated in French |
+| Jupyter Notebook | bloc-notes Jupyter | Use when translating "notebook" generically; "Jupyter Notebook" when it's the tool name |
+| Workspace | espace de travail | |
+| Template | modèle | |
+| Widget | widget | Kept in English |
+| Read-only | lecture seule | |
+| Tile (Magic ETL) | mosaïque | |
+| Pushdown | pushdown | Technical term kept in English |
+| AI Chat | Conversation par IA | |
+
+---
+
+## German Rules (de/)
+
+### Tone and register
+
+- Use formal register throughout: address the reader as **Sie** (always capitalized in German)
+- Use second-person plural formal verb forms: "Sie können", "Sie haben", "Wählen Sie", "Klicken Sie"
+- Imperative mood for instructional text: "Wählen Sie das Symbol", "Klicken Sie auf Speichern"
+
+### German compound words
+
+German frequently forms compound nouns by combining words, sometimes with hyphens:
+
+- **Hyphenate** compounds where one element is an English term: "Cloud-Integration", "Pass-Through-SQL", "KI-Chat", "OAuth-Unterstützung"
+- **Combine without hyphen** for fully German compounds: "Datenbank", "Berechtigungen", "Arbeitsabläufe"
+- When in doubt with longer compounds, use a hyphen for readability
+
+### Capitalization
+
+German capitalizes all nouns. This means translated terms that are nouns are always capitalized even when they are not proper nouns:
+- "die Verbindung" (the connection)
+- "die Berechtigung" (the permission)
+- "der Bericht" (the report)
+
+### Standard section headers
+
+| English | German |
+|---------|--------|
+| New Features and Enhancements | Neue Funktionen und Verbesserungen |
+| Support & Feedback | Unterstützung und Feedback |
+| Note | Hinweis |
+| Important | Wichtig |
+| Tip | Tipp |
+
+### Core term glossary — German
+
+| English term | German translation | Notes |
+|-------------|-------------------|-------|
+| Workflows | Arbeitsabläufe | Always translated |
+| workflow (generic) | Arbeitsablauf | Singular |
+| Connector / Connectors | Konnektor / Konnektoren | Translated; German technical term |
+| Cloud Integration | Cloud-Integration | Hyphenated compound |
+| Dashboard | Dashboard | Kept in English (widely understood in German tech) |
+| Alert / Alerts | Mitteilung / Mitteilungen | "Benachrichtigung" is also acceptable |
+| Chart | Diagramm | |
+| Table (UI) | Tabelle | |
+| Database table | Tabelle | Same word; context clarifies |
+| Filter | Filter | Kept in English |
+| Group | Gruppe | |
+| Card | Karte | |
+| Page | Seite | |
+| Query | Abfrage | |
+| Section | Abschnitt | |
+| Report | Bericht | |
+| Role | Rolle | |
+| Permission / Permissions | Berechtigung / Berechtigungen | |
+| Grant | Zugriffsrecht / Berechtigung | |
+| Setting | Einstellung | |
+| Update | Aktualisierung | As noun; "aktualisieren" as verb |
+| Enhancement | Verbesserung | |
+| Feature | Funktion | |
+| User | Benutzer | |
+| Admin | Administrator | |
+| Instance | Instanz | |
+| Account | Konto | |
+| Magic ETL | Magic ETL | Kept in English (unlike Spanish) |
+| App Studio | App Studio | Kept in English in German |
+| Workspace | Arbeitsbereich | |
+| Template | Vorlage | |
+| Widget | Widget | Kept in English |
+| Read-only | schreibgeschützt | Adjective; "schreibgeschützter Zugriff" = read-only access |
+| Tile (Magic ETL) | Kachel | |
+| Pushdown | Pushdown | Technical term kept in English |
+| AI / Artificial Intelligence | KI / Künstliche Intelligenz | "KI" as acronym; "KI-Chat" = AI Chat |
+| Pass-Through | Pass-Through | Kept with hyphen |
+| Drag-and-drop | Drag-and-Drop | Kept with capitalization as noun |
+
+---
+
+## Release Notes Conventions
+
+Release notes are the primary vehicle for localization at Domo. These conventions were derived entirely from the approved translator Release Notes archives.
+
+### Title format per language
+
+| English pattern | Spanish | French | German |
+|----------------|---------|--------|--------|
+| "2025 Release 6 \| November" | "2025 \| Notas de la versión de noviembre" | "Notes de version de novembre 2025" | "2025 \| Versionshinweise November" |
+| "Current Release Notes" | "Notas de la versión actual" | "Notes de version actuelles" | "Aktuelle Versionshinweise" |
+
+### Archived release notes nav group names
+
+| English | Spanish | French | German |
+|---------|---------|--------|--------|
+| Release Notes (tab) | Notas de la versión | Notes de version | Versionshinweise |
+| Archived Feature Release Notes | Notas de la versión de funciones archivadas | Notes de version des fonctionnalités archivées | Archivierte Versionshinweise zu Funktionen |
+| Year groups (e.g., "2025") | Keep the same ("2025") | Keep the same ("2025") | Keep the same ("2025") |
+| Year range groups (e.g., "2020–2024") | Keep the same | Keep the same | Keep the same |
+
+### "Learn more" links in release notes
+
+Release notes often contain "Learn more about X" links or similar calls to action. When translating:
+
+| English | Spanish | French | German |
+|---------|---------|--------|--------|
+| Learn more about [X] | Aprenda más sobre [X] | Apprenez-en plus sur [X] | Erfahren Sie mehr über [X] |
+| See [article title] for more information | Consulte [article title] para obtener más información | Consultez [article title] pour plus d'informations | Weitere Informationen finden Sie unter [article title] |
+
+---
+
+## Filename Convention
+
+Localized article filenames **always remain in English**, identical to the source English filename. The language directory is the only differentiating factor.
+
+- English source: `s/article/March-2026-Release.mdx`
+- Spanish: `es/s/article/March-2026-Release.mdx`
+- French: `fr/s/article/March-2026-Release.mdx`
+- German: `de/s/article/March-2026-Release.mdx`
+
+New article filename format: `Article-Title-Here.mdx` (Title Case, hyphen-separated, no special characters, `.mdx` extension).

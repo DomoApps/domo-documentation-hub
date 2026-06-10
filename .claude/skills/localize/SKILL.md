@@ -127,7 +127,7 @@ Key reminders for Current Release Notes translation:
 - Title for the localized Current Release Notes files should be the language's equivalent of "Current Release Notes" (see style guide Release Notes Conventions)
 - Translate "## New Features and Enhancements" to the language-specific header (see style guide)
 - Preserve all `<Frame>`, `<BetaNote />`, `import` statements, and MDX components unchanged
-- For images: check whether localized image versions exist in `/images/kb/{lang}/`; if not, use the English image path and flag as TODO
+- For images: check whether localized image versions exist in `/images/kb/{lang}/`; if not, use the English image path
 - Apply all language-specific term translations from the style guide glossary
 
 **3. Write the translated content to the pre-existing localized Current Release Notes files** — replacing the content that was just archived:
@@ -220,6 +220,5 @@ Tell the user:
 1. **Files created or updated** — list each new or modified file path
 2. **Navigation entries added** — list each `docs.json` insertion (language, tab, group, position)
 3. **Archived files** (Current Release Notes flow only) — what was archived, where, and any languages where the archive was skipped because it already existed
-4. **Image TODOs** — list any articles where localized images are not yet available and English image paths were used as a fallback
-5. **Link TODOs** — list any internal links that could not be updated to localized paths because the target article has not yet been localized
-6. **docs.json validation** — confirm it passed or report the error
+4. **Link TODOs** — list any internal links that could not be updated to localized paths because the target article has not yet been localized
+5. **docs.json validation** — confirm it passed or report the error

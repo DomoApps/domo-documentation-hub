@@ -169,7 +169,7 @@ Following all rules in `Localization-Style-Guide.mdx`:
 - Translate the `title:` and `excerpt:` frontmatter fields
 - Translate all prose, headings, list items, and callout body text
 - Apply language-specific term translations from the style guide glossary
-- For images: check whether localized images exist; fall back to English paths if not and flag as TODO
+- For images: check whether localized images exist; fall back to English paths if not
 - Internal links: always keep as English paths (`/s/article/...`) — do not prefix with a language code
 - Preserve all MDX components, code blocks, import statements, and formatting exactly — **with one exception: BetaNote** (see below)
 - **BetaNote:** When the English source uses `import { BetaNote } from '/snippets/BetaNote.mdx';` and `<BetaNote />` or `<BetaNote generic />`, replace with the language-specific export from the same snippet file. The import path stays identical; only the named export and component name change:

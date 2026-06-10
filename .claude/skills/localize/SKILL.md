@@ -171,7 +171,8 @@ Following all rules in `Localization-Style-Guide.mdx`:
 - Apply language-specific term translations from the style guide glossary
 - For images: check whether localized images exist; fall back to English paths if not
 - Internal links: always keep as English paths (`/s/article/...`) — do not prefix with a language code
-- Preserve all MDX components, code blocks, import statements, and formatting exactly — **with one exception: BetaNote** (see below)
+- Preserve all MDX components, code blocks, import statements, and formatting exactly — **with two exceptions: BetaNote and legacy TOC blocks** (see below)
+- **Legacy TOC blocks:** Some older English articles were originally migrated with an old-format table-of-contents block immediately after frontmatter — a `---` horizontal rule, then `######` or `##` headings with bullet lists summarizing the article, then another `---`. These blocks have since been removed from English. If the English source article you are translating contains one, do NOT include it in the translation. If an existing localized version you are updating has one, remove it. The pattern to recognize: frontmatter `---` → blank line → `---` → section headings with bullets → `---` → actual content.
 - **BetaNote:** When the English source uses `import { BetaNote } from '/snippets/BetaNote.mdx';` and `<BetaNote />` or `<BetaNote generic />`, replace with the language-specific export from the same snippet file. The import path stays identical; only the named export and component name change:
   - Spanish: `import { BetaNoteEs } from '/snippets/BetaNote.mdx';` → `<BetaNoteEs />` / `<BetaNoteEs generic />`
   - French: `import { BetaNoteFr } from '/snippets/BetaNote.mdx';` → `<BetaNoteFr />` / `<BetaNoteFr generic />`

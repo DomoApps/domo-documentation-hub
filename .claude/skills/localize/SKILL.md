@@ -171,7 +171,13 @@ Following all rules in `Localization-Style-Guide.mdx`:
 - Apply language-specific term translations from the style guide glossary
 - For images: check whether localized images exist; fall back to English paths if not and flag as TODO
 - Internal links: always keep as English paths (`/s/article/...`) — do not prefix with a language code
-- Preserve all MDX components, code blocks, import statements, and formatting exactly
+- Preserve all MDX components, code blocks, import statements, and formatting exactly — **with one exception: BetaNote** (see below)
+- **BetaNote:** When the English source uses `import { BetaNote } from '/snippets/BetaNote.mdx';` and `<BetaNote />` or `<BetaNote generic />`, replace with the language-specific export from the same snippet file. The import path stays identical; only the named export and component name change:
+  - Spanish: `import { BetaNoteEs } from '/snippets/BetaNote.mdx';` → `<BetaNoteEs />` / `<BetaNoteEs generic />`
+  - French: `import { BetaNoteFr } from '/snippets/BetaNote.mdx';` → `<BetaNoteFr />` / `<BetaNoteFr generic />`
+  - German: `import { BetaNoteDe } from '/snippets/BetaNote.mdx';` → `<BetaNoteDe />` / `<BetaNoteDe generic />`
+  - Japanese: `import { BetaNoteJa } from '/snippets/BetaNote.mdx';` → `<BetaNoteJa />` / `<BetaNoteJa generic />`
+- If the English source contains legacy raw beta text (an italic paragraph mentioning `beta.admin@domo.com` rather than the snippet), replace it with the appropriate `<LangBetaNote generic />` component and add the import line. Never carry forward raw italic beta text into a localized article.
 
 ### 3. Write the translated files
 

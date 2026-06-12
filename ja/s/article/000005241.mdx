@@ -1,15 +1,14 @@
 ---
 title: "DomoのSCIM（System for Cross-domain Identity Management）"
+excerpt: "Domo の SCIM エンドポイントを使用して、アイデンティティープロバイダーから Domo へのユーザーとグループの作成・更新を自動化する方法を説明します。"
 ---
 
-import {InlineImage} from "/snippets/InlineImage.mdx";
-
-### はじめに
+## はじめに
 
 System for Cross-domain Identity Management（SCIM）は、システムがIDの管理に使用できるAPIエンドポイントを定義する規格です。SSO統合では、Domoは新規または更新されたユーザーに関する情報を、これらのユーザーがDomoにログインしたときにのみ受け取ります。ただし、SCIMを使用すると、アイデンティティープロバイダー（IdP）でユーザーとグループが作成および変更されたときに、Domoでユーザーとグループを作成または更新するようにIdPを設定できます。
 
 <Note>
-  **注記：** SCIMの詳細については、 [IETFプロトコルドキュメント](https://datatracker.ietf.org/doc/html/rfc7644) <InlineImage src="/images/kb/ja/ka0Vq000000CdP0-00N5w00000Ri7BU-0EMVq000003uGmj.jpg" /> を参照してください。
+  **注記：** SCIMの詳細については、 [IETFプロトコルドキュメント](https://datatracker.ietf.org/doc/html/rfc7644) <img src="/images/kb/ja/ka0Vq000000CdP0-00N5w00000Ri7BU-0EMVq000003uGmj.jpg" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/> を参照してください。
 
 </Note>
 
@@ -22,18 +21,18 @@ System for Cross-domain Identity Management（SCIM）は、システムがIDの�
 
 ---
 
-* [必要条件](#configure_scim_in_domo)
-* [必要な許可とSCIM統合ユーザー](#required_grants)
-* [IdP設定](#idp_configuration)
-* [サポートされるエンドポイント](#supported_endpoints)
-  + [設定とスキーマ](#configuration_schemas)
-  + [ユーザー](#user_endpoints)
-  + [グループ（ベータ版）](#group_endpoints)
-* [SCIMステータス](#scim_status)
+* [必要条件](#必要な許可とscim統合ユーザー)
+* 必要な許可とSCIM統合ユーザー
+* [IdP設定](#idp)
+* サポートされるエンドポイント
+  + 設定とスキーマ
+  + ユーザー
+  + グループ（ベータ版）
+* [SCIMステータス](#scim)
 
 ---
 
-### 必要条件
+## 必要条件
 
 DomoのSCIMエンドポイントは、Domoアクセストークンを使用したヘッダーベースの認証を使用します。
 
@@ -42,7 +41,7 @@ DomoのSCIMエンドポイントは、以下の2つの認証ヘッダーのい�
 * Authorization: Bearer \< *Domoアクセストークン* > * X-Domo-Developer-Token: \< *Domoアクセストークン* > 
 アクセストークンを生成する方法については、 [こちら](/ja/s/article/360042934494) を参照してください。
 
-### 必要な許可とSCIM統合ユーザー
+## 必要な許可とSCIM統合ユーザー
 
 SCIM統合のカスタマイズされた権限とユーザーの作成を推奨します。
 
@@ -64,39 +63,37 @@ SCIM統合のカスタマイズされた権限とユーザーの作成を推奨�
 
 カスタマイズされた権限にこれらの許可を追加する方法については、 [こちら](/s/article/360043438973) を参照してください。
 
-[このページのトップへ](#intro)
-
-### IdP設定
+## IdP設定
 
 IdPとDomoの間のSCIM統合は、IdP側で設定されています。開始するには、IdPのドキュメントを参照してください。
 
 設定の間、IdPからDomoに同期するユーザー属性を設定する必要があります。DomoのSCIMエンドポイントは、以下の6つのSCIMスキーマの要素をマップします。
 
-# ユーザーエンドポイント
+### ユーザー
 
 * ``` コア（urn:ietf:params:scim:schemas:core:2.0:User） ```
 * ``` エンタープライズ（urn:ietf:params:scim:schemas:extension:enterprise:2.0:User） ```
-
 * ``` カスタム（urn:ietf:params:scim:schemas:extension:custom:2.0:User） ```
-
-# グループエンドポイント
-
 * ``` Domo （urn:ietf:params:scim:schemas:extension:domo:2.0:User） ```
+
+<Warning>
+  **重要：** `active` 属性は、ユーザーがDomoでアクティブかどうかを示します。PUTまたはPATCHリクエストで `active` 属性をfalseに設定すると、Domoユーザーが削除されます。この削除は、ユーザーがDataSetまたはDataFlowを所有している場合は失敗するという、ユーザーの削除と同じ制限を受けます。
+</Warning>
+
+### グループ
 
 * ``` グループ（urn:ietf:params:scim:schemas:core:2.0:Group） ```
 * ``` Domoグループ（urn:ietf:params:scim:schemas:extension:domo:2.0:Group） ```
 
 これらのスキーマとその要素は、Domoの様々なユーザー属性とグループ属性にマップされます。以下の表は、Domoのユーザーとグループの属性名と対応するSCIMスキーマと属性を示しています。
 
-<table border="1" cellpadding="1" cellspacing="1" data-aura-rendered-by="33:207;a"><thead><tr><th colspan="1" rowspan="1"><p> Domo属性とSCIMユーザーエンドポイント </p></th><th colspan="1" rowspan="1"><p> SCIMスキーマと要素 </p></th></tr></thead><tbody><tr><td colspan="1" rowspan="1"><p> ユーザー名 </p><p> これはユーザーのメールアドレスで、Domoのユーザーの固有の識別子です。 </p></td><td colspan="1" rowspan="1"><p> Core / userName </p></td></tr><tr><td colspan="1" rowspan="1"><p> 名前 </p></td><td colspan="1" rowspan="1"><p> Core / displayName </p></td></tr><tr><td colspan="1" rowspan="1"><p> メール </p></td><td colspan="1" rowspan="1"><p> Core / emails / \{emails (required), type [primary | alternate]} </p></td></tr><tr><td colspan="1" rowspan="1"><p> 代替メール </p></td><td colspan="1" rowspan="1"><p> Core / emails / \{email (required), type [primary | alternate]} </p></td></tr><tr><td colspan="1" rowspan="1"><p> 権限 </p><p> Domoは、ユーザーごとに1つの権限をサポートします。 </p></td><td colspan="1" rowspan="1"><p> Core / roles / \{id(required), name} </p></td></tr><tr><td colspan="1" rowspan="1"><p> 社員ID </p></td><td colspan="1" rowspan="1"><p> Enterprise / employeeNumber </p></td></tr><tr><td colspan="1" rowspan="1"><p> 雇用日 </p></td><td colspan="1" rowspan="1"><p> Domo / hireDate </p></td></tr><tr><td colspan="1" rowspan="1"><p> タイトル </p></td><td colspan="1" rowspan="1"><p> Core / title </p></td></tr><tr><td colspan="1" rowspan="1"><p> 部署 </p></td><td colspan="1" rowspan="1"><p> Enterprise / department </p></td></tr><tr><td colspan="1" rowspan="1"><p> 場所 </p></td><td colspan="1" rowspan="1"><p> Domo / employeeLocation </p></td></tr><tr><td colspan="1" rowspan="1"><p> 携帯電話 </p></td><td colspan="1" rowspan="1"><p> Core / phoneNumbers / \{phoneNumber, type [cell | desk]} </p></td></tr><tr><td colspan="1" rowspan="1"><p> 固定電話 </p></td><td colspan="1" rowspan="1"><p> Core / phoneNumbers / \{phoneNumber, type [cell | desk]} </p></td></tr><tr><td colspan="1" rowspan="1"><p> ロケール </p></td><td colspan="1" rowspan="1"><p> Core / locale </p></td></tr><tr><td colspan="1" rowspan="1"><p> タイムゾーン </p></td><td colspan="1" rowspan="1"><p> Core / timezone </p></td></tr><tr><td colspan="1" rowspan="1"><p> グループ </p></td><td colspan="1" rowspan="1"><p> Core / groups / \{ <em> value </em>, <em> display </em> } </p><p><b> value </b> はDomoのグループIDで、 <b> display </b> はIdPで定義されたグループ名です。 </p></td></tr><tr><td colspan="1" rowspan="1"><p> 組織 </p></td><td colspan="1" rowspan="1"><p> Enterprise / organization </p></td></tr><tr><td colspan="1" rowspan="1"><p> マネージャー </p></td><td colspan="1" rowspan="1"><p> Enterprise / manager { <em> value, display </em> } </p><p><b> value </b> は管理者のDomoユーザーIDです。 </p></td></tr><tr><td colspan="1" rowspan="1"><p> すべてのカスタム属性 </p><div class="mdx-embed"><Note><p><b> 注記： </b> カスタム属性は、SCIMで入力する前にDomoで定義する必要があります。SCIMのキーは、Domoの属性キーと完全に一致する必要があります（大文字と小文字が区別されます）。 </p></Note></div><p></p><div class="mdx-embed"><Note><p><p><b> サポートされている値のタイプは、以下のDomoのカスタムユーザー属性と同じです。 </b></p><ul><li> 文字列 </li><li> 文字列のリスト </li><li> 大きな小数 </li><li> 大きな小数のリスト </li><li> 整数 </li><li> 整数のリスト </li><li> プラスの整数 </li><li> 日付 </li><li> 日付のリスト </li><li> 日時 </li><li> 日時のリスト </li><li> 長い数字 </li></ul></p></Note></div><p> Domoのカスタム属性の詳細については、 <a href="https://domo-support.domo.com/s/article/000005164?#create_attribute" target="_self"> こちら </a> を参照してください。 </p></td><td colspan="1" rowspan="1"><p> Custom / customAttributes [\{ <em> key </em>, <em> values </em> }] </p><p><b> key </b> は、Domoおよびで定義されている属性キー、 <b> values </b> はユーザー属性値です。 </p><div class="mdx-embed"><Note><p><b> 注記： </b> valuesは、属性のデータ型、または属性が単一値かリストかに関係なく、文字列のリストとして指定する必要があります。 </p></Note></div></td></tr><tr><td colspan="1" rowspan="1"><p> ディレクトリ名 </p><p> IdPで定義されているグループ名です。 </p></td><td colspan="1" rowspan="1"><p> Group / displayName </p></td></tr><tr><td colspan="1" rowspan="1"><p> Domoグループ表示名 </p><p> Domoユーザーが最も簡単にアクセスできるDomoのグループ名です。コンテンツの共有やカード所有権の表示の際などに、製品全体のユーザーに表示されます。 </p></td><td colspan="1" rowspan="1"><p> Domo Group / domoDisplayName </p></td></tr><tr><td colspan="1" rowspan="1"><p> 説明 </p></td><td colspan="1" rowspan="1"><p> Domo Group / description <a id="supported_endpoints" target="_blank"></a></p></td></tr><tr><td colspan="1" rowspan="1"><p> グループメンバーシップ </p></td><td colspan="1" rowspan="1"><p> Group / members / [\{ <em> value </em>, <em> display </em> }] </p><p><b> value </b> は、グループメンバーのDomoユーザーIDで、 <b> display </b> はユーザー名です。 </p><p></p></td></tr></tbody></table>
+<table border="1" cellpadding="1" cellspacing="1" data-aura-rendered-by="33:207;a"><thead><tr><th colspan="1" rowspan="1"><p> Domo属性とSCIMユーザーエンドポイント </p></th><th colspan="1" rowspan="1"><p> SCIMスキーマと要素 </p></th></tr></thead><tbody><tr><td colspan="1" rowspan="1"><p> ユーザー名 </p><p> これはユーザーのメールアドレスで、Domoのユーザーの固有の識別子です。 </p></td><td colspan="1" rowspan="1"><p> Core / userName </p></td></tr><tr><td colspan="1" rowspan="1"><p> 名前 </p></td><td colspan="1" rowspan="1"><p> Core / displayName </p></td></tr><tr><td colspan="1" rowspan="1"><p> メール </p></td><td colspan="1" rowspan="1"><p> Core / emails / \{emails (required), type [primary | alternate]} </p></td></tr><tr><td colspan="1" rowspan="1"><p> 代替メール </p></td><td colspan="1" rowspan="1"><p> Core / emails / \{email (required), type [primary | alternate]} </p></td></tr><tr><td colspan="1" rowspan="1"><p> 権限 </p><p> Domoは、ユーザーごとに1つの権限をサポートします。 </p></td><td colspan="1" rowspan="1"><p> Core / roles / \{id(required), name} </p></td></tr><tr><td colspan="1" rowspan="1"><p> 社員ID </p></td><td colspan="1" rowspan="1"><p> Enterprise / employeeNumber </p></td></tr><tr><td colspan="1" rowspan="1"><p> 雇用日 </p></td><td colspan="1" rowspan="1"><p> Domo / hireDate </p></td></tr><tr><td colspan="1" rowspan="1"><p> タイトル </p></td><td colspan="1" rowspan="1"><p> Core / title </p></td></tr><tr><td colspan="1" rowspan="1"><p> 部署 </p></td><td colspan="1" rowspan="1"><p> Enterprise / department </p></td></tr><tr><td colspan="1" rowspan="1"><p> 場所 </p></td><td colspan="1" rowspan="1"><p> Domo / employeeLocation </p></td></tr><tr><td colspan="1" rowspan="1"><p> 携帯電話 </p></td><td colspan="1" rowspan="1"><p> Core / phoneNumbers / \{phoneNumber, type [cell | desk]} </p></td></tr><tr><td colspan="1" rowspan="1"><p> 固定電話 </p></td><td colspan="1" rowspan="1"><p> Core / phoneNumbers / \{phoneNumber, type [cell | desk]} </p></td></tr><tr><td colspan="1" rowspan="1"><p> ロケール </p></td><td colspan="1" rowspan="1"><p> Core / locale </p></td></tr><tr><td colspan="1" rowspan="1"><p> タイムゾーン </p></td><td colspan="1" rowspan="1"><p> Core / timezone </p></td></tr><tr><td colspan="1" rowspan="1"><p> グループ </p></td><td colspan="1" rowspan="1"><p> Core / groups / \{ <em> value </em>, <em> display </em> } </p><p><b> value </b> はDomoのグループIDで、 <b> display </b> はIdPで定義されたグループ名です。 </p></td></tr><tr><td colspan="1" rowspan="1"><p> 組織 </p></td><td colspan="1" rowspan="1"><p> Enterprise / organization </p></td></tr><tr><td colspan="1" rowspan="1"><p> マネージャー </p></td><td colspan="1" rowspan="1"><p> Enterprise / manager { <em> value, display </em> } </p><p><b> value </b> は管理者のDomoユーザーIDです。 </p></td></tr><tr><td colspan="1" rowspan="1"><p> すべてのカスタム属性 </p><div class="mdx-embed"><Note><p><b> 注記： </b> カスタム属性は、SCIMで入力する前にDomoで定義する必要があります。SCIMのキーは、Domoの属性キーと完全に一致する必要があります（大文字と小文字が区別されます）。 </p></Note></div><p></p><div class="mdx-embed"><Note><p><p><b> サポートされている値のタイプは、以下のDomoのカスタムユーザー属性と同じです。 </b></p><ul><li> 文字列 </li><li> 文字列のリスト </li><li> 大きな小数 </li><li> 大きな小数のリスト </li><li> 整数 </li><li> 整数のリスト </li><li> プラスの整数 </li><li> 日付 </li><li> 日付のリスト </li><li> 日時 </li><li> 日時のリスト </li><li> 長い数字 </li></ul></p></Note></div><p> Domoのカスタム属性の詳細については、 <a href="/s/article/000005164#create-a-custom-attribute" target="_self"> こちら </a> を参照してください。 </p></td><td colspan="1" rowspan="1"><p> Custom / customAttributes [\{ <em> key </em>, <em> values </em> }] </p><p><b> key </b> は、Domoおよびで定義されている属性キー、 <b> values </b> はユーザー属性値です。 </p><div class="mdx-embed"><Note><p><b> 注記： </b> valuesは、属性のデータ型、または属性が単一値かリストかに関係なく、文字列のリストとして指定する必要があります。 </p></Note></div></td></tr><tr><td colspan="1" rowspan="1"><p> ディレクトリ名 </p><p> IdPで定義されているグループ名です。 </p></td><td colspan="1" rowspan="1"><p> Group / displayName </p></td></tr><tr><td colspan="1" rowspan="1"><p> Domoグループ表示名 </p><p> Domoユーザーが最も簡単にアクセスできるDomoのグループ名です。コンテンツの共有やカード所有権の表示の際などに、製品全体のユーザーに表示されます。 </p></td><td colspan="1" rowspan="1"><p> Domo Group / domoDisplayName </p></td></tr><tr><td colspan="1" rowspan="1"><p> 説明 </p></td><td colspan="1" rowspan="1"><p> Domo Group / description <a id="supported_endpoints" target="_blank"></a></p></td></tr><tr><td colspan="1" rowspan="1"><p> グループメンバーシップ </p></td><td colspan="1" rowspan="1"><p> Group / members / [\{ <em> value </em>, <em> display </em> }] </p><p><b> value </b> は、グループメンバーのDomoユーザーIDで、 <b> display </b> はユーザー名です。 </p><p></p></td></tr></tbody></table>
 
-[このページのトップへ](#intro)
-
-### サポートされるエンドポイント
+## サポートされるエンドポイント
 
 DomoのSCIM実装は、多くの標準的なエンドポイントをサポートしています。以下のセクションのエンドポイント情報は、IdPの設定に役立ちます。
 
-各アクションで何が必要かについての詳細は、 [SCIM仕様](https://datatracker.ietf.org/doc/html/rfc7644) <InlineImage src="/images/kb/ja/ka0Vq000000CdP0-00N5w00000Ri7BU-0EMVq000003vb4L.jpg" /> を参照してください。
+各アクションで何が必要かについての詳細は、 [SCIM仕様](https://datatracker.ietf.org/doc/html/rfc7644) <img src="/images/kb/ja/ka0Vq000000CdP0-00N5w00000Ri7BU-0EMVq000003vb4L.jpg" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/> を参照してください。
 
 エンドポイント
 
@@ -104,47 +101,41 @@ DomoのSCIM実装は、多くの標準的なエンドポイントをサポート
  {YourDomoSubdomain}.domo.com/api/identity/v1/scim
 ```
 
-# 設定とスキーマ
+### 設定とスキーマ
 
 Domoでは、以下の設定とスキーマのエンドポイントがサポートされています。
 
 <table border="1" cellpadding="1" cellspacing="1" data-aura-rendered-by="33:207;a"><thead><tr><th colspan="1" rowspan="1"><p> エンドポイント名 </p></th><th colspan="1" rowspan="1"><p> 説明 </p></th><th colspan="1" rowspan="1"><p> エンドポイント </p></th></tr></thead><tbody><tr><td colspan="1" rowspan="1"><p> サービスプロバイダー設定を取得する </p></td><td colspan="1" rowspan="1"><p> DomoがサポートするSCIM機能を取得します。 </p></td><td colspan="1" rowspan="1"><pre class="ckeditor_codeblock">GET /ServiceProviderConfig</pre></td></tr><tr><td colspan="1" rowspan="1"><p> スキーマを取得する </p></td><td colspan="1" rowspan="1"><p> サポートされているSCIMスキーマの詳細なリストを取得します。 <a id="user_endpoints" target="_blank"></a></p></td><td colspan="1" rowspan="1"><pre class="ckeditor_codeblock">GET /Schemas</pre></td></tr><tr><td colspan="1" rowspan="1"><p> ユーザースキーマを取得する </p></td><td colspan="1" rowspan="1"><p> ユーザースキーマを取得します。 </p></td><td colspan="1" rowspan="1"><pre class="ckeditor_codeblock">GET /Schemas/User</pre></td></tr></tbody></table>
 
-[このページのトップへ](#intro)
-
-# ユーザー
+### ユーザー
 
 Domoでは、以下のユーザーエンドポイントがサポートされています。
 
 <table border="1" cellpadding="1" cellspacing="1" data-aura-rendered-by="33:207;a"><thead><tr><th colspan="1" rowspan="1"><p> エンドポイント名 </p></th><th colspan="1" rowspan="1"><p> 説明 </p></th><th colspan="1" rowspan="1"><p> エンドポイント </p></th></tr></thead><tbody><tr><td colspan="1" rowspan="1"><p> ユーザーを取得する </p></td><td colspan="1" rowspan="1"><p> ユーザーをフィルターするための様々なリクエストパラメーターを持つすべてのユーザーを取得します。以下のリクエストパラメーターとフィルターパラメーターがサポートされています。 </p><ul><li> Filter </li><li> requestedAttributes（文字列のカンマ区切りリスト） </li><li> startIndex（オフセット） </li><li> count（制限） </li><li> sortBy（並べ替えの基準となるユーザー属性を選択する） </li><li> sortOrder（「昇順」または「降順」） </li></ul></td><td colspan="1" rowspan="1"><pre class="ckeditor_codeblock">GET /Users</pre></td></tr><tr><td colspan="1" rowspan="1"><p> ユーザーを取得する </p></td><td colspan="1" rowspan="1"><p> Domo userIdで指定されたユーザーを取得します。リクエストされた属性は、「attributes」という名前のクエリパラメーターを使用して、カンマ区切りリストとして渡すことができます。一部の属性は常に返されることに注意してください。 </p><p></p></td><td colspan="1" rowspan="1"><pre class="ckeditor_codeblock">GET /Users/{userId}</pre><p></p><p> 例： </p><ul><li> phoneNumber属性を持つユーザーを返します。 <br/><pre class="ckeditor_codeblock">/Users/{userId}?<br/><br/>attributes=phoneNumbers</pre></li><li> カスタム属性を含むすべてのDomo属性を持つユーザーを返します。 <br/><pre class="ckeditor_codeblock">/scim/Users/{userId}?<br/><br/>attributes= _all</pre></li></ul></td></tr><tr><td colspan="1" rowspan="1"><p> ユーザーをPUTする </p></td><td colspan="1" rowspan="1"><p> Domo userIdでユーザーを更新します。ユーザーの既存の属性は、PUTリクエストで指定された属性に完全に置き換えられます。部分的に既存のユーザーを更新する必要がある場合は、PATCHユーザーエンドポイントを使用します。 </p></td><td colspan="1" rowspan="1"><pre class="ckeditor_codeblock">PUT /Users/{userId}</pre></td></tr><tr><td colspan="1" rowspan="1"><p> ユーザーをPatch する（ベータ版） </p></td><td colspan="1" rowspan="1"><p> リクエスト本文で指定されているように、ユーザーの属性を部分的に更新します。ほとんどのユーザー属性は、追加、置換、削除できます。 </p></td><td colspan="1" rowspan="1"><pre class="language-markup"><code>PATCH /Users/{userID}</code></pre></td></tr><tr><td colspan="1" rowspan="1"><p> ユーザーを削除する </p></td><td colspan="1" rowspan="1"><p> 指定したDomoユーザーを削除します。 </p><p></p><div class="mdx-embed"><Note><p><b> 注記： </b> Domo DataSetまたはDataFlowを所有しているユーザーをSCIMで削除することはできません。これは、DomoではすべてのDataSetとDataFlowに所有者がいる必要があり、所有者を削除する前に、これらのオブジェクトの管理者権限を再割り当てする必要があるためです。 </p></Note></div></td><td colspan="1" rowspan="1"><p></p><pre class="ckeditor_codeblock">DELETE /Users/{userId}</pre><p></p></td></tr><tr><td colspan="1" rowspan="1"><p> ユーザーをPOSTする </p></td><td colspan="1" rowspan="1"><p> Domoでユーザーを作成します。 <a id="group_endpoints" target="_blank"></a></p></td><td colspan="1" rowspan="1"><pre class="ckeditor_codeblock">POST /Users</pre></td></tr></tbody></table>
 
-[このページのトップへ](#intro)
+### グループ（ベータ版）
 
-# グループ（ベータ版）
+Domoディレクトリグループ（IdPで定義され、SSOまたはSCIM統合経由でDomoで作成および管理されるグループ） は、SSOおよびSCIMを介して作成、管理、および削除できます。SCIM APIは、ディレクトリグループでのみ機能します。つまり、SCIM経由で作成されたグループは常にディレクトリグループであり、グループを取得するエンドポイントはディレクトリグループに関する情報のみを返します。Domoのディレクトリグループとその他のグループタイプについては [こちら](/ja/s/article/360042934294) を参照してください。
 
-Domoディレクトリグループ（IdPで定義され、SSOまたはSCIM統合経由でDomoで作成および管理されるグループ） は、SSOおよびSCIMを介して作成、管理、および削除できます。SCIM APIは、ディレクトリグループでのみ機能します。つまり、SCIM経由で作成されたグループは常にディレクトリグループであり、グループを取得するエンドポイントはディレクトリグループに関する情報のみを返します。Domoのディレクトリグループとその他のグループタイプについては [こちら](/ja/s/article/360042934294?#group_types) を参照してください。
-
-DomoのSCIM統合は、SCIM統合で使用されるDomoアクセストークンを所有するDomoユーザーのコンテキストで機能します。（ [前述の](#required_grants) SCIM統合ユーザーの推奨事項を参照してください）DomoディレクトリグループをSCIM経由で管理できるようにするには、ディレクトリグループの管理を許可するユーザーとして、グループ設定でDomo SCIM統合ユーザーを指定する必要があります。
+DomoのSCIM統合は、SCIM統合で使用されるDomoアクセストークンを所有するDomoユーザーのコンテキストで機能します。（ 前述の SCIM統合ユーザーの推奨事項を参照してください）DomoディレクトリグループをSCIM経由で管理できるようにするには、ディレクトリグループの管理を許可するユーザーとして、グループ設定でDomo SCIM統合ユーザーを指定する必要があります。
 
 グループ設定でSCIM統合ユーザーを指定するには、次の手順を実行します。
 
 1. **［管理者］** ＞ **［ガバナンス］** ＞ **［グループ］** の順に移動します。
-2. <InlineImage src="/images/kb/ja/ka0Vq000000CdP0-00N5w00000Ri7BU-0EMVq000007742s.jpg" /> **［グループ設定］** （歯車のアイコン）を選択します。
+2. <img src="/images/kb/ja/ka0Vq000000CdP0-00N5w00000Ri7BU-0EMVq000007742s.jpg" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/> **［グループ設定］** （歯車のアイコン）を選択します。
 
-   <Frame><img alt="" src="/images/kb/ka0Vq000000CdP0-00N5w00000Ri7BU-0EMVq00000776cX.jpg" style={{width: 300, height: 118}}/></Frame>
+   <Frame><img alt="" src="/images/kb/ka0Vq000000CdP0-00N5w00000Ri7BU-0EMVq00000776cX.jpg"/></Frame>
 3. 表示されるモーダルでドロップダウンを使用してSCIM統合ユーザーを選択し、変更を保存します。
      
-   <Frame><img alt="" src="/images/kb/ka0Vq000000CdP0-00N5w00000Ri7BU-0EMVq00000772p4.jpg" style={{width: 451, height: 250}}/></Frame>
+   <Frame><img alt="" src="/images/kb/ka0Vq000000CdP0-00N5w00000Ri7BU-0EMVq00000772p4.jpg"/></Frame>
 Domoでは、以下のグループエンドポイントがサポートされています。
 
 <table border="1"><tbody><tr><td colspan="1" rowspan="1"><b> エンドポイント名 </b></td><td colspan="1" rowspan="1"><b> 説明 </b></td><td colspan="1" rowspan="1"><b> エンドポイント </b></td></tr><tr><td colspan="1" rowspan="1"> グループを取得する </td><td colspan="1" rowspan="1"> IDでグループを取得します。 </td><td colspan="1" rowspan="1"><pre class="language-markup"><code>GET /Groups/{groupID}</code></pre></td></tr><tr><td colspan="1" rowspan="1"> グループをPOSTする </td><td colspan="1" rowspan="1"> Domoでグループを作成します。 </td><td colspan="1" rowspan="1"><pre class="language-markup"><code>POST /Groups</code></pre></td></tr><tr><td colspan="1" rowspan="1"> グループをPUTする </td><td colspan="1" rowspan="1"> グループを更新します。Domoのグループ定義は、新しいグループ定義に完全に置き換えられます。 </td><td colspan="1" rowspan="1"><pre class="language-markup"><code>PUT /Groups{groupId}</code></pre></td></tr><tr><td colspan="1" rowspan="1"> グループをPatchする </td><td colspan="1" rowspan="1"> グループを更新します。 <a id="scim_status" target="_blank"></a></td><td colspan="1" rowspan="1"><pre class="language-markup"><code>PATCH /Groups/{groupID}</code></pre></td></tr><tr><td colspan="1" rowspan="1"> グループを削除する </td><td colspan="1" rowspan="1"> グループを削除します。 </td><td colspan="1" rowspan="1"><pre class="language-markup"><code>DELETE /Groups/{groupID}</code></pre></td></tr></tbody></table>
 
-### SCIMステータス
+## SCIMステータス
 
 以下の表に、使用可能な各アクションのステータスを示します。
 
-<table border="1" data-aura-rendered-by="33:207;a"><tbody><tr><td colspan="1" rowspan="1"><b> タイプ </b></td><td colspan="1" rowspan="1"><b> アクション </b></td><td colspan="1" rowspan="1"><b> 仕様準拠のAPI </b></td><td colspan="1" rowspan="1"><b> Oktaでテスト済み </b></td><td colspan="1" rowspan="1"><b> Entraでテスト済み </b></td><td colspan="1" rowspan="1"><b> その他 </b></td></tr><tr><td colspan="1" rowspan="1"> 設定とスキーマ </td><td colspan="1" rowspan="1"> サービスプロバイダー設定を取得する </td><td colspan="1" rowspan="1"><InlineImage src="/images/kb/ja/ka0Vq000000CdP0-00N5w00000Ri7BU-0EMVq000006pEWv.jpg" /></td><td colspan="1" rowspan="1"></td><td colspan="1" rowspan="1"></td><td colspan="1" rowspan="1"></td></tr><tr><td colspan="1" rowspan="1"> 設定とスキーマ </td><td colspan="1" rowspan="1"> スキーマを取得する </td><td colspan="1" rowspan="1"><InlineImage src="/images/kb/ja/ka0Vq000000CdP0-00N5w00000Ri7BU-0EMVq000006pEWv-1.jpg" /></td><td colspan="1" rowspan="1"></td><td colspan="1" rowspan="1"></td><td colspan="1" rowspan="1"></td></tr><tr><td colspan="1" rowspan="1"> 設定とスキーマ </td><td colspan="1" rowspan="1"> ユーザースキーマを取得する </td><td colspan="1" rowspan="1"><InlineImage src="/images/kb/ja/ka0Vq000000CdP0-00N5w00000Ri7BU-0EMVq000006pEWv-2.jpg" /></td><td colspan="1" rowspan="1"></td><td colspan="1" rowspan="1"></td><td colspan="1" rowspan="1"></td></tr><tr><td colspan="1" rowspan="1"> ユーザー </td><td colspan="1" rowspan="1"> ユーザーを取得する </td><td colspan="1" rowspan="1"><InlineImage src="/images/kb/ja/ka0Vq000000CdP0-00N5w00000Ri7BU-0EMVq000006pEWv-3.jpg" /></td><td colspan="1" rowspan="1"></td><td colspan="1" rowspan="1"></td><td colspan="1" rowspan="1"></td></tr><tr><td colspan="1" rowspan="1"> ユーザー </td><td colspan="1" rowspan="1"> ユーザーを取得する </td><td colspan="1" rowspan="1"><InlineImage src="/images/kb/ja/ka0Vq000000CdP0-00N5w00000Ri7BU-0EMVq000006pEWv-4.jpg" /></td><td colspan="1" rowspan="1"></td><td colspan="1" rowspan="1"></td><td colspan="1" rowspan="1"></td></tr><tr><td colspan="1" rowspan="1"> ユーザー </td><td colspan="1" rowspan="1"> ユーザーをPUTする </td><td colspan="1" rowspan="1"><InlineImage src="/images/kb/ja/ka0Vq000000CdP0-00N5w00000Ri7BU-0EMVq000006pEWv-5.jpg" /></td><td colspan="1" rowspan="1"></td><td colspan="1" rowspan="1"></td><td colspan="1" rowspan="1"></td></tr><tr><td colspan="1" rowspan="1"> ユーザー </td><td colspan="1" rowspan="1"> ユーザーをPATCHする </td><td colspan="1" rowspan="1"> ベータ版 </td><td colspan="1" rowspan="1"></td><td colspan="1" rowspan="1"></td><td colspan="1" rowspan="1"></td></tr><tr><td colspan="1" rowspan="1"> ユーザー </td><td colspan="1" rowspan="1"> ユーザーを削除する </td><td colspan="1" rowspan="1"><InlineImage src="/images/kb/ja/ka0Vq000000CdP0-00N5w00000Ri7BU-0EMVq000006pEWv-6.jpg" /></td><td colspan="1" rowspan="1"></td><td colspan="1" rowspan="1"></td><td colspan="1" rowspan="1"></td></tr><tr><td colspan="1" rowspan="1"> ユーザー </td><td colspan="1" rowspan="1"> ユーザーをPOSTする </td><td colspan="1" rowspan="1"><InlineImage src="/images/kb/ja/ka0Vq000000CdP0-00N5w00000Ri7BU-0EMVq000006pEWv-7.jpg" /></td><td colspan="1" rowspan="1"></td><td colspan="1" rowspan="1"></td><td colspan="1" rowspan="1"></td></tr><tr><td colspan="1" rowspan="1"> グループ </td><td colspan="1" rowspan="1"> グループを取得する </td><td colspan="1" rowspan="1"> ベータ版 </td><td colspan="1" rowspan="1"></td><td colspan="1" rowspan="1"></td><td colspan="1" rowspan="1"></td></tr><tr><td colspan="1" rowspan="1"> グループ </td><td colspan="1" rowspan="1"> グループをPOSTする </td><td colspan="1" rowspan="1"> ベータ版 </td><td colspan="1" rowspan="1"></td><td colspan="1" rowspan="1"></td><td colspan="1" rowspan="1"></td></tr><tr><td colspan="1" rowspan="1"> グループ </td><td colspan="1" rowspan="1"> グループをPUTする </td><td colspan="1" rowspan="1"> ベータ版 </td><td colspan="1" rowspan="1"></td><td colspan="1" rowspan="1"></td><td colspan="1" rowspan="1"></td></tr><tr><td colspan="1" rowspan="1"> グループ </td><td colspan="1" rowspan="1"> グループをPatchする </td><td colspan="1" rowspan="1"> ベータ版 </td><td colspan="1" rowspan="1"></td><td colspan="1" rowspan="1"></td><td colspan="1" rowspan="1"></td></tr><tr><td colspan="1" rowspan="1"> グループ </td><td colspan="1" rowspan="1"> グループを削除する </td><td colspan="1" rowspan="1"> ベータ版 </td><td colspan="1" rowspan="1"></td><td colspan="1" rowspan="1"></td><td colspan="1" rowspan="1"></td></tr></tbody></table>
-
-[このページのトップへ](#intro)
+<table border="1" data-aura-rendered-by="33:207;a"><tbody><tr><td colspan="1" rowspan="1"><b> タイプ </b></td><td colspan="1" rowspan="1"><b> アクション </b></td><td colspan="1" rowspan="1"><b> 仕様準拠のAPI </b></td><td colspan="1" rowspan="1"><b> Oktaでテスト済み </b></td><td colspan="1" rowspan="1"><b> Entraでテスト済み </b></td><td colspan="1" rowspan="1"><b> その他 </b></td></tr><tr><td colspan="1" rowspan="1"> 設定とスキーマ </td><td colspan="1" rowspan="1"> サービスプロバイダー設定を取得する </td><td colspan="1" rowspan="1"><img src="/images/kb/ja/ka0Vq000000CdP0-00N5w00000Ri7BU-0EMVq000006pEWv.jpg" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/></td><td colspan="1" rowspan="1"></td><td colspan="1" rowspan="1"></td><td colspan="1" rowspan="1"></td></tr><tr><td colspan="1" rowspan="1"> 設定とスキーマ </td><td colspan="1" rowspan="1"> スキーマを取得する </td><td colspan="1" rowspan="1"><img src="/images/kb/ja/ka0Vq000000CdP0-00N5w00000Ri7BU-0EMVq000006pEWv-1.jpg" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/></td><td colspan="1" rowspan="1"></td><td colspan="1" rowspan="1"></td><td colspan="1" rowspan="1"></td></tr><tr><td colspan="1" rowspan="1"> 設定とスキーマ </td><td colspan="1" rowspan="1"> ユーザースキーマを取得する </td><td colspan="1" rowspan="1"><img src="/images/kb/ja/ka0Vq000000CdP0-00N5w00000Ri7BU-0EMVq000006pEWv-2.jpg" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/></td><td colspan="1" rowspan="1"></td><td colspan="1" rowspan="1"></td><td colspan="1" rowspan="1"></td></tr><tr><td colspan="1" rowspan="1"> ユーザー </td><td colspan="1" rowspan="1"> ユーザーを取得する </td><td colspan="1" rowspan="1"><img src="/images/kb/ja/ka0Vq000000CdP0-00N5w00000Ri7BU-0EMVq000006pEWv-3.jpg" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/></td><td colspan="1" rowspan="1"></td><td colspan="1" rowspan="1"></td><td colspan="1" rowspan="1"></td></tr><tr><td colspan="1" rowspan="1"> ユーザー </td><td colspan="1" rowspan="1"> ユーザーを取得する </td><td colspan="1" rowspan="1"><img src="/images/kb/ja/ka0Vq000000CdP0-00N5w00000Ri7BU-0EMVq000006pEWv-4.jpg" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/></td><td colspan="1" rowspan="1"></td><td colspan="1" rowspan="1"></td><td colspan="1" rowspan="1"></td></tr><tr><td colspan="1" rowspan="1"> ユーザー </td><td colspan="1" rowspan="1"> ユーザーをPUTする </td><td colspan="1" rowspan="1"><img src="/images/kb/ja/ka0Vq000000CdP0-00N5w00000Ri7BU-0EMVq000006pEWv-5.jpg" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/></td><td colspan="1" rowspan="1"></td><td colspan="1" rowspan="1"></td><td colspan="1" rowspan="1"></td></tr><tr><td colspan="1" rowspan="1"> ユーザー </td><td colspan="1" rowspan="1"> ユーザーをPATCHする </td><td colspan="1" rowspan="1"> ベータ版 </td><td colspan="1" rowspan="1"></td><td colspan="1" rowspan="1"></td><td colspan="1" rowspan="1"></td></tr><tr><td colspan="1" rowspan="1"> ユーザー </td><td colspan="1" rowspan="1"> ユーザーを削除する </td><td colspan="1" rowspan="1"><img src="/images/kb/ja/ka0Vq000000CdP0-00N5w00000Ri7BU-0EMVq000006pEWv-6.jpg" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/></td><td colspan="1" rowspan="1"></td><td colspan="1" rowspan="1"></td><td colspan="1" rowspan="1"></td></tr><tr><td colspan="1" rowspan="1"> ユーザー </td><td colspan="1" rowspan="1"> ユーザーをPOSTする </td><td colspan="1" rowspan="1"><img src="/images/kb/ja/ka0Vq000000CdP0-00N5w00000Ri7BU-0EMVq000006pEWv-7.jpg" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/></td><td colspan="1" rowspan="1"></td><td colspan="1" rowspan="1"></td><td colspan="1" rowspan="1"></td></tr><tr><td colspan="1" rowspan="1"> グループ </td><td colspan="1" rowspan="1"> グループを取得する </td><td colspan="1" rowspan="1"> ベータ版 </td><td colspan="1" rowspan="1"></td><td colspan="1" rowspan="1"></td><td colspan="1" rowspan="1"></td></tr><tr><td colspan="1" rowspan="1"> グループ </td><td colspan="1" rowspan="1"> グループをPOSTする </td><td colspan="1" rowspan="1"> ベータ版 </td><td colspan="1" rowspan="1"></td><td colspan="1" rowspan="1"></td><td colspan="1" rowspan="1"></td></tr><tr><td colspan="1" rowspan="1"> グループ </td><td colspan="1" rowspan="1"> グループをPUTする </td><td colspan="1" rowspan="1"> ベータ版 </td><td colspan="1" rowspan="1"></td><td colspan="1" rowspan="1"></td><td colspan="1" rowspan="1"></td></tr><tr><td colspan="1" rowspan="1"> グループ </td><td colspan="1" rowspan="1"> グループをPatchする </td><td colspan="1" rowspan="1"> ベータ版 </td><td colspan="1" rowspan="1"></td><td colspan="1" rowspan="1"></td><td colspan="1" rowspan="1"></td></tr><tr><td colspan="1" rowspan="1"> グループ </td><td colspan="1" rowspan="1"> グループを削除する </td><td colspan="1" rowspan="1"> ベータ版 </td><td colspan="1" rowspan="1"></td><td colspan="1" rowspan="1"></td><td colspan="1" rowspan="1"></td></tr></tbody></table>
 
 日本語

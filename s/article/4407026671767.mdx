@@ -1,9 +1,7 @@
 ---
 title: "Workbench 5.1 FAQs"
+excerpt: "Frequently asked questions about Domo Workbench 5.1, covering supported data sources, languages, behavior, and security."
 ---
-
-
-import {InlineImage} from "/snippets/InlineImage.mdx";
 
 ## Intro
 
@@ -48,7 +46,7 @@ If you would like Workbench in a language not shown in the list above, please co
 
 <Accordion title="What type of encryption does Workbench use to transmit data?">
 
-All data transferred from Workbench into Domo’s production systems is sent using encrypted HTTPS sessions, the same technology you typically use to conduct online banking and online purchases. No data is sent from Workbench to Domo in an unencrypted manner.
+All data transferred from Workbench into Domo's production systems is sent using encrypted HTTPS sessions, the same technology you typically use to conduct online banking and online purchases. No data is sent from Workbench to Domo in an unencrypted manner.
 </Accordion>
 
 <Accordion title="If access credentials cannot be stored as part of the Windows DSN, how are those credentials stored?">
@@ -59,6 +57,17 @@ Workbench stores access credentials for ODBC DataSets. To properly protect these
 <Accordion title="How are access controls configured for Workbench?">
 
 Workbench is configured by the client from an access control perspective. Workbench allows users to upload DataSets into Domo to enable KPI card creation and automated updates. Users select DataSets (System DSNs, flat files, Microsoft Excel spreadsheets, JIRA, QuickBooks, JSON, XML namespaces) to which they already have access. Workbench can connect to DataSets only if the Microsoft Windows system running the software can reach the DataSet, and if the machine has access to read the DataSet files or databases.
+</Accordion>
+
+<Accordion title="Can I run the Workbench service under a Windows service account while individual users run the Workbench client with their own logins?">
+
+Yes, and this is a recommended setup. Have an IT administrator (or whoever manages the server) install Workbench on the machine and authenticate it with a Domo service account so that it isn't tied to an individual user.
+
+Then add each user who needs to use Workbench to the **Workbench Users** local security group. For more information, see [Active Directory security groups](https://learn.microsoft.com/en-us/windows-server/identity/ad-ds/manage/understand-security-groups) on Microsoft Learn. After a user is added to the group, they can access Workbench to create, run, and monitor jobs.
+
+<Note>
+**Note:** This works well as long as multiple users aren't editing the same things at the same time. When that happens, Workbench displays **Live updates are not available** in red text at the top of the window.
+</Note>
 </Accordion>
 
 <Accordion title="Is any of the data transmitted by Workbench cached on the local machine?">
@@ -100,7 +109,7 @@ When using a MySQL driver, you can decrease its memory usage and improve its per
 
    1. In the **Connection** tab, mark the **Allow big result sets** box.  
       When selected, the driver does not set packet limits for results.
-   2. In the **Cursors/Results** tab, mark the **Don’t cache results of forward-only cursors** box and the **Force use of forward-only cursors** box.  
+   2. In the **Cursors/Results** tab, mark the **Don't cache results of forward-only cursors** box and the **Force use of forward-only cursors** box.  
       When selected, the driver does not cache results and uses forward-only cursors.
 
 <Note>
@@ -114,7 +123,7 @@ When running a job on a schedule, if the file is not located on the local machin
 
 Follow these steps to set up impersonation:
 
-1. Click the <InlineImage src="/images/kb/ka05w00000123sE-00N5w00000Ri7BU-0EM5w000005vPOU.png" /> icon in the left-hand icon bar.
+1. Click the <i className="legacy-icon-database sm" aria-hidden="true" /> icon in the left-hand icon bar.
 2. Double-click the name of the job you want to set up impersonation for.
 3. Click the **Configure** subtab.
 4. Click **Impersonation** to expand that section.
@@ -126,7 +135,7 @@ If you are connecting to a file on a domain file share that the Workbench comput
 
 Follow these steps to give domain access:
 
-1. Click the <InlineImage src="/images/kb/ka05w00000123sE-00N5w00000Ri7BU-0EM5w000005vPOU.png" /> icon in the left-hand icon bar.
+1. Click the <i className="legacy-icon-database sm" aria-hidden="true" /> icon in the left-hand icon bar.
 2. Double-click the name of the job you want to provide domain access for.
 3. Click **Edit** under "Source."
 4. Enter the network file path in the **File Path** field.
@@ -137,7 +146,7 @@ Follow these steps to give domain access:
 
 <Accordion title="How do I clear the queue in Workbench?">
 
-Say you have a dataset set up to update every hour, and you keep getting an error when you’re trying to run the job in Workbench. More specifically, you’re not able to add that job to the queue because it is either already queued or currently executing.
+Say you have a dataset set up to update every hour, and you keep getting an error when you're trying to run the job in Workbench. More specifically, you're not able to add that job to the queue because it is either already queued or currently executing.
 
 There are a few reasons why this error can occur and ways to avoid it:
 
@@ -166,24 +175,24 @@ You can create a new job that will append the data that has changes in the RDBMS
     
   <Frame>![](/images/kb/ka0Vq00000000o1-00N5w00000Ri7BU-0EM5w000005vPPg.png)</Frame>
 * Order by  
-  Ensure you have an **Order By** clause in the SQL statement, since it will be the value from the last row that will be saved in the Lastvalue variable. If you don’t order by the column that contains the change data capture field, then you might not get the changed rows in the query.
+  Ensure you have an **Order By** clause in the SQL statement, since it will be the value from the last row that will be saved in the Lastvalue variable. If you don't order by the column that contains the change data capture field, then you might not get the changed rows in the query.
 
 3. After the query change, Click Apply.
-4. Click the <InlineImage src="/images/kb/ka0Vq00000000o1-00N5w00000Ri7BU-0EM5w000005vPPc.png" /> icon at the top of the pane to save your transform.
+4. Click the <img src="/images/kb/ka0Vq00000000o1-00N5w00000Ri7BU-0EM5w000005vPPc.png" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/> icon at the top of the pane to save your transform.
 
 **Query Variable Setup Steps**
 
-1. Perform the Query Variable setup on the separate ‘Edit Query Variables’ screen. Note that you have the option of setting a Job Variable or a Global Variable.
-2. Create a Job Variable that matches the ‘Name’ of the field that contains the data that controls the Changed data.
+1. Perform the Query Variable setup on the separate 'Edit Query Variables' screen. Note that you have the option of setting a Job Variable or a Global Variable.
+2. Create a Job Variable that matches the 'Name' of the field that contains the data that controls the Changed data.
 
 <Frame>![WB4_query.png](/images/kb/ka0Vq00000000o1-00N5w00000Ri7BU-0EM5w000005vPPl.png)</Frame>
 
-3. The 'Current Value’ will indicate the last value the job loaded. The initial value must be less than the first record you want to import.
+3. The 'Current Value' will indicate the last value the job loaded. The initial value must be less than the first record you want to import.
 </Accordion>
 
 <Accordion title="What proxy settings does Workbench use?">
 
-When you first connect to Domo via Workbench, Workbench leverages your Windows system proxy settings. You can open your proxy settings for editing by clicking <InlineImage src="/images/kb/ka05w00000123t2-00N5w00000Ri7BU-0EM5w000005vPP4.png" /> and selecting **Proxy**.
+When you first connect to Domo via Workbench, Workbench leverages your Windows system proxy settings. You can open your proxy settings for editing by clicking dots icon <i className="icon-dots-horizontal sm" aria-hidden="true" /> and selecting **Proxy**.
 
 **Can I save Workbench jobs to a shared folder? I want multiple users to be able to access and edit the jobs, but I can't figure out where jobs are saved on the drive.**
 
@@ -206,7 +215,7 @@ Not at this time.
 
 <Accordion title="Can I do a mass export of all my job files?">
 
-Yes. Workbench 5.1 allows the mass import/export of job files. Click <InlineImage src="/images/kb/ka05w00000123t2-00N5w00000Ri7BU-0EM5w000005vPP4.png" /> and select **Export**. You can then choose a save folder and select all of the jobs you want to export.
+Yes. Workbench 5.1 allows the mass import/export of job files. Click the dots icon <i className="icon-dots-horizontal sm" aria-hidden="true" /> and select **Export**. You can then choose a save folder and select all of the jobs you want to export.
 
 <Frame>![wb5_mass_export1.png](/images/kb/ka0Vq00000000o1-00N5w00000Ri7BU-0EM5w000005vPPa.png)</Frame>
 </Accordion>
@@ -256,7 +265,7 @@ You must be logged into Windows with an active session for QuickBooks integrated
 
 <Accordion title="What do I do if the Unsafe Save dialog appears?">
 
-The "Unsafe Save" dialog is displayed when your local job configuration and the remote job configuration stored in Domo do not match up or the job is currently running. To prevent the loss of data, you must first wait for the job to finish if it’s running, then re-sync your local configuration with Domo. This can be done by either clicking **Revert** or pressing F5 on your keyboard to refresh your entire job list. Unfortunately you will lose any changes that you have made when you take either of these actions. If your job runs long enough or frequently enough that you constantly see this dialog when attempting to make changes, you likely need to temporarily turn off the Workbench service, make your changes, then re-enable the service to start running your newly modified job.
+The "Unsafe Save" dialog is displayed when your local job configuration and the remote job configuration stored in Domo do not match up or the job is currently running. To prevent the loss of data, you must first wait for the job to finish if it's running, then re-sync your local configuration with Domo. This can be done by either clicking **Revert** or pressing F5 on your keyboard to refresh your entire job list. Unfortunately you will lose any changes that you have made when you take either of these actions. If your job runs long enough or frequently enough that you constantly see this dialog when attempting to make changes, you likely need to temporarily turn off the Workbench service, make your changes, then re-enable the service to start running your newly modified job.
 </Accordion>
 
 <Accordion title="My IT department requires a whitelist for all outgoing internet traffic from our network. Does Domo have an IP whitelist for purposes of running Workbench?">
@@ -279,5 +288,27 @@ This could mean a few different things. If another person is running Workbench o
 <Accordion title="Can I run jobs more frequently than every 15 minutes?">
 
 Yes, if you need this ability, please reach out to your account team for evaluation.
+</Accordion>
+
+<Accordion title="Can Workbench match filenames by 'contains' instead of an exact filename?">
+
+Workbench does not support a "contains" match on filenames directly, but you can achieve the same result by pointing the job at a directory rather than a specific file. Workbench uploads any file that lands in that directory.
+
+**To set up a path-only (directory) source:**
+
+1. Create a new directory dedicated to the incoming file.
+2. In the Workbench job, on the **Configure** tab, click **Edit** under **Source**.
+3. For the **Path**, enter the directory only — do not include a filename.
+4. Configure the rest of the job normally and save.
+
+When a file appears in the directory, Workbench uploads it on the next run.
+
+<Warning>
+**Warning:** Every file that lands in the directory must have a schema identical to the file uploaded previously. If schemas differ, the job fails or produces unexpected results.
+</Warning>
+
+<Note>
+**Note:** Only one file should reside in the directory at a time. Workbench uploads every file present in the directory on each run, so if multiple files are waiting, all of them are uploaded. Use Windows Task Scheduler (or similar) to delete or move each file after it has been uploaded.
+</Note>
 </Accordion>
 </AccordionGroup>

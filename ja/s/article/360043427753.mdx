@@ -1,8 +1,9 @@
 ---
 title: "古いMagic ETLのタイル：データサイエンス"
+excerpt: "従来の Magic ETL のデータサイエンスタイル（分類、クラスタリング、フォーキャスト、外れ値検出、予測）を活用して、DataFlow 内で高度な分析を実行します。"
 ---
 
-### はじめに
+## はじめに
 
 <Note>
   **注記：** この記事は従来のMagic ETLを対象としています。新しいMagic ETLの詳細については、「 [Magic ETL](/s/topic/0TO5w000000ZanvGAC) 」を参照してください。
@@ -23,8 +24,8 @@ title: "古いMagic ETLのタイル：データサイエンス"
 * [分類](#classification)
 * [クラスタリング](#clustering)
 * [フォーキャスト](#forecasting)
-* [多変量外れ値](#multivariate_outliers)
-* [外れ値検出](#outlier_detection)
+* 多変量外れ値
+* 外れ値検出
 * [予測](#prediction)
 
 ---
@@ -34,21 +35,21 @@ title: "古いMagic ETLのタイル：データサイエンス"
 
 </Note>
 
-### 分類
+## 分類
 
 分類（数値ではなくカテゴリー値を予測すること）アルゴリズムの目的は、データ内のカテゴリー列を予測する統計モデルを構築することです。このモデルを使用すると、その列の値を新しいデータにもとづいて分類できます。複数の方法を使用し、それらを比較することを推奨します。
 
 このタイルでは、1つのトレーニング用DataSetと、オプションのテスト/検証用のDataSetが必要です。トレーニング用DataSetに1つのカテゴリー列（従属列）が、トレーニング用およびテスト用のDataSetの両方に1つ以上の数値および/またはカテゴリー列（予測子列）が含まれます。［分類］タイル内では、ナイーブベイズまたはランダムフォレストのいずれかを選択できます。
 
-#### ナイーブベイズ分類子
+### ナイーブベイズ分類子
 
 ナイーブベイズ分類は、その他の分類アルゴリズムよりも高速かつシンプルですが、一般に精度が劣ります。この分類はサイズの大きなDataSetに使用することを推奨します。
 
-#### ランダムフォレスト分類子
+### ランダムフォレスト分類子
 
 ランダムフォレスト分類は、複数の決定木を作成し、その結果を組み合わせて全体的な分類を得るアンサンブル学習方法です。直線性の前提は必要ありません。このアルゴリズムは、データ内の極値に対してより堅牢です。
 
-#### 例
+### 例
 
 以下の例は、DomoのMagic ETLで分類アルゴリズムを実装して使用する方法を示しています。サンプルDataSet： [Catastrophic\_Train.xlsx](https://domosoftware.sharepoint.com/:x:/s/CS-Edu-PublicFiles/EYq2O7xGusFHr_lq0qP1LfgBudWLtjjOlY8EXl_xV9GgIg?e=KUheNx "Catastrophic_Train.xlsx") （800行）と [Catastrophic\_Test.xlsx](https://domosoftware.sharepoint.com/:x:/s/CS-Edu-PublicFiles/EWJT9HIPVXNAhdnrdnECGV0BJJCN5na5X0I5l6o1lg_dcQ?e=dnLB4z "Catastrophic_Test.xlsx") （200行）は、人為的に生成されたDataSetで、この例を試したい場合はダウンロード可能です。これらのDataSetには保険金請求に関するデータが含まれており、その目的は新しい請求が高額かどうかを正確に分類できる分類アルゴリズムをトレーニングすることです。
 
@@ -77,29 +78,28 @@ title: "古いMagic ETLのタイル：データサイエンス"
      
    <Frame><img alt="randomforest_2.png" src="/images/kb/ka0Vq0000000yXF-00N5w00000Ri7BU-0EM5w000005vNfb.png"/></Frame>
 5. 最後に、
-   [ナイーブベイズ](#h_01F0MEVR0PPQFM9TB077TE3JM6 "ETL操作：データサイエンス") または [ランダムフォレスト](#h_01F0MEVX4PSQBDXCP08DZBSASN "ETL操作：データサイエンス") のいずれかを［分類］タイルの基盤アルゴリズムとして選択します。
+   ナイーブベイズ または ランダムフォレスト のいずれかを［分類］タイルの基盤アルゴリズムとして選択します。
      
    <Frame><img alt="Classification_-_Step_7.png" src="/images/kb/ka0Vq0000000yXF-00N5w00000Ri7BU-0EM5w000005vNfc.png"/></Frame>
 6. 出力DataSetを接続し、名前を付けます。生成されるDataSetには、「classification」列が付加された元のDataSetが含まれます。
      
    <Frame><img alt="randomforest_4.png" src="/images/kb/ka0Vq0000000yXF-00N5w00000Ri7BU-0EM5w000005vNf5.png"/></Frame>
-[このページのトップへ](#intro)
 
-### クラスタリング
+## クラスタリング
 
 クラスタリングアルゴリズムの目的は、同じグループ内のオブジェクト間の類似性がほかのグループのオブジェクトとの類似性よりも高くなるように、一連のオブジェクトをグループ化することです。これはデータ分析の説明段階で特に役立ちます。ユーザーが、必ずしも明白でないパターンとグループを明らかにできるようになるからです。
 
 このタイルには、（K）でクラスター化するために、少なくとも1つの数値列といくつかのクラスターが必要です。ユーザーはK平均法アルゴリズムまたはK中央値アルゴリズムのいずれかを選択できます。
 
-#### K平均法クラスタリング
+### K平均法クラスタリング
 
 K平均法では、DataSetからk行をランダムに選択し、それらをクラスターの中心として扱うことでクラスターを形成します。次に、各行のクラスターの中心までの距離にもとづいてkクラスターが形成されます。続いて、各クラスターの平均が計算され、新しいクラスターの中心として扱われます。このプロセスは、クラスターのメンバーシップが安定するまで繰り返されます。
 
-#### K中央値クラスタリング
+### K中央値クラスタリング
 
 K中央値では、DataSetからk行をランダムに選択し、それらをクラスターの中心として扱うことでクラスターを形成します。次に、各行のクラスターの中心までの距離にもとづいてkクラスターが形成されます。続いて、各クラスターの中央値が計算され、新しいクラスターの中心として扱われます。このプロセスは、クラスターのメンバーシップが安定するまで繰り返されます。
 
-#### 例
+### 例
 
 以下の例は、DomoのMagic ETLでクラスタリングアルゴリズムを実装して使用する方法を示しています。この例を試したい場合は、サンプルDataSetの [Wholesale\_Distributor\_Sales.xlsx](https://domosoftware.sharepoint.com/:x:/s/CS-Edu-PublicFiles/EZt5R1P6XTpCoHGOxOS5BKcBZN34yYrrrF7tTj8hN7ytGQ?e=5xPTZI "Wholesale_Distributor_Sales.xlsx") （440行）をダウンロードします。
   
@@ -122,7 +122,7 @@ K中央値では、DataSetからk行をランダムに選択し、それらを�
 </Note>
 
 4. 次に、この［クラスタリング］タイルの基盤アルゴリズムとして
-   [［K平均法］](#h_01F0MEXGD3DB1VT720YW7P17T9 "ETL操作：データサイエンス") または [［k中央値］](#h_01F0MEXNHNN2JWS6A586AD9RRG "ETL操作：データサイエンス") のいずれかを選択します。
+   ［K平均法］ または ［k中央値］ のいずれかを選択します。
      
    <Frame><img alt="Clustering_-_Step_4.png" src="/images/kb/ka0Vq0000000yXF-00N5w00000Ri7BU-0EM5w000005vNfY.png"/></Frame>
 5. 最後に、出力DataSetを接続して名前を付ける必要があります。
@@ -130,26 +130,24 @@ K中央値では、DataSetからk行をランダムに選択し、それらを�
 生成される出力DataSetには、クラスターメンバーシップを含む列が付加された元のDataSetが含まれます。
 
 <Frame><img alt="kmeans_clustering_6.png" src="/images/kb/ka0Vq0000000yXF-00N5w00000Ri7BU-0EM5w000005vNfE.png"/></Frame>
-#### このDataSetを使用してカードを作成する
+### このDataSetを使用してカードを作成する
 
 散布図は、このDataSetのデータを可視化するための優れた方法です。
 
 <Frame><img alt="kmeans_clustering_7.png" src="/images/kb/ka0Vq0000000yXF-00N5w00000Ri7BU-0EM5w000005vNfU.png"/></Frame>
 この散布図は、生鮮製品（X軸）と食料雑貨製品（Y軸）に対するクライアントの支出を示しています。各点は、割り当てられたクラスター別に色付けされています。この例では、3つのクラスターが選択されており、クラスター1のクライアント（青）は生鮮製品に、クラスター3のクライアント（オレンジ）は食料雑貨製品に多く支出する傾向があり、クラスター2のクライアント（緑）はどちらにもあまり支出していません。追加の散布図を作成して、別の製品カテゴリー（牛乳や冷凍食品）内でクライアントがどのようにグループ化されるかを調べることもできます。
 
-[このページのトップへ](#intro)
-
-### フォーキャスト
+## フォーキャスト
 
 時系列予測では、時間順のデータ列を使用して様々な方法で未来の観測値の予測を生成できます。
 
 このタイルでは、日時列と数値列が1つずつ必要です。予測では、ARIMAアルゴリズムが使用されます。
 
-#### ARIMA
+### ARIMA
 
 ARIMA（自己回帰和分移動平均）では、モデルへの適合性に応じて、予測パラメーターが自動的に選ばれます。これにより、データ内の動向や季節性などが考慮されます。予測は、最終的なモデルのパラメーターにもとづいて行われます。
 
-#### 例
+### 例
 
 以下の例は、DomoのMagic ETLでARIMA予測アルゴリズムを実装して使用する方法を示しています。サンプルDataSetの [Daily\_Web\_Sales.xlsx](https://domosoftware.sharepoint.com/:x:/s/CS-Edu-PublicFiles/EU2e-GaRbRhChqHFRgCAOi8BPDiR2vKenemskHJlcY8GMA?e=AAx9SK) （171行）は人為的に生成されたDataSetで、1日当たりの収益合計を含んでいます。この例を試したい場合は、DataSetをダウンロードできます。
 
@@ -175,29 +173,27 @@ ARIMA（自己回帰和分移動平均）では、モデルへの適合性に応
      
    この例では、7回です。
      
-   <Frame><img alt="Screen Shot 2022-11-16 at 3.19.41 PM.png" src="/images/kb/ka0Vq0000000yXF-00N5w00000Ri7BU-0EM5w000005vqxO.jpg" style={{width: 244.983, height: 258.993}}/></Frame>
+   <Frame><img alt="Screen Shot 2022-11-16 at 3.19.41 PM.png" src="/images/kb/ka0Vq0000000yXF-00N5w00000Ri7BU-0EM5w000005vqxO.jpg"/></Frame>
 7. 最後に、出力DataSetを接続して名前を付けます。
      
    <Frame><img alt="arima_7.png" src="/images/kb/ka0Vq0000000yXF-00N5w00000Ri7BU-0EM5w000005vNfQ.png"/></Frame>
 生成される出力DataSetには、「prediction」列、「prediction lower」列、「prediction upper」列が付加された元のDataSetが含まれます。これら3つの新しい列は、予測が行われている場所（DataSetの最下部）を除いて空白です。
 
 <Frame><img alt="arima_9.png" src="/images/kb/ka0Vq0000000yXF-00N5w00000Ri7BU-0EM5w000005vNf0.png"/></Frame>
-#### このDataSetを使用してカードを作成する
+### このDataSetを使用してカードを作成する
 
 予測カードは、このDataSetのデータを可視化するための優れた方法です。
 
 <Frame><img alt="arima_8.png" src="/images/kb/ka0Vq0000000yXF-00N5w00000Ri7BU-0EM5w000005vNfZ.png"/></Frame>
 この予測カードには、1日当たりの予測収益値（上限および下限付き）が青色で表示されています。
 
-[このページのトップへ](#intro)
-
-### 多変量外れ値
+## 多変量外れ値
 
 多変量外れ値検出は、DataSetに含まれている1つ以上の数値列のセットの外れ値または異常観測値を検出することを目的とする異常検出アルゴリズムです。多変量外れ値検出を使用すると、複数の次元の異常観測値（または行）を検出できます。ある観測値が単一の列については外れ値ではないものの、複数の列については外れ値になるという場合もあります。これは列数が増えるときに特に役立ちます。
 
 真の多変量外れ値を見つけるには、このタイルでは2つ以上の数値列が必要です。ただし、タイルタスクは1つの数値で動作します。
 
-#### 例
+### 例
 
 以下の例は、DomoのMagic ETLで外れ値検出アルゴリズムを実装して使用する方法を示しています。サンプルDataSet：この例を試したい場合は、 [Wholesale\_Distributor\_Sales.xlsx](https://domosoftware.sharepoint.com/:x:/s/CS-Edu-PublicFiles/EZt5R1P6XTpCoHGOxOS5BKcBZN34yYrrrF7tTj8hN7ytGQ?e=igdQ5f "Wholesale_Distributor_Sales.xlsx") （440行）をダウンロードできます。
 
@@ -221,30 +217,28 @@ ARIMA（自己回帰和分移動平均）では、モデルへの適合性に応
 生成される出力DataSetには、外れ値インジケーター（下のプレビューペインで丸で囲まれている部分）を含む列が付加された元のDataSetが含まれます。
 
 <Frame><img alt="multivariate_outliers_6.png" src="/images/kb/ka0Vq0000000yXF-00N5w00000Ri7BU-0EM5w000005vNf9.png"/></Frame>
-#### このDataSetを使用してカードを作成する
+### このDataSetを使用してカードを作成する
 
 散布図は、このDataSetのデータを可視化するための優れた方法です。
 
 <Frame><img alt="multivariate_outliers_7.png" src="/images/kb/ka0Vq0000000yXF-00N5w00000Ri7BU-0EM5w000005vNfK.png"/></Frame>
 この散布図は、食料雑貨製品（X軸）と生鮮製品（Y軸）に対するクライアントの支出を示しています。外れ値検出の対象として6つすべての製品カテゴリーを選択したことを思い出してください。外れ値と見なされるクライアントは赤で表示されます。外れ値クライアントのほとんどは、生鮮食品、食料雑貨、またはその両方に多く支出しています。生鮮食品にも食料雑貨にもあまり支出していない外れ値クライアントもいくつかあります（図の左下の隅にあります）。これらのクライアントは、その他の4つの製品カテゴリーに多く支出している可能性があります。様々な散布図を使用して、外れ値と見なされるクライアントが存在する理由を調べることができます。
 
-[このページのトップへ](#intro)
-
-### 外れ値検出
+## 外れ値検出
 
 外れ値とは、ほかの観測値/点から離れていて、発生する確率が低い観測値/点のことです。各種の外れ値の検出方法は、データに対する基本的な前提（大まかな正規釣鐘曲線データ、高次元データ、時系列データなど）と異常値の検出方法がそれぞれ異なっています。
 
 このタイルでは1つの数値列が必要で、標準偏差アルゴリズムまたは平均絶対偏差アルゴリズムのいずれかを選択できます。
 
-#### 平均絶対偏差
+### 平均絶対偏差
 
 平均絶対偏差外れ値検出は、DataSet内の数値列の外れ値または異常観測値を検出することを目的とする異常検出アルゴリズムです。標準偏差検出とは異なり、平均絶対偏差外れ値検出では、列の値が正規分布（釣鐘形分布）しているとは想定されません。そのため、非正規の、または歪みのある（大きい、または小さい観測値が不釣り合いなほど多くある）列に最適です。列の観測値は、事前に指定された数の、中央値からのいずれかの方向における中央値絶対偏差（MAD）より大きい場合には、外れ値として分類されます。
 
-#### 標準偏差
+### 標準偏差
 
 標準偏差外れ値検出は、DataSet内の数値列の外れ値または異常観測値の検出を試みる異常検出アルゴリズムです。標準偏差外れ値検出では、列の値が大まかに正規分布（釣鐘型分布）していると想定されます。列の観測値は、事前に指定された数の、平均値からのいずれかの方向における標準偏差より大きい場合には、外れ値として分類されます。
 
-#### 例
+### 例
 
 以下の例は、DomoのMagic ETLで外れ値検出アルゴリズムを実装して使用する方法を示しています。サンプルDataSet：この例を試したい場合は、 [Wholesale\_Distributor\_Sales.xlsx](https://domosoftware.sharepoint.com/:x:/s/CS-Edu-PublicFiles/EZt5R1P6XTpCoHGOxOS5BKcBZN34yYrrrF7tTj8hN7ytGQ?e=igdQ5f "Wholesale_Distributor_Sales.xlsx") （440行）をダウンロードできます。
 
@@ -263,7 +257,7 @@ ARIMA（自己回帰和分移動平均）では、モデルへの適合性に応
 
    <Frame><img alt="nonparametric_outliers_3.png" src="/images/kb/ka0Vq0000000yXF-00N5w00000Ri7BU-0EM5w000005vNfM.png"/></Frame>
 4. 次に、
-   [［標準偏差］](#h_01F0MF4QW8E8D0D3HAKJB7764R "ETL操作：データサイエンス") または [［平均絶対偏差］](#h_01F0MF4ZAPRZA4XXY1FBN2D477 "ETL操作：データサイエンス") のいずれかのアルゴリズムを選択します。この例では、［標準偏差］を選択します。
+   ［標準偏差］ または ［平均絶対偏差］ のいずれかのアルゴリズムを選択します。この例では、［標準偏差］を選択します。
      
    <Frame><img alt="Outlier_Detection_-_Standard_Deviation.png" src="/images/kb/ka0Vq0000000yXF-00N5w00000Ri7BU-0EM5w000005vNfA.png"/></Frame>
 5. 最後に、出力DataSetを接続して名前を付ける必要があります。
@@ -272,28 +266,28 @@ ARIMA（自己回帰和分移動平均）では、モデルへの適合性に応
 生成される出力DataSetには、外れ値インジケーター（下のプレビューペインで丸で囲まれている部分）を含む列が付加された元のDataSetが含まれます。
 
 <Frame><img alt="nonparametric_outliers_5.png" src="/images/kb/ka0Vq0000000yXF-00N5w00000Ri7BU-0EM5w000005vNf2.png"/></Frame>
-#### このDataSetを使用してカードを作成する
+### このDataSetを使用してカードを作成する
 
 散布図は、このDataSetのデータを可視化するための優れた方法です。
 
 <Frame><img alt="nonparametric_outliers_6.png" src="/images/kb/ka0Vq0000000yXF-00N5w00000Ri7BU-0EM5w000005vNfJ.png"/></Frame>
 この散布図は、食料雑貨製品（X軸）と生鮮製品（Y軸）に対するクライアントの支出を示しています。生鮮食品が外れ値検出の対象として選択されたことを思い出してください。外れ値と見なされるクライアントは赤で表示されます。これらのクライアントは、ほかのクライアントよりも生鮮食品にかなり多く支出しているようです。支出スペクトラムの下側には、外れ値と見なされたクライアントはありませんでした。この分析を再現することで、ほかの製品カテゴリーの潜在的な外れ値を調べることができます。
 
-### 予測
+## 予測
 
 回帰アルゴリズムの目的は、データ内の数値列を予測する統計モデルを構築することです。このモデルを使用すると、その列の値を新しいデータにもとづいて予測できます。複数の方法を使用し、それらを比較することを推奨します。
 
 このタイルでは、線形回帰またはランダムフォレストのいずれかのアルゴリズムを選択できます。
 
-#### 線形回帰
+### 線形回帰
 
 線形回帰予測では、線形回帰モデルを使用してデータ内の数値列を予測します。この予測では、予測したい列、および予測プロセスに役立つと考えられるその他の列（「予測子」とも呼ばれます）を含むトレーニング用DataSetが必要です。このアルゴリズムは、トレーニング用DataSetを使用して予測アルゴリズムを「トレーニング」します。トレーニングされた予測アルゴリズムは、「テスト用」DataSet（テスト用DataSetとトレーニング用DataSetは同じでも構いません）に適用可能になり、そこで同じ「予測子」列を使用して各行を分類します。
 
-#### ランダムフォレスト
+### ランダムフォレスト
 
 ランダムフォレスト回帰は非常に強力です。多数の弱い決定木の集合体を使用して、個々の木それぞれの平均を予測する1つの強い回帰アルゴリズムを作成するためです。このアルゴリズムは、データの複雑な下部構造を適切に識別できるため、様々なデータタイプに対して有効に機能します。
 
-#### 例
+### 例
 
 以下の例は、DomoのMagic ETLで回帰予測アルゴリズムを実装して使用する方法を示しています。サンプルDataSet： [Catastrophic\_Train.xlsx](https://domosoftware.sharepoint.com/:x:/s/CS-Edu-PublicFiles/EYq2O7xGusFHr_lq0qP1LfgBudWLtjjOlY8EXl_xV9GgIg?e=pGi7R3 "Catastrophic_Train.xlsx") （800行）と [Catastrophic\_Test.xlsx](https://domosoftware.sharepoint.com/:x:/s/CS-Edu-PublicFiles/EWJT9HIPVXNAhdnrdnECGV0BJJCN5na5X0I5l6o1lg_dcQ?e=ou64D0 "Catastrophic_Test.xlsx") （200行）は、人為的に生成されたDataSetで、この例を試したい場合はダウンロードできます。これらのDataSetには、保険金請求に関するデータが含まれており、その目的は、DataSet内の各行の請求数をほかの列のデータにもとづいて正確に予測できる予測アルゴリズムをトレーニングすることです。
 
@@ -322,7 +316,7 @@ ARIMA（自己回帰和分移動平均）では、モデルへの適合性に応
 
    <Frame><img alt="olsprediction_3.png" src="/images/kb/ka0Vq0000000yXF-00N5w00000Ri7BU-0EM5w000005vNf7.png"/></Frame>
 5. 最後に、
-   [［線形回帰］](#h_01F0MF9CVHERPTWNKBP33ME62Y "ETL操作：データサイエンス") または [［ランダムフォレスト］](#h_01F0MF9HPJ3HE4CT9EPBY9289D "ETL操作：データサイエンス") のいずれかのアルゴリズムを選択します。この例では、［線形回帰］を選択します。
+   ［線形回帰］ または ［ランダムフォレスト］ のいずれかのアルゴリズムを選択します。この例では、［線形回帰］を選択します。
 
    <Frame><img alt="Prediction_-_Algorithm.png" src="/images/kb/ka0Vq0000000yXF-00N5w00000Ri7BU-0EM5w000005vNfd.png"/></Frame>
 6. 出力DataSetを接続して名前を付ける必要があります。
@@ -331,12 +325,9 @@ ARIMA（自己回帰和分移動平均）では、モデルへの適合性に応
    生成される出力DataSetには、予測列が付加された元のトレーニング用DataSetが含まれます。その後、予測列と「num.claims」列を比較できます。
 
    <Frame><img alt="olsprediction_6.png" src="/images/kb/ka0Vq0000000yXF-00N5w00000Ri7BU-0EM5w000005vNf1.png"/></Frame>
-[このページのトップへ](#intro)
 
-### Magic ETLにおけるデータサイエンスタイル（動画）
+## Magic ETLにおけるデータサイエンスタイル（動画）
 
 <iframe allowfullscreen="allowfullscreen" frameborder="1" height="315" src="//www.youtube-nocookie.com/embed/KullowvBhrc" width="560"></iframe>
-
-[このページのトップへ](#intro)
 
 日本語

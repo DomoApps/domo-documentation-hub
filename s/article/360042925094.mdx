@@ -1,5 +1,6 @@
 ---
 title: "Word Cloud Chart"
+excerpt: "Build a Word Cloud chart that varies font size and color to represent the frequency or importance of words in your DataSet."
 ---
 
 ## Intro
@@ -55,7 +56,7 @@ There may be times when you need to build a Word Cloud chart using a column that
      
    where *your\_data\_table* is the name of the DataSet and *your\_column* is the column you are parsing, and you insert *y* to exclude common words/common symbols or *n* to keep them.
      
-   For example, if your table is named “survey\_results” and the column to be split is called “feedback” and you’d like to exclude common words but not common symbols, you would modify the code to look like the following:<br/><br/>
+   For example, if your table is named “survey\_results” and the column to be split is called “feedback” and you'd like to exclude common words but not common symbols, you would modify the code to look like the following:<br/><br/>
      
    `` CALL word_cloud('survey_results', '`feedback`', 'y','n'); ``<br/><br/>
 10. Click **Run SQL**.
@@ -65,6 +66,16 @@ There may be times when you need to build a Word Cloud chart using a column that
     `SELECT * FROM final`<br/><br/>
 
 A new table called “final” is created, which contains the data from your original table with rows created for each item in the column to be split. There will be a new column added to the end of each record in the table that contains the original string that was split.
+
+In step 12, instead of outputting the entire table with `SELECT * FROM final`, you can update only a segment of the data. Use a `UNION ALL` query that filters each `SELECT` by a date range, so that only the rows in the segment you choose are refreshed while the rest of the data is preserved. For example, the following query keeps records older than two months from one table and the most recent two months of records from another:
+
+```sql
+SELECT * FROM tickets a
+WHERE DATE(`a`.`Date`) <= DATE_SUB(NOW(),INTERVAL 2 MONTH)
+UNION ALL
+SELECT * FROM final b
+WHERE DATE(`b`.`Date`) > DATE_SUB(NOW(),INTERVAL 2 MONTH);
+```
 
 ### Common words
 
@@ -77,7 +88,7 @@ If you choose to remove common words the words that will be removed are as follo
 If you choose to remove common symbols the symbols that will be removed are as follows:
 
 ```text
-'~', '`', '!', '@', '#', '£', '€', '$', '¢', '¥', '§', '%', '°', '^', '&', '*', '(', ')', '-', '_', '+', '=', '{', '}', '[', ']', '|', '\', '/', ':', ';', ''', ',', '<', '>', '.', '?', '“', '”', '-', '–', '’', '"'
+'~', '`', '!', '@', '#', '£', '€', '$', '¢', '¥', '§', '%', '°', '^', '&', '*', '(', ')', '-', '_', '+', '=', '{', '}', '[', ']', '|', '\', '/', ':', ';', ''', ',', '<', '>', '.', '?', '“', '”', '-', '–', ''', '"'
 ```
 
 #### To create a Magic ETL DataFlow with the Python Scripting tile for use in a Word Cloud,

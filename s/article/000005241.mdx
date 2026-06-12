@@ -1,8 +1,7 @@
 ---
 title: "SCIM (System for Cross-domain Identity Management) in Domo"
+excerpt: "Configure SCIM in Domo so your identity provider can automatically create and update users and groups from your IdP."
 ---
-
-
 
 ## Intro
 
@@ -50,9 +49,9 @@ Learn how to add these grants to a [custom role](/s/article/360043438973).
 
 ## Synchronize Directory Groups
 
-Domo directory groups (groups defined in the IdP and created and managed in Domo via SSO or SCIM integration) can be created, managed, and deleted via SSO and SCIM. The SCIM APIs only function on directory groups. This means that groups created via SCIM are always directory groups, and the Get Group endpoint only returns information about directory groups. [Learn more](/s/article/360042934294#group_types) about directory groups and other group types in Domo.
+Domo directory groups (groups defined in the IdP and created and managed in Domo via SSO or SCIM integration) can be created, managed, and deleted via SSO and SCIM. The SCIM APIs only function on directory groups. This means that groups created via SCIM are always directory groups, and the Get Group endpoint only returns information about directory groups. [Learn more](/s/article/360042934294#group-types) about directory groups and other group types in Domo.
 
-Domo's SCIM integration functions in the context of the Domo user who owns the Domo Access Token used by the SCIM integration. (See our recommendations for the SCIM Integration User [above](#required_grants).) To allow Domo directory groups to be managed via SCIM, the Domo SCIM Integration User must be designated in Groups Settings as the user permitted to manage directory groups.
+Domo's SCIM integration functions in the context of the Domo user who owns the Domo Access Token used by the SCIM integration. (See our recommendations for the SCIM Integration User [above](#configure-required-grants).) To allow Domo directory groups to be managed via SCIM, the Domo SCIM Integration User must be designated in Groups Settings as the user permitted to manage directory groups.
 
 Follow these steps to designate the SCIM Integration User in Group Settings:
 
@@ -60,11 +59,11 @@ Follow these steps to designate the SCIM Integration User in Group Settings:
 2. Select
    <img src="/images/kb/ka0Vq000000EOth-00N5w00000Ri7BU-0EMVq000007742s.jpg" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/> **Group Settings** (gear icon).
      
-   <Frame><img alt="Groups page with Group Settings gear icon highlighted" src="/images/kb/ka0Vq000000CdP0-00N5w00000Ri7BU-0EMVq00000776cX.jpg" style={{width: 300, height: 118}}/></Frame>
+   <Frame><img alt="Groups page with Group Settings gear icon highlighted" src="/images/kb/ka0Vq000000CdP0-00N5w00000Ri7BU-0EMVq00000776cX.jpg"/></Frame>
 
 3. In the modal that displays, use the dropdown to choose the SCIM Integration User and save your changes.
      
-   <Frame><img alt="Group Settings modal with dropdown to select the SCIM Integration User" src="/images/kb/ka0Vq000000CdP0-00N5w00000Ri7BU-0EMVq00000772p4.jpg" style={{width: 451, height: 250}}/></Frame>
+   <Frame><img alt="Group Settings modal with dropdown to select the SCIM Integration User" src="/images/kb/ka0Vq000000CdP0-00N5w00000Ri7BU-0EMVq00000772p4.jpg"/></Frame>
 
 ---
 
@@ -94,14 +93,14 @@ The following configuration and schema endpoints are supported in Domo:
 
 The following user endpoints are supported in Domo:
 
-| Endpoint Name     | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  | Endpoint                                                                                                                                                                                                                                          |
-| ----------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Get Users         | Retrieves all users with different request parameters to filter users. The following request and filter parameters are supported: Filter, requestedAttributes (comma-separated list of strings), startIndex (offset), count (limit), sortBy (choose a user attribute to sort by), sortOrder (`ascending` or `descending`)                                                                                                                                                                                                    | `GET /Users`                                                                                                                                                                                                                                      |
-| Get User          | Retrieves a user specified by their Domo userId. The requested attributes can be passed in as a comma-separated list via query parameters named "attributes." Note that some attributes are always returned.                                                                                                                                                                                                                                                                                                                 | `GET /Users/{userId}`<br/>Examples:<br/>Returns a user with the phoneNumber attribute: `/Users/{userId}?attributes=phoneNumbers`<br/>Returns a user with all Domo attributes, including custom attributes: `/scim/Users/{userId}?attributes=_all` |
-| Put User          | Updates a user by Domo userId. The user's existing attributes will be completely replaced by the attributes specified in the PUT request. If you need to update partially existing users, use the PATCH user endpoint.                                                                                                                                                                                                                                                                                                       | `PUT /Users/{userId}`                                                                                                                                                                                                                             |
-| Patch User (Beta) | Partially updates a user's attributes as specified in the request body. Most user attributes can be added, replaced, or removed.                                                                                                                                                                                                                                                                                                                                                                                             | `PATCH /Users/{userID}`                                                                                                                                                                                                                           |
-| Delete User       | Deletes the specified Domo user. <Warning>**Important:** If a user owns Domo DataSets or DataFlows, the user cannot be deleted via SCIM. This is because Domo requires all DataSets and DataFlows to have owners and requires ownership of those objects to be reassigned before the owner can be deleted.<br/><br/>**Important:** Setting the "active" attribute to false via a PUT or PATCH request also deletes the user and is subject to the same restriction—deletion fails if the user owns DataSets or DataFlows.</Warning> | `DELETE /Users/{userId}`                                                                                                                                                                                                                          |
-| Post User         | Creates a user in Domo.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      | `POST /Users`                                                                                                                                                                                                                                     |
+| Endpoint Name                                                                   | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  | Endpoint                                                                                                                                                                                                                                          |
+| ------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Get Users                                                                       | Retrieves all users with different request parameters to filter users. The following request and filter parameters are supported: Filter, requestedAttributes (comma-separated list of strings), startIndex (offset), count (limit), sortBy (choose a user attribute to sort by), sortOrder (`ascending` or `descending`)                                                                                                                                                                                                    | `GET /Users`                                                                                                                                                                                                                                      |
+| Get User                                                                        | Retrieves a user specified by their Domo userId. The requested attributes can be passed in as a comma-separated list via query parameters named "attributes." Note that some attributes are always returned.                                                                                                                                                                                                                                                                                                                 | `GET /Users/{userId}`<br/>Examples:<br/>Returns a user with the phoneNumber attribute: `/Users/{userId}?attributes=phoneNumbers`<br/>Returns a user with all Domo attributes, including custom attributes: `/scim/Users/{userId}?attributes=_all` |
+| Put User                                                                        | Updates a user by Domo userId. The user's existing attributes will be completely replaced by the attributes specified in the PUT request. If you need to update partially existing users, use the PATCH user endpoint.                                                                                                                                                                                                                                                                                                       | `PUT /Users/{userId}`                                                                                                                                                                                                                             |
+| Patch User <Badge className="text-primary bg-primary/10 font-bold">Beta</Badge> | Partially updates a user's attributes as specified in the request body. Most user attributes can be added, replaced, or removed.                                                                                                                                                                                                                                                                                                                                                                                             | `PATCH /Users/{userID}`                                                                                                                                                                                                                           |
+| Delete User                                                                     | Deletes the specified Domo user. <Warning>**Important:** If a user owns Domo DataSets or DataFlows, the user cannot be deleted via SCIM. This is because Domo requires all DataSets and DataFlows to have owners and requires ownership of those objects to be reassigned before the owner can be deleted.<br/><br/>**Important:** Setting the "active" attribute to false via a PUT or PATCH request also deletes the user and is subject to the same restriction—deletion fails if the user owns DataSets or DataFlows.</Warning> | `DELETE /Users/{userId}`                                                                                                                                                                                                                          |
+| Post User                                                                       | Creates a user in Domo.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      | `POST /Users`                                                                                                                                                                                                                                     |
 
 #### Examples
 
@@ -161,8 +160,12 @@ The following user endpoints are supported in Domo:
 		"customAttributes": [
 			{
 				"key": "building",
+				"values": "Building A"
+			},{
+				"key": "alternateBuildings",
 				"values": [
-					"Building A"
+					"Building B",
+					"Building C"
 				]
 			}
 		]
@@ -216,7 +219,7 @@ The following group endpoints are supported in Domo:
 | Get Group     | Get a group by ID.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       | `GET /Groups/{groupID}`    |
 | Post Group    | Create a group in Domo.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  | `POST /Groups`             |
 | Put Group     | Update a group—group definition in Domo is completely replaced by the new group definition.                                                                                                                                                                                                                                                                                                                                                                                                                                              | `PUT /Groups/{groupId}`    |
-| Patch Group   | Partially updates a group's attributes. <Note>**Note:** Unlike PATCH for users, PATCH for groups supports only the following operation structure: <br/>`{ "op": "Replace\|Add\|Remove", "path": "attributePath", "value": value }`. <br/>"path" is always required and its value is case-sensitive. Removing group attributes is not supported, except for members. <br/><br/>The "value" for the members path must be an array of objects each containing a "value" property with the Domo user ID (for example, `[{"value": 84173534}]`). <br/><br/>The `$ref` attribute is ignored.</Note> | `PATCH /Groups/{groupID}`  |
+| Patch Group   | Partially updates a group's attributes.<br/><br/>**Note:** Unlike PATCH for users, PATCH for groups only supports the following structure: <br/>`{ "op": "Replace\|Add\|Remove", "path": "attributePath", "value": value }`.<br/><br/>`path` is always required and its value is case-sensitive. Removing group attributes is not supported, except for members.<br/><br/>`value` is optional for the `members` path in a "Remove" op. If provided, must be an array of objects each containing a "value" property with the Domo user ID (for example, `[{"value": 84173534}]`). <br/><br/>For the Remove op, if the `value` property is not provided, **all members** will be removed from the group.<br/><br/>The `$ref` attribute is ignored. | `PATCH /Groups/{groupID}`  |
 | Delete Group  | Delete a group.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          | `DELETE /Groups/{groupID}` |
 
 #### Examples
@@ -239,6 +242,47 @@ The following group endpoints are supported in Domo:
 		"domoDisplayName": "Marketing",
 		"description": "Members of the US-based marketing team."
 	}
+}
+```
+
+`PATCH /Groups/{GROUP_ID}`
+
+*This removes all members from a group*
+
+```json
+{
+	"schemas": [
+		"urn:ietf:params:scim:api:messages:2.0:PatchOp"
+	],
+	"Operations": [
+		{
+			"op": "Remove",
+			"path": "members"
+		}
+	]
+}
+```
+
+`PATCH /Groups/{GROUP_ID}`
+
+*This replaces all members of a group with those provided*
+
+```json
+{
+	"schemas": [
+		"urn:ietf:params:scim:api:messages:2.0:PatchOp"
+	],
+	"Operations": [
+		{
+			"op": "Replace",
+			"path": "members",
+			"value": [
+				{
+					"value": "1201764328"
+				}
+			]
+		}
+	]
 }
 ```
 
@@ -276,7 +320,7 @@ These schemas and their elements are mapped to various Domo user and group attri
 | **Group** | `urn:ietf:params:scim:schemas:core:2.0:User` | `groups / {value, display}`<br/>Where **value** is the ID of the group in Domo and **display** is the group name as defined in the IdP. | |
 | **Organization** | `urn:ietf:params:scim:schemas:extension:enterprise:2.0:User` | `organization` | |
 | **Manager** | `urn:ietf:params:scim:schemas:extension:enterprise:2.0:User` | `manager {value, display}`<br/>*Complex of value (Domo user ID) and display (optional, manager name, ignored by Domo).* | |
-| **All custom attributes**<Tip>**Tip:** Learn more about [Domo custom attributes](/s/article/000005164#create_a_custom_attribute).</Tip> | `urn:ietf:params:scim:schemas:extension:custom:2.0:User` | `customAttributes [{key, values}]`<br/>*Array of complex of key (the attribute key as defined in Domo) and values (the user attribute values). Values must be provided as a list of strings, regardless of the data type of the attribute or whether the attribute is single-valued or a list.* | Custom attributes must be defined in Domo before they can be populated via SCIM, and the key in the SCIM must match the attribute key in Domo exactly (case-sensitive). |
+| **All custom attributes**<Tip>**Tip:** Learn more about [Domo custom attributes](/s/article/000005164#create-a-custom-attribute).</Tip> | `urn:ietf:params:scim:schemas:extension:custom:2.0:User` | `customAttributes: [{key, values}]`<br/>*Array of complex of key (the attribute key as defined in Domo) and values (the user attribute values).* | Custom attributes must be defined in Domo before they can be populated via SCIM, and the key in the SCIM must match the attribute key in Domo exactly (case-sensitive). For example, a Domo attribute of `building` is defined:<br/><br/>**For Okta** - *External name*: `customAttributes.^[key == building].values`<br/>**For Entra** - *User attribute name*: `urn:ietf:params:scim:schemas:extension:custom:2.0:User:customAttributes[key eq "building"].value` |
 
 ### Map Group Attributes
 
@@ -286,3 +330,12 @@ These schemas and their elements are mapped to various Domo user and group attri
 | **Domo Group Display Name**<br/>The group name in Domo that is most readily accessible to Domo users and is presented to users throughout the product, such as when sharing content or viewing card ownership. | `urn:ietf:params:scim:schemas:extension:domo:2.0:Group` | `domoDisplayName` | |
 | **Description** | `urn:ietf:params:scim:schemas:extension:domo:2.0:Group` | `description` | |
 | **Group Membership** | `urn:ietf:params:scim:schemas:core:2.0:Group` | `members`<br/>*An array of complex of value (the group member Domo user ID) and display (optional, group member name, ignored by Domo).* | |
+
+### FAQs
+
+1. Why does Okta's SCIM sync for groups sometimes remove all members or change membership unexpectedly?
+		- Okta requires different groups for assignment and membership. See Okta's [support site](https://support.okta.com/help/s/article/Using-the-Same-Group-for-Application-Assignment-and-Group-Push?language=en_US) for details on this limitation.
+2. Why is Okta's SCIM sync not working reliably after pointing my Okta app at a different Domo instance?
+		- Okta stores the "external id" (ID of the user in Domo, for example) within the Okta app.
+		If the Okta app is pointed to a different Domo instance where the ID's of your users and groups are different, Okta can no longer reconcile those which may result in unexpected behavior.
+		This is a known limitation with Okta's SCIM implementation. Because of that, we recommend creating a new Okta app for each Domo instance and not changing the target instance URL after creation.

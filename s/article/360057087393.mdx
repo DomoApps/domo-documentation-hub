@@ -1,5 +1,6 @@
 ---
 title: "Creating a Recursive/Snapshot DataFlow in Magic ETL"
+excerpt: "Create a recursive or snapshot DataFlow in Magic ETL that uses its own output as input to append historical data on each run."
 ---
 
 ## Intro
@@ -8,7 +9,7 @@ A "recursive" or "snapshot" DataFlow is a DataFlow that uses itself as an input.
 
 DataFlows (both SQL and Magic ETL) cannot append data natively like Connectors. However, if you need to create a DataFlow that appends data, you can do so by running it once and then using the output as part of the input for the next run. By doing this, every time the DataFlow runs, it includes the data from before and also appends the new data onto itself.
 
-<Warning>**Important:** There are significant behavioral differences in Magic ETL. Read the [Behavior Changes and Feature Updates in Magic ETL](/s/article/360047787514) article before converting mission-critical Magic ETL DataFlows. ** Failure to do so may cause an unintended change to your DataFlow’s behavior.**</Warning>
+<Warning>**Important:** There are significant behavioral differences in Magic ETL. Read the [Behavior Changes and Feature Updates in Magic ETL](/s/article/360047787514) article before converting mission-critical Magic ETL DataFlows. ** Failure to do so may cause an unintended change to your DataFlow's behavior.**</Warning>
 
 **Video - What is a Recursive DataFlow?**
 
@@ -18,18 +19,18 @@ DataFlows (both SQL and Magic ETL) cannot append data natively like Connectors. 
 
 ### To create a recursive DataFlow in Magic ETL:
 
-1. Create and run a Magic ETL DataFlow. <img alt="1.png" src="/images/kb/0EM5w000005vOu3.png" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/> 2. Once the DataFlow has finished running, load the output DataSet as an input DataSet.  
-   The Output tile will show the output DataSet name followed by "1." <img alt="2.png" src="/images/kb/0EM5w000005vOu5.png" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/> You should now have two DataSets in the DataFlow—the updating original DataSet and the historical DataSet.  
+1. Create and run a Magic ETL DataFlow. <img alt="1.png" src="/images/kb/0EM5w000005vOu3.png" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/> 2. Once the DataFlow has finished running, load the output DataSet as an input DataSet.  
+   The Output tile will show the output DataSet name followed by "1." <img alt="2.png" src="/images/kb/0EM5w000005vOu5.png" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/> You should now have two DataSets in the DataFlow—the updating original DataSet and the historical DataSet.  
    You now need to find a column to use as a constraint. This helps determine when to replace data in your historical DataSet with new data. Constraint columns are normally ID columns or date columns or have other unique identifiers. In this example, we use the `Date` column as a constraint.
-3. Use **Select Columns** to select only the constraint column. <img alt="step3.png" src="/images/kb/0EM5w000005vOu9.png" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/> 4. Use ** Remove Duplicates** to return a unique list of constraints.  
+3. Use **Select Columns** to select only the constraint column. <img alt="step3.png" src="/images/kb/0EM5w000005vOu9.png" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/> 4. Use **Remove Duplicates** to return a unique list of constraints.  
 
      
      
 
-<img alt="7.png" src="/images/kb/0EM5w000005vOuC.png" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/> 6. Filter any rows from your DataSet where the new date column is not null.  
+<img alt="7.png" src="/images/kb/0EM5w000005vOuC.png" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/> 6. Filter any rows from your DataSet where the new date column is not null.  
    This returns only rows from the historical DataSet that do not exist in the new updating DataSet. You can do this by adding a Filter Rule or by adding a Formula Rule as shown in the examples below. <img alt="step6.png" src="/images/kb/0EM5w000005vOtp.png" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/> **Add Filter Rule:**  
    Make sure not to forget to choose how you would like the data to be handled if the data types don't match between columns that should be combined. For more information about this option you can find it here under the "Append Rows (Union)" section: [Behavior Changes and Feature Updates in Magic ETL](/s/article/360047787514). <img alt="step8.png" src="/images/kb/0EM5w000005vOto.png" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/> 9. Connect the **Append** tile to your output. Once complete, your ETL should look like the following:  
 
 ### Troubleshooting/FAQ
 
-See [DataFlow Troubleshooting](/s/article/360043427953) to see common issues and errors seen when building DataFlows.
+See [DataFlow Troubleshooting](/s/article/360043427953) to see common issues and errors seen when building DataFlows.

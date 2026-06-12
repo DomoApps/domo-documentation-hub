@@ -1,10 +1,9 @@
 ---
 title: "Magic ETL Tiles: Scripting"
+excerpt: "Use the Python Script and R Script tiles in Magic ETL to embed custom code in a DataFlow and define the output schema."
 ---
 
-import {InlineImage} from "/snippets/InlineImage.mdx";
-
-### Intro
+## Intro
 
 There are two available scripting tiles in Magic ETL: Python Script and R Script.
 
@@ -20,23 +19,20 @@ There are two available scripting tiles in Magic ETL: Python Script and R Script
 
 </Note>
 
-<Frame><img alt="Screenshot 2023-04-27 at 8.46.52 PM.png" src="/images/kb/ka0Vq0000000yCH-00N5w00000Ri7BU-0EM5w000006ub6K.jpg" style={{width: 298, height: 158}}/></Frame>
-
+<Frame><img alt="Screenshot 2023-04-27 at 8.46.52 PM.png" src="/images/kb/ka0Vq0000000yCH-00N5w00000Ri7BU-0EM5w000006ub6K.jpg"/></Frame>
 
 ---
 
-### General Information
+## General Information
 
 This section provides information about all scripting tiles in Magic ETL. For information about specific tiles, use one of the following links to jump to the API reference for that tile:
 
-* [Python Package API Reference](#python_api_reference "ETL Actions: Scripting")
-* [R Package API Reference](#r_api_reference "Scripting Actions in ETL")
+* [Python Package API Reference](#python-script-tile-module-api-reference)
+* [R Package API Reference](#r-script-tile-package-api-reference)
 
 Scripting tiles are a powerful tool within Magic ETL. They allow you to write custom R or Python algorithms and implement them directly into DataFlows. Use them to create complex data science analyses that run every time your data updates.
 
-
-
-# Take a Tour
+### Take a Tour
 
 All scripting tiles have the same look. The only difference between them is the supported language.
 
@@ -49,9 +45,9 @@ On the right side of the tile is a searchable list of input tiles currently conn
 There is a second tab on the right side of the tile called **Packages**. When you click the tab, a searchable list of available packages for the supported language is displayed. Hover over the package name for a description, or click on the arrow that appears to go to the package's documentation website. As with inputs, if you click on a package, a code snippet is injected into the script at the location of the cursor. This code snippet imports the selected library for use in the script.
 
 <Frame><img alt="scripting_actions_packages.png" src="/images/kb/ka0Vq0000000yCH-00N5w00000Ri7BU-0EM5w000005vNjL.png"/></Frame>
-On the right side of the tile editor panel toolbar is a template icon button <InlineImage src="/images/kb/ka0Vq0000000yCH-00N5w00000Ri7BU-0EM5w000005vNjg.png" />. Clicking this button resets the script to the example code template that exists when you first open a scripting tile. Be careful though—if you have already written a script, clicking this button overwrites your script (after a confirmation prompt). However, as long as you do not close the tile, you can retrieve your overwritten script by placing the cursor within the code editor and pressing Command+z or CTRL+z.
+On the right side of the tile editor panel toolbar is a template icon button <img src="/images/kb/ka0Vq0000000yCH-00N5w00000Ri7BU-0EM5w000005vNjg.png" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/>. Clicking this button resets the script to the example code template that exists when you first open a scripting tile. Be careful though—if you have already written a script, clicking this button overwrites your script (after a confirmation prompt). However, as long as you do not close the tile, you can retrieve your overwritten script by placing the cursor within the code editor and pressing Command+z or CTRL+z.
 
-In the **Schema** tab, you tell the tile what the results of your script looks like. To use this, click **Schema** in the tile editor panel toolbar. For a deep dive into this tab, see the [Populating the Resulting Schema](#populate_the_schema "Scripting Actions in ETL") section of this article.
+In the **Schema** tab, you tell the tile what the results of your script looks like. To use this, click **Schema** in the tile editor panel toolbar. For a deep dive into this tab, see the [Populating the Resulting Schema](#populate-the-resulting-schema) section of this article.
 
 <Frame><img alt="scripting_actions_schema.png" src="/images/kb/ka0Vq0000000yCH-00N5w00000Ri7BU-0EM5w000005vNjM.png"/></Frame>
 In the **Console** tab, you can see the standard out (`stdout` ) and standard error (`stderr` ) that your script produces. This tab is not available until after a preview is run on the tile, when it will appear as an option in the tile editor panel toolbar.
@@ -60,7 +56,7 @@ In the **Console** tab, you can see the standard out (`stdout` ) and standard er
 In the **Preview** tab, you can see the results of running your script. This tab also does not appear until after a preview is run. It will then appear as an option in the tile editor panel toolbar.
 
 <Frame><img alt="scripting_actions_preview.png" src="/images/kb/ka0Vq0000000yCH-00N5w00000Ri7BU-0EM5w000005vNji.png"/></Frame>
-# Get Data In and Out of the Scripting Tile
+### Get Data In and Out of the Scripting Tile
 
 Domo provides a basic API for importing data (read) from the Domo ecosystem into your script and then for exporting your results out (writing) of the script and back into the Domo ecosystem. The API is different for each scripting language and tries to follow the semantics of the language.
 
@@ -75,29 +71,21 @@ Domo provides a basic API for importing data (read) from the Domo ecosystem into
 
 The easiest way to see the specific API calls for your language is to examine the initial code template that is provided in a newly created and connected Scripting tile.
 
-
-
 #### Step 1: Import The Domo Package
 
 The first line in any script should be used for importing the language-specific Domo package into the script. This follows standard package import semantics for the chosen language. It is part of the initial code template. Alternatively, you can search for "domo" in the **Packages** list to the right of the code editor and click on the package to inject the code snippet into the editor.
-
-
 
 #### Step 2: Read Data Into The Script
 
 The next step in writing a script is getting access to the data. Each language will have its own semantic version of a Domo "read" method. This is included in the initial code template. Alternatively, you can click on one of the inputs in the input list to the right of the code editor. This injects a code snippet that reads the input data and stores it in a variable. You can rename this variable if you like.
 
-
-
 #### Step 3: Export Data Out Of The Script
 
 The last step in writing a script is returning the results to the Domo ecosystem. Each language has its own semantic version of a Domo "write" method. This is also included in the initial code template. There is no other way of injecting a code snippet for this, however. Provide the name of the variable that is storing the results of your script to this "write" method. **There can only be one export per script.**
 
-# Populate the Resulting Schema
+### Populate the Resulting Schema
 
 There are three ways to tell the tile what schema your script produces. These methods can be mixed and matched as necessary to get the proper result. You perform all of these in the **Schema** tab of the tile.
-
-
 
 #### Manually Adding the Columns
 
@@ -138,7 +126,7 @@ Follow these steps to add the columns in bulk:
 Follow these steps to have Domo run the script for you:
 
 1. Click either the
-   <InlineImage src="/images/kb/ka0Vq0000000yCH-00N5w00000Ri7BU-0EM5w000005vNjV.png" /> button on the right side of the tile editor panel toolbar or the **Run Preview** button in the toolbar at the top of the canvas. (If there is an issue with your preview, see the [Troubleshooting](#troubleshooting "Scripting Actions in ETL") section of this article.)
+   <img src="/images/kb/ka0Vq0000000yCH-00N5w00000Ri7BU-0EM5w000005vNjV.png" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/> button on the right side of the tile editor panel toolbar or the **Run Preview** button in the toolbar at the top of the canvas. (If there is an issue with your preview, see the [Troubleshooting](#troubleshooting "Scripting Actions in ETL") section of this article.)
      
    After the preview has finished running, a sentence appears under the text inputs for creating new columns. This tells you how many columns the preview returned that are not currently listed as being part of the tile's schema.
 2. Click the button at the end of the sentence.
@@ -147,11 +135,9 @@ After you populate the schema, the tile knows what the results of your script lo
 
 The columns listed in the **Schema** tab will be passed to the next tile in the DataFlow.
 
+## Configuration Steps
 
-
-### Configuration Steps
-
-If you have not done so already, check out the [Take a Tour](#take_a_tour "Scripting Actions in ETL") section of this article to become familiar with the different features of the Scripting Tile.
+If you have not done so already, check out the [Take a Tour](#take-a-tour) section of this article to become familiar with the different features of the Scripting Tile.
 
 1. Start a new Magic ETL DataFlow.
 2. Drag an
@@ -163,7 +149,7 @@ If you have not done so already, check out the [Take a Tour](#take_a_tour "Scrip
    <Frame><img alt="Python_1.png" src="/images/kb/ka0Vq0000000yCH-00N5w00000Ri7BU-0EM5w000005vNjo.png"/></Frame>
 4. (Conditional) If the editor panel is not open at the bottom of the screen, click the Scripting tile you just added to the canvas so that it is selected; the editor panel will then open.
      
-   The code editor will be auto-populated with an initial code template. For more information on what is included in the template, see [Get Data In and Out of the Scripting Tile](#get_data_in_and_out "Scripting Actions in ETL"), above. A yellow banner also displays. Ignore this for now; it will be addressed later on in the configuration steps.
+   The code editor will be auto-populated with an initial code template. For more information on what is included in the template, see [Get Data In and Out of the Scripting Tile](#get-data-in-and-out-of-the-scripting-tile), above. A yellow banner also displays. Ignore this for now; it will be addressed later on in the configuration steps.
      
    You will see that the template is pulling the data from the "Input DataSet" tile that is connected to the Scripting tile and storing it in a variable. This is the variable that your script should manipulate.
      
@@ -182,7 +168,7 @@ If you have not done so already, check out the [Take a Tour](#take_a_tour "Scrip
    1. Select the
       **Schema** tab in the toolbar of the tile editor panel.
    2. Choose one of the methods listed in the
-      [Populate the Resulting Schema](#populate_the_schema "Scripting Actions in ETL") section of this article and follow the steps there. Afterwards, continue the rest of the steps listed below.
+      [Populate the Resulting Schema](#populate-the-resulting-schema) section of this article and follow the steps there. Afterwards, continue the rest of the steps listed below.
 8. Drag an "Output DataSet" tile from the sidebar and drop it onto the canvas.
 9. Drag a connection from the Scripting tile to this new "Output DataSet" tile.
      
@@ -197,22 +183,18 @@ If you have not done so already, check out the [Take a Tour](#take_a_tour "Scrip
 
 Congratulations! You have created a DataFlow that utilizes a Scripting Tile. This is a basic configuration that only uses a single Input DataSet tile, a single Scripting tile, and a single Output DataSet tile. Don't forget that you can still use all of the classic DataFlow tiles to manipulate the data before and after your Scripting tile.
 
-
-
-### API Reference
+## API Reference
 
 domomagic is the simple API provided to both the Magic ETL Python Tile and R Tile authors, allowing them to load and unload data to and from the Python and R contexts.
 
+### Python Script Tile Module API Reference
 
-
-# Python Script Tile Module API Reference
-
-<Frame><img alt="Python_Script.png" src="/images/kb/ka0Vq0000000yCH-00N5w00000Ri7BU-0EM5w000005vNjW.png" style={{width: 104, height: 100}}/></Frame>
+<Frame><img alt="Python_Script.png" src="/images/kb/ka0Vq0000000yCH-00N5w00000Ri7BU-0EM5w000005vNjW.png"/></Frame>
 <table class="mt-responsive-table" data-aura-rendered-by="33:209;a"><thead><tr><th colspan="1" rowspan="1"><p> Method Signature </p></th><th colspan="1" rowspan="1"><p> Parameters </p></th><th colspan="1" rowspan="1"><p> Returns </p></th></tr></thead><tbody><tr><td colspan="1" rowspan="1"><p><code> read_dataframe(input_name=None) </code></p></td><td colspan="1" rowspan="1"><p><em> input_name: </em> Name of the Magic ETL input tile. Not required if only one input is available. </p></td><td colspan="1" rowspan="1"><p> A Pandas DataFrame representing the tiles input. </p></td></tr><tr><td colspan="1" rowspan="1"><p><code> write_dataframe(dataframe) </code></p></td><td colspan="1" rowspan="1"><p><em> dataframe: </em> Pandas DataFrame that will be used as the output for the Magic ETL tile. </p></td><td colspan="1" rowspan="1"> N/A </td></tr><tr><td colspan="1" rowspan="1"><code> read_array(column_name,input_name=None) </code></td><td colspan="1" rowspan="1"><em> column_name </em>: Name of the column. <br/><br/><em> input_name: </em> Name of the Magic ETL input tile. Not required if only one input is available. </td><td colspan="1" rowspan="1"> A single column from the input as a NumPy array. </td></tr><tr><td colspan="1" rowspan="1"><code> read_array_dict(input_name=None) </code></td><td colspan="1" rowspan="1"><em> input_name: </em> Name of the Magic ETL input tile. Not required if only one input is available. </td><td colspan="1" rowspan="1"> The input as an OrderedDict of column names mapping to NumPy arrays. <a id="r_api_reference" target="_blank"></a></td></tr><tr><td colspan="1" rowspan="1"><code> write_array_dict(array_dict) </code></td><td colspan="1" rowspan="1"><em> array_dict </em>: The dictionary of column names mapping to NumPy arrays as output to the Magic ETL context. The arrays must be of equal length. </td><td colspan="1" rowspan="1"> N/A </td></tr></tbody></table>
 
-# R Script Tile Package API Reference
+### R Script Tile Package API Reference
 
-<Frame><img alt="R_Script.png" src="/images/kb/ka0Vq0000000yCH-00N5w00000Ri7BU-0EM5m000005vNjD.png" style={{width: 100, height: 113}}/></Frame>
+<Frame><img alt="R_Script.png" src="/images/kb/ka0Vq0000000yCH-00N5w00000Ri7BU-0EM5m000005vNjD.png"/></Frame>
 <table border="1" cellpadding="1" cellspacing="1" data-aura-rendered-by="33:209;a"><thead><tr><th colspan="1" rowspan="1"><p> Method Signature </p></th><th colspan="1" rowspan="1"><p> Parameters </p></th><th colspan="1" rowspan="1"><p> Returns </p></th></tr></thead><tbody><tr><td colspan="1" rowspan="1"><p><code> read.dataframe(input.name =NULL, see below) </code></p></td><td colspan="1" rowspan="1"><p><code> input.name </code><em>: </em> Name of the Magic ETL input tile. Optional if only one input is available. </p></td><td colspan="1" rowspan="1"><p> The tiles input data.frame. </p></td></tr><tr><td colspan="1" rowspan="1"><p><code> write.dataframe(table) </code></p></td><td colspan="1" rowspan="1"><p><code> table </code><em>: </em> Exports a data.frame or matrix as the output for a Magic ETL tile. </p></td><td colspan="1" rowspan="1"><p> N/A </p></td></tr></tbody></table>
 
 The R Package `read.dataframe` function also supports the following parameters that allow you to customize its behavior:
@@ -223,15 +205,11 @@ The R Package `read.dataframe` function also supports the following parameters t
 
 In Magic ETL's Python and R scripting environment, you can use two special directories to store and share data between scripting tiles in a DataFlow—the Project Directory and the /tmp Directory. These directories simplify the experience of working with complex data processing tasks.
 
-
-
-### Project Directory
+## Project Directory
 
 The Project Directory is a shared space for all scripting tiles within a DataFlow, and its contents persist between executions. This means that you can store things like statistical models in the Project Directory and continue working on them across multiple executions. The Project Directory is located at /home/domo/project, but you can simply refer to it as `project` in your script. Any changes you make to the Project Directory are only saved after successful executions. Changes from preview or failed executions are discarded.
 
-The total size of a Project Directory may not exceed eight gigabytes (8 GB). Contact [Domo Support](https://domo-support.domo.com/s/) <InlineImage src="/images/kb/ka0Vq00000001FR-00N5w00000Ri7BU-0EMVq0000000XDh.jpg" /> if you need to increase this limit, restore a directory from a backup, or copy a directory from one DataFlow to another.
-
-
+The total size of a Project Directory may not exceed eight gigabytes (8 GB). Contact [Domo Support <i className="icon-arrow-square-out sm" aria-hidden="true" />](https://domo-support.domo.com/s/) if you need to increase this limit, restore a directory from a backup, or copy a directory from one DataFlow to another.
 
 #### Use Cases
 
@@ -242,26 +220,20 @@ Possible use cases for the project directory include the following:
 * **Use Case 2 —**
   Update complex calculations or aggregate statistics with new data instead of re-computing everything from the beginning when using the Input DataSet option that loads only new batches since the last successful execution.
 
-
-
 #### Set Up a Project Directory
 
 1. Create your DataFlow with the necessary scripting tiles (Python and/or R) and any required input and output DataSet tiles.
 2. In the first scripting tile, whether Python or R, write your script to process the data incrementally and save the intermediate results or models to the Project Directory.
 
-   <Frame><img alt="step 2 example proj dir.png" src="/images/kb/ka0Vq0000000yCH-00N5w00000Ri7BU-0EM5w000006ub6A.jpg" style={{width: 780, height: 433}}/></Frame>
+   <Frame><img alt="step 2 example proj dir.png" src="/images/kb/ka0Vq0000000yCH-00N5w00000Ri7BU-0EM5w000006ub6A.jpg"/></Frame>
 3. In another scripting tile, whether Python or R, read the intermediate results or models saved in the Project Directory from the previous tile and continue processing as needed.
 
-   <Frame><img alt="read intermediate results.png" src="/images/kb/ka0Vq0000000yCH-00N5w00000Ri7BU-0EM5w000006ub6F.jpg" style={{width: 790, height: 437}}/></Frame>
+   <Frame><img alt="read intermediate results.png" src="/images/kb/ka0Vq0000000yCH-00N5w00000Ri7BU-0EM5w000006ub6F.jpg"/></Frame>
 4. Save the final results or updated models to the Project Directory, if needed, and use the Output DataSet tile to store the final results.
 
-
-
-### /tmp Directory
+## /tmp Directory
 
 The /tmp directory is a shared space for all scripting tiles within a DataFlow. If you create a file in the /tmp Directory in one scripting tile, you can access it from another scripting tile within the same DataFlow. Unlike the Project Directory, the contents of the /tmp Directory are temporary and are deleted between executions of the DataFlow.
-
-
 
 #### Use Cases
 
@@ -279,22 +251,20 @@ Set Up a /tmp Directory
 1. Create your DataFlow with the necessary scripting tiles, whether Python or R, and any required input and output DataSet tiles.
 2. In the first scripting tile, write your script to process the data as needed and save the resulting data or objects to the /tmp Directory.
 
-   <Frame><img alt="step two tmp directory.png" src="/images/kb/ka0Vq0000000yCH-00N5w00000Ri7BU-0EM5w000006ub6t.jpg" style={{width: 635, height: 349}}/></Frame>
+   <Frame><img alt="step two tmp directory.png" src="/images/kb/ka0Vq0000000yCH-00N5w00000Ri7BU-0EM5w000006ub6t.jpg"/></Frame>
 3. In the second scripting tile, read the data saved in the /tmp Directory from the previous tile.
 
    <Frame><img alt="tmp second tile.png" src="/images/kb/ka0Vq0000000yCH-00N5w00000Ri7BU-0EM5w000006ub6y.jpg"/></Frame>
 4. Continue processing the data as needed, and use the Output DataSet tile to save the final results.
 
-
-
-### Troubleshooting
+## Troubleshooting
 
 * If your tile is not marked as configured after writing the script, make sure you have provided a resulting schema. See
-  [Populate the Resulting Schema](#populate_the_schema "Scripting Actions in ETL") above to learn more.
+  [Populate the Resulting Schema](#populate-the-resulting-schema) above to learn more.
 * To get feedback on the behavior of your script, run a preview. You can run a preview by selecting the
   **Preview** in the toolbar at the top of the canvas. After running a preview, a **Console** tab appears in the tile editor panel toolbar. This displays the standard out (`stdout` ) and standard error (`stderr` ) that your script produces. If the preview fails, check this console for errors.
 * If a script is failing, check that you have properly finished all three of the steps listed in the
-  [Get Data In and Out of the Scripting Tile](#get_data_in_and_out "Scripting Actions in ETL") section of this article. Check the variable name that you are writing back to Domo to make sure it is correct.
+  [Get Data In and Out of the Scripting Tile](#get-data-in-and-out-of-the-scripting-tile) section of this article. Check the variable name that you are writing back to Domo to make sure it is correct.
 * Previews run on only a sample of your DataSet. If your script requires a certain variability in data to function properly, the sample used by the preview might not meet this variability requirement. You can control the size of the preview sample by changing the
   **Row Limit** in the canvas toolbar.
 

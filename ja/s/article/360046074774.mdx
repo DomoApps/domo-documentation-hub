@@ -1,258 +1,257 @@
 ---
 title: "DataSetビューを管理する"
+excerpt: "Views Explorer と高度な SQL エディターを使って DataSet ビューを作成・編集し、フィルター・Join・集計・グループ化などでデータを探索します。"
 ---
 
-import { InlineImage } from "/snippets/InlineImage.mdx";
-
-### はじめに
+## はじめに
 
 Views ExplorerのDataSetビューを使用すると、フィルター、グループ、集計などのシンプルでありながらパワフルな方法でデータを探索できます。また、変換DataFlowを作成することなく、スプレッドシートインターフェースでデータを結合することもできます。DataSetビューはAnalyzerで使用できるため、ビジュアライゼーションの作成中にビューを作成および編集できます。DataSetビューの作成と編集は、Views Explorer内で行います。
 
-SQLに習熟しているユーザーであれば [高度なSQLエディター](#advanced_sql_editor) を使用してDataSetビューを作成できますし、 [AIアシスタント](#use_ai_to_write_query) がSQLクエリの作成を手助けしてくれます。
+SQLに習熟しているユーザーであれば [高度なSQLエディター](#高度なsqlエディター) を使用してDataSetビューを作成できますし、 AIアシスタント がSQLクエリの作成を手助けしてくれます。
 
-<Frame><img alt="dataset views interface.jpg" src="/images/kb/ka0Vq00000081QL-00N5w00000Ri7BU-0EMVq000000DmA6.jpg" style={{width: 900, height: 402}}/></Frame>
+<Frame><img alt="dataset views interface.jpg" src="/images/kb/ka0Vq00000081QL-00N5w00000Ri7BU-0EMVq000000DmA6.jpg"/></Frame>
 ---
 
 Views Explorerの使用方法と高度なSQLエディターについては、以下のトピックを参照してください。
 
 * [権限](#permissions)
-* [Views Explorerにアクセスする](#access_views_explorer)
-* [Views Explorerを使用する](#use_views_explorer)
+* [Views Explorerにアクセスする](#views-explorer)
+* [Views Explorerを使用する](#views-explorer)
 
-  + [列を追加する](#add_columns "DataSetビュー（ベータ版）")
-  + [列名を変更する](#rename_columns "DataSetビュー（ベータ版）")
-  + [列を移動する](#move_columns "DataSetビュー（ベータ版）")
-  + [計算列を追加する](#add_calculated_column "DataSetビュー（ベータ版）")
-  + [列を削除する](#remove_columns "DataSetビュー（ベータ版）")
-  + [Joinを実行する](#perform_joins "DataSetビュー（ベータ版）")
-  + [Unionを実行する](#perform_unions)
-  + [データにフィルターをかける](#filter_data "DataSetビュー（ベータ版）")
-  + [データをグループ化する](#group_data "DataSetビュー（ベータ版）")
-  + [データをソートする](#sort_data "DataSetビュー（ベータ版）")
-  + [データを制限する](#limit_data "DataSetビュー（ベータ版）")
-  + [DataSetの提案](#dataset_suggestions)
-  + [バージョン履歴](#version_history)
-  + [コントロールを変更する](#change_controls)
-  + [DataSetビューを保存する](#save_dataset_view "DataSetビュー（ベータ版）")
-  + [DataSetビューをエクスポートする](#export_view)
-* [AIアシスタントを使用した高度なSQLエディター](#advanced_sql_editor)
-  + [高度なSQLエディターを使用する](#advanced_sql_editor)
-  + [AIアシスタントを使用してクエリを記述する](#use_ai_to_write_query)
+  + 列を追加する
+  + 列名を変更する
+  + 列を移動する
+  + 計算列を追加する
+  + 列を削除する
+  + Joinを実行する
+  + Unionを実行する
+  + データにフィルターをかける
+  + データをグループ化する
+  + データをソートする
+  + データを制限する
+  + [DataSetの提案](#dataset)
+  + バージョン履歴
+  + コントロールを変更する
+  + [DataSetビューを保存する](#datasetビューのコントロール)
+  + DataSetビューをエクスポートする
+* [AIアシスタントを使用した高度なSQLエディター](#高度なsqlエディター)
+  + [高度なSQLエディターを使用する](#高度なsqlエディター)
+  + AIアシスタントを使用してクエリを記述する
 * [よくある質問](#faq)
   + [一般](#general)
-  + [AIアシスタントを使用した高度なSQLエディター](#advanced_sql_editor_faq)
+  + [AIアシスタントを使用した高度なSQLエディター](#高度なsqlエディター)
 * [動画 — DataSet Views Explorerの概要](#video)
 
 ---
 
-### 権限
+## 権限
 
 権限は以下の通りです。
 
 * **DataSetビュー —** 管理者または「DataSetを編集」または「DataSetを管理」の許可が有効な権限を持つユーザーは、DataSetビューを使用できます。詳細については、「 [カスタマイズされた権限を管理する](/s/article/360043438973) 」を参照してください。
 * **高度なSQLエディターとAIアシスタント —** 高度なSQLエディターは、DataSetビューへの編集権限を持つすべてのユーザーが利用できます。AIアシスタントは、 「AIサービスを利用する」の許可が有効な権限を持つユーザーに限定されます。
 
-### Views Explorerにアクセスする
+## Views Explorerにアクセスする
 
 Views ExplorerにはData Centerからアクセスする方法とAnalyzer内からアクセスする方法の2通りがあります。AnalyzerでDataSetビューを使用する方法については、 [こちら](/s/article/4402058407191) を参照してください。
 
 Data CenterからViews Explorerにアクセスするには、DataSetビューの作成に使用するDataSetを見つけて選択し、 **［トップページ］** タブを開いて表示します。
 
-<Frame><img alt="select open with.jpg" src="/images/kb/ka0Vq00000081QL-00N5w00000Ri7BU-0EMVq000000Cs9V.jpg" style={{width: 902, height: 321}}/></Frame>
+<Frame><img alt="select open with.jpg" src="/images/kb/ka0Vq00000081QL-00N5w00000Ri7BU-0EMVq000000Cs9V.jpg"/></Frame>
 **［開く：］** > **［Views Explorer］** を選択します。
 
-<Frame><img alt="views explorer.jpg" src="/images/kb/ka0Vq00000081QL-00N5w00000Ri7BU-0EMVq000000CrqA.jpg" style={{width: 550, height: 362}}/></Frame>
-### Views Explorerを使用する
+<Frame><img alt="views explorer.jpg" src="/images/kb/ka0Vq00000081QL-00N5w00000Ri7BU-0EMVq000000CrqA.jpg"/></Frame>
+## Views Explorerを使用する
 
 Views Explorerを使用すると、DataSet内のすべての行を表示したり、設定された数の行をサンプリングして、各行の変更が表示されるのを待つことなく、変更をよりすばやく表示したりできます。
 
 Views Explorerの上部ナビゲーションからサンプルプレビューを設定するには、 **［データのプレビュー］** > **［サンプリング］** を選択します。次に、サンプルサイズとして行数を入力します。
 
 <Columns>
-  <Frame><img alt="Screenshot 2024-01-23 at 2.54.18 PM.png" src="/images/kb/ka0Vq00000081QL-00N5w00000Ri7BU-0EMVq000000F4Hp.jpg" style={{width: 500, height: 194}}/></Frame>
-  <Frame><img alt="Screenshot 2024-01-23 at 2.58.52 PM.png" src="/images/kb/ka0Vq00000081QL-00N5w00000Ri7BU-0EMVq000000F4JR.jpg" style={{width: 249, height: 243}}/></Frame>
+  <Frame><img alt="Screenshot 2024-01-23 at 2.54.18 PM.png" src="/images/kb/ka0Vq00000081QL-00N5w00000Ri7BU-0EMVq000000F4Hp.jpg"/></Frame>
+  <Frame><img alt="Screenshot 2024-01-23 at 2.58.52 PM.png" src="/images/kb/ka0Vq00000081QL-00N5w00000Ri7BU-0EMVq000000F4JR.jpg"/></Frame>
 </Columns>
 #### 外観のコントロール
 
-ビューの上部リボンの <InlineImage src="/images/kb/ja/ka0Vq0000008bqQ-00N5w00000Ri7BU-0EMVq000000F49m.jpg" /> **コントロール** を選択すると、テキストの表示方法としてデフォルトまたはモノスペースを選択し、NULL値と小数を処理する方法を選択できます。
+ビューの上部リボンの <img src="/images/kb/ja/ka0Vq0000008bqQ-00N5w00000Ri7BU-0EMVq000000F49m.jpg" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/> **コントロール** を選択すると、テキストの表示方法としてデフォルトまたはモノスペースを選択し、NULL値と小数を処理する方法を選択できます。
 
-<Frame><img alt="Screenshot 2024-01-23 at 3.13.23 PM.png" src="/images/kb/ka0Vq00000081QL-00N5w00000Ri7BU-0EMVq000000F4o5.jpg" style={{width: 250, height: 308}}/></Frame>
+<Frame><img alt="Screenshot 2024-01-23 at 3.13.23 PM.png" src="/images/kb/ka0Vq00000081QL-00N5w00000Ri7BU-0EMVq000000F4o5.jpg"/></Frame>
 <Note>
   **NULL値：** デフォルトでは、NULL値は空白として表示されます。DataSetビューでNULL値の処理として **［高度な］** を選択すると、NULL値は列に「null」として表示されます。
 
-  <Frame><img alt="null values.jpg" src="/images/kb/ka0Vq00000081QL-00N5w00000Ri7BU-0EMVq000001qJ1B.jpg" style={{width: 701, height: 232}}/></Frame>
+  <Frame><img alt="null values.jpg" src="/images/kb/ka0Vq00000081QL-00N5w00000Ri7BU-0EMVq000001qJ1B.jpg"/></Frame>
 </Note>
 
 Views Explorerの使用方法については、以下のトピックを参照してください。
 
 ###### 列
 
-* [列を追加する](#add_columns "DataSetビュー（ベータ版）")
-* [列名を変更する](#rename_columns "DataSetビュー（ベータ版）")
-* [列を移動する](#move_columns "DataSetビュー（ベータ版）")
-* [計算列を追加する](#add_calculated_column "DataSetビュー（ベータ版）")
-* [列を削除する](#remove_columns "DataSetビュー（ベータ版）")
+* 列を追加する
+* 列名を変更する
+* 列を移動する
+* 計算列を追加する
+* 列を削除する
 
 ###### JoinとUnion
 
-* [Joinを実行する](#perform_joins "DataSetビュー（ベータ版）")
-* [Unionを実行する](#h_01F89DQC4EXKVWE52B3RYCF8TN)
+* Joinを実行する
+* Unionを実行する
 
 ###### フィルターとソート
 
-* [データにフィルターをかける](#filter_data "DataSetビュー（ベータ版）")
-* [データをグループ化する](#group_data "DataSetビュー（ベータ版）")
-* [データをソートする](#sort_data "DataSetビュー（ベータ版）")
-* [データを制限する](#limit_data "DataSetビュー（ベータ版）")
-* [DataSetの提案](#dataset_suggestions)
+* データにフィルターをかける
+* データをグループ化する
+* データをソートする
+* データを制限する
+* [DataSetの提案](#dataset)
 
 ###### DataSetビューのコントロール
 
-* [バージョン履歴](#version_history)
-* [コントロールを変更する](#change_controls)
-* [DataSetビューを保存する](#save_dataset_view "DataSetビュー（ベータ版）")
-* [DataSetビューをエクスポートする](#export_view)
+* バージョン履歴
+* コントロールを変更する
+* [DataSetビューを保存する](#datasetビューのコントロール)
+* DataSetビューをエクスポートする
 
-# 列を追加する
+### 列を追加する
 
 DataSetビューに1つ以上の列の複製を追加したいこともあるでしょう。これを行うには、列を追加します。
 
-DataSetビューに列を追加するには、 **［列を追加］** を選択します（または <InlineImage src="/images/kb/ja/ka0Vq0000008bqQ-00N5w00000Ri7BU-0EMVq000000Ct5Z.jpg" /> **追加** にマウスポインターを合わせて、 **［列を追加］** を選択します）。
+DataSetビューに列を追加するには、 **［列を追加］** を選択します（または <img src="/images/kb/ja/ka0Vq0000008bqQ-00N5w00000Ri7BU-0EMVq000000Ct5Z.jpg" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/> **追加** にマウスポインターを合わせて、 **［列を追加］** を選択します）。
 
 <Columns>
-  <Frame><img alt="add column small.jpg" src="/images/kb/ka0Vq00000081QL-00N5w00000Ri7BU-0EMVq000000Ct7B.jpg" style={{width: 901, height: 437}}/></Frame>
-  <Frame><img alt="add column.jpg" src="/images/kb/ka0Vq00000081QL-00N5w00000Ri7BU-0EMVq000000CtAP.jpg" style={{width: 900, height: 419}}/></Frame>
+  <Frame><img alt="add column small.jpg" src="/images/kb/ka0Vq00000081QL-00N5w00000Ri7BU-0EMVq000000Ct7B.jpg"/></Frame>
+  <Frame><img alt="add column.jpg" src="/images/kb/ka0Vq00000081QL-00N5w00000Ri7BU-0EMVq000000CtAP.jpg"/></Frame>
 </Columns>
 **［列を追加］** パネルがViews Explorerの右側に表示されます。
 
-<Frame><img alt="add column panel.jpg" src="/images/kb/ka0Vq00000081QL-00N5w00000Ri7BU-0EMVq000000CtDd.jpg" style={{width: 897, height: 601}}/></Frame>
+<Frame><img alt="add column panel.jpg" src="/images/kb/ka0Vq00000081QL-00N5w00000Ri7BU-0EMVq000000CtDd.jpg"/></Frame>
 検索ツールを使用して複製する列を見つけたり、各列のチェックボックスをオンにしたりできます。すべての列を選択する場合は、 **［xx列］** チェックボックスをオンにします。
 
-<Frame><img alt="search and select.jpg" src="/images/kb/ka0Vq00000081QL-00N5w00000Ri7BU-0EMVq000000CwzV.jpg" style={{width: 300, height: 676}}/></Frame>
+<Frame><img alt="search and select.jpg" src="/images/kb/ka0Vq00000081QL-00N5w00000Ri7BU-0EMVq000000CwzV.jpg"/></Frame>
 複製する列をすべて選択したら、 **［xx列を追加］** を選択します。
 
-<Frame><img alt="add xx columns.jpg" src="/images/kb/ka0Vq00000081QL-00N5w00000Ri7BU-0EMVq000000Cx4L.jpg" style={{width: 301, height: 672}}/></Frame>
+<Frame><img alt="add xx columns.jpg" src="/images/kb/ka0Vq00000081QL-00N5w00000Ri7BU-0EMVq000000Cx4L.jpg"/></Frame>
 複製された列は、同じ名前の元の列の横に表示されます。同じタイトルと数字は斜体で表示されます。列の元のバージョンは0（表示されません）で、複製バージョンは1から始まります。
 
-<Frame><img alt="duplicated column.jpg" src="/images/kb/ka0Vq00000081QL-00N5w00000Ri7BU-0EMVq000000Cx7Z.jpg" style={{width: 349, height: 504}}/></Frame>
-# 列名を変更する
+<Frame><img alt="duplicated column.jpg" src="/images/kb/ka0Vq00000081QL-00N5w00000Ri7BU-0EMVq000000Cx7Z.jpg"/></Frame>
+### 列名を変更する
 
-列名を変更するには、列名にマウスポインターを合わせて、 <InlineImage src="/images/kb/ja/ka0Vq0000008bqQ-00N5w00000Ri7BU-0EMVq000000CxE1.jpg" /> **編集** アイコンを表示します。次に、名前をクリックしてフィールドを編集可能にします。フィールドの外側をクリックして、変更を保存します。
+列名を変更するには、列名にマウスポインターを合わせて、 <img src="/images/kb/ja/ka0Vq0000008bqQ-00N5w00000Ri7BU-0EMVq000000CxE1.jpg" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/> **編集** アイコンを表示します。次に、名前をクリックしてフィールドを編集可能にします。フィールドの外側をクリックして、変更を保存します。
 
-<Frame><img alt="Screenshot 2024-01-16 at 4.03.09 PM.png" src="/images/kb/ka0Vq00000081QL-00N5w00000Ri7BU-0EMVq000000CxHF.jpg" style={{width: 320, height: 96}}/></Frame>
-# 列を移動する
+<Frame><img alt="Screenshot 2024-01-16 at 4.03.09 PM.png" src="/images/kb/ka0Vq00000081QL-00N5w00000Ri7BU-0EMVq000000CxHF.jpg"/></Frame>
+### 列を移動する
 
 左側パネルの列を並べ替えるには、ハンドルを使用して列を正しい順序にドラッグします。
 
-<Frame><img alt="reorder columns.jpg" src="/images/kb/ka0Vq00000081QL-00N5w00000Ri7BU-0EMVq000000CxPJ.jpg" style={{width: 301, height: 477}}/></Frame>
-# 計算列を追加する
+<Frame><img alt="reorder columns.jpg" src="/images/kb/ka0Vq00000081QL-00N5w00000Ri7BU-0EMVq000000CxPJ.jpg"/></Frame>
+### 計算列を追加する
 
-新しい計算列をDataSetビューに追加するには、 [［列を追加］パネル](#add_columns) を開いて **［計算列を作成］** を選択します。
+新しい計算列をDataSetビューに追加するには、 ［列を追加］パネル を開いて **［計算列を作成］** を選択します。
 
-<Frame><img alt="create calc column.jpg" src="/images/kb/ka0Vq00000081QL-00N5w00000Ri7BU-0EMVq000000CxQv.jpg" style={{width: 300, height: 676}}/></Frame>
+<Frame><img alt="create calc column.jpg" src="/images/kb/ka0Vq00000081QL-00N5w00000Ri7BU-0EMVq000000CxQv.jpg"/></Frame>
 **計算列エディター** が表示されます。
 
-<Frame><img alt="Screenshot 2024-01-16 at 4.12.13 PM.png" src="/images/kb/ka0Vq00000081QL-00N5w00000Ri7BU-0EMVq000000CxSX.jpg" style={{width: 901, height: 543}}/></Frame>
+<Frame><img alt="Screenshot 2024-01-16 at 4.12.13 PM.png" src="/images/kb/ka0Vq00000081QL-00N5w00000Ri7BU-0EMVq000000CxSX.jpg"/></Frame>
 エディターの **スクリプト** フィールドに計算を入力します。
 
 計算の記述が完了したら、 **［計算列を作成］** を選択します。これにより、Views Explorerで自動的に新しい計算列がDataSetに追加されます。計算列をDataSetに保存するには、DataSetを新しいDataSetビューとして保存する必要があります。
 
-<Frame><img alt="create calc field.jpg" src="/images/kb/ka0Vq00000081QL-00N5w00000Ri7BU-0EMVq000000CwQ3.jpg" style={{width: 902, height: 543}}/></Frame>
-# 列を削除する
+<Frame><img alt="create calc field.jpg" src="/images/kb/ka0Vq00000081QL-00N5w00000Ri7BU-0EMVq000000CwQ3.jpg"/></Frame>
+### 列を削除する
 
-列を削除するには、 <InlineImage src="/images/kb/ja/ka0Vq0000008bqQ-00N5w00000Ri7BU-0EMVq000000Cxdp.jpg" /> 列の三点メニューを選択して **［外す］** を選択します。複数の列を削除するには、左側の列から **［すべて選択］** オプションを選択して［削除］アイコンを選択することもできます。
+列を削除するには、 <img src="/images/kb/ja/ka0Vq0000008bqQ-00N5w00000Ri7BU-0EMVq000000Cxdp.jpg" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/> 列の三点メニューを選択して **［外す］** を選択します。複数の列を削除するには、左側の列から **［すべて選択］** オプションを選択して［削除］アイコンを選択することもできます。
 
-<Frame><img alt="remove column.jpg" src="/images/kb/ka0Vq00000081QL-00N5w00000Ri7BU-0EMVq000000CxfR.jpg" style={{width: 301, height: 504}}/></Frame>
+<Frame><img alt="remove column.jpg" src="/images/kb/ka0Vq00000081QL-00N5w00000Ri7BU-0EMVq000000CxfR.jpg"/></Frame>
 #### 一括削除
 
 複数の列を同時に削除するには、削除する列のチェックボックスをオンにして、 **［削除］** を選択します。
 
-<Frame><img alt="bulk removal columns.jpg" src="/images/kb/ka0Vq00000081QL-00N5w00000Ri7BU-0EMVq000000CxkH.jpg" style={{width: 300, height: 642}}/></Frame>
-# Joinを実行する
+<Frame><img alt="bulk removal columns.jpg" src="/images/kb/ka0Vq00000081QL-00N5w00000Ri7BU-0EMVq000000CxkH.jpg"/></Frame>
+### Joinを実行する
 
 Views ExplorerでDataSetをJoinするには、左側パネルを［DataSet］に切り替えます。
 
-<Frame><img alt="toggle dataset column.jpg" src="/images/kb/ka0Vq00000081QL-00N5w00000Ri7BU-0EMVq000000Cxqj.jpg" style={{width: 301, height: 245}}/></Frame>
+<Frame><img alt="toggle dataset column.jpg" src="/images/kb/ka0Vq00000081QL-00N5w00000Ri7BU-0EMVq000000Cxqj.jpg"/></Frame>
 **［+** **JOINを追加］** を選択して、 **［新規DataSetを結合］** モーダルを表示します。
 
 <Columns>
-  <Frame><img alt="add join.jpg" src="/images/kb/ka0Vq00000081QL-00N5w00000Ri7BU-0EMVq000000Cxp7.jpg" style={{width: 301, height: 245}}/></Frame>
-  <Frame><img alt="Screenshot 2024-01-16 at 4.39.16 PM.png" src="/images/kb/ka0Vq00000081QL-00N5w00000Ri7BU-0EMVq000000CxsL.jpg" style={{width: 499, height: 395}}/></Frame>
+  <Frame><img alt="add join.jpg" src="/images/kb/ka0Vq00000081QL-00N5w00000Ri7BU-0EMVq000000Cxp7.jpg"/></Frame>
+  <Frame><img alt="Screenshot 2024-01-16 at 4.39.16 PM.png" src="/images/kb/ka0Vq00000081QL-00N5w00000Ri7BU-0EMVq000000CxsL.jpg"/></Frame>
 </Columns>
 JoinするDataSetを選択し、両方のDataSetから結合キーとして使用する列を選択します。複数の結合キーを設定する場合は、 **［+キーを追加］** を選択します。
 
-<Frame><img alt="Screenshot 2024-01-16 at 4.42.51 PM.png" src="/images/kb/ka0Vq00000081QL-00N5w00000Ri7BU-0EMVq000000CxxB.jpg" style={{width: 500, height: 427}}/></Frame>
+<Frame><img alt="Screenshot 2024-01-16 at 4.42.51 PM.png" src="/images/kb/ka0Vq00000081QL-00N5w00000Ri7BU-0EMVq000000CxxB.jpg"/></Frame>
 DataSetの結合タイプ（左、右、内側の結合）を選択し、 **［列を選択］** を選択します。
 
-<Frame><img alt="select columns.jpg" src="/images/kb/ka0Vq00000081QL-00N5w00000Ri7BU-0EMVq000000Cxyn.jpg" style={{width: 501, height: 434}}/></Frame>
+<Frame><img alt="select columns.jpg" src="/images/kb/ka0Vq00000081QL-00N5w00000Ri7BU-0EMVq000000Cxyn.jpg"/></Frame>
 JoinしたDataSetに含める両方のDataSetの列を選択します。Join設定を変更するには、 **［結合の設定を編集］** を選択します。
 
-<Frame><img alt="edit join configuration.jpg" src="/images/kb/ka0Vq00000081QL-00N5w00000Ri7BU-0EMVq000000Cy3d.jpg" style={{width: 500, height: 524}}/></Frame>
+<Frame><img alt="edit join configuration.jpg" src="/images/kb/ka0Vq00000081QL-00N5w00000Ri7BU-0EMVq000000Cy3d.jpg"/></Frame>
 含める列を選択したら、 **［保存］** を選択します。
 
-<Frame><img alt="save join.jpg" src="/images/kb/ka0Vq00000081QL-00N5w00000Ri7BU-0EMVq000000Cy5F.jpg" style={{width: 504, height: 528}}/></Frame>
+<Frame><img alt="save join.jpg" src="/images/kb/ka0Vq00000081QL-00N5w00000Ri7BU-0EMVq000000Cy5F.jpg"/></Frame>
 JoinしたDataSetが、Views Explorerの左側パネルの **［DataSet］** 側に表示されます。
 
-<Frame><img alt="Screenshot 2024-01-16 at 4.53.50 PM.png" src="/images/kb/ka0Vq00000081QL-00N5w00000Ri7BU-0EMVq000000Cy6r.jpg" style={{width: 348, height: 341}}/></Frame>
-# Unionを実行する
+<Frame><img alt="Screenshot 2024-01-16 at 4.53.50 PM.png" src="/images/kb/ka0Vq00000081QL-00N5w00000Ri7BU-0EMVq000000Cy6r.jpg"/></Frame>
+### Unionを実行する
 
 Views Explorerを使用してDataSetをUnionするには、左側パネルを［DataSet］に切り替えます。次に、 **［UNIONを追加］** ボタンを選択します。
 
-<Frame><img alt="toggle dataset column.jpg" src="/images/kb/ka0Vq00000081QL-00N5w00000Ri7BU-0EMVq000000Cxqj.jpg" style={{width: 301, height: 245}}/></Frame>
+<Frame><img alt="toggle dataset column.jpg" src="/images/kb/ka0Vq00000081QL-00N5w00000Ri7BU-0EMVq000000Cxqj.jpg"/></Frame>
 **［+UNIONを追加］** を選択して、 **［Unionの設定］** モーダルを表示します。
 
-<Frame><img alt="add union.jpg" src="/images/kb/ka0Vq00000081QL-00N5w00000Ri7BU-0EMVq000000DqYg.jpg" style={{width: 297, height: 242}}/></Frame>
+<Frame><img alt="add union.jpg" src="/images/kb/ka0Vq00000081QL-00N5w00000Ri7BU-0EMVq000000DqYg.jpg"/></Frame>
 モーダルで、 **［+ソースを追加］** を選択し、UnionするDataSetを選択して、 **［保存］** を選択します。
 
-<Frame><img alt="add source.jpg" src="/images/kb/ka0Vq00000081QL-00N5w00000Ri7BU-0EMVq000000F04X.jpg" style={{width: 700, height: 562}}/></Frame>
+<Frame><img alt="add source.jpg" src="/images/kb/ka0Vq00000081QL-00N5w00000Ri7BU-0EMVq000000F04X.jpg"/></Frame>
 <Note>
-  **注記：** Unionが正しく動作するには、すべてのDataSetに同じ列が含まれている必要があります。異なる複数の列がDataSetに含まれている場合は、Unionではなく [Join](#perform_joins) を実行することを推奨します。
+  **注記：** Unionが正しく動作するには、すべてのDataSetに同じ列が含まれている必要があります。異なる複数の列がDataSetに含まれている場合は、Unionではなく Join を実行することを推奨します。
 
 </Note>
 
-<Frame><img alt="save union config.jpg" src="/images/kb/ka0Vq00000081QL-00N5w00000Ri7BU-0EMVq000000Dqf7.jpg" style={{width: 700, height: 539}}/></Frame>
-### — | —
+<Frame><img alt="save union config.jpg" src="/images/kb/ka0Vq00000081QL-00N5w00000Ri7BU-0EMVq000000Dqf7.jpg"/></Frame>
+## — | —
 
-# データにフィルターをかける
+### データにフィルターをかける
 
 ビュー内の列にフィルターをかけるには、ビューの上部の **［+フィルター］** オプションを使用します。
 
-<Frame><img alt="add filter.jpg" src="/images/kb/ka0Vq00000081QL-00N5w00000Ri7BU-0EMVq000000F1iA.jpg" style={{width: 900, height: 444}}/></Frame>
+<Frame><img alt="add filter.jpg" src="/images/kb/ka0Vq00000081QL-00N5w00000Ri7BU-0EMVq000000F1iA.jpg"/></Frame>
 フィルターを選択する際には、選択された列を表示するか、フィルターで利用可能な列を表示するかを切り替えることができます。
 
 <Columns>
-  <Frame><img alt="view available columns.jpg" src="/images/kb/ka0Vq00000081QL-00N5w00000Ri7BU-0EMVq000000F1jl.jpg" style={{width: 202, height: 377}}/></Frame>
-  <Frame><img alt="view selected columns.jpg" src="/images/kb/ka0Vq00000081QL-00N5w00000Ri7BU-0EMVq000000F1NC.jpg" style={{width: 197, height: 369}}/></Frame>
+  <Frame><img alt="view available columns.jpg" src="/images/kb/ka0Vq00000081QL-00N5w00000Ri7BU-0EMVq000000F1jl.jpg"/></Frame>
+  <Frame><img alt="view selected columns.jpg" src="/images/kb/ka0Vq00000081QL-00N5w00000Ri7BU-0EMVq000000F1NC.jpg"/></Frame>
 </Columns>
 1つのフィルターを設定したら、 **［+フィルター］** を再度選択し、 **［+フィルターを追加］** を選択することで、別のフィルターを追加できます。
 
-<Frame><img alt="add filter again.jpg" src="/images/kb/ka0Vq00000081QL-00N5w00000Ri7BU-0EMVq000000F2BB.jpg" style={{width: 400, height: 292}}/></Frame>
-フィルターを削除するには、 <InlineImage src="/images/kb/ja/ka0Vq0000008bqQ-00N5w00000Ri7BU-0EMVq000000F2Cn.jpg" /> **削除** を選択します。
+<Frame><img alt="add filter again.jpg" src="/images/kb/ka0Vq00000081QL-00N5w00000Ri7BU-0EMVq000000F2BB.jpg"/></Frame>
+フィルターを削除するには、 <img src="/images/kb/ja/ka0Vq0000008bqQ-00N5w00000Ri7BU-0EMVq000000F2Cn.jpg" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/> **削除** を選択します。
 
-<Frame><img alt="remove filter.jpg" src="/images/kb/ka0Vq00000081QL-00N5w00000Ri7BU-0EMVq000000F1lO.jpg" style={{width: 350, height: 336}}/></Frame>
-### — | —
+<Frame><img alt="remove filter.jpg" src="/images/kb/ka0Vq00000081QL-00N5w00000Ri7BU-0EMVq000000F1lO.jpg"/></Frame>
+## — | —
 
-# データをグループ化する
+### データをグループ化する
 
 データをグループ化すると、目的の列と集計のみを表示して、選択したカテゴリーのデータを要約することができます。データをグループ化するには、ビューの上部の **［+グループ］** を選択します。
 
-<Frame><img alt="group by.jpg" src="/images/kb/ka0Vq00000081QL-00N5w00000Ri7BU-0EMVq000000F1qE.jpg" style={{width: 900, height: 545}}/></Frame>
+<Frame><img alt="group by.jpg" src="/images/kb/ka0Vq00000081QL-00N5w00000Ri7BU-0EMVq000000F1qE.jpg"/></Frame>
 **［グループ化を設定］** モーダルで、目的の列を **［カテゴリ］** セクションにドラッグします。
 
-<Frame><img alt="categories in modal.jpg" src="/images/kb/ka0Vq00000081QL-00N5w00000Ri7BU-0EMVq000000F237.jpg" style={{width: 701, height: 447}}/></Frame>
+<Frame><img alt="categories in modal.jpg" src="/images/kb/ka0Vq00000081QL-00N5w00000Ri7BU-0EMVq000000F237.jpg"/></Frame>
 集計する列を **［集計］** セクションにドラッグします。
 
-<Frame><img alt="aggregations in modal.jpg" src="/images/kb/ka0Vq00000081QL-00N5w00000Ri7BU-0EMVq000000F26L.jpg" style={{width: 700, height: 439}}/></Frame>
+<Frame><img alt="aggregations in modal.jpg" src="/images/kb/ka0Vq00000081QL-00N5w00000Ri7BU-0EMVq000000F26L.jpg"/></Frame>
 カテゴリーと集計を選択したら、集計を設定できます。この例では、集計のカウントを設定しています。
 
-<Frame><img alt="aggregation count.jpg" src="/images/kb/ka0Vq00000081QL-00N5w00000Ri7BU-0EMVq000000F2G1.jpg" style={{width: 700, height: 491}}/></Frame>
+<Frame><img alt="aggregation count.jpg" src="/images/kb/ka0Vq00000081QL-00N5w00000Ri7BU-0EMVq000000F2G1.jpg"/></Frame>
 完了したら、 **［終了］** を選択してモーダルを閉じます。
 
-<Frame><img alt="finish group.jpg" src="/images/kb/ka0Vq00000081QL-00N5w00000Ri7BU-0EMVq000000F1S2.jpg" style={{width: 700, height: 662}}/></Frame>
+<Frame><img alt="finish group.jpg" src="/images/kb/ka0Vq00000081QL-00N5w00000Ri7BU-0EMVq000000F1S2.jpg"/></Frame>
 ビューからグループ化の条件を削除するには、 **［グループ化を設定］** モーダルを開いて、 **［グループ化を削除］** を選択します。
 
-<Frame><img alt="remove group by.jpg" src="/images/kb/ka0Vq00000081QL-00N5w00000Ri7BU-0EMVq000000F2Kr.jpg" style={{width: 700, height: 662}}/></Frame>
-# データをソートする
+<Frame><img alt="remove group by.jpg" src="/images/kb/ka0Vq00000081QL-00N5w00000Ri7BU-0EMVq000000F2Kr.jpg"/></Frame>
+### データをソートする
 
 データタイプに応じて、以下の方法でデータをソートすることができます。
 
@@ -262,14 +261,14 @@ Views Explorerを使用してDataSetをUnionするには、左側パネルを［
 
 データをソートするには、ビューの上部の **［+ソート］** を選択します。 **［+ソートを追加］** を選択します。
 
-<Frame><img alt="Screenshot 2024-01-23 at 1.54.13 PM.png" src="/images/kb/ka0Vq00000081QL-00N5w00000Ri7BU-0EMVq000000F2Sv.jpg" style={{width: 501, height: 252}}/></Frame>
+<Frame><img alt="Screenshot 2024-01-23 at 1.54.13 PM.png" src="/images/kb/ka0Vq00000081QL-00N5w00000Ri7BU-0EMVq000000F2Sv.jpg"/></Frame>
 複数のソート条件を追加したり、ハンドルを使用してドラッグすることで、適用方法を変更したりできます。
 
-<Frame><img alt="reorder sorts.jpg" src="/images/kb/ka0Vq00000081QL-00N5w00000Ri7BU-0EMVq000000F2ZN.jpg" style={{width: 601, height: 283}}/></Frame>
+<Frame><img alt="reorder sorts.jpg" src="/images/kb/ka0Vq00000081QL-00N5w00000Ri7BU-0EMVq000000F2ZN.jpg"/></Frame>
 ソートを削除するには、 **［削除］** を選択します。
 
-<Frame><img alt="remove sort.jpg" src="/images/kb/ka0Vq00000081QL-00N5w00000Ri7BU-0EMVq000000F2cb.jpg" style={{width: 601, height: 283}}/></Frame>
-# データを制限する
+<Frame><img alt="remove sort.jpg" src="/images/kb/ka0Vq00000081QL-00N5w00000Ri7BU-0EMVq000000F2cb.jpg"/></Frame>
+### データを制限する
 
 データを制限するとは、DataSetが、選択された行数のみを、選択されたソートのルールでソートして返すことを意味します。データの行数を制限するには、 **［+制限］** を選択し、DataSetに含める行数を追加します。
 
@@ -277,43 +276,43 @@ Views Explorerを使用してDataSetをUnionするには、左側パネルを［
 
 **［適用］** を選択して、ビューに反映された変更を確認します。
 
-<Frame><img alt="Screenshot 2024-01-23 at 2.02.54 PM.png" src="/images/kb/ka0Vq00000081QL-00N5w00000Ri7BU-0EMVq000000F2mH.jpg" style={{width: 500, height: 413}}/></Frame>
-# DataSetの提案
+<Frame><img alt="Screenshot 2024-01-23 at 2.02.54 PM.png" src="/images/kb/ka0Vq00000081QL-00N5w00000Ri7BU-0EMVq000000F2mH.jpg"/></Frame>
+### DataSetの提案
 
-ビューの上部リボンの <InlineImage src="/images/kb/ja/ka0Vq0000008bqQ-00N5w00000Ri7BU-0EMVq000000F4JS.jpg" /> **DataSetの提案** ツールを使用すると、外れ値や定数値などのアイテムをビューで確認し、フィルターで除外したり、削除したりできます。
+ビューの上部リボンの <img src="/images/kb/ja/ka0Vq0000008bqQ-00N5w00000Ri7BU-0EMVq000000F4JS.jpg" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/> **DataSetの提案** ツールを使用すると、外れ値や定数値などのアイテムをビューで確認し、フィルターで除外したり、削除したりできます。
 
-<Frame><img alt="Screenshot 2024-01-23 at 3.10.03 PM.png" src="/images/kb/ka0Vq00000081QL-00N5w00000Ri7BU-0EMVq000000F30o.jpg" style={{width: 350, height: 455}}/></Frame>
-# バージョン履歴
+<Frame><img alt="Screenshot 2024-01-23 at 3.10.03 PM.png" src="/images/kb/ka0Vq00000081QL-00N5w00000Ri7BU-0EMVq000000F30o.jpg"/></Frame>
+### バージョン履歴
 
-以前のバージョンのDataSetビューに戻るには、バージョン履歴を使用します。ビューの上部リボンで、 <InlineImage src="/images/kb/ja/ka0Vq0000008bqQ-00N5w00000Ri7BU-0EMVq000000F4Uj.jpg" /> **履歴** を選択して **［履歴］** パネルを開きます。
+以前のバージョンのDataSetビューに戻るには、バージョン履歴を使用します。ビューの上部リボンで、 <img src="/images/kb/ja/ka0Vq0000008bqQ-00N5w00000Ri7BU-0EMVq000000F4Uj.jpg" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/> **履歴** を選択して **［履歴］** パネルを開きます。
 
 復元するバージョンを見つけて選択します。
 
 **［バージョンの復元］** を選択します。
 
-<Frame><img alt="restore version.jpg" src="/images/kb/ka0Vq00000081QL-00N5w00000Ri7BU-0EMVq000000F4ZZ.jpg" style={{width: 352, height: 397}}/></Frame>
-# コントロールを変更する
+<Frame><img alt="restore version.jpg" src="/images/kb/ka0Vq00000081QL-00N5w00000Ri7BU-0EMVq000000F4ZZ.jpg"/></Frame>
+### コントロールを変更する
 
 上部のナビゲーションには、ビューを変更する際に使用できる3つのコントロールがあります。
 
 * **取り消す —**
-  <InlineImage src="/images/kb/ja/ka0Vq0000008bqQ-00N5w00000Ri7BU-0EMVq000000F3lZ.jpg" /> **取り消す** を使用すると、最後の変更を元に戻すことができます。
-* **やり直す —** 誤って取り消し操作をした場合は、 <InlineImage src="/images/kb/ja/ka0Vq0000008bqQ-00N5w00000Ri7BU-0EMVq000000F2pW.jpg" /> **やり直す** を使用すると、取り消した変更をやり直すことができます。
+  <img src="/images/kb/ja/ka0Vq0000008bqQ-00N5w00000Ri7BU-0EMVq000000F3lZ.jpg" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/> **取り消す** を使用すると、最後の変更を元に戻すことができます。
+* **やり直す —** 誤って取り消し操作をした場合は、 <img src="/images/kb/ja/ka0Vq0000008bqQ-00N5w00000Ri7BU-0EMVq000000F2pW.jpg" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/> **やり直す** を使用すると、取り消した変更をやり直すことができます。
 * **元の状態に戻す —**
-  <InlineImage src="/images/kb/ja/ka0Vq0000008bqQ-00N5w00000Ri7BU-0EMVq000000F2r8.jpg" /> **前の状態に戻す** を使用すると、このビューに加えられたすべての変更を取り消すことができます。
+  <img src="/images/kb/ja/ka0Vq0000008bqQ-00N5w00000Ri7BU-0EMVq000000F2r8.jpg" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/> **前の状態に戻す** を使用すると、このビューに加えられたすべての変更を取り消すことができます。
 
-<Frame><img alt="change controls.jpg" src="/images/kb/ka0Vq00000081QL-00N5w00000Ri7BU-0EMVq000000F41h.jpg" style={{width: 901, height: 322}}/></Frame>
-上部のナビゲーションで、 <InlineImage src="/images/kb/ja/ka0Vq0000008bqQ-00N5w00000Ri7BU-0EMVq000000F37G.jpg" /> **閉じる** を選択すると、保存せずにDataSetビューを閉じることができます。
+<Frame><img alt="change controls.jpg" src="/images/kb/ka0Vq00000081QL-00N5w00000Ri7BU-0EMVq000000F41h.jpg"/></Frame>
+上部のナビゲーションで、 <img src="/images/kb/ja/ka0Vq0000008bqQ-00N5w00000Ri7BU-0EMVq000000F37G.jpg" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/> **閉じる** を選択すると、保存せずにDataSetビューを閉じることができます。
 
-# DataSetビューを保存する
+### DataSetビューを保存する
 
 データを変更したら、データを新しいDataSetビューとして保存できます。上部のナビゲーションで、 **［名前を付けて保存］** を選択します。モーダルでビューの新しい名前を選択して **［保存］** を選択します。
 
 <Columns>
-  <Frame><img alt="save as.jpg" src="/images/kb/ka0Vq00000081QL-00N5w00000Ri7BU-0EMVq000000F3s1.jpg" style={{width: 892, height: 319}}/></Frame>
-  <Frame><img alt="save as modal.jpg" src="/images/kb/ka0Vq00000081QL-00N5w00000Ri7BU-0EMVq000000F3vF.jpg" style={{width: 450, height: 293}}/></Frame>
+  <Frame><img alt="save as.jpg" src="/images/kb/ka0Vq00000081QL-00N5w00000Ri7BU-0EMVq000000F3s1.jpg"/></Frame>
+  <Frame><img alt="save as modal.jpg" src="/images/kb/ka0Vq00000081QL-00N5w00000Ri7BU-0EMVq000000F3vF.jpg"/></Frame>
 </Columns>
-保存すると、Domo Data Centerの **［DataSet］** にDataSetビューがDataSetビューアイコンとともに表示されます。 <InlineImage src="/images/kb/ja/ka0Vq0000008bqQ-00N5w00000Ri7BU-0EMVq000000F3Yf.jpg" />
+保存すると、Domo Data Centerの **［DataSet］** にDataSetビューがDataSetビューアイコンとともに表示されます。 <img src="/images/kb/ja/ka0Vq0000008bqQ-00N5w00000Ri7BU-0EMVq000000F3Yf.jpg" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/>
 
 DataSetビューはほかのユーザーとシェアすることができます。
 
@@ -322,89 +321,76 @@ DataSetビューはほかのユーザーとシェアすることができます�
 
 </Warning>
 
-# DataSetビューをエクスポートする
+### DataSetビューをエクスポートする
 
-DataSetビューをエクスポートするには、 <InlineImage src="/images/kb/ja/ka0Vq0000008bqQ-00N5w00000Ri7BU-0EMVq000000F341.jpg" /> > **［エクスポート］** を選択します。DataSetビューがCSVファイルとしてエクスポートされます。
+DataSetビューをエクスポートするには、 <img src="/images/kb/ja/ka0Vq0000008bqQ-00N5w00000Ri7BU-0EMVq000000F341.jpg" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/> > **［エクスポート］** を選択します。DataSetビューがCSVファイルとしてエクスポートされます。
 
-<Frame><img alt="export.jpg" src="/images/kb/ka0Vq00000081QL-00N5w00000Ri7BU-0EMVq000000F38r.jpg" style={{width: 501, height: 192}}/></Frame>
-### 高度なSQLエディター
+<Frame><img alt="export.jpg" src="/images/kb/ka0Vq00000081QL-00N5w00000Ri7BU-0EMVq000000F38r.jpg"/></Frame>
+## 高度なSQLエディター
 
 DataSetビュー用の高度なSQLエディターを使用すると、AIアシスタントから自然言語を複雑なデータクエリに変換するための支援を得ることができます。一般的な質問に対する回答については、「 [よくある質問](#faq) 」を参照してください。
 
-# 高度なSQLエディターを使用する
+### 高度なSQLエディターを使用する
 
 Views Explorerで **［SQLエディター］** を選択して高度なSQLエディターを開きます。
 
-<Frame><img alt="open sql editor.jpg" src="/images/kb/ka0Vq00000081QL-00N5w00000Ri7BU-0EMVq000000CyBh.jpg" style={{width: 899, height: 562}}/></Frame>
+<Frame><img alt="open sql editor.jpg" src="/images/kb/ka0Vq00000081QL-00N5w00000Ri7BU-0EMVq000000CyBh.jpg"/></Frame>
 SQLエディターに切り替えると、既存のビュープロパティが失われることを警告するメッセージが表示されます。続行するには、 **［SQLエディターを有効にする］** を選択します。
 
-<Frame><img alt="enable sql editor.jpg" src="/images/kb/ka0Vq00000081QL-00N5w00000Ri7BU-0EMVq000000CyGX.jpg" style={{width: 500, height: 200}}/></Frame>
+<Frame><img alt="enable sql editor.jpg" src="/images/kb/ka0Vq00000081QL-00N5w00000Ri7BU-0EMVq000000CyGX.jpg"/></Frame>
 高度なSQLエディターで、有効なSQLクエリを記述して **［適用］** を選択します。結果がエディターの下に表示されます。
 
-<Frame><img alt="apply query.jpg" src="/images/kb/ka0Vq00000081QL-00N5w00000Ri7BU-0EMVq000000CyLN.jpg" style={{width: 898, height: 444}}/></Frame>
-# AIアシスタントを使用してクエリを記述する
+<Frame><img alt="apply query.jpg" src="/images/kb/ka0Vq00000081QL-00N5w00000Ri7BU-0EMVq000000CyLN.jpg"/></Frame>
+### AIアシスタントを使用してクエリを記述する
 
 SQLエディターで、表示する結果を説明するテキストを自然言語で記述し、 **Enter** キーを押すか、 **［SQLを作成］** を選択します。
 
-<Frame><img alt="use ai to query.jpg" src="/images/kb/ka0Vq00000081QL-00N5w00000Ri7BU-0EMVq000000CyMz.jpg" style={{width: 900, height: 443}}/></Frame>
+<Frame><img alt="use ai to query.jpg" src="/images/kb/ka0Vq00000081QL-00N5w00000Ri7BU-0EMVq000000CyMz.jpg"/></Frame>
 AIはクエリをSQLに変換し、SQLエディターに追加します。
 
 **［+DataSet］** を選択すると、さらにDataSetを追加できます。これにより、追加のDataSetをメインのDataSetにJoinすることで必要な情報をAIアシスタントが検索できるようになります。
 
-<Frame><img alt="add dataset.jpg" src="/images/kb/ka0Vq00000081QL-00N5w00000Ri7BU-0EMVq000000DnSj.jpg" style={{width: 749, height: 420}}/></Frame>
-### よくある質問
+<Frame><img alt="add dataset.jpg" src="/images/kb/ka0Vq00000081QL-00N5w00000Ri7BU-0EMVq000000DnSj.jpg"/></Frame>
+## よくある質問
 
 <AccordionGroup>
 <Accordion title="DataSetビューはNULL値をどのように扱いますか？">
 
-
 NULL値はほかの値と等しいとも等しくないとも見なされません。つまり、=または!= (\<>)を使用してNULL値を持つ列をほかの列と比較すると、その行には必ずfalseが返されます。
-
 
 </Accordion>
 <Accordion title="私のビューはフェデレーテッドDataSetにもとづいています。基盤となるデータが更新されても、行数カウントが変更されないのはなぜですか？">
 
-
 フェデレーテッドDataSetのビューの行数カウントメタデータには、ビューが作成された時点での行数カウントが常に表示されます。
-
 
 </Accordion>
 <Accordion title="フェデレーテッドDataSetのビューの行数が0になっています。何が起きているのでしょうか？">
 
-
 サブスクライバー側では、公開されたフェデレーテッドDataSetのビューの作成はサポートされていますが、行数カウントはサポートされていません。
-
 
 </Accordion>
 <Accordion title="MySQL DataFlowの内部でDataSetビューを使用できますか？">
 
-
 MySQL DataFlowの内部ではDataSetビューはサポートされていません。
-
 
 </Accordion>
 <Accordion title="DomoStatレポートやその他のAdrenaline DataSetをフェデレーテッドDataSetにJoinできますか？">
 
-
 いいえ。これらはサポートされていないため、エラーが発生します。
 
-# AIアシスタントを使用した高度なSQLエディター
-
+### AIアシスタントを使用した高度なSQLエディター
 
 </Accordion>
 <Accordion title="DomoはすべてのデータをAIサービス（ChatGPTなど）に送信しますか？">
 
-
 いいえ。AIサービスのプロンプトには、エディターの右側にあるDataSetのリストに含まれるDataSetのスキーマのみが含まれます。これにより、AIモデルはSQLクエリで使用する正しい列名とDataSet名を返すことができます。
-
 
 </Accordion>
 <Accordion title="AIアシスタントプロンプトは常に正しいSQLを返しますか？">
 
-
 いいえ。AIサービス（ChatGPTなど）に対してプロンプトを送信するため、結果は異なる場合があります。AIアシスタントは、DataSetビューに含めるデータのSQLの生成を手助けするツールとして使用することを想定しています。
 
-### 動画 — DataSet Views Explorerの概要
+## 動画 — DataSet Views Explorerの概要
 
 <iframe allowfullscreen="allowfullscreen" frameborder="0" height="315" src="//www.youtube-nocookie.com/embed/hkW2iAGjyAM" width="560"></iframe>
 

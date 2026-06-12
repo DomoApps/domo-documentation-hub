@@ -1,6 +1,6 @@
 # Domo Documentation Hub
 
-Domo's public documentation site — Getting Started guides, the Knowledge Base (~1,700 articles), API Reference, and topic pages. Content is authored in MDX, navigation is defined in `docs.json`, and the site is built and hosted by [Mintlify](https://mintlify.com).
+Domo's public documentation site — Getting Started guides, the Knowledge Base (\~1,700 articles), API Reference, and topic pages. Content is authored in MDX, navigation is defined in `docs.json`, and the site is built and hosted by [Mintlify](https://mintlify.com).
 
 ## Repository layout
 
@@ -22,9 +22,37 @@ git checkout <branch>   # any branch with changes you want to preview
 mintlify dev            # run from the repo root (where docs.json lives)
 ```
 
-Open <http://localhost:3000>. Most edits hot-reload; `docs.json` schema changes may need a server restart.
+Open [http://localhost:3000](http://localhost:3000). Most edits hot-reload; `docs.json` schema changes may need a server restart.
 
 For a faster, but less robust preview experience, VS Code has several extenstions offering an MDX preview. For example: [Modern MDX Preview](https://marketplace.visualstudio.com/items?itemName=ggfincke.vsc-mdx-preview).
+
+### Troubleshooting
+
+#### "Client not built" error
+
+If `mintlify dev` fails with:
+
+```text
+Error: Client not built. Run: cd <path>/apps/client && STANDALONE_BUILD=true NEXT_PUBLIC_ENV=cli yarn build
+```
+
+The Mintlify CLI's internal `tar` library may have silently skipped dotfile directories (like `.next/`) when extracting its client package, leaving the cache broken (see [this issue](https://github.com/mintlify/docs/issues/5624)). Work around it by extracting manually with the system `tar`:
+
+```bash
+# 1. Clear the broken cache
+rm -rf ~/.mintlify
+
+# 2. Download the client package manually (uses system tar, which handles dotfiles correctly)
+VERSION=$(curl -s https://releases.mintlify.com/mint-version.txt)
+mkdir -p ~/.mintlify
+curl -s -o /tmp/mint.tar.gz "https://releases.mintlify.com/mint-${VERSION}.tar.gz"
+tar -xzf /tmp/mint.tar.gz -C ~/.mintlify
+echo "$VERSION" > ~/.mintlify/mint/mint-version.txt
+rm /tmp/mint.tar.gz
+
+# 3. Run as normal — mintlify will see the version file and skip the re-download
+mintlify dev
+```
 
 ## Deployment
 

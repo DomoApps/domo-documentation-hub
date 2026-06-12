@@ -1,8 +1,7 @@
 ---
 title: "Set Up AWS PrivateLink with Domo"
+excerpt: "Evaluate AWS PrivateLink for use with Domo, complete the customer-side AWS setup, and manage an existing PrivateLink connection."
 ---
-
-
 
 ## Intro
 
@@ -12,13 +11,9 @@ If PrivateLink is not the right fit for your situation, contact your Domo repres
 
 ---
 
-
-
 ## Required Grants
 
 No specific Domo grants are required to complete this setup. Admin access to your AWS account is required.
-
-
 
 ## Understand How PrivateLink Works
 
@@ -28,8 +23,6 @@ PrivateLink connects two sides:
 - **VPC Endpoint (Domo's side) —** Domo's cloud engineers create a VPC Endpoint in Domo's AWS account that connects to your Endpoint Service. Domo also creates a security group that restricts traffic to only the ports you specify.
 
 All connection requests are initiated by Domo (the Endpoint/client side) toward servers on or behind your NLB. This means Domo can pull data from your private resources, but connections initiated from your network won't reach Domo's private VPC.
-
-
 
 ## Review Considerations Before Setup
 
@@ -60,8 +53,6 @@ If you already have an existing PrivateLink and want to add access to a new reso
 
 PrivateLink does not replace authentication. Resources accessible over the link should have their own access controls (database credentials, TLS certificates, and so on) in place. The PrivateLink itself provides network-level isolation, not application-level security.
 
-
-
 ## Pricing
 
 Domo charges two SKUs for PrivateLink:
@@ -72,8 +63,6 @@ Domo charges two SKUs for PrivateLink:
 | PrivateLink Annual Fee (maintenance, support, data) |
 
 Contact your Domo representative for pricing details. Some non-standard scenarios require VP approval. AWS also charges separately for Endpoint and data transfer usage on both sides of the link.
-
-
 
 ## Set Up PrivateLink
 
@@ -145,8 +134,6 @@ Use this as the **hostname** when configuring any Domo connector or Cloud Amplif
 
 <Note>**Note:** You cannot use a private IP address to connect. PrivateLink abstracts the two networks from each other, so private IPs from your network have no meaning within Domo's VPC. Always use the DNS name (or a custom DNS alias) to reach the Domo side of the PrivateLink—never a raw IP address.</Note>
 
-
-
 ## Set Up Snowflake PrivateLink
 
 Connecting Domo's Cloud Amplifier to Snowflake over PrivateLink is a supported use case but has a different workflow, since Snowflake is a fully managed service and you do not have direct access to the underlying AWS VPC.
@@ -163,8 +150,6 @@ Connecting Domo's Cloud Amplifier to Snowflake over PrivateLink is a supported u
 3. After Snowflake authorizes Domo's account, determine the **PrivateLink VPCE ID** (`privatelink-vpce-id` in Snowflake's documentation). This is the Endpoint Service Name you will pass to Domo.
 4. Share your **Snowflake account URL** with your Domo representative.
 5. Domo will complete the connection setup. You will then configure Cloud Amplifier to use the private DNS name Domo provides in place of the standard Snowflake public hostname.
-
-
 
 ## Troubleshoot
 
@@ -189,8 +174,6 @@ If Domo can establish a TCP connection to the NLB but the connector still fails 
 
 This is expected behavior. PrivateLink traffic is routed via DNS, not IP. You must use the DNS name that Domo provides (or a custom DNS alias), never a raw private IP address. The private IP of a resource behind the NLB is not routable from Domo's VPC.
 
-
-
 ## Manage Existing Links
 
 ### Add Ports or Resources
@@ -204,8 +187,6 @@ If a new resource is in a different AWS VPC or network (not reachable through th
 ### Remove a Link
 
 If a PrivateLink is no longer needed, notify your Domo representative and reject the existing link. Domo will decommission the VPC Endpoint. You may then delete the Endpoint Service and NLB on your side. CloudWatch metrics in the AWS console can help determine whether a link is actively passing traffic before making a teardown decision.
-
-
 
 ## FAQ
 

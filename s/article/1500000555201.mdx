@@ -1,19 +1,20 @@
 ---
 title: "Snowflake KeyPair Unload V2 Connector"
+excerpt: "Configure Domo's Snowflake KeyPair Unload V2 Connector to move very large Snowflake query results through S3 using key pair authentication."
 ---
 
 ## Intro
 
 Snowflake is a data warehouse built for the cloud for all your data and users. The Domo Snowflake KeyPair Unload V2 Connector unloads data from the Snowflake database into Amazon S3 providing an easy and secure access to your Snowflake data. This connector should be preferred over the Snowflake connector if you are executing very large queries.
 
-You connect to your Snowflake database in the Data Center. This topic discusses the fields and menus that are specific to the Snowflake KeyPair Unload V2 connector user interface. General information for adding DataSets, setting update schedules, and editing DataSet information is discussed in [Adding a DataSet Using a Data Connector](/s/article/360042926274).
+You connect to your Snowflake database in the Data Center. This topic discusses the fields and menus that are specific to the Snowflake KeyPair Unload V2 connector user interface. General information for adding DataSets, setting update schedules, and editing DataSet information is discussed in [Adding a DataSet Using a Data Connector](/s/article/360042926274).
 
 ## Prerequisites
 
 To connect to a Snowflake database and create a DataSet, you must have the following:
 
 - The full name of your account (provided by Snowflake). This is the portion of your Snowflake URL immediately following https://.  
-  Note that your full account name may include additional segments that identify the region and cloud platform where your account is hosted. For US West Region **account\_name** and All other regions ** account\_name.region\_id**. The following table provides account name examples by cloud platform/region. For each row, it assumes your account name is "xy12345."
+  Note that your full account name may include additional segments that identify the region and cloud platform where your account is hosted. For US West Region **account\_name** and All other regions **account\_name.region\_id**. The following table provides account name examples by cloud platform/region. For each row, it assumes your account name is "xy12345."
 
 <Frame>![snowflake_account_names.png](/images/kb/0EM5w000005vO5d.png)</Frame>
 
@@ -21,7 +22,7 @@ To connect to a Snowflake database and create a DataSet, you must have the follo
 - The private key.
 - The passphrase. If you create an encrypted private key, then OpenSSL prompts for a passphrase used to encrypt the private key file.
 - The name for your role.
-- Your AWS access key. It is available in the AWS Console in the **Security Credentials** section or under ** Users** if you are using ** IAM**.
+- Your AWS access key. It is available in the AWS Console in the **Security Credentials** section or under **Users** if you are using **IAM**.
 - Your AWS secret key. was provided when you created your Access Key. You can generate a new one in the AWS Console.
 - The name of the AWS S3 bucket that your Snowflake data will be unloaded into.
 - Your Amazon S3 Region.
@@ -50,11 +51,11 @@ To configure the public/private key pair, follow these steps:
       wHLjfCYycUPennlX2bd8yX8xOxGSGfvB+99+PmSlex0FmY9ov1J8H1H9Y3lMWXbL  
       ...  
       -----END ENCRYPTED PRIVATE KEY-----`
-2. From the command line, generate the public key by referencing the private key. Assuming the private key is encrypted and contained in the file named “rsa\_key.p8”, use the following command:
+2. From the command line, generate the public key by referencing the private key. Assuming the private key is encrypted and contained in the file named “rsa\_key.p8”, use the following command:
 
    `$ openssl rsa -in rsa_key.p8 -pubout -out rsa_key.pub`  
      
-    The following is a sample PEM public key:  
+    The following is a sample PEM public key:  
      
    `-----BEGIN PUBLIC KEY-----  
     MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAy+Fw2qv4Roud3l6tjPH4  
@@ -62,14 +63,14 @@ To configure the public/private key pair, follow these steps:
     ...  
     -----END PUBLIC KEY-----`
 3. Copy the public and private key files to a local directory for storage. Record the path to the files. Note that the private key is stored using the PKCS#8 (Public Key Cryptography Standards) format and is encrypted using the passphrase you specified in the previous step; however, the file should still be protected from unauthorized access using the file permission mechanism provided by your operating system. It is your responsibility to secure the file when it is not being used.
-4. Assign the public key to the Snowflake user using ALTER USER. For example:
+4. Assign the public key to the Snowflake user using ALTER USER. For example:
 
    `alter user jsmith set rsa_public_key='MIIBIjANBgkqh...';`
 
-   **Notes:** 
+   **Notes:** 
    - Only security administrators (i.e. users with the SECURITYADMIN role) or higher can alter a user.
    - Exclude the public key header and footer in the SQL statement.
-5. Verify the user’s public key fingerprint using DESCRIBE USER:  
+5. Verify the user's public key fingerprint using DESCRIBE USER:  
 
 <table border="1" cellpadding="1" cellspacing="1">
   <thead>
@@ -104,7 +105,7 @@ To configure the public/private key pair, follow these steps:
    
 <Note>
 
-**Note:** For more information about the RSA\_PUBLIC\_KEY\_2\_FP property, see [Key Rotation](#h_01ES6Z0BJZFCZ3TSR79F91AE6J)
+**Note:** For more information about the RSA\_PUBLIC\_KEY\_2\_FP property, see Key Rotation
 6. Modify and execute the sample code, below. The code decrypts the private key file and passes it to the Snowflake driver to create a connection:
 
 </Note>
@@ -194,7 +195,7 @@ To rotate your keys,
 
 ## Connecting to Your Snowflake Account
 
-This section enumerates the options in the **Credentials** and ** Details** panes in the Snowflake KeyPair Unload V2 Connector page. The components of the other panes in this page, ** Scheduling** and ** Name & Describe Your DataSet**, are universal across most connector types and are discussed in greater length in [Adding a DataSet Using a Data Connector](/s/article/360042926274).
+This section enumerates the options in the **Credentials** and **Details** panes in the Snowflake KeyPair Unload V2 Connector page. The components of the other panes in this page, **Scheduling** and **Name & Describe Your DataSet**, are universal across most connector types and are discussed in greater length in [Adding a DataSet Using a Data Connector](/s/article/360042926274).
 
 ### Credentials Pane
 
@@ -210,11 +211,11 @@ This pane contains fields for entering credentials to your Snowflake account. Th
   <tbody>
     <tr>
       <td colspan="1" rowspan="1"><p>Account Name</p></td>
-      <td colspan="1" rowspan="1"><p>Enter the full name of your account (provided by Snowflake.) For US West Region <b>account\_name</b> and All other regions <b> account\_name.region\_id</b></p></td>
+      <td colspan="1" rowspan="1"><p>Enter the full name of your account (provided by Snowflake.) For US West Region <b>account\_name</b> and All other regions <b> account\_name.region\_id</b></p></td>
     </tr>
     <tr>
       <td colspan="1" rowspan="1"><p>Username</p></td>
-      <td colspan="1" rowspan="1"><p>Enter the username used to connect to your Snowflake host.</p></td>
+      <td colspan="1" rowspan="1"><p>Enter the username used to connect to your Snowflake host.</p></td>
     </tr>
     <tr>
       <td colspan="1" rowspan="1"><p>Private Key</p></td>
@@ -279,7 +280,7 @@ This pane contains a primary **Reports** menu, along with various other menus wh
     </tr>
     <tr>
       <td colspan="1" rowspan="1"><p>Databases</p></td>
-      <td colspan="1" rowspan="1"><p>Select the database containing the data you want to retrieve.  The list populates with all databases you have access to based on your credentials.</p></td>
+      <td colspan="1" rowspan="1"><p>Select the database containing the data you want to retrieve.  The list populates with all databases you have access to based on your credentials.</p></td>
     </tr>
     <tr>
       <td colspan="1" rowspan="1"><p>Schemas</p></td>
@@ -302,7 +303,7 @@ This pane contains a primary **Reports** menu, along with various other menus wh
       <td colspan="1" rowspan="1"><p>Select the table columns you would like to include in your report. If you do not select any table column, the connector will retrieve your entire selected database table.</p></td>
     </tr>
     <tr>
-      <td colspan="1" rowspan="1"><p>View  Column Names</p></td>
+      <td colspan="1" rowspan="1"><p>View  Column Names</p></td>
       <td colspan="1" rowspan="1"><p>Select the view columns that you would like to include in your report.</p></td>
     </tr>
     <tr>
@@ -389,7 +390,7 @@ Make sure that all the words, table names, and field names are correctly spelled
 </Accordion>
 
 <Accordion title="Why can't I connect to my Snowflake database? Do I need to whitelist any IP addresses?">
-Before you can connect to a Snowflake database, you must also whitelist a number of IP addresses on your database server on the port you want to connect to. For the full list of IP addresses, see [Whitelisting IP Addresses in Domo](/s/article/360043439173).
+Before you can connect to a Snowflake database, you must also whitelist a number of IP addresses on your database server on the port you want to connect to. For the full list of IP addresses, see [Whitelisting IP Addresses in Domo](/s/article/360043439173).
 </Accordion>
 
 </AccordionGroup>

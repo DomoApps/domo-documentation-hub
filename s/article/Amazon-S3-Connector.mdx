@@ -1,0 +1,53 @@
+---
+title: Amazon S3 Connector
+excerpt: "Generate the AWS IAM credentials needed to connect an Amazon S3 bucket to Domo Documents."
+---
+
+<Frame>
+  <img alt="Amazon S3 logo" src="/images/kb/AmazonS3.png" />
+</Frame>
+
+## Intro
+
+This article explains how to create an AWS IAM user, grant S3 permissions, and generate the access key credentials needed to connect Amazon S3 to Domo Documents.
+
+---
+
+## Required Grants
+
+To access Documents, the following grants must be enabled for your role:
+
+- **Manage Documents —** View, edit, and delete any Document Collections in this instance.
+- **Edit Documents —** Create and edit Document Collections to which you have access.
+- **View Documents —** View only for any Document Collections to which you have access.
+
+Learn more about [grants](/s/article/360043438973).
+
+## Create an IAM User and Grant S3 Permissions
+
+AWS access keys belong to an IAM user identity, not directly to the S3 bucket itself. To get an AWS Access Key ID and Secret Access Key for programmatic access to Amazon S3, generate them through the AWS Identity and Access Management (IAM) service.
+
+1. Sign in to your [AWS Management Console](https://aws.amazon.com/console/).
+2. Search for and select IAM (Identity and Access Management) from the services menu.
+3. Select **Users** in the left sidebar menu, then select **Create user**.
+4. Enter a name (such as `s3-application-user`) and select **Next**.
+5. On the permissions page, choose **Attach policies directly**.
+6. In the search box, type `S3` and select the appropriate policy:
+   - Select **AmazonS3FullAccess** for complete access to all your buckets.
+   - **Security Recommendation:** To enforce least-privilege, create a custom inline JSON policy that restricts permissions to your specific bucket name.
+7. Select **Next**, review the user configurations, and select **Create user**.
+
+## Generate the Access Key and Secret Key
+
+1. Select your newly created user from the IAM user list.
+2. Select the **Security credentials** tab.
+3. Scroll down to the **Access keys** section and select **Create access key**.
+4. Choose **Application running outside AWS** (or **Other**) as your use case, then select **Next**.
+5. Set an optional tag value description and select **Create access key**.
+6. Copy both the **Access key ID** and the **Secret access key** immediately.
+
+<Warning>**Important:** The Secret Access Key is only displayed once. Select **Download .csv file** to save a copy locally. If you navigate away or lose the secret key, you cannot retrieve it; you must delete the key and generate a new pair. Never upload these keys to public repositories like GitHub.</Warning>
+
+<Frame>
+  <img alt="AWS access key credentials screen" src="/images/kb/AmazonS3_1.png" />
+</Frame>

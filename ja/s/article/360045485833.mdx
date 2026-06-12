@@ -1,10 +1,9 @@
 ---
 title: "Magic ETLのタイル：スクリプティング"
+excerpt: "Magic ETL の Python・R スクリプティングタイルを設定し、カスタムスクリプトでデータを変換して結果を DataFlow に取り込みます。"
 ---
 
-import {InlineImage} from "/snippets/InlineImage.mdx";
-
-### はじめに
+## はじめに
 
 Magic ETLでは、PythonスクリプトとRスクリプトの2つのスクリプティングタイルを使用できます。
 
@@ -15,38 +14,38 @@ Magic ETLでは、PythonスクリプトとRスクリプトの2つのスクリプ
 
 </Note>
 
-<Frame><img alt="Screenshot 2023-04-27 at 8.46.52 PM.png" src="/images/kb/ka0Vq0000000yCH-00N5w00000Ri7BU-0EM5w000006ub6K.jpg" style={{width: 298, height: 158}}/></Frame>
+<Frame><img alt="Screenshot 2023-04-27 at 8.46.52 PM.png" src="/images/kb/ka0Vq0000000yCH-00N5w00000Ri7BU-0EM5w000006ub6K.jpg"/></Frame>
 ---
 
-* [全般的な情報](#general_information)
-  + [ツアーを見る](#take_a_tour)
-  + [スクリプティングタイルにデータを入出力する](#get_data_in_and_out)
-  + [生成されるスキーマを設定する](#populate_the_schema)
-    - [列を手動で追加する](#manually_add_columns)
-    - [列を一括で追加する](#bulk_add_columns)
-    - [スクリプトを実行する](#run_script)
-* [設定ステップ](#configuration_steps)
-* [APIリファレンス](#api_reference)
-  + [Python APIリファレンス](#python_api_reference)
-  + [R APIリファレンス](#r_api_reference)
-* [プロジェクトディレクトリと/tmpディレクトリ](#directories_in_scripting_tiles)
+* 全般的な情報
+  + ツアーを見る
+  + スクリプティングタイルにデータを入出力する
+  + 生成されるスキーマを設定する
+    - 列を手動で追加する
+    - 列を一括で追加する
+    - スクリプトを実行する
+* 設定ステップ
+* [APIリファレンス](#api)
+  + [Python APIリファレンス](#pythonapi)
+  + [R APIリファレンス](#rapi)
+* プロジェクトディレクトリと/tmpディレクトリ
 
-  + [プロジェクトディレクトリ](#project_directory)
-  + [/tmpディレクトリ](#tmp_directory)
+  + プロジェクトディレクトリ
+  + [/tmpディレクトリ](#tmp)
 * [トラブルシューティング](#troubleshooting)
 
 ---
 
-### 全般的な情報
+## 全般的な情報
 
 このセクションでは、Magic ETLのすべてのスクリプティングタイルに関する情報を提供します。特定のタイルについては、以下のいずれかのリンクをクリックして、該当するタイルのAPIリファレンスを参照してください。
 
-* [PythonパッケージのAPIリファレンス](#python_api_reference "ETL操作：スクリプティング")
-* [RパッケージのAPIリファレンス](#r_api_reference "ETLのスクリプティング操作")
+* [PythonパッケージのAPIリファレンス](#pythonスクリプトタイルモジュールのapiリファレンス)
+* [RパッケージのAPIリファレンス](#rスクリプトタイルパッケージのapiリファレンス)
 
 スクリプティングタイルは、Magic ETLの強力なツールです。この機能を使用すると、カスタムのRまたはPythonアルゴリズムを記述して、DataFlowに直接実装できます。これらを使用して、データが更新されるたびに実行される複雑なデータサイエンス分析を作成できます。
 
-# ツアーを見る
+### ツアーを見る
 
 すべてのスクリプティングタイルは同じ外観をしています。唯一の違いはサポートされる言語です。
 
@@ -59,9 +58,9 @@ Magic ETLでは、PythonスクリプトとRスクリプトの2つのスクリプ
 タイルの右側には、 **［パッケージ］** という名前の2番目のタブがあります。このタブをクリックすると、サポートされる言語の使用可能なパッケージを検索するためのリストが表示されます。パッケージ名の上にカーソルを合わせると、説明が表示されます。また、表示される矢印をクリックすると、パッケージのドキュメントがあるウェブサイトに移動します。入力と同様に、パッケージをクリックすると、スクリプト内のカーソルの位置にコードスニペットが挿入されます。このコードスニペットは、スクリプトで使用するために選択されたライブラリをインポートします。
 
 <Frame><img alt="scripting_actions_packages.png" src="/images/kb/ka0Vq0000000yCH-00N5w00000Ri7BU-0EM5w000005vNjL.png"/></Frame>
-タイルエディターパネルのツールバーの右側には、テンプレートアイコンボタン <InlineImage src="/images/kb/ja/ka0Vq0000001oUE-00N5w00000Ri7BU-0EM5w000005vNjg.png" /> があります。このボタンをクリックすると、最初にスクリプティングタイルを開いたときに表示されるサンプルのコードテンプレートへと、スクリプトがリセットされます。既にスクリプトを記述している場合は、このボタンをクリックすると（確認プロンプトの後に）スクリプトが上書きされるので注意が必要です。ただし、タイルを閉じない限り、コードエディター内にカーソルを置いてCommand+zまたはCTRL+zを押すことで、上書きされたスクリプトを元に戻すことができます。
+タイルエディターパネルのツールバーの右側には、テンプレートアイコンボタン <img src="/images/kb/ja/ka0Vq0000001oUE-00N5w00000Ri7BU-0EM5w000005vNjg.png" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/> があります。このボタンをクリックすると、最初にスクリプティングタイルを開いたときに表示されるサンプルのコードテンプレートへと、スクリプトがリセットされます。既にスクリプトを記述している場合は、このボタンをクリックすると（確認プロンプトの後に）スクリプトが上書きされるので注意が必要です。ただし、タイルを閉じない限り、コードエディター内にカーソルを置いてCommand+zまたはCTRL+zを押すことで、上書きされたスクリプトを元に戻すことができます。
 
-**［スキーマ］** タブでは、スクリプトの結果をどのようにタイルに表示するかを指定します。このタブを使用するには、タイルエディターパネルのツールバーで **［スキーマ］** をクリックします。このタブの詳細については、この記事の「 [生成されるスキーマを設定する](#populate_the_schema "ETLのスクリプティング操作") 」セクションを参照してください。
+**［スキーマ］** タブでは、スクリプトの結果をどのようにタイルに表示するかを指定します。このタブを使用するには、タイルエディターパネルのツールバーで **［スキーマ］** をクリックします。このタブの詳細については、この記事の「 生成されるスキーマを設定する 」セクションを参照してください。
 
 <Frame><img alt="scripting_actions_schema.png" src="/images/kb/ka0Vq0000000yCH-00N5w00000Ri7BU-0EM5w000005vNjM.png"/></Frame>
 **［コンソール］** タブには、スクリプトが生成する標準出力（ `stdout` ）と標準エラー（ `stderr` ）が表示されます。このタブは、タイルでプレビューが実行されるまで使用できません。プレビューが実行されると、タイルエディターパネルのツールバーのオプションとして表示されます。
@@ -70,9 +69,8 @@ Magic ETLでは、PythonスクリプトとRスクリプトの2つのスクリプ
 **［プレビュー］** タブには、スクリプトの実行結果が表示されます。このタブも、プレビューが実行されるまで表示されません。プレビューが実行されると、タイルエディターパネルのツールバーのオプションとして表示されます。
 
 <Frame><img alt="scripting_actions_preview.png" src="/images/kb/ka0Vq0000000yCH-00N5w00000Ri7BU-0EM5w000005vNji.png"/></Frame>
-[このページのトップへ](#intro)
 
-# スクリプティングタイルにデータを入出力する
+### スクリプティングタイルにデータを入出力する
 
 Domoには、Domoエコシステムからスクリプトにデータをインポート（読み込み）してから、スクリプトの結果をDomoエコシステムにエクスポート（書き込み）するための基本的なAPIが用意されています。このAPIは、スクリプト言語ごとに異なり、各言語のセマンティクスに従います。
 
@@ -98,9 +96,7 @@ Domoには、Domoエコシステムからスクリプトにデータをインポ
 
 スクリプトを記述する最後のステップは、結果をDomoエコシステムに返すことです。各言語には、独自のセマンティックバージョンのDomo「書き込み」メソッドがあります。これも初期コードテンプレートに含まれています。ただし、このためのコードスニペットを挿入する方法はほかにはありません。この「書き込み」メソッドでは、スクリプトの結果を格納している変数の名前を使います。 **スクリプトごとに作成できるエクスポートは1つのみです。**
 
-[このページのトップへ](#intro)
-
-# 生成されるスキーマを設定する
+### 生成されるスキーマを設定する
 
 スクリプトが生成するスキーマをタイルに伝える方法は3つあります。必要に応じて、これらの方法を組み合わせて使用することで適切な結果を得ることができます。これらの手順はすべて、タイルの **［スキーマ］** タブで行います。
 
@@ -122,8 +118,6 @@ Domoには、Domoエコシステムからスクリプトにデータをインポ
 
    </Warning>
 
-[このページのトップへ](#intro)
-
 #### 列を一括で追加する
 
 列を一括で追加するには、次の手順に従います。
@@ -140,7 +134,7 @@ Domoには、Domoエコシステムからスクリプトにデータをインポ
 Domoにスクリプトを実行させるには、次の手順に従います。
 
 1. タイルエディターパネルのツールバーの右側にある
-   <InlineImage src="/images/kb/ja/ka0Vq0000001oUE-00N5w00000Ri7BU-0EM5w000005vNjV.png" /> ボタンか、キャンバスの上部にあるツールバーの **［プレビューを実行］** ボタンをクリックします（プレビューに問題がある場合は、この記事の「 [トラブルシューティング](#troubleshooting "ETLのスクリプティング操作") 」セクションを参照してください）。
+   <img src="/images/kb/ja/ka0Vq0000001oUE-00N5w00000Ri7BU-0EM5w000005vNjV.png" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/> ボタンか、キャンバスの上部にあるツールバーの **［プレビューを実行］** ボタンをクリックします（プレビューに問題がある場合は、この記事の「 [トラブルシューティング](#troubleshooting "ETLのスクリプティング操作") 」セクションを参照してください）。
      
    プレビューの実行が完了すると、新しい列を作成するためのテキスト入力の下にセンテンスが表示されます。このセンテンスは、プレビューが返した列のうち、タイルのスキーマの一部としてリストされていない列の数を示しています。
 2. センテンスの最後にあるボタンをクリックします。
@@ -149,11 +143,9 @@ Domoにスクリプトを実行させるには、次の手順に従います。
 
 **［スキーマ］** タブに表示される列は、DataFlowの次のタイルに渡されます。
 
-[このページのトップへ](#intro)
+## 設定ステップ
 
-### 設定ステップ
-
-これをまだ完了していない場合は、この記事の「 [ツアーを見る](#take_a_tour "ETLのスクリプティング操作") 」セクションに目を通し、スクリプティングタイルの様々な機能を把握しておいてください。
+これをまだ完了していない場合は、この記事の「 ツアーを見る 」セクションに目を通し、スクリプティングタイルの様々な機能を把握しておいてください。
 
 1. 新しいMagic ETL DataFlowを起動します。
 2. **［入力DataSet］** タイルをキャンバスにドラッグし、使用するDataSetを選択します。
@@ -164,7 +156,7 @@ Domoにスクリプトを実行させるには、次の手順に従います。
    <Frame><img alt="Python_1.png" src="/images/kb/ka0Vq0000000yCH-00N5w00000Ri7BU-0EM5w000005vNjo.png"/></Frame>
 4. （条件付き）画面の下にエディターパネルが開いていない場合は、先ほどキャンバスに追加したスクリプティングタイルをクリックして選択すると、エディターパネルが開きます。
      
-   コードエディターには、初期コードテンプレートが自動で記述されます。テンプレートの内容に関する詳細は、前述の「 [スクリプティングタイルにデータを入出力する](#GET_DATA_IN_AND_OUT "ETLのスクリプティング操作") 」を参照してください 。黄色のバナーも表示されます。これは現段階では無視してください。後で設定ステップのところで説明します。
+   コードエディターには、初期コードテンプレートが自動で記述されます。テンプレートの内容に関する詳細は、前述の「 スクリプティングタイルにデータを入出力する 」を参照してください 。黄色のバナーも表示されます。これは現段階では無視してください。後で設定ステップのところで説明します。
      
    テンプレートがスクリプティングタイルに接続されている［入力DataSet］タイルからデータを取得し、変数に格納していることが分かります。これがスクリプトで操作する必要がある変数です。
      
@@ -182,7 +174,7 @@ Domoにスクリプトを実行させるには、次の手順に従います。
 
    1. タイルエディターパネルのツールバーで **［スキーマ］** タブをクリックします。
    2. この記事の「
-      [生成されるスキーマを設定する](#populate_the_schema "ETLのスクリプティング操作") 」セクションに記載されている方法のいずれかを選択し、そのステップに従います。その後、以下に示すステップを続行します。
+      生成されるスキーマを設定する 」セクションに記載されている方法のいずれかを選択し、そのステップに従います。その後、以下に示すステップを続行します。
 8. ［出力DataSet］タイルをスライドバーからドラッグし、キャンバスにドロップします。
 9. スクリプティングタイルからこの新しい［出力DataSet］タイルに接続をドラッグします。
      
@@ -196,39 +188,33 @@ Domoにスクリプトを実行させるには、次の手順に従います。
 
 おめでとうございます。スクリプティングタイルを活用するDataFlowが作成できました。これは、1つの［入力DataSet］タイル、1つのスクリプティングタイル、1つの［出力DataSet］タイルのみを使用するごく基本的な設定です。スクリプティングタイルの前後に、従来のすべてのDataFlowタイルを使用してデータを操作できることも、覚えておいてください。
 
-[このページのトップへ](#intro)
-
-### APIリファレンス
+## APIリファレンス
 
 domomagicは、Magic ETLの「Pythonタイル」と「Rタイル」の作成者の両方に提供されるシンプルなAPIで、PythonとRのコンテキストの間でデータをロード/アンロードできるようにします。
 
-# PythonスクリプトタイルモジュールのAPIリファレンス
+### PythonスクリプトタイルモジュールのAPIリファレンス
 
-<Frame><img alt="Python_Script.png" src="/images/kb/ka0Vq0000000yCH-00N5w00000Ri7BU-0EM5w000005vNjW.png" style={{width: 104, height: 100}}/></Frame>
+<Frame><img alt="Python_Script.png" src="/images/kb/ka0Vq0000000yCH-00N5w00000Ri7BU-0EM5w000005vNjW.png"/></Frame>
 <table class="mt-responsive-table" data-aura-rendered-by="33:203;a"><thead><tr><th colspan="1" rowspan="1"><p> メソッドシグネチャー </p></th><th colspan="1" rowspan="1"><p> パラメーター </p></th><th colspan="1" rowspan="1"><p> 戻り値 </p></th></tr></thead><tbody><tr><td colspan="1" rowspan="1"><p><code> read_dataframe(input_name=None) </code></p></td><td colspan="1" rowspan="1"><p><em> input_name： </em> Magic ETL入力タイルの名前。使用可能な入力が1つしかない場合は必要ありません。 </p></td><td colspan="1" rowspan="1"><p> 入力タイルを表すPandas DataFrame。 </p></td></tr><tr><td colspan="1" rowspan="1"><p><code> write_dataframe(dataframe) </code></p></td><td colspan="1" rowspan="1"><p><em> dataframe： </em> Magic ETLのタイルの出力として使用されるPandas DataFrame。 </p></td><td colspan="1" rowspan="1"> 該当なし </td></tr><tr><td colspan="1" rowspan="1"><code> read_array(column_name,input_name=None) </code></td><td colspan="1" rowspan="1"><em> column_name： </em> 列の名前。 <br/><br/><em> input_name： </em> Magic ETL入力タイルの名前。使用可能な入力が1つしかない場合は必要ありません。 </td><td colspan="1" rowspan="1"> 入力から得られる単一の列。NumPy配列として表現。 </td></tr><tr><td colspan="1" rowspan="1"><code> read_array_dict(input_name=None) </code></td><td colspan="1" rowspan="1"><em> input_name： </em> Magic ETL入力タイルの名前。使用可能な入力が1つしかない場合は必要ありません。 </td><td colspan="1" rowspan="1"> 列名のOrderedDictとしてNumPy配列にマップされる入力。 <a id="r_api_reference" target="_blank"></a></td></tr><tr><td colspan="1" rowspan="1"><code> write_array_dict(array_dict) </code></td><td colspan="1" rowspan="1"><em> array_dict： </em> Magic ETLコンテキストへの出力としてNumPy配列にマップされる列名のディクショナリ。配列は同じ長さでなければなりません。 </td><td colspan="1" rowspan="1"> 該当なし </td></tr></tbody></table>
 
-[このページのトップへ](#intro)
+### RスクリプトタイルパッケージのAPIリファレンス
 
-# RスクリプトタイルパッケージのAPIリファレンス
-
-<Frame><img alt="R_Script.png" src="/images/kb/ka0Vq0000000yCH-00N5w00000Ri7BU-0EM5w000005vNjD.png" style={{width: 100, height: 113}}/></Frame>
+<Frame><img alt="R_Script.png" src="/images/kb/ka0Vq0000000yCH-00N5w00000Ri7BU-0EM5w000005vNjD.png"/></Frame>
 <table border="1" cellpadding="1" cellspacing="1" data-aura-rendered-by="33:203;a"><thead><tr><th colspan="1" rowspan="1"><p> メソッドシグネチャー </p></th><th colspan="1" rowspan="1"><p> パラメーター </p></th><th colspan="1" rowspan="1"><p> 戻り値 </p></th></tr></thead><tbody><tr><td colspan="1" rowspan="1"><p><code> read.dataframe(input.name =NULL、以下を参照) </code></p></td><td colspan="1" rowspan="1"><p><code> input.name </code><em> ： </em> Magic ETL入力タイルの名前。使用可能な入力が1つしかない場合は必須ではありません。 </p></td><td colspan="1" rowspan="1"><p> 入力タイルのdata.frame。 </p></td></tr><tr><td colspan="1" rowspan="1"><p><code> write.dataframe(table) </code></p></td><td colspan="1" rowspan="1"><p><code> table </code><em> ： </em> data.frameまたはマトリックスをMagic ETLのタイルの出力としてエクスポートします。 </p></td><td colspan="1" rowspan="1"><p> 該当なし </p></td></tr></tbody></table>
 
 Rパッケージの `read.dataframe` 関数は、以下のパラメーターもサポートしており、動作をカスタマイズできます。
 
 <table class="mt-responsive-table" data-aura-rendered-by="33:203;a"><thead><tr><th colspan="1" rowspan="1"><p> パラメーター </p></th><th colspan="1" rowspan="1"><p> 説明 </p></th></tr></thead><tbody><tr><td colspan="1" rowspan="1"><p><code> colClasses </code></p></td><td colspan="1" rowspan="1"><p> 名前付きの列に割り当てられる、クラスの名前付きの文字ベクトル。 </p></td></tr><tr><td colspan="1" rowspan="1"><p><code> stringsAsFactors </code></p></td><td colspan="1" rowspan="1"><p> 文字列列を要素として読み込むかどうかを指定する論理値。デフォルトはfalseで、colClassesによって上書きされます。 </p></td></tr><tr><td colspan="1" rowspan="1"><p><code> integersAsNumerics </code></p></td><td colspan="1" rowspan="1"><p> 整数を数値（浮動小数点数）として読み込むかどうかを指定する論理値。デフォルトはtrueで、colClassesによって上書きされます。 </p></td></tr><tr><td colspan="1" rowspan="1"><p><code> allVerbatimExcept </code></p></td><td colspan="1" rowspan="1"><p> デフォルトの動作に従って読み込まれる列名の文字ベクトル。その他の列はすべて文字列として逐字的に読み込まれ、元のタイプで書き込まれます。Rコンテキストとの間で変換を行うと精度が失われるかエラーが発生し、実行される計算に列が必要ない場合に役立ちます。 <a id="directories_in_scripting_tiles" target="_blank"></a></p></td></tr><tr><td colspan="1" rowspan="1"><p><code> allIgnoredExcept </code></p></td><td colspan="1" rowspan="1"><p> 読み込まれる列名の文字ベクトル。その他の列はすべて無視されます。 </p></td></tr></tbody></table>
 
-[このページのトップへ](#intro)
-
 ## スクリプティングタイルのプロジェクトディレクトリと/tmpディレクトリ
 
 Magic ETLのPythonとRのスクリプティング環境では、プロジェクトディレクトリと/tmpディレクトリという2つの特別なディレクトリを使用して、DataFlowのスクリプティングタイル間でデータを保存し、共有できます。これらのディレクトリを使用すると、複雑なデータ処理タスクを簡単に処理できます。
 
-### プロジェクトディレクトリ
+## プロジェクトディレクトリ
 
 プロジェクトディレクトリは、DataFlow内のすべてのスクリプティングタイルの共有スペースであり、そのコンテンツは実行間で保持されます。つまり、統計モデルなどをプロジェクトディレクトリに保存して、複数の実行にわたって作業を続けることができます。プロジェクトディレクトリは /home/domo/project にあります。ただし、スクリプト内では単に「project」と呼びます。プロジェクトディレクトリに加えた変更は、正常に実行された後にのみ保存されます。プレビューまたは失敗した実行への変更は破棄されます。
 
-プロジェクトディレクトリの合計サイズは、8ギガバイト（8GB）を超えてはなりません。この制限を増やす、バックアップからディレクトリを復元する、またはDataFlowから別のDataFlowにディレクトリをコピーする必要がある場合は、 [Domoサポート](https://domo-support.domo.com/s/) <InlineImage src="/images/kb/ja/ka0Vq0000001oUE-00N5w00000Ri7BU-0EMVq000001E3By.jpg" /> までお問い合わせください。
+プロジェクトディレクトリの合計サイズは、8ギガバイト（8GB）を超えてはなりません。この制限を増やす、バックアップからディレクトリを復元する、またはDataFlowから別のDataFlowにディレクトリをコピーする必要がある場合は、 [Domoサポート](https://domo-support.domo.com/s/) <img src="/images/kb/ja/ka0Vq0000001oUE-00N5w00000Ri7BU-0EMVq000001E3By.jpg" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/> までお問い合わせください。
 
 #### 使用事例
 
@@ -242,15 +228,13 @@ Magic ETLのPythonとRのスクリプティング環境では、プロジェク�
 1. 必要なスクリプティングタイル（PythonやR）と、必要な入出力DataSetタイルを使用してDataFlowを作成します。
 2. 最初のスクリプティングタイルでは、PythonかRかにかかわらず、データを段階的に処理するスクリプトを記述し、中間結果またはモデルをプロジェクトディレクトリに保存します。
 
-   <Frame><img alt="step 2 example proj dir.png" src="/images/kb/ka0Vq0000000yCH-00N5w00000Ri7BU-0EM5w000006ub6A.jpg" style={{width: 780, height: 433}}/></Frame>
+   <Frame><img alt="step 2 example proj dir.png" src="/images/kb/ka0Vq0000000yCH-00N5w00000Ri7BU-0EM5w000006ub6A.jpg"/></Frame>
 3. PythonかRかに関係なく、別のスクリプティングタイルで、前のタイルからプロジェクトディレクトリに保存された中間結果またはモデルを読み込み、必要に応じて処理を続けます。
 
-   <Frame><img alt="read intermediate results.png" src="/images/kb/ka0Vq0000000yCH-00N5w00000Ri7BU-0EM5w000006ub6F.jpg" style={{width: 790, height: 437}}/></Frame>
+   <Frame><img alt="read intermediate results.png" src="/images/kb/ka0Vq0000000yCH-00N5w00000Ri7BU-0EM5w000006ub6F.jpg"/></Frame>
 4. 必要に応じて、最終結果または更新されたモデルをプロジェクトディレクトリに保存し、［出力DataSet］タイルを使用して最終結果を保存します。
 
-[このページのトップへ](#intro)
-
-### /tmpディレクトリ
+## /tmpディレクトリ
 
 /tmpディレクトリは、DataFlow内のすべてのスクリプティングタイルの共有スペースです。あるスクリプティングタイルで/tmpディレクトリにファイルを作成すると、同じDataFlow内の別のスクリプティングタイルからこのファイルにアクセスできます。プロジェクトディレクトリとは異なり、/tmpディレクトリの内容は一時的なものであり、DataFlowの実行中に削除されます。
 
@@ -267,21 +251,19 @@ Magic ETLのPythonとRのスクリプティング環境では、プロジェク�
 1. PythonかRかに関係なく、必要なスクリプティングタイルと、必要な入出力DataSetタイルを使用してDataFlowを作成します。
 2. 最初のスクリプティングタイルで、必要に応じてデータを処理するスクリプトを記述し、結果のデータまたはオブジェクトを/tmpディレクトリに保存します。
 
-   <Frame><img alt="step two tmp directory.png" src="/images/kb/ka0Vq0000000yCH-00N5w00000Ri7BU-0EM5w000006ub6t.jpg" style={{width: 635, height: 349}}/></Frame>
+   <Frame><img alt="step two tmp directory.png" src="/images/kb/ka0Vq0000000yCH-00N5w00000Ri7BU-0EM5w000006ub6t.jpg"/></Frame>
 3. 2番目のスクリプティングタイルで、前のタイルから/tmpディレクトリに保存されているデータを読み取ります。
 
    <Frame><img alt="tmp second tile.png" src="/images/kb/ka0Vq0000000yCH-00N5w00000Ri7BU-0EM5w000006ub6y.jpg"/></Frame>
 4. 必要に応じてデータの処理を続行し、出力DataSetタイルを使用して最終結果を保存します。
 
-[このページのトップへ](#intro)
-
-### トラブルシューティング
+## トラブルシューティング
 
 * スクリプトを記述した後にタイルが設定済みとしてマークされない場合は、生成されるスキーマを提供したことを確認してください。詳細については、「
-  [生成されるスキーマを設定する](#populate_the_schema "ETLのスクリプティング操作") 」を参照してください。
+  生成されるスキーマを設定する 」を参照してください。
 * スクリプトの動作に関するフィードバックを得るには、プレビューを実行します。キャンバス上部のツールバーで **［プレビュー］** を選択すると、プレビューを実行できます。プレビューを実行すると、タイルエディターパネルのツールバーに **［コンソール］** タブが表示されます。このタブには、スクリプトが生成する標準出力（ `stdout` ）と標準エラー（ `stderr` ）が表示されます。プレビューが失敗する場合は、コンソールにエラーが表示されていないか確認してください。
 * スクリプトが失敗する場合は、この記事の「
-  [スクリプティングタイルにデータを入出力する](#get_data_in_and_out "ETLのスクリプティング操作") 」セクションに記載されている3つのステップすべてを適切に実行したことを確認してください。Domoに書き込む変数の名前をチェックし、その名前が正しいことを確認してください。
+  スクリプティングタイルにデータを入出力する 」セクションに記載されている3つのステップすべてを適切に実行したことを確認してください。Domoに書き込む変数の名前をチェックし、その名前が正しいことを確認してください。
 * プレビューはサンプルのDataSetに対してのみ実行されます。スクリプトが正常に機能するためにデータにいくらかの可変性が必要な場合は、プレビューで使用したサンプルがこの可変性要件を満たさない場合があります。キャンバスのツールバーの **行の上限** を変更することで、プレビューサンプルのサイズを設定できます。
 
   <Note>
@@ -293,7 +275,5 @@ Magic ETLのPythonとRのスクリプティング環境では、プロジェク�
 * 列のすべての値がNULL値になる場合は、スクリプトによって列が実際には生成されていない可能性があります。ある列が **［スキーマ］** タブのリストに表示されている場合、その列は、スクリプトが実際にその列を生成するかどうかに関係なく、結果に追加されます。スクリプトが列を生成しない場合は、その列のすべての値がNULL値に設定されます。プレビューを実行してから **［スキーマ］** タブを調べることで、スクリプトによって作成される列と作成されない列を確認できます。各列のステータスは、列データタイプの右側に表示されます。
 * スクリプトが実行時にメモリー不足エラーで失敗する場合は、入力DataSetが大きすぎるか、スクリプトがデータの急増を引き起こす何らかのJoin処理を実行している可能性があります。データがスクリプティングタイルに挿入される前にデータにフィルターをかけたり、スクリプトのリファクタリングを行ったりすることで、データの急増を防ぎます。メモリーエラーのトラブルシューティングの詳細については、「
   [スクリプティングタイルのメモリーエラーのトラブルシューティング](/s/article/4662511363351) 」を参照してください。
-
-[このページのトップへ](#intro)
 
 日本語

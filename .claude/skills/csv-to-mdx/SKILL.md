@@ -188,6 +188,22 @@ The script cannot reliably fix these. Review every converted article for:
 - [ ] FAQ items that didn't match the bold-Q/paragraph-A or numbered-list patterns are left verbatim and need manual `<AccordionGroup>` conversion
 - [ ] New English articles need `/add-to-nav` run to add them to `docs.json`
 
+**Image paths — case collisions**
+
+Salesforce image IDs are case-sensitive (`…vPFA.png` and `…vPFa.png` are different images in Salesforce), but macOS APFS and Windows NTFS are case-insensitive by default. Two filenames that differ only by case collapse to one file on disk for most contributors, silently breaking articles. CI now blocks merging case-colliding paths (see `.github/workflows/case-collision-check.yml`).
+
+- [ ] For every new image the conversion writes under `images/kb/`, check whether its lowercase form matches an already-tracked path (`git ls-files images/kb/ | tr A-Z a-z | sort | uniq -d` against the new basenames). If it collides, rename the new file by inserting `-2` before the extension (e.g., `…vPFa.png` → `…vPFa-2.png`) and update every reference the script wrote.
+
+**Inline icons (image → font)**
+
+The converter emits image-based inline icons (`<img src="/images/kb/...">`). Both Domo icon fonts cover the full glyph set, so any inline icon that depicts a UI element should be migrated to the font convention. Pick the font that matches the surface the article describes — see `Domo-KB-Style-Guide.mdx` › **Icons** for full guidance.
+
+- [ ] Inline `<img>` icons depicting **current Domo product UI** → migrate to `<i className="icon-{name}" aria-hidden="true" />` (phosphor). If the original image showed a pre-refresh icon, this is also a stale-screenshot upgrade — go to phosphor anyway.
+- [ ] Inline `<img>` icons depicting **legacy surfaces** (release notes describing pre-refresh UI, Workbench, other legacy apps) → migrate to `<i className="legacy-icon-{name}" aria-hidden="true" />`.
+- [ ] Inline `<img>` icons that are **third-party brand logos** (AWS, OpenAI, Anthropic, GitHub, …) → these aren't in the Domo icon font, and a monochrome logo image breaks in dark mode. Migrate to a coded icon: `<Icon icon="{slug}" iconType="brands" aria-hidden="true" />` (Font Awesome brands), or an inline `<svg fill="currentColor">` (e.g. a [Simple Icons](https://simpleicons.org) path) when FA's free set lacks the brand. See `Domo-KB-Style-Guide.mdx` › **Brand and Third-Party Logos**.
+- [ ] After migration, confirm the surrounding prose names the icon (e.g. "click the line chart icon \<icon\>"). If it doesn't, rewrite the prose inline rather than reaching for `aria-label`.
+- [ ] Remove any leftover `import { InlineImage } from "/snippets/InlineImage.mdx";` line — the snippet is no longer in use anywhere in the repo. Inline images should always be a native `<img>` with an inline `style` block (see `Domo-KB-Style-Guide.mdx` › **Inline images**).
+
 **Headings**
 - [ ] All headings use the **imperative mood** — never the gerund. **Correct:** "Connect a DataSet" **Incorrect:** "Connecting a DataSet"
 - [ ] Top-level sections are H2 (`##`), subsections are H3 (`###`) and deeper — never jump levels
@@ -213,6 +229,17 @@ The script cannot reliably fix these. Review every converted article for:
 - [ ] No "Domo story/stories" — use "Dashboard/Dashboards"
 - [ ] No "Drilldown" — use "Drill Path" or "drill into"
 - [ ] No "Slicers" — use "Quick Filters"
+
+**Beta markers**
+
+Salesforce-era articles use a variety of legacy beta indicators. Convert any you find to the current convention defined in `Domo-KB-Style-Guide.mdx` › **Beta Features**:
+
+- [ ] `(Beta)` or `(BETA)` in a `title:` frontmatter value → remove the parenthetical and add `tag: "Beta"` to the frontmatter; insert the standard beta Note above the Intro
+- [ ] `(Beta)` or `(BETA)` appended to a heading → remove the parenthetical and append `<Badge className="text-primary bg-primary/10 font-bold">Beta</Badge>` to the heading
+- [ ] Ad-hoc beta notes (e.g., "This feature is in beta. Contact your account team…") → replace with the standard beta Note from the style guide
+- [ ] References to `betafeedback@domo.com` or `betadmin@domo.com` → replace with `beta.admin@domo.com` (the standard Note already contains the right address)
+- [ ] If multiple sections in one article are beta, keep only one standard Note in the article (under the first beta section) — do not repeat it under each
+- [ ] If the converted article links to other articles whose link text contains `(Beta)`/`(BETA)`, drop the parenthetical from the link text
 
 **Punctuation and formatting**
 - [ ] Em-dashes in body text: no spaces — `tools—such as these—work`
@@ -252,7 +279,8 @@ When invoked, do the following:
 1. **Read the file** at the path provided in `$ARGUMENTS`. If a title is given instead, find the file with `grep -r "title:.*<title>" s/article/`.
 2. **Scan for human-review items** from Section B above.
 3. **Check image placeholders** — search for `<!-- TODO: embed image` comments and flag them.
-4. **Check for leftover Salesforce artifacts** — any remaining `— | —`, bare Salesforce URLs, or raw HTML tags that markdownify didn't convert.
-5. **Apply fixes** to items from Section B that are clearly wrong (e.g., incorrect Domo terminology, `whitelist` → `allowlist`).
-6. **List items requiring editorial judgment** (e.g., gerund headings, passive-voice sentences) with line numbers so the user can decide.
-7. **Write the corrected file** and report what was changed vs. what needs the user's review.
+4. **Check image-path case collisions** — for any image path the article references under `images/kb/`, run `git ls-files images/kb/ | grep -i "<basename>"` to confirm no case-sibling exists. If one does, rename the new file with a `-2` suffix and update the article's references.
+5. **Check for leftover Salesforce artifacts** — any remaining `— | —`, bare Salesforce URLs, or raw HTML tags that markdownify didn't convert.
+6. **Apply fixes** to items from Section B that are clearly wrong (e.g., incorrect Domo terminology, `whitelist` → `allowlist`).
+7. **List items requiring editorial judgment** (e.g., gerund headings, passive-voice sentences) with line numbers so the user can decide.
+8. **Write the corrected file** and report what was changed vs. what needs the user's review.

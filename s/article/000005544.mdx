@@ -1,10 +1,9 @@
 ---
 title: "Use AI Prompts in Jupyter"
+excerpt: "Use AI prompts inside Jupyter Workspaces to generate text and run Domo AI Playground prompts without leaving your notebook."
 ---
 
-import {InlineImage} from "/snippets/InlineImage.mdx";
-
-### Intro
+## Intro
 
 Jupyter Workspaces allows you to write AI prompts within Notebooks. Jupyter uses the same prompts as in the Domo. AI Playground without navigating away from Jupyter.
 
@@ -12,32 +11,30 @@ Learn more about [Jupyter AI](https://domo-support.domo.com/s/article/000005291?
 
 ---
 
-### Required Grants
+## Required Grants
 
 To access Jupyter, at least one of the following grants must be enabled for your role:
 
 * **Create Jupyter Workspace —** Allows a user to create, edit, and delete Jupyter Workspaces to which they have access.
 * **Manage Jupyter Workspace** (Jupyter Admin) **—** Allows a user to view, edit, and delete any Jupyter Workspaces in the instance. This grant is needed to enable workspace sharing for other users.
 
-### Access Jupyter Workspaces
+## Access Jupyter Workspaces
 
 In the navigation header, select **Data** to open the Data Center.
 
-In the left navigation, select <InlineImage src="/images/kb/ka0Vq00000051WX-00N5w00000Ri7BU-0EM5w000005vXkP.png" /> **More** (three horizontal dots icon) > **Jupyter Workspaces**.
+In the left navigation, select <img src="/images/kb/ka0Vq00000051WX-00N5w00000Ri7BU-0EM5w000005vXkP.png" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/> **More** (three horizontal dots icon) > **Jupyter Workspaces**.
 
-<Frame><img alt="jupyter workspaces.jpg" src="/images/kb/ka0Vq00000051WX-00N5w00000Ri7BU-0EMVq0000040sfd.jpg" style={{width: 280, height: 512}}/></Frame>
-Learn more about [creating a Workspace](https://domo-support.domo.com/s/article/36004740075?language=en_US#create_workspace).
+<Frame><img alt="jupyter workspaces.jpg" src="/images/kb/ka0Vq00000051WX-00N5w00000Ri7BU-0EMVq0000040sfd.jpg"/></Frame>
+Learn more about [creating a Workspace](/s/article/36004740075#create-a-workspace).
 
-### Use the Generate Text Prompt
+## Use the Generate Text Prompt
 
 The generate\_text prompt provides answers to questions. In the example, the prompt provided to the AI service is in the prompt\_template. It is given a limitation of ${words}, which is provided in the prompt\_parameters.
 
 The output prompt is provided at the bottom.
 
-<Frame><img alt="Screenshot 2024-09-18 at 2.04.56 PM.png" src="/images/kb/ka0Vq00000051WX-00N5w00000Ri7BU-0EMVq000002moSn.jpg" style={{width: 903, height: 110}}/></Frame>
-You can modify the standard generate\_text template by providing a new prompt to the input\_str — the prompt\_template overrides the input\_str.
-
-To use input\_str, the prompt\_template and prompt\_parameters must be deleted.
+<Frame><img alt="Screenshot 2024-09-18 at 2.04.56 PM.png" src="/images/kb/ka0Vq00000051WX-00N5w00000Ri7BU-0EMVq000002moSn.jpg"/></Frame>
+When a prompt\_template is included, it will ignore the input\_str unless you include the placeholder `${input}` within your prompt template text. If you include the `${input}` placeholder, then the input\_str will automatically be inserted for that placeholder.
 
 The following parameters are available in the generate\_text function. All of the parameters are optional except `input_str`.
 
@@ -69,13 +66,13 @@ text_ai_response = TextAIResponse(text_response['prompt'], text_response['choice
 return text_ai_response
 ```
 
-### Use the Text-to-SQL Prompt
+## Use the Text-to-SQL Prompt
 
 The text\_to\_sql prompt provides a SQL query based on the question asked. In the example, the prompt provided to the AI service is in the prompt\_template, and the specified column is in the prompt\_parameters.
 
 The functional SQL query is provided in the output at the bottom.
 
-<Frame><img alt="text to sql.png" src="/images/kb/ka0Vq00000051WX-00N5w00000Ri7BU-0EMVq000002lNpd.jpg" style={{width: 901, height: 358}}/></Frame>
+<Frame><img alt="text to sql.png" src="/images/kb/ka0Vq00000051WX-00N5w00000Ri7BU-0EMVq000002lNpd.jpg"/></Frame>
 You can modify the standard text\_to\_sql template by providing a new DataSourceSchema and an input\_str that specifies what the AI prompt should write.
 
 You can also provide the workspace\_data\_source\_alias for an existing DataSet attached to the workspace. Providing the workspace\_data\_source\_alias allows the workspace to use the schema when generating the column names for the SQL query.
@@ -125,13 +122,13 @@ def text_to_sql(input_str: str,
    return text_ai_response
 ```
 
-### Use the Text-to-Beast-Mode Prompt
+## Use the Text-to-Beast-Mode Prompt
 
 The Text-to-Beast-Mode service provides a Beast Mode function based on the question asked. In the example, the prompt provided to the AI asks to add all of the value columns (data\_source\_schemas) together.
 
 The Beast Mode function is provided in the output at the bottom.
 
-<Frame><img alt="text to beast mode.png" src="/images/kb/ka0Vq00000051WX-00N5w00000Ri7BU-0EMVq000002lQab.jpg" style={{width: 897, height: 322}}/></Frame>
+<Frame><img alt="text to beast mode.png" src="/images/kb/ka0Vq00000051WX-00N5w00000Ri7BU-0EMVq000002lQab.jpg"/></Frame>
 The following parameters are available in the text\_to\_beast\_mode function. All of the parameters are optional except `input_str`.
 
 ```
@@ -159,13 +156,13 @@ def text_to_beast_mode(input_str: str,
   """
 ```
 
-### Use the Summarize Text Prompt
+## Use the Summarize Text Prompt
 
 The summarize\_text prompt provides a text summary based on the question asked. In the example, the prompt provided to the AI service is in text\_summarization.
 
 The output prompt is provided at the bottom.
 
-<Frame><img alt="Screenshot 2024-09-18 at 11.30.03 AM.png" src="/images/kb/ka0Vq00000051WX-00N5w00000Ri7BU-0EMVq000002mmsQ.jpg" style={{width: 898, height: 449}}/></Frame>
+<Frame><img alt="Screenshot 2024-09-18 at 11.30.03 AM.png" src="/images/kb/ka0Vq00000051WX-00N5w00000Ri7BU-0EMVq000002mmsQ.jpg"/></Frame>
 The following parameters are available in the summarize\_text function. All of the parameters are optional except `input_str`.
 
 ```
@@ -196,4 +193,104 @@ def summarize(input_str: str,
   Returns:          
     response: summarized text      
   """
+```
+
+<Note>**Note:** The parameter behavior described below should be confirmed against the current product. This content was submitted for PM review.</Note>
+
+The `summarize()` function generates a summary from a long block of text using an AI model. It supports optional configurations that control the style, structure, and length of the summary. The only required parameter is `input_str`.
+
+```python
+summarize(input_str="Paste your text here...")
+```
+
+### Optional Parameters
+
+#### prompt_template
+
+**`prompt_template` (Optional) —** The `PromptTemplate` class helps structure reusable prompt strings for AI tasks. In this implementation, it is lightweight, requiring only a single input: the full prompt text.
+
+```python
+from domojupyter.ai.models.PromptTemplate import PromptTemplate
+
+template_text = "Summarize the following text:\n{text}"
+prompt = PromptTemplate(template=template_text)
+```
+
+#### parameters
+
+**`parameters` (Optional) —** A dictionary used to replace placeholders in the `prompt_template`.
+
+```python
+parameters = {
+    "topic": "monthly sales report",
+    "audience": "executive leadership"
+}
+```
+
+#### model and model_configuration
+
+* **`model` (Optional) —** Name or ID of the language model to be used for summarization.
+* **`model_configuration` (Optional) —** A dictionary with custom configuration parameters for a selected language model.
+
+#### chunking_configuration
+
+**`chunking_configuration` (Optional) —** Use this when summarizing large blocks of text. It splits the text into smaller, manageable chunks before summarization.
+
+```python
+from domojupyter.ai.models.ChunkingConfiguration import ChunkingConfiguration
+from domojupyter.ai.models.SeparatorType import SeparatorType
+
+chunking_configuration = ChunkingConfiguration(
+    max_chunk_size=1000,
+    chunk_overlap=100,
+    separators=["\n\n", "\n", " "],
+    separator_type=SeparatorType.TEXT,
+    disallow_intermediate_chunks=False
+)
+```
+
+Available `SeparatorType` options: `CPP`, `GO`, `HTML`, `JAVA`, `JAVASCRIPT`, `LATEX`, `MARKDOWN`, `PROTO`, `PYTHON`, `RST`, `RUBY`, `SCALA`, `SOL`, `SWIFT`, `TEXT`.
+
+#### output_style
+
+**`output_style` (Optional) —** Determines the design, structuring, and organization of the summarization's output.
+
+```python
+from domojupyter.ai.models.SummarizationOutputStyle import SummarizationOutputStyle
+
+output_style = SummarizationOutputStyle.BULLETED  # Options: BULLETED, NUMBERED, PARAGRAPH
+```
+
+#### output_word_length
+
+**`output_word_length` (Optional) —** Defines a size boundary to limit the length of the output summary, based on number of words.
+
+```python
+from domojupyter.ai.models.SizeBoundary import SizeBoundary
+
+output_word_length = SizeBoundary(min_bound=75, max_bound=150)
+```
+
+### Example
+
+The following example combines several optional parameters.
+
+```python
+from domojupyter.ai.models.ChunkingConfiguration import ChunkingConfiguration
+from domojupyter.ai.models.SeparatorType import SeparatorType
+from domojupyter.ai.models.SummarizationOutputStyle import SummarizationOutputStyle
+from domojupyter.ai.models.SizeBoundary import SizeBoundary
+
+summary = summarize(
+    input_str=long_text,
+    output_style=SummarizationOutputStyle.BULLETED,
+    output_word_length=SizeBoundary(min_bound=75, max_bound=150),
+    chunking_configuration=ChunkingConfiguration(
+        max_chunk_size=1200,
+        chunk_overlap=100,
+        separators=["\n", ".", " "],
+        separator_type=SeparatorType.MARKDOWN,
+        disallow_intermediate_chunks=False
+    )
+)
 ```

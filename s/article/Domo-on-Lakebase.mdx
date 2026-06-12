@@ -1,85 +1,132 @@
 ---
 title: "Domo on Lakebase"
+excerpt: "Set up and manage a Lakebase Cloud Integration in Domo to query and visualize Lakebase data without copying or duplicating it."
 ---
 
 ## Intro
 
-With Cloud Integrations, you can query and visualize Lakebase data directly in Domo without copying or duplicating data.
+With Cloud Integrations, you can query and visualize Lakebase data directly in Domo without copying or duplicating data. This article explains how to set up and manage a Lakebase integration in Domo.
 
 ---
 
-
-## Before You Begin
+## Prerequisites
 
 - Confirm you have an account with access to Lakebase.
-- Ensure the Lakebase service account has the following Postgres privileges:
-  - `CONNECT` on the database — database visibility
-  - `USAGE` on the schemas — schemas visibility
-  - `SELECT` on the tables — query data
-- Go to Lakebase **Advanced Settings**, enable **Postgres native role login**, and create a native username and password. You will use these credentials in steps 4 and 5 of [Create a Lakebase Service Account](#create-a-lakebase-service-account).
-
+- Ensure the Postgres user you will use for the Lakebase service account has the following Postgres privileges:
+  - **CONNECT —** on the database—database visibility
+  - **USAGE —** on the schemas—schema visibility
+  - **SELECT —** on the tables—query data
+- If you plan to use **Username & Password** authentication: In Lakebase, go to **Advanced Settings**, enable **Postgres native role login**, and create a native username and password. Use these credentials when creating the service account.
 
 ## Access the Lakebase Integrations Page
- 
+
 1. Navigate to **Data Warehouse**.
 2. Select **Connect Data**.
 3. From the Cloud Integrations list, select **Lakebase**.
-   The Domo on Lakebase page appears.
-   <Frame>![Domo on Lakebase landing page](/images/kb/lakebase-kb-01.png)</Frame>
+   The **Domo on Lakebase** page appears.
 
+<Frame>
+  ![Domo on Lakebase landing page](/images/kb/lakebase-01.png)
+</Frame>
 
 ## Create a Lakebase Integration
- 
-Every Lakebase integration requires a Lakebase service account. A single service account can be reused across multiple integrations. Multiple integrations can coexist in the same Domo instance, so use clear, descriptive names.
- 
-<Frame>![Lakebase integration setup form](/images/kb/lakebase-kb-03.png)</Frame>
+
+Every Lakebase integration requires a service account. You can reuse one service account across multiple integrations and run multiple integrations in the same Domo instance—use clear, descriptive names to tell them apart.
+
+<Frame>
+  ![Lakebase integration setup form](/images/kb/lakebase-03.png)
+</Frame>
 
 1. Enter a **Name** for the integration.
-   This label identifies it within Domo — it doesn't need to match any Lakebase names and can be changed later.
-2. (Optional) Enter a **Description** to explain the purpose of the integration and who created it.
-   Most users see only the integration name in menus and lists — the description appears only in integration details.
-3. In the **Lakebase Service Account** field, select an existing service account, or select **+ Add Account** to create a new one.
-   If you select **+ Add Account**, the New Lakebase Service Account dialog appears — see [Create a Lakebase Service Account](#create-a-lakebase-service-account) below before continuing.
-   <Warning>**Important:** If you change the service account later, DataSets and DataFlows may need remapping, and access to previously connected tables may change if the new account has different privileges.</Warning>
-4. Enter the **Lakebase Account Database** — the name of the database that contains your Lakebase tables.
-5. Select **Save Integration**.
-   <Frame>![Lakebase service account dropdown](/images/kb/lakebase-kb-04.png)</Frame>
+   This label identifies it within Domo—it doesn't need to match any Lakebase names and can be changed later.
 
+2. (Optional) Enter a **Description**.
+   The description appears only in integration details—most views show only the name.
+
+3. In the **Lakebase service account** field, select an existing service account, or select **Add account...** to create a new one.
+   If you select **Add account...**, the New Lakebase Service Account dialog appears—complete the steps in [Create a Lakebase service account](#create-a-lakebase-service-account) below, then return here and continue with step 4.
+
+   <Warning>**Important:** If you change the service account later, DataSets and DataFlows may need remapping, and access to previously connected tables may change if the new account has different privileges.</Warning>
+
+4. In the **Lakebase account database** field, enter the name of the database that contains your Lakebase tables.
+   You can find this in your Lakebase catalog or database settings.
+
+5. Select **Save integration**.
+
+<Frame>
+  ![Lakebase service account dropdown](/images/kb/lakebase-04.png)
+</Frame>
+
+After saving, a confirmation screen appears.
+
+<Frame>
+  ![Integration created successfully](/images/kb/lakebase-09.png)
+</Frame>
+
+Select **Proceed to Integration Overview** to start connecting tables and configuring the integration.
 
 ## Create a Lakebase Service Account
- 
-To view and manage existing service accounts, go to **Accounts** in Domo. You can create multiple service accounts for the same Lakebase instance.
- 
-<Warning>**Important:** When you create a Lakebase service account, you, other account owners, and anyone the account is shared with can use its credentials to access Lakebase and create connected DataSets in Domo. Sensitive values such as passwords, tokens, and keys are not visible to anyone.</Warning>
- 
-<Frame>![New Lakebase Service Account dialog](/images/kb/lakebase-kb-05.png)</Frame>
 
-1. Enter a **New Account Name** to identify this service account within Domo.
+<Warning>**Important:** Anyone with access to this service account—including other account owners, Domo admins, and users you share it with—can use its credentials to access Lakebase and create connected DataSets in Domo. Passwords, tokens, and keys are never visible.</Warning>
+
+1. In the **New account name** field, enter a name to identify this service account within Domo.
    Use a clear, distinctive name to avoid confusion with other Lakebase accounts and integrations.
-2. Enter the **Lakebase Account Server Hostname** — the server name or IP address of your Lakebase instance.
-3. Enter the **Lakebase Account Port** — the port your Lakebase instance uses for incoming connections.
-4. Enter the **Lakebase Username** — the native username you created in Lakebase.
-5. Enter the **Lakebase Password** — the native password you created in Lakebase.
-6. Select **Add Account**.
 
+2. In the **Lakebase account server hostname** field, enter the server name or IP address of your Lakebase instance.
+
+3. In the **Lakebase account port** field, enter the port your Lakebase instance uses for incoming connections.
+
+4. From the **Connect with** dropdown, select your authentication method:
+   - **Username & Password —** Authenticate using a native Postgres username and password. Requires Postgres native role login to be enabled in Lakebase Advanced Settings.
+   - **M2M OAuth —** Authenticate using Databricks machine-to-machine OAuth credentials.
+
+   <Frame>
+     ![New Lakebase Service Account dialog — M2M OAuth selected](/images/kb/lakebase-06.png)
+   </Frame>
+
+5. Enter the credentials for your selected method.
+
+   (Conditional) If you selected **Username & Password**:
+
+   a. In the **Lakebase username** field, enter the native username you created in Lakebase.
+
+   b. In the **Lakebase password** field, enter the native password you created in Lakebase.
+
+   <Frame>
+     ![New Lakebase Service Account dialog — Username & Password](/images/kb/lakebase-05.png)
+   </Frame>
+
+   (Conditional) If you selected **M2M OAuth**:
+
+   a. In the **Databricks workspace hostname** field, enter the hostname of your Databricks workspace.
+
+   b. In the **Client ID** field, enter the application ID of the Databricks service principal.
+
+   c. In the **Client Secret** field, enter the OAuth secret for the service principal.
+
+   <Frame>
+     ![M2M OAuth credential fields](/images/kb/lakebase-07.png)
+   </Frame>
+
+6. Select **Create Account**.
+   The service account is saved and available in the **Lakebase service account** dropdown when creating an integration.
+
+To view and manage existing service accounts, go to **Data Warehouse** > **Connect Data** > **Cloud Integrations** > **Lakebase**.
 
 ## Manage Existing Integrations
- 
-Select **Manage Integrations** from the Domo on Lakebase page to view existing integrations.
 
-The Lakebase Cloud Integrations page lists each integration's name, number of connected tables, configuration type, and your access level. You can also select **+ Add New Integration** from this page.
- 
-<Frame>![Lakebase cloud integrations page](/images/kb/lakebase-kb-02.png)</Frame>
+Select **Manage Integrations** from the **Domo on Lakebase** page to view existing integrations. The Lakebase Cloud Integrations page lists each integration's name, number of connected tables, configuration type, and your access level. You can also select **+ Add New Integration** from this page.
 
-To manage a specific integration, select the **Wrench** icon next to it.
- 
-<Frame>![Integration management options](/images/kb/lakebase-kb-06.png)</Frame>
+<Frame>
+  ![Lakebase cloud integrations page](/images/kb/lakebase-02.png)
+</Frame>
 
-Available options vary based on your access level:
-- **Edit Integration** — update the integration's name, description, service account, or database settings. From the integration settings page, you can also connect tables, configure data freshness, and share the integration with other users. For details on data freshness and account sharing, see [Cloud Integrations Overview](/s/article/4412849158167)
-- **Select Tables to Connect** — add or remove Lakebase tables from the integration. See [Connect Tables in Cloud Integrations](/s/article/Connect-Tables-in-Cloud-Integrations) for instructions
-- **Delete Integration** — permanently remove the integration
+To manage a specific integration, select the wrench icon next to it. Available options vary based on your access level:
 
-<Frame>![Integration settings page](/images/kb/lakebase-kb-07.png)</Frame>
+- **Edit integration —** Update the integration's name, description, service account, or database settings. From the integration settings page, you can also connect tables, configure data freshness, and share the integration with other users. For details on data freshness and account sharing, see [Cloud Integrations Overview](/s/article/4412849158167#cloud-integrations-overview).
+- **Select tables to connect —** Add or remove Lakebase tables from the integration. See [Connect Tables](/s/article/Connect-Tables-in-Cloud-Integrations#connect-tables-in-cloud-integrations) for instructions.
+- **Delete integration —** Permanently remove the integration.
 
-From this page, you can update integration settings, connect tables, configure data freshness, and share the integration with other users.
+<Frame>
+  ![Integration settings page](/images/kb/lakebase-11.png)
+</Frame>

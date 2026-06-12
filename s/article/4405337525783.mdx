@@ -1,41 +1,38 @@
 ---
 title: "Data Fundamentals: Understanding Relational Data, Domo Architecture, and Data Pipeline Optimization"
+excerpt: "Overview of relational database basics, Domo architecture, and data pipeline optimization techniques for working effectively with data in Domo."
 ---
 
-# Relational Database Basics
+## Relational Database Basics
 
 A relational database stores data in tables (rows and columns). It makes use of “relationships” that exist between tables to minimize the disk space required to store that data. While Domo isn't strictly speaking a relational database management system (RDBMS), it does use relational databases in its infrastructure and many basic principles of relational databases can be used to describe and understand how Domo functions and how to work with data in Domo effectively.
 
-
-
-#### Dimensions and Metrics
+### Dimensions and Metrics
 
 A metric is often a numeric value, such as number of web ad clicks or dollar value of sales. A dimension describes the value. For example, a table of sales data might include a product SKU column. That table would store data that would allow answering business questions such as what are total sales amounts (metric) per SKU (dimension)?
 
 <Frame><img alt="Figure_1.png" src="/images/kb/ka05w0000012BId-00N5w00000Ri7BU-0EM5w000005vPVK.png"/></Frame>
 **Figure 1 - Row, Columns, Dimensions, and Metrics.**
 
-#### Types of Tables
+### Types of Tables
 
 Often, rather than presenting a single table with transactions and all associated dimensional information, data are presented in multiple tables, with one table containing the metrics and the other(s) containing more information about the dimensions. These various tables are related to each other by “keys” (discussed below). The keys establish the relations in a “relational database”. There are at least two types of tables.
 
-
-
-##### Transaction
+#### Transaction
 
 A transaction table (also sometimes called a "fact" table in data warehousing terminology) contains one record for every transaction event, where a "transaction" is a record of some action or event such as a social media post interaction, a website click, or a record of a sale.
 
 <Frame><img alt="Figure_2.png" src="/images/kb/ka05w0000012BId-00N5w00000Ri7BU-0EM5w000005vPV5.png"/></Frame>
 **Figure 2 - In a transaction or fact table, each record represents a transaction or event. In this table, each record represents a sale of some quantity of product.**
 
-##### Dimension
+#### Dimension
 
 A dimension table contains a single record for each dimension value and attributes further describing that dimension. For example, a dimension table might contain information about products, where each row represents a single SKU and the various columns in the table describe the SKU. Such attributes might include product name and unit price.
 
 <Frame><img alt="Figure_3.png" src="/images/kb/ka05w0000012BId-00N5w00000Ri7BU-0EM5w000005vPVL.png"/></Frame>
 **Figure 3 - A dimension table contains one record for each value for a type of dimension. In this case, there is one record for each SKU with additional information - such as description and unit price - that describes the dimension.**
 
-#### Types of Data
+### Types of Data
 
 The data type of a column will govern what data can be stored in the column and which operations are allowed on the column. Data type also affects how efficiently some operations can be executed on the column. For example, joins, filters, and case logic on numeric columns are faster than equivalent operations on text columns. There are many different data types, and the fine details of each vary from one database system to another. However, these data types can be considered in just a few groups:
 
@@ -47,15 +44,11 @@ The data type of a column will govern what data can be stored in the column and 
 
 There are certainly other types of data but these three groups are by far the most common.
 
-
-
-##### NULL: No Value
+#### NULL: No Value
 
 Each cell in a table can contain a value or no value at all. When a cell contains no value, it is said to be null. It is important to understand what null means and how databases and Domo treat null. First, null is NOT zero and it is NOT an empty string. Zero and the empty string are both values, whereas null is no value at all. Null serves a very specific purpose: it is how the lack of any information/value is represented. Because null is no value at all, it is impossible for null to equal anything else, including other nulls. Therefore, when logic is to be applied to a column that could contain null (and it is safest to assume all fields could contain null), that logic must account for or “handle” nulls. This is especially true in logic where two columns are compared with one another, where a column is compared to a constant value, or when performing mathematical calculations. Examples include CASE logic, filters, and join conditions.
 
-
-
-#### Granularity and Uniqueness
+### Granularity and Uniqueness
 
 To prevent misuse or misinterpretation, it is important to understand the granularity of the data in a table. Granularity describes the "level" at which data are presented. For example, a table of employees is granular at the employee level meaning each record represents a single employee. That table may contain many attributes of the employee, such as employee ID, name, and department. A table of transactions is granular at the transaction level. That is, each record represents a transaction and the values in the various columns describe the transaction.
 
@@ -64,39 +57,33 @@ Closely related is the idea of "uniqueness". Uniqueness is an indication of the 
 <Frame><img alt="Figure_4.png" src="/images/kb/ka05w0000012BId-00N5w00000Ri7BU-0EM5w000005vPV1.png"/></Frame>
 **Figure 4 - In the table of employees, which is granular at the Employee level (meaning there is a single row per Employee), the Employee ID column alone uniquely identifies each row.**
 
-Often, a table will include a single ID column that uniquely identifies each row in the table. Such is the case with the table of employees: Each employee has an Employee ID and no two employees share the same Employee ID. But tables don’t always contain explicit ID columns, nor is uniqueness always defined by a single column. In the sales transaction table for example, there is no “Transaction ID” field, and three columns must be considered together to establish uniqueness: PO Number, Customer, and Product SKU. (A single purchase order may include multiple SKUs, and since PO number comes from the customer, it is possible that two customers could submit the same PO number. Therefore, only the combination of PO Number, Customer, and Product SKU establishes uniqueness.)
+Often, a table will include a single ID column that uniquely identifies each row in the table. Such is the case with the table of employees: Each employee has an Employee ID and no two employees share the same Employee ID. But tables don't always contain explicit ID columns, nor is uniqueness always defined by a single column. In the sales transaction table for example, there is no “Transaction ID” field, and three columns must be considered together to establish uniqueness: PO Number, Customer, and Product SKU. (A single purchase order may include multiple SKUs, and since PO number comes from the customer, it is possible that two customers could submit the same PO number. Therefore, only the combination of PO Number, Customer, and Product SKU establishes uniqueness.)
 
 <Frame><img alt="Figure_5.png" src="/images/kb/ka05w0000012BId-00N5w00000Ri7BU-0EM5w000005vPVN.png"/></Frame>
 **Figure 5 - In the sales transactions table, which has no single column that uniquely identifies each row, a combination of PO Number, Customer, and Product SKU is required to uniquely identify each row.**
 
-#### Data Relationships
+### Data Relationships
 
 Often, data from multiple tables will need to be combined to answer a particular business question. This is especially true when the source data comes from a data warehouse, which will often make use of a “star schema” data architecture where a central transaction (fact) table references one or many other peripheral dimension tables that can be used to further describe each transaction. For example, the table of sales transactions lists the date of the sale, the quantity sold, the dollar amount of the sale, the SKU of the item sold, and the employee ID of the sales rep who performed the sale. Separately, the table of products contains SKUs with the associated product names and categories. To determine the dollar value of sales within each product category, the sales transaction table and product table will need to be referenced together making use of the key columns that define the relationship between the tables.
 
-
-
-##### Cardinality
+#### Cardinality
 
 Cardinality is closely related to the concepts of granularity and uniqueness described above. Cardinality describes the nature of the relationships between records in two tables. In the example above, there is a many-to-one relationship between the sales transaction table and the product table: Each SKU may be represented in the sales transactions data zero, one, or many times; and the sales transaction table is related to the product table where each SKU is presented exactly once.
 
+#### Primary and Foreign Keys
 
+A column (or set of columns) that uniquely identifies a row of data is called a primary key. Thus, a primary key is fully unique. Primary key columns can't contain NULL values. A primary key in one table can be referenced by a foreign key in another table. Put another way, the relationship between two tables is described by their primary and foreign keys. In the sales transactions example above, the Product SKU column is the primary key in the product and it is referenced by the Product SKU column in the sales transactions table, in which it is a foreign key.
 
-##### Primary and Foreign Keys
+In relational database management systems, primary-foreign key relationships can be codified such that the database will enforce “referential integrity” by requiring that primary keys be unique and by preventing deletes of records in dimension tables that are referenced by foreign keys in transaction tables. As stated, Domo is not a relational database management system, so primary and foreign key constraints aren't enforced. Still, to effectively use Domo, it is important to understand these concepts.
 
-A column (or set of columns) that uniquely identifies a row of data is called a primary key. Thus, a primary key is fully unique. Primary key columns can’t contain NULL values. A primary key in one table can be referenced by a foreign key in another table. Put another way, the relationship between two tables is described by their primary and foreign keys. In the sales transactions example above, the Product SKU column is the primary key in the product and it is referenced by the Product SKU column in the sales transactions table, in which it is a foreign key.
-
-In relational database management systems, primary-foreign key relationships can be codified such that the database will enforce “referential integrity” by requiring that primary keys be unique and by preventing deletes of records in dimension tables that are referenced by foreign keys in transaction tables. As stated, Domo is not a relational database management system, so primary and foreign key constraints aren’t enforced. Still, to effectively use Domo, it is important to understand these concepts.
-
-
-
-##### Entity relationship diagrams
+#### Entity relationship diagrams
 
 Data tables and relationships between tables are often represented using “entity relationship diagrams” (ERD). The lines connecting two tables indicate the existence of a relationship; the terminals on the lines represent the cardinality of the relationship. In the sales data example, there are many-to-one relationships between the sales transaction table and the employee table; and between the sales transaction table and the product table. These relationships can also be interpreted in natural language: A single employee can complete a sale 0, 1, or many times; a particular SKU could be sold 0, 1, or many times.
 
 <Frame><img alt="Figure_6.png" src="/images/kb/ka05w0000012BId-00N5w00000Ri7BU-0EM5w000005vPVP.png"/></Frame>
 **Figure 6 - An entity relationship diagram can be used to represent the nature of relationships between data tables.**
 
-##### Joins
+#### Joins
 
 A join makes use of the relationships between tables. It is a command that tells the database how to combine two tables side-by-side. The “side-by-side” nature of the join is hinted at by the names of various join types: “left outer” and “right outer”, for example.
 
@@ -116,37 +103,29 @@ In the diagram below each join type is presented as a Venn diagram where the two
 <Frame><img alt="Figure_7.png" src="/images/kb/ka05w0000012BId-00N5w00000Ri7BU-0EM5w000005vPVA.png"/></Frame>
 **Figure 7 - Join types are presented as Venn diagrams. The circles represent the two tables participating in the join. The shaded regions represent those records that are returned by the join.**
 
-# Granularity and Uniqueness – Common Pitfalls
+## Granularity and Uniqueness – Common Pitfalls
 
 It is important to establish a good understanding of the granularity and uniqueness of various tables and the relationships between them. Otherwise, data may be joined or used in ways that are misleading or entirely incorrect. There are two common pitfalls that both result from misunderstanding or misuse of the underlying data.
 
-
-
-#### Cartesian Joins
+### Cartesian Joins
 
 In mathematics, a “cartesian product” is all possible combinations of elements of two sets. The cartesian product of sets \{A, B} and \{C, D} would be \{AC, AD, BC, BD}. The same concept appears when joining two data tables: without a good understanding of the granularity and uniqueness of the tables, and without specifying the appropriate join conditions, a cartesian join may result. In a cartesian join, records from one or both tables will be duplicated, resulting in inaccurate results. Row count increases and duplication of records – a column or columns that were previously unique identifiers are no longer after the join – are indicators of a cartesian join. There are specific use cases where a cartesian join is desired and expected, but those use cases are the small exception.
 
-To prevent a cartesian join, the join should be defined such that the join conditions uniquely identify a row. Typically, this is accomplished by using the unique identifier column(s) of the joining table in the join condition. Of course, this requires knowing which column(s) constitute the unique identifier. In circumstances where uniqueness isn’t guaranteed (e.g., in the absence of a system generated unique ID, and especially when dealing with manually-maintained data), best practice suggests enforcing uniqueness.
+To prevent a cartesian join, the join should be defined such that the join conditions uniquely identify a row. Typically, this is accomplished by using the unique identifier column(s) of the joining table in the join condition. Of course, this requires knowing which column(s) constitute the unique identifier. In circumstances where uniqueness isn't guaranteed (e.g., in the absence of a system generated unique ID, and especially when dealing with manually-maintained data), best practice suggests enforcing uniqueness.
 
-
-
-#### Tables Containing Mixed Attribution or Level of Granularity
+### Tables Containing Mixed Attribution or Level of Granularity
 
 Typically, a table contains records of distinct instances of some type or class of entity. For example, the sales transaction table contains one record for each sales transaction; the product table contains one record for each SKU; etc. And each instance of each entity is defined by its various dimensions or attributes. Thus, each data dimension can be thought of as an attribute of some thing.
 
-The organization of data in a star schema usually makes it easy to identify which dimensions are attributes of which entities; or, which dimensions apply at which levels of granularity. For example, the unit price is an attribute of a product, identified by SKU in the product table; and salary might be an attribute of an employee, identified by employee ID in the employees table. However, when data from multiple tables are combined via a join, it can be difficult to understand which attributes apply to which class. In the employee table, it is probably acceptable to treat salary as a metric that can be summed (i.e., to calculate total salary overhead) or averaged (i.e., to calculate average salary per seniority band). However, when the employee data is joined to the sales transaction table, any attempt to consider salary as a metric would yield incorrect results. That’s because salary is an attribute of employee and granular at the level of one record per employee; but the sales table is granular at the level of one record per sales transaction.
+The organization of data in a star schema usually makes it easy to identify which dimensions are attributes of which entities; or, which dimensions apply at which levels of granularity. For example, the unit price is an attribute of a product, identified by SKU in the product table; and salary might be an attribute of an employee, identified by employee ID in the employees table. However, when data from multiple tables are combined via a join, it can be difficult to understand which attributes apply to which class. In the employee table, it is probably acceptable to treat salary as a metric that can be summed (i.e., to calculate total salary overhead) or averaged (i.e., to calculate average salary per seniority band). However, when the employee data is joined to the sales transaction table, any attempt to consider salary as a metric would yield incorrect results. That's because salary is an attribute of employee and granular at the level of one record per employee; but the sales table is granular at the level of one record per sales transaction.
 
-Best practice suggests not mixing attributes from different classes or levels of granularity. Thus, instead of joining the salary data to the sales data and then trying to answer questions about salary from that combined data, salary should be kept separate from the sales data and questions about salary should rely upon the employee data directly. If this isn’t possible, consider adopting a naming convention that makes clear the class or level of granularity of a column. In the example of sales and salary, “Employee Salary” might be a more appropriate and helpful column name than merely “Salary”. Salary is universally understood to be an attribute of an employee so there is low risk of misinterpretation, but that isn’t always the case. For example, perhaps the region of a sale can be attributed in two different ways: 1) based on the customer’s headquarters location; 2) based on the geographical hierarchy of the sales organization. In that case, appropriate column names might be “Customer Region” and “Sales Geography Region”.
+Best practice suggests not mixing attributes from different classes or levels of granularity. Thus, instead of joining the salary data to the sales data and then trying to answer questions about salary from that combined data, salary should be kept separate from the sales data and questions about salary should rely upon the employee data directly. If this isn't possible, consider adopting a naming convention that makes clear the class or level of granularity of a column. In the example of sales and salary, “Employee Salary” might be a more appropriate and helpful column name than merely “Salary”. Salary is universally understood to be an attribute of an employee so there is low risk of misinterpretation, but that isn't always the case. For example, perhaps the region of a sale can be attributed in two different ways: 1) based on the customer's headquarters location; 2) based on the geographical hierarchy of the sales organization. In that case, appropriate column names might be “Customer Region” and “Sales Geography Region”.
 
-
-
-# Investigating and Enforcing Uniqueness
+## Investigating and Enforcing Uniqueness
 
 While Domo isn't a relational database management system, basic principles of relational databases are in play. For example, even though Domo doesn't allow defining a primary key on a DataSet, it is important to understand the granularity and uniqueness of data, especially when joining or aggregating. There are a few different ways to check for and/or ensure the uniqueness of data.
 
-
-
-#### Analyzer and Views
+### Analyzer and Views
 
 If a column (or group of columns) uniquely identifies the rows in a table, then there will be exactly one row represented by each of the values in the column (or each permutation of values across the columns). Uniqueness can be explored or validated by configuring a table card in Analyzer or using Views Explorer. To check for uniqueness, aggregate the data to the level of the presumed unique key and count the rows. If the column(s) is in fact a unique key in the table, the row counts will all be exactly 1; if not, the column(s) is not a unique key.
 
@@ -155,108 +134,80 @@ In the sales transactions example, neither PO Number, Customer, nor Product SKU 
 <Frame><img alt="Figure_8.png" src="/images/kb/ka05w0000012BId-00N5w00000Ri7BU-0EM5w000005vPVO.png"/></Frame>
 **Figure 8 - Neither PO Number, Customer, nor Product SKU is a unique identifier (because each has at least one instance where there is more than 1 record identified by a particular value. However, the combination of the three fields does form a unique identifier.**
 
-Of course, if a field (or combination of fields) should be a unique identifier but isn’t, then ideally the duplication issue would be corrected upstream in the source system. However, if that isn't possible for whatever reason, uniqueness can be enforced using Domo Views or ETL processes. That is done by eliminating duplicate rows. In this context, “duplicate” means two or more records that share the same values in the field or fields that should constitute the primary key. The important distinction is that “duplicate” records may not be exact duplicates across all columns.
+Of course, if a field (or combination of fields) should be a unique identifier but isn't, then ideally the duplication issue would be corrected upstream in the source system. However, if that isn't possible for whatever reason, uniqueness can be enforced using Domo Views or ETL processes. That is done by eliminating duplicate rows. In this context, “duplicate” means two or more records that share the same values in the field or fields that should constitute the primary key. The important distinction is that “duplicate” records may not be exact duplicates across all columns.
 
-
-
-#### Aggregation
+### Aggregation
 
 Duplicate records can be removed via aggregation. In this approach, the data is aggregated up to the level of the column(s) in which uniqueness is to be enforced. Additional attributes/dimensions can be included as well but that must be done cautiously: sometimes, adding dimensions to the aggregation will result in the non-uniqueness in the column(s) in which uniqueness should be enforced. Metric/value columns can be aggregated. Be careful when choosing the aggregation method (i.e. sum, average, min, etc.). After the aggregation, the data is unique at the level the aggregation was performed.
 
-
-
-#### Removing Duplicates
+### Removing Duplicates
 
 Rather than aggregating, it is also possible to remove duplicate rows. Magic ETL provides a “Remove Duplicates” tile. To use that tile, specify the fields that should constitute the unique key. Domo removes duplicates by retaining only one record for each unique key value and filtering out all others. However, using this tile is often not recommended because it doesn't give control over which record is retained and which are filtered out.
 
 Rather than using the Remove Duplicates tile, the preferred method involves “partitioned” row numbering and filtering. In this method, the rows are numbered, partitioned by the unique key field(s), and then filtered such that only the one record with row number 1 is retained and all others are filtered out. By specifying the sort order in this approach, more logic can be implemented to select which one record is retained and which records are filtered out. This method can be accomplished in Magic ETL using the “Rank & Window” tile or in Redshift SQL using the row\_number() over(partition by [] order by []) function. MySQL in Domo doesn't support an equivalent row number function; however, the same result can be achieved using variables, though the syntax is more complex.
 
-
-
-# Domo Architecture
+## Domo Architecture
 
 To understand how to optimize data processing in Domo, you must have a basic understanding of Domo's architecture. Domo stores data in two places: Vault, the Domo data warehouse; and Adrenaline, the high-performance Card-rendering engine. The Adrenaline engine is used for supporting Card-rendering by responding to the queries that are executed each time a Card is loaded. Data processes (extract/transform/load processes, or “ETL” for short) run in separate data processing environments. Exceptions are Adrenaline Dataflows and Views, which are both executed on the Adrenaline engine. When a data process begins, data must be loaded from Vault into the ETL engine: Magic ETL, MySQL, or Redshift. Then, the data transformations specified in the ETL process are executed. Finally, the output data is written to Vault and then written to Adrenaline and indexed.
 
-
-
-# Data Pipeline Optimization
+## Data Pipeline Optimization
 
 Oftentimes, especially with ETL processes consuming very large input data, the initial input and the final output step account for the majority of the total ETL processing time. Thus, any methods that effectively reduce the size of the input and/or output data (either rows or columns) will reduce total processing time. This is the over-arching guiding principal: reduce the total size of the data to be processed as soon (i.e. as far upstream) as possible. There are several general guidelines that if followed will produce robust, efficient, performant data pipelines. These guidelines apply to ETL in general, both inside and outside of Domo, but this document focuses on how these guidelines can be implemented in Domo. These principles apply at the macro level (several data processes in a complete pipeline) and at the micro level (various transformations within a single DataFlow).
 
-
-
-#### Minimize number of times a record is processed
+### Minimize number of times a record is processed
 
 The idea here is to process a record as few times as possible. If a record might be updated in the source data (i.e. the phone number of a customer, stored in a contacts dimension table; or the status of an order) then it is necessary to re-process any changed records if/when they change. However, if the data doesn't change over time (that is, new records may be added but existing records will never be modified) it isn't necessary to re-process historical records. There are several methods that follow this general guideline:
 
-##### Partitioning
+#### Partitioning
 
-Partitioning will be discussed in detail later. The idea is to "subset" or "partition" the data and then only process those partitions that need to be processed. Partitioning can be accomplished using some Domo Connectors, the Domo command line interface (CLI), or by scripting against Domo APIs (directly or using Domo’s Java or Python SDKs).
+Partitioning will be discussed in detail later. The idea is to "subset" or "partition" the data and then only process those partitions that need to be processed. Partitioning can be accomplished using some Domo Connectors, the Domo command line interface (CLI), or by scripting against Domo APIs (directly or using Domo's Java or Python SDKs).
 
-
-
-##### Filtered DataFlow inputs using Views
+#### Filtered DataFlow inputs using Views
 
 In this method, a View is used to limit the number of records that must be run through an ETL process. For example, if a DataSet contains a lot of historical data but the end use only requires recent data (i.e. rolling 13 months or similar), a Dynamic Date Filter can be implemented in a View such that the View returns only the rolling 13 month data, and thus only that data is processed through the ETL.
 
-
-
-##### Enhanced data processing in the Magic ETL v2 engine
+#### Enhanced data processing in the Magic ETL v2 engine
 
 The Magic ETL v2 engine is smart enough to know which records are new or have been updated since the last time a DataFlow ran. Thus, it will process only the new or changed data where possible. Some functions within Magic ETL v2 (e.g. aggregations, windowed functions, etc.) require all input data to be processed.
 
-
-
-#### Minimize the number of rows processed
+### Minimize the number of rows processed
 
 This can be done using filters and/or aggregations. The extent to which a DataSet can be filtered or aggregated is defined by the end use case: obviously, if the final output requires a particular scope of data or a particular level of granularity, then that scope and granularity must be persisted from the source to the final output DataSet. However, oftentimes raw data provides much more granularity than is necessary. For example, does the final output really need to see every web click of every link? Or is it sufficient to simply know the number of clicks per user or per some other dimension(s)?
 
-#### Minimize the number of columns processed
+### Minimize the number of columns processed
 
-By default when a DataSet passes into an ETL process, all the columns are copied from Vault into the ETL engine, whether those columns are actually necessary in the process or not. MySQL DataFlows can be configured to select only specific columns to be copied into the ETL engine. This isn’t possible with Magic ETL, but Views can be used to subset only the necessary columns and then that view output can be read into a Magic ETL v2 process as an input.
+By default when a DataSet passes into an ETL process, all the columns are copied from Vault into the ETL engine, whether those columns are actually necessary in the process or not. MySQL DataFlows can be configured to select only specific columns to be copied into the ETL engine. This isn't possible with Magic ETL, but Views can be used to subset only the necessary columns and then that view output can be read into a Magic ETL v2 process as an input.
 
-
-
-#### Avoid single-threading through a single DataFlow or DataSet
+### Avoid single-threading through a single DataFlow or DataSet
 
 Domo users sometimes design their data environments with too much focus on creating a single pipeline or DataSet to support all (or too many) use cases. There are at least two reasons such designs may not be optimal: first, they increase the number of users and Cards reliant upon a DataSet, and in extreme cases that can lead to Card- and Page-rendering performance problems; second, such designs typically result in more complex processes and larger DataSets, both of which can result in excessive processing times. Rather than creating a single data pipeline and a single output DataSet “to rule them all”, consider creating processes and output DataSets that are designed for specific end use cases. This approach will generally allow a greater degree of row- and column-reduction. It also allows data processing to be conducted in parallel rather than in series. Such architectures are also optimized for Card-rendering performance, which is especially important with very large DataSets and/or large numbers of concurrent users.
 
 Of course, this must be balanced with other important ideas such as avoiding replication of logic or data. In general, any two use cases probably have some data, dimensionality, and logic in common; and other data, dimensionality, and logic that are distinct between them. Data processes should be created such that common concepts and logic are “collocated” in processes that support both use cases; but as the two use cases diverge in terms of their definitions or data requirements, they should also be allowed to diverge in terms of their supporting data processes, too. This suggests architectures in which data standardization and clean-up, as well as some look-ups and other operations, take place in a semantic middle layer designed to support multiple end use cases, followed by a use case-specific layer in which processes diverge to support the requirements of the various end use cases. This concept can be applied at the macro-level (across multiple DataFlows and DataSets) or the micro level (within a single DataFlow).
 
-One common example of this balanced approach can be seen in the need for aggregated historical data and detailed recent data. For example, perhaps the business requires a trailing 13-month view of sales volume as well as the customer, product, and rep details for transactions in the current month. Rather than a single DataSet containing 13 months’ worth of data at the detail level, this business need can be met with two distinct DataSets: an aggregated history DataSet, which contains 13 months’ worth of aggregated data by region; and a detailed current month DataSet, which contains detailed data for a single month. As illustrated in the diagram below, depending on the scope and dimensionality of the raw data, the two combined output DataSets could represent an 85 to 90% total row count reduction. (In terms of visualization, Domo’s drill-down functionality allows drilling down from one DataSet into another. End users don’t need to juggle or even be aware of the presence of two DataSets.)
+One common example of this balanced approach can be seen in the need for aggregated historical data and detailed recent data. For example, perhaps the business requires a trailing 13-month view of sales volume as well as the customer, product, and rep details for transactions in the current month. Rather than a single DataSet containing 13 months' worth of data at the detail level, this business need can be met with two distinct DataSets: an aggregated history DataSet, which contains 13 months' worth of aggregated data by region; and a detailed current month DataSet, which contains detailed data for a single month. As illustrated in the diagram below, depending on the scope and dimensionality of the raw data, the two combined output DataSets could represent an 85 to 90% total row count reduction. (In terms of visualization, Domo's drill-down functionality allows drilling down from one DataSet into another. End users don't need to juggle or even be aware of the presence of two DataSets.)
 
 <Frame><img alt="Figure_9.png" src="/images/kb/ka05w0000012BId-00N5w00000Ri7BU-0EM5w000005vPVJ.png"/></Frame>
 **Figure 9 - By allowing data processes to diverge when data, dimensionality, and logic requirements diverge, pipelines can be performance-tuned to support the specific end use cases.**
 
-#### Other tips
+### Other tips
 
-
-
-#### Strike a balance between joining data too far upstream or downstream
+### Strike a balance between joining data too far upstream or downstream
 
 There is a balance to be struck between joining upstream, which may enable upstream aggregation but also increase up-stream column counts; and joining downstream, which may result in retaining more granularity (and therefore more rows) further down the data pipeline. Perform joins upstream whenever significant aggregation can be accomplished upstream as a result.
 
-
-
-##### Join Using Numbers Rather Than Strings
+#### Join Using Numbers Rather Than Strings
 
 Whenever possible, perform joins using numeric columns rather than string columns. Joins on numbers, especially integers, are faster than joins on strings.
 
-
-
-##### Define indexes
+#### Define indexes
 
 Databases use indexes just like a person might use the index in a textbook: to quickly find information. Indexes are essential for data processes to run efficiently, especially operations such as joins, aggregations, and filters. In Magic ETL and Redshift, the database engine effectively creates indexes automatically. However, in MySQL, indexes must be created explicitly within the DataFlow. Missing indexes can have a huge negative impact on data processing time.
 
-
-
-# Data Update Methods
+## Data Update Methods
 
 There are four methods used by Domo to update your data: Replace, Append, Merge (Upsert), and Partition. To learn more, see [DataSet Update Methods](/s/article/360043430733).
 
-
-
-# Recursive DataFlow
+## Recursive DataFlow
 
 Appending, upserting, and partitioning are supported in various parts of the Domo product such as Connectors, Workbench, and the Domo APIs. Depending on how the recursive DataFlow is configured, it can yield results that are effectively the same as the results of appending, upserting, or partitioning. The benefit of using a recursive DataFlow is that the logic can be fine-tuned to the particular use case. However, recursive DataFlows are costly to run because, by definition, their output data grows continually over time and because they require re-processing all historical data each time new incoming data is processed. Still, recursive DataFlows can be an important part of a pipeline solution as long as the total data size and growth rate remain relatively small.
 
@@ -269,17 +220,13 @@ Other resources:
 * [Creating a Recursive/Snapshot DataFlow in Magic ETL v2](/s/article/360057087393)
 * [Creating a Recursive/Snapshot SQL DataFlow](/s/article/360043428133)
 
+### Accumulating Raw Data at Point of Ingestion
 
+Depending on the ingestion method, accumulating data by appending, upserting, or partitioning may all be supported. In addition, recursive DataFlows can be created immediately downstream from raw source data to effectively accumulate at the point of ingestion. However, accumulating data upstream violates the general guideline that records should be processed as few times as possible (that's because any downstream DataFlows would likely be operating on the full accumulated DataSets). The guideline to process data as few times as possible suggests accumulating data downstream, and that will often yield a more performant data pipeline.
 
-#### Accumulating Raw Data at Point of Ingestion
+### Accumulating Data “Mid-stream”
 
-Depending on the ingestion method, accumulating data by appending, upserting, or partitioning may all be supported. In addition, recursive DataFlows can be created immediately downstream from raw source data to effectively accumulate at the point of ingestion. However, accumulating data upstream violates the general guideline that records should be processed as few times as possible (that’s because any downstream DataFlows would likely be operating on the full accumulated DataSets). The guideline to process data as few times as possible suggests accumulating data downstream, and that will often yield a more performant data pipeline.
-
-
-
-#### Accumulating Data “Mid-stream”
-
-While all accumulation methods may be applicable at the point of ingestion, Domo currently doesn’t support mid-stream accumulation natively. Data accumulation can still be accomplished downstream, but it requires a bit more creativity. Recursive DataFlows are one possibility. Another option is to extract data from Domo (i.e. by scripting using the Domo CLI or by scripting against Domo’s APIs) and then re-upload to Domo using partitioning or upsert. The re-upload step could be accomplished using CLI commands or Workbench).
+While all accumulation methods may be applicable at the point of ingestion, Domo currently doesn't support mid-stream accumulation natively. Data accumulation can still be accomplished downstream, but it requires a bit more creativity. Recursive DataFlows are one possibility. Another option is to extract data from Domo (i.e. by scripting using the Domo CLI or by scripting against Domo's APIs) and then re-upload to Domo using partitioning or upsert. The re-upload step could be accomplished using CLI commands or Workbench).
 
 <Note>
   **Note:**

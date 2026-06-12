@@ -1,5 +1,6 @@
 ---
 title: "Amazon KinesisデータをDomoに書き込む"
+excerpt: "Amazon Lambda 関数と JSON Webhook DataSet を組み合わせ、Amazon Kinesis Stream のデータを Domo DataSet に書き込みます。"
 ---
 
 ## はじめに
@@ -23,7 +24,7 @@ KinesisにプッシュされたデータがJSON Webhook DataSetの中にコピ�
 2. **［Get the Data］** をクリックします。
 3. **［Webhook URL］** フィールドの中のリンクをコピーし、保存します（このフィールドは変更できません）。
 
-   <Frame><img alt="Webhook URL_［Details］セクション" src="/images/kb/ka0Vq00000003qj-00N5w00000Ri7BU-0EMVq0000005kzt.jpg" style={{width: 698, height: 464}}/></Frame>
+   <Frame><img alt="Webhook URL_［Details］セクション" src="/images/kb/ka0Vq00000003qj-00N5w00000Ri7BU-0EMVq0000005kzt.jpg"/></Frame>
 
 4. （オプション）データがWebhookに送信されるときにWebhookに対するシークレットの認証情報が要求されるようにしたい場合は、**［Webhook Secret］** フィールドに入力してください（以降のステップに対しては、Webhookシークレットが使用されていないと仮定します）。
 5. DataSetを追加にするか、置き換えにするかを選択します。デフォルトでは追加に設定されており、これは一般にKinesisユーザーが必要とするものです。
@@ -40,7 +41,7 @@ Kinesis StreamからWebhookの中にデータを送信するには、Amazon Lamb
 
 1. AWSマネジメントコンソールでLambdaサービスを選択します（実際のAWSのUIとは少し異なる場合があります）。
 
-   <Frame><img alt="Lambda" src="/images/kb/ka0Vq00000003qj-00N5w00000Ri7BU-0EMVq0000005lG1.jpg" style={{width: 638, height: 468}}/></Frame>
+   <Frame><img alt="Lambda" src="/images/kb/ka0Vq00000003qj-00N5w00000Ri7BU-0EMVq0000005lG1.jpg"/></Frame>
 
 2. 左側のメニューで、**［Functions］** を選択します。
 
@@ -56,12 +57,12 @@ Kinesis StreamからWebhookの中にデータを送信するには、Amazon Lamb
    * ［Runtime］ – 関数が使用する言語を選択します。このチュートリアルではNode.js 20.xを使用しています。Java、C#、Go、Python、またはRubyを使用して関数を作成することも可能です。
    * ［Role］ – **［Choose an existing role］** を選択します。AWS管理者と協力し、この関数に適した権限が存在するようにしてください。権限はKinesisを読み取り、（ロギングのために）CloudWatchに書き込み、HTTPSコールを行うことができなければなりません。
 
-     <Frame><img alt="関数を作成する_最初から作成する" src="/images/kb/ka0Vq00000003qj-00N5w00000Ri7BU-0EMVq0000005lJF.jpg" style={{width: 607, height: 715}}/></Frame>
+     <Frame><img alt="関数を作成する_最初から作成する" src="/images/kb/ka0Vq00000003qj-00N5w00000Ri7BU-0EMVq0000005lJF.jpg"/></Frame>
 
 5. **［Create function］** をクリックします。
 6. Lambda関数が作成されたら、画面の左側にあるメニューから **［Kinesis］** を選択し、Kinesisをトリガーとして関数に追加します。
 
-   <Frame><img alt="トリガーを追加する_Kinesis2Webhook" src="/images/kb/ka0Vq00000003qj-00N5w00000Ri7BU-0EMVq0000005lZN.jpg" style={{width: 639, height: 248}}/></Frame>
+   <Frame><img alt="トリガーを追加する_Kinesis2Webhook" src="/images/kb/ka0Vq00000003qj-00N5w00000Ri7BU-0EMVq0000005lZN.jpg"/></Frame>
 
 7. 必要なフィールドに入力して、トリガーを設定します。一般的に、デフォルト値が許容されます。
 
@@ -71,7 +72,7 @@ Kinesis StreamからWebhookの中にデータを送信するには、Amazon Lamb
    * ［Starting Position］ – **［Latest］** に設定します。これにより、関数にはKinesis Streamの直近のデータが与えられます。
    * ［Activate Trigger］ – 必ずこのボックスにチェックマークを入れてください。
 
-     <Frame><img alt="トリガー設定" src="/images/kb/ka0Vq00000003qj-00N5w00000Ri7BU-0EMVq0000005laz.jpg" style={{width: 627, height: 554}}/></Frame>
+     <Frame><img alt="トリガー設定" src="/images/kb/ka0Vq00000003qj-00N5w00000Ri7BU-0EMVq0000005laz.jpg"/></Frame>
 
 8. **［Add］** をクリックします。
 9. 関数の名前をクリックして関数コードパネルを表示します。
@@ -137,7 +138,7 @@ Kinesis StreamからWebhookの中にデータを送信するには、Amazon Lamb
     * ［WEBHOOK\_HOST］– これは、この手順のステップ1で作成したDataSet内のWebhook URLのドメインの部分です。これは通常 [webhooks.domo.com](http://webhooks.domo.com) です。
     * ［WEBHOOK\_ENDPOINT］– これは、Webhook URLの「/api」以降のすべてです。これは非常に長い英数字の文字列になります。
 
-      <Frame><img alt="環境変数" src="/images/kb/ka0Vq00000003qj-00N5w00000Ri7BU-0EMVq0000005lcb.jpg" style={{width: 621, height: 324}}/></Frame>
+      <Frame><img alt="環境変数" src="/images/kb/ka0Vq00000003qj-00N5w00000Ri7BU-0EMVq0000005lcb.jpg"/></Frame>
 
 13. エディターの中のメニューから、**［File］>［Save］** を選択します。
 14. 画面の一番上で、**［Save］** をクリックし、Lambda関数に対して行ったすべての変更を保存します。

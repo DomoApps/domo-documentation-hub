@@ -5,7 +5,7 @@ permalink: 1l1fm2g0sfm69-app-db-api
 
 AppDB allows the storage of arbitrary JSON documents similar to a normal NoSQL database. This enables the ability to store a state within your DomoApp. Optionally, you can also sync the data in AppDB back to a Domo DataSet. Three layers (analogous to traditional storage mechanisms) provide this data storage:
 
-1. Datastores: Analogous to a database. A CustomApp has a single datastore that is created automatically, named with the CustomApp’s ID and managed transparently to the CustomApp.
+1. Datastores: Analogous to a database. A CustomApp has a single datastore that is created automatically, named with the CustomApp's ID and managed transparently to the CustomApp.
 2. Collections: Analogous to a collection in a NoSQL database or a table in a relational database. A datastore can have multiple collections defined.
 3. Documents: Analogous to documents in a NoSQL database or a table row in a relational database. A collection can have multiple documents.
 
@@ -1224,7 +1224,7 @@ While your front-end application code can accomplish these examples in an attemp
   ]
 ```
 
-In this example, any user who belongs to the group with ID `12` or `15` in Domo will only be able to see, modify, or delete documents that have the value of “West” in the document’s `content.region` property. As you can see, the `filters` property of this Collection's configuration object takes a list of filter rules. Adding multiple filter rules in the `filters` property will chain together the rules as an `OR` statement as in any standard data query language. There are several properties of a filter rule that are required to secure your documents. The following image groups them together by function.
+In this example, any user who belongs to the group with ID `12` or `15` in Domo will only be able to see, modify, or delete documents that have the value of “West” in the document's `content.region` property. As you can see, the `filters` property of this Collection's configuration object takes a list of filter rules. Adding multiple filter rules in the `filters` property will chain together the rules as an `OR` statement as in any standard data query language. There are several properties of a filter rule that are required to secure your documents. The following image groups them together by function.
 
 ![Filter Rule](/images/dev/web-assets.domo.com/miyagi/images/product/product-feature-dev-portal-appdbb-security-Filtering.png)
 
@@ -1241,14 +1241,14 @@ In this example, any user who belongs to the group with ID `12` or `15` in Domo 
     - type – The property that determines what kind of condition to compare against the current user:
       - `USER_ID`
       - `GROUP_ID`
-    - `values` – The property that takes a list of possible values that the current user will be compared to. For example, if the `type` of the condition is `USER_ID` and the `values` list contains the current user’s ID, then the condition will evaluate to true, and this filter rule will apply to the current user. If the list does not contain the user’s ID, the condition will evaluate to false, and the filter rule will not apply and will be skipped.
+    - `values` – The property that takes a list of possible values that the current user will be compared to. For example, if the `type` of the condition is `USER_ID` and the `values` list contains the current user's ID, then the condition will evaluate to true, and this filter rule will apply to the current user. If the list does not contain the user's ID, the condition will evaluate to false, and the filter rule will not apply and will be skipped.
       - **Wildcards**: In addition to listing static values, this field also supports two wildcards: `%userId%` and `%groupIds%`. An example of using one is, `"query": {"content.user": "%userId%"}`, which would replace the `%userId%` with the ID of the current user.
 
 - `applyToAll` – A boolean value that overrides the applyTo property. If this property is set to true, then the current filter rule will apply to all users of the app.
 
 **What**
 
-- `query` – The AppDB query that should be combined with any query the user is trying to make to further filter their request for documents. For example, let’s say the user belongs to the “West Sales” group, as defined in our example Collection, and they write the following query to search for documents:
+- `query` – The AppDB query that should be combined with any query the user is trying to make to further filter their request for documents. For example, let's say the user belongs to the “West Sales” group, as defined in our example Collection, and they write the following query to search for documents:
 
 ```json
 { "content.country": "US" }
@@ -1262,7 +1262,7 @@ In this case, because the user is part of a group defined in the `applyTo` secti
 
 So although the user requested all documents from the “US” country, only those documents which are both in the “US” and the “West” region will be returned to the user.
 
-- `limitToOwner` – This property takes a boolean that determines whether to add another query to any request that limits documents to only those created by the current user. So, if this flag were set to `true`, then the resulting query on the backend would be transformed still further to add the user’s ID to the request. In the case of our previous example, even though the user requested documents from the “US”, they would be returned all documents from the “US” that are in the “West” region **and** created by the existing user.
+- `limitToOwner` – This property takes a boolean that determines whether to add another query to any request that limits documents to only those created by the current user. So, if this flag were set to `true`, then the resulting query on the backend would be transformed still further to add the user's ID to the request. In the case of our previous example, even though the user requested documents from the “US”, they would be returned all documents from the “US” that are in the “West” region **and** created by the existing user.
 
 ```json
 { "content.country": "US", "content.region": "West", "owner": "123456" }
@@ -1333,7 +1333,7 @@ The following are the possible permissions that can be added using the `permissi
 
 **Delete Permissions**
 
-You can remove all permissions for an entity using the endpoint below. If all entities’ permissions are removed, then only users with the Manage AppDB grant will still have access.
+You can remove all permissions for an entity using the endpoint below. If all entities' permissions are removed, then only users with the Manage AppDB grant will still have access.
 
 **Code Example**
 

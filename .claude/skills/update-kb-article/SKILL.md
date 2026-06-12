@@ -41,7 +41,7 @@ Once the file(s) are identified, ask the user what type of change they need — 
 
 1. **Rename** — change the article title, filename, or both
 2. **Content update** — edit body text, callouts, or other prose
-3. **Image/screenshot swap** — replace one or more images
+3. **Image/screenshot swap** — replace one or more images, or swap a legacy image-based UI icon for the Domo icon font
 4. **Content removal** — delete a section, step, or block
 5. **File path update** — rename a file and update all references to it
 6. **Cross-file change** — the same change needs to appear in multiple articles
@@ -49,6 +49,7 @@ Once the file(s) are identified, ask the user what type of change they need — 
 8. **Navigation move** — relocate the article in the site nav
 9. **Merge** — combine two or more articles into one
 10. **Split** — break one article into two or more
+11. **Beta status change** — mark a feature as beta, promote a beta feature to GA, or convert a legacy beta marker to the current convention
 
 Use AskUserQuestion if you need to clarify which type applies, or if the user's description could map to more than one type.
 
@@ -148,13 +149,67 @@ Edit the `title:` field in the article's frontmatter. The filename and all links
 
 Use the Edit tool with enough surrounding context (2–3 lines) to make `old_string` unique. Never rewrite more than what was approved.
 
+### Writing or editing a Required Grants section
+
+When an edit adds or changes a **Required Grants** section, use the grant's canonical wording — don't invent a description. Most grants are already described in the standard format elsewhere in the KB; search for and reuse the existing wording so the grant reads consistently across articles:
+
+```bash
+grep -rn "Grant Name —" s/article/
+```
+
+Reuse the existing description verbatim (adjusting only to fit the em-dash format). If no article describes the grant, write a concise one-sentence description and flag it to the user as newly authored rather than presenting it as canonical. See `Domo-KB-Style-Guide.mdx` › **Required Grants** › _Use canonical grant wording_.
+
 ### Image/screenshot swap
 
 Update the `src` attribute in the `<Frame>` or `<img>` tag. Update `alt` text if appropriate. Do not move or delete image files — note to the user that the image asset itself must be updated separately in `images/kb/`.
 
+### Image-based icon → icon font swap
+
+Many older articles use `<img>` or `<Icon icon="/images/icons/*.svg" />` for inline UI icons that now exist in the Domo icon fonts. The font versions inherit text color and adapt to light/dark mode automatically; image-based icons don't.
+
+Two icon fonts are wired up, and they ship the **same glyph set** — the choice is about which UI the article depicts, not glyph availability:
+
+- **`icon-{name}`** — phosphor, the design refresh. **Default for current Domo product surfaces.** Browse at [Domo Icons (phosphor)](https://git.empdev.domo.com/pages/Development/DomoIcons/#!/icons/phosphor).
+- **`legacy-icon-{name}`** — the previous-generation Domo icons. **Only for release notes describing the pre-refresh UI and legacy applications like Workbench.** Browse at [Domo Icons (domocons)](https://git.empdev.domo.com/pages/Development/DomoIcons/#!/icons/domocons).
+
+When you're already updating an article and notice an image-based icon, propose swapping it to the font convention. **Pick the font based on the UI surface the article describes:**
+
+```mdx
+<i className="icon-{name}" aria-hidden="true" />              {/* current Domo UI */}
+<i className="legacy-icon-{name}" aria-hidden="true" />       {/* release notes / Workbench */}
+```
+
+**Stale-screenshot upgrade case.** If the article describes the *current* Domo UI but the original `<img>` showed a legacy-style glyph, that screenshot is just out of date — swap to the phosphor `icon-*` version (not `legacy-icon-*`) so the article reflects what users see today.
+
+**Third-party brand logos** (AWS, OpenAI, Anthropic, GitHub, …) are a different swap — they're *not* in the Domo icon font, and a monochrome logo `<img>` disappears in dark mode. Swap to a coded icon that inherits text color: Font Awesome's `brands` family via `<Icon icon="{slug}" iconType="brands" aria-hidden="true" />` (the one correct use of `<Icon>` — it resolves a font glyph, not a local SVG), or, when FA's free set lacks the brand (e.g. Anthropic), an inline `<svg fill="currentColor">` with a path from a source like [Simple Icons](https://simpleicons.org). See `Domo-KB-Style-Guide.mdx` › **Brand and Third-Party Logos**.
+
+Don't open a wholesale icon migration as a side effect of an unrelated update; only swap icons in the section the user asked you to change, plus any that read awkwardly inconsistent next to the change.
+
+**Check the surrounding prose for an inline label.** When swapping (or auditing existing font icons), confirm the icon is named in the surrounding prose. If the prose says "click \<icon\>" with no inline label, propose rewriting it to "click the {name} icon \<icon\>". The inline-label rewrite is preferred over `aria-label` in flowing prose because it helps every reader, not just screen-reader users. Reserve `role="img"` + `aria-label="..."` for the narrow case where the icon truly stands alone with no room for prose (icon-only button, sole content of a link). See `Domo-KB-Style-Guide.mdx` › **Icons** for the full convention.
+
+### HTML table normalization
+
+Many migrated articles ship HTML tables collapsed onto a single line, often with data rows wrapped inside `<thead>` instead of `<tbody>`. Both are migration artifacts: the single-line form blows past VS Code's syntax-highlighting threshold (so the table renders as one unhighlighted blob), and the misplaced data rows cause browsers to vertically center-align the cells.
+
+When you're already editing a section that touches one of these tables, normalize it: put `<table>`, `<thead>`, `<tbody>`, each `<tr>`, and their closing tags on their own lines, and move data rows into `<tbody>`. See `Domo-KB-Style-Guide.mdx` › **Tables** › **HTML tables** for the canonical form.
+
+As with icon migrations, don't reformat every HTML table you encounter — only the tables in the section the user asked you to change, plus any directly adjacent ones that would look inconsistent.
+
 ### Navigation move
 
 Invoke the `add-to-nav` skill. Do not attempt to edit `docs.json` directly for navigation moves.
+
+### Beta status change
+
+Apply the convention defined in `Domo-KB-Style-Guide.mdx` › **Beta Features**. Read it before making changes. Summary:
+
+- **Mark a whole article as beta:** add `tag: "Beta"` to the frontmatter and insert the standard beta Note immediately after the frontmatter, above the Intro. Do not append `(Beta)` to the title.
+- **Mark a section as beta:** append `<Badge className="text-primary bg-primary/10 font-bold">Beta</Badge>` to the heading. If the article has no other beta sections, also place the standard beta Note under that section. If another section in the same article is already marked beta, do not add another Note — one Note per article.
+- **Promote beta to GA (whole article):** remove the `tag: "Beta"` line from frontmatter and remove the standard beta Note above the Intro.
+- **Promote beta to GA (section):** remove the Badge from the heading. If the Note immediately below this section was the article's single beta Note, decide where it should go: if other sections remain beta, move it under the first remaining beta section; if no beta sections remain, remove the Note.
+- **Convert legacy beta markers:** when you find `(Beta)` or `(BETA)` in titles or headings, ad-hoc beta notes, references to `betafeedback@domo.com` or `betadmin@domo.com`, or other legacy treatments, replace them with the current convention (tag + standard Note for whole-article betas; Badge + single standard Note for section-level betas). When updating cross-article links whose anchor text contained `(Beta)`, drop the parenthetical from the link text as well.
+
+The Badge `className` must be exactly `text-primary bg-primary/10 font-bold`. The standard beta Note must be used verbatim — copy it from the style guide.
 
 ### Merge
 
@@ -176,7 +231,28 @@ Invoke the `add-to-nav` skill. Do not attempt to edit `docs.json` directly for n
 
 ---
 
-## Step 5: Verify
+## Step 5: Style-guide revision pass
+
+Editing introduces style drift just as drafting does. After making the approved changes, do an explicit pass against the style guide over the content you changed and revise it in place.
+
+1. **Re-read `Domo-KB-Style-Guide.mdx` now, in full** — not from memory.
+2. **Audit the content you added or rewrote** against this checklist and fix every violation. Scope this to what you changed: fix style errors in your edited content and any clearly broken style directly adjacent to it, but do not silently rewrite untouched sections. If you spot broader pre-existing violations outside your edit, note them to the user rather than rewriting them (consistent with this skill's conservative-execution principle). This pass is EN-only — never touch the localized directories.
+   - **Intro** (if touched) — opens with "This article explains…" or "This article covers…", states only what the article covers, and is followed by a `---` horizontal rule.
+   - **Headings** — imperative mood at every level; the structural labels (Intro, Required Grants, Prerequisites, FAQ, Troubleshoot, Related Articles) are exempt. Top-level sections H2, subsections H3+.
+   - **Required Grants** — exact format and canonical grant wording, with the em-dash inside the bold and a space on each side (`**Grant —** description`).
+   - **Callouts** — `<Note>`/`<Warning>`/`<Tip>` with the label and its colon bolded (`**Note:**`), and a blank line before the callout (except inside table cells).
+   - **Tables** — every pipe table you touched padded so columns align. Run `python3 scripts/pad_md_tables.py <file>` to do this mechanically. Normalize any HTML table you edited (one tag per line, data rows in `<tbody>`).
+   - **Links** — internal links use the file path with no `.mdx` extension and no full URL.
+   - **Em-dashes** — no spaces in prose; spaces only in the bolded-term list exception.
+   - **Voice and word choice** — present tense, not "will"; active voice; "after", not causal "once"; no "utilize"; spell out numbers under 10; "allowlist"/"blocklist"; "select", not "click"; Oxford comma; no exclamation points.
+   - **Domo terms** — `DataSet`, `DataFlow`, `DataFusion`, `Beast Mode`, `Workbench`; `dashboard` lowercase except at the start of a sentence or with a type; never "Page" (use "dashboard"). Verify any product term against the **Domo-Specific Terms and Usage** table.
+   - **Frontmatter** — if the article still has a `description` field, replace it with a single-sentence `excerpt`.
+   - **Images** — block screenshots wrapped in `<Frame>` with a native `<img>` and descriptive `alt`, no inline `width`/`height`; inline glyphs use the icon font or the inline `<img>` style; never `<Frame>` inside a table cell.
+3. **Revise in place.** Run `python3 scripts/pad_md_tables.py <file>` on any file whose tables you touched.
+
+---
+
+## Step 6: Verify
 
 After all edits:
 
@@ -194,7 +270,7 @@ Report any remaining references to the user.
 
 ---
 
-## Step 6: Output
+## Step 7: Output
 
 Tell the user:
 - What was changed, created, or deleted

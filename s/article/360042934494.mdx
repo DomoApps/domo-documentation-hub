@@ -1,37 +1,75 @@
 ---
 title: "Manage Access Tokens"
+excerpt: "Generate, list, and revoke Domo access tokens used to import or export data programmatically."
 ---
 
-Access tokens are used to import or export data from Domo. If you have an Admin default security role or a custom role with either the Manage All Company Settings or Manage All Access Tokens grant enabled, you can generate access tokens; otherwise, you need to request an access token from your Domo administrator. For more information about default security roles, see [Managing Custom Roles](/s/article/360043438973).
+import { BetaNote } from '/snippets/BetaNote.mdx';
 
-<Warning>**Important:** Access tokens are associated with specific user accounts and grant the same access as the user who generated the token. If the user's permissions change, the access token reflects that. You should not share your access tokens with others.</Warning>
+## Intro
+
+This article explains how to generate and revoke access tokens used to import or export data from Domo.
+
+---
+
+## Required Grants
+
+You can generate access tokens if you have one of the following roles.
+
+- An Admin security role
+- A custom role with at least one of the following:
+    - The **Create Access Tokens** grant <Badge className="text-primary bg-primary/10 font-bold">Beta</Badge>
+    - The **Manage all access tokens and API clients** grant
+
+For more information about security roles, see [Managing Custom Roles](/s/article/360043438973).
+
+<Warning>**Important:** Treat access tokens like a password: Do not share them, hard-code them in scripts, or commit them to version control. Access tokens grant the same level of access as the user account they belong to. If the user's permissions change, the token's access level changes accordingly; revoking or restricting a user's access also limits what their tokens can do.</Warning> 
+
+## Self-Serve Access Token Creation <Badge className="text-primary bg-primary/10 font-bold">Beta</Badge>
+
+<BetaNote />
+
+If self-serve access token creation beta functionality is enabled, users with a Domo role that includes the **Create Access Tokens** grant can create access tokens and list and revoke access tokens they own. This grant does not allow listing and revoking access tokens owned by other users. Learn more about the [new access tokens functionality and governance model](/s/article/Access-Tokens) currently available in beta.
+
+## Generate an Access Token
 
 Follow these steps to generate an access token:
 
-1. From the navigation header, select **More** > ** Admin**.  
+1. From the navigation header, select **More** > **Admin**.  
     The Admin Settings display.
-2. Under **Authentication**, select ** Access tokens**.  
-    The **Manage access tokens** page displays.
-3. Select **Generate access token**.
-
+2. Under **Authentication**, select **Access tokens**.  
+    The **Manage access tokens** page displays.
+3. Select **Generate access token**.
    <Frame>![generate access token.jpg](/images/kb/0EM5w000006v8Kr.jpg)</Frame>
 4. Specify the token information:
+   1. In the **Access token description** field, enter a name for the token. We recommend using a name that helps you understand the purpose of the token.
+   2. In the **Search users** field, select the user the token is for.
 
-   1. In the **Access token description** field, enter a name for the token. We recommend using a name that helps you understand the purpose of the token.
-   2. In the **Search users** field, select the user the token is for.
+      <Warning>**Important:** The access token is associated with a specific user account. Users should *not* share the access token with others.</Warning>
 
-      
-<Warning>**Important:** The access token is associated with a specific user account. Users should *not* share the access token with others.</Warning>
-
-3. In the **Expire after** list, select the number of days/years before the token expires.
-4. Select **Generate**.
-
+   3. In the **Expire after** list, select the number of days/years before the token expires.
+   4. Select **Generate**.
       <Frame>![Screenshot 2023-06-27 at 1.21.54 PM.png](/images/kb/0EM5w000006v8Nq.jpg)</Frame>
-5. Copy the access token, pasting it where you can use it later. The token does not display again after you leave the **Manage access tokens** page.
+5. Copy the access token and save it somewhere secure. The token does not display again.
+## Revoke an Access Token
 
 Follow these steps to revoke an access token:
 
 1. Navigate to the **Manage access tokens** page of the Authentication settings.
 2. Locate the access token you want to revoke in the list of access tokens that have been issued. You can search by user name and token name.
-3. Select **Revoke**. 
-<Note>**Note:** There is no warning dialog after selecting ** Revoke**. Make sure that you are revoking the correct token.</Note>
+3. Select **Revoke**.
+
+<Note>**Note:** There is no warning dialog after selecting **Revoke**. Make sure you are revoking the correct token.</Note>
+
+## Frequently Asked Questions
+
+<AccordionGroup>
+  <Accordion title="Is creating a client ID and secret for API connectors a 'Manage all access tokens and API clients' grant or a 'Manage all accounts' grant?">
+    Creating a client ID and secret is not tied to any grant. The access tokens described in this article are the ones you generate in the Admin section of Domo, not the access token generated from the client ID and client secret you create at [developer.domo.com](https://developer.domo.com). When someone uses a client ID and secret, what data they can access is determined by their role in Domo and by the content that has been shared with them in Domo (which personalized data permissions (PDP) can further restrict).
+  </Accordion>
+  <Accordion title="Does using an API account require the 'Create dataset account' grant or the 'Edit Dataset' grant?">
+    These grants do different things. Without the **Edit Dataset** grant, the user doesn't see the **Data** navigation button at the top of Domo, which they need in order to edit a dataset that has been shared with them. The **Create dataset account** grant lets a user add credentials for another platform, such as Salesforce, that can then be used to power a dataset. If a user has **Edit Dataset** but not **Create dataset account**, they encounter an error when they try to create a dataset account.
+  </Accordion>
+  <Accordion title="What is the difference between the 'Manage all accounts' grant and the 'Create dataset account' grant?">
+    The **Manage all accounts** grant lets a user edit the credentials of any existing account in Domo or delete those accounts, which affects the runs of any datasets powered by them. This is a powerful grant that should be given to only a select few people. The **Create dataset account** grant lets a user create and manage only the accounts they have been given explicit access to, such as the ones they created themselves.
+  </Accordion>
+</AccordionGroup>

@@ -1,152 +1,479 @@
 ---
-title: "Creación y administración de grupos de usuarios"
+title: "Creación y administración de grupos"
+excerpt: "Cree grupos de usuarios estáticos o dinámicos en Domo y administre la pertenencia para conceder acceso a contenido a gran escala."
 ---
 
 ## Introducción
 
-En la Configuración del administrador, puede crear y administrar grupos de usuarios de Domo. Los grupos son útiles porque puede conceder acceso a contenido específico a todos los miembros de un grupo. Por ejemplo, puede crear un grupo de "Marketing" cuyos miembros tengan acceso a tarjetas relacionadas con marketing. También podría crear un grupo "Financiero" con acceso a tarjetas de varios departamentos.
+Los administradores pueden crear y administrar grupos de usuarios de Domo. Use los grupos para conceder acceso a contenido específico a todos los miembros del grupo. Por ejemplo, puede crear un grupo de "Marketing" cuyos miembros tengan acceso a tarjetas relacionadas con marketing.
 
-Puede crear y eliminar grupos, agregar y eliminar miembros o cambiar el nombre de un grupo. En este tema se tratan todas estas tareas de una en una.
+También puede crear grupos dinámicos en los que la pertenencia se determina automáticamente en función de si las personas cumplen criterios específicos. Los criterios pueden incluir atributos. Obtenga información sobre los [Atributos](/s/article/000005164). Por ejemplo, un grupo dinámico de "Marketing" incluye a todos los miembros del departamento de Marketing que tengan el cargo de "gerente". Si un gerente de marketing deja la organización y es reemplazado por un nuevo gerente, el nuevo gerente se agrega al grupo automáticamente.
 
-Puede editar, eliminar o agregar y quitar miembros solo en los grupos a los que tenga acceso, a menos que tenga un rol de seguridad predeterminado de "Administrador" o un rol personalizado con el privilegio "Administrar todos los grupos" habilitado. Para obtener más información sobre los roles predeterminados, consulte [Administración de roles personalizados](/s/article/360043438973).
+---
+
+## Acceso a la página de inicio de Grupos
+
+Vaya a la Configuración del administrador. En **Gobernanza**, seleccione **Grupos** para abrir la página de inicio de Grupos.
+
+<Frame>![groups interface.jpg](/images/kb/0EMVq000001L5nJ.jpg)</Frame>
+
+## Página de inicio de Grupos
+
+Desde la página de inicio de Grupos, puede crear grupos y administrarlos (si es el propietario del grupo). Los administradores también pueden ajustar la [Configuración de grupos](#configuración-de-grupos).
+
+Los grupos existentes aparecen en la [lista de grupos](#lista-de-grupos), que puede buscar, filtrar y ordenar.
+
+### Configuración de grupos
+
+Desde la página de inicio de Grupos, seleccione <i className="icon-gear sm" aria-hidden="true" /> **Configuración de grupos** para abrir la página **Configuración de grupos**.
+
+<Frame>![group settings callout.jpg](/images/kb/0EMVq000001KzjW.jpg)</Frame>
+
+Hay dos opciones en la interfaz de **Configuración de grupos**, que puede habilitar marcando la casilla correspondiente.
+
+- **Agregar automáticamente el grupo de administradores `<Nombre del grupo>` como propietario durante la creación de todos los grupos nuevos —** Con esta opción habilitada, cada grupo nuevo creado en la instancia incluye este grupo como propietario.
+  - Para usar esta opción, debe asignar un grupo como grupo de administradores en el campo **Grupo de administradores**. Como se muestra en la imagen siguiente, puede crear un grupo que incluya a todos los titulares de un determinado privilegio dentro de su instancia. La imagen muestra un grupo denominado "Privilegio: Administrar todos los grupos" asignado como grupo de administradores. En este caso, todos los usuarios que tengan habilitado el privilegio Administrar todos los grupos pasan a formar parte de este grupo y son propietarios de cada grupo nuevo creado cuando esta opción está habilitada.
+  - La casilla **Cualquier propietario puede quitar a `<Nombre del grupo>` como propietario durante la creación del grupo o después de ella** le ofrece la opción de permitir que cualquier propietario del grupo quite este grupo de administradores durante la creación de un grupo o después de ella.
+- **Ocultar grupos del sistema —** Al marcar esta casilla se quitan los grupos del sistema de la lista de grupos.
+
+<Frame>
+  ![Screenshot 2024-06-13 at 3.33.18 PM.png](/images/kb/0EMVq000001L8oP.jpg)
+</Frame>
+
+Para volver a la página de inicio de Grupos, siga las migas de pan en la parte superior de la página **Configuración de grupos**.
+
+<Frame>![groups home.jpg](/images/kb/0EMVq000001L8wT.jpg)</Frame>
+
+### Lista de grupos
+
+La lista de grupos muestra todos los grupos existentes en su instancia. Expanda las secciones a continuación para conocer las columnas, las herramientas y las opciones disponibles para trabajar con la lista.
+
+<AccordionGroup>
+
+<Accordion title="Columnas">
+La lista de grupos puede contener siete columnas disponibles, según su selección. La primera columna, **Nombre**, siempre se muestra. Puede optar por mostrar u ocultar las demás columnas.
+
+Para cambiar la configuración de columnas, seleccione **x columnas seleccionadas de 7**.
+
+<Frame>![columns selected.jpg](/images/kb/0EMVq000001SRBB.jpg)</Frame>
+
+Un cuadro de diálogo muestra las columnas. Marque las casillas de las columnas que desee mostrar en la lista de grupos. Las columnas disponibles incluyen las siguientes:
+
+- **Nombre —** El nombre y la imagen de perfil del grupo. De forma predeterminada, los grupos se muestran en la lista por orden alfabético. No puede ocultar esta columna.
+- **Descripción —** Una descripción del grupo. Esto es opcional al crear un grupo.
+- **Tipo de grupo —** El tipo de grupo. Las opciones son Abierto, Ad hoc, Directorio, Cerrado, Dinámico y Sistema.
+- **Propietarios —** La imagen de perfil del propietario o de los propietarios del grupo. Pase el cursor sobre una imagen de perfil para ver el nombre de la persona o del grupo.
+- **Miembros —** Muestra el número de miembros del grupo, redondeado a un decimal para números superiores a 1000. Por ejemplo, 1600 miembros se muestra como 1,6 K.
+- **Creado —** La fecha en que se creó el grupo.
+- **Nombre de directorio —** Para los grupos de directorio, el nombre del grupo en el proveedor de autenticación única. Difiere del nombre del grupo en Domo si se cambió el nombre del grupo en Domo después de su creación.
+
+<Frame>
+  ![Screenshot 2024-06-13 at 3.12.51 PM.png](/images/kb/0EMVq000001L18c.jpg)
+</Frame>
 
 <Note>
-**Nota:** Si habilita la autenticación única, se crean dos tipos distintos de grupos, a saber, grupos ad hoc y grupos de directorios. Los grupos ad hoc se crean en la instancia de Domo, mientras que los grupos de directorios se crean en su IdP. Los grupos de directorios deben administrarse en el sitio web del proveedor de la autenticación única.
+  **Nota:** Cuando habilita la autenticación única, se crean dos tipos
+  diferentes de grupos: grupos ad hoc y grupos de directorio. Los grupos ad hoc
+  se crean dentro de su instancia de Domo, mientras que los grupos de directorio
+  se crean dentro de su IdP y deben administrarse desde el sitio web de su
+  proveedor de autenticación única. Obtenga más información sobre la
+  [implementación de
+  SSO](https://domo-support.domo.com/s/topic/0TO5w000000ZanoGAC/implementing-sso?language=en_US).
+</Note>
+</Accordion>
+
+<Accordion title="Búsqueda">
+  Use la herramienta de búsqueda para buscar en la lista con texto. Puede
+  introducir un nombre de grupo parcial o completo, o un tipo de grupo parcial o
+  completo (_Ej._ _Directorio_ o _Cerrado_).
+</Accordion>
+
+<Accordion title="Selección de grupos">
+En la lista de grupos, cada grupo tiene una casilla. Marque la casilla para seleccionar la fila. Marque varias casillas para seleccionar varias filas.
+
+**Seleccionar todos los grupos**
+
+La selección de todos los grupos depende del número de grupos de su instancia.
+
+Para menos de 100 grupos, marque la casilla situada en la esquina superior izquierda de la lista de grupos para seleccionar todos los grupos.
+
+Para más de 100 grupos, marque la casilla situada en la esquina superior izquierda de la lista de grupos para seleccionar los primeros 100 grupos. Desplácese hacia abajo hasta el grupo número 101 y vuelva a marcar la casilla (que se rellena con el azul de Domo) para seleccionar los siguientes 100 grupos. Repita estos pasos hasta que se seleccionen todos los grupos.
+
+<Frame>![select all.jpg](/images/kb/0EMVq000001TkZx.jpg)</Frame>
+
+Cuando marca la casilla de uno o más grupos, aparecen varios iconos adicionales en la esquina superior derecha de la página **Grupos**. Estos le permiten realizar acciones masivas en los grupos. Las siguientes opciones están disponibles:
+
+<Frame>![2.png](/images/kb/0EM5w000005vODH.png)</Frame>
+
+- <i className="icon-person-plus sm" aria-hidden="true" /> — Le permite agregar
+  usuarios de su instancia de Domo a este grupo como nuevos miembros (solo
+  propietarios).
+- <i className="icon-arrow-box sm" aria-hidden="true" /> — Le permite compartir
+  una página o tarjeta seleccionada con todos los miembros de este grupo.
+- <i className="icon-gear sm" aria-hidden="true" /> — Le permite elegir entre
+  cambiar los tipos de grupo o agregar propietarios a varios grupos (solo
+  propietarios).
+- <i className="icon-trash sm" aria-hidden="true" /> — Le permite eliminar todos
+  los grupos seleccionados (solo propietarios).
+
+Si hace clic en el enlace del nombre del grupo dentro de una celda, se muestra una vista de detalles del grupo en la que puede realizar todas las acciones siguientes:
+
+- Ver una lista de los miembros del grupo.
+- Ver los grupos de los que este grupo es propietario.
+- Ver las tarjetas y los paneles compartidos con el grupo.
+- Ver el contenido de resumen predeterminado configurado para el grupo.
+- Cambiar el nombre del grupo.
+- Agregar una descripción o editarla si ya existe.
+- Cambiar el tipo de grupo (solo grupos abiertos, cerrados y dinámicos).
+- Ver la configuración de autenticación única de un grupo de directorio.
+- Establecer o cambiar los propietarios.
+- Agregar miembros al grupo.
+- Compartir una página o tarjeta seleccionada con todos los miembros de este grupo.
+- Eliminar miembros del grupo.
+
+</Accordion>
+
+<Accordion title="Icono de configuración">
+Abre la subpestaña **Configuración de grupos**, en la que puede activar o desactivar las siguientes opciones:
+
+- **Agregar automáticamente el grupo de administradores [grupo seleccionado] como propietario durante la creación de todos los grupos** — Cuando está marcada, cualquier usuario del grupo seleccionado en **Grupo de administradores** se agrega como propietario a todos los grupos nuevos. De forma predeterminada, está establecido en el privilegio "Administrar todos los grupos". Para obtener más información sobre los privilegios, consulte [Administración de roles personalizados](/s/article/360043438973).
+- **Cualquier propietario puede quitar a [grupo seleccionado] como propietario durante la creación del grupo o después de ella** — Cuando está marcada, cualquier usuario agregado como propietario del grupo a través del grupo seleccionado puede ser quitado como propietario por cualquier otro propietario.
+- **Ocultar grupos del sistema en las páginas de administración de grupos** — Cuando está marcada, los grupos del sistema no se muestran en la lista de grupos en **Configuración del administrador** > **Grupos**.
+
+</Accordion>
+
+<Accordion title="Icono de nuevo grupo">
+  Le permite agregar un grupo cerrado, abierto o dinámico a su instancia de Domo
+  mediante el asistente de creación de grupos.
+</Accordion>
+
+<Accordion title="Filtros rápidos">
+  Le permite filtrar la lista de grupos para mostrar todos los grupos de su
+  instancia, los grupos de los que es propietario o los grupos de los que es
+  miembro.
+</Accordion>
+
+<Accordion title="Ordenamientos y filtros">
+Muestra todos los grupos de su instancia que pasan los filtros que ha aplicado (si los hay). Para cualquier grupo, puede ver el nombre del grupo, los propietarios, el tipo de grupo, los miembros del grupo y cuándo se creó el grupo.
+
+En todas las columnas, puede aplicar ordenamientos haciendo clic en el nombre de la columna o filtrar haciendo clic en el icono de filtro <i className="icon-funnel sm" aria-hidden="true" /> del encabezado de la columna.
+
+- Para la columna `Nombre`, haga clic en el encabezado o en el icono de ordenar <i className="icon-triangle sm" aria-hidden="true" /> para ordenar los nombres de los grupos por orden alfabético o alfabético inverso.
+- Para la columna `Tipo de grupo`, haga clic en el icono de filtro <i className="icon-funnel sm" aria-hidden="true" /> para filtrar por un tipo de grupo diferente. Los diferentes tipos de grupos se describen en la sección [Tipos de grupos](#tipos-de-grupos) de este artículo más abajo.
+- Para la columna `Propietarios`, haga clic en el icono de filtro <i className="icon-funnel sm" aria-hidden="true" /> para filtrar por un propietario específico.
+- Para la columna `Miembros`, haga clic en el icono de filtro <i className="icon-funnel sm" aria-hidden="true" /> para filtrar personas de una lista y ver solo los grupos a los que pertenecen.
+- Para la columna `Creado`, haga clic en el icono de filtro <i className="icon-funnel sm" aria-hidden="true" /> para configurar un filtro de fecha y ver los grupos modificados en una fecha determinada, entre dos fechas específicas, o antes o después de una fecha determinada.
+
+</Accordion>
+
+</AccordionGroup>
+
+## Propiedad de grupos
+
+Los grupos abiertos, cerrados y dinámicos pueden tener uno o más propietarios, que son responsables de administrar el grupo. La mayoría de las acciones de administración de grupos solo están disponibles para los propietarios.
+
+Estas acciones incluyen:
+
+- Asignar otros propietarios al grupo o quitar propietarios.
+- Agregar y quitar miembros al/del grupo.
+- Eliminar el grupo de Domo.
+- Cambiar el tipo de grupo.
+- Cambiar la configuración del grupo.
+- Cambiar la imagen de perfil del grupo.
+- Cambiar los criterios de pertenencia de un grupo dinámico.
+
+Los propietarios pueden ser usuarios individuales de Domo u otros grupos, en cuyo caso todos los miembros del grupo se consideran propietarios.
+
+<Note>
+  **Nota:** Los propietarios de grupos no son necesariamente miembros del grupo,
+  lo que significa que no tienen el mismo acceso que los miembros. Esto es así
+  por diseño y les permite controlar la pertenencia al grupo según sea
+  necesario. Si el tipo de grupo permite al propietario editar la pertenencia,
+  puede agregarse a sí mismo a ese grupo si lo desea.
 </Note>
 
-### Creación de un grupo
+## Tipos de grupos
 
-Puede crear un nuevo grupo en la pestaña **Grupos** de la Configuración del administrador. Después de crear un grupo, puede agregarle usuarios y especificar el contenido (tarjetas y páginas) al pueden acceder sus miembros.
+Hay varios tipos de grupos diferentes disponibles en Domo, que se describen a continuación.
 
-**Para crear un grupo:**
+### Grupos cerrados
 
-1. Haga clic en <img alt="new_app_icon.png" src="/images/kb/es/0EM5w000005wKNa.png" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/> **> Administrador**.  
-   Se abre la Configuración del administrador.
-2. Seleccione **Grupos**.  
-   Aparece una lista de grupos, donde el primer grupo de la lista está seleccionado de forma predeterminada.
-3. Haga clic en **Agregar nuevo grupo**, que se encuentra en la parte inferior del panel de la lista de grupos.
+Los grupos cerrados se consideran "grupos de plena responsabilidad" en Domo y están diseñados para funcionar como "grupos ancla" para los departamentos. Solo los propietarios del grupo pueden invitar a nuevos miembros a un grupo cerrado. Los propietarios deben ser personas o grupos con nombre, y los miembros deben ser personas con nombre. Todos los cambios realizados en los grupos cerrados se reflejan en los [Registros de actividad](/s/article/360042934574).
 
-   <Tip>
-   **Consejo:** También puede abrir este cuadro de diálogo desde cualquier ubicación de Domo si selecciona en la barra de herramientas de la aplicación y después selecciona **Personas > Grupo**.
-   </Tip>
-4. Escriba un nombre para el nuevo grupo.
-5. Haga clic en **Agregar nuevo grupo** o presione Intro.  
-   La información básica del nuevo grupo aparece en el panel situado más a la derecha, como el nombre del grupo y su imagen de perfil (porque ha sido usted quien ha creado el grupo). En este punto, el grupo no contiene ningún otro miembro y no puede acceder a ninguna tarjeta o página; debe agregar miembros y contenido al que el grupo pueda acceder. Para obtener información sobre cómo agregar miembros a un grupo, consulte la siguiente sección. Para obtener información sobre cómo agregar contenido a un grupo, consulte [Agregar o eliminar contenido al que un grupo pueda acceder](/s/article/360043438873).
+Los grupos cerrados pueden asignarse como propietarios de otros grupos y activos de Domo (paneles y tarjetas).
+
+Los grupos cerrados no pueden cambiarse a ningún otro tipo de grupo; una vez que un grupo se crea como grupo cerrado, no puede cambiarse.
+
+### Grupos abiertos
+
+Los grupos abiertos son "grupos sociales" dentro de Domo. En estos grupos, el grupo se posee a sí mismo. Esto significa que cada miembro es un propietario y puede invitar a otros usuarios a unirse. Estos grupos son ideales para generar conversaciones de Buzz y compartir contenido ampliamente, o para organizar grupos de contactos. Los grupos abiertos no pueden poseer otros grupos.
+
+### Grupos dinámicos
+
+Con la pertenencia a grupos basada en políticas, los grupos dinámicos permiten la administración escalable y flexible de su entorno de Domo. Como propietario de un grupo, puede crear políticas de pertenencia que hagan referencia a atributos de usuario o a la pertenencia a otros grupos; Domo se encarga entonces del mantenimiento de la pertenencia al grupo.
+
+Por ejemplo, puede crear un grupo dinámico para el departamento de Marketing con una política que incluya solo a los usuarios cuyo valor de atributo _Departamento_ sea **Marketing**. La pertenencia a ese grupo se actualiza automáticamente a medida que los usuarios se unen o abandonan el departamento de Marketing cuando cambia el valor de su atributo _Departamento_.
+
+No puede basar la pertenencia a un grupo dinámico en la pertenencia a otro grupo dinámico, abierto o ad hoc. Del mismo modo, un grupo dinámico no puede ser el propietario de otro grupo. Sin embargo, puede basar las políticas de grupos dinámicos en atributos de usuario o en la pertenencia a un grupo cerrado, del sistema o de directorio.
+
+Para admitir los controles de gobernanza, las políticas de grupos dinámicos solo pueden hacer referencia a atributos de usuario _Administrados_. Los atributos administrados no pueden ser establecidos por los usuarios finales: solo pueden establecerse a través de SSO, SCIM o por usuarios con los permisos de nivel de administrador necesarios. Aprenda a [configurar atributos administrados](/s/article/000005164).
+
+### Grupos de directorio
+
+Los grupos de directorio se importan a Domo a través de la autenticación única. Estos grupos no pueden tener propietarios, y su pertenencia no puede administrarse desde dentro de Domo, aunque puede eliminarlos si tiene el privilegio "Administrar todos los grupos". Estos grupos pueden poseer otros grupos.
+
+### Grupos ad hoc
+
+Los grupos ad hoc son "grupos heredados" creados dentro de Domo (no a través de un sistema de autenticación única de terceros) antes de que se lanzaran los grupos abiertos, cerrados y dinámicos. Al igual que los grupos de directorio, no pueden tener propietarios. Pueden ser administrados por usuarios con el privilegio "Administrar todos los grupos" o "Editar usuarios". Los grupos ad hoc no pueden poseer otros grupos.
+
+Un ejemplo de grupo ad hoc es uno denominado "Predeterminado". Los administradores con el privilegio «Administrar todos los grupos» habilitado para su rol pueden quitar a los usuarios de este grupo y volver a agregarlos posteriormente según sea necesario.
+
+### Grupos del sistema
+
+Los grupos del sistema son grupos que Domo posee y mantiene, incluidos los grupos de roles y privilegios. No pueden administrarse ni eliminarse y no tienen propietarios, aunque pueden poseer otros grupos. Puede ocultar los grupos del sistema haciendo clic en el icono de engranaje en la esquina superior derecha de la página Grupos y marcando la casilla **Ocultar grupos del sistema**.
+
+## Creación de un grupo
+
+1. En **Más** > **Administrador** > **Gobernanza** > **Grupos**, seleccione **Nuevo grupo** en la esquina superior derecha de la pestaña.
+
+   <Frame>
+     ![group_management_new_group_button.png](/images/kb/0EM5w000005vODD.png)
+   </Frame>
+
+2. Escriba un nombre para el grupo.
+3. (Opcional) Escriba una descripción para el grupo de modo que usted y otros usuarios puedan identificarlo más fácilmente más adelante y, a continuación, seleccione **Siguiente**.
+
+   <Frame>
+     ![group_management_name_and_description.png](/images/kb/0EM5w000005vOD5.png)
+   </Frame>
+
+4. Seleccione el tipo de grupo que desee, que incluyen:
+   - Con un grupo **abierto**, usted selecciona a todos los miembros del grupo, y cualquier miembro del grupo puede invitar a cualquier persona a unirse al grupo.
+   - Con un grupo **cerrado**, usted selecciona a todos los miembros del grupo, pero solo los propietarios del grupo pueden invitar a nuevos usuarios a unirse al grupo.
+   - Con los grupos **dinámicos**, usted _no_ selecciona miembros específicos del grupo; en su lugar, la pertenencia se basa en el cumplimiento de reglas dinámicas. Por ejemplo, podría tener grupos dinámicos para todas sus regiones de ventas. Si se contrata a un nuevo representante de ventas en la región "Oeste", esa persona se agrega automáticamente al grupo "Oeste" de su instancia de Domo porque coincide con la región de ventas para la que fue contratada.
+5. (Condicional) Realice una de las siguientes acciones:
+   - Si eligió **Abierto** o **Cerrado** en el paso anterior, seleccione todos los miembros que desee del grupo de la lista de usuarios. Puede buscar usuarios por nombre o filtrar con las opciones de filtro disponibles en cada columna. Una vez que haya terminado, seleccione **Siguiente**.
+   - Si eligió **Dinámico** en el paso anterior, haga lo siguiente:
+     1. En el primer menú desplegable, seleccione **Cualquiera** si la pertenencia al grupo solo depende del cumplimiento de una única regla (una instrucción OR), o seleccione **Todos** si deben cumplirse todas las reglas seleccionadas (una instrucción AND). Por ejemplo, puede tener un caso en el que los miembros del grupo deban ser miembros del departamento de "Ventas" O tener el cargo de "Gerente de desarrollo de cuentas"; si se cumple cualquiera de las condiciones, se incluyen en el grupo. Alternativamente, puede tener un grupo en el que los miembros deban estar en el departamento de "Ventas" Y tener el cargo de "Gerente de desarrollo de cuentas"; si no se cumplen ambas condiciones, el usuario no se incluye en el grupo.
+     2. En el campo **Agregar criterio**, seleccione un atributo de confianza por el que filtrar. Para obtener más información sobre cómo establecer atributos de confianza, consulte nuestro artículo sobre los [Permisos personalizados de datos (PDP)](/s/article/360042934614).
+     3. Seleccione todos los valores dentro del atributo que cumplan las condiciones de pertenencia al grupo. Por ejemplo, si seleccionó Departamento como atributo en el paso anterior, seleccionaría todos los departamentos cuyos miembros deban ser miembros de este grupo.
+
+        <Frame>
+          ![group_management_dynamic_criteria.png](/images/kb/0EM5w000005vOD8.png)
+        </Frame>
+
+     4. (Opcional) Agregue instrucciones OR adicionales a los criterios de pertenencia seleccionando **OR** debajo del cuadro de criterios y repitiendo los pasos 5a a 5c anteriores.
+     5. (Opcional) Vea los miembros que pasan los filtros seleccionando **Vista previa de la pertenencia**.
+     6. Seleccione **Siguiente** cuando haya terminado.
+
+6. Elija una imagen de perfil entre una de las siguientes opciones y, a continuación, seleccione **Siguiente**.
+   - Edite la imagen de perfil de texto estándar (una burbuja con dos o tres letras iniciales) haciendo clic en **Editar imagen de perfil de texto** y, a continuación, eligiendo un color de fondo y un color de texto e introduciendo el texto que desee (límite de tres caracteres).
+   - Cargue una imagen desde su equipo haciendo clic en **Cargar foto**, seleccionando el archivo de imagen (la imagen no tiene que ser una foto, solo un archivo de imagen estándar como JPEG o PNG) y, a continuación, girándola y recortándola como desee.
+   - Tome una foto de sí mismo con su cámara web.
+
+7. Especifique todos los propietarios del grupo y, a continuación, seleccione **Siguiente**. De forma predeterminada, se le asigna como propietario del grupo que cree. No puede cambiar esto aquí, pero puede quitarse a sí mismo como propietario más adelante, como se describe en la sección Asignar propietarios a un grupo a continuación. A menos que haya desmarcado la casilla **Agregar automáticamente el grupo de administradores `<Grupo seleccionado>` como propietario durante la creación de todos los grupos** en la pantalla Configuración de grupos (accesible haciendo clic en el icono de engranaje en **Configuración del administrador** > **Grupos**), los miembros del grupo predeterminado también se asignan automáticamente como propietarios.
+8. Revise su configuración y, cuando esté listo, seleccione **Guardar**.
+
+<Note>
+  **Nota:** La creación de grupos se aplica solo a los grupos abiertos, cerrados
+  y dinámicos. No puede crear ninguno de los siguientes tipos de grupos dentro
+  de Domo:
+
+- Directorio (estos se crean a través de la autenticación única)
+- Sistema
+- Ad hoc
+
+</Note>
+
+## Compartir contenido con un grupo o con los miembros de un grupo
+
+Después de crear un grupo, puede compartir paneles y tarjetas relacionados con las funciones y responsabilidades de los miembros del grupo. No tiene que ser propietario del grupo para compartir contenido con los miembros.
+
+## Compartir contenido con miembros individuales de un grupo
+
+1. Seleccione el nombre del grupo para abrir su vista de detalles.
+2. Marque los nombres de todos los usuarios con los que desee compartir el contenido y, a continuación, seleccione el icono de compartir <i className="icon-arrow-box sm" aria-hidden="true" /> en la esquina superior derecha de la ventana.
+3. Elija las tarjetas y paneles que desee compartir con el usuario o los usuarios. Puede buscar por palabra clave en el campo **Buscar** o filtrar para mostrar solo tarjetas o paneles eligiendo el tipo **Tarjetas** o **Paneles** en el menú **Agregar filtro <i className="icon-funnel-plus sm" aria-hidden="true" />**.
+4. Seleccione **Compartir** para confirmar.
+   <Frame>
+     ![Share Cards and Dashboards with Group(s)](/images/kb/0EM5w000005vODJ.png)
+   </Frame>
+
+## Compartir contenido de forma masiva con varios grupos
+
+1. En la lista de grupos en **Más** > **Administrador** > **Gobernanza** > **Grupos**, marque la casilla o las casillas del grupo o los grupos con los que desee compartir contenido y, a continuación, seleccione el icono de compartir <i className="icon-arrow-box sm" aria-hidden="true" /> en la esquina superior derecha de la ventana.
+2. Elija las tarjetas y paneles que desee compartir con el grupo o los grupos. Puede buscar por palabra clave en el campo **Buscar** o filtrar para mostrar solo tarjetas o paneles eligiendo el tipo **Tarjetas** o **Paneles** en el menú **Agregar filtro <i className="icon-funnel-plus sm" aria-hidden="true" />**.
+3. Seleccione **Compartir** para confirmar.
 
 ## Adición de miembros a un grupo
 
-En la Configuración del administrador, puede agregar miembros a un grupo existente, de tal forma que dichos usuarios tendrán acceso a todas las páginas y tarjetas asignadas a dicho grupo. Puede hacerlo de alguna de las siguientes formas:
+En la Configuración del administrador, puede agregar miembros a un grupo abierto o cerrado, lo que significa que esos usuarios tienen acceso a todas las tarjetas y paneles asignados a ese grupo.
 
-- Puede agregar usuarios al grupo (en la pestaña **Grupos** en la Configuración del administrador).
-- Puede asignar grupos existentes a la lista de grupos de los que un usuario es miembro (en la pestaña **Personas** de la Configuración del administrador).
+<Note>
+  **Nota:** No puede agregar miembros a un grupo dinámico de esta forma porque la
+  pertenencia a estos grupos se basa en reglas preconfiguradas.
+</Note>
 
-Los usuarios agregados a un grupo pueden acceder a todas las conversaciones de Buzz anteriores de dicho grupo. Para obtener más información, consulte [Conversaciones en Buzz](/s/article/360042925574).
+Para agregar usuarios a un grupo cerrado, debe ser propietario del grupo.
 
-**Para agregar usuarios a un grupo:**
+<Note>
+  **Nota:** Cuando agrega miembros a un grupo predeterminado, se envía una
+  notificación a *todos los miembros*.
+</Note>
 
-1. Haga clic en <img alt="new_app_icon.png" src="/images/kb/es/0EM5w000005wKNa.png" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/> **> Administrador**.  
-   Se abre la Configuración del administrador.
-2. Seleccione **Grupos**.  
-   Aparece una lista de grupos, donde el primer grupo de la lista está seleccionado de forma predeterminada**.**
-3. Seleccione el grupo al que desea agregar usuarios.  
-   La información de este grupo aparece en el panel de la derecha.
-4. Haga clic en **Agregar personas a este grupo**. <img alt="add_people_to_group_button.png" src="/images/kb/es/0EM5w000005wKNU.png" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/>
-5. Escriba el nombre de un usuario en el campo.  
-   Los resultados relevantes de la búsqueda aparecen automáticamente en una lista a medida que escribe caracteres y filtra según corresponda mientras agrega o elimina caracteres.  
+Los usuarios agregados a un grupo obtienen acceso a todas las conversaciones de Buzz anteriores del grupo. Para obtener más información, consulte nuestro artículo sobre [Conversaciones en Buzz](/s/article/360042925574).
+
+## Agregar usuarios a un grupo abierto o cerrado
+
+1. En **Más** > **Administrador** > **Gobernanza** > **Grupos**, localice el grupo al que desee agregar miembros.
+2. Seleccione el nombre del grupo para abrir su vista de detalles.
+3. Seleccione **Agregar personas** en la esquina superior derecha. Si el grupo es un grupo cerrado del que no es propietario, este botón no se muestra.
+4. Marque las casillas situadas junto a los nombres de todos los usuarios que desee agregar.
+
    <Frame>
-   ![add_people_list.png](/images/kb/es/0EM5w000005wKNY.png)
+     ![group_management_new_members.png](/images/kb/0EM5w000005vODI.png)
    </Frame>
-6. Seleccione el nombre de un usuario en la lista.  
-   El nombre del usuario aparece en el campo.
-7. (Opcional) Agregue usuarios adicionales a este grupo con la repetición de los dos pasos anteriores.
-8. (Opcional) Quite un usuario del campo haciendo clic en la "x" situada a la derecha del nombre de dicho usuario.
-9. Haga clic en **Agregar** para agregar al grupo todos los usuarios cuyos nombres aparecen en el campo.
 
-Los usuarios agregados tienen acceso a las tarjetas y páginas asignadas al grupo.
+5. Seleccione **Guardar**.
 
-**Para asignar la pertenencia a un grupo a un usuario específico:**
+Los usuarios ahora están agregados al grupo y pueden acceder al contenido del grupo.
 
-1. Haga clic en <img alt="new_app_icon.png" src="/images/kb/es/0EM5w000005wKNa.png" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/> **> Administrador**.  
-   Se abre la Configuración del administrador.
-2. Seleccione **Personas**.
-3. En la lista de usuarios, seleccione el usuario al que desea asignar la pertenencia a un grupo.  
-   Se abre el panel de información del usuario.
-4. Haga clic en **Agregar grupo**. <img alt="add_group_button.png" src="/images/kb/es/0EM5w000005wKNb.png" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/>  
-   Aparece un campo en el que puede buscar grupos existentes en Domo.
-5. Escriba el nombre de un grupo en el campo.  
-   Los resultados relevantes de la búsqueda aparecen automáticamente en una lista a medida que escribe caracteres y filtra según corresponda mientras agrega o elimina caracteres.  
-   <Frame>
-   ![groups_listing.png](/images/kb/es/0EM5w000005wKNT.png)
-   </Frame>
-6. Seleccione un grupo de la lista.  
-   El nombre del grupo aparece en el campo.
-7. (Opcional) Agregue pertenencias adicionales a grupos a este usuario con la repetición de los dos pasos anteriores.
-8. (Opcional) Quite el nombre de un grupo del campo haciendo clic en la "x" situada a la derecha del nombre.
-9. Haga clic en **Agregar** para agregar todos los grupos que aparecen en el campo a la lista de pertenencias a grupos del usuario.
+## Agregar un usuario específico a un grupo
 
-El usuario ahora pertenece a los grupos agregados y tiene acceso a las tarjetas y páginas asignadas a los grupos.
+1. En la lista de usuarios en **Más** > **Administrador** > **Gobernanza** > **Personas**, marque la casilla situada junto al usuario que desee agregar a un grupo.
+2. En el panel de acciones en la parte superior de la pantalla, seleccione **Agregar personas a grupos <i className="icon-people-plus sm" aria-hidden="true" />**. Aparece un campo en el que puede buscar grupos existentes en Domo.
 
-## Eliminación de usuarios de un grupo
+   <Frame>![Screenshot](/images/kb/0EM5w000005vOD4.png)</Frame>
 
-Si elimina usuarios de un grupo de usuarios, ya no podrán acceder al contenido de dicho grupo (a menos que sean miembros de otro grupo con acceso al mismo contenido O BIEN que se les haya concedido acceso al mismo contenido en la pestaña **Personas**). Puede eliminar un usuario de un grupo mediante alguna de las siguientes acciones:
+3. En el campo, escriba el nombre de un grupo.  
+   Los resultados principales de su búsqueda se muestran automáticamente en una lista a medida que introduce caracteres y se filtran en consecuencia a medida que agrega o quita caracteres.
 
-- Eliminar el usuario del grupo (en la pestaña **Grupo** de la Configuración del administrador)
-- Eliminar el grupo de la lista de pertenencias a grupos del usuario (en la pestaña **Personas** de la Configuración del administrador)
+4. Seleccione un grupo de la lista.  
+   El nombre del grupo se muestra en el campo.
+5. (Opcional) Agregue este usuario a otros grupos repitiendo los dos pasos anteriores.
+6. (Opcional) Quite un grupo seleccionado del campo seleccionando ✕ a la derecha del nombre.
+7. Seleccione **Guardar** para finalizar.
 
-Los usuarios eliminados de un grupo pierden el acceso a todas las conversaciones de Buzz anteriores de dicho grupo. Para obtener más información, consulte [Conversaciones en Buzz](/s/article/360042925574).
+El usuario ahora es miembro de los grupos seleccionados y tiene acceso a su contenido.
 
-**Para eliminar un usuario de un grupo:**
+## Eliminación de miembros de un grupo
 
-1. Haga clic en <img alt="new_app_icon.png" src="/images/kb/es/0EM5w000005wKNa.png" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/> **> Administrador**.  
-   Se abre la Configuración del administrador.
-2. Seleccione **Grupos**.  
-   Aparece una lista de grupos, donde el primer grupo de la lista está seleccionado de forma predeterminada.
-3. Seleccione el grupo del que desea eliminar un miembro.  
-   La información del grupo aparece en el panel de la derecha.
-4. Mantenga el cursor sobre la imagen de perfil del miembro que desea eliminar.  
-   Aparece una "x" roja junto a la imagen de perfil.
-5. Haga clic en la "x" roja para eliminar el usuario del grupo.
+<Note>**Nota:** Debe ser el propietario del grupo para realizar esta tarea.</Note>
 
-**Para eliminar un grupo de la lista de pertenencias a grupos de un usuario:**
+Cuando elimina usuarios de un grupo de usuarios abierto o cerrado, ya no pueden acceder al contenido del grupo (a menos que sean miembros de otro grupo con acceso O que se les haya concedido acceso al mismo contenido como usuario individual).
 
-1. Haga clic en <img alt="new_app_icon.png" src="/images/kb/es/0EM5w000005wKNa.png" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/> **> Administrador**.  
-   Se abre la Configuración del administrador.
-2. Seleccione **Personas**.
-3. En la lista de usuarios, seleccione el usuario del que quiere eliminar la pertenencia a un grupo.  
-   La información del usuario aparece en el panel situado más a la derecha.
-4. Haga clic en **Quitar** en el grupo que desea eliminar de la lista **Miembros del grupo**.  
+Los usuarios eliminados de un grupo pierden el acceso a todas las conversaciones de Buzz anteriores del grupo. Para obtener más información, consulte nuestro artículo sobre [Conversaciones en Buzz](/s/article/360042925574).
+
+## Eliminar usuarios de un grupo
+
+1. En **Más** > **Administrador** > **Gobernanza** > **Grupos**, localice el grupo del que desee eliminar miembros.
+2. Seleccione el nombre del grupo para abrir su vista de detalles.
+3. Marque las casillas de todos los usuarios que desee eliminar del grupo.
+4. En la esquina superior derecha de la ventana, seleccione <i className="icon-gear sm" aria-hidden="true" /> **Configuración** > **Quitar del grupo**. Si no es propietario o el grupo no es un grupo abierto o cerrado, esto no se muestra.
+
+## Eliminar la pertenencia a un grupo de un usuario específico
+
+1. En la lista de usuarios en **Más** > **Administrador** > **Gobernanza** > **Personas**, seleccione el usuario que desee eliminar de un grupo.  
+   La información del usuario se muestra en el panel situado más a la derecha.
+2. Seleccione **Quitar** en el grupo que desee eliminar de la lista **Miembros del grupo**.  
    Aparece un cuadro de diálogo de confirmación.
-5. Haga clic en **Quitar** para confirmar.
+3. Seleccione **Quitar** para confirmar.
 
-## Eliminación de grupos de usuarios de Domo
+## Eliminación de grupos de Domo
 
-Puede eliminar grupos de usuarios de Domo en la Configuración del administrador.
+Puede eliminar grupos de usuarios de Domo en la Configuración del administrador. Debe ser el propietario de un grupo para eliminarlo.
 
-**Para eliminar un grupo de Domo:**
+Cuando elimina un grupo, todos los miembros del grupo pierden el acceso a las tarjetas y paneles que estaban asignados al grupo.
 
-1. Haga clic en <img alt="new_app_icon.png" src="/images/kb/es/0EM5w000005wKNa.png" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/> **> Administrador**.  
-   Se abre la Configuración del administrador.
-2. Expanda la sección **Personas** en el panel de navegación de la izquierda y luego haga clic en **Grupos**.  
-   Aparece una lista de grupos, donde el primer grupo de la lista está seleccionado de forma predeterminada.
-3. Seleccione el grupo que desea eliminar.  
-   La información del grupo aparece en el panel de la derecha.
-4. Haga clic en **Eliminar este grupo**, que se encuentra en la parte inferior del panel de información del grupo.
-5. Haga clic en **Eliminar** para confirmar la decisión.
+Para eliminar un grupo de Domo, siga estos pasos:
 
-El grupo se elimina, y todos los usuarios incluidos en este grupo pierden el acceso al contenido al que podían acceder sus miembros (a menos que sean miembros de otro grupo con acceso al mismo contenido O que se les haya concedido acceso al mismo contenido en la pestaña **Personas**).
+1. En **Más** > **Administrador** > **Gobernanza** > **Grupos**, marque las casillas de todos los grupos que desee eliminar.
+2. En la esquina superior derecha de la ventana, seleccione <i className="icon-trash sm" aria-hidden="true" /> **Eliminar**.
+3. Seleccione **Eliminar** para confirmar su decisión.
 
-## Modificación del nombre de un grupo
+El grupo se elimina, y los usuarios que eran miembros del grupo ya no pueden acceder al contenido del grupo (a menos que sean miembros de otro grupo con acceso al mismo contenido O que se les haya concedido acceso al mismo contenido en la subpestaña **Personas**).
 
-Puede cambiar el nombre de un grupo de usuarios en la Configuración del administrador.
+## Modificación del nombre y la descripción de un grupo
 
-**Para modificar el nombre de un grupo:**
+Use los pasos siguientes para cambiar el nombre y la descripción de un grupo de usuarios en la Configuración del administrador. _No_ necesita ser propietario del grupo para realizar estos cambios.
 
-1. Haga clic en <img alt="new_app_icon.png" src="/images/kb/es/0EM5w000005wKNa.png" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/> **> Administrador**.  
-   Se abre la Configuración del administrador.
-2. Seleccione **Grupos**.  
-   Aparece una lista de grupos, donde el primer grupo de la lista está seleccionado de forma predeterminada.
-3. Haga clic en el grupo cuyo nombre desea modificar.  
-   La información del grupo aparece en el panel de la derecha.
-4. Haga clic en **Editar nombre del grupo** en la esquina superior derecha del panel.
-5. Escriba un nombre nuevo para el grupo.
-6. Haga clic en **Guardar**.
+1. En **Más** > **Administrador** > **Gobernanza** > **Grupos**, seleccione el nombre del grupo para abrir su vista de detalles.
+2. Seleccione el nombre o la descripción del grupo y, a continuación, escriba el nuevo nombre o la nueva descripción del grupo.
+
+## Agregar o quitar propietarios de un grupo
+
+Como propietario de un grupo, puede realizar muchas acciones que no están disponibles para los miembros normales del grupo. Para obtener una lista de estas acciones, consulte la sección Propiedad de grupos de este artículo.
+
+Cuando crea un grupo, se le asigna automáticamente como propietario del grupo. Puede cambiar los propietarios actuales, incluido usted mismo, en la vista de detalles del grupo.
+
+La propiedad de grupos solo está disponible para los grupos abiertos, cerrados y dinámicos.
+
+Para agregar o quitar propietarios de un grupo, siga estos pasos:
+
+1. En **Más** > **Administrador** > **Gobernanza** > **Grupos**, seleccione el nombre del grupo para abrir su vista de detalles.
+2. Pase el cursor sobre el área **Propietarios** y, a continuación, seleccione **Editar**.
+
+   <Frame>
+     ![group_management_edit_owners.png](/images/kb/0EM5w000005vODA.png)
+   </Frame>
+
+3. En el cuadro de diálogo **Establecer propietarios**, agregue o quite propietarios según sea necesario.
+4. Seleccione **Guardar**.
+
+## Cambio del tipo de grupo
+
+Como propietario de un grupo abierto, dinámico o ad hoc, puede cambiar el tipo de grupo a abierto, dinámico o cerrado. Si un grupo es cerrado, no puede cambiar el tipo de grupo. No puede cambiar el tipo de grupo de los grupos de directorio o del sistema, pero los grupos de directorio pueden anidarse dentro de grupos dinámicos.
+
+Para cambiar el tipo de grupo de un grupo, siga estos pasos:
+
+1. En **Más** > **Administrador** > **Gobernanza** > **Grupos**, seleccione el nombre del grupo para abrir su vista de detalles.
+2. Pase el cursor sobre el área **Tipo de grupo** y, a continuación, seleccione **Editar**.
+
+   <Frame>
+     ![group_management_change_type.png](/images/kb/0EM5w000005vOD7.png)
+   </Frame>
+
+3. Seleccione el tipo de grupo que desee. Tenga en cuenta lo siguiente:
+   - Cambiar un grupo **dinámico** a un grupo **abierto** o **cerrado** detiene la adición dinámica de usuarios al grupo. En un grupo **abierto**, cualquier miembro del grupo puede administrar su contenido y su pertenencia.
+   - Cambiar un grupo **dinámico** o **abierto** a un grupo **cerrado** es irreversible. Una vez que un grupo es cerrado, permanece cerrado.
+   - Cambiar un grupo **abierto** a un grupo **dinámico** requiere que establezca los criterios de pertenencia del grupo, como se explica en los pasos 5i a 5vi de la sección [Creación de un grupo](#creación-de-un-grupo) de este artículo.
+   - Puede cambiar un grupo **ad hoc** a **dinámico**, **abierto** o **cerrado**, pero no puede volver a cambiarlo a **ad hoc**.
+
+4. Después de haber realizado los cambios, seleccione **Guardar**.
+
+## Cambio de los criterios de pertenencia de un grupo dinámico
+
+<Note>**Nota:** Debe ser el propietario del grupo para realizar esta tarea.</Note>
+
+Es posible que necesite actualizar los criterios de pertenencia de un grupo dinámico después de haber creado el grupo. Siga los pasos a continuación para cambiar estos criterios:
+
+1. [Acceda a la página **Grupos**.](#acceso-a-la-página-de-inicio-de-grupos)
+2. Seleccione el nombre del grupo de la lista para abrir la vista de detalles del grupo.
+3. (Condicional) Para un grupo dinámico, pase el cursor sobre **Criterios de pertenencia** y seleccione **Editar**.
+
+   <Frame>
+     ![edit membership criteria.jpg](/images/kb/0EM5w000006vwum.jpg)
+   </Frame>
+
+4. Realice los cambios, como se explica en los pasos 5i a 5vi de Creación de un grupo, más arriba.
+5. Haga clic en **Guardar** cuando haya terminado.
+
+## Cambio de la imagen de perfil del grupo
+
+<Note>**Nota:** Debe ser el propietario del grupo para realizar esta tarea.</Note>
+
+Puede cambiar la imagen de perfil de su grupo en la vista de detalles del grupo sin tener que volver a pasar por el proceso de creación del grupo.
+
+Siga estos pasos:
+
+1. [Acceda a la página **Grupos**.](#acceso-a-la-página-de-inicio-de-grupos)
+2. Seleccione el nombre del grupo de la lista para abrir la vista de detalles del grupo.
+3. Pase el cursor sobre la imagen de perfil y seleccione <i className="icon-pencil sm" aria-hidden="true" /> **Editar** cuando se muestre.
+
+   <Frame>![edit avatar.jpg](/images/kb/0EM5w000006vwto.jpg)</Frame>
+
+4. Realice los cambios en la imagen de perfil como se describe en Creación de un grupo, más arriba.
+
+   <Frame>
+     ![Screenshot 2023-09-22 at 2.49.29 PM.png](/images/kb/0EM5w000006vwtt.jpg)
+   </Frame>

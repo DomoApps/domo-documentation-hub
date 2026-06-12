@@ -60,6 +60,10 @@ mintlify dev
 - **`release/**`** — pushes to release branches create a Mintlify preview via `.github/workflows/mint-preview.yml`. Preview URL is posted to any open PR whose head is the release branch.
 - **Any PR** — Mintlify's GitHub App posts a preview link in the PR's Checks tab.
 
+## Contributing
+
+Training on how to contribute to this repository is available in the [KB Contribution App](https://domo.domo.com/app-studio/649552668/pages/1393071293). To request access to the app, contact the Knowledge Base Administrator: Jared Peterson ([jared.peterson@domo.com](mailto:jared.peterson@domo.com)).
+
 ## Writing content
 
 - `CLAUDE.md` — repo conventions and MDX style.

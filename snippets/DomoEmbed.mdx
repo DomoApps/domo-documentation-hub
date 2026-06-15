@@ -1,0 +1,34 @@
+import { useEffect, useRef } from "react";
+
+export const DomoEmbed = ({ src, width = "100%", initialHeight = "600" }) => {
+  const iframeRef = useRef(null);
+
+  useEffect(() => {
+    function handleMessage(event) {
+      if (
+        iframeRef.current &&
+        iframeRef.current.contentWindow === event.source &&
+        event.data &&
+        event.data.params &&
+        event.data.params.height
+      ) {
+        iframeRef.current.style.height = event.data.params.height + 15 + "px";
+      }
+    }
+    window.addEventListener("message", handleMessage);
+    return () => window.removeEventListener("message", handleMessage);
+  }, []);
+
+  return (
+    <iframe
+      ref={iframeRef}
+      src={src}
+      width={width}
+      height={initialHeight}
+      marginHeight="0"
+      marginWidth="0"
+      frameBorder="0"
+      style={{ display: "block" }}
+    />
+  );
+};

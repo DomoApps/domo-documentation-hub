@@ -1,3 +1,38 @@
+{/*
+  DomoEmbed — reusable component for embedding Domo-hosted content in MDX pages.
+
+  USAGE
+  -----
+  Import and drop into any MDX page:
+
+    import { DomoEmbed } from "/snippets/DomoEmbed.mdx";
+
+    <DomoEmbed
+      src="https://embed.domo.com/embed/pages/XXXXX"
+      width="100%"
+      initialHeight="600"
+    />
+
+  PROPS
+  -----
+  src            (required) — The Domo embed URL (cards or pages endpoint).
+  width          (optional) — CSS width of the iframe. Defaults to "100%".
+  initialHeight  (optional) — Starting height in pixels before auto-resize fires. Defaults to "600".
+
+  AUTO-RESIZE
+  -----------
+  Domo's embed runtime sends a postMessage event containing the rendered page height.
+  This component listens for that message and updates the iframe height automatically,
+  eliminating scroll traps and double scrollbars. A 15px buffer is added to account
+  for sub-pixel rounding and scrollbar gutter width.
+
+  For the underlying mechanism and plain-HTML equivalents, see:
+  /portal/embed/embed-in-sites-and-apps/dynamic-iframe-height
+
+  NOTE: The embed URL must come from a Domo instance that allows embedding on this domain.
+  If the iframe appears blank, check the source instance's CSP / embed allowlist settings.
+*/}
+
 import { useEffect, useRef } from "react";
 
 export const DomoEmbed = ({ src, width = "100%", initialHeight = "600" }) => {

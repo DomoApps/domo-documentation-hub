@@ -28,24 +28,24 @@ To connect to a Snowflake database and create a DataSet, you must have the follo
 * Your Snowflake private key
 * The passphrase used to encrypt the private key file, if you created an encrypted key
 
-## Configure the Public/Private Key Pair
+### Configure the Public/Private Key Pair
 
 Follow these steps to configure a public/private key pair.
 
-### Generate a Private Key
+#### Generate a Private Key
 
 1. Open a terminal window.
 2. Generate a private key.
 
    You can create either an unencrypted or encrypted private key.
 
-   - **Unencrypted private key**
+   - **For Unencrypted private key, use the following command:**
 
      ```bash
      openssl genrsa 2048 | openssl pkcs8 -topk8 -inform PEM -out rsa_key.p8 -nocrypt
      ```
 
-   - **Encrypted private key**
+   - **For Encrypted private key, use the following command:**
 
      ```bash
      openssl genrsa 2048 | openssl pkcs8 -topk8 -v2 des3 -inform PEM -out rsa_key.p8
@@ -58,14 +58,16 @@ The commands generate a private key in PEM format:
       MIIE6T...
       -----END ENCRYPTED PRIVATE KEY-----
   ```
----
 
-### Generate a Public Key
+#### Generate a Public Key
+
+Generate the public key from the command line by referencing the private key. This example assumes the private key is encrypted and stored in the file ```rsa_key.p8```.
 
 Generate a public key from the private key:
 
 ```bash
 openssl rsa -in rsa_key.p8 -pubout -out rsa_key.pub
+```
 
 The command generates the public key in PEM format:
 
@@ -75,31 +77,31 @@ The command generates the public key in PEM format:
       -----END PUBLIC KEY-----
   ```
 
-### Store the Keys Securely
+#### Store the Keys Securely
 
-1. Store the private and public key files in a secure local directory.  
-2. Record the file paths for future reference.  
-3. The private key uses the PKCS#8 format and is encrypted with the specified passphrase.
+* Store the private and public key files in a secure local directory. 
+* Record the file paths for future reference.
+* The private key uses the PKCS#8 (Public Key Cryptography Standards) format and is encrypted with the specified passphrase.
 
-### Assign the Public Key to a Snowflake User
+#### Assign the Public Key to a Snowflake User
 
-Run the following command to assign the public key:
+Use the [ALTER USER](https://docs.snowflake.com/en/sql-reference/sql/alter-user) command to assign the public key to the user by setting the RSA_PUBLIC_KEY property. For example:
 
-ALTER USER example_user SET RSA_PUBLIC_KEY='MIIBIjANBgkqh...';
+```ALTER USER example_user SET RSA_PUBLIC_KEY='MIIBIjANBgkqh...';```
 
-### Verify the Public Key Fingerprint
+#### Verify the Public Key Fingerprint
 
-Retrieve the user's public key fingerprint:
+1. Run the following command to retrieve the users public key fingerprint, and then copy the output.
 
-1. DESC USER example_user;
-SELECT SUBSTR(
+```DESC USER example_user
+    ->> SELECT SUBSTR(
   (SELECT "value" FROM $1 WHERE "property" = 'RSA_PUBLIC_KEY_FP'),
   LEN('SHA256:') + 1
-) AS key;
+) AS key;```
 
-2. Generate the fingerprint from the public key:
+2. Run the following command on the command line and copy the output.
 
-openssl rsa -pubin -in rsa_key.pub -outform DER | openssl dgst -sha256 -binary | openssl enc -base64
+```openssl rsa -pubin -in rsa_key.pub -outform DER | openssl dgst -sha256 -binary | openssl enc -base64```
 
 3. Compare both outputs.
 If the values match, the configuration is correct.

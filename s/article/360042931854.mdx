@@ -93,15 +93,19 @@ Use the [ALTER USER](https://docs.snowflake.com/en/sql-reference/sql/alter-user)
 
 1. Run the following command to retrieve the users public key fingerprint, and then copy the output.
 
-```DESC USER example_user
-    ->> SELECT SUBSTR(
-  (SELECT "value" FROM $1 WHERE "property" = 'RSA_PUBLIC_KEY_FP'),
-  LEN('SHA256:') + 1
-) AS key;```
+```bash
+DESC USER example_user
+  ->> SELECT SUBSTR(
+    (SELECT "value" FROM $1
+     WHERE "property" = 'RSA_PUBLIC_KEY_FP'),
+    LEN('SHA256:') + 1) AS key;
+```
 
 2. Run the following command on the command line and copy the output.
 
-```openssl rsa -pubin -in rsa_key.pub -outform DER | openssl dgst -sha256 -binary | openssl enc -base64```
+```bash
+openssl rsa -pubin -in rsa_key.pub -outform DER | openssl dgst -sha256 -binary | openssl enc -base64
+```
 
 3. Compare both outputs.
 If the values match, the configuration is correct.

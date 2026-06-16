@@ -13,6 +13,7 @@ import json
 import os
 import re
 import csv
+import datetime
 from collections import defaultdict
 from pathlib import Path
 
@@ -492,6 +493,9 @@ for feat, cnt in feat_count.most_common(20):
 # Sort: by feature (Product Group), then by title within each group
 rows_sorted = sorted(rows, key=lambda r: (r['feature'].lower(), r['title'].lower()))
 
+today = datetime.date.today().isoformat()
+out_path = ROOT / 'Article-PM-Ownership-Reference.mdx'
+
 def esc(s):
     """Escape pipe chars so they don't break Markdown table cells."""
     return s.replace('|', '\\|')
@@ -507,7 +511,7 @@ lines = [
     '> **How to use:** Search this page (Ctrl/Cmd+F) for a feature name, article title, or PM name to quickly find ownership. '
     'The Feature column matches the "Feature" column in the *Feature – Owning Squad, PM, Eng, UX* CSV at the repo root.',
     '',
-    f'_Last generated: 2026-06-16 · {len(rows)} articles_',
+    f'_Last generated: {today} · {len(rows)} articles_',
     '',
     '| Feature | Article Title | Article File Name | PM |',
     '|---|---|---|---|',
@@ -520,7 +524,6 @@ for r in rows_sorted:
 
 lines.append('')
 
-out_path = ROOT / 'Article-PM-Ownership-Reference.mdx'
 with open(out_path, 'w', encoding='utf-8') as f:
     f.write('\n'.join(lines))
 

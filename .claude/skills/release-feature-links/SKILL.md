@@ -64,6 +64,20 @@ ls s/article/ | grep -iE "<keyword>"
 
 Then verify each hit by reading the frontmatter and a snippet of the body to confirm the article is actually about the feature (not a coincidental keyword match — e.g. *"Jupyter Workspaces"* is **not** the same as the *"Workspaces (Mobile & Web)"* feature).
 
+For features with a confirmed match, you can also cross-reference `Article-PM-Ownership-Reference.mdx` to confirm the PM assigned to that article and surface the PM name to the user — useful when the writer needs to route follow-up questions or review:
+
+```bash
+grep "matched-filename.mdx" Article-PM-Ownership-Reference.mdx
+```
+
+For features with **no matched article**, check `Article-PM-Ownership-Reference.mdx` by Feature name to identify the PM who would own a future article for that feature:
+
+```bash
+grep "^| Feature Name" Article-PM-Ownership-Reference.mdx | head -3
+```
+
+Include the PM name in the "no match" note so the user knows exactly who to follow up with.
+
 Tips for tricky cases:
 
 - **Rebranded features** — search the old name too. Example: *Domo Documents* was formerly *FileSets*.

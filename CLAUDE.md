@@ -69,6 +69,29 @@ To find by filename or slug, use a glob against `s/article/*.mdx` or `s/topic/*.
 
 Both `s/article/` and `s/topic/` should be searched — topics are grouping pages and articles are the detailed content.
 
+## Article PM Ownership
+
+Every article in `s/article/` is mapped to a **Feature** (using the same nomenclature as the internal squad-ownership CSV) and its **Product Manager** in `Article-PM-Ownership-Reference.mdx` at the repo root.
+
+- **Reference file:** `Article-PM-Ownership-Reference.mdx` — searchable table of Feature, Article Title, Article File Name, PM.
+- **Source CSV:** `Feature - Owning Squad, PM, Eng, UX.csv` — authoritative squad/PM roster; the Feature column is the canonical identifier used in the reference.
+- **Generation script:** `scripts/build-pm-ownership.py` — regenerates the reference by cross-referencing the CSV against `docs.json` navigation hierarchy and article frontmatter. Re-run whenever articles are added in bulk or the CSV changes.
+
+To look up who owns a specific article:
+```bash
+grep "filename.mdx" Article-PM-Ownership-Reference.mdx
+```
+
+To look up all articles owned by a PM:
+```bash
+grep "PM Name" Article-PM-Ownership-Reference.mdx
+```
+
+To look up all articles for a Feature:
+```bash
+grep "^| Feature Name" Article-PM-Ownership-Reference.mdx
+```
+
 ## Style Standards
 
 See `Domo-KB-Style-Guide.mdx` for full standards. Key points:
@@ -100,3 +123,4 @@ This activates a `post-merge` hook that warns you when a `git pull` leaves track
 |update-kb-article|Any update to an existing KB article: renames, content edits, image swaps, content removal, file path updates, cross-file changes, step/process edits, navigation moves, merges, or splits|
 |mintlify-design|Mintlify component/page-design expert: choosing components, composing custom layouts, building rich pages, "is there a component for X" questions, or authoring reusable snippets in `/snippets/`|
 |fix-ja-formatting|Fixing structural formatting issues in queued Japanese articles: inline image placement, block vs. inline `<img>` mismatches, callout wrapping, and redundant blank lines|
+|update-pm-ownership|Regenerate `Article-PM-Ownership-Reference.mdx` after the squad CSV or article list changes|

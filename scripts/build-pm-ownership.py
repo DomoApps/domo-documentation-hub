@@ -524,7 +524,58 @@ for r in rows_sorted:
 
 lines.append('')
 
+# ── 10. Pad table columns so all pipes align ────────────────────────────────
+# Cells may contain \| (escaped pipe, renders as |); treat \| as 1 display
+# char when measuring widths so columns align as they appear on screen.
+
+_PLACEHOLDER = '\x01'
+
+def _split_cells(line: str) -> list[str]:
+    """Split a pipe-table row into cells, treating \\| as a single unit."""
+    escaped = line.replace('\\|', _PLACEHOLDER)
+    inner = escaped.strip().lstrip('|').rstrip('|')
+    return [c.strip().replace(_PLACEHOLDER, '\\|') for c in inner.split('|')]
+
+def _disp(cell: str) -> int:
+    """Display width of a cell (\\| counts as 1, not 2)."""
+    return len(cell.replace('\\|', '|'))
+
+def pad_table(lines: list[str]) -> list[str]:
+    """Pad every data/header row so column pipes align."""
+    # Identify table rows (non-separator pipe rows)
+    table_idxs = []
+    for i, line in enumerate(lines):
+        if line.startswith('| ') and not line.startswith('|---'):
+            cells = _split_cells(line)
+            if len(cells) == 4:
+                table_idxs.append(i)
+
+    # Compute max RAW length per column (raw alignment = pipes line up in a text editor)
+    # Cells with \\| are 1 raw char longer than their display width, so we pad by raw length
+    # to keep all row lengths equal. The rendered display difference is imperceptible (1 char).
+    col_widths = [0, 0, 0, 0]
+    for i in table_idxs:
+        for j, cell in enumerate(_split_cells(lines[i])):
+            col_widths[j] = max(col_widths[j], len(cell))  # raw length, not display width
+
+    # Rebuild
+    result = []
+    for i, line in enumerate(lines):
+        if i in set(table_idxs):
+            cells = _split_cells(line)
+            padded = [cell + ' ' * (col_widths[j] - len(cell))
+                      for j, cell in enumerate(cells)]
+            result.append('| ' + ' | '.join(padded) + ' |')
+        elif line.startswith('|---'):
+            # Separator: dash-pad each column to match its max width
+            result.append('| ' + ' | '.join('-' * w for w in col_widths) + ' |')
+        else:
+            result.append(line)
+    return result
+
+lines = pad_table(lines)
+
 with open(out_path, 'w', encoding='utf-8') as f:
     f.write('\n'.join(lines))
 
-print(f"\nWrote {out_path} ({len(rows)} rows)")
+print(f"\nWrote {out_path} ({len(rows)} rows, columns padded)")

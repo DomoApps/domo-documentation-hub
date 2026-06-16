@@ -132,6 +132,24 @@ If any articles are mis-assigned, return to step 4 and adjust the routing rules.
 
 ---
 
+## Step 6b: Verify column alignment
+
+The script automatically pads all table columns so every pipe character aligns at the same position in every row (raw-length padding, so pipes align in a plain-text editor). Confirm the output is consistent:
+
+```bash
+python3 -c "
+with open('Article-PM-Ownership-Reference.mdx') as f:
+    lines = [l.rstrip('\n') for l in f]
+widths = set(len(l) for l in lines if l.startswith('| '))
+print('Distinct row lengths:', widths)
+print('Expected: exactly one value')
+"
+```
+
+If more than one length is reported, the padding logic in `scripts/build-pm-ownership.py` has a bug — check the `pad_table()` function in the Write MDX section. All 1,822+ rows should be identical in raw length.
+
+---
+
 ## Manual correction
 
 If the user reports a specific mis-assignment (e.g. "article X should be Feature Y, not Feature Z"):

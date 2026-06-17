@@ -1,6 +1,6 @@
 # KB Information Architecture Spec
 
-**Status:** Phase 2 complete — ready for Phase 3 (content creation) and Phase 7 (nav rebuild)
+**Status:** Phase 2 complete — updated with workshop feedback (2026-06-17); ready for Phase 3 (content creation) and Phase 7 (nav rebuild)
 **Generated from:** `scripts/build_ia_spec.py` + `scripts/output/ia-spec.json`
 **Article mapping:** `scripts/output/ia-mapping.json` (every article → new pillar/group/sub_group)
 
@@ -16,7 +16,8 @@ Counts in parentheses are existing articles moving to that location.
 |--------|-------------------|---------------------|----------|
 | Getting Started | 34 | 5 (3 role-based + 2 concept) | 🔴 Critical |
 | Connect & Bring In Data | 1,050 | 4 (hub + 3 concept) | 🟡 Medium |
-| Prepare & Transform Data | 101 | 4 (hub + 3 concept) | 🔴 Critical |
+| Manage Data | 0–31 (pending D9) | 3 (hub + 2 concept) | 🔴 Critical |
+| Prepare & Transform Data | 101 (or ~70 pending D9) | 4 (hub + 3 concept) | 🔴 Critical |
 | Analyze & Visualize | 230 | 4 (hub + 3 concept) | 🔴 Critical |
 | Build Apps & Automate | 106 | 3 (hub + 2 concept) | 🟡 Medium |
 | Share & Collaborate | 51 | 2 (hub + 1 concept) | 🟡 Medium |
@@ -73,53 +74,81 @@ Getting Started
 
 ## Pillar 2: Connect & Bring In Data
 
-**Story:** You have data somewhere else. Here's how to get it into Domo — from the simplest connector to on-premises systems and cloud warehouses.
+**Story:** You have data somewhere else. Here's how to get it into Domo — and, where needed, how to write data back to source systems — from the simplest connector to on-premises systems and cloud warehouses.
 
 ```
 Connect & Bring In Data
-├── [NEW] Overview: Connecting Your Data to Domo     ← hub article
+├── [NEW] Overview: Connecting Your Data to Domo     ← hub article (establishes read + write framing)
 ├── [NEW] What is a Connector?                        ← synthesize from General Connector Info
 ├── [NEW] Getting Started: Connect Your First DataSet ← synthesize from connector setup articles
 ├── [NEW] How Connectors Work                         ← synthesize from General Connector Info (12)
 │   (OAuth, credentials, scheduling, update methods)
-├── Cloud Data Warehouses (104)
-│   ├── [NEW] Cloud Data Warehouses Overview
-│   ├── Snowflake (26)
-│   │   ├── [NEW] Snowflake Overview
-│   │   └── [existing 26 articles]
-│   ├── Google BigQuery (11)
-│   ├── Azure (17)
-│   ├── Amazon Redshift/Athena (13)
-│   ├── Databricks (5)
-│   ├── MySQL (10)
-│   ├── Oracle (9)
-│   ├── PostgreSQL (8)
-│   └── Dremio (1)
-├── Connector Library — A-Z Reference (817)          ← reference library; not a "story" section
-│   ├── [NEW] Connector Library Overview              ← 1 hub article for the library
-│   ├── Data Providers A-B (130)
-│   ├── Data Providers C-F (119)
-│   ├── Data Providers G-K (122)
-│   ├── Data Providers L-P (176)
-│   ├── Data Providers Q-S (144)
-│   ├── Data Providers T-Z & # (102)
+├── Connector Library — Reference (976)               ← CDW + A-Z + Writeback merged; reference section
+│   ├── [NEW] Connector Library Overview              ← hub article; introduces Cloud Amplifier for CDWs;
+│   │                                                    "most commonly used connectors" curated highlight
+│   ├── Cloud Data Warehouses (104)                   ← CDW sub-groups promoted within the library
+│   │   ├── [NEW] Cloud Data Warehouses Overview      ← Cloud Amplifier as #1 recommended path for all CDWs;
+│   │   │                                                introduces read + write framing for CDWs
+│   │   ├── Snowflake (26)
+│   │   │   ├── [NEW] Connect to Snowflake            ← read: Cloud Amplifier preferred; write: Cloud Amplifier
+│   │   │   │                                            write path; fallback: existing Snowflake connectors
+│   │   │   └── [existing 26 articles]
+│   │   ├── Google BigQuery (11)
+│   │   ├── Azure (17)
+│   │   ├── Amazon Redshift/Athena (13)
+│   │   ├── Databricks (5)
+│   │   ├── MySQL (10)
+│   │   ├── Oracle (9)
+│   │   ├── PostgreSQL (8)
+│   │   └── Dremio (1)
+│   ├── Connectors A-B (130)
+│   ├── Connectors C-F (119)
+│   ├── Connectors G-K (122)
+│   ├── Connectors L-P (176)
+│   ├── Connectors Q-S (144)
+│   ├── Connectors T-Z & # (102)
+│   ├── Writeback Connectors (55)                     ← integrated into library; no longer a top-level section
 │   └── Files & APIs (24)
-├── Writeback Connectors (55)
-│   └── [existing articles — all how-tos for specific writeback targets]
 └── Workbench (62)
-    ├── [NEW] What is Workbench?                      ← synthesize from Workbench 5.2 overview
+    ├── [NEW] What is Workbench?                      ← synthesize from Workbench 5.2 overview;
+    │                                                    covers both read and writeback capabilities
     ├── Workbench Enterprise (current)
     ├── Workbench 5 (current)
     └── Workbench 5.1 (Legacy) (12)                  ← collapsed group, clearly labeled legacy
 ```
 
+**Note on Writeback Connectors:** The 55 writeback connector articles are no longer a standalone top-level section. CDW-specific write paths (Cloud Amplifier writeback) are documented within each CDW's sub-group overview. Standard writeback connectors are integrated into the alphabetical Connector Library groups alongside read connectors. Workbench writeback is covered in the Workbench section.
+
 **[DECISION]** Workbench 4 (37 articles) is in Archive. Confirm: should it be completely removed from primary nav, or kept in a Legacy group? Recommend: Archive — these are 5+ year old articles for an EOL product.
 
-**[DECISION]** "Files & APIs" is a sub-group of the A-Z connector library containing 24 articles. These are HTTP-based and file-upload connectors (SFTP, XML, JSON, etc.). Confirm they stay in Connector Library vs. getting their own section.
+**[DECISION]** "Files & APIs" is a sub-group of the connector library containing 24 articles. These are HTTP-based and file-upload connectors (SFTP, XML, JSON, etc.). Confirm they stay in Connector Library vs. getting their own section.
 
 ---
 
-## Pillar 3: Prepare & Transform Data
+## Pillar 3: Manage Data
+
+**Story:** You've connected your data. Now find it, understand it, and put it to work — navigate the Data Center, discover what's available, manage dataset health, and share data with the right people.
+
+```
+Manage Data
+├── [NEW] Overview: Manage Your Data in Domo         ← hub article
+├── [NEW] What is the Data Center?                    ← synthesize from connector + DataSet articles
+│   (data list view, dataset cards, status indicators)
+├── [NEW] Find and Manage Your DataSets               ← how to search, filter, favorite, share datasets
+├── DataSet Management (31)                           ← [DECISION D9: some articles may stay in Pillar 4]
+│   ├── DataSet Update Methods
+│   ├── Export DataSets
+│   ├── DataSet Backup
+│   ├── Virtual DataSets
+│   └── [remaining DataSet management how-tos]
+└── [articles covering Data Center navigation, dataset lifecycle, workspaces/favorites — TBD pending D9]
+```
+
+**[DECISION D9]** Which existing DataSet Management articles (currently in Prepare & Transform Data) belong in Manage Data vs. staying in Prepare & Transform? Pipeline-oriented articles (update methods, virtual datasets) likely stay in Prepare & Transform; governance-adjacent articles (backup, sharing, lifecycle) likely move here. Resolve before Phase 7 nav rebuild.
+
+---
+
+## Pillar 4: Prepare & Transform Data
 
 **Story:** Your data is in Domo. Now you need to clean it, join it, transform it, and shape it for analysis.
 
@@ -157,7 +186,7 @@ Prepare & Transform Data
 
 ---
 
-## Pillar 4: Analyze & Visualize
+## Pillar 5: Analyze & Visualize
 
 **Story:** Your data is clean and ready. Now let's turn it into insights — cards, charts, dashboards, and calculations.
 
@@ -204,7 +233,7 @@ Analyze & Visualize
 
 ---
 
-## Pillar 5: Build Apps & Automate
+## Pillar 6: Build Apps & Automate
 
 **Story:** You understand your data. Now let's build experiences on top of it — apps, workflows, and automations that help your whole organization act on insights.
 
@@ -257,7 +286,7 @@ Build Apps & Automate
 
 ---
 
-## Pillar 6: Share & Collaborate
+## Pillar 7: Share & Collaborate
 
 **Story:** You've built your insights. Now get them in front of the right people — share dashboards, set up alerts, collaborate in Buzz, and publish to external audiences.
 
@@ -309,7 +338,7 @@ Share & Collaborate
 
 ---
 
-## Pillar 7: AI & Data Science
+## Pillar 8: AI & Data Science
 
 **Story:** Go beyond standard charts — use AI to generate insights, run machine learning models, write Python and R in Jupyter, and build AI agents.
 
@@ -341,7 +370,7 @@ AI & Data Science
 
 ---
 
-## Pillar 8: Administer & Govern
+## Pillar 9: Administer & Govern
 
 **Story:** You're responsible for the Domo instance. Here's how to manage users, set up security, govern data quality, and keep the platform running smoothly.
 
@@ -391,7 +420,7 @@ Administer & Govern
 
 ---
 
-## Pillar 9: Develop & Integrate
+## Pillar 10: Develop & Integrate
 
 **Story:** You want to build on top of Domo programmatically — call the REST API, use SDKs, integrate via MCP, or build custom apps.
 
@@ -413,7 +442,7 @@ Develop & Integrate
 
 ---
 
-## Pillar 10: Release Notes
+## Pillar 11: Release Notes
 
 ```
 Release Notes
@@ -427,7 +456,7 @@ Release Notes
 
 ---
 
-## Pillar 11: Archive (not in primary nav)
+## Pillar 12: Archive (not in primary nav)
 
 The Archive pillar holds deprecated/legacy content that is removed from primary navigation but not deleted. It should be linked from a single "Legacy & Archived Content" page at the bottom of the KB.
 
@@ -453,6 +482,7 @@ Archive (64 articles)
 | D6 | Confirm Develop & Integrate scope — KB how-tos vs. link-out to developer.domo.com? | Clarify with dev relations | You / Dev PM |
 | D7 | Data Models section (1 article, Beta) — expand or hold? | Hold until feature ships | You / PM |
 | D8 | Instance Settings (39) — sub-group further or keep flat? | Keep flat for now | You |
+| D9 | Which DataSet Management articles move from Prepare & Transform to Manage Data? | Pipeline articles stay; governance/lifecycle articles move | You / PM |
 
 ---
 
@@ -476,18 +506,21 @@ Listed in priority order. All synthesizable without PM input unless marked [PM].
 | 12 | `Analyze-and-Visualize-Overview.mdx` | All Analyzer/chart/dashboard articles (hub) |
 | 13 | `What-is-an-Alert.mdx` | Alerts Overview, alert articles |
 | 14 | `What-is-a-Connector.mdx` | General Connector Info (12 articles) |
-| 15 | `Connect-and-Bring-In-Data-Overview.mdx` | All connector/Workbench articles (hub) |
-| 16 | `What-is-Domo-AI.mdx` | Domo AI FAQ, AI Playground, AI articles |
-| 17 | `AI-and-Data-Science-Overview.mdx` | All AI/DomoStats/Jupyter articles (hub) |
-| 18 | `What-is-App-Studio.mdx` | App Studio Overview (may just reframe it) |
-| 19 | `Build-Apps-and-Automate-Overview.mdx` | App Studio, Workflows, Code Engine articles (hub) |
-| 20 | `What-is-Workbench.mdx` | Workbench 5.2 overview, Workbench Enterprise |
-| 21 | `Share-and-Collaborate-Overview.mdx` | Sharing, Buzz, Publications, Embed articles (hub) |
-| 22 | `Domo-User-Roles-and-What-They-Can-Do.mdx` | Roles/grants articles |
-| 23 | `Security-and-Permissions-Overview.mdx` | PDP, access rights, OAuth, security settings |
-| 24 | `Administer-and-Govern-Overview.mdx` | Admin articles (hub) |
-| 25 | `Domo-Sandbox-and-Promotion-Overview.mdx` | Sandbox article, Linked Repositories |
-| 26 | `Develop-and-Integrate-Overview.mdx` | Existing 5 API articles (hub) |
+| 15 | `Connect-and-Bring-In-Data-Overview.mdx` | All connector/Workbench articles (hub); frames read + write directions |
+| 16 | `Manage-Data-Overview.mdx` | DataSet articles, Data Center articles (hub) |
+| 17 | `What-is-the-Data-Center.mdx` | Connector how-tos (implicit Data Center context), DataSet management articles |
+| 18 | `Find-and-Manage-Your-DataSets.mdx` | DataSet management, sharing, workspace/favorites articles |
+| 19 | `What-is-Domo-AI.mdx` | Domo AI FAQ, AI Playground, AI articles |
+| 20 | `AI-and-Data-Science-Overview.mdx` | All AI/DomoStats/Jupyter articles (hub) |
+| 21 | `What-is-App-Studio.mdx` | App Studio Overview (may just reframe it) |
+| 22 | `Build-Apps-and-Automate-Overview.mdx` | App Studio, Workflows, Code Engine articles (hub) |
+| 23 | `What-is-Workbench.mdx` | Workbench 5.2 overview, Workbench Enterprise |
+| 24 | `Share-and-Collaborate-Overview.mdx` | Sharing, Buzz, Publications, Embed articles (hub) |
+| 25 | `Domo-User-Roles-and-What-They-Can-Do.mdx` | Roles/grants articles |
+| 26 | `Security-and-Permissions-Overview.mdx` | PDP, access rights, OAuth, security settings |
+| 27 | `Administer-and-Govern-Overview.mdx` | Admin articles (hub) |
+| 28 | `Domo-Sandbox-and-Promotion-Overview.mdx` | Sandbox article, Linked Repositories |
+| 29 | `Develop-and-Integrate-Overview.mdx` | Existing 5 API articles (hub) |
 | PM | `How-Data-Flows-Through-Domo.mdx` | [PM: needs canonical pipeline narrative] |
 | PM | `Choosing-the-Right-Data-Prep-Tool.mdx` | [PM: ETL vs DataFlow vs SQL positioning] |
 | PM | `Understanding-DataSet-Joins-and-Relationships.mdx` | [PM: decision guidance needed] |

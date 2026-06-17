@@ -5,7 +5,7 @@ Update it at the end of every work session. Future Claude sessions should read t
 file at the start of any restructure work to orient themselves before doing anything.
 
 **Plan document:** `KB-RESTRUCTURE-PLAN.md`
-**Last updated:** 2026-06-10
+**Last updated:** 2026-06-17
 
 ---
 
@@ -97,6 +97,7 @@ All 1,819 articles assigned to 11 pillars + Archive. Full spec in `RESTRUCTURE-I
 | D6 | Develop & Integrate scope — KB how-tos vs. link-out to developer.domo.com? |
 | D7 | Data Models (1 article, Beta) — expand or hold until feature ships? |
 | D8 | Instance Settings (39) — sub-group further or keep flat? |
+| D9 | Which DataSet Management articles (currently in Prepare & Transform) move to new Manage Data pillar? |
 
 These decisions don't block Phase 3a article writing — they only block the nav rebuild in Phase 7.
 
@@ -124,18 +125,21 @@ Write the ~26 new articles that can be synthesized from existing KB content. All
 | 12 | `portal/analyze-visualize/Analyze-and-Visualize-Overview.mdx` | All analyzer/chart articles | `new-overview-article` |
 | 13 | `portal/share-collaborate/What-is-an-Alert.mdx` | Alerts Overview + alert articles | `new-overview-article` |
 | 14 | `portal/connect/What-is-a-Connector.mdx` | General Connector Info (12 articles) | `new-overview-article` |
-| 15 | `portal/connect/Connect-and-Bring-In-Data-Overview.mdx` | All connector articles | `new-overview-article` |
-| 16 | `portal/ai-data-science/What-is-Domo-AI.mdx` | Domo AI FAQ + AI articles | `new-overview-article` |
-| 17 | `portal/ai-data-science/AI-and-Data-Science-Overview.mdx` | All AI/DomoStats/Jupyter articles | `new-overview-article` |
-| 18 | `portal/build-automate/What-is-App-Studio.mdx` | App Studio Overview | `new-overview-article` |
-| 19 | `portal/build-automate/Build-Apps-and-Automate-Overview.mdx` | App Studio/Workflows/Code Engine | `new-overview-article` |
-| 20 | `portal/connect/What-is-Workbench.mdx` | Workbench 5.2 overview | `new-overview-article` |
-| 21 | `portal/share-collaborate/Share-and-Collaborate-Overview.mdx` | Sharing/Buzz/Publications articles | `new-overview-article` |
-| 22 | `portal/administer-govern/Domo-User-Roles.mdx` | Roles/grants articles | `new-overview-article` |
-| 23 | `portal/administer-govern/Security-and-Permissions-Overview.mdx` | PDP, OAuth, security articles | `new-overview-article` |
-| 24 | `portal/administer-govern/Administer-and-Govern-Overview.mdx` | All admin articles | `new-overview-article` |
-| 25 | `portal/administer-govern/Domo-Sandbox-Overview.mdx` | Sandbox article | `new-overview-article` |
-| 26 | `portal/develop-integrate/Develop-and-Integrate-Overview.mdx` | Existing 5 API articles | `new-overview-article` |
+| 15 | `portal/connect/Connect-and-Bring-In-Data-Overview.mdx` | All connector articles; frames read + write | `new-overview-article` |
+| 16 | `portal/manage-data/Manage-Data-Overview.mdx` | DataSet articles, Data Center context | `new-overview-article` |
+| 17 | `portal/manage-data/What-is-the-Data-Center.mdx` | DataSet management articles | `new-overview-article` |
+| 18 | `portal/manage-data/Find-and-Manage-Your-DataSets.mdx` | DataSet management, sharing, workspace articles | `new-kb-article` |
+| 19 | `portal/ai-data-science/What-is-Domo-AI.mdx` | Domo AI FAQ + AI articles | `new-overview-article` |
+| 20 | `portal/ai-data-science/AI-and-Data-Science-Overview.mdx` | All AI/DomoStats/Jupyter articles | `new-overview-article` |
+| 21 | `portal/build-automate/What-is-App-Studio.mdx` | App Studio Overview | `new-overview-article` |
+| 22 | `portal/build-automate/Build-Apps-and-Automate-Overview.mdx` | App Studio/Workflows/Code Engine | `new-overview-article` |
+| 23 | `portal/connect/What-is-Workbench.mdx` | Workbench 5.2 overview | `new-overview-article` |
+| 24 | `portal/share-collaborate/Share-and-Collaborate-Overview.mdx` | Sharing/Buzz/Publications articles | `new-overview-article` |
+| 25 | `portal/administer-govern/Domo-User-Roles.mdx` | Roles/grants articles | `new-overview-article` |
+| 26 | `portal/administer-govern/Security-and-Permissions-Overview.mdx` | PDP, OAuth, security articles | `new-overview-article` |
+| 27 | `portal/administer-govern/Administer-and-Govern-Overview.mdx` | All admin articles | `new-overview-article` |
+| 28 | `portal/administer-govern/Domo-Sandbox-Overview.mdx` | Sandbox article | `new-overview-article` |
+| 29 | `portal/develop-integrate/Develop-and-Integrate-Overview.mdx` | Existing 5 API articles | `new-overview-article` |
 
 **Note on file paths:** The `portal/` sub-paths above are proposed — they don't exist yet. They'll be created when Phase 3a articles are written. Confirm directory structure before first write.
 
@@ -192,3 +196,8 @@ python3 scripts/find_duplicates_and_gaps.py
 | 2026-06-10 | Workbench 4 → Archive (pending D1 human sign-off) | EOL product; 37 legacy articles; not surfaced in primary nav |
 | 2026-06-10 | Connector library keeps A-Z structure | 971 connectors too many to story-ize; reference library + hub article is correct pattern |
 | 2026-06-10 | DomoStats → AI & Data Science (override) | DomoStats is an analytics/data-science tool, not an admin tool despite admin overlap |
+| 2026-06-17 | Cloud Data Warehouses merged into Connector Library | CDWs are connectors; separate top-level section created false structural split (workshop feedback: Leema Lallmamode) |
+| 2026-06-17 | Writeback Connectors integrated into context, not standalone | CDW writeback lives in each CDW sub-group; standard writeback connectors appear alphabetically in the library (workshop feedback) |
+| 2026-06-17 | "Data Providers" renamed to "Connectors" in all nav groups | Non-standard industry term; no competitor KB uses it (workshop feedback) |
+| 2026-06-17 | Manage Data added as Pillar 3 | Missing link between Connect and Prepare: Data Center navigation, dataset discovery, lifecycle, sharing not covered anywhere (workshop feedback) |
+| 2026-06-17 | Read/write framing convention added to Connect pillar | Authors must treat read + write as a pair in all Connect section overviews; prevents writeback from being invisible (workshop feedback) |

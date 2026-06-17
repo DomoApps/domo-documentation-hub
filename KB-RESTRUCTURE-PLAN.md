@@ -46,7 +46,7 @@ Different users have different jobs to be done. A data consumer's first question
 The KB should tell this story in order, for each user role:
 
 ```
-What is Domo? → First Login → Bring In Data → Prepare Data →
+What is Domo? → First Login → Bring In Data → Manage Data → Prepare & Transform Data →
 Analyze & Visualize → Share & Act → Build & Automate →
 Govern & Administer → Go Deeper (AI, Dev, Advanced)
 ```
@@ -167,15 +167,16 @@ Classification heuristics (from title + excerpt):
 | 1 | Getting Started | 1 | 10 → expand to ~25 |
 | 2 | Core Concepts | 0 | 0 → create ~15 |
 | 3 | Connect & Bring In Data | 60+ | ~900 (connectors + Workbench) |
-| 4 | Prepare & Transform Data | 8 | ~80 |
-| 5 | Analyze & Visualize | 25 | ~200 |
-| 6 | Build Cards & Dashboards | 15 | ~100 |
-| 7 | Build Apps & Automate | 20 | ~80 |
-| 8 | Share & Collaborate | 10 | ~40 |
-| 9 | AI & Data Science | 15 | ~50 |
-| 10 | Administer & Govern | 30 | ~150 |
-| 11 | Develop & Integrate | 20 | ~80 |
-| 12 | Release Notes | 10 | all release notes |
+| 4 | Manage Data | 0 | 0 → create ~3 + pull from Prepare & Transform (pending D9) |
+| 5 | Prepare & Transform Data | 8 | ~80 (or ~50 pending D9) |
+| 6 | Analyze & Visualize | 25 | ~200 |
+| 7 | Build Cards & Dashboards | 15 | ~100 |
+| 8 | Build Apps & Automate | 20 | ~80 |
+| 9 | Share & Collaborate | 10 | ~40 |
+| 10 | AI & Data Science | 15 | ~50 |
+| 11 | Administer & Govern | 30 | ~150 |
+| 12 | Develop & Integrate | 20 | ~80 |
+| — | Release Notes | 10 | all release notes |
 
 ### 2.2 Section Structure Template
 
@@ -200,7 +201,7 @@ Every pillar follows this hub-and-spoke pattern in the nav:
     └── [Integration pattern]
 ```
 
-### 2.3 Special Handling: Connector Articles (~800 articles)
+### 2.3 Special Handling: Connector Articles (~900 articles)
 
 Connectors are a reference library — they don't need full story treatment per article but need a proper hub and category organization.
 
@@ -208,25 +209,40 @@ Connectors are a reference library — they don't need full story treatment per 
 
 ```
 Connect & Bring In Data
-├── Overview: Connecting Your Data to Domo        ← new hub
+├── Overview: Connecting Your Data to Domo        ← new hub (frames read + write)
 ├── What is a Connector?                          ← new explanation
 ├── Getting Started: Connect Your First DataSet   ← new tutorial
 ├── How Connectors Work (OAuth, scheduling, etc.) ← new explanation
-├── Cloud Data Warehouses
-│   ├── Snowflake (hub → existing 25 articles)
-│   ├── Google BigQuery
-│   ├── Databricks
-│   └── Amazon Redshift/Athena
-├── Connector Library
-│   ├── Business & Productivity
-│   ├── CRM & Sales
-│   ├── Marketing & Advertising
-│   ├── Finance & Accounting
-│   ├── DevOps & Engineering
-│   └── Other
-├── Workbench                                     ← consolidated (see 2.4)
-└── Writeback Connectors
+└── Connector Library — Reference
+    ├── Connector Library Overview                ← hub; "most commonly used" curated list
+    ├── Cloud Data Warehouses                     ← CDW sub-groups promoted within the library
+    │   ├── Cloud Data Warehouses Overview        ← Cloud Amplifier as #1 for all CDWs
+    │   ├── Snowflake (hub → existing articles)   ← read + write framing; Cloud Amplifier first
+    │   ├── Google BigQuery
+    │   ├── Databricks
+    │   └── Amazon Redshift/Athena
+    ├── Connectors A-B
+    ├── Connectors C-F
+    │   ... (alphabetical)
+    ├── Writeback Connectors                      ← integrated into library; not a top-level section
+    └── Files & APIs
 ```
+
+**Key structural decisions from workshop (2026-06-17):**
+- Cloud Data Warehouses and the Connector Library are one section, not two. CDWs are connectors.
+- Writeback Connectors are not a standalone section. CDW writeback is in each CDW's sub-group; standard writeback connectors appear alphabetically in the library alongside read connectors.
+- "Data Providers" terminology replaced with "Connectors" throughout.
+- Connector Library stays alphabetical. No use-case grouping for the main list.
+
+### 2.3a Read/Write Framing Convention
+
+**This applies to all articles in the Connect & Bring In Data pillar.**
+
+The pillar covers both directions of data movement. Authors must treat read and write as a pair — not as separate concerns, with write as an afterthought.
+
+**Convention:** The pillar overview article and every technology section (Cloud Amplifier/CDW, Connectors, Workbench) must explicitly address both its read path (bringing data into Domo) and its write path (writing data back to source systems) before linking to detailed how-tos. Section overview articles should answer both "How do I get data from X into Domo?" and "How do I write data back to X from Domo?" in sequence.
+
+**Why:** Without this framing, writeback documentation becomes invisible. Users who land in the CDW section or Connector Library looking to write data back have no way to discover that capability unless the section overviews introduce both directions upfront.
 
 ### 2.4 Workbench Rationalization
 

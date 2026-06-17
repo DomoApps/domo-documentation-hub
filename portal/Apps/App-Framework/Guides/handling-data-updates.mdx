@@ -99,45 +99,33 @@ domo publish
 We'll be making a few changes to the `app.js` file. Replace the current contents with the following:
 
 ```js
-(function (domo) {
-  var COUNTER = 0;
-  var TOTAL = 0;
+let counter = 0;
+let total = 0;
 
-  // main function to fetch data from domo
-  function getData(alias) {
-    COUNTER += 1;
-    domo.get('/data/v1/' + alias + '?sum=total').then(function (data) {
-      TOTAL = data[0].total;
-      updateUI();
-    });
-  }
+function getData(alias) {
+  counter += 1;
+  domo.get(`/data/v1/${alias}?sum=total`).then((data) => {
+    total = data[0].total;
+    updateUI();
+  });
+}
 
-  // add variables to UI
-  function updateUI() {
-    var totalEl = document.getElementById('total');
-    var counterEl = document.getElementById('updateCount');
+function updateUI() {
+  document.getElementById('total').innerHTML = total;
+  document.getElementById('updateCount').innerHTML = counter;
+}
 
-    totalEl.innerHTML = TOTAL.toString();
-    counterEl.innerHTML = COUNTER.toString();
-  }
-
-  // initial fetch
-  console.info('App Ready...');
-  getData('sales');
-})(domo);
+getData('sales');
 ```
 
-In its current state, the `COUNTER` variable would never increment. It would always show as `1` because the app would always do a full refresh each time the data updated. Go ahead and try it. Publish the design in its current state, deploy a new app, and then in a new tab update a row in the Webform dataset.
+In its current state, the `counter` variable would never increment. It would always show as `1` because the app would always do a full refresh each time the data updated. Go ahead and try it. Publish the design in its current state, deploy a new app, and then in a new tab update a row in the Webform dataset.
 
 #### Adding `domo.onDataUpdate()`
 
 See how the app did a full page reload after the dataset was updated and the counter remained at `1`? Now we'll add an event listener to add more control over how our app behaves on data updates. Add the following function inside your script.
 
 ```js
-domo.onDataUpdate(function (alias) {
-  console.info('domo.onDataUpdate: ', new Date().getTime());
-  getData(alias);
-});
+domo.onDataUpdated(getData);
 ```
 
 Publish again and now this time, each time you update the dataset your app should update the counter.

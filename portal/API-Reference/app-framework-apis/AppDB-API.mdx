@@ -1224,24 +1224,29 @@ While your front-end application code can accomplish these examples in an attemp
   ]
 ```
 
-<Warning>
-`name`, `applyOn`, `applyTo`, and `query` are required on every filter rule — even if `applyTo.values` is empty or `query` is an empty object. `applyToAll` and `limitToOwner` are optional. For example, a minimal rule that restricts every user to only their own documents looks like this:
-
-```json
-{
-  “name”: “limitToOwner”,
-  “applyOn”: [“READ”, “UPDATE”, “DELETE”],
-  “applyTo”: [{ “type”: “USER_ID”, “values”: [] }],
-  “applyToAll”: true,
-  “limitToOwner”: true,
-  “query”: {}
-}
-```
-</Warning>
-
 In this example, any user who belongs to the group with ID `12` or `15` in Domo will only be able to see, modify, or delete documents that have the value of “West” in the document's `content.region` property. As you can see, the `filters` property of this Collection's configuration object takes a list of filter rules. Adding multiple filter rules in the `filters` property will chain together the rules as an `OR` statement as in any standard data query language. There are several properties of a filter rule that are required to secure your documents. The following image groups them together by function.
 
 ![Filter Rule](/images/dev/web-assets.domo.com/miyagi/images/product/product-feature-dev-portal-appdbb-security-Filtering.png)
+
+<Warning>
+**All four core fields are required — even when empty.** Omitting any of them causes the upload to fail.
+
+- **Required:** `name`, `applyOn`, `applyTo`, `query`
+- **Optional:** `applyToAll` (default `false`), `limitToOwner` (default `false`)
+
+Minimal example — restrict every user to only their own documents:
+
+```json
+{
+  “name”: “mindYaBusiness”,
+  “applyOn”: [“READ”, “UPDATE”, “DELETE”],
+  “applyTo”: [{ “type”: “USER_ID”, “values”: [] }],
+  “query”: {},
+  “applyToAll”: true,
+  “limitToOwner”: true
+}
+```
+</Warning>
 
 **Filter Rule**
 

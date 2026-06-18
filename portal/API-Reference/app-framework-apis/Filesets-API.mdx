@@ -1,14 +1,9 @@
 ---
-title: "FileSet API"
-tag: "Beta"
+title: "Documents API"
 permalink: 7e8654dedb1c8-file-set-api
 ---
 
-import { BetaNote } from '/snippets/BetaNote.mdx';
-
-<BetaNote />
-
-This API reference documents the endpoints for managing FileSets and Files in Domo from within a Domo app.
+This API reference documents the endpoints for managing Document Collections and Files in Domo from within a Domo app.
 
 <Note>
   **Note:** All code examples below are tested and match the working Domo app
@@ -21,14 +16,14 @@ This API reference documents the endpoints for managing FileSets and Files in Do
 ## Get File by Path
 
 **Method:** `GET`  
-**Endpoint:** `/domo/files/v1/filesets/{filesetId}/path?path={filePath}`
+**Endpoint:** `/domo/files/v1/filesets/{documentCollectionId}/path?path={filePath}`
 
 **Path Parameters:**
 
 | Parameter | Type   | Required | Description                             |
 | --------- | ------ | -------- | --------------------------------------- |
-| filesetId | String | Yes      | The ID of the FileSet                   |
-| path      | String | Yes      | The path to the File within the FileSet |
+| documentCollectionId | String | Yes      | The ID of the Document Collection                   |
+| path      | String | Yes      | The path to the File within the Document Collection |
 
 <Tabs>
 <Tab title="Javascript (domo.get)">
@@ -36,7 +31,7 @@ This API reference documents the endpoints for managing FileSets and Files in Do
 ```js
 domo
   .get(
-    `/domo/files/v1/filesets/${filesetId}/path?path=${encodeURIComponent(
+    `/domo/files/v1/filesets/${documentCollectionId}/path?path=${encodeURIComponent(
       filePath,
     )}`,
   )
@@ -49,7 +44,7 @@ domo
 
 ```js
 fetch(
-  `/domo/files/v1/filesets/${filesetId}/path?path=${encodeURIComponent(
+  `/domo/files/v1/filesets/${documentCollectionId}/path?path=${encodeURIComponent(
     filePath,
   )}`,
 )
@@ -87,13 +82,13 @@ fetch(
 ## Get File by Id
 
 **Method:** `GET`  
-**Endpoint:** `/domo/files/v1/filesets/{filesetId}/files/{fileId}`
+**Endpoint:** `/domo/files/v1/filesets/{documentCollectionId}/files/{fileId}`
 
 **Path Parameters:**
 
 | Parameter | Type   | Required | Description           |
 | --------- | ------ | -------- | --------------------- |
-| filesetId | String | Yes      | The ID of the FileSet |
+| documentCollectionId | String | Yes      | The ID of the Document Collection |
 | fileId    | String | Yes      | The ID of the File    |
 
 <Tabs>
@@ -101,7 +96,7 @@ fetch(
 
 ```js
 domo
-  .get(`/domo/files/v1/filesets/${filesetId}/files/${fileId}`)
+  .get(`/domo/files/v1/filesets/${documentCollectionId}/files/${fileId}`)
   .then((result) => console.log(result))
   .catch((error) => console.error(`Error: ${error}`));
 ```
@@ -110,7 +105,7 @@ domo
 <Tab title="Javascript (fetch)">
 
 ```js
-fetch(`/domo/files/v1/filesets/${filesetId}/files/${fileId}`)
+fetch(`/domo/files/v1/filesets/${documentCollectionId}/files/${fileId}`)
   .then((response) => response.json())
   .then((result) => console.log(result))
   .catch((error) => console.error(`Error: ${error}`));
@@ -145,13 +140,13 @@ fetch(`/domo/files/v1/filesets/${filesetId}/files/${fileId}`)
 ## Download File by Id
 
 **Method:** `GET`  
-**Endpoint:** `/domo/files/v1/filesets/{filesetId}/files/{fileId}/download`
+**Endpoint:** `/domo/files/v1/filesets/{documentCollectionId}/files/{fileId}/download`
 
 **Path Parameters:**
 
 | Parameter | Type   | Required | Description           |
 | --------- | ------ | -------- | --------------------- |
-| filesetId | String | Yes      | The ID of the FileSet |
+| documentCollectionId | String | Yes      | The ID of the Document Collection |
 | fileId    | String | Yes      | The ID of the File    |
 
 > **Note:** Use `fetch` for File downloads. `domo.get` does not support binary downloads.
@@ -160,7 +155,7 @@ fetch(`/domo/files/v1/filesets/${filesetId}/files/${fileId}`)
 <Tab title="Javascript (fetch)">
 
 ```js
-fetch(`/domo/files/v1/filesets/${filesetId}/files/${fileId}/download`)
+fetch(`/domo/files/v1/filesets/${documentCollectionId}/files/${fileId}/download`)
   .then((response) => response.blob())
   .then((blob) => {
     const url = window.URL.createObjectURL(blob);
@@ -187,13 +182,13 @@ fetch(`/domo/files/v1/filesets/${filesetId}/files/${fileId}/download`)
 ## Query Files
 
 **Method:** `POST`  
-**Endpoint:** `/domo/files/v1/filesets/{filesetId}/query`
+**Endpoint:** `/domo/files/v1/filesets/{documentCollectionId}/query`
 
 **Path Parameters:**
 
 | Parameter | Type   | Required | Description           |
 | --------- | ------ | -------- | --------------------- |
-| filesetId | String | Yes      | The ID of the FileSet |
+| documentCollectionId | String | Yes      | The ID of the Document Collection |
 
 **Request Body Parameters:**
 
@@ -208,7 +203,7 @@ fetch(`/domo/files/v1/filesets/${filesetId}/files/${fileId}/download`)
 
 ```js
 domo
-  .post(`/domo/files/v1/filesets/${filesetId}/query`, {
+  .post(`/domo/files/v1/filesets/${documentCollectionId}/query`, {
     query: "search for text in documents", // Required: Text to search for in files
     directoryPath: "reports/quarterly", // Optional: Limit search to specific directory
     topK: 5, // Optional: Maximum number of results to return
@@ -221,7 +216,7 @@ domo
 <Tab title="Javascript (fetch)">
 
 ```js
-fetch(`/domo/files/v1/filesets/${filesetId}/query`, {
+fetch(`/domo/files/v1/filesets/${documentCollectionId}/query`, {
   method: "POST",
   headers: { "Content-Type": "application/json" },
   body: JSON.stringify({
@@ -260,13 +255,13 @@ fetch(`/domo/files/v1/filesets/${filesetId}/query`, {
 ## Upload File
 
 **Method:** `POST`  
-**Endpoint:** `/domo/files/v1/filesets/{filesetId}/files`
+**Endpoint:** `/domo/files/v1/filesets/{documentCollectionId}/files`
 
 **Path Parameters:**
 
 | Parameter | Type   | Required | Description           |
 | --------- | ------ | -------- | --------------------- |
-| filesetId | String | Yes      | The ID of the FileSet |
+| documentCollectionId | String | Yes      | The ID of the Document Collection |
 
 > **Note:** Use `fetch` for file uploads. Always set the file content type to `text/plain` for text files, as in the app code.
 
@@ -283,7 +278,7 @@ formdata.append(
 );
 formdata.append("createFileRequest", JSON.stringify({ directoryPath: "" }));
 
-fetch(`/domo/files/v1/filesets/${filesetId}/files`, {
+fetch(`/domo/files/v1/filesets/${documentCollectionId}/files`, {
   method: "POST",
   body: formdata,
 })
@@ -312,16 +307,16 @@ fetch(`/domo/files/v1/filesets/${filesetId}/files`, {
 
 ---
 
-## Search Files in FileSet
+## Search Files in Document Collection
 
 **Method:** `POST`  
-**Endpoint:** `/domo/files/v1/filesets/{filesetId}/files/search`
+**Endpoint:** `/domo/files/v1/filesets/{documentCollectionId}/files/search`
 
 **Path Parameters:**
 
 | Parameter | Type   | Required | Description           |
 | --------- | ------ | -------- | --------------------- |
-| filesetId | String | Yes      | The ID of the FileSet |
+| documentCollectionId | String | Yes      | The ID of the Document Collection |
 
 **Query Parameters:**
 
@@ -371,14 +366,14 @@ fetch(`/domo/files/v1/filesets/${filesetId}/files`, {
 ```js
 // Example 1: List all files
 domo
-  .post(`/domo/files/v1/filesets/${filesetId}/files/search`, {})
+  .post(`/domo/files/v1/filesets/${documentCollectionId}/files/search`, {})
   .then((result) => console.log(result.files))
   .catch((error) => console.error(`Error: ${error}`));
 
 // Example 2: Advanced search with directory path and filters
 domo
   .post(
-    `/domo/files/v1/filesets/${filesetId}/files/search?directoryPath=reports&limit=20`,
+    `/domo/files/v1/filesets/${documentCollectionId}/files/search?directoryPath=reports&limit=20`,
     {
       // Sort by file name in ascending order
       fieldSort: [
@@ -414,7 +409,7 @@ domo
 
 ```js
 // Example 1: List all files
-fetch(`/domo/files/v1/filesets/${filesetId}/files/search`, {
+fetch(`/domo/files/v1/filesets/${documentCollectionId}/files/search`, {
   method: "POST",
   headers: { "Content-Type": "application/json" },
   body: JSON.stringify({}),
@@ -425,7 +420,7 @@ fetch(`/domo/files/v1/filesets/${filesetId}/files/search`, {
 
 // Example 2: Advanced search with directory path and filters
 fetch(
-  `/domo/files/v1/filesets/${filesetId}/files/search?directoryPath=reports&immediateChildren=true&limit=20`,
+  `/domo/files/v1/filesets/${documentCollectionId}/files/search?directoryPath=reports&immediateChildren=true&limit=20`,
   {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -491,14 +486,14 @@ fetch(
 ## Delete Files by Path
 
 **Method:** `DELETE`  
-**Endpoint:** `/domo/files/v1/filesets/{filesetId}/path?path={filePath}`
+**Endpoint:** `/domo/files/v1/filesets/{documentCollectionId}/path?path={filePath}`
 
 **Path Parameters:**
 
 | Parameter | Type   | Required | Description                             |
 | --------- | ------ | -------- | --------------------------------------- |
-| filesetId | String | Yes      | The ID of the FileSet                   |
-| filePath  | String | Yes      | The path to the File within the FileSet |
+| documentCollectionId | String | Yes      | The ID of the Document Collection                   |
+| filePath  | String | Yes      | The path to the File within the Document Collection |
 
 <Tabs>
 <Tab title="Javascript (domo.delete)">
@@ -506,7 +501,7 @@ fetch(
 ```js
 domo
   .delete(
-    `/domo/files/v1/filesets/${filesetId}/path?path=${encodeURIComponent(
+    `/domo/files/v1/filesets/${documentCollectionId}/path?path=${encodeURIComponent(
       filePath,
     )}`,
   )
@@ -525,7 +520,7 @@ domo
 
 ```js
 fetch(
-  `/domo/files/v1/filesets/${filesetId}/path?path=${encodeURIComponent(
+  `/domo/files/v1/filesets/${documentCollectionId}/path?path=${encodeURIComponent(
     filePath,
   )}`,
   {
@@ -560,13 +555,13 @@ fetch(
 ## Delete File by Id
 
 **Method:** `DELETE`  
-**Endpoint:** `/domo/files/v1/filesets/{filesetId}/files/{fileId}`
+**Endpoint:** `/domo/files/v1/filesets/{documentCollectionId}/files/{fileId}`
 
 **Path Parameters:**
 
 | Parameter | Type   | Required | Description           |
 | --------- | ------ | -------- | --------------------- |
-| filesetId | String | Yes      | The ID of the FileSet |
+| documentCollectionId | String | Yes      | The ID of the Document Collection |
 | fileId    | String | Yes      | The ID of the File    |
 
 <Tabs>
@@ -574,7 +569,7 @@ fetch(
 
 ```js
 domo
-  .delete(`/domo/files/v1/filesets/${filesetId}/files/${fileId}`)
+  .delete(`/domo/files/v1/filesets/${documentCollectionId}/files/${fileId}`)
   .then((result) => {
     if (result === 1 || (result && result.status === "success")) {
       console.log("File deleted successfully.");
@@ -589,7 +584,7 @@ domo
 <Tab title="Javascript (fetch)">
 
 ```js
-fetch(`/domo/files/v1/filesets/${filesetId}/files/${fileId}`, {
+fetch(`/domo/files/v1/filesets/${documentCollectionId}/files/${fileId}`, {
   method: "DELETE",
 })
   .then((response) => response.json())
@@ -617,7 +612,7 @@ fetch(`/domo/files/v1/filesets/${filesetId}/files/${fileId}`, {
 
 ---
 
-## Search FileSets
+## Search Document Collections
 
 **Method:** `POST`  
 **Endpoint:** `/domo/files/v1/filesets/search`
@@ -629,7 +624,7 @@ fetch(`/domo/files/v1/filesets/${filesetId}/files/${fileId}`, {
 | limit     | Integer | No       | Maximum number of results (default: 100) |
 | offset    | Integer | No       | Pagination offset (default: 0)           |
 
-> **Note:** To list all FileSets, send an empty object as the body. To filter, provide filter parameters in the body.
+> **Note:** To list all Document Collections, send an empty object as the body. To filter, provide filter parameters in the body.
 
 **Request Body Parameters:**
 
@@ -668,7 +663,7 @@ fetch(`/domo/files/v1/filesets/${filesetId}/files/${fileId}`, {
 <Tab title="Javascript (domo.post)">
 
 ```js
-// Example 1: List all FileSets (empty search)
+// Example 1: List all Document Collections (empty search)
 domo
   .post("/domo/files/v1/filesets/search", {})
   .then((result) => console.log(result.fileSets))
@@ -684,7 +679,7 @@ domo
         order: "ASC",
       },
     ],
-    // Filter FileSet by name containing "Marketing"
+    // Filter Document Collection by name containing "Marketing"
     filters: [
       {
         field: "name",
@@ -692,7 +687,7 @@ domo
         operator: "LIKE",
       },
     ],
-    // Filter FileSet created between two dates
+    // Filter Document Collection created between two dates
     dateFilters: [
       {
         field: "created",
@@ -709,7 +704,7 @@ domo
 <Tab title="Javascript (fetch)">
 
 ```js
-// Example 1: List all FileSets (empty search)
+// Example 1: List all Document Collections (empty search)
 fetch("/domo/files/v1/filesets/search", {
   method: "POST",
   headers: { "Content-Type": "application/json" },
@@ -731,7 +726,7 @@ fetch("/domo/files/v1/filesets/search?limit=50&offset=0", {
         order: "ASC",
       },
     ],
-    // Filter FileSet by name containing "Marketing"
+    // Filter Document Collection by name containing "Marketing"
     filters: [
       {
         field: "name",
@@ -739,7 +734,7 @@ fetch("/domo/files/v1/filesets/search?limit=50&offset=0", {
         operator: "LIKE",
       },
     ],
-    // Filter FileSet created between two dates
+    // Filter Document Collection created between two dates
     dateFilters: [
       {
         field: "created",
@@ -764,8 +759,8 @@ fetch("/domo/files/v1/filesets/search?limit=50&offset=0", {
   "fileSets": [
     {
       "id": "00000000-0000-0000-0000-000000000010",
-      "name": "Sample FileSet",
-      "description": "A sample FileSet for demonstration purposes.",
+      "name": "Sample Document Collection",
+      "description": "A sample Document Collection for demonstration purposes.",
       "created": "2025-01-01T00:00:00.000Z",
       "createdBy": 111111111
     }
@@ -775,7 +770,7 @@ fetch("/domo/files/v1/filesets/search?limit=50&offset=0", {
 
 ---
 
-## Create FileSet
+## Create Document Collection
 
 **Method:** `POST`  
 **Endpoint:** `/domo/files/v1/filesets`
@@ -784,10 +779,10 @@ fetch("/domo/files/v1/filesets/search?limit=50&offset=0", {
 
 | Parameter        | Type    | Required | Description                                                            |
 | ---------------- | ------- | -------- | ---------------------------------------------------------------------- |
-| name             | String  | Yes      | The name of the FileSet                                                |
+| name             | String  | Yes      | The name of the Document Collection                                                |
 | accountId        | Integer | No       | The account ID to associate (nullable)                                 |
-| connectorContext | Object  | No       | Connector context for the FileSet (nullable). ConnectorContext Object. |
-| description      | String  | No       | Description for the FileSet                                            |
+| connectorContext | Object  | No       | Connector context for the Document Collection (nullable). ConnectorContext Object. |
+| description      | String  | No       | Description for the Document Collection                                            |
 
 **ConnectorContext Object Properties:**
 
@@ -802,8 +797,8 @@ fetch("/domo/files/v1/filesets/search?limit=50&offset=0", {
 ```js
 domo
   .post("/domo/files/v1/filesets", {
-    name: "Sample FileSet",
-    description: "A sample FileSet for demonstration purposes.",
+    name: "Sample Document Collection",
+    description: "A sample Document Collection for demonstration purposes.",
     // accountId: 12345, // Optional
     // connectorContext: { connector: 'S3', relativePath: 'bucket/path' }, // Optional
   })
@@ -819,8 +814,8 @@ fetch("/domo/files/v1/filesets", {
   method: "POST",
   headers: { "Content-Type": "application/json" },
   body: JSON.stringify({
-    name: "Sample FileSet",
-    description: "A sample FileSet for demonstration purposes.",
+    name: "Sample Document Collection",
+    description: "A sample Document Collection for demonstration purposes.",
     // accountId: 12345, // Optional
     // connectorContext: { connector: 'S3', relativePath: 'bucket/path' }, // Optional
   }),
@@ -838,8 +833,8 @@ fetch("/domo/files/v1/filesets", {
 ```json
 {
   "id": "00000000-0000-0000-0000-000000000012",
-  "name": "Sample FileSet",
-  "description": "A sample FileSet for demonstration purposes.",
+  "name": "Sample Document Collection",
+  "description": "A sample Document Collection for demonstration purposes.",
   "created": "2025-01-01T00:00:00.000Z",
   "createdBy": 111111111
 }
@@ -847,23 +842,23 @@ fetch("/domo/files/v1/filesets", {
 
 ---
 
-## Get FileSet by Id
+## Get Document Collection by Id
 
 **Method:** `GET`
-**Endpoint:** `/domo/files/v1/filesets/{filesetId}`
+**Endpoint:** `/domo/files/v1/filesets/{documentCollectionId}`
 
 **Path Parameters:**
 
 | Parameter | Type   | Required | Description           |
 | --------- | ------ | -------- | --------------------- |
-| filesetId | String | Yes      | The ID of the FileSet |
+| documentCollectionId | String | Yes      | The ID of the Document Collection |
 
 <Tabs>
 <Tab title="Javascript (domo.get)">
 
 ```js
 domo
-  .get(`/domo/files/v1/filesets/${filesetId}`)
+  .get(`/domo/files/v1/filesets/${documentCollectionId}`)
   .then((result) => console.log(result))
   .catch((error) => console.error(`Error: ${error}`));
 ```
@@ -872,7 +867,7 @@ domo
 <Tab title="Javascript (fetch)">
 
 ```js
-fetch(`/domo/files/v1/filesets/${filesetId}`)
+fetch(`/domo/files/v1/filesets/${documentCollectionId}`)
   .then((response) => response.json())
   .then((result) => console.log(result))
   .catch((error) => console.error(`Error: ${error}`));
@@ -886,38 +881,38 @@ fetch(`/domo/files/v1/filesets/${filesetId}`)
 ```json
 {
   "id": "00000000-0000-0000-0000-000000000013",
-  "name": "Sample FileSet",
-  "description": "A sample FileSet for demonstration purposes.",
+  "name": "Sample Document Collection",
+  "description": "A sample Document Collection for demonstration purposes.",
   "created": "2025-01-01T00:00:00.000Z",
   "createdBy": 111111111
 }
 ```
 
-## Update FileSet by Id
+## Update Document Collection by Id
 
 **Method:** `POST`  
-**Endpoint:** `/domo/files/v1/filesets/{filesetId}`
+**Endpoint:** `/domo/files/v1/filesets/{documentCollectionId}`
 
 **Path Parameters:**
 
 | Parameter | Type   | Required | Description           |
 | --------- | ------ | -------- | --------------------- |
-| filesetId | String | Yes      | The ID of the FileSet |
+| documentCollectionId | String | Yes      | The ID of the Document Collection |
 
 **Request Body Parameters:**
 
 | Parameter   | Type   | Required | Description                         |
 | ----------- | ------ | -------- | ----------------------------------- |
-| name        | String | No       | The new name for the FileSet        |
-| description | String | No       | The new description for the FileSet |
+| name        | String | No       | The new name for the Document Collection        |
+| description | String | No       | The new description for the Document Collection |
 
 <Tabs>
 <Tab title="Javascript (domo.post)">
 
 ```js
 domo
-  .post(`/domo/files/v1/filesets/${filesetId}`, {
-    name: "Updated FileSet Name", // Optional: New name for the FileSet
+  .post(`/domo/files/v1/filesets/${documentCollectionId}`, {
+    name: "Updated Document Collection Name", // Optional: New name for the Document Collection
     description: "Updated description.", // Optional: New description
   })
   .then((result) => console.log(result))
@@ -928,11 +923,11 @@ domo
 <Tab title="Javascript (fetch)">
 
 ```js
-fetch(`/domo/files/v1/filesets/${filesetId}`, {
+fetch(`/domo/files/v1/filesets/${documentCollectionId}`, {
   method: "POST",
   headers: { "Content-Type": "application/json" },
   body: JSON.stringify({
-    name: "Updated FileSet Name", // Optional: New name for the FileSet
+    name: "Updated Document Collection Name", // Optional: New name for the Document Collection
     description: "Updated description.", // Optional: New description
   }),
 })
@@ -949,8 +944,8 @@ fetch(`/domo/files/v1/filesets/${filesetId}`, {
 ```json
 {
   "id": "00000000-0000-0000-0000-000000000014",
-  "name": "Sample FileSet",
-  "description": "A sample FileSet for demonstration purposes.",
+  "name": "Sample Document Collection",
+  "description": "A sample Document Collection for demonstration purposes.",
   "created": "2025-01-01T00:00:00.000Z",
   "createdBy": 111111111
 }
@@ -958,23 +953,23 @@ fetch(`/domo/files/v1/filesets/${filesetId}`, {
 
 ---
 
-## Delete FileSet by Id
+## Delete Document Collection by Id
 
 **Method:** `DELETE`  
-**Endpoint:** `/domo/files/v1/filesets/{filesetId}`
+**Endpoint:** `/domo/files/v1/filesets/{documentCollectionId}`
 
 **Path Parameters:**
 
 | Parameter | Type   | Required | Description           |
 | --------- | ------ | -------- | --------------------- |
-| filesetId | String | Yes      | The ID of the FileSet |
+| documentCollectionId | String | Yes      | The ID of the Document Collection |
 
 <Tabs>
 <Tab title="Javascript (domo.delete)">
 
 ```js
 domo
-  .delete(`/domo/files/v1/filesets/${filesetId}`)
+  .delete(`/domo/files/v1/filesets/${documentCollectionId}`)
   .then((result) => console.log(result))
   .catch((error) => console.error(`Error: ${error}`));
 ```
@@ -983,7 +978,7 @@ domo
 <Tab title="Javascript (fetch)">
 
 ```js
-fetch(`/domo/files/v1/filesets/${filesetId}`, {
+fetch(`/domo/files/v1/filesets/${documentCollectionId}`, {
   method: "DELETE",
 })
   .then((response) => response.json())
@@ -999,6 +994,6 @@ fetch(`/domo/files/v1/filesets/${filesetId}`, {
 ```json
 {
   "status": "success",
-  "message": "FileSet deleted successfully."
+  "message": "Document Collection deleted successfully."
 }
 ```

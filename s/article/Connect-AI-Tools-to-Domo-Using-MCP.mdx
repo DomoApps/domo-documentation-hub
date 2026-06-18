@@ -34,6 +34,77 @@ The following grants allow you to use the AI Library feature.
 
 Learn about [grants and custom roles](https://domo-support.domo.com/s/article/360043438973?language=en_US).
 
+## Connection Options
+- OAuth (Recommended)
+- Manual
+  - Cluade Desktop
+  - VS Code
+
+## Intro
+
+How to connect Domo to Claude Desktop as a remote MCP (Model Context Protocol) server using OAuth, giving Claude access to your Domo data.
+
+---
+
+## Prerequisites
+
+Visit the **AI Library** and retrieve the MCP server URL from the **Domo Basic MCP** toolkit.
+
+```
+https://<DOMO_DOMAIN>/api/ai/v1/assistant/mcp/toolkits/domo_basic_mcp
+```
+
+<Frame><img alt="domo-basic" src="/images/kb/domo-basic.png" /></Frame>
+
+## Add a Custom Connector
+
+In Claude Cowork or Chat, customization lets you tailor your AI agent using the **Customize** menu on the left sidebar of the Claude Desktop app.
+
+<Frame><img alt="claude_3" src="/images/kb/claude_3.png" /></Frame>
+
+Link third-party applications like remote MCPs by selecting **Customize** > **Connectors** to give Claude access to your data.
+
+<Frame><img alt="claude_2" src="/images/kb/claude_2.png" /></Frame>
+
+Give the MCP server a name and paste the **Domo Basic MCP** URL into the **Remote MCP server URL** field, then select **Add**.
+
+```
+https://<DOMO_DOMAIN>/api/ai/v1/assistant/mcp/toolkits/domo_basic_mcp
+```
+
+<Note>**Note:** Replace `<DOMO_DOMAIN>` with your actual Domo instance domain (for example, `mycompany.domo.com`).</Note>
+
+<Frame><img alt="claude_1" src="/images/kb/claude_1.png" /></Frame>
+
+## Authenticate with OAuth
+
+Select **Connect** and follow the prompts to log into your Domo instance.
+
+<Frame><img alt="claude_4" src="/images/kb/claude_4.png" /></Frame>
+
+<Frame><img alt="login_1" src="/images/kb/login_1.png" /></Frame>
+
+<Frame><img alt="login_2" src="/images/kb/login_2.png" /></Frame>
+
+<Frame><img alt="login_3" src="/images/kb/login_3.png" /></Frame>
+
+Once authentication is complete, the connector will be active and Claude will have access to your Domo instance.
+
+<Frame><img alt="complete" src="/images/kb/complete.png" /></Frame>
+
+## OAuth FAQ
+
+**Q: What if I don't know my Domo domain?**
+A: Your Domo domain is the subdomain in the URL you use to log into Domo — for example, if you access Domo at `mycompany.domo.com`, your domain is `mycompany.domo.com`. Contact your Domo Admin if you are unsure.
+
+**Q: Can I connect multiple Domo instances?**
+A: Yes. Repeat the steps in this article for each instance, using a unique connector name and the corresponding domain in the MCP server URL for each.
+
+**Q: What data does Claude have access to once connected?**
+A: Claude can access the data and tools exposed by the Domo Basic MCP toolkit, which includes querying DataSets and interacting with Domo features available through the MCP API. Access is scoped to what your Domo user account is permitted to see.
+
+## Manual Connections
+
 ## Prerequisites
 
 Before connecting, ensure you have the following:
@@ -84,8 +155,13 @@ This opens the configuration file located at:
 
 Paste the following into the configuration file, replacing `<DOMO_DOMAIN>` with your Domo instance domain and `<DOMO_ACCESS_TOKEN>` with your Access Token:
 
+<Note>
+  **Note:** If this is your first mannual connection, paste the following right after the first opening brace '{'.
+If you have other mannual connections, paste the contents of the 'mcpServers' property (second example block).
+</Note>
+
+
 ```json
-{
   "mcpServers": {
     "domo-mcp-npx": {
       "command": "npx",
@@ -97,7 +173,18 @@ Paste the following into the configuration file, replacing `<DOMO_DOMAIN>` with 
       ]
     }
   }
-}
+```
+
+```json
+    "domo-mcp-npx": {
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://<DOMO_DOMAIN>/api/ai/v1/assistant/mcp/toolkits/DOMO_BASIC_MCP",
+        "--header",
+        "X-DOMO-DEVELOPER-TOKEN:<DOMO_ACCESS_TOKEN>"
+      ]
+    }
 ```
 
 ### Step 6: Restart Claude Desktop
@@ -109,6 +196,12 @@ Quit and restart Claude Desktop for the configuration to take effect.
 ### Step 7: Verify the connection
 
 Go to **Settings** > **Connectors** and confirm the Domo MCP server is listed and connected.
+
+<Note>
+  **Note:** Connectors have moved to *Customize*. Head there to browse, connect, and manage them.
+</Note>
+
+
 
 <Frame>![](/images/kb/DOMO-MCP-Server-Screenshot-7.png)</Frame>
 

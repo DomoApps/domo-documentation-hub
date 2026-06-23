@@ -213,7 +213,7 @@ Content-Type: application/json;charset=UTF-8
             "username": "Ted Theodore Logan"
         },
         "syncRequired": true
-    },
+    }
 ]
 ```
 
@@ -296,11 +296,15 @@ domo.put(`/domo/datastores/v1/collections/Users/documents/b3ea3d2d-86c5-44e6-a2f
 
 **HTTP Request**
 
-```json
+```text
 PUT /domo/datastores/v1/collections/{collectionName}/documents/{documentId} HTTP/1.1
 Content-Type: application/json
 Accept: application/json
-Request Body
+```
+
+**Request Body**
+
+```json
 {
     "content": {
         "username": "Bill S. Preston, Esquire",
@@ -340,6 +344,7 @@ Content-Type: application/json;charset=UTF-8
 domo
   .put(
     `/domo/datastores/v1/collections/Users/documents/b3ea3d2d-86c5-44e6-a2f4-985136bbbce1`,
+    { content: { username: 'Bill S. Preston, Esquire', Band: 'Wyld Stallyns' } },
   )
   .then(console.log);
 ```
@@ -359,6 +364,7 @@ Deleting documents in an AppDB Collection may have performance implications with
 
 ```javascript
 domo.delete(`/domo/datastores/v1/collections/Users/documents/1e61d99d-9885-419a-a33e-3be3941ee720`);
+```
 
 **Arguments**
 
@@ -410,8 +416,8 @@ Accept: application/json
 ```js
 { $or:
        [
-           { content.comments: {$regex: 'happy'} },
-           { content.username: {$ne: 'Eeyore' } }
+           { "content.comments": { $regex: 'happy' } },
+           { "content.username": { $ne: 'Eeyore' } }
        ]
 }
 ```
@@ -453,7 +459,7 @@ HTTP/1.1 200 OK
             "comments": "Bouncing makes me so happy!"
         },
         "syncRequired": true
-     },
+     }
 ]
 ```
 
@@ -603,7 +609,7 @@ Please refer to the official [mongoDB documentation](https://www.mongodb.com/doc
 
 **Code Example**
 
-```text
+```js
 domo.put(`/domo/datastores/v1/collections/Users/documents/update`, body)
     .then(data => console.log(data));
 ```
@@ -816,11 +822,17 @@ domo
 
 **HTTP Request**
 
-```json
+```text
 DELETE /domo/datastores/v1/collections/{collectionName}/documents/bulk?ids={idList} HTTP/1.1
 Content-Type: application/json
 Accept: application/json
+```
 
+**HTTP Response**
+
+Returns the number of documents deleted.
+
+```json
 HTTP/1.1 200 OK
 Content-Type: application/json;charset=UTF-8
 
@@ -831,7 +843,7 @@ Content-Type: application/json;charset=UTF-8
 
 ### Programmatic Operations for Collections
 
-While most of the time you are going to want to define a Collection in your manifest and have the platform automatically create the Collection for you, there is also the option to programmatically manipulate Dollections from your app code.
+While most of the time you are going to want to define a Collection in your manifest and have the platform automatically create the Collection for you, there is also the option to programmatically manipulate Collections from your app code.
 
 ### Create a Collection
 

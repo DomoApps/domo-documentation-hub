@@ -44,11 +44,10 @@ HTTP/1.1 200 OK
   "datastoreId": "12345678-2484-1234-af98-c60131367cf2",
   "collectionId": "12345678-78a9-1234-b641-7afc39ba2e84",
   "syncRequired": true,
-  "owner": "123456789",
-  "createdBy": "123456789",
-  "createdOn": "2024-05-08T19:39:00.708226378Z",
-  "updatedOn": "2024-05-08T19:39:00.708226378Z",
-  "updatedBy": "123456789",
+  "owner": 123456789,
+  "createdOn": "2024-05-08T19:39:00.708Z",
+  "updatedOn": "2024-05-08T19:39:00.708Z",
+  "updatedBy": 123456789,
   "content": {}
 }
 ```
@@ -120,11 +119,11 @@ Dates can be queried in AppDB using the [MongoDB Extended JSON v2](https://www.m
 
 ```json
 {
-    "createdOn": {
-        "$lte": {
-            "$date": "2020-05-12T00:00:00.000Z"
-        }
+  "createdOn": {
+    "$lte": {
+      "$date": "2020-05-12T00:00:00.000Z"
     }
+  }
 }
 ```
 
@@ -146,19 +145,21 @@ POST /api/datastores/v2/collections/{collectionId}/documents/query?groupby={prop
 
 **Arguments**:
 
-| Parameter      | Type    | Required | Description                                                                                                             |
-| -------------- | ------- | -------- | ----------------------------------------------------------------------------------------------------------------------- |
-| collectionId   | String  | Required | The ID of the collection.                                                                                               |
-| groupby        | String  | Optional | Comma-separated list of properties to group by.                                                                         |
-| count          | String  | Optional | Alias for a count aggregation.                                                                                          |
-| avg            | String  | Optional | Comma-separated list of properties with aliases to average.                                                             |
-| min            | String  | Optional | Comma-separated list of properties with aliases to find the minimum.                                                    |
-| max            | String  | Optional | Comma-separated list of properties with aliases to find the maximum.                                                    |
-| sum            | String  | Optional | Comma-separated list of properties with aliases to sum.                                                                 |
-| unwind         | String  | Optional | Comma-separated list of properties to unwind (flattens nested arrays).                                                  |
-| orderby        | String  | Optional | Alias of the aggregation to order by, followed by `ascending` or `descending`.                                          |
-| limit          | Integer | Optional | Maximum number of results to return. Default is 10,000.                                                                 |
-| offset         | Integer | Optional | Number of results to skip before returning. Default is 0.                                                               |
+Any parameter that accepts field names uses standard MongoDB dot notation. Fields inside the `content` object must be prefixed with `content.` (e.g., `content.campaignName`). Top-level document fields (`owner`, `createdOn`, etc.) can be referenced directly without a prefix. The `count`, `limit`, and `offset` parameters take aliases or integers and do not use field names.
+
+| Parameter    | Type    | Required | Description                                                                                                                                                      |
+| ------------ | ------- | -------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| collectionId | String  | Required | The ID of the collection.                                                                                                                                        |
+| groupby      | String  | Optional | Comma-separated list of properties to group by.                                                                                                                  |
+| count        | String  | Optional | Alias for a count aggregation.                                                                                                                                   |
+| avg          | String  | Optional | Comma-separated list of properties with aliases to average.                                                                                                      |
+| min          | String  | Optional | Comma-separated list of properties with aliases to find the minimum.                                                                                             |
+| max          | String  | Optional | Comma-separated list of properties with aliases to find the maximum.                                                                                             |
+| sum          | String  | Optional | Comma-separated list of properties with aliases to sum.                                                                                                          |
+| unwind       | String  | Optional | Comma-separated list of array properties to unwind (flattens nested arrays — one row per array element).                                                         |
+| orderby      | String  | Optional | Field or alias to order by, followed by `ascending` or `descending`. Accepts either an aggregation alias or a field name (using dot notation for nested fields). |
+| limit        | Integer | Optional | Maximum number of results to return. Default is 10,000.                                                                                                          |
+| offset       | Integer | Optional | Number of results to skip before returning. Default is 0.                                                                                                        |
 
 **Request Body**:
 
@@ -173,29 +174,35 @@ An empty object `{}` returns all documents before aggregating. Pass a MongoDB qu
 ```json
 [
   {
+    "_id": {
+      "campaignName": "Red Campaign",
+      "month": "February"
+    },
     "documentCount": 2,
     "sumClicks": 210,
-    "avgClicks": 105,
+    "avgClicks": 105.0,
     "maxClicks": 120,
-    "minClicks": 90,
-    "campaignName": "Red Campaign",
-    "month": "February"
+    "minClicks": 90
   },
   {
+    "_id": {
+      "campaignName": "Blue Campaign",
+      "month": "January"
+    },
     "documentCount": 1,
     "sumClicks": 100,
-    "avgClicks": 100,
+    "avgClicks": 100.0,
     "maxClicks": 100,
-    "minClicks": 100,
-    "campaignName": "Blue Campaign",
-    "month": "January"
+    "minClicks": 100
   }
 ]
 ```
 
+The `groupby` fields are returned inside the `_id` object. Aggregation values (`count`, `sum`, `avg`, `min`, `max`) are returned as top-level fields using their configured aliases. Average values are returned as floats.
+
 ### Partially Update Documents
 
-**Description**: Perform partial updates on documents using MongoDB query and update operations. The query must reference an existing document or a property in a document.
+**Description**: Perform partial updates on documents using MongoDB query and update operations.
 
 **Supported Operators**:
 
@@ -220,7 +227,7 @@ An empty object `{}` returns all documents before aggregating. Pass a MongoDB qu
 - `slice`
 - `sort`
 
-Refer to the official [MongoDB Update Operators documentation](https://www.mongodb.com/docs/manual/reference/mql/update/) for details. Note that `$setOnInsert` is not supported because queries must reference an existing document or property.
+Refer to the official [MongoDB Update Operators documentation](https://www.mongodb.com/docs/manual/reference/mql/update/) for details. Note that `$setOnInsert` is not supported because queries must reference an existing document or property; using it has no effect because AppDB partial updates do not perform upserts.
 
 **HTTP Request**:
 
@@ -270,12 +277,12 @@ Returns the number of updated documents or properties.
 
 ### List Documents
 
-**Description**: Retrieve all documents from a specified collection. Note there is an upper limit of 10,000 documents. We recommend using pagination to retrieve large sets of documents.
+**Description**: Retrieve documents from a specified collection. There is an upper limit of 10,000 documents per request. Use `limit` and `offset` to paginate through large collections.
 
 **HTTP Request**:
 
 ```http
-GET /api/datastores/v1/collections/{collectionId}/documents
+GET /api/datastores/v1/collections/{collectionId}/documents?limit={limit}&offset={offset}
 ```
 
 **Headers**:
@@ -283,6 +290,14 @@ GET /api/datastores/v1/collections/{collectionId}/documents
 - `X-DOMO-Developer-Token`: `<developer token here>`
 - `Accept`: `application/json`
 - `Content-Type`: `application/json`
+
+**Arguments**:
+
+| Parameter    | Type    | Required | Description                                                 |
+| ------------ | ------- | -------- | ----------------------------------------------------------- |
+| collectionId | String  | Required | The ID of the collection.                                   |
+| limit        | Integer | Optional | Maximum number of documents to return per request.          |
+| offset       | Integer | Optional | Number of documents to skip before returning. Default is 0. |
 
 **Response**:
 
@@ -297,11 +312,10 @@ HTTP/1.1 200 OK
     "datastoreId": "12345678-2484-1234-af98-c60131367cf2",
     "collectionId": "12345678-78a9-1234-b641-7afc39ba2e84",
     "syncRequired": true,
-    "owner": "123456789",
-    "createdBy": "123456789",
-    "createdOn": "2024-05-08T19:39:00.708226378Z",
-    "updatedOn": "2024-05-08T19:39:00.708226378Z",
-    "updatedBy": "123456789",
+    "owner": 123456789,
+    "createdOn": "2024-05-08T19:39:00.708Z",
+    "updatedOn": "2024-05-08T19:39:00.708Z",
+    "updatedBy": 123456789,
     "content": {}
   },
   ...
@@ -349,8 +363,8 @@ HTTP/1.1 200 OK
   "syncRequired": true,
   "owner": "123456789",
   "createdBy": "123456789",
-  "createdOn": "2024-05-08T19:39:00.708226378Z",
-  "updatedOn": "2024-05-08T19:39:00.708226378Z",
+  "createdOn": "2024-05-08T19:39:00.708Z",
+  "updatedOn": "2024-05-08T19:39:00.708Z",
   "updatedBy": "123456789",
   "content": {
     "title": "Q2 Campaign",
@@ -399,11 +413,10 @@ HTTP/1.1 200 OK
   "datastoreId": "12345678-2484-1234-af98-c60131367cf2",
   "collectionId": "12345678-78a9-1234-b641-7afc39ba2e84",
   "syncRequired": true,
-  "owner": "123456789",
-  "createdBy": "123456789",
-  "createdOn": "2024-05-08T19:39:00.708226378Z",
-  "updatedOn": "2024-05-08T19:39:00.708226378Z",
-  "updatedBy": "123456789",
+  "owner": 123456789,
+  "createdOn": "2024-05-08T19:39:00.708Z",
+  "updatedOn": "2024-05-08T19:39:00.708Z",
+  "updatedBy": 123456789,
   "content": {
     "title": "Q2 Campaign",
     "region": "West",
@@ -455,14 +468,16 @@ DELETE /api/datastores/v1/collections/{collectionId}/documents/bulk?ids=[ids]
 **Response**:
 
 ```http
-HTTP/1.1 200 OK
+HTTP/1.1 202 Accepted
 ```
 
 ```json
 {
-  "Deleted": 1
+  "Deleted": 2
 }
 ```
+
+Returns the count of deleted documents.
 
 ### Update Collection Schema
 

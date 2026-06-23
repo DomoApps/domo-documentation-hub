@@ -153,7 +153,7 @@ domo.post(`/domo/datastores/v1/collections/Users/documents`, {
 
 ---
 
-Lists all documents from a given Collection.
+Lists all documents from a given Collection. There is an upper limit of 10,000 documents per request. Use `limit` and `offset` to paginate through large collections.
 
 **Code Example**
 
@@ -165,14 +165,16 @@ domo
 
 **Arguments**
 
-| Property Name  | Type   | Required | Description                                      |
-| -------------- | ------ | -------- | ------------------------------------------------ |
-| collectionName | String | Required | The name given to the collection in the manifest |
+| Property Name  | Type    | Required | Description                                      |
+| -------------- | ------- | -------- | ------------------------------------------------ |
+| collectionName | String  | Required | The name given to the collection in the manifest |
+| limit          | Integer | Optional | Maximum number of documents to return. Default is 10,000. |
+| offset         | Integer | Optional | Number of documents to skip before returning. Default is 0. |
 
 **HTTP Request**
 
 ```text
-GET /domo/datastores/v1/collections/{collectionName}/documents/ HTTP/1.1
+GET /domo/datastores/v1/collections/{collectionName}/documents/?limit={limit}&offset={offset} HTTP/1.1
 Content-Type: application/json
 Accept: application/json
 ```
@@ -383,8 +385,6 @@ Accept: application/json
 
 **HTTP Response**
 
-Returns the parameter of a success or an error.
-
 ```text
 HTTP/1.1 200 OK
 ```
@@ -498,6 +498,8 @@ Accept: application/json
 
 **Arguments**
 
+Any parameter that accepts field names uses standard MongoDB dot notation. Fields inside the `content` object must be prefixed with `content.` (e.g., `content.campaignName`). Top-level document fields (`owner`, `createdOn`, etc.) can be referenced directly without a prefix. The `count`, `limit`, and `offset` parameters take aliases or integers and do not use field names.
+
 | Property Name  | Type    | Required | Description                                                                                                                                                        |
 | -------------- | ------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | collectionName | String  | Required | The name given to the collection in the manifest                                                                                                                   |
@@ -508,8 +510,8 @@ Accept: application/json
 | min            | String  | Optional | The comma-separated list of properties in which you wish to perform a minimum aggregation followed by the name you wish to alias the result                        |
 | max            | String  | Optional | The comma-separated list of properties in which you wish to perform a maximum aggregation followed by the name you wish to alias the result                        |
 | sum            | String  | Optional | The comma-separated list of properties in which you wish to perform a sum aggregation followed by the name you wish to alias the result                            |
-| unwind         | String  | Optional | The comma-separated list of properties that you wish to unwind (the unwind operator flattens nested arrays - see MongoDB documentation for additional information) |
-| orderby        | String  | Optional | Alias of the aggregation you wish to order by (ascending or descending)                                                                                            |
+| unwind         | String  | Optional | The comma-separated list of properties that you wish to unwind (the unwind operator flattens nested arrays — one row per array element)                            |
+| orderby        | String  | Optional | Field or alias to order by, followed by `ascending` or `descending`. Accepts either an aggregation alias or a field name using dot notation.                       |
 | limit          | Integer | Optional | The number of documents in which to limit the number of return objects, default is 10,000                                                                          |
 | offset         | Integer | Optional | The number of documents in which to skip before returning documents, default is 0                                                                                  |
 
@@ -527,59 +529,69 @@ domo.post(url, {}).then((data) => console.log(data));
 ```json
 [
   {
+    "_id": {
+      "campaignName": "Red Campaign",
+      "month": "February"
+    },
+    "documentCount": 2,
     "maxImps": 1250,
     "sumClicks": 210,
     "sumImps": 2260,
-    "documentCount": 2,
     "minImps": 1010,
-    "avgImps": 1130,
-    "campaignName": "Red Campaign",
+    "avgImps": 1130.0,
     "minClicks": 90,
-    "avgClicks": 105,
-    "maxClicks": 120,
-    "month": "February"
+    "avgClicks": 105.0,
+    "maxClicks": 120
   },
   {
+    "_id": {
+      "campaignName": "Red Campaign",
+      "month": "January"
+    },
+    "documentCount": 2,
     "maxImps": 1150,
     "sumClicks": 190,
     "sumImps": 2050,
-    "documentCount": 2,
     "minImps": 900,
-    "avgImps": 1025,
-    "campaignName": "Red Campaign",
+    "avgImps": 1025.0,
     "minClicks": 85,
-    "avgClicks": 95,
-    "maxClicks": 105,
-    "month": "January"
+    "avgClicks": 95.0,
+    "maxClicks": 105
   },
   {
+    "_id": {
+      "campaignName": "Blue Campaign",
+      "month": "January"
+    },
+    "documentCount": 1,
     "maxImps": 1000,
     "sumClicks": 100,
     "sumImps": 1000,
-    "documentCount": 1,
     "minImps": 1000,
-    "avgImps": 1000,
-    "campaignName": "Blue Campaign",
+    "avgImps": 1000.0,
     "minClicks": 100,
-    "avgClicks": 100,
-    "maxClicks": 100,
-    "month": "January"
+    "avgClicks": 100.0,
+    "maxClicks": 100
   },
   {
+    "_id": {
+      "campaignName": "Blue Campaign",
+      "month": "February"
+    },
+    "documentCount": 1,
     "maxImps": 500,
     "sumClicks": 50,
     "sumImps": 500,
-    "documentCount": 1,
     "minImps": 500,
-    "avgImps": 500,
-    "campaignName": "Blue Campaign",
+    "avgImps": 500.0,
     "minClicks": 50,
-    "avgClicks": 50,
-    "maxClicks": 50,
-    "month": "February"
+    "avgClicks": 50.0,
+    "maxClicks": 50
   }
 ]
 ```
+
+The `groupby` fields are returned inside the `_id` object when multiple fields are grouped; with a single `groupby` field, `_id` is a scalar value. Aggregation values (`count`, `sum`, `avg`, `min`, `max`) are returned as top-level fields using their configured aliases.
 
 ### Partially Update Documents Using Queries
 
@@ -610,7 +622,7 @@ Supported Modifiers:
 - slice
 - sort
 
-Please refer to the official [mongoDB documentation](https://www.mongodb.com/docs/manual/reference/mql/update/) on Update Operators to better understand these operators and how to create them. Note that since we require that the query reference an existing document or property, the operator `$setOnInsert` is not supported.
+Please refer to the official [mongoDB documentation](https://www.mongodb.com/docs/manual/reference/mql/update/) on Update Operators to better understand these operators and how to create them. Note that the operator `$setOnInsert` has no effect because AppDB partial updates do not perform upserts.
 
 **Code Example**
 

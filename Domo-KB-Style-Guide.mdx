@@ -357,6 +357,38 @@ Wrap a YouTube (or other host) embed `<iframe>` in a `<Frame>`. Use the host's s
 
 Always include a descriptive `title` attribute — screen readers announce it, and it's what appears if the embed fails to load.
 
+## Embedded Domo Content
+
+Use the `DomoEmbed` snippet to embed live Domo content—dashboards, pages, or cards—directly inside a documentation article. Unlike a screenshot or video, an embedded view reflects current data and lets readers interact with it in context.
+
+The component handles sizing automatically: Domo's embed runtime sends a `postMessage` with the rendered page height, and `DomoEmbed` updates the iframe height accordingly, preventing scroll traps and double scrollbars.
+
+**When to use:** Reserve `DomoEmbed` for situations where live, interactive Domo content adds genuine value—a product overview, a walkthrough that references a live dashboard, or a reference page that benefits from real data context. For static illustration, a screenshot is simpler and more reliable.
+
+### Import and Use
+
+Add the import directly below the frontmatter (alongside any other imports):
+
+```mdx
+import { DomoEmbed } from '/snippets/DomoEmbed.mdx';
+```
+
+Then place the component wherever the embed should appear:
+
+```mdx
+<DomoEmbed src="https://embed.domo.com/embed/pages/XXXXX" />
+```
+
+Three props are available:
+
+| Prop            | Required | Default  | Description                                         |
+| --------------- | -------- | -------- | --------------------------------------------------- |
+| `src`           | Yes      | —        | The Domo embed URL (cards or pages endpoint).       |
+| `width`         | No       | `"100%"` | CSS width of the iframe.                            |
+| `initialHeight` | No       | `"600"`  | Starting height in pixels before auto-resize fires. |
+
+<Note>**Note:** The Domo instance that hosts the embed must allow your documentation domain in its embed allowlist. If the iframe appears blank, check the source instance's CSP / embed allowlist settings.</Note>
+
 ## Callouts
 
 Use React callout elements for notes, warnings, and tips — not plain text or HTML. Always bold the label and its colon, for example `**Note:**`.

@@ -29,6 +29,47 @@ Counts in parentheses are existing articles moving to that location.
 
 ---
 
+## Cross-Cutting Concerns
+
+These three principles apply across all pillars and must be kept in mind during Phase 3 (content creation), Phase 5 (interlinking), and Phase 7 (nav rebuild).
+
+### 1. KB ↔ Developer Portal Cross-Linking
+
+The Developer Portal (`portal/` directory) is the technical documentation layer — API references, SDKs, pro-code guides, scripting environments. It is a separate audience and depth tier from the KB, but the two systems should function as a unified network.
+
+**Rule:** Wherever a KB how-to touches a capability that has an API or developer-depth equivalent in the portal, add a developer callout pointing to the relevant portal page. The portal already links to the KB in ~45 places; those existing links are the starting map for adding the reverse direction.
+
+Key KB pillars with the most portal cross-link surface area: Develop & Integrate (primary bridge), Build Apps & Automate, AI & Data Science, Connect & Bring In Data, Administer & Govern.
+
+See **Phase 5.5** of `KB-RESTRUCTURE-PLAN.md` for the full execution spec and agent task definition.
+
+### 2. AI as First Option (Incremental Approach)
+
+**Long-term vision:** AI surfaces as the first-recommended approach for completing tasks across every pillar — AI Chat, Beast Mode AI Assistant, Workflows agent tasks, MCP integrations, and the AI Service Layer as default options before manual procedural steps.
+
+**For this restructure:** The AI & Data Science pillar remains its own standalone section (it is a major product area with depth that can't be dissolved). However, each pillar's hub article and key how-tos should include an "AI-powered approach" callout wherever a GA AI feature already exists for that task.
+
+Add this callout only when:
+- The AI feature is GA (not Alpha/Beta with restricted access)
+- The KB article for it already exists in the AI & Data Science pillar
+
+See the "Cross-Cutting Principle: AI as First Option" section in `KB-RESTRUCTURE-PLAN.md` for the pillar-by-pillar surface map and callout pattern.
+
+### 3. GitHub Actions Automation (Post-Rename)
+
+After Phase 6 (slug rename), a suite of GitHub Actions should run on every PR and push to keep the documentation system healthy automatically:
+
+- **Nav validator** — no broken `docs.json` refs, no orphaned articles
+- **Orphan detector** — new files must have a nav entry
+- **Slug linter** — new filenames must follow convention
+- **Numeric-ID ref checker** — no regression to old numeric IDs
+- **Redirect integrity check** — `redirects.json` entries must point to real files
+- **Stale link reporter** — weekly scan, opens an Issue for broken internal links
+
+See **Phase 6.5** of `KB-RESTRUCTURE-PLAN.md` for the full spec and implementation priority order.
+
+---
+
 ## Pillar 1: Getting Started
 
 **Story:** A new user's first hour in Domo — what is it, how do I log in, and where do I start based on my role.
@@ -342,9 +383,14 @@ Share & Collaborate
 
 **Story:** Go beyond standard charts — use AI to generate insights, run machine learning models, write Python and R in Jupyter, and build AI agents.
 
+**This pillar stays standalone.** Even as AI features get surfaced as first-option callouts across other pillars (see Cross-Cutting Concerns above), the AI & Data Science pillar remains its own section — it is the depth destination for users who want to understand, configure, and build with Domo's AI capabilities at a level that doesn't belong inside the product-area pillars.
+
+**Forward-looking integration note:** As AI capabilities mature and GA coverage expands, a future restructure pass should evaluate elevating AI from a callout in other pillars to the primary recommended path. The callout pattern established now (using `<Tip>**Try it with AI:**...`) primes the structure for that upgrade without requiring it today.
+
 ```
 AI & Data Science
-├── [NEW] Overview: AI & Data Science in Domo         ← hub article
+├── [NEW] Overview: AI & Data Science in Domo         ← hub article; includes "AI across Domo" map
+│                                                         showing which AI features live in which pillars
 ├── [NEW] What is Domo AI?                            ← synthesize from Domo AI FAQ + AI articles
 ├── Domo AI (27)
 │   ├── Domo AI FAQ
@@ -367,6 +413,13 @@ AI & Data Science
 └── Unstructured Data (1)
     └── Use FileSets to Gather Information from Unstructured Data
 ```
+
+**Developer Portal cross-links for this pillar:**
+- Hub article → `portal/data-science/ai-services` (AI Service Layer, tools index)
+- AI Playground / AI Models articles → `portal/API-Reference/app-framework-apis/AI-Service-Layer-API`
+- Jupyter articles → `portal/data-science/jupyter`
+- AutoML article → `portal/data-science/autoML`
+- MCP Integration → `portal/Getting-Started/overview` (Integrate AI section)
 
 ---
 

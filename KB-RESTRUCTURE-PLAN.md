@@ -55,6 +55,47 @@ Every section of the KB should have a clear place in this arc, and users should 
 
 ---
 
+## Cross-Cutting Principle: AI as First Option
+
+### Long-Term Vision
+
+The eventual goal is to position AI as the *first-recommended path* for completing tasks across every product area at every level of documentation — surfacing AI Chat, the AI Playground, MCP integrations, Workflows automation, and agent-based approaches as the preferred method wherever Domo AI can accomplish what a user is trying to do.
+
+This vision is not fully implementable in this restructure cycle. Domo's AI capabilities are not yet consistently mature enough across all product areas to make AI the default first option in every how-to guide. Attempting it now would introduce inconsistent guidance and risk sending users down paths that don't yet work reliably at scale. **The AI & Data Science pillar therefore remains its own standalone pillar for this restructure and must not be dissolved into other sections.**
+
+### What We Can Do Now
+
+Within the current restructure, actively surface AI-first options in other pillars wherever existing AI & Data Science content already supports it. The signal for "do this now" is simple: if an AI feature for that task already exists and is GA, surface it.
+
+**Pattern for the callout** (add to hub articles and key how-to guides during Phase 3a and Phase 5):
+
+```mdx
+<Tip>**Try it with AI:** [AI Chat](/s/article/000005539) can answer questions about your data directly. See [AI & Data Science](/s/article/AI-and-Data-Science-Overview) for the full toolkit.</Tip>
+```
+
+**Current AI surface points by pillar:**
+
+| Pillar | AI feature to surface | Where to add it |
+|--------|-----------------------|-----------------|
+| Prepare & Transform Data | Magic ETL AI (AI-assisted tile config); AI-assisted SQL in DataSet Views | Hub article + Magic ETL how-tos |
+| Analyze & Visualize | Beast Mode AI Assistant; AI Chat on dashboards | Hub article + Beast Mode articles + Card Building how-tos |
+| Build Apps & Automate | Workflows AI agent tasks; Code Engine + AI Service Layer API | Hub article + Workflows overview |
+| Share & Collaborate | AI Chat surfaced from dashboards | Hub article |
+| Develop & Integrate | AI Service Layer API; MCP connector (`Connect-AI-Tools-to-Domo-Using-MCP.mdx`) | Hub article + API overview |
+| Administer & Govern | AI Readiness (DataSet prep for AI); AI governance settings | Hub article + DataSet management how-tos |
+| Connect & Bring In Data | AI-assisted connector troubleshooting (where available) | Hub article only — don't force it |
+
+**Rules for this phase:**
+- Only add an AI callout if the feature is GA and the KB article for it already exists in the AI & Data Science pillar.
+- Do not add placeholder callouts for capabilities that aren't available or that only exist as Alpha/Beta with restricted access — link to the existing article which will carry the access caveat.
+- Do not restructure existing how-to content around the AI path. Add the callout, then continue the existing procedural steps.
+
+### Forward-Looking Requirement for New Hub Articles
+
+When writing new hub articles in Phase 3a, include a brief "AI-powered approaches" card group or callout section at the end of the hub where relevant AI features exist. This primes the structure for full AI-first documentation in a future pass without requiring the current restructure to solve it completely.
+
+---
+
 ## Current State (Audit Summary)
 
 - **1,819 articles** in `s/article/`, **126 topic pages** in `s/topic/`
@@ -441,6 +482,55 @@ Example at the top of a Beast Mode article:
 This article is part of **Analyze & Visualize → Beast Mode**. New to Beast Mode? [Start here.](/s/article/What-is-Beast-Mode)
 ```
 
+### 5.5 KB ↔ Developer Portal Cross-Linking
+
+**Goal:** Make the KB and Developer Portal function as a unified documentation network rather than two parallel but disconnected systems. A user should be able to move fluidly from a KB how-to into the developer-level depth the portal offers, and vice versa — the portal already does the vice-versa half in ~45 places.
+
+**Context — how the portal currently links to the KB:**
+
+The Developer Portal (`portal/` directory) already references KB articles in at least these areas:
+
+| Portal area | KB articles already linked |
+|-------------|---------------------------|
+| Authentication & API access | Access Token management, client revocation |
+| Connectors & Cloud Amplifier | Cloud Amplifier (4412849158167), Workbench, Jupyter |
+| Code Engine | Code Engine functions reference (000005173) |
+| Workflows | Create a Workflow (000005331), Workflows overview (000005108) |
+| AI services | AI Chat (000005539), AI Playground (000005236), AI Models (000005502), Beast Mode AI (000005304), Forecasting (000005567) |
+| Jupyter Workspaces | Jupyter User Guide, Jupyter Troubleshooting, Jupyter + GitHub |
+| DataSets / Governance | DataSet management, PDP policies, access token revocation |
+| Embed | Embed how-tos |
+| App Studio / Apps | App Studio how-tos (000005295, 000005331) |
+
+These portal→KB links are the highest-priority targets for adding the reverse KB→Portal link: users already in those KB articles are the most likely audience for developer-level depth.
+
+**Interlinking priorities by pillar:**
+
+| KB Pillar | Primary Developer Portal targets | Link direction note |
+|-----------|----------------------------------|---------------------|
+| Connect & Bring In Data | `portal/Connectors/` — Custom Connectors, Writeback Connectors, API Connections, Federated Queries | KB connector setup articles → Portal for API/programmatic data ingestion |
+| Prepare & Transform Data | `portal/data-science/scripting-tiles`, `portal/data-science/jupyter` | KB DataFlow and ETL articles → Portal for scripting-based prep |
+| Analyze & Visualize | `portal/API-Reference/Product-APIs/` — Cards API, Beast Modes API | KB card/Beast Mode articles → Portal for programmatic card management |
+| Build Apps & Automate | `portal/Apps/`, `portal/Automate-Actions/` — App Framework, Workflows API | KB App Studio + Workflows articles → Portal for pro-code and API-driven automation |
+| AI & Data Science | `portal/data-science/`, `portal/API-Reference/app-framework-apis/AI-Service-Layer-API` | KB AI articles → Portal for AI Service Layer API, scripting-based ML, AutoML |
+| Administer & Govern | `portal/Governance/` — PDP, content management, data management APIs | KB PDP and governance articles → Portal for API-driven governance automation |
+| Develop & Integrate | All `portal/API-Reference/` sections | This pillar is the primary bridge; every new article should link to the corresponding Portal API reference |
+
+**How to execute (agent task, Phase 5):**
+
+1. Read each portal file that already links to KB articles (identified by `grep -r "s/article" portal/ --include="*.mdx" -l`).
+2. For each portal→KB link found, extract the KB article path and the portal page path.
+3. Output `scripts/output/portal-kb-crosslinks.json` — a bidirectional map: `{kb_article, portal_page, portal_section_title}`.
+4. For each KB article in the map, add a developer callout near the Related Articles section using this pattern:
+
+```mdx
+<Note>**For developers:** This feature is also accessible via the Domo API. See [Resource Name](/portal/path) in the Developer Portal for programmatic access and API reference.</Note>
+```
+
+5. For Develop & Integrate hub and sub-articles (Phase 3a), make portal links primary, not secondary — the portal is this pillar's source of truth for reference content.
+
+**Output:** `scripts/output/portal-kb-crosslinks.json`
+
 ---
 
 ## Phase 6: Rename to Slugs (Migration Script)
@@ -475,6 +565,31 @@ Output a `redirects.json` (or Mintlify-compatible redirect config entries) mappi
 4. Run link-updater script
 5. Run nav validator (Phase 7)
 6. Commit as a single atomic commit with message: "migrate: rename articles from ID-based to slug-based filenames"
+
+### 6.5 GitHub Actions for Ongoing Automation
+
+After the slug rename completes, the following GitHub Actions keep the documentation system healthy automatically on every PR and push. Implement these alongside the rename so the slug-based system stays consistent from day one.
+
+**Pre-implementation audit:** Before building these, run a quick audit of `.github/workflows/` — existing actions (`case-collision-check.yml`, `mint-preview.yml`, `sync-api-docs.yml`, `sync-video-library.yml`) already cover case collisions and OpenAPI sync. New actions should not duplicate these.
+
+| Action | Trigger | What it does |
+|--------|---------|--------------|
+| **Nav validator** | PR, push to `main` | Runs `scripts/validate-nav.js`; fails the PR if any `docs.json` page ref points to a missing file, or if any article in `s/article/` has no nav entry | Extends the Phase 7 validator |
+| **Orphan detector** | PR, push to `main` | Flags any new `.mdx` file in `s/article/` not referenced in `docs.json` — catches articles added without a nav entry | New: `scripts/check-orphans.js` |
+| **Slug linter** | PR only | Checks that new article filenames follow the slug convention (lowercase, hyphens only, no special characters) — prevents regression to numeric IDs | New: `scripts/lint-slugs.js` or a remark lint rule |
+| **Numeric-ID ref checker** | PR, push to `main` | After Phase 6, greps all `.mdx` files and `docs.json` for any remaining `s/article/[0-9]` references — enforces migration completeness as new articles are added | New: simple grep action |
+| **Redirect integrity check** | PR, push to `main` | Validates every entry in `redirects.json` points to a real slug — catches cases where a slug is later changed without updating the redirect map | Extend nav validator or new script |
+| **Stale internal link reporter** | Weekly `schedule` | Scans all internal links across `.mdx` files and `docs.json`; opens a GitHub Issue listing broken refs | New script; weekly cron |
+
+**Priority order for implementation:**
+1. Nav validator — highest priority; prevents broken site deployments
+2. Orphan detector — prevents nav drift as articles are added
+3. Numeric-ID ref checker — enforces the migration stays clean
+4. Slug linter — guards filename convention going forward
+5. Redirect integrity check — SEO and bookmark protection
+6. Stale link reporter — maintenance, lowest urgency
+
+**Note for non-technical contributors:** These actions run silently in the background. A failing check blocks a PR from merging. If your PR is blocked, a technical contributor can resolve the specific validation error — it usually means a file was added or renamed without updating `docs.json`, which is a one-line fix.
 
 ---
 

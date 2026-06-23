@@ -24,11 +24,12 @@ CLAUDE.md is AI-facing, so it's fine to discuss tooling here.
 
 ### Content Layout
 
-- **`portal/`** — topic-organized content (Getting-Started, API-Reference, Knowledge-Base, etc.)
-- **`s/article/`** — 1,700+ flat KB article files, referenced by numeric ID (e.g. `000005874.mdx`) or slug
+- **`portal/`** — topic-organized content (Getting-Started, API-Reference, embed, Security, etc.) plus auto-generated OpenAPI endpoint pages (hash-named files) synced from the internal API repo
+- **`s/article/`** — 1,822 flat KB article files, referenced by numeric ID (e.g. `000005874.mdx`) or slug
 - **`s/topic/`** — topic grouping files
 - **`de/`, `es/`, `fr/`, `ja/`** — localized content, each mirrors the `s/` structure
 - **`images/kb/`** — screenshots and diagrams (\~7,100 files)
+- **`snippets/`** — reusable MDX components imported into articles: `DomoEmbed.mdx` (embeds Domo-hosted iframes with auto-resize), `BetaNote.mdx` (standardized beta-feature callout), `ColorTable.jsx`, `TypographyTable.jsx`
 
 ### Navigation
 
@@ -47,6 +48,18 @@ Key Mintlify components in use:
 - Third-party brand logos (AWS, OpenAI, Anthropic, GitHub, …) are not in the Domo icon font. Prefer a coded icon over an `<img>` — a monochrome logo image disappears in dark mode. First choice: Font Awesome's brands set via `<Icon icon="{slug}" iconType="brands" aria-hidden="true" />` (this is the one case where `<Icon>` is correct — it's a font glyph, not a local SVG). When the free FA set lacks it (e.g. Anthropic), inline raw `<svg fill="currentColor" …>` with a path from a source like Simple Icons. See `Domo-KB-Style-Guide.mdx` › **Brand and Third-Party Logos**.
 
 Internal links use root-relative paths: `[text](/s/article/Article-Title)`
+
+### Snippets
+
+Reusable components live in `snippets/`. Import them at the top of an MDX file:
+
+```mdx
+import { DomoEmbed } from "/snippets/DomoEmbed.mdx";
+import { BetaNote } from "/snippets/BetaNote.mdx";
+```
+
+- **`<DomoEmbed src="..." />`** — embeds a Domo-hosted card or page in an iframe with automatic height-resize. Props: `src` (required — embed URL), `width` (CSS width, default `"100%"`), `initialHeight` (px, default `"600"`).
+- **`<BetaNote />`** — renders the standardized beta-program callout (links to the enable-features and sign-up pages). Pass `generic={true}` to omit "This feature is in beta." and emit only the program links. Use this instead of writing the beta Note by hand — it stays up-to-date with the program URLs automatically.
 
 ## Domo Release Cadence
 
@@ -68,6 +81,49 @@ grep -r "title:.*keyword" s/article/ s/topic/
 To find by filename or slug, use a glob against `s/article/*.mdx` or `s/topic/*.mdx`.
 
 Both `s/article/` and `s/topic/` should be searched — topics are grouping pages and articles are the detailed content.
+
+## Article PM Ownership
+
+Every article in `s/article/` is mapped to a **Feature** (using the same nomenclature as the internal squad-ownership CSV) and its **Product Manager** in `Article-PM-Ownership-Reference.mdx` at the repo root.
+
+- **Reference file:** `Article-PM-Ownership-Reference.mdx` — searchable table of Feature, Article Title, Article File Name, PM.
+- **Source CSV:** `Feature - Owning Squad, PM, Eng, UX.csv` — authoritative squad/PM roster; the Feature column is the canonical identifier used in the reference.
+- **Generation script:** `scripts/build-pm-ownership.py` — regenerates the reference by cross-referencing the CSV against `docs.json` navigation hierarchy and article frontmatter. Re-run whenever articles are added in bulk or the CSV changes.
+- **CODEOWNERS:** `.github/CODEOWNERS` — maps article files to GitHub logins for notification-only review routing. When a PR touches a listed file, GitHub auto-requests a review from the assigned PM. The PM → GitHub login mapping table is in the file header. Update this file whenever `Article-PM-Ownership-Reference.mdx` is regenerated (see the `update-pm-ownership` skill).
+
+To look up who owns a specific article:
+```bash
+grep "filename.mdx" Article-PM-Ownership-Reference.mdx
+```
+
+To look up all articles owned by a PM:
+```bash
+grep "PM Name" Article-PM-Ownership-Reference.mdx
+```
+
+To look up all articles for a Feature:
+```bash
+grep "^| Feature Name" Article-PM-Ownership-Reference.mdx
+```
+
+## Scripts
+
+All scripts live in `scripts/`. They are optional dev-quality tools — non-technical writers never need to run them.
+
+| Script | Purpose |
+| ------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| `pad_md_tables.py` | Pad all Markdown pipe-table columns in a file so pipes align. Run after editing any article that has Markdown tables: `python3 scripts/pad_md_tables.py s/article/Filename.mdx` |
+| `build-pm-ownership.py` | Regenerate `Article-PM-Ownership-Reference.mdx` from the squad CSV + `docs.json`. See the `update-pm-ownership` skill. |
+| `docs_cli.py` | Export the full nav structure (all tabs/groups/pages) to CSV. `python3 scripts/docs_cli.py export` → `scripts/reports/doc_structure.csv`. Supports `--language` (en/jp/fr/de/es) and `--output`. |
+| `html_to_mdx.py` | Bulk Salesforce-to-MDX conversion pipeline (used with the `csv-to-mdx` skill). Reads an exported Salesforce CSV, converts HTML bodies to MDX, and writes files to `s/article/`. |
+| `html-to-mdx.mjs` | Node.js single-file HTML-to-MDX converter (used by the `migrate-html` skill for one-off article migrations via pandoc). |
+| `add_excerpts.py` | Batch-add `excerpt:` frontmatter to articles that only have `title:`. |
+| `fix-heading-levels.py` | Normalize heading levels across migrated articles. |
+| `fix_anchors.py` | Fix broken anchor IDs introduced by the HTML migration. |
+| `diff_kb_articles.py` | Diff two versions of a KB article (e.g., Salesforce export vs. repo copy). |
+| `build_video_library.py` | Build a video library index from article frontmatter. |
+| `update_kb_articles.py` | Entry point for the bulk Salesforce CSV import pipeline. |
+| `remark-domo-style.mjs` | Remark lint plugin enforcing Domo style rules (optional; runs via `yarn lint`). |
 
 ## Style Standards
 
@@ -100,3 +156,11 @@ This activates a `post-merge` hook that warns you when a `git pull` leaves track
 |update-kb-article|Any update to an existing KB article: renames, content edits, image swaps, content removal, file path updates, cross-file changes, step/process edits, navigation moves, merges, or splits|
 |mintlify-design|Mintlify component/page-design expert: choosing components, composing custom layouts, building rich pages, "is there a component for X" questions, or authoring reusable snippets in `/snippets/`|
 |fix-ja-formatting|Fixing structural formatting issues in queued Japanese articles: inline image placement, block vs. inline `<img>` mismatches, callout wrapping, and redundant blank lines|
+|update-pm-ownership|Regenerate `Article-PM-Ownership-Reference.mdx` after the squad CSV or article list changes|
+|csv-to-mdx|Review and audit an MDX article produced by the Salesforce-to-Domo programmatic conversion pipeline (`scripts/html_to_mdx.py`)|
+|migrate-html|Migrate a single HTML article to a repo-ready MDX file: convert with pandoc, apply Domo style rules, save to `s/article/`, and register in `docs.json`|
+|release-feature-links|Match every feature in a PMM release copy to a KB article and produce link sentences for the shared PMM Word doc or `Current-Release-Notes.mdx`|
+|release-notes|Generate user-friendly internal release notes by diffing the latest git tag against the previous tag|
+|mintlify-preview-workflow|Working on `.github/workflows/mint-preview.yml` — the Mintlify preview deployment GitHub Action|
+|openapi-sync-workflow|Working on the OpenAPI sync GitHub Action (`sync-api-docs.yml`) — YAML detection, sync scripts, or `docs.json` nav-generation integration|
+|connector-review|Manage the connector PR/Jira review lifecycle: run the dashboard, post follow-ups on stale tickets, merge approved PRs, post release-date comments, close Jira tickets, and handle publish/migration requests from Arun|

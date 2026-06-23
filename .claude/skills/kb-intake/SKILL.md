@@ -93,6 +93,9 @@ When the conversation is complete, present a summary in this format:
 **Related articles to link:**
 - [title or topic]
 
+**PM owner:**
+- Look up the article's owning PM by searching `Article-PM-Ownership-Reference.mdx` for the feature or article title. If this is a net-new article, identify the closest matching Feature in the reference and note that PM as the likely owner.
+
 **Out of scope:**
 - [anything explicitly excluded]
 

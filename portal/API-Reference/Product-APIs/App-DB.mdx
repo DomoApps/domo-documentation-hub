@@ -51,7 +51,14 @@ HTTP/1.1 200 OK
 
 ### Query Document
 
-**Description**: Retrieve a specific document from a collection via query.
+**Description**: Retrieve documents from a collection via query.
+
+AppDB supports the full range of MongoDB query predicates that can be used in a `find()` function. The following operators are **not** supported:
+
+- `$where` — JavaScript expression evaluation is disabled server-side.
+- `$near` and `$nearSphere` — proximity searches require a geospatial index, which AppDB collections do not have.
+
+All other operators in the [official MongoDB query predicate documentation](https://www.mongodb.com/docs/manual/reference/mql/query-predicates/) are supported, including comparison, logical, array, data type, bitwise, `$expr`, `$jsonSchema`, and `$regex` operators. The geospatial shape operators `$geoWithin` and `$geoIntersects` are also supported when your documents contain GeoJSON data.
 
 **HTTP Request**:
 
@@ -102,6 +109,95 @@ HTTP/1.1 200 OK
     ...
 ]
 ```
+
+**Querying Based on Dates**
+
+Dates can be queried in AppDB using the [MongoDB Extended JSON v2](https://www.mongodb.com/docs/manual/reference/mongodb-extended-json/) spec. This casts the provided string to a date object using the `$date` operator. The date string must be in ISO format.
+
+```json
+{
+    "createdOn": {
+        "$lte": {
+            "$date": "2020-05-12T00:00:00.000Z"
+        }
+    }
+}
+```
+
+### Partially Update Documents
+
+**Description**: Perform partial updates on documents using MongoDB query and update operations. The query must reference an existing document or a property in a document.
+
+**Supported Operators**:
+
+- `currentDate`
+- `inc`
+- `min`
+- `max`
+- `mul`
+- `rename`
+- `set`
+- `unset`
+- `addToSet`
+- `pop`
+- `pull`
+- `pullAll`
+- `push`
+
+**Supported Modifiers**:
+
+- `each`
+- `position`
+- `slice`
+- `sort`
+
+Refer to the official [MongoDB Update Operators documentation](https://www.mongodb.com/docs/manual/reference/mql/update/) for details. Note that `$setOnInsert` is not supported because queries must reference an existing document or property.
+
+**HTTP Request**:
+
+```http
+PUT /api/datastores/v1/collections/{collectionId}/documents/update
+```
+
+**Headers**:
+
+- `X-DOMO-Developer-Token`: `<developer token here>`
+- `Accept`: `application/json`
+- `Content-Type`: `application/json`
+
+**Request Body**:
+
+The request body must be structured as a single object containing a `query` and an `operation`.
+
+```json
+{
+  "query": "{mongo query JSON}",
+  "operation": "{mongo operation JSON}"
+}
+```
+
+Example:
+
+```json
+{
+  "query": { "content.username": "Bill S. Preston, Esquire" },
+  "operation": {
+    "$set": {
+      "content.comment": "Excellent!"
+    }
+  }
+}
+```
+
+**Response**:
+
+```http
+HTTP/1.1 200 OK
+Content-Type: application/json;charset=UTF-8
+1
+```
+
+Returns the number of updated documents or properties.
 
 ### List Documents
 

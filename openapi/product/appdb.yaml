@@ -282,8 +282,17 @@ paths:
   /api/datastores/v2/collections/{collectionId}/documents/query:
     post:
       summary: Query Document
-      description: Retrieve documents from a collection via query (using v2 endpoint).
-      tags: 
+      description: |
+        Retrieve documents from a collection via MongoDB query (v2 endpoint).
+
+        AppDB supports the full range of MongoDB query predicates. The following operators are **not** supported:
+        - `$where` — JavaScript expression evaluation is disabled server-side.
+        - `$near` and `$nearSphere` — proximity searches require a geospatial index, which AppDB collections do not have.
+
+        All other operators in the [official MongoDB query predicate documentation](https://www.mongodb.com/docs/manual/reference/mql/query-predicates/) are supported, including comparison, logical, array, data type, bitwise, `$expr`, `$jsonSchema`, and `$regex` operators. The geospatial shape operators `$geoWithin` and `$geoIntersects` are also supported when your documents contain GeoJSON data.
+
+        Dates can be queried using MongoDB Extended JSON v2: `{ "createdOn": { "$lte": { "$date": "2020-05-12T00:00:00.000Z" } } }`
+      tags:
         - App DB API (Product)
       parameters:
         - name: collectionId
@@ -300,3 +309,50 @@ paths:
       responses:
         '200':
           description: OK (Response body is not documented)
+
+  /api/datastores/v1/collections/{collectionId}/documents/update:
+    put:
+      summary: Partially Update Documents
+      description: |
+        Perform partial updates on documents using MongoDB query and update operations.
+        The query must reference an existing document or property. `$setOnInsert` is not supported.
+
+        **Supported update operators:** `currentDate`, `inc`, `min`, `max`, `mul`, `rename`, `set`, `unset`, `addToSet`, `pop`, `pull`, `pullAll`, `push`
+
+        **Supported modifiers:** `each`, `position`, `slice`, `sort`
+
+        See the [MongoDB Update Operators documentation](https://www.mongodb.com/docs/manual/reference/mql/update/) for details.
+      tags:
+        - App DB API (Product)
+      parameters:
+        - name: collectionId
+          in: path
+          required: true
+          schema: { type: string }
+          description: The ID of the collection.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [query, operation]
+              properties:
+                query:
+                  type: object
+                  additionalProperties: true
+                  description: MongoDB query that identifies the documents to update.
+                  example: { "content.username": "Bill S. Preston, Esquire" }
+                operation:
+                  type: object
+                  additionalProperties: true
+                  description: MongoDB update operation to apply.
+                  example: { "$set": { "content.comment": "Excellent!" } }
+      responses:
+        '200':
+          description: Returns the number of updated documents or properties.
+          content:
+            application/json:
+              schema:
+                type: integer
+                example: 1

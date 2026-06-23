@@ -33,7 +33,7 @@ from pathlib import Path
 
 REPO = "DomoApps/domo-documentation-hub"
 JIRA_BASE = "https://domoinc.atlassian.net"
-BRANCH_PATTERN = re.compile(r"arun\.raj/connectors-(DOMO-\d+)", re.IGNORECASE)
+BRANCH_PATTERN = re.compile(r"arun\.raj/connectors?-(DOMO-\d+)", re.IGNORECASE)
 TEMPLATES_PATH = Path(__file__).parent / "connector-templates.json"
 
 # ── Credentials ────────────────────────────────────────────────────────────────
@@ -780,6 +780,35 @@ def main():
             sys.exit(1)
         print(f"Closing {target}...")
         close_jira_ticket(target, dry_run)
+        return
+
+    # Finish the Jira side for a PR that was merged outside the skill
+    if "--finish-merged" in args:
+        idx = args.index("--finish-merged")
+        if idx + 2 >= len(args):
+            print("Usage: --finish-merged PR-NUMBER DOMO-123456")
+            sys.exit(1)
+        pr_num = args[idx + 1]
+        jira_id = args[idx + 2]
+        jared_jira = my_jira_account()
+        jared_jira_id = jared_jira.get("accountId", "")
+        print(f"Fetching PR #{pr_num} and Jira ticket {jira_id}...")
+        pr = gh_json(["pr", "view", pr_num, "--repo", REPO,
+                      "--json", "number,title,headRefName,url,state"])
+        jira_data = analyze_jira_ticket(jira_id, jared_jira_id, templates)
+        if "error" in jira_data:
+            print(f"❌ Could not fetch {jira_id}: {jira_data['error']}")
+            sys.exit(1)
+        print(f"Posting merge comment to {jira_id}...")
+        body = build_merge_comment(
+            pr, jira_data.get("secondary_approvers", []),
+            jira_data.get("arun_account"), False, templates,
+        )
+        post_comment(jira_id, body, dry_run)
+        if not dry_run:
+            print(f"✓ Merge comment posted")
+        print(f"Closing {jira_id}...")
+        close_jira_ticket(jira_id, dry_run)
         return
 
     print("🔍 Fetching open connector PRs...")

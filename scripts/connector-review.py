@@ -326,8 +326,10 @@ def analyze_jira_ticket(jira_id, my_account_id, templates):
             action_type = "publish"
 
     secondary_ids = {a["accountId"] for a in secondary_approvers}
+    known_approver_names = [n.lower() for n in templates.get("known_approvers", [])]
 
-    # Check for secondary approval after Arun's comment
+    # Check for secondary approval after Arun's comment.
+    # Accepts approvals from: (a) accounts Arun @-mentioned, or (b) anyone in known_approvers.
     secondary_approved = False
     past_arun = arun_comment is None  # if no arun comment, scan all
     for c in comments:
@@ -335,8 +337,11 @@ def analyze_jira_ticket(jira_id, my_account_id, templates):
             if c.get("id") == arun_comment.get("id"):
                 past_arun = True
             continue
-        author_id = c.get("author", {}).get("accountId", "")
-        if author_id in secondary_ids:
+        author = c.get("author", {})
+        author_id = author.get("accountId", "")
+        author_name = author.get("displayName", "").lower()
+        is_known = any(kn in author_name for kn in known_approver_names)
+        if author_id in secondary_ids or is_known:
             text = extract_text(c.get("body", {})).lower()
             if any(p in text for p in approval_phrases):
                 secondary_approved = True

@@ -19,6 +19,8 @@ tags:
     description: Manage individual documents in an AppDB collection.
   - name: Collections
     description: Manage AppDB collections (schema, permissions).
+  - name: App DB API (Product)
+    description: Manage documents and collections in AppDB.
 components:
   securitySchemes:
     developerToken:
@@ -34,16 +36,24 @@ components:
         message:
           type: string
           description: A human-readable error message.
+        status:
+          type: integer
+          description: HTTP status code.
+        statusReason:
+          type: string
+          description: HTTP status reason phrase.
+        toe:
+          type: string
+          description: Trace identifier for support; stands for Thread of Execution.
           
     #========= REQUEST BODY SCHEMAS =========
     DocumentContent:
       type: object
-      required: [content]
       properties:
         content:
           type: object
           additionalProperties: true
-          description: "Arbitrary JSON content of the document."
+          description: "Arbitrary JSON content of the document. If omitted, the document is created with an empty content object."
       example:
         content: { "title": "Q2 Campaign", "region": "West" }
 
@@ -138,8 +148,8 @@ paths:
   /api/datastores/v1/collections/{collectionId}/documents:
     get:
       summary: List Documents
-      description: Retrieve all documents from a specified collection (limit 10,000).
-      tags: 
+      description: Retrieve documents from a specified collection. There is an upper limit of 10,000 documents per request. Use `limit` and `offset` to paginate through large collections.
+      tags:
         - App DB API (Product)
       parameters:
         - name: collectionId
@@ -147,6 +157,14 @@ paths:
           required: true
           schema: { type: string }
           description: The ID of the collection.
+        - name: limit
+          in: query
+          schema: { type: integer }
+          description: Maximum number of documents to return.
+        - name: offset
+          in: query
+          schema: { type: integer }
+          description: Number of documents to skip before returning. Default is 0.
       responses:
         '200':
           description: OK (Response body is not documented)
@@ -277,8 +295,16 @@ paths:
             type: string
           example: "id1,id2,id3"
       responses:
-        '200':
-          description: OK (Response body is not documented)
+        '202':
+          description: Accepted — returns the count of deleted documents.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  Deleted:
+                    type: integer
+                    example: 2
   /api/datastores/v2/collections/{collectionId}/documents/query:
     post:
       summary: Query Document
@@ -300,6 +326,46 @@ paths:
           required: true
           schema: { type: string }
           description: The ID of the collection.
+        - name: groupby
+          in: query
+          schema: { type: string }
+          description: "Comma-separated list of properties to group by. Use dot notation for nested fields (e.g., `content.campaignName`). Top-level fields can be referenced directly."
+        - name: count
+          in: query
+          schema: { type: string }
+          description: Alias for a count aggregation.
+        - name: avg
+          in: query
+          schema: { type: string }
+          description: "Comma-separated list of properties with aliases to average (e.g., `content.clicks myAlias`). Use dot notation for nested fields."
+        - name: min
+          in: query
+          schema: { type: string }
+          description: "Comma-separated list of properties with aliases to find the minimum. Use dot notation for nested fields."
+        - name: max
+          in: query
+          schema: { type: string }
+          description: "Comma-separated list of properties with aliases to find the maximum. Use dot notation for nested fields."
+        - name: sum
+          in: query
+          schema: { type: string }
+          description: "Comma-separated list of properties with aliases to sum. Use dot notation for nested fields."
+        - name: unwind
+          in: query
+          schema: { type: string }
+          description: "Comma-separated list of array properties to unwind (flattens nested arrays — one row per array element). Use dot notation for nested fields."
+        - name: orderby
+          in: query
+          schema: { type: string }
+          description: "Field or alias to order by, followed by `ascending` or `descending` (e.g., `totalClicks descending`). Accepts either an aggregation alias or a field name using dot notation."
+        - name: limit
+          in: query
+          schema: { type: integer }
+          description: Maximum number of results to return. Default is 10,000.
+        - name: offset
+          in: query
+          schema: { type: integer }
+          description: Number of results to skip before returning. Default is 0.
       requestBody:
         required: true
         content:
@@ -315,7 +381,8 @@ paths:
       summary: Partially Update Documents
       description: |
         Perform partial updates on documents using MongoDB query and update operations.
-        The query must reference an existing document or property. `$setOnInsert` is not supported.
+        Returns the number of documents updated. Returns `0` if no documents matched — this is a successful response, not an error.
+        `$setOnInsert` has no effect because AppDB partial updates do not perform upserts.
 
         **Supported update operators:** `currentDate`, `inc`, `min`, `max`, `mul`, `rename`, `set`, `unset`, `addToSet`, `pop`, `pull`, `pullAll`, `push`
 

@@ -393,7 +393,12 @@ HTTP/1.1 200 OK
 
 ---
 
-Any MongoDB query that can be used in a Mongo `find()` function can be used to query for documents in an AppDB Datastore. For a full list of available query predicates, see the [official MongoDB query predicate documentation](https://www.mongodb.com/docs/manual/reference/mql/query-predicates/). Note that some operators are not supported in AppDB (for example, `$where` and geospatial operators).
+AppDB supports the full range of MongoDB query predicates that can be used in a `find()` function. The following operators are **not** supported:
+
+- `$where` — JavaScript expression evaluation is disabled server-side.
+- `$near` and `$nearSphere` — proximity searches require a geospatial index, which AppDB collections do not have.
+
+All other operators in the [official MongoDB query predicate documentation](https://www.mongodb.com/docs/manual/reference/mql/query-predicates/) are supported, including comparison, logical, array, data type, bitwise, `$expr`, `$jsonSchema`, and `$regex` operators. The geospatial shape operators `$geoWithin` and `$geoIntersects` are also supported when your documents contain GeoJSON data.
 
 Example of querying for a document that includes a comment that has the word 'happy' (via a regex operator) or does not include the username 'Eeyore' (via the not equals operator) can be found below. The return value of this call will be an array of documents that matches the query.
 

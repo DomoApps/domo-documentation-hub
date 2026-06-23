@@ -3,12 +3,16 @@ title: App DB API
 permalink: c0c8604e2d275-app-db-api
 ---
 
-The App DB API allows developers to interact with AppDB, a NoSQL database for storing arbitrary JSON documents. This API supports CRUD operations, querying, and aggregation, enabling developers to manage data efficiently within their Domo applications.
+The App DB API allows developers to interact with AppDB, a NoSQL database for storing arbitrary JSON documents. This API supports CRUD operations, querying with MongoDB predicates, partial document updates, bulk operations, and aggregation, enabling developers to manage data efficiently within their Domo applications.
 
 ## Features
 
 - **CRUD Operations**: Create, read, update, and delete documents in AppDB collections.
-- **Collection Management**: Programmatically update collections.
+- **Querying**: Query documents using the full range of MongoDB query predicates, including date queries via MongoDB Extended JSON v2.
+- **Aggregation**: Group, count, sum, average, min, and max query results by field.
+- **Partial Updates**: Use MongoDB update operators to modify specific fields within existing documents without replacing the entire document.
+- **Bulk Operations**: Delete multiple documents in a single request.
+- **Collection Management**: Programmatically update collection schemas and permissions.
 
 ## Endpoints
 
@@ -124,6 +128,71 @@ Dates can be queried in AppDB using the [MongoDB Extended JSON v2](https://www.m
 }
 ```
 
+### Query Documents with Aggregations
+
+After the query filters which documents to return, you can add query string parameters to aggregate the results. Each parameter (except `groupby`) can optionally take an alias — useful when passing the same property to different aggregations to avoid name collisions.
+
+**HTTP Request**:
+
+```http
+POST /api/datastores/v2/collections/{collectionId}/documents/query?groupby={property1},{property2}&count={alias}&avg={property1 alias1},{property2 alias2}&sum={property1 alias1}&max={property1 alias1}&min={property1 alias1}&orderby={alias1 ascending|descending}&limit={limit}&offset={offset}
+```
+
+**Headers**:
+
+- `X-DOMO-Developer-Token`: `<developer token here>`
+- `Accept`: `application/json`
+- `Content-Type`: `application/json`
+
+**Arguments**:
+
+| Parameter      | Type    | Required | Description                                                                                                             |
+| -------------- | ------- | -------- | ----------------------------------------------------------------------------------------------------------------------- |
+| collectionId   | String  | Required | The ID of the collection.                                                                                               |
+| groupby        | String  | Optional | Comma-separated list of properties to group by.                                                                         |
+| count          | String  | Optional | Alias for a count aggregation.                                                                                          |
+| avg            | String  | Optional | Comma-separated list of properties with aliases to average.                                                             |
+| min            | String  | Optional | Comma-separated list of properties with aliases to find the minimum.                                                    |
+| max            | String  | Optional | Comma-separated list of properties with aliases to find the maximum.                                                    |
+| sum            | String  | Optional | Comma-separated list of properties with aliases to sum.                                                                 |
+| unwind         | String  | Optional | Comma-separated list of properties to unwind (flattens nested arrays).                                                  |
+| orderby        | String  | Optional | Alias of the aggregation to order by, followed by `ascending` or `descending`.                                          |
+| limit          | Integer | Optional | Maximum number of results to return. Default is 10,000.                                                                 |
+| offset         | Integer | Optional | Number of results to skip before returning. Default is 0.                                                               |
+
+**Request Body**:
+
+```json
+{}
+```
+
+An empty object `{}` returns all documents before aggregating. Pass a MongoDB query object to filter first.
+
+**Response**:
+
+```json
+[
+  {
+    "documentCount": 2,
+    "sumClicks": 210,
+    "avgClicks": 105,
+    "maxClicks": 120,
+    "minClicks": 90,
+    "campaignName": "Red Campaign",
+    "month": "February"
+  },
+  {
+    "documentCount": 1,
+    "sumClicks": 100,
+    "avgClicks": 100,
+    "maxClicks": 100,
+    "minClicks": 100,
+    "campaignName": "Blue Campaign",
+    "month": "January"
+  }
+]
+```
+
 ### Partially Update Documents
 
 **Description**: Perform partial updates on documents using MongoDB query and update operations. The query must reference an existing document or a property in a document.
@@ -180,10 +249,10 @@ Example:
 
 ```json
 {
-  "query": { "content.username": "Bill S. Preston, Esquire" },
+  "query": { "content.status": "Draft" },
   "operation": {
     "$set": {
-      "content.comment": "Excellent!"
+      "content.status": "Active"
     }
   }
 }
@@ -260,7 +329,8 @@ POST /api/datastores/v1/collections/{collectionId}/documents/
 ```json
 {
   "content": {
-    // content goes here
+    "title": "Q2 Campaign",
+    "region": "West"
   }
 }
 ```
@@ -282,7 +352,10 @@ HTTP/1.1 200 OK
   "createdOn": "2024-05-08T19:39:00.708226378Z",
   "updatedOn": "2024-05-08T19:39:00.708226378Z",
   "updatedBy": "123456789",
-  "content": {}
+  "content": {
+    "title": "Q2 Campaign",
+    "region": "West"
+  }
 }
 ```
 
@@ -307,7 +380,9 @@ PUT /api/datastores/v1/collections/{collectionId}/documents/{documentId}
 ```json
 {
   "content": {
-    // content goes here
+    "title": "Q2 Campaign",
+    "region": "West",
+    "status": "Active"
   }
 }
 ```
@@ -329,7 +404,11 @@ HTTP/1.1 200 OK
   "createdOn": "2024-05-08T19:39:00.708226378Z",
   "updatedOn": "2024-05-08T19:39:00.708226378Z",
   "updatedBy": "123456789",
-  "content": {}
+  "content": {
+    "title": "Q2 Campaign",
+    "region": "West",
+    "status": "Active"
+  }
 }
 ```
 

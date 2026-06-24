@@ -11,10 +11,377 @@ The App DB API allows developers to interact with AppDB, a NoSQL database for st
 - **Querying**: Query documents using the full range of MongoDB query predicates, including date queries via MongoDB Extended JSON v2.
 - **Aggregation**: Group, count, sum, average, min, and max query results by field.
 - **Partial Updates**: Use MongoDB update operators to modify specific fields within existing documents without replacing the entire document.
-- **Bulk Operations**: Delete multiple documents in a single request.
-- **Collection Management**: Programmatically update collection schemas and permissions.
+- **Bulk Operations**: Create, upsert, or delete multiple documents in a single request.
+- **Datastore Management**: List, create, and delete datastores.
+- **Collection Management**: Programmatically create, update, delete, and query collections; manage permissions.
+- **Data Transfer**: Download all documents from a collection as JSON, or import documents in bulk.
 
 ## Endpoints
+
+### List Datastores
+
+**Description**: Get all datastores owned by the current user.
+
+**HTTP Request**:
+
+```http
+GET /api/datastores/v1
+```
+
+**Headers**:
+
+- `X-DOMO-Developer-Token`: `<developer token here>`
+- `Accept`: `application/json`
+
+**Response**:
+
+```http
+HTTP/1.1 200 OK
+```
+
+```json
+[
+  {
+    "id": "39b88a97-8247-4c0d-ba1d-8ed78d1a6680",
+    "name": "My App Datastore",
+    "customer": "mycompany",
+    "owner": 870010733,
+    "createdOn": "2024-01-15T10:00:00.000Z",
+    "updatedOn": "2024-01-15T10:00:00.000Z"
+  }
+]
+```
+
+### Create Datastore
+
+**Description**: Create a new datastore.
+
+**HTTP Request**:
+
+```http
+POST /api/datastores/v1
+```
+
+**Headers**:
+
+- `X-DOMO-Developer-Token`: `<developer token here>`
+- `Accept`: `application/json`
+- `Content-Type`: `application/json`
+
+**Request Body**:
+
+```json
+{
+  "name": "My App Datastore"
+}
+```
+
+**Response**:
+
+```http
+HTTP/1.1 201 Created
+```
+
+### Get Datastore
+
+**Description**: Get a datastore by ID.
+
+**HTTP Request**:
+
+```http
+GET /api/datastores/v1/{datastoreId}
+```
+
+**Headers**:
+
+- `X-DOMO-Developer-Token`: `<developer token here>`
+- `Accept`: `application/json`
+
+**Response**:
+
+```http
+HTTP/1.1 200 OK
+```
+
+### Delete Datastore
+
+**Description**: Permanently delete a datastore and all of its collections and documents. This action cannot be undone.
+
+**HTTP Request**:
+
+```http
+DELETE /api/datastores/v1/{datastoreId}
+```
+
+**Headers**:
+
+- `X-DOMO-Developer-Token`: `<developer token here>`
+
+**Response**:
+
+```http
+HTTP/1.1 204 No Content
+```
+
+### List Collections
+
+**Description**: Get all collections visible to the current user. Use the `datastoreId` query parameter to filter by datastore.
+
+**HTTP Request**:
+
+```http
+GET /api/datastores/v1/collections?datastoreId={datastoreId}
+```
+
+**Headers**:
+
+- `X-DOMO-Developer-Token`: `<developer token here>`
+- `Accept`: `application/json`
+
+**Response**:
+
+```http
+HTTP/1.1 200 OK
+```
+
+### Create Collection
+
+**Description**: Create a new collection in a datastore.
+
+**HTTP Request**:
+
+```http
+POST /api/datastores/v1/collections?datastoreId={datastoreId}
+```
+
+**Headers**:
+
+- `X-DOMO-Developer-Token`: `<developer token here>`
+- `Accept`: `application/json`
+- `Content-Type`: `application/json`
+
+**Request Body**:
+
+```json
+{
+  "name": "users",
+  "syncEnabled": true,
+  "schema": {
+    "columns": [
+      { "type": "STRING", "name": "username", "visible": true },
+      { "type": "STRING", "name": "email", "visible": true }
+    ]
+  }
+}
+```
+
+**Response**:
+
+```http
+HTTP/1.1 201 Created
+```
+
+### Query Collections
+
+**Description**: Filter and sort collections using field-level predicates with pagination.
+
+**HTTP Request**:
+
+```http
+POST /api/datastores/v1/collections/query
+```
+
+**Headers**:
+
+- `X-DOMO-Developer-Token`: `<developer token here>`
+- `Accept`: `application/json`
+- `Content-Type`: `application/json`
+
+**Request Body**:
+
+```json
+{
+  "collectionFilteringList": [
+    { "filterType": "nameof", "typedValue": "users" }
+  ],
+  "sortBy": "createdOn",
+  "direction": "DESC",
+  "pageSize": 25,
+  "pageNumber": 1
+}
+```
+
+**Filter Types**:
+
+| `filterType`  | Description                                  | `typedValue`                          |
+| ------------- | -------------------------------------------- | ------------------------------------- |
+| `nameof`      | Filter by collection name                    | Collection name string                |
+| `datastorename` | Filter by app/card (datastore) name        | Datastore name string                 |
+| `ownedby`     | Filter by owner                              | User ID                               |
+| `createddate` | Filter by creation date (requires `comparingCriteria`: `after`, `before`, or `on`) | ISO date string |
+
+**Response**:
+
+```http
+HTTP/1.1 200 OK
+```
+
+### Delete Collection
+
+**Description**: Permanently delete a collection and all of its documents.
+
+**HTTP Request**:
+
+```http
+DELETE /api/datastores/v1/collections/{collectionId}
+```
+
+**Headers**:
+
+- `X-DOMO-Developer-Token`: `<developer token here>`
+
+**Response**:
+
+```http
+HTTP/1.1 204 No Content
+```
+
+### List Collection Permissions
+
+**Description**: List all entities that have permissions on a collection.
+
+**HTTP Request**:
+
+```http
+GET /api/datastores/v1/collections/{collectionId}/permission
+```
+
+**Headers**:
+
+- `X-DOMO-Developer-Token`: `<developer token here>`
+- `Accept`: `application/json`
+
+**Query Parameters**:
+
+| Parameter   | Type   | Description                            |
+| ----------- | ------ | -------------------------------------- |
+| `sourceType` | String | Filter by entity type: `USER`, `GROUP`, or `RYUU_APP` |
+| `sourceIds` | String | Comma-separated list of entity IDs to filter by |
+
+**Response**:
+
+```http
+HTTP/1.1 200 OK
+```
+
+```json
+{
+  "RYUU_APP": [
+    {
+      "sourceType": "RYUU_APP",
+      "sourceId": "a1b2c3d4-0000-0000-0000-000000000000",
+      "permissions": ["read", "create_content", "read_content"]
+    }
+  ]
+}
+```
+
+### Check User Permission
+
+**Description**: Returns `true` if the current user has permission to edit permissions on a collection.
+
+**HTTP Request**:
+
+```http
+GET /api/datastores/v1/collections/{collectionId}/permission/user
+```
+
+**Headers**:
+
+- `X-DOMO-Developer-Token`: `<developer token here>`
+- `Accept`: `application/json`
+
+**Response**:
+
+```http
+HTTP/1.1 200 OK
+```
+
+```json
+true
+```
+
+### Download Documents
+
+**Description**: Download the documents in a collection as a JSON file (returned with a `Content-Disposition: attachment` header). Each entry is a complete document object — the same shape accepted by Import Documents — so a download can be fed straight back into Import Documents to copy or restore a collection. Useful for backups and bulk export.
+
+**HTTP Request**:
+
+```http
+GET /api/datastores/v2/collections/{collectionId}/download
+```
+
+**Headers**:
+
+- `X-DOMO-Developer-Token`: `<developer token here>`
+- `Accept`: `application/json`
+
+**Response**:
+
+```http
+HTTP/1.1 200 OK
+```
+
+Returns a JSON array of the documents in the collection, each a complete document object.
+
+### Import Documents
+
+**Description**: Bulk-import complete document objects into a collection — the counterpart to Download Documents. Each item must be a full document including its `id`; documents are **upserted by `id`**, so the original `id`, `createdOn`, and `owner` are preserved. This is the format produced by Download Documents, making the two a copy/restore pair. To add brand-new documents from raw content, use [Create Document](#create-document) instead. Existing documents not present in the payload are left untouched.
+
+**HTTP Request**:
+
+```http
+PUT /api/datastores/v2/collections/{collectionId}/documents/import
+```
+
+**Headers**:
+
+- `X-DOMO-Developer-Token`: `<developer token here>`
+- `Accept`: `application/json`
+- `Content-Type`: `application/json`
+
+**Request Body**:
+
+```json
+[
+  {
+    "id": "a8428d64-a01d-49b2-9144-ddeec001acf8",
+    "datastoreId": "39b88a97-8247-4c0d-ba1d-8ed78d1a6680",
+    "collectionId": "232e6d6c-46e9-49b6-a137-8933f0f05999",
+    "syncRequired": true,
+    "owner": "870010733",
+    "createdBy": "870010733",
+    "createdOn": "2026-06-23T20:58:06.567Z",
+    "updatedOn": "2026-06-23T23:36:13.177Z",
+    "updatedBy": "870010733",
+    "content": { "username": "bill", "email": "bill@example.com" }
+  }
+]
+```
+
+**Response**:
+
+<CodeGroup>
+
+```http http
+HTTP/1.1 200 OK
+```
+
+```json json
+{ "Updated": 0, "Created": 0, "Upserted": 1 }
+```
+
+</CodeGroup>
 
 ### Get Document
 

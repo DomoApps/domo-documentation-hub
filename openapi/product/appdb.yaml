@@ -135,13 +135,296 @@ components:
                 $ref: '#/components/schemas/CollectionColumn'
         syncEnabled:
           type: boolean
-          
+
+    Datastore:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the datastore.
+        name:
+          type: string
+          description: Name of the datastore.
+        customer:
+          type: string
+          description: The Domo instance name this datastore belongs to.
+        owner:
+          type: integer
+          description: User ID of the datastore owner.
+        createdOn:
+          type: string
+          format: date-time
+        updatedOn:
+          type: string
+          format: date-time
+        updatedBy:
+          type: integer
+      example:
+        id: "39b88a97-8247-4c0d-ba1d-8ed78d1a6680"
+        name: "My App Datastore"
+        customer: "mycompany"
+        owner: 870010733
+        createdOn: "2024-01-15T10:00:00.000Z"
+        updatedOn: "2024-01-15T10:00:00.000Z"
+
+    Collection:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the collection.
+        datastoreId:
+          type: string
+          format: uuid
+          description: ID of the datastore this collection belongs to.
+        name:
+          type: string
+          description: Name of the collection.
+        owner:
+          type: integer
+          description: User ID of the collection owner.
+        datasourceId:
+          type: string
+          nullable: true
+          description: ID of the linked Domo DataSet, or null if not yet linked.
+        schema:
+          type: object
+          properties:
+            columns:
+              type: array
+              items:
+                $ref: '#/components/schemas/CollectionColumn'
+        syncEnabled:
+          type: boolean
+          description: Whether documents are periodically synced to the linked DataSet.
+        syncRequired:
+          type: boolean
+          description: Whether a sync is pending.
+        fullReplaceRequired:
+          type: boolean
+        lastSync:
+          type: string
+          format: date-time
+          nullable: true
+        createdOn:
+          type: string
+          format: date-time
+        updatedOn:
+          type: string
+          format: date-time
+        updatedBy:
+          type: integer
+      example:
+        id: "232e6d6c-46e9-49b6-a137-8933f0f05999"
+        datastoreId: "39b88a97-8247-4c0d-ba1d-8ed78d1a6680"
+        name: "users"
+        owner: 870010733
+        datasourceId: null
+        schema:
+          columns:
+            - type: "STRING"
+              name: "username"
+              visible: true
+            - type: "STRING"
+              name: "email"
+              visible: true
+        syncEnabled: true
+        syncRequired: true
+        fullReplaceRequired: false
+        lastSync: null
+        createdOn: "2024-01-15T10:00:00.000Z"
+        updatedOn: "2024-01-15T10:00:00.000Z"
+        updatedBy: 870010733
+
 security:
   - developerToken: []
 
 paths:
   #========= Collection Endpoints =========
+  /api/datastores/v1/collections:
+    get:
+      summary: List Collections
+      description: Get all collections visible to the current user. Use `datastoreId` to filter by datastore.
+      tags:
+        - App DB API (Product)
+      parameters:
+        - name: datastoreId
+          in: query
+          required: false
+          schema: { type: string }
+          description: Filter collections by datastore ID.
+        - name: shareable
+          in: query
+          required: false
+          schema: { type: boolean, default: false }
+          description: When true, returns only collections the current user can share.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Collection'
+    post:
+      summary: Create Collection
+      description: Create a new collection in a datastore. Pass `datastoreId` as a query parameter.
+      tags:
+        - App DB API (Product)
+      parameters:
+        - name: datastoreId
+          in: query
+          required: true
+          schema: { type: string }
+          description: The ID of the datastore to create the collection in.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: Name for the collection.
+                syncEnabled:
+                  type: boolean
+                  description: Whether to enable periodic syncing to a linked Domo DataSet.
+                schema:
+                  type: object
+                  properties:
+                    columns:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/CollectionColumn'
+            example:
+              name: "users"
+              syncEnabled: true
+              schema:
+                columns:
+                  - name: "username"
+                    type: "STRING"
+                    visible: true
+                  - name: "email"
+                    type: "STRING"
+                    visible: true
+      responses:
+        '201':
+          description: Collection created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Collection'
+
+  /api/datastores/v1/collections/query:
+    post:
+      summary: Query Collections
+      description: Filter and sort collections using field-level predicates with pagination.
+      tags:
+        - App DB API (Product)
+      parameters:
+        - name: ownedBy
+          in: query
+          required: false
+          schema: { type: boolean, default: true }
+          description: Include a summary of collections grouped by owner in the response.
+        - name: createdOn
+          in: query
+          required: false
+          schema: { type: boolean, default: true }
+          description: Include a summary of collections grouped by creation date in the response.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                collectionFilteringList:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      filterType:
+                        type: string
+                        enum: [datastorename, ownedby, createddate, nameof]
+                        description: "`datastorename` — filter by the app/card name. `ownedby` — filter by owner user ID. `createddate` — filter by creation date. `nameof` — filter by collection name."
+                      not:
+                        type: boolean
+                        nullable: true
+                        description: When true, inverts the filter (supported for `ownedby`, `createddate` with `on`, and `nameof`).
+                      comparingCriteria:
+                        type: string
+                        nullable: true
+                        description: "Required for `createddate`. One of: `after`, `before`, `on`."
+                      typedValue:
+                        type: string
+                        description: "The value to filter on: a user ID for `ownedby`, an ISO date for `createddate`, or a name string for `nameof` and `datastorename`."
+                sortBy:
+                  type: string
+                  description: "Field to sort by. One of: `documentCount`, `createdOn`, `updatedOn`, `name`, `datastoreName`."
+                direction:
+                  type: string
+                  enum: [ASC, DESC]
+                pageSize:
+                  type: integer
+                  default: -1
+                  description: "Number of results per page. Pass `-1` to return all results."
+                pageNumber:
+                  type: integer
+                  default: -1
+                  description: "1-indexed page number. Pass `-1` to return all results."
+            example:
+              collectionFilteringList:
+                - filterType: "nameof"
+                  typedValue: "users"
+              sortBy: "createdOn"
+              direction: "DESC"
+              pageSize: 25
+              pageNumber: 1
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  totalCollectionCount:
+                    type: integer
+                  pageSize:
+                    type: integer
+                  pageNumber:
+                    type: integer
+                  pageCount:
+                    type: integer
+                  collections:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Collection'
+
   /api/datastores/v1/collections/{collectionId}:
+    get:
+      summary: Get Collection
+      description: Get a collection by ID.
+      tags:
+        - App DB API (Product)
+      parameters:
+        - name: collectionId
+          in: path
+          required: true
+          schema: { type: string }
+          description: The ID of the collection.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Collection'
     put:
       summary: Update Collection Schema
       description: Update the schema of a collection.
@@ -162,6 +445,20 @@ paths:
       responses:
         '200':
           description: OK
+    delete:
+      summary: Delete Collection
+      description: Permanently delete a collection and all of its documents.
+      tags:
+        - App DB API (Product)
+      parameters:
+        - name: collectionId
+          in: path
+          required: true
+          schema: { type: string }
+          description: The ID of the collection to delete.
+      responses:
+        '204':
+          description: Collection deleted. No response body is returned.
 
   /api/datastores/v1/collections/{collectionId}/permission/RYUU_APP/{proxyId}:
     put:
@@ -191,7 +488,154 @@ paths:
         '204':
           description: No Content
 
+  /api/datastores/v1/collections/{collectionId}/permission:
+    get:
+      summary: List Collection Permissions
+      description: List all entities that have permissions on a collection, optionally filtered by entity type or ID.
+      tags:
+        - App DB API (Product)
+      parameters:
+        - name: collectionId
+          in: path
+          required: true
+          schema: { type: string }
+          description: The ID of the collection.
+        - name: sourceType
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [USER, GROUP, RYUU_APP]
+          description: Filter by entity type.
+        - name: sourceIds
+          in: query
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+          description: Filter by specific entity IDs.
+      responses:
+        '200':
+          description: OK. Returns a map of entity type to list of permission entries.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      sourceType:
+                        type: string
+                      sourceId:
+                        type: string
+                      permissions:
+                        type: array
+                        items:
+                          type: string
+              example:
+                RYUU_APP:
+                  - sourceType: "RYUU_APP"
+                    sourceId: "a1b2c3d4-0000-0000-0000-000000000000"
+                    permissions: ["read", "create_content", "read_content"]
+
+  /api/datastores/v1/collections/{collectionId}/permission/user:
+    get:
+      summary: Check User Permission
+      description: Returns `true` if the current user has permission to edit permissions on the collection, `false` otherwise.
+      tags:
+        - App DB API (Product)
+      parameters:
+        - name: collectionId
+          in: path
+          required: true
+          schema: { type: string }
+          description: The ID of the collection.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: boolean
+
   #========= Datastore Endpoints =========
+  /api/datastores/v1:
+    get:
+      summary: List Datastores
+      description: Get all datastores owned by the current user.
+      tags:
+        - App DB API (Product)
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Datastore'
+    post:
+      summary: Create Datastore
+      description: Create a new datastore.
+      tags:
+        - App DB API (Product)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: Name for the new datastore.
+            example:
+              name: "My App Datastore"
+      responses:
+        '201':
+          description: Datastore created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Datastore'
+
+  /api/datastores/v1/{datastoreId}:
+    get:
+      summary: Get Datastore
+      description: Get a datastore by ID.
+      tags:
+        - App DB API (Product)
+      parameters:
+        - name: datastoreId
+          in: path
+          required: true
+          schema: { type: string }
+          description: The ID of the datastore.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Datastore'
+    delete:
+      summary: Delete Datastore
+      description: "Permanently delete a datastore and all of its collections and documents. **This action cannot be undone.**"
+      tags:
+        - App DB API (Product)
+      parameters:
+        - name: datastoreId
+          in: path
+          required: true
+          schema: { type: string }
+          description: The ID of the datastore to delete.
+      responses:
+        '204':
+          description: Datastore deleted successfully. No response body is returned.
+
   /api/datastores/v1/export/{datastoreId}:
     post:
       summary: Export Datastore (v1, Deprecated)
@@ -978,6 +1422,94 @@ paths:
               schema:
                 type: integer
                 example: 1
+
+  /api/datastores/v2/collections/{collectionId}/download:
+    get:
+      summary: Download Documents
+      description: >-
+        Download the documents in a collection as a JSON file (served with a
+        `Content-Disposition: attachment` header). Each entry is a complete document object —
+        the same shape accepted by Import Documents — so a download can be fed directly into
+        Import Documents to copy or restore a collection. Useful for backups and bulk export.
+      tags:
+        - App DB API (Product)
+      parameters:
+        - name: collectionId
+          in: path
+          required: true
+          schema: { type: string }
+          description: The ID of the collection.
+      responses:
+        '200':
+          description: JSON array of the documents in the collection.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Document'
+
+  /api/datastores/v2/collections/{collectionId}/documents/import:
+    put:
+      summary: Import Documents
+      description: >-
+        Bulk-import complete document objects into a collection — the counterpart to Download
+        Documents. Each item must be a full document (including its `id`); documents are
+        **upserted by `id`**, so the original `id`, `createdOn`, and `owner` are preserved.
+        This is the format produced by Download Documents, which makes the two endpoints a
+        copy/restore pair. To add brand-new documents from raw content instead, use Create
+        Document. Existing documents not present in the payload are left untouched.
+      tags:
+        - App DB API (Product)
+      parameters:
+        - name: collectionId
+          in: path
+          required: true
+          schema: { type: string }
+          description: The ID of the collection.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/Document'
+            example:
+              - id: "a8428d64-a01d-49b2-9144-ddeec001acf8"
+                datastoreId: "39b88a97-8247-4c0d-ba1d-8ed78d1a6680"
+                collectionId: "232e6d6c-46e9-49b6-a137-8933f0f05999"
+                syncRequired: true
+                owner: "870010733"
+                createdBy: "870010733"
+                createdOn: "2026-06-23T20:58:06.567Z"
+                updatedOn: "2026-06-23T23:36:13.177Z"
+                updatedBy: "870010733"
+                content:
+                  username: "bill"
+                  email: "bill@example.com"
+      responses:
+        '200':
+          description: >-
+            Import completed. Returns counts of the operations performed.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  Updated:
+                    type: integer
+                    description: Number of existing documents that were updated.
+                  Created:
+                    type: integer
+                    description: Number of documents created.
+                  Upserted:
+                    type: integer
+                    description: Number of documents inserted via upsert (matched no existing document).
+              example:
+                Updated: 0
+                Created: 0
+                Upserted: 1
 
   /api/datastores/v1/collections/{collectionId}/documents/update:
     put:

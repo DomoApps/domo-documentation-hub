@@ -292,6 +292,11 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+              example:
+                message: "Document with id 'b1e2f3a4-c5d6-7890-abcd-ef1234567890' not found"
+                status: 404
+                statusReason: "Not Found"
+                toe: "1Y7SXEXLME-YM859-UOWZK"
 
     put:
       summary: Update Document
@@ -316,7 +321,7 @@ paths:
             schema:
               $ref: '#/components/schemas/DocumentContent'
             example:
-              content: { "campaignName": "Q2 Campaign", "region": "West", "status": "Active" }
+              content: { "campaignName": "Q2 Campaign", "region": "West", "status": "Inactive" }
       responses:
         '200':
           description: OK
@@ -330,7 +335,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-                
+              example:
+                message: "Could not find document with id 'b1e2f3a4-c5d6-7890-abcd-ef1234567890' to update"
+                status: 404
+                statusReason: "Not Found"
+                toe: "HKUMCHOWVY-GRVTS-RU3ZG"
+
     delete:
       summary: Delete Document
       description: Remove a document from a collection.
@@ -349,7 +359,9 @@ paths:
           description: The ID of the document.
       responses:
         '204':
-          description: No Content
+          description: The document was successfully deleted. No response body is returned.
+          
+
         '404':
           description: Not Found
           content:

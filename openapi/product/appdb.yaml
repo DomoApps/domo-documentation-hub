@@ -122,7 +122,35 @@ components:
           type: string
         visible:
           type: boolean
-          
+
+    CollectionSummary:
+      type: object
+      description: Simplified collection object returned by Query Collections.
+      properties:
+        id:
+          type: string
+          format: uuid
+        owner:
+          type: integer
+        name:
+          type: string
+        syncEnabled:
+          type: boolean
+        createdOn:
+          type: string
+          format: date-time
+        updatedOn:
+          type: string
+          format: date-time
+        documentCount:
+          type: integer
+          description: Number of documents in the collection.
+        datastoreId:
+          type: string
+          format: uuid
+        datastoreName:
+          type: string
+
     CollectionSchemaRequest:
       type: object
       properties:
@@ -160,13 +188,23 @@ components:
           format: date-time
         updatedBy:
           type: integer
+          description: User ID of the user who last updated the datastore.
+        datastore_id:
+          type: integer
+          description: "Internal numeric ID for the datastore. Present in Get and List responses; absent in the Create response."
+        temporary:
+          type: boolean
+          description: Whether the datastore is temporary.
       example:
         id: "39b88a97-8247-4c0d-ba1d-8ed78d1a6680"
         name: "My App Datastore"
         customer: "mycompany"
         owner: 870010733
-        createdOn: "2024-01-15T10:00:00.000Z"
-        updatedOn: "2024-01-15T10:00:00.000Z"
+        createdOn: "2024-01-15T18:42:17.293Z"
+        updatedOn: "2024-01-15T18:42:17.293Z"
+        updatedBy: 870010733
+        datastore_id: 125691
+        temporary: false
 
     Collection:
       type: object
@@ -179,12 +217,18 @@ components:
           type: string
           format: uuid
           description: ID of the datastore this collection belongs to.
-        name:
-          type: string
-          description: Name of the collection.
+        defaultPermissions:
+          nullable: true
+          description: Default permissions for the collection. Always null.
+        requiredAuthorities:
+          nullable: true
+          description: Required authorities for the collection. Always null.
         owner:
           type: integer
           description: User ID of the collection owner.
+        name:
+          type: string
+          description: Name of the collection.
         datasourceId:
           type: string
           nullable: true
@@ -196,6 +240,9 @@ components:
               type: array
               items:
                 $ref: '#/components/schemas/CollectionColumn'
+        filters:
+          nullable: true
+          description: Filters applied to the collection. Always null.
         syncEnabled:
           type: boolean
           description: Whether documents are periodically synced to the linked DataSet.
@@ -219,23 +266,24 @@ components:
       example:
         id: "232e6d6c-46e9-49b6-a137-8933f0f05999"
         datastoreId: "39b88a97-8247-4c0d-ba1d-8ed78d1a6680"
-        name: "users"
+        defaultPermissions: null
+        requiredAuthorities: null
         owner: 870010733
+        name: "users"
         datasourceId: null
         schema:
           columns:
             - type: "STRING"
               name: "username"
-              visible: true
             - type: "STRING"
               name: "email"
-              visible: true
+        filters: null
         syncEnabled: true
-        syncRequired: true
+        syncRequired: false
         fullReplaceRequired: false
         lastSync: null
-        createdOn: "2024-01-15T10:00:00.000Z"
-        updatedOn: "2024-01-15T10:00:00.000Z"
+        createdOn: "2024-01-15T18:42:30.115Z"
+        updatedOn: "2024-01-15T18:42:30.115Z"
         updatedBy: 870010733
 
 security:
@@ -404,7 +452,52 @@ paths:
                   collections:
                     type: array
                     items:
-                      $ref: '#/components/schemas/Collection'
+                      $ref: '#/components/schemas/CollectionSummary'
+                  ownedBy:
+                    type: array
+                    description: Aggregate of collections grouped by owner. Present when the `ownedBy` query parameter is true (default).
+                    items:
+                      type: object
+                      properties:
+                        ownerId:
+                          type: string
+                        ownerName:
+                          type: string
+                        collectionCount:
+                          type: integer
+                  createdOn:
+                    type: object
+                    description: Aggregate of collections grouped by creation date. Present when the `createdOn` query parameter is true (default).
+                    properties:
+                      sevenDaysAgo:
+                        type: integer
+                      fifteenDaysAgo:
+                        type: integer
+                      thirtyDaysAgo:
+                        type: integer
+              example:
+                totalCollectionCount: 1
+                pageSize: 1
+                pageNumber: 1
+                pageCount: 1
+                collections:
+                  - id: "232e6d6c-46e9-49b6-a137-8933f0f05999"
+                    owner: 870010733
+                    name: "users"
+                    syncEnabled: true
+                    createdOn: "2024-01-15T18:42:30.115Z"
+                    updatedOn: "2024-01-15T18:42:30.115Z"
+                    documentCount: 42
+                    datastoreId: "39b88a97-8247-4c0d-ba1d-8ed78d1a6680"
+                    datastoreName: "My App Datastore"
+                ownedBy:
+                  - ownerId: "870010733"
+                    ownerName: "Jane Smith"
+                    collectionCount: 1
+                createdOn:
+                  sevenDaysAgo: 0
+                  fifteenDaysAgo: 1
+                  thirtyDaysAgo: 1
 
   /api/datastores/v1/collections/{collectionId}:
     get:
@@ -445,6 +538,10 @@ paths:
       responses:
         '200':
           description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Collection'
     delete:
       summary: Delete Collection
       description: Permanently delete a collection and all of its documents.
@@ -522,24 +619,30 @@ paths:
             application/json:
               schema:
                 type: object
+                description: "Keys are entity types (`USER`, `GROUP`, `RYUU_APP`). Values are arrays of permission entries."
                 additionalProperties:
                   type: array
                   items:
                     type: object
                     properties:
-                      sourceType:
+                      id:
                         type: string
-                      sourceId:
-                        type: string
+                        description: The entity ID (user ID, group ID, or proxy ID).
                       permissions:
                         type: array
                         items:
                           type: string
+                        description: "List of permissions granted. Values are uppercase: `ADMIN`, `READ`, `WRITE`, `SHARE`, `DELETE`, `CREATE_CONTENT`, `READ_CONTENT`, `UPDATE_CONTENT`, `DELETE_CONTENT`."
+                      name:
+                        type: string
+                        description: Display name of the entity, if available.
               example:
+                USER:
+                  - id: "870010733"
+                    permissions: ["ADMIN", "SHARE", "DELETE", "WRITE", "READ"]
                 RYUU_APP:
-                  - sourceType: "RYUU_APP"
-                    sourceId: "a1b2c3d4-0000-0000-0000-000000000000"
-                    permissions: ["read", "create_content", "read_content"]
+                  - id: "a1b2c3d4-1234-5678-abcd-ef0123456789"
+                    permissions: ["READ", "CREATE_CONTENT", "READ_CONTENT", "UPDATE_CONTENT", "DELETE_CONTENT"]
 
   /api/datastores/v1/collections/{collectionId}/permission/user:
     get:

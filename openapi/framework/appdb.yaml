@@ -697,18 +697,28 @@ paths:
   /domo/datastores/v1/export:
     post:
       summary: Manually Export Collections
-      description: Manually trigger export of collections to Domo instance
+      description: >-
+        Manually trigger an asynchronous export (sync) of this card's collections to
+        their linked Domo DataSets. Only collections that have a linked DataSet and
+        pending changes are synced. By default, only the collections in this card's own
+        datastore are exported. Set `includeRelatedCollections=true` to additionally
+        export the related collections this card instance is mapped to through the app's
+        design manifest (its `collectionsMapping`), such as collections shared from
+        another instance. Returns an empty body on success.
       tags:
       - AppDB API
       parameters:
         - name: includeRelatedCollections
           in: query
-          description: Export all collections wired to app instance
+          description: >-
+            When `true`, exports this card's own datastore collections **plus** the related
+            collections the card instance is mapped to through the app design. When `false`
+            (default), exports only the card's own datastore collections.
           schema:
             type: boolean
             default: false
       requestBody:
-        required: true
+        required: false
         content:
           application/json:
             schema:
@@ -716,9 +726,9 @@ paths:
             example: {}
       responses:
         '200':
-          description: Export request received successfully
+          description: Export accepted and running asynchronously. No response body is returned.
         '423':
-          description: Export already in progress (LOCKED)
+          description: Export already in progress (LOCKED). Retry once the current export completes.
 
   /domo/datastores/v1/collections/{collectionName}/permission/{entity}/{entityId}:
     put:

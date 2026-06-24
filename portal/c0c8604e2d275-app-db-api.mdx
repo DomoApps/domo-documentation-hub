@@ -8,9 +8,244 @@ The App DB API allows developers to interact with AppDB, a NoSQL database for st
 ## Features
 
 * **CRUD Operations**: Create, read, update, and delete documents in AppDB collections.
-* **Collection Management**: Programmatically update collections.
+* **Datastore Management**: List, create, and delete datastores.
+* **Collection Management**: Programmatically create, update, delete, and query collections; manage permissions.
+* **Data Transfer**: Download all documents from a collection as JSON, or import documents in bulk.
 
 ## Endpoints
+
+### List Datastores
+
+**Description**: Get all datastores owned by the current user.
+
+<Card horizontal arrow title="Playground" icon="code" href="/api-reference/app-db-api-product/list-datastores" />
+
+**HTTP Request**:
+
+```http
+GET /api/datastores/v1
+```
+
+### Create Datastore
+
+**Description**: Create a new datastore.
+
+<Card horizontal arrow title="Playground" icon="code" href="/api-reference/app-db-api-product/create-datastore" />
+
+**HTTP Request**:
+
+```http
+POST /api/datastores/v1
+```
+
+### Get Datastore
+
+**Description**: Get a datastore by ID.
+
+<Card horizontal arrow title="Playground" icon="code" href="/api-reference/app-db-api-product/get-datastore" />
+
+**HTTP Request**:
+
+```http
+GET /api/datastores/v1/{datastoreId}
+```
+
+### Delete Datastore
+
+**Description**: Permanently delete a datastore and all of its collections and documents.
+
+<Card horizontal arrow title="Playground" icon="code" href="/api-reference/app-db-api-product/delete-datastore" />
+
+**HTTP Request**:
+
+```http
+DELETE /api/datastores/v1/{datastoreId}
+```
+
+**Response**:
+
+```text
+HTTP/1.1 204 No Content
+```
+
+### Export Datastore
+
+**Description**: Trigger an async sync of one or more collections in the datastore to their linked Domo DataSets. Each collection must have `syncEnabled: true` and a linked DataSet to be exported.
+
+<Card horizontal arrow title="Playground" icon="code" href="/api-reference/app-db-api-product/export-datastore" />
+
+**HTTP Request**:
+
+```http
+POST /api/datastores/v2/export/{datastoreId}
+```
+
+**Body**:
+
+```json
+["232e6d6c-46e9-49b6-a137-8933f0f05999"]
+```
+
+**Response**:
+
+```text
+HTTP/1.1 200 OK
+```
+
+### List Collections
+
+**Description**: Get all collections visible to the current user. Filter by datastore using the `datastoreId` query parameter.
+
+<Card horizontal arrow title="Playground" icon="code" href="/api-reference/app-db-api-product/list-collections" />
+
+**HTTP Request**:
+
+```http
+GET /api/datastores/v1/collections?datastoreId={datastoreId}
+```
+
+### Create Collection
+
+**Description**: Create a new collection in a datastore.
+
+<Card horizontal arrow title="Playground" icon="code" href="/api-reference/app-db-api-product/create-collection" />
+
+**HTTP Request**:
+
+```http
+POST /api/datastores/v1/collections?datastoreId={datastoreId}
+```
+
+**Body**:
+
+```json
+{
+  "name": "users",
+  "syncEnabled": true,
+  "schema": {
+    "columns": [
+      { "type": "STRING", "name": "username", "visible": true }
+    ]
+  }
+}
+```
+
+### Query Collections
+
+**Description**: Filter and sort collections using field-level predicates with pagination.
+
+<Card horizontal arrow title="Playground" icon="code" href="/api-reference/app-db-api-product/query-collections" />
+
+**HTTP Request**:
+
+```http
+POST /api/datastores/v1/collections/query
+```
+
+**Body**:
+
+```json
+{
+  "collectionFilteringList": [
+    { "filterType": "nameof", "typedValue": "users" }
+  ],
+  "sortBy": "createdOn",
+  "direction": "DESC",
+  "pageSize": 25,
+  "pageNumber": 1
+}
+```
+
+### Delete Collection
+
+**Description**: Permanently delete a collection and all of its documents.
+
+<Card horizontal arrow title="Playground" icon="code" href="/api-reference/app-db-api-product/delete-collection" />
+
+**HTTP Request**:
+
+```http
+DELETE /api/datastores/v1/collections/{collectionId}
+```
+
+**Response**:
+
+```text
+HTTP/1.1 204 No Content
+```
+
+### List Collection Permissions
+
+**Description**: List all entities that have permissions on a collection, optionally filtered by entity type or ID.
+
+<Card horizontal arrow title="Playground" icon="code" href="/api-reference/app-db-api-product/list-collection-permissions" />
+
+**HTTP Request**:
+
+```http
+GET /api/datastores/v1/collections/{collectionId}/permission
+```
+
+### Check User Permission
+
+**Description**: Returns `true` if the current user has permission to edit permissions on a collection.
+
+<Card horizontal arrow title="Playground" icon="code" href="/api-reference/app-db-api-product/check-user-permission" />
+
+**HTTP Request**:
+
+```http
+GET /api/datastores/v1/collections/{collectionId}/permission/user
+```
+
+### Download Documents
+
+**Description**: Download the documents in a collection as a JSON file (returned with a `Content-Disposition: attachment` header). Each entry is a complete document object — the same shape accepted by Import Documents — so a download can be fed straight back into Import Documents to copy or restore a collection.
+
+<Card horizontal arrow title="Playground" icon="code" href="/api-reference/app-db-api-product/download-documents" />
+
+**HTTP Request**:
+
+```http
+GET /api/datastores/v2/collections/{collectionId}/download
+```
+
+### Import Documents
+
+**Description**: Bulk-import complete document objects into a collection — the counterpart to Download Documents. Each item must be a full document including its `id`; documents are **upserted by `id`**, so the original `id`, `createdOn`, and `owner` are preserved. To add brand-new documents from raw content, use Create Document instead.
+
+<Card horizontal arrow title="Playground" icon="code" href="/api-reference/app-db-api-product/import-documents" />
+
+**HTTP Request**:
+
+```http
+PUT /api/datastores/v2/collections/{collectionId}/documents/import
+```
+
+**Body**:
+
+```json
+[
+  {
+    "id": "a8428d64-a01d-49b2-9144-ddeec001acf8",
+    "datastoreId": "39b88a97-8247-4c0d-ba1d-8ed78d1a6680",
+    "collectionId": "232e6d6c-46e9-49b6-a137-8933f0f05999",
+    "syncRequired": true,
+    "owner": "870010733",
+    "createdBy": "870010733",
+    "createdOn": "2026-06-23T20:58:06.567Z",
+    "updatedOn": "2026-06-23T23:36:13.177Z",
+    "updatedBy": "870010733",
+    "content": { "username": "bill", "email": "bill@example.com" }
+  }
+]
+```
+
+**Response**:
+
+```json
+{ "Updated": 0, "Created": 0, "Upserted": 1 }
+```
 
 ### Get Document
 
@@ -515,42 +750,4 @@ PUT /api/datastores/v1/collections/{collectionId}/permission/RYUU_APP/{proxyId}?
 
 ```text
 HTTP/1.1 204 No Content
-```
-
-
-### Export Datastore
-
-**Description**: Trigger an async sync of one or more collections in the datastore to their linked Domo DataSets. Each collection must have `syncEnabled: true` and a linked DataSet to be exported.
-
-<Card
-  horizontal
-  arrow
-  title="Playground"
-  icon="code"
-  href="/api-reference/app-db-api-product/export-datastore"
-/>
-
-**HTTP Request**:
-
-```http
-POST /api/datastores/v2/export/{datastoreId}
-```
-
-
-**Headers**:
-
-* `X-DOMO-Developer-Token`: `<developer token here>`
-* `Accept`: `application/json`
-* `Content-Type`: `application/json`
-
-**Body**:
-
-```json
-["232e6d6c-46e9-49b6-a137-8933f0f05999"]
-```
-
-**Response**:
-
-```text
-HTTP/1.1 200 OK
 ```

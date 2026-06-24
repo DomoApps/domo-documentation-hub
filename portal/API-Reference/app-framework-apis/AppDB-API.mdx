@@ -57,15 +57,21 @@ The schema object takes a list of columns. Each column has a name and a type. Th
 - `DATETIME`
 
 <Note>
-Documents that contain DATE or DATETIME data must be formatted as YYYY-MM-DD or YYYY-MM-DDTHH:MM:SSZ in order to be successfully synced to a Domo DataSet.
+  Documents that contain DATE or DATETIME data must be formatted as YYYY-MM-DD
+  or YYYY-MM-DDTHH:MM:SSZ in order to be successfully synced to a Domo DataSet.
 </Note>
 
 <Warning>
-Incorrect schema data types prevent DataSet creation. If your AppDB DataSet doesn't appear after 15 minutes, verify your schema uses valid types (STRING, LONG, DECIMAL, DOUBLE, DATE, DATETIME). Common mistakes include using NUMBER or INTEGER.
+  Incorrect schema data types prevent DataSet creation. If your AppDB DataSet
+  doesn't appear after 15 minutes, verify your schema uses valid types (STRING,
+  LONG, DECIMAL, DOUBLE, DATE, DATETIME). Common mistakes include using NUMBER
+  or INTEGER.
 </Warning>
 
 <Warning>
-Collections won't sync if the owner lacks permissions on the target DataSet. If a user is removed from Domo, their Collection stops syncing. The new owner must have both Collection ownership and Admin Permissions.
+  Collections won't sync if the owner lacks permissions on the target DataSet.
+  If a user is removed from Domo, their Collection stops syncing. The new owner
+  must have both Collection ownership and Admin Permissions.
 </Warning>
 
 ### Making API Calls to Your Collection
@@ -73,7 +79,10 @@ Collections won't sync if the owner lacks permissions on the target DataSet. If 
 Examples of how to make calls to the Collections defined in your manifest are below. For now, you will not be able to make these calls in local dev without including a proxy. Instead, you must publish your app and ensure that it is making calls in an installed app.
 
 <Note>
-If you make any updates to the manifest and re-publish your app design, **you will need to edit the installed app and re-save it** for the manifest changes to take effect on the installed app (similar to what you would have to do when making changes to the mapping section of your manifest).
+  If you make any updates to the manifest and re-publish your app design, **you
+  will need to edit the installed app and re-save it** for the manifest changes
+  to take effect on the installed app (similar to what you would have to do when
+  making changes to the mapping section of your manifest).
 </Note>
 
 ### Create Document
@@ -144,7 +153,7 @@ Content-Type: application/json;charset=UTF-8
 ```js
 domo.post(`/domo/datastores/v1/collections/Users/documents`, {
   content: {
-    username: 'Bill S. Preston, Esquire',
+    username: "Bill S. Preston, Esquire",
   },
 });
 ```
@@ -165,10 +174,10 @@ domo
 
 **Arguments**
 
-| Property Name  | Type    | Required | Description                                      |
-| -------------- | ------- | -------- | ------------------------------------------------ |
-| collectionName | String  | Required | The name given to the collection in the manifest |
-| limit          | Integer | Optional | Maximum number of documents to return. Default is 10,000. |
+| Property Name  | Type    | Required | Description                                                 |
+| -------------- | ------- | -------- | ----------------------------------------------------------- |
+| collectionName | String  | Required | The name given to the collection in the manifest            |
+| limit          | Integer | Optional | Maximum number of documents to return. Default is 10,000.   |
 | offset         | Integer | Optional | Number of documents to skip before returning. Default is 0. |
 
 **HTTP Request**
@@ -308,10 +317,10 @@ Accept: application/json
 
 ```json
 {
-    "content": {
-        "username": "Bill S. Preston, Esquire",
-        "Band": "Wyld Stallyns"
-    }
+  "content": {
+    "username": "Bill S. Preston, Esquire",
+    "Band": "Wyld Stallyns"
+  }
 }
 ```
 
@@ -346,7 +355,9 @@ Content-Type: application/json;charset=UTF-8
 domo
   .put(
     `/domo/datastores/v1/collections/Users/documents/b3ea3d2d-86c5-44e6-a2f4-985136bbbce1`,
-    { content: { username: 'Bill S. Preston, Esquire', Band: 'Wyld Stallyns' } },
+    {
+      content: { username: "Bill S. Preston, Esquire", Band: "Wyld Stallyns" },
+    },
   )
   .then(console.log);
 ```
@@ -358,14 +369,18 @@ domo
 Permanently deletes a document from your application's Collection.
 
 <Danger>
-**This is destructive and cannot be reversed**.
-Deleting documents in an AppDB Collection may have performance implications with regard to syncing to its corresponding DataSet in Domo if the `syncEnabled` property is set to `true` for the Collection.
+  **This is destructive and cannot be reversed**. Deleting documents in an AppDB
+  Collection may have performance implications with regard to syncing to its
+  corresponding DataSet in Domo if the `syncEnabled` property is set to `true`
+  for the Collection.
 </Danger>
 
 **Code Example**
 
 ```javascript
-domo.delete(`/domo/datastores/v1/collections/Users/documents/1e61d99d-9885-419a-a33e-3be3941ee720`);
+domo.delete(
+  `/domo/datastores/v1/collections/Users/documents/1e61d99d-9885-419a-a33e-3be3941ee720`,
+);
 ```
 
 **Arguments**
@@ -419,11 +434,11 @@ Accept: application/json
 **Request Body**
 
 ```js
-{ $or:
-       [
-           { "content.comments": { $regex: 'happy' } },
-           { "content.username": { $ne: 'Eeyore' } }
-       ]
+{
+  $or: [
+    { "content.comments": { $regex: "happy" } },
+    { "content.username": { $ne: "Eeyore" } },
+  ];
 }
 ```
 
@@ -500,26 +515,26 @@ Accept: application/json
 
 Any parameter that accepts field names uses standard MongoDB dot notation. Fields inside the `content` object must be prefixed with `content.` (e.g., `content.campaignName`). Top-level document fields (`owner`, `createdOn`, etc.) can be referenced directly without a prefix. The `count`, `limit`, and `offset` parameters take aliases or integers and do not use field names.
 
-| Property Name  | Type    | Required | Description                                                                                                                                                        |
-| -------------- | ------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| collectionName | String  | Required | The name given to the collection in the manifest                                                                                                                   |
-| query          | Object  | Required | The JSON object that represents a Mongo query                                                                                                                      |
-| groupby        | String  | Optional | The comma-separated list of properties you wish to group by                                                                                                        |
-| count          | String  | Optional | The name you wish to alias a count aggregation property                                                                                                            |
-| avg            | String  | Optional | The comma-separated list of properties in which you wish to perform an average aggregation followed by the name you wish to alias the result                       |
-| min            | String  | Optional | The comma-separated list of properties in which you wish to perform a minimum aggregation followed by the name you wish to alias the result                        |
-| max            | String  | Optional | The comma-separated list of properties in which you wish to perform a maximum aggregation followed by the name you wish to alias the result                        |
-| sum            | String  | Optional | The comma-separated list of properties in which you wish to perform a sum aggregation followed by the name you wish to alias the result                            |
-| unwind         | String  | Optional | The comma-separated list of properties that you wish to unwind (the unwind operator flattens nested arrays — one row per array element)                            |
-| orderby        | String  | Optional | Field or alias to order by, followed by `ascending` or `descending`. Accepts either an aggregation alias or a field name using dot notation.                       |
-| limit          | Integer | Optional | The number of documents in which to limit the number of return objects, default is 10,000                                                                          |
-| offset         | Integer | Optional | The number of documents in which to skip before returning documents, default is 0                                                                                  |
+| Property Name  | Type    | Required | Description                                                                                                                                  |
+| -------------- | ------- | -------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| collectionName | String  | Required | The name given to the collection in the manifest                                                                                             |
+| query          | Object  | Required | The JSON object that represents a Mongo query                                                                                                |
+| groupby        | String  | Optional | The comma-separated list of properties you wish to group by                                                                                  |
+| count          | String  | Optional | The name you wish to alias a count aggregation property                                                                                      |
+| avg            | String  | Optional | The comma-separated list of properties in which you wish to perform an average aggregation followed by the name you wish to alias the result |
+| min            | String  | Optional | The comma-separated list of properties in which you wish to perform a minimum aggregation followed by the name you wish to alias the result  |
+| max            | String  | Optional | The comma-separated list of properties in which you wish to perform a maximum aggregation followed by the name you wish to alias the result  |
+| sum            | String  | Optional | The comma-separated list of properties in which you wish to perform a sum aggregation followed by the name you wish to alias the result      |
+| unwind         | String  | Optional | The comma-separated list of properties that you wish to unwind (the unwind operator flattens nested arrays — one row per array element)      |
+| orderby        | String  | Optional | Field or alias to order by, followed by `ascending` or `descending`. Accepts either an aggregation alias or a field name using dot notation. |
+| limit          | Integer | Optional | The number of documents in which to limit the number of return objects, default is 10,000                                                    |
+| offset         | Integer | Optional | The number of documents in which to skip before returning documents, default is 0                                                            |
 
 **Code Example**
 
 ```js
 const url =
-  '/domo/datastores/v1/collections/campaigns/documents/query?groupby=content.campaignName, content.month&count=documentCount&avg=content.clicks avgClicks, content.impressions avgImps&sum=content.clicks sumClicks, content.impressions sumImps&max=content.clicks maxClicks, content.impressions maxImps&min=content.clicks minClicks, content.impressions minImps&orderby=sumClicks descending';
+  "/domo/datastores/v1/collections/campaigns/documents/query?groupby=content.campaignName, content.month&count=documentCount&avg=content.clicks avgClicks, content.impressions avgImps&sum=content.clicks sumClicks, content.impressions sumImps&max=content.clicks maxClicks, content.impressions maxImps&min=content.clicks minClicks, content.impressions minImps&orderby=sumClicks descending";
 
 domo.post(url, {}).then((data) => console.log(data));
 ```
@@ -627,8 +642,9 @@ Please refer to the official [mongoDB documentation](https://www.mongodb.com/doc
 **Code Example**
 
 ```js
-domo.put(`/domo/datastores/v1/collections/Users/documents/update`, body)
-    .then(data => console.log(data));
+domo
+  .put(`/domo/datastores/v1/collections/Users/documents/update`, body)
+  .then((data) => console.log(data));
 ```
 
 **Arguments**
@@ -818,8 +834,10 @@ Content-Type: application/json;charset=UTF-8
 Provides a list of document IDs to be permanently deleted as a comma-separated query parameter.
 
 <Danger>
-**This is destructive and cannot be reversed**.
-Deleting documents in an AppDB collection may have performance implications with regard to syncing to its corresponding DataSet in Domo if the `syncEnabled` property is set to `true` for the Collection.
+  **This is destructive and cannot be reversed**. Deleting documents in an AppDB
+  collection may have performance implications with regard to syncing to its
+  corresponding DataSet in Domo if the `syncEnabled` property is set to `true`
+  for the Collection.
 </Danger>
 
 ```js
@@ -1035,8 +1053,12 @@ Content-Type: application/json;charset=UTF-8
 This PUT request allows you to modify any of your Collections programmatically.
 
 <Danger>
-**This is destructive and cannot be reversed**.
-If you manually override the properties of a Collection that exists in your manifest, then any time an app Card is saved, the Card will revert back to the manifest definition of that Collection. It is best practice to only update Collections that you have created manually. Otherwise, to update a Collection, simply update the manifest.
+  **This is destructive and cannot be reversed**. If you manually override the
+  properties of a Collection that exists in your manifest, then any time an app
+  Card is saved, the Card will revert back to the manifest definition of that
+  Collection. It is best practice to only update Collections that you have
+  created manually. Otherwise, to update a Collection, simply update the
+  manifest.
 </Danger>
 
 **Code Example**
@@ -1136,8 +1158,9 @@ Returns the updated Collection object.
 Programmatically deletes a Collection.
 
 <Danger>
-**This is destructive and cannot be reversed**.
-Deleting a Collection may have performance implications with regard to syncing to its corresponding DataSet in Domo if the `syncEnabled` property is set to `true` for the Collection.
+  **This is destructive and cannot be reversed**. Deleting a Collection may have
+  performance implications with regard to syncing to its corresponding DataSet
+  in Domo if the `syncEnabled` property is set to `true` for the Collection.
 </Danger>
 
 **Code Example**
@@ -1170,15 +1193,17 @@ HTTP/1.1 200 OK
 
 ### Manually Exporting Collections
 
-Collections that are marked as `syncEnabled` will be exported to the Domo instance every 15 minutes. If for some reason, you need the Collections for your app to be exported at a certain moment in time, you can manually call the export endpoint, and it will begin the export process. If there is already an export in progress, you will receive a `423 LOCKED` HTTP response. Otherwise, you will receive a `200 OK` HTTP response suggesting that the export request was successfully received.
+Collections marked as `syncEnabled` are exported to the Domo instance every 15 minutes automatically. If you need to trigger an export immediately, call the export endpoint manually.
 
-The export endpoint is a POST request that takes no body.
+On success you receive a `200 OK` with an empty response body, meaning the export has been accepted and is running asynchronously. If an export is already actively in progress, you will receive `423 LOCKED` instead.
 
 **Code Example**
 
 ```js
-domo.post(`/domo/datastores/v1/export`);
+domo.post("/domo/datastores/v1/export");
 ```
+
+`domo.post()` returns an empty string (`""`) on success.
 
 **HTTP Request**
 
@@ -1190,25 +1215,28 @@ Accept: application/json
 
 **HTTP Response**
 
-Returns the parameter of success or error.
-
 ```text
 HTTP/1.1 200 OK
 ```
 
-By default, hitting this endpoint will only export Collections that were created by the app instance you are routing the request against. If you'd like to export all Collections wired to the app instance, regardless of which instance created them, you can set `includeRelatedCollections=true` in the query string.
+Returns an empty body. The export runs asynchronously after the response is returned.
+
+By default, this endpoint exports the collections in the current card's own datastore. When `includeRelatedCollections=true`, it exports those collections **plus** the related collections this card instance is mapped to through the app's design (its `collectionsMapping`) — for example, a collection shared from another instance of the design.
 
 ```javascript
 const exportCollection = async () => {
-  const response = await fetch(
-    '/domo/datastores/v1/export?includeRelatedCollections=true',
+  const resp = await fetch(
+    "/domo/datastores/v1/export?includeRelatedCollections=true",
     {
-      body: '{}',
-      method: 'POST',
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+      body: "{}",
     },
   );
-  console.log(response);
-  return response;
+  return resp.status; // 200 on success, 423 if export already in progress
 };
 ```
 
@@ -1276,6 +1304,7 @@ Minimal example — restrict every user to only their own documents:
   "limitToOwner": true
 }
 ```
+
 </Warning>
 
 **Filter Rule**
@@ -1285,9 +1314,7 @@ Minimal example — restrict every user to only their own documents:
 **Who**
 
 - `applyTo` – The property that describes who to apply this filter rule to. This property takes a list of one or more condition objects.
-
   - condition – The condition that must be met in order for the filter rule to apply to the current user. The condition contains two properties.
-
     - type – The property that determines what kind of condition to compare against the current user:
       - `USER_ID`
       - `GROUP_ID`
@@ -1321,7 +1348,6 @@ So although the user requested all documents from the “US” country, only tho
 **When**
 
 - `applyOn` – Takes a list of HTTP methods that the current filter rule should apply to. The list of methods is as follows:
-
   - `READ`
   - `UPDATE`
   - `DELETE`
@@ -1340,7 +1366,7 @@ Assuming you already have permission to modify the Collection, you can change th
 
 ```js
 domo.put(
-  '/domo/datastores/v1/collections/Users/permission/RYUU_APP/733ff55b-387c-472e-b3c7-9911c7057f5f?permissions=read,create_content,update_content,read_content',
+  "/domo/datastores/v1/collections/Users/permission/RYUU_APP/733ff55b-387c-472e-b3c7-9911c7057f5f?permissions=read,create_content,update_content,read_content",
 );
 ```
 
@@ -1389,7 +1415,7 @@ You can remove all permissions for an entity using the endpoint below. If all en
 
 ```js
 domo.delete(
-  '/domo/datastores/v1/collections/Users/permission/RYUU_APP/733ff55b-387c-472e-b3c7-9911c7057f5f',
+  "/domo/datastores/v1/collections/Users/permission/RYUU_APP/733ff55b-387c-472e-b3c7-9911c7057f5f",
 );
 ```
 

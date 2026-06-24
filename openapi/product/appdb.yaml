@@ -55,6 +55,58 @@ components:
           additionalProperties: true
           description: "Arbitrary JSON content of the document. If omitted, the document is created with an empty content object."
 
+    #========= RESPONSE SCHEMAS =========
+    Document:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier for the document.
+        datastoreId:
+          type: string
+          description: ID of the datastore the document belongs to.
+        collectionId:
+          type: string
+          description: ID of the collection the document belongs to.
+        syncRequired:
+          type: boolean
+          description: Whether the document is pending a sync to the underlying dataset.
+        owner:
+          type: string
+          description: User ID of the document owner.
+        createdBy:
+          type: string
+          description: User ID of the user who created the document. Returned by Create Document and Query Document; omitted by List Documents, Get Document, and Update Document.
+        createdOn:
+          type: string
+          format: date-time
+          description: ISO 8601 timestamp when the document was created.
+        updatedOn:
+          type: string
+          format: date-time
+          description: ISO 8601 timestamp when the document was last updated.
+        updatedBy:
+          type: string
+          description: User ID of the user who last updated the document.
+        content:
+          type: object
+          additionalProperties: true
+          description: Arbitrary JSON content of the document.
+      example:
+        id: "a8428d64-a01d-49b2-9144-ddeec001acf8"
+        datastoreId: "39b88a97-8247-4c0d-ba1d-8ed78d1a6680"
+        collectionId: "232e6d6c-46e9-49b6-a137-8933f0f05999"
+        syncRequired: true
+        owner: "870010733"
+        createdBy: "870010733"
+        createdOn: "2026-06-23T20:58:06.567Z"
+        updatedOn: "2026-06-23T23:36:13.177Z"
+        updatedBy: "870010733"
+        content:
+          campaignName: "Q2 Campaign"
+          region: "West"
+          status: "Active"
+
     QueryRequest:
       type: object
       additionalProperties:
@@ -146,7 +198,7 @@ paths:
   /api/datastores/v1/collections/{collectionId}/documents:
     get:
       summary: List Documents
-      description: Retrieve documents from a specified collection. There is an upper limit of 10,000 documents per request. Use `limit` and `offset` to paginate through large collections.
+      description: Retrieve documents from a specified collection. There is an upper limit of 10,000 documents per request. Use `limit` and `offset` to paginate through large collections. Note that this endpoint omits the `createdBy` field from each document; use Get Document or Query Document if you need that field.
       tags:
         - App DB API (Product)
       parameters:
@@ -165,8 +217,27 @@ paths:
           description: Number of documents to skip before returning. Default is 0.
       responses:
         '200':
-          description: OK (Response body is not documented)
-          
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Document'
+              example:
+                - id: "a8428d64-a01d-49b2-9144-ddeec001acf8"
+                  datastoreId: "39b88a97-8247-4c0d-ba1d-8ed78d1a6680"
+                  collectionId: "232e6d6c-46e9-49b6-a137-8933f0f05999"
+                  syncRequired: true
+                  owner: 870010733
+                  createdOn: "2026-06-23T20:58:06.567Z"
+                  updatedOn: "2026-06-23T23:36:13.177Z"
+                  updatedBy: 870010733
+                  content:
+                    campaignName: "Q2 Campaign"
+                    region: "West"
+                    status: "Active"
+
     post:
       summary: Create Document
       description: Add a new document to a specified collection.
@@ -188,7 +259,11 @@ paths:
               content: { "title": "Q2 Campaign", "region": "West" }
       responses:
         '200':
-          description: OK (Response body is not documented)
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Document'
 
   /api/datastores/v1/collections/{collectionId}/documents/{documentId}:
     get:
@@ -209,14 +284,18 @@ paths:
           description: The ID of the document.
       responses:
         '200':
-          description: OK (Response body is not documented)
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Document'
         '404':
           description: Not Found
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-                
+
     put:
       summary: Update Document
       description: Modify an existing document in a collection.
@@ -243,7 +322,11 @@ paths:
               content: { "title": "Q2 Campaign", "region": "West" }
       responses:
         '200':
-          description: OK (Response body is not documented)
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Document'
         '404':
           description: Not Found
           content:
@@ -376,7 +459,27 @@ paths:
               $ref: '#/components/schemas/QueryRequest'
       responses:
         '200':
-          description: OK (Response body is not documented)
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Document'
+              example:
+                - id: "a8428d64-a01d-49b2-9144-ddeec001acf8"
+                  datastoreId: "39b88a97-8247-4c0d-ba1d-8ed78d1a6680"
+                  collectionId: "232e6d6c-46e9-49b6-a137-8933f0f05999"
+                  syncRequired: true
+                  owner: "870010733"
+                  createdBy: "870010733"
+                  createdOn: "2026-06-23T20:58:06.567Z"
+                  updatedOn: "2026-06-23T23:36:13.177Z"
+                  updatedBy: "870010733"
+                  content:
+                    campaignName: "Q2 Campaign"
+                    region: "West"
+                    status: "Active"
 
   /api/datastores/v1/collections/{collectionId}/documents/update:
     put:

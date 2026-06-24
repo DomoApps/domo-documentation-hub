@@ -1,996 +1,240 @@
 ---
-title: App DB API
-permalink: c0c8604e2d275-app-db-api
+title: "App DB API"
+permalink: "c0c8604e2d275-app-db-api"
+sidebarTitle: "Overview"
 ---
 
-The App DB API allows developers to interact with AppDB, a NoSQL database for storing arbitrary JSON documents. This API supports CRUD operations, querying with MongoDB predicates, partial document updates, bulk operations, and aggregation, enabling developers to manage data efficiently within their Domo applications.
+AppDB is Domo's built-in NoSQL document store. It lets apps persist and query arbitrary JSON documents without requiring an external database. Data is organized in three layers: a **Datastore** contains one or more **Collections**, and each Collection holds **Documents**.
 
-## Features
+## Data Model
 
-- **CRUD Operations**: Create, read, update, and delete documents in AppDB collections.
-- **Querying**: Query documents using the full range of MongoDB query predicates, including date queries via MongoDB Extended JSON v2.
-- **Aggregation**: Group, count, sum, average, min, and max query results by field.
-- **Partial Updates**: Use MongoDB update operators to modify specific fields within existing documents without replacing the entire document.
-- **Bulk Operations**: Create, upsert, or delete multiple documents in a single request.
-- **Datastore Management**: List, create, and delete datastores.
-- **Collection Management**: Programmatically create, update, delete, and query collections; manage permissions.
-- **Data Transfer**: Download all documents from a collection as JSON, or import documents in bulk.
+```mermaid
+flowchart LR
+    DS[Datastore: my-app]
 
-## Endpoints
+    DS --> C1[Collection: preferences]
+    DS -.-> C2[Collection: annotations]
 
-### List Datastores
+    C1 --> D1["{ userId: '1042', theme: 'dark', defaultView: 'chart' }"]
+    C1 --> D2["{ userId: '8817', theme: 'light', defaultView: 'table' }"]
 
-**Description**: Get all datastores owned by the current user.
+    classDef dim fill:#f5f5f5,stroke:#ccc,color:#bbb
+    class C2 dim
+```
 
-**HTTP Request**:
+| Layer          | SQL analogy | Description                                                                                                                                                           |
+| -------------- | ----------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Datastore**  | Database    | The top-level namespace. Typically one datastore per app. Identified by a UUID `id` — not the numeric `datastore_id` that also appears in responses.                  |
+| **Collection** | Table       | A typed bucket of documents. A collection's `schema` describes the fields in each document's `content` object — primarily used to sync documents into a Domo DataSet. |
+| **Document**   | Row         | A JSON object with a system-managed envelope (`id`, `owner`, `createdOn`, etc.) and a free-form `content` object that holds your app data.                            |
+
+## API Surfaces
+
+### Product API
+
+The Product API is the full management surface for AppDB. Authenticate with a Domo developer token:
 
 ```http
-GET /api/datastores/v1
+X-DOMO-Developer-Token: <your developer token>
 ```
 
-**Headers**:
+Base path: `/api/datastores/`
 
-- `X-DOMO-Developer-Token`: `<developer token here>`
-- `Accept`: `application/json`
+The Product API supports the complete lifecycle — create, read, update, and delete datastores and collections; manage permissions; write and query documents; and transfer data in bulk.
 
-**Response**:
+### App Framework API
 
-```http
-HTTP/1.1 200 OK
+If you're building a Domo Custom App, a scoped proxy is available at `/domo/datastores/` that uses the card's session rather than a developer token. It covers collection and document CRUD and export, but does not expose datastore management, permission reads, download, or import — those remain Product API-only.
+
+See the [App Framework AppDB API](/portal/API-Reference/app-framework-apis/AppDB-API) for the full reference.
+
+## Quick Start
+
+The following example creates a datastore, adds a collection, stores a document, and reads it back. Requires `curl` and `jq`.
+
+**Set your credentials**
+
+You'll need a Domo developer token — see [Manage Access Tokens](/s/article/360042934494) for instructions on generating one.
+
+```bash
+TOKEN="your-developer-token"
+INSTANCE="https://yourcompany.domo.com"
 ```
 
-```json
-[
-  {
-    "id": "39b88a97-8247-4c0d-ba1d-8ed78d1a6680",
-    "name": "My App Datastore",
-    "customer": "mycompany",
-    "owner": 870010733,
-    "createdOn": "2024-01-15T10:00:00.000Z",
-    "updatedOn": "2024-01-15T10:00:00.000Z"
-  }
-]
+**1. Create a datastore**
+
+```bash
+DS_ID=$(curl --silent --request POST "$INSTANCE/api/datastores/v1" \
+  --header "X-DOMO-Developer-Token: $TOKEN" \
+  --header "Content-Type: application/json" \
+  --data '{"name":"my-app"}' | jq -r '.id')
+echo "Datastore ID: $DS_ID"
 ```
 
-### Create Datastore
-
-**Description**: Create a new datastore.
-
-**HTTP Request**:
-
-```http
-POST /api/datastores/v1
-```
-
-**Headers**:
-
-- `X-DOMO-Developer-Token`: `<developer token here>`
-- `Accept`: `application/json`
-- `Content-Type`: `application/json`
-
-**Request Body**:
-
-```json
-{
-  "name": "My App Datastore"
-}
-```
-
-**Response**:
-
-```http
-HTTP/1.1 201 Created
-```
-
-### Get Datastore
-
-**Description**: Get a datastore by ID.
-
-**HTTP Request**:
-
-```http
-GET /api/datastores/v1/{datastoreId}
-```
-
-**Headers**:
-
-- `X-DOMO-Developer-Token`: `<developer token here>`
-- `Accept`: `application/json`
-
-**Response**:
-
-```http
-HTTP/1.1 200 OK
-```
-
-### Delete Datastore
-
-**Description**: Permanently delete a datastore and all of its collections and documents. This action cannot be undone.
-
-**HTTP Request**:
-
-```http
-DELETE /api/datastores/v1/{datastoreId}
-```
-
-**Headers**:
-
-- `X-DOMO-Developer-Token`: `<developer token here>`
-
-**Response**:
-
-```http
-HTTP/1.1 204 No Content
-```
-
-### List Collections
-
-**Description**: Get all collections visible to the current user. Use the `datastoreId` query parameter to filter by datastore.
-
-**HTTP Request**:
-
-```http
-GET /api/datastores/v1/collections?datastoreId={datastoreId}
-```
-
-**Headers**:
-
-- `X-DOMO-Developer-Token`: `<developer token here>`
-- `Accept`: `application/json`
-
-**Response**:
-
-```http
-HTTP/1.1 200 OK
-```
-
-### Create Collection
-
-**Description**: Create a new collection in a datastore.
-
-**HTTP Request**:
-
-```http
-POST /api/datastores/v1/collections?datastoreId={datastoreId}
-```
-
-**Headers**:
-
-- `X-DOMO-Developer-Token`: `<developer token here>`
-- `Accept`: `application/json`
-- `Content-Type`: `application/json`
-
-**Request Body**:
-
-```json
-{
-  "name": "users",
-  "syncEnabled": true,
-  "schema": {
-    "columns": [
-      { "type": "STRING", "name": "username", "visible": true },
-      { "type": "STRING", "name": "email", "visible": true }
-    ]
-  }
-}
-```
-
-**Response**:
-
-```http
-HTTP/1.1 201 Created
-```
-
-### Query Collections
-
-**Description**: Filter and sort collections using field-level predicates with pagination.
-
-**HTTP Request**:
-
-```http
-POST /api/datastores/v1/collections/query
-```
-
-**Headers**:
-
-- `X-DOMO-Developer-Token`: `<developer token here>`
-- `Accept`: `application/json`
-- `Content-Type`: `application/json`
-
-**Request Body**:
-
-```json
-{
-  "collectionFilteringList": [
-    { "filterType": "nameof", "typedValue": "users" }
-  ],
-  "sortBy": "createdOn",
-  "direction": "DESC",
-  "pageSize": 25,
-  "pageNumber": 1
-}
-```
-
-**Filter Types**:
-
-| `filterType`  | Description                                  | `typedValue`                          |
-| ------------- | -------------------------------------------- | ------------------------------------- |
-| `nameof`      | Filter by collection name                    | Collection name string                |
-| `datastorename` | Filter by app/card (datastore) name        | Datastore name string                 |
-| `ownedby`     | Filter by owner                              | User ID                               |
-| `createddate` | Filter by creation date (requires `comparingCriteria`: `after`, `before`, or `on`) | ISO date string |
-
-**Response**:
-
-```http
-HTTP/1.1 200 OK
-```
-
-### Delete Collection
-
-**Description**: Permanently delete a collection and all of its documents.
-
-**HTTP Request**:
-
-```http
-DELETE /api/datastores/v1/collections/{collectionId}
-```
-
-**Headers**:
-
-- `X-DOMO-Developer-Token`: `<developer token here>`
-
-**Response**:
-
-```http
-HTTP/1.1 204 No Content
-```
-
-### List Collection Permissions
-
-**Description**: List all entities that have permissions on a collection.
-
-**HTTP Request**:
-
-```http
-GET /api/datastores/v1/collections/{collectionId}/permission
-```
-
-**Headers**:
-
-- `X-DOMO-Developer-Token`: `<developer token here>`
-- `Accept`: `application/json`
-
-**Query Parameters**:
-
-| Parameter   | Type   | Description                            |
-| ----------- | ------ | -------------------------------------- |
-| `sourceType` | String | Filter by entity type: `USER`, `GROUP`, or `RYUU_APP` |
-| `sourceIds` | String | Comma-separated list of entity IDs to filter by |
-
-**Response**:
-
-```http
-HTTP/1.1 200 OK
-```
-
-```json
-{
-  "RYUU_APP": [
-    {
-      "sourceType": "RYUU_APP",
-      "sourceId": "a1b2c3d4-0000-0000-0000-000000000000",
-      "permissions": ["read", "create_content", "read_content"]
+**2. Create a collection**
+
+```bash
+COL_ID=$(curl --silent --request POST "$INSTANCE/api/datastores/v1/collections?datastoreId=$DS_ID" \
+  --header "X-DOMO-Developer-Token: $TOKEN" \
+  --header "Content-Type: application/json" \
+  --data '{
+    "name": "preferences",
+    "syncEnabled": false,
+    "schema": {
+      "columns": [
+        {"type": "STRING", "name": "theme"},
+        {"type": "STRING", "name": "defaultView"}
+      ]
     }
-  ]
-}
+  }' | jq -r '.id')
+echo "Collection ID: $COL_ID"
 ```
 
-### Check User Permission
+**3. Create a document**
 
-**Description**: Returns `true` if the current user has permission to edit permissions on a collection.
-
-**HTTP Request**:
-
-```http
-GET /api/datastores/v1/collections/{collectionId}/permission/user
+```bash
+curl --silent --request POST "$INSTANCE/api/datastores/v1/collections/$COL_ID/documents" \
+  --header "X-DOMO-Developer-Token: $TOKEN" \
+  --header "Content-Type: application/json" \
+  --data '{"content":{"userId":"1042","theme":"dark","defaultView":"chart"}}' | jq
 ```
 
-**Headers**:
+**4. Query documents**
 
-- `X-DOMO-Developer-Token`: `<developer token here>`
-- `Accept`: `application/json`
-
-**Response**:
-
-```http
-HTTP/1.1 200 OK
+```bash
+curl --silent --request POST "$INSTANCE/api/datastores/v2/collections/$COL_ID/documents/query" \
+  --header "X-DOMO-Developer-Token: $TOKEN" \
+  --header "Content-Type: application/json" \
+  --data '{"content.theme":{"$eq":"dark"}}' | jq
 ```
 
-```json
-true
-```
-
-### Download Documents
-
-**Description**: Download the documents in a collection as a JSON file (returned with a `Content-Disposition: attachment` header). Each entry is a complete document object — the same shape accepted by Import Documents — so a download can be fed straight back into Import Documents to copy or restore a collection. Useful for backups and bulk export.
-
-**HTTP Request**:
-
-```http
-GET /api/datastores/v2/collections/{collectionId}/download
-```
-
-**Headers**:
-
-- `X-DOMO-Developer-Token`: `<developer token here>`
-- `Accept`: `application/json`
-
-**Response**:
-
-```http
-HTTP/1.1 200 OK
-```
-
-Returns a JSON array of the documents in the collection, each a complete document object.
-
-### Import Documents
-
-**Description**: Bulk-import complete document objects into a collection — the counterpart to Download Documents. Each item must be a full document including its `id`; documents are **upserted by `id`**, so the original `id`, `createdOn`, and `owner` are preserved. This is the format produced by Download Documents, making the two a copy/restore pair. To add brand-new documents from raw content, use [Create Document](#create-document) instead. Existing documents not present in the payload are left untouched.
-
-**HTTP Request**:
-
-```http
-PUT /api/datastores/v2/collections/{collectionId}/documents/import
-```
-
-**Headers**:
-
-- `X-DOMO-Developer-Token`: `<developer token here>`
-- `Accept`: `application/json`
-- `Content-Type`: `application/json`
-
-**Request Body**:
-
-```json
-[
-  {
-    "id": "a8428d64-a01d-49b2-9144-ddeec001acf8",
-    "datastoreId": "39b88a97-8247-4c0d-ba1d-8ed78d1a6680",
-    "collectionId": "232e6d6c-46e9-49b6-a137-8933f0f05999",
-    "syncRequired": true,
-    "owner": "870010733",
-    "createdBy": "870010733",
-    "createdOn": "2026-06-23T20:58:06.567Z",
-    "updatedOn": "2026-06-23T23:36:13.177Z",
-    "updatedBy": "870010733",
-    "content": { "username": "bill", "email": "bill@example.com" }
-  }
-]
-```
-
-**Response**:
-
-<CodeGroup>
-
-```http http
-HTTP/1.1 200 OK
-```
-
-```json json
-{ "Updated": 0, "Created": 0, "Upserted": 1 }
-```
-
-</CodeGroup>
-
-### Get Document
-
-**Description**: Retrieve a specific document from a collection.
-
-**HTTP Request**:
-
-```http
-GET /api/datastores/v1/collections/{collectionId}/documents/{documentId}
-```
-
-**Headers**:
-
-- `X-DOMO-Developer-Token`: `<developer token here>`
-- `Accept`: `application/json`
-- `Content-Type`: `application/json`
-
-**Response**:
-
-```http
-HTTP/1.1 200 OK
-```
-
-```json
-{
-  "id": "12345678-7949-1234-82bb-bd3e533e4c7d",
-  "datastoreId": "12345678-2484-1234-af98-c60131367cf2",
-  "collectionId": "12345678-78a9-1234-b641-7afc39ba2e84",
-  "syncRequired": true,
-  "owner": 123456789,
-  "createdOn": "2024-05-08T19:39:00.708Z",
-  "updatedOn": "2024-05-08T19:39:00.708Z",
-  "updatedBy": 123456789,
-  "content": {}
-}
-```
-
-### Query Document
-
-**Description**: Retrieve documents from a collection via query.
-
-AppDB supports the full range of MongoDB query predicates that can be used in a `find()` function. The following operators are **not** supported:
-
-- `$where` — JavaScript expression evaluation is disabled server-side.
-- `$near` and `$nearSphere` — proximity searches require a geospatial index, which AppDB collections do not have.
-
-All other operators in the [official MongoDB query predicate documentation](https://www.mongodb.com/docs/manual/reference/mql/query-predicates/) are supported, including comparison, logical, array, data type, bitwise, `$expr`, `$jsonSchema`, and `$regex` operators. The geospatial shape operators `$geoWithin` and `$geoIntersects` are also supported when your documents contain GeoJSON data.
-
-**HTTP Request**:
-
-```http
-POST /api/datastores/v2/collections/{collectionId}/documents/query
-```
-
-**Headers**:
-
-- `X-DOMO-Developer-Token`: `<developer token here>`
-- `Accept`: `application/json`
-- `Content-Type`: `application/json`
-
-**Request Body**:
-
-```json
-{
-  "content.userId": {
-    "$eq": "123456789"
-  }
-}
-```
-
-**Response**:
-
-```http
-HTTP/1.1 200 OK
-```
-
-```json
-[
-    {
-        "id": "12345678-8683-4aa8-a3ca-3ad2c5c4cc47",
-        "datastoreId": "12345678-3366-4b4e-b968-48c1b0a453f4",
-        "collectionId": "12345678-ef0b-4c2d-8f39-db29042dad57",
-        "syncRequired": true,
-        "owner": "123456789",
-        "createdBy": "123456789",
-        "createdOn": "2023-09-26T20:46:10.290Z",
-        "updatedOn": "2025-05-08T20:52:33.176Z",
-        "updatedBy": "123456789",
-        "content": {
-            "listId": "12345678-4865-457e-ab4a-6e5ce70a7c69",
-            "userId": "123456789",
-            "listTitle": "New Test"
-        }
-    },
-    ...
-]
-```
-
-**Querying Based on Dates**
-
-Dates can be queried in AppDB using the [MongoDB Extended JSON v2](https://www.mongodb.com/docs/manual/reference/mongodb-extended-json/) spec. This casts the provided string to a date object using the `$date` operator. The date string must be in ISO format.
-
-```json
-{
-  "createdOn": {
-    "$lte": {
-      "$date": "2020-05-12T00:00:00.000Z"
-    }
-  }
-}
-```
-
-### Query Documents with Aggregations
-
-After the query filters which documents to return, you can add query string parameters to aggregate the results. Each parameter (except `groupby`) can optionally take an alias — useful when passing the same property to different aggregations to avoid name collisions.
-
-**HTTP Request**:
-
-```http
-POST /api/datastores/v2/collections/{collectionId}/documents/query?groupby={property1},{property2}&count={alias}&avg={property1 alias1},{property2 alias2}&sum={property1 alias1}&max={property1 alias1}&min={property1 alias1}&orderby={alias1 ascending|descending}&limit={limit}&offset={offset}
-```
-
-**Headers**:
-
-- `X-DOMO-Developer-Token`: `<developer token here>`
-- `Accept`: `application/json`
-- `Content-Type`: `application/json`
-
-**Arguments**:
-
-Any parameter that accepts field names uses standard MongoDB dot notation. Fields inside the `content` object must be prefixed with `content.` (e.g., `content.campaignName`). Top-level document fields (`owner`, `createdOn`, etc.) can be referenced directly without a prefix. The `count`, `limit`, and `offset` parameters take aliases or integers and do not use field names.
-
-| Parameter    | Type    | Required | Description                                                                                                                                                      |
-| ------------ | ------- | -------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| collectionId | String  | Required | The ID of the collection.                                                                                                                                        |
-| groupby      | String  | Optional | Comma-separated list of properties to group by.                                                                                                                  |
-| count        | String  | Optional | Alias for a count aggregation.                                                                                                                                   |
-| avg          | String  | Optional | Comma-separated list of properties with aliases to average.                                                                                                      |
-| min          | String  | Optional | Comma-separated list of properties with aliases to find the minimum.                                                                                             |
-| max          | String  | Optional | Comma-separated list of properties with aliases to find the maximum.                                                                                             |
-| sum          | String  | Optional | Comma-separated list of properties with aliases to sum.                                                                                                          |
-| unwind       | String  | Optional | Comma-separated list of array properties to unwind (flattens nested arrays — one row per array element).                                                         |
-| orderby      | String  | Optional | Field or alias to order by, followed by `ascending` or `descending`. Accepts either an aggregation alias or a field name (using dot notation for nested fields). |
-| limit        | Integer | Optional | Maximum number of results to return. Default is 10,000.                                                                                                          |
-| offset       | Integer | Optional | Number of results to skip before returning. Default is 0.                                                                                                        |
-
-**Request Body**:
-
-```json
-{}
-```
-
-An empty object `{}` returns all documents before aggregating. Pass a MongoDB query object to filter first.
-
-**Response**:
-
-```json
-[
-  {
-    "_id": {
-      "campaignName": "Red Campaign",
-      "month": "February"
-    },
-    "documentCount": 2,
-    "sumClicks": 210,
-    "avgClicks": 105.0,
-    "maxClicks": 120,
-    "minClicks": 90
-  },
-  {
-    "_id": {
-      "campaignName": "Blue Campaign",
-      "month": "January"
-    },
-    "documentCount": 1,
-    "sumClicks": 100,
-    "avgClicks": 100.0,
-    "maxClicks": 100,
-    "minClicks": 100
-  }
-]
-```
-
-The `groupby` fields are returned inside the `_id` object when multiple fields are grouped; with a single `groupby` field, `_id` is a scalar value. Aggregation values (`count`, `sum`, `avg`, `min`, `max`) are returned as top-level fields using their configured aliases.
-
-### Partially Update Documents
-
-**Description**: Perform partial updates on documents using MongoDB query and update operations.
-
-**Supported Operators**:
-
-- `currentDate`
-- `inc`
-- `min`
-- `max`
-- `mul`
-- `rename`
-- `set`
-- `unset`
-- `addToSet`
-- `pop`
-- `pull`
-- `pullAll`
-- `push`
-
-**Supported Modifiers**:
-
-- `each`
-- `position`
-- `slice`
-- `sort`
-
-Refer to the official [MongoDB Update Operators documentation](https://www.mongodb.com/docs/manual/reference/mql/update/) for details. Note that `$setOnInsert` is not supported because queries must reference an existing document or property; using it has no effect because AppDB partial updates do not perform upserts.
-
-**HTTP Request**:
-
-```http
-PUT /api/datastores/v1/collections/{collectionId}/documents/update
-```
-
-**Headers**:
-
-- `X-DOMO-Developer-Token`: `<developer token here>`
-- `Accept`: `application/json`
-- `Content-Type`: `application/json`
-
-**Request Body**:
-
-The request body must be structured as a single object containing a `query` and an `operation`.
-
-```json
-{
-  "query": "{mongo query JSON}",
-  "operation": "{mongo operation JSON}"
-}
-```
-
-Example:
-
-```json
-{
-  "query": { "content.status": "Draft" },
-  "operation": {
-    "$set": {
-      "content.status": "Active"
-    }
-  }
-}
-```
-
-**Response**:
-
-```http
-HTTP/1.1 200 OK
-Content-Type: application/json;charset=UTF-8
-1
-```
-
-Returns the number of updated documents or properties.
-
-### List Documents
-
-**Description**: Retrieve documents from a specified collection. There is an upper limit of 10,000 documents per request. Use `limit` and `offset` to paginate through large collections.
-
-**HTTP Request**:
-
-```http
-GET /api/datastores/v1/collections/{collectionId}/documents?limit={limit}&offset={offset}
-```
-
-**Headers**:
-
-- `X-DOMO-Developer-Token`: `<developer token here>`
-- `Accept`: `application/json`
-- `Content-Type`: `application/json`
-
-**Arguments**:
-
-| Parameter    | Type    | Required | Description                                                 |
-| ------------ | ------- | -------- | ----------------------------------------------------------- |
-| collectionId | String  | Required | The ID of the collection.                                   |
-| limit        | Integer | Optional | Maximum number of documents to return per request.          |
-| offset       | Integer | Optional | Number of documents to skip before returning. Default is 0. |
-
-**Response**:
-
-```http
-HTTP/1.1 200 OK
-```
-
-```json
-[
-  {
-    "id": "12345678-7949-1234-82bb-bd3e533e4c7d",
-    "datastoreId": "12345678-2484-1234-af98-c60131367cf2",
-    "collectionId": "12345678-78a9-1234-b641-7afc39ba2e84",
-    "syncRequired": true,
-    "owner": 123456789,
-    "createdOn": "2024-05-08T19:39:00.708Z",
-    "updatedOn": "2024-05-08T19:39:00.708Z",
-    "updatedBy": 123456789,
-    "content": {}
-  },
-  ...
-]
-```
-
-### Create Document
-
-**Description**: Add a new document to a specified collection.
-
-**HTTP Request**:
-
-```http
-POST /api/datastores/v1/collections/{collectionId}/documents/
-```
-
-**Headers**:
-
-- `X-DOMO-Developer-Token`: `<developer token here>`
-- `Accept`: `application/json`
-- `Content-Type`: `application/json`
-
-**Request Body**:
-
-```json
-{
-  "content": {
-    "title": "Q2 Campaign",
-    "region": "West"
-  }
-}
-```
-
-**Response**:
-
-```http
-HTTP/1.1 200 OK
-```
-
-```json
-{
-  "id": "12345678-7949-1234-82bb-bd3e533e4c7d",
-  "datastoreId": "12345678-2484-1234-af98-c60131367cf2",
-  "collectionId": "12345678-78a9-1234-b641-7afc39ba2e84",
-  "syncRequired": true,
-  "owner": "123456789",
-  "createdBy": "123456789",
-  "createdOn": "2024-05-08T19:39:00.708Z",
-  "updatedOn": "2024-05-08T19:39:00.708Z",
-  "updatedBy": "123456789",
-  "content": {
-    "title": "Q2 Campaign",
-    "region": "West"
-  }
-}
-```
-
-### Update Document
-
-**Description**: Modify an existing document in a collection.
-
-**HTTP Request**:
-
-```http
-PUT /api/datastores/v1/collections/{collectionId}/documents/{documentId}
-```
-
-**Headers**:
-
-- `X-DOMO-Developer-Token`: `<developer token here>`
-- `Accept`: `application/json`
-- `Content-Type`: `application/json`
-
-**Request Body**:
-
-```json
-{
-  "content": {
-    "title": "Q2 Campaign",
-    "region": "West",
-    "status": "Active"
-  }
-}
-```
-
-**Response**:
-
-```http
-HTTP/1.1 200 OK
-```
-
-```json
-{
-  "id": "12345678-7949-1234-82bb-bd3e533e4c7d",
-  "datastoreId": "12345678-2484-1234-af98-c60131367cf2",
-  "collectionId": "12345678-78a9-1234-b641-7afc39ba2e84",
-  "syncRequired": true,
-  "owner": 123456789,
-  "createdOn": "2024-05-08T19:39:00.708Z",
-  "updatedOn": "2024-05-08T19:39:00.708Z",
-  "updatedBy": 123456789,
-  "content": {
-    "title": "Q2 Campaign",
-    "region": "West",
-    "status": "Active"
-  }
-}
-```
-
-### Delete Document
-
-**Description**: Remove a document from a collection.
-
-**HTTP Request**:
-
-```http
-DELETE /api/datastores/v1/collections/{collectionId}/documents/{documentId}
-```
-
-**Headers**:
-
-- `X-DOMO-Developer-Token`: `<developer token here>`
-- `Accept`: `application/json`
-- `Content-Type`: `application/json`
-
-**Response**:
-
-```http
-HTTP/1.1 204 No Content
-```
-
-### Bulk Delete Documents
-
-**Description**: Remove multiple documents from a collection in a single request.
-
-_Please note, this will end up reaching the maximum url length limit of your browser/client. If you have a large number of documents to delete, this can be done in batches._
-
-**HTTP Request**:
-
-```http
-DELETE /api/datastores/v1/collections/{collectionId}/documents/bulk?ids=[ids]
-```
-
-**Headers**:
-
-- `X-DOMO-Developer-Token`: `<developer token here>`
-- `Accept`: `application/json`
-- `Content-Type`: `application/json`
-
-**Response**:
-
-```http
-HTTP/1.1 202 Accepted
-```
-
-```json
-{
-  "Deleted": 2
-}
-```
-
-Returns the count of deleted documents.
-
-### Update Collection Schema
-
-**Description**: Update the schema of a collection.
-
-**HTTP Request**:
-
-```http
-PUT /api/datastores/v1/collections/{collectionId}
-```
-
-**Headers**:
-
-- `X-DOMO-Developer-Token`: `<developer token here>`
-- `Accept`: `application/json`
-- `Content-Type`: `application/json`
-
-**Request Body**:
-
-```json
-{
-  "schema": {
-    "columns": [
-      {
-        "type": "STRING",
-        "name": "username",
-        "visible": true
-      },
-      {
-        "type": "STRING",
-        "name": "band",
-        "visible": true
-      },
-      {
-        "type": "STRING",
-        "name": "favorite color",
-        "visible": true
-      }
-    ]
-  },
-  "syncEnabled": true
-}
-```
-
-**Response**:
-
-```http
-HTTP/1.1 200 OK
-```
-
-```json
-{
-  "id": "12345678-7949-1234-82bb-bd3e533e4c7d",
-  "datastoreId": "12345678-a8ee-4ef7-a235-87b77993a33d",
-  "defaultPermissions": null,
-  "requiredAuthorities": null,
-  "owner": 123456789,
-  "name": "CollectionName",
-  "datasourceId": null,
-  "schema": {
-    "columns": [
-      {
-        "type": "STRING",
-        "name": "username"
-      },
-      {
-        "type": "STRING",
-        "name": "band"
-      },
-      {
-        "type": "STRING",
-        "name": "favorite color"
-      }
-    ]
-  },
-  "filters": null,
-  "syncEnabled": true,
-  "syncRequired": true,
-  "fullReplaceRequired": false,
-  "lastSync": null,
-  "createdOn": "2022-06-07T21:35:18.736Z",
-  "updatedOn": "2024-05-08T19:55:32.158402516Z",
-  "updatedBy": 123456789
-}
-```
-
-### Update Collection Permissions
-
-**Description**: Update permissions for a collection as it relates to a specific Custom App. Proxy ID is available in the Asset Library
-
-**Parameter Options**:
-
-| **Permission**   | **Name**       | **Description**                                                                |
-| ---------------- | -------------- | ------------------------------------------------------------------------------ |
-| `read`           | Read           | Grants the ability to read documents in the collection.                        |
-| `share`          | Share          | Grants the ability to share the collection with other users or groups.         |
-| `delete`         | Delete         | Allows the deletion of the entire collection.                                  |
-| `write`          | Write          | Provides write access to the collection, including creating and updating data. |
-| `admin`          | Admin          | Grants full administrative control over the collection.                        |
-| `create_content` | Create Content | Allows creating new documents in the collection.                               |
-| `read_content`   | Read Content   | Enables reading the content of documents in the collection.                    |
-| `update_content` | Update Content | Permits updating existing documents in the collection.                         |
-| `delete_content` | Delete Content | Authorizes the deletion of documents from the collection.                      |
-
-**HTTP Request**:
-
-```http
-PUT /api/datastores/v1/collections/{collectionId}/permission/RYUU_APP/{proxyId}?permissions=read,create_content,read_content,update_content,delete_content
-```
-
-**Headers**:
-
-- `X-DOMO-Developer-Token`: `<developer token here>`
-- `Accept`: `application/json`
-- `Content-Type`: `application/json`
-
-**Response**:
-
-```http
-HTTP/1.1 204 No Content
-```
-
-### Export Datastore
-
-**Description**: Trigger an async sync of one or more collections in the datastore to their linked Domo DataSets. Each collection must have `syncEnabled: true` and a linked DataSet to be exported.
-
-**HTTP Request**:
-
-```http
-POST /api/datastores/v2/export/{datastoreId}
-```
-
-**Headers**:
-
-- `X-DOMO-Developer-Token`: `<developer token here>`
-- `Accept`: `application/json`
-- `Content-Type`: `application/json`
-
-**Request Body**:
-
-```json
-["232e6d6c-46e9-49b6-a137-8933f0f05999"]
-```
-
-**Response**:
-
-```http
-HTTP/1.1 200 OK
-```
+## Endpoint Reference
+
+Use the sidebar to browse all endpoints, or jump to a starting point below.
+
+### Datastores
+
+<CardGroup cols={2}>
+  <Card
+    horizontal
+    arrow
+    title="List Datastores"
+    icon="list"
+    href="/api-reference/app-db-api-product/list-datastores"
+  />
+  <Card
+    horizontal
+    arrow
+    title="Create Datastore"
+    icon="plus"
+    href="/api-reference/app-db-api-product/create-datastore"
+  />
+  <Card
+    horizontal
+    arrow
+    title="Get Datastore"
+    icon="magnifying-glass"
+    href="/api-reference/app-db-api-product/get-datastore"
+  />
+  <Card
+    horizontal
+    arrow
+    title="Export Datastore"
+    icon="arrow-up-from-bracket"
+    href="/api-reference/app-db-api-product/export-datastore"
+  />
+</CardGroup>
+
+### Collections
+
+<CardGroup cols={2}>
+  <Card
+    horizontal
+    arrow
+    title="List Collections"
+    icon="list"
+    href="/api-reference/app-db-api-product/list-collections"
+  />
+  <Card
+    horizontal
+    arrow
+    title="Create Collection"
+    icon="plus"
+    href="/api-reference/app-db-api-product/create-collection"
+  />
+  <Card
+    horizontal
+    arrow
+    title="Query Collections"
+    icon="filter"
+    href="/api-reference/app-db-api-product/query-collections"
+  />
+  <Card
+    horizontal
+    arrow
+    title="Update Collection Schema"
+    icon="pen"
+    href="/api-reference/app-db-api-product/update-collection-schema"
+  />
+  <Card
+    horizontal
+    arrow
+    title="List Permissions"
+    icon="lock"
+    href="/api-reference/app-db-api-product/list-collection-permissions"
+  />
+  <Card
+    horizontal
+    arrow
+    title="Update Permissions"
+    icon="lock-open"
+    href="/api-reference/app-db-api-product/update-collection-permissions"
+  />
+</CardGroup>
+
+### Documents
+
+<CardGroup cols={2}>
+  <Card
+    horizontal
+    arrow
+    title="Create Document"
+    icon="plus"
+    href="/api-reference/app-db-api-product/create-document"
+  />
+  <Card
+    horizontal
+    arrow
+    title="Query Documents"
+    icon="filter"
+    href="/api-reference/app-db-api-product/query-document"
+  />
+  <Card
+    horizontal
+    arrow
+    title="Update Document"
+    icon="pen"
+    href="/api-reference/app-db-api-product/update-document"
+  />
+  <Card
+    horizontal
+    arrow
+    title="Bulk Upsert"
+    icon="arrows-rotate"
+    href="/api-reference/app-db-api-product/bulk-upsert-documents"
+  />
+  <Card
+    horizontal
+    arrow
+    title="Download Documents"
+    icon="arrow-down-to-bracket"
+    href="/api-reference/app-db-api-product/download-documents"
+  />
+  <Card
+    horizontal
+    arrow
+    title="Import Documents"
+    icon="arrow-up-to-bracket"
+    href="/api-reference/app-db-api-product/import-documents"
+  />
+</CardGroup>

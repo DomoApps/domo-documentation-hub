@@ -191,11 +191,12 @@ paths:
         '204':
           description: No Content
 
-  #========= Document Endpoints (v1) =========
+  #========= Document Endpoints (v1, Deprecated) =========
   /api/datastores/v1/collections/{collectionId}/documents:
     get:
-      summary: List Documents
-      description: Retrieve documents from a specified collection. There is an upper limit of 10,000 documents per request. Use `limit` and `offset` to paginate through large collections. Note that this endpoint omits the `createdBy` field from each document; use Get Document or Query Document if you need that field.
+      summary: List Documents (v1, Deprecated)
+      deprecated: true
+      description: "**Deprecated.** Use the [v2 List Documents](#operation/listDocumentsV2) endpoint instead. This v1 endpoint returns a stripped-down document object that omits `createdBy` and returns numeric user IDs instead of strings."
       tags:
         - App DB API (Product)
       parameters:
@@ -236,9 +237,10 @@ paths:
                     status: "Active"
 
     post:
-      summary: Create Document
-      description: Add a new document to a specified collection.
-      tags: 
+      summary: Create Document (v1, Deprecated)
+      deprecated: true
+      description: "**Deprecated.** Use the v2 Create Document endpoint instead. Add a new document to a specified collection."
+      tags:
         - App DB API (Product)
       parameters:
         - name: collectionId
@@ -264,9 +266,10 @@ paths:
 
   /api/datastores/v1/collections/{collectionId}/documents/{documentId}:
     get:
-      summary: Get Document
-      description: Retrieve a specific document from a collection.
-      tags: 
+      summary: Get Document (v1, Deprecated)
+      deprecated: true
+      description: "**Deprecated.** Use the [v2 Get Document](#operation/getDocumentV2) endpoint instead. This v1 endpoint returns a stripped-down document object that omits `createdBy` and returns numeric user IDs instead of strings."
+      tags:
         - App DB API (Product)
       parameters:
         - name: collectionId
@@ -299,9 +302,10 @@ paths:
                 toe: "1Y7SXEXLME-YM859-UOWZK"
 
     put:
-      summary: Update Document
-      description: Modify an existing document in a collection.
-      tags: 
+      summary: Update Document (v1, Deprecated)
+      deprecated: true
+      description: "**Deprecated.** Use the v2 Update Document endpoint instead. Modify an existing document in a collection."
+      tags:
         - App DB API (Product)
       parameters:
         - name: collectionId
@@ -355,9 +359,10 @@ paths:
                 toe: "HKUMCHOWVY-GRVTS-RU3ZG"
 
     delete:
-      summary: Delete Document
-      description: Remove a document from a collection.
-      tags: 
+      summary: Delete Document (v1, Deprecated)
+      deprecated: true
+      description: "**Deprecated.** Use the v2 Delete Document endpoint instead. Remove a document from a collection."
+      tags:
         - App DB API (Product)
       parameters:
         - name: collectionId
@@ -389,8 +394,9 @@ paths:
 
   /api/datastores/v1/collections/{collectionId}/documents/bulk:
     delete:
-      summary: Bulk Delete Documents
-      description: Remove multiple documents from a collection in a single request.
+      summary: Bulk Delete Documents (v1, Deprecated)
+      deprecated: true
+      description: "**Deprecated.** Use the v2 Bulk Delete Documents endpoint instead. Remove multiple documents from a collection in a single request."
       tags: 
         - App DB API (Product)
       parameters:
@@ -523,10 +529,377 @@ paths:
                     region: "West"
                     status: "Inactive"
 
-  /api/datastores/v1/collections/{collectionId}/documents/update:
+  #========= Document Endpoints (v2) =========
+  /api/datastores/v2/collections/{collectionId}/documents:
+    get:
+      operationId: listDocumentsV2
+      summary: List Documents
+      description: Retrieve documents from a specified collection. There is an upper limit of 10,000 documents per request. Use `limit` and `offset` to paginate through large collections.
+      tags:
+        - App DB API (Product)
+      parameters:
+        - name: collectionId
+          in: path
+          required: true
+          schema: { type: string }
+          description: The ID of the collection.
+        - name: limit
+          in: query
+          schema: { type: integer }
+          description: Maximum number of documents to return.
+        - name: offset
+          in: query
+          schema: { type: integer }
+          description: Number of documents to skip before returning. Default is 0.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Document'
+              example:
+                - id: "a8428d64-a01d-49b2-9144-ddeec001acf8"
+                  datastoreId: "39b88a97-8247-4c0d-ba1d-8ed78d1a6680"
+                  collectionId: "232e6d6c-46e9-49b6-a137-8933f0f05999"
+                  syncRequired: true
+                  owner: "870010733"
+                  createdBy: "870010733"
+                  createdOn: "2026-06-23T20:58:06.567Z"
+                  updatedOn: "2026-06-23T23:36:13.177Z"
+                  updatedBy: "870010733"
+                  content:
+                    campaignName: "Q2 Campaign"
+                    region: "West"
+                    status: "Active"
+
+    post:
+      summary: Create Document
+      description: Add a new document to a specified collection.
+      tags:
+        - App DB API (Product)
+      parameters:
+        - name: collectionId
+          in: path
+          required: true
+          schema: { type: string }
+          description: The ID of the collection.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DocumentContent'
+            example:
+              content: { "campaignName": "Q2 Campaign", "region": "West", "status": "Active" }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Document'
+
+  /api/datastores/v2/collections/{collectionId}/documents/{documentId}:
+    get:
+      operationId: getDocumentV2
+      summary: Get Document
+      description: Retrieve a specific document from a collection.
+      tags:
+        - App DB API (Product)
+      parameters:
+        - name: collectionId
+          in: path
+          required: true
+          schema: { type: string }
+          description: The ID of the collection.
+        - name: documentId
+          in: path
+          required: true
+          schema: { type: string }
+          description: The ID of the document.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Document'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                message: "Document with id 'b1e2f3a4-c5d6-7890-abcd-ef1234567890' not found"
+                status: 404
+                statusReason: "Not Found"
+                toe: "1Y7SXEXLME-YM859-UOWZK"
+
+    put:
+      summary: Update Document
+      description: Modify an existing document in a collection.
+      tags:
+        - App DB API (Product)
+      parameters:
+        - name: collectionId
+          in: path
+          required: true
+          schema: { type: string }
+          description: The ID of the collection.
+        - name: documentId
+          in: path
+          required: true
+          schema: { type: string }
+          description: The ID of the document.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DocumentContent'
+            example:
+              content: { "campaignName": "Q2 Campaign", "region": "West", "status": "Inactive" }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Document'
+              example:
+                id: "a8428d64-a01d-49b2-9144-ddeec001acf8"
+                datastoreId: "39b88a97-8247-4c0d-ba1d-8ed78d1a6680"
+                collectionId: "232e6d6c-46e9-49b6-a137-8933f0f05999"
+                syncRequired: true
+                owner: "870010733"
+                createdBy: "870010733"
+                createdOn: "2026-06-23T20:58:06.567Z"
+                updatedOn: "2026-06-24T14:22:11.403Z"
+                updatedBy: "870010733"
+                content:
+                  campaignName: "Q2 Campaign"
+                  region: "West"
+                  status: "Inactive"
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                message: "Could not find document with id 'b1e2f3a4-c5d6-7890-abcd-ef1234567890' to update"
+                status: 404
+                statusReason: "Not Found"
+                toe: "HKUMCHOWVY-GRVTS-RU3ZG"
+
+    delete:
+      summary: Delete Document
+      description: Remove a document from a collection.
+      tags:
+        - App DB API (Product)
+      parameters:
+        - name: collectionId
+          in: path
+          required: true
+          schema: { type: string }
+          description: The ID of the collection.
+        - name: documentId
+          in: path
+          required: true
+          schema: { type: string }
+          description: The ID of the document.
+      responses:
+        '204':
+          description: The document was successfully deleted. No response body is returned.
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                message: "Document could not be found: b1e2f3a4-c5d6-7890-abcd-ef1234567890"
+                status: 404
+                statusReason: "Not Found"
+                toe: "BH3HHD53Y3-BZGE0-DQSG3"
+
+  /api/datastores/v2/collections/{collectionId}/documents/bulk:
+    post:
+      summary: Bulk Create Documents
+      description: Add multiple documents to a collection in a single request.
+      tags:
+        - App DB API (Product)
+      parameters:
+        - name: collectionId
+          in: path
+          required: true
+          schema: { type: string }
+          description: The ID of the collection.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/DocumentContent'
+            example:
+              - content: { "campaignName": "Q2 Campaign", "region": "West", "status": "Active" }
+              - content: { "campaignName": "Red Campaign", "region": "East", "status": "Inactive" }
+      responses:
+        '200':
+          description: Returns the number of created documents.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  Created:
+                    type: integer
+                    description: Number of documents created.
+              example:
+                Created: 2
+
+    put:
+      summary: Bulk Upsert Documents
+      description: Insert or update multiple documents in a single request. Documents with a matching `id` are updated; documents without a matching `id` are created.
+      tags:
+        - App DB API (Product)
+      parameters:
+        - name: collectionId
+          in: path
+          required: true
+          schema: { type: string }
+          description: The ID of the collection.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    description: Document ID to update. Omit to create a new document.
+                  content:
+                    type: object
+                    additionalProperties: true
+                    description: Arbitrary JSON content of the document.
+            example:
+              - id: "a8428d64-a01d-49b2-9144-ddeec001acf8"
+                content: { "campaignName": "Q2 Campaign", "region": "West", "status": "Inactive" }
+              - content: { "campaignName": "New Campaign", "region": "North", "status": "Active" }
+      responses:
+        '200':
+          description: Returns the number of updated and created documents.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  Updated:
+                    type: integer
+                    description: Number of documents updated.
+                  Created:
+                    type: integer
+                    description: Number of documents created.
+              example:
+                Updated: 1
+                Created: 1
+
+    delete:
+      summary: Bulk Delete Documents
+      description: Remove multiple documents from a collection in a single request.
+      tags:
+        - App DB API (Product)
+      parameters:
+        - name: collectionId
+          in: path
+          required: true
+          schema: { type: string }
+          description: The ID of the collection.
+        - name: ids
+          in: query
+          required: true
+          description: A comma-separated list of document IDs.
+          schema:
+            type: string
+          example: "id1,id2,id3"
+      responses:
+        '200':
+          description: Returns the number of deleted documents.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  Deleted:
+                    type: integer
+                    description: Number of documents deleted.
+              example:
+                Deleted: 2
+
+  /api/datastores/v2/collections/{collectionId}/documents/update:
     put:
       summary: Partially Update Documents
       description: |
+        Perform partial updates on documents using MongoDB query and update operations.
+        Returns the number of documents updated. Returns `0` if no documents matched — this is a successful response, not an error.
+        `$setOnInsert` has no effect because AppDB partial updates do not perform upserts.
+
+        **Supported update operators:** `currentDate`, `inc`, `min`, `max`, `mul`, `rename`, `set`, `unset`, `addToSet`, `pop`, `pull`, `pullAll`, `push`
+
+        **Supported modifiers:** `each`, `position`, `slice`, `sort`
+
+        See the [MongoDB Update Operators documentation](https://www.mongodb.com/docs/manual/reference/mql/update/) for details.
+      tags:
+        - App DB API (Product)
+      parameters:
+        - name: collectionId
+          in: path
+          required: true
+          schema: { type: string }
+          description: The ID of the collection.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [query, operation]
+              properties:
+                query:
+                  type: object
+                  additionalProperties: true
+                  description: MongoDB query that identifies the documents to update.
+                  example: { "content.status": "Draft" }
+                operation:
+                  type: object
+                  additionalProperties: true
+                  description: MongoDB update operation to apply.
+                  example: { "$set": { "content.status": "Active" } }
+      responses:
+        '200':
+          description: Returns the number of updated documents or properties.
+          content:
+            application/json:
+              schema:
+                type: integer
+                example: 1
+
+  /api/datastores/v1/collections/{collectionId}/documents/update:
+    put:
+      summary: Partially Update Documents (v1, Deprecated)
+      deprecated: true
+      description: |
+        **Deprecated.** Use the v2 Partially Update Documents endpoint instead.
+
         Perform partial updates on documents using MongoDB query and update operations.
         Returns the number of documents updated. Returns `0` if no documents matched — this is a successful response, not an error.
         `$setOnInsert` has no effect because AppDB partial updates do not perform upserts.

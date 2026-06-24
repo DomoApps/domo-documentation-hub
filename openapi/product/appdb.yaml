@@ -120,8 +120,6 @@ components:
           enum: [STRING, LONG, DECIMAL, DOUBLE, DATE, DATETIME]
         name:
           type: string
-        visible:
-          type: boolean
 
     CollectionSummary:
       type: object
@@ -317,6 +315,44 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Collection'
+              example:
+                - id: "cf97ef6f-4c7c-4739-9af5-5cc0bd782ddb"
+                  datastoreId: "78a89993-3d3a-4b57-a325-1b3886fe1e1b"
+                  defaultPermissions: "READ,CREATE_CONTENT,READ_CONTENT,UPDATE_CONTENT,DELETE_CONTENT"
+                  requiredAuthorities: null
+                  owner: 870010733
+                  name: "groups"
+                  datasourceId: null
+                  schema: null
+                  filters: null
+                  syncEnabled: false
+                  syncRequired: false
+                  fullReplaceRequired: false
+                  lastSync: null
+                  createdOn: "2026-06-24T20:09:12.502Z"
+                  updatedOn: "2026-06-24T20:09:12.502Z"
+                  updatedBy: 870010733
+                - id: "8050a95f-7865-4ed9-bbeb-a82eaf1d1c41"
+                  datastoreId: "f812ea02-0e52-478b-90f0-00aad7e05029"
+                  defaultPermissions: null
+                  requiredAuthorities: null
+                  owner: 870010733
+                  name: "users"
+                  datasourceId: "de683ed7-eb83-4799-a9c7-876da6b5b008"
+                  schema:
+                    columns:
+                      - type: "STRING"
+                        name: "username"
+                      - type: "DATETIME"
+                        name: "joined"
+                  filters: null
+                  syncEnabled: true
+                  syncRequired: false
+                  fullReplaceRequired: false
+                  lastSync: "2026-06-24T21:42:28Z"
+                  createdOn: "2026-06-24T21:35:39.593Z"
+                  updatedOn: "2026-06-24T21:42:28.493Z"
+                  updatedBy: 870010733
     post:
       summary: Create Collection
       description: Create a new collection in a datastore. Pass `datastoreId` as a query parameter.
@@ -340,7 +376,7 @@ paths:
                   description: Name for the collection.
                 syncEnabled:
                   type: boolean
-                  description: Whether to enable periodic syncing to a linked Domo DataSet.
+                  description: "Whether to enable periodic syncing to a linked Domo DataSet. Requires `schema` to be provided; the API returns a 400 if `syncEnabled: true` is passed without a schema."
                 schema:
                   type: object
                   properties:
@@ -355,10 +391,8 @@ paths:
                 columns:
                   - name: "username"
                     type: "STRING"
-                    visible: true
                   - name: "email"
                     type: "STRING"
-                    visible: true
       responses:
         '201':
           description: Collection created.
@@ -704,6 +738,15 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Datastore'
+              example:
+                id: "98572030-591b-4b6e-94dd-817a30ec5e2f"
+                name: "My App Datastore"
+                customer: "mycompany"
+                owner: 870010733
+                createdOn: "2026-06-24T21:17:18.767Z"
+                updatedOn: "2026-06-24T21:17:18.767Z"
+                updatedBy: 870010733
+                temporary: false
 
   /api/datastores/v1/{datastoreId}:
     get:
@@ -716,7 +759,7 @@ paths:
           in: path
           required: true
           schema: { type: string }
-          description: The ID of the datastore.
+          description: "The UUID of the datastore. Use the `id` field from the datastore object — **not** the numeric `datastore_id` field. For example, `98572030-591b-4b6e-94dd-817a30ec5e2f` is valid; `157944` is not."
       responses:
         '200':
           description: OK
@@ -724,6 +767,27 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Datastore'
+              example:
+                id: "98572030-591b-4b6e-94dd-817a30ec5e2f"
+                name: "My App Datastore"
+                customer: "mycompany"
+                owner: 870010733
+                createdOn: "2026-06-24T21:17:18.767Z"
+                updatedOn: "2026-06-24T21:17:18.767Z"
+                updatedBy: 870010733
+                datastore_id: 157944
+                temporary: false
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                message: "No static resource api/datastores/v1/157944 for request '/api/datastores/v1/157944'."
+                status: 404
+                statusReason: "Not Found"
+                toe: "6NHUOBZXHJ-7JQU0-BAPQM"
     delete:
       summary: Delete Datastore
       description: "Permanently delete a datastore and all of its collections and documents. **This action cannot be undone.**"
@@ -743,7 +807,7 @@ paths:
     post:
       summary: Export Datastore (v1, Deprecated)
       deprecated: true
-      description: "**Deprecated.** Use the [v2 Export Datastore](#operation/exportDatastoreV2) endpoint instead. Triggers an async sync of all collections in the datastore to their linked Domo DataSets. Each collection must have `syncEnabled: true` and a linked `datasourceId` to be exported."
+      description: "**Deprecated.** Use the [v2 Export Datastore](#operation/exportDatastoreV2) endpoint instead. Triggers an async sync of all collections in the datastore to their linked Domo DataSets. Each collection must have `syncEnabled: true` to be exported. If a collection does not yet have a `datasourceId`, one is created automatically on first export."
       tags:
         - App DB API (Product)
       parameters:
@@ -761,7 +825,7 @@ paths:
     post:
       operationId: exportDatastoreV2
       summary: Export Datastore
-      description: "Triggers an async sync of one or more collections in the datastore to their linked Domo DataSets. Pass the IDs of the collections to export in the request body. Each collection must have `syncEnabled: true` and a linked `datasourceId` to be exported."
+      description: "Triggers an async sync of one or more collections in the datastore to their linked Domo DataSets. Optionally pass a list of collection IDs in the request body to export specific collections; if the body is omitted or empty, all collections in the datastore are exported. Each collection must have `syncEnabled: true` to be exported. If a collection does not yet have a `datasourceId`, one is created automatically on first export."
       tags:
         - App DB API (Product)
       parameters:
@@ -772,14 +836,14 @@ paths:
             type: string
           description: The ID of the datastore.
       requestBody:
-        required: true
+        required: false
         content:
           application/json:
             schema:
               type: array
               items:
                 type: string
-              description: List of collection IDs to export.
+              description: List of collection IDs to export. Omit or pass an empty array to export all collections.
             example:
               - "232e6d6c-46e9-49b6-a137-8933f0f05999"
       responses:

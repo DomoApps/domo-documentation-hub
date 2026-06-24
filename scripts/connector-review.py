@@ -330,6 +330,8 @@ def analyze_jira_ticket(jira_id, my_account_id, templates):
 
     # Check for secondary approval after Arun's comment.
     # Accepts approvals from: (a) accounts Arun @-mentioned, or (b) anyone in known_approvers.
+    # Also treats a secondary's publish/migration request as an implicit approval — when a
+    # reviewer says "please publish it" they have approved and are escalating to Jared.
     secondary_approved = False
     past_arun = arun_comment is None  # if no arun comment, scan all
     for c in comments:
@@ -345,6 +347,14 @@ def analyze_jira_ticket(jira_id, my_account_id, templates):
             text = extract_text(c.get("body", {})).lower()
             if any(p in text for p in approval_phrases):
                 secondary_approved = True
+                break
+            if any(p in text for p in publish_phrases):
+                secondary_approved = True
+                action_type = "publish"
+                break
+            if any(p in text for p in migration_phrases):
+                secondary_approved = True
+                action_type = "migration"
                 break
 
     # Track follow-ups and escalation posted by Jared

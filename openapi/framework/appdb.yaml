@@ -35,8 +35,6 @@ components:
           type: string
           format: uuid
           description: Unique identifier for the document
-        customer:
-          type: string
         owner:
           type: integer
           format: int64
@@ -61,6 +59,18 @@ components:
           description: The actual document content
         syncRequired:
           type: boolean
+      example:
+        id: "c023b254-647e-4839-b74b-b050d4c17447"
+        datastoreId: "5565fecc-a852-4799-83bf-f9423c0f7687"
+        collectionId: "a3aaeeed-5210-4048-9ff0-d88fa0de4eda"
+        syncRequired: true
+        owner: 870010733
+        createdOn: "2026-06-25T01:33:56.332Z"
+        updatedOn: "2026-06-25T01:33:56.332Z"
+        updatedBy: 870010733
+        content:
+          username: "Bill S. Preston, Esquire"
+          score: 42
 
     DocumentCreate:
       type: object
@@ -88,8 +98,6 @@ components:
         id:
           type: string
           format: uuid
-        customer:
-          type: string
         owner:
           type: integer
           format: int64
@@ -101,8 +109,20 @@ components:
         datasourceId:
           type: string
           format: uuid
-        schemaJson:
-          type: string
+          nullable: true
+        defaultPermissions:
+          nullable: true
+          description: Default permissions for the collection. Null when not configured.
+        requiredAuthorities:
+          nullable: true
+          description: Required authorities for access. Null when not configured.
+        filters:
+          nullable: true
+          description: Collection-level filters. Null when not configured.
+        schema:
+          $ref: '#/components/schemas/Schema'
+        syncEnabled:
+          type: boolean
         syncRequired:
           type: boolean
         fullReplaceRequired:
@@ -110,21 +130,38 @@ components:
         lastSync:
           type: string
           format: date-time
-        updatedBy:
-          type: integer
-          format: int64
-        schema:
-          $ref: '#/components/schemas/Schema'
+          nullable: true
         createdOn:
           type: string
           format: date-time
         updatedOn:
           type: string
           format: date-time
-        exportable:
-          type: boolean
-        syncEnabled:
-          type: boolean
+        updatedBy:
+          type: integer
+          format: int64
+      example:
+        id: "a3aaeeed-5210-4048-9ff0-d88fa0de4eda"
+        datastoreId: "5565fecc-a852-4799-83bf-f9423c0f7687"
+        defaultPermissions: null
+        requiredAuthorities: null
+        owner: 870010733
+        name: "Users"
+        datasourceId: null
+        schema:
+          columns:
+            - type: "STRING"
+              name: "username"
+            - type: "STRING"
+              name: "band"
+        filters: null
+        syncEnabled: false
+        syncRequired: false
+        fullReplaceRequired: false
+        lastSync: null
+        createdOn: "2026-06-25T01:26:34.744Z"
+        updatedOn: "2026-06-25T01:26:34.744Z"
+        updatedBy: 870010733
 
     CollectionCreate:
       type: object
@@ -188,6 +225,8 @@ components:
       properties:
         Created:
           type: integer
+      example:
+        Created: 2
 
     BulkUpsertResponse:
       type: object
@@ -196,12 +235,17 @@ components:
           type: integer
         Created:
           type: integer
+      example:
+        Updated: 1
+        Created: 1
 
     BulkDeleteResponse:
       type: object
       properties:
         Deleted:
           type: integer
+      example:
+        Deleted: 3
 
 paths:
   /domo/datastores/v1/collections/{collectionName}/documents:
@@ -242,6 +286,17 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Document'
+              example:
+                id: "c023b254-647e-4839-b74b-b050d4c17447"
+                datastoreId: "5565fecc-a852-4799-83bf-f9423c0f7687"
+                collectionId: "a3aaeeed-5210-4048-9ff0-d88fa0de4eda"
+                syncRequired: true
+                owner: 870010733
+                createdOn: "2026-06-25T01:33:56.332Z"
+                updatedOn: "2026-06-25T01:33:56.332Z"
+                updatedBy: 870010733
+                content:
+                  username: "Bill S. Preston, Esquire"
         '400':
           description: Bad request
           content:
@@ -278,6 +333,29 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Document'
+              example:
+                - id: "c023b254-647e-4839-b74b-b050d4c17447"
+                  datastoreId: "5565fecc-a852-4799-83bf-f9423c0f7687"
+                  collectionId: "a3aaeeed-5210-4048-9ff0-d88fa0de4eda"
+                  syncRequired: true
+                  owner: 870010733
+                  createdOn: "2026-06-25T01:33:56.332Z"
+                  updatedOn: "2026-06-25T01:33:56.332Z"
+                  updatedBy: 870010733
+                  content:
+                    username: "Bill S. Preston, Esquire"
+                    score: 42
+                - id: "6d2138c7-cb4a-4cda-9515-bd8a406b5270"
+                  datastoreId: "5565fecc-a852-4799-83bf-f9423c0f7687"
+                  collectionId: "a3aaeeed-5210-4048-9ff0-d88fa0de4eda"
+                  syncRequired: false
+                  owner: 870010733
+                  createdOn: "2026-06-25T01:34:10.201Z"
+                  updatedOn: "2026-06-25T01:34:10.201Z"
+                  updatedBy: 870010733
+                  content:
+                    username: "Ted Theodore Logan"
+                    score: 77
 
   /domo/datastores/v1/collections/{collectionName}/documents/{documentId}:
     get:
@@ -314,6 +392,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Document'
+              example:
+                id: "c023b254-647e-4839-b74b-b050d4c17447"
+                datastoreId: "5565fecc-a852-4799-83bf-f9423c0f7687"
+                collectionId: "a3aaeeed-5210-4048-9ff0-d88fa0de4eda"
+                syncRequired: true
+                owner: 870010733
+                createdOn: "2026-06-25T01:33:56.332Z"
+                updatedOn: "2026-06-25T01:33:56.332Z"
+                updatedBy: 870010733
+                content:
+                  username: "Bill S. Preston, Esquire"
+                  score: 42
         '404':
           description: Document not found
 
@@ -356,15 +446,27 @@ paths:
             }).then(doc => console.log(doc));
       responses:
         '200':
-          description: Document updated successfully
+          description: Document updated successfully. Returns the full updated document.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Document'
+              example:
+                id: "c023b254-647e-4839-b74b-b050d4c17447"
+                datastoreId: "5565fecc-a852-4799-83bf-f9423c0f7687"
+                collectionId: "a3aaeeed-5210-4048-9ff0-d88fa0de4eda"
+                syncRequired: true
+                owner: 870010733
+                createdOn: "2026-06-25T01:33:56.332Z"
+                updatedOn: "2026-06-25T01:33:58.316Z"
+                updatedBy: 870010733
+                content:
+                  username: "Bill S. Preston, Esquire"
+                  Band: "Wyld Stallyns"
 
     delete:
       summary: Delete Document
-      description: Permanently deletes a document from the collection
+      description: Permanently deletes a document from the collection. Returns an empty response body on success.
       tags:
       - AppDB API
       parameters:
@@ -390,7 +492,9 @@ paths:
               .then(() => console.log('deleted'));
       responses:
         '200':
-          description: Document deleted successfully
+          description: Document deleted successfully. No response body is returned.
+        '404':
+          description: Document not found
 
   /domo/datastores/v1/collections/{collectionName}/documents/query:
     post:
@@ -509,6 +613,19 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Document'
+              example:
+                - id: "c023b254-647e-4839-b74b-b050d4c17447"
+                  datastoreId: "5565fecc-a852-4799-83bf-f9423c0f7687"
+                  collectionId: "a3aaeeed-5210-4048-9ff0-d88fa0de4eda"
+                  syncRequired: true
+                  owner: 870010733
+                  createdOn: "2026-06-25T01:33:56.332Z"
+                  updatedOn: "2026-06-25T01:33:58.316Z"
+                  updatedBy: 870010733
+                  content:
+                    username: "Bill S. Preston, Esquire"
+                    score: 99
+                    band: "Wyld Stallyns"
 
   /domo/datastores/v1/collections/{collectionName}/documents/update:
     put:
@@ -546,11 +663,12 @@ paths:
             }).then(count => console.log(count + ' document(s) updated'));
       responses:
         '200':
-          description: Number of updated objects
+          description: Number of documents updated
           content:
             application/json:
               schema:
                 type: integer
+              example: 2
 
   /domo/datastores/v1/collections/{collectionName}/documents/bulk:
     post:
@@ -595,6 +713,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/BulkCreateResponse'
+              example:
+                Created: 2
 
     put:
       summary: Upsert Documents in Bulk
@@ -652,6 +772,9 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/BulkUpsertResponse'
+              example:
+                Updated: 2
+                Created: 1
 
     delete:
       summary: Delete Documents in Bulk
@@ -688,6 +811,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/BulkDeleteResponse'
+              example:
+                Deleted: 3
 
   /domo/datastores/v1/collections:
     post:
@@ -731,6 +856,28 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Collection'
+              example:
+                id: "a3aaeeed-5210-4048-9ff0-d88fa0de4eda"
+                datastoreId: "5565fecc-a852-4799-83bf-f9423c0f7687"
+                defaultPermissions: null
+                requiredAuthorities: null
+                owner: 870010733
+                name: "Users"
+                datasourceId: null
+                schema:
+                  columns:
+                    - type: "STRING"
+                      name: "username"
+                    - type: "STRING"
+                      name: "band"
+                filters: null
+                syncEnabled: false
+                syncRequired: false
+                fullReplaceRequired: false
+                lastSync: null
+                createdOn: "2026-06-25T01:26:34.744Z"
+                updatedOn: "2026-06-25T01:26:34.744Z"
+                updatedBy: 870010733
 
     get:
       summary: List Collections
@@ -752,6 +899,28 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Collection'
+              example:
+                - id: "a3aaeeed-5210-4048-9ff0-d88fa0de4eda"
+                  datastoreId: "5565fecc-a852-4799-83bf-f9423c0f7687"
+                  defaultPermissions: null
+                  requiredAuthorities: null
+                  owner: 870010733
+                  name: "Users"
+                  datasourceId: null
+                  schema:
+                    columns:
+                      - type: "STRING"
+                        name: "username"
+                      - type: "STRING"
+                        name: "band"
+                  filters: null
+                  syncEnabled: false
+                  syncRequired: false
+                  fullReplaceRequired: false
+                  lastSync: null
+                  createdOn: "2026-06-25T01:26:34.744Z"
+                  updatedOn: "2026-06-25T01:26:34.744Z"
+                  updatedBy: 870010733
 
   /domo/datastores/v1/collections/{collectionName}:
     put:
@@ -812,11 +981,38 @@ paths:
             }).then(collection => console.log(collection));
       responses:
         '200':
-          description: Collection updated successfully
+          description: Collection updated successfully. Returns the full updated collection.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Collection'
+              example:
+                id: "a3aaeeed-5210-4048-9ff0-d88fa0de4eda"
+                datastoreId: "5565fecc-a852-4799-83bf-f9423c0f7687"
+                defaultPermissions: null
+                requiredAuthorities: null
+                owner: 870010733
+                name: "Users"
+                datasourceId: null
+                schema:
+                  columns:
+                    - type: "STRING"
+                      name: "username"
+                      visible: true
+                    - type: "STRING"
+                      name: "band"
+                      visible: true
+                    - type: "STRING"
+                      name: "favorite color"
+                      visible: true
+                filters: null
+                syncEnabled: true
+                syncRequired: true
+                fullReplaceRequired: true
+                lastSync: null
+                createdOn: "2026-06-25T01:26:34.744Z"
+                updatedOn: "2026-06-25T01:26:41.145Z"
+                updatedBy: 870010733
 
     delete:
       summary: Delete Collection
@@ -840,7 +1036,7 @@ paths:
               .then(() => console.log('collection deleted'));
       responses:
         '200':
-          description: Collection deleted successfully
+          description: Collection deleted successfully. No response body is returned.
 
   /domo/datastores/v1/export:
     post:
@@ -935,7 +1131,7 @@ paths:
             ).then(() => console.log('permissions updated'));
       responses:
         '200':
-          description: Permissions updated successfully
+          description: Permissions updated successfully. No response body is returned.
 
     delete:
       summary: Delete Permissions
@@ -972,4 +1168,4 @@ paths:
             ).then(() => console.log('permissions removed'));
       responses:
         '200':
-          description: Permissions removed successfully
+          description: Permissions removed successfully. No response body is returned.

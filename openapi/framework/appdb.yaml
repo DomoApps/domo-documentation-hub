@@ -230,7 +230,9 @@ paths:
         - lang: JavaScript
           label: domo.js
           source: |-
-            domo.post('/domo/datastores/v1/collections/Users/documents', {
+            const collectionName = 'YourCollection';
+
+            domo.post(`/domo/datastores/v1/collections/${collectionName}/documents`, {
               content: { username: 'Bill S. Preston, Esquire' }
             }).then(doc => console.log(doc));
       responses:
@@ -263,7 +265,9 @@ paths:
         - lang: JavaScript
           label: domo.js
           source: |-
-            domo.get('/domo/datastores/v1/collections/Users/documents')
+            const collectionName = 'YourCollection';
+
+            domo.get(`/domo/datastores/v1/collections/${collectionName}/documents`)
               .then(docs => console.log(docs));
       responses:
         '200':
@@ -298,7 +302,10 @@ paths:
         - lang: JavaScript
           label: domo.js
           source: |-
-            domo.get('/domo/datastores/v1/collections/Users/documents/a1b2c3d4-e5f6-7890-abcd-ef1234567890')
+            const collectionName = 'YourCollection';
+            const documentId = 'your-document-id';
+
+            domo.get(`/domo/datastores/v1/collections/${collectionName}/documents/${documentId}`)
               .then(doc => console.log(doc));
       responses:
         '200':
@@ -341,7 +348,10 @@ paths:
         - lang: JavaScript
           label: domo.js
           source: |-
-            domo.put('/domo/datastores/v1/collections/Users/documents/a1b2c3d4-e5f6-7890-abcd-ef1234567890', {
+            const collectionName = 'YourCollection';
+            const documentId = 'your-document-id';
+
+            domo.put(`/domo/datastores/v1/collections/${collectionName}/documents/${documentId}`, {
               content: { username: 'Bill S. Preston, Esquire', Band: 'Wyld Stallyns' }
             }).then(doc => console.log(doc));
       responses:
@@ -373,7 +383,10 @@ paths:
         - lang: JavaScript
           label: domo.js
           source: |-
-            domo.delete('/domo/datastores/v1/collections/Users/documents/a1b2c3d4-e5f6-7890-abcd-ef1234567890')
+            const collectionName = 'YourCollection';
+            const documentId = 'your-document-id';
+
+            domo.delete(`/domo/datastores/v1/collections/${collectionName}/documents/${documentId}`)
               .then(() => console.log('deleted'));
       responses:
         '200':
@@ -472,8 +485,10 @@ paths:
         - lang: JavaScript
           label: domo.js
           source: |-
+            const collectionName = 'YourCollection';
+
             // Simple filter
-            domo.post('/domo/datastores/v1/collections/Users/documents/query', {
+            domo.post(`/domo/datastores/v1/collections/${collectionName}/documents/query`, {
               $or: [
                 { 'content.comments': { $regex: 'happy' } },
                 { 'content.username': { $ne: 'Eeyore' } }
@@ -482,7 +497,7 @@ paths:
 
             // With aggregation (query params)
             domo.post(
-              '/domo/datastores/v1/collections/Users/documents/query?groupby=content.band&count=count',
+              `/domo/datastores/v1/collections/${collectionName}/documents/query?groupby=content.band&count=count`,
               {}
             ).then(results => console.log(results));
       responses:
@@ -523,7 +538,9 @@ paths:
         - lang: JavaScript
           label: domo.js
           source: |-
-            domo.put('/domo/datastores/v1/collections/Users/documents/update', {
+            const collectionName = 'YourCollection';
+
+            domo.put(`/domo/datastores/v1/collections/${collectionName}/documents/update`, {
               query: { 'content.username': 'Bill S. Preston, Esquire' },
               operation: { $set: { 'content.comment': 'Excellent!' } }
             }).then(count => console.log(count + ' document(s) updated'));
@@ -565,7 +582,9 @@ paths:
         - lang: JavaScript
           label: domo.js
           source: |-
-            domo.post('/domo/datastores/v1/collections/Users/documents/bulk', [
+            const collectionName = 'YourCollection';
+
+            domo.post(`/domo/datastores/v1/collections/${collectionName}/documents/bulk`, [
               { content: { username: 'Bill S. Preston, Esquire' } },
               { content: { username: 'Ted Theodore Logan' } }
             ]).then(result => console.log(result));
@@ -619,7 +638,9 @@ paths:
         - lang: JavaScript
           label: domo.js
           source: |-
-            domo.put('/domo/datastores/v1/collections/Users/documents/bulk', [
+            const collectionName = 'YourCollection';
+
+            domo.put(`/domo/datastores/v1/collections/${collectionName}/documents/bulk`, [
               { id: 'b3ea3d2d-86c5-44e6-a2f4-985136bbbce1', content: { username: 'Bill S. Preston, Esquire', Band: 'Wyld Stallyns' } },
               { id: '1e61d99d-9885-419a-a33e-3be3941ee720', content: { username: 'Ted Theodore Logan', Band: 'Wyld Stallyns' } },
               { content: { username: 'Rufus' } }
@@ -655,8 +676,10 @@ paths:
         - lang: JavaScript
           label: domo.js
           source: |-
-            const ids = '2bdd6370-85af-4e06-aadb-380839e4de8c,c78ba737-5f84-49c9-8ac9-58615a0f8aa8';
-            domo.delete(`/domo/datastores/v1/collections/Users/documents/bulk?ids=${ids}`)
+            const collectionName = 'YourCollection';
+            const ids = 'id-one,id-two';
+
+            domo.delete(`/domo/datastores/v1/collections/${collectionName}/documents/bulk?ids=${ids}`)
               .then(result => console.log(result));
       responses:
         '200':
@@ -692,7 +715,7 @@ paths:
           label: domo.js
           source: |-
             domo.post('/domo/datastores/v1/collections', {
-              name: 'Users',
+              name: 'YourCollection',
               schema: {
                 columns: [
                   { name: 'username', type: 'STRING' },
@@ -774,8 +797,10 @@ paths:
         - lang: JavaScript
           label: domo.js
           source: |-
-            domo.put('/domo/datastores/v1/collections/Users', {
-              id: '6de8034e-0aa3-4fd9-ac1d-9a1ffeccb759',
+            const collectionName = 'YourCollection';
+
+            domo.put(`/domo/datastores/v1/collections/${collectionName}`, {
+              id: 'your-collection-id',
               schema: {
                 columns: [
                   { name: 'username', type: 'STRING', visible: true },
@@ -809,7 +834,9 @@ paths:
         - lang: JavaScript
           label: domo.js
           source: |-
-            domo.delete('/domo/datastores/v1/collections/Users')
+            const collectionName = 'YourCollection';
+
+            domo.delete(`/domo/datastores/v1/collections/${collectionName}`)
               .then(() => console.log('collection deleted'));
       responses:
         '200':
@@ -898,8 +925,13 @@ paths:
         - lang: JavaScript
           label: domo.js
           source: |-
+            const collectionName = 'YourCollection';
+            const entity = 'RYUU_APP'; // USER, GROUP, or RYUU_APP
+            const entityId = 'your-entity-id';
+            const permissions = 'read,create_content,update_content,read_content';
+
             domo.put(
-              '/domo/datastores/v1/collections/Users/permission/RYUU_APP/733ff55b-387c-472e-b3c7-9911c7057f5f?permissions=read,create_content,update_content,read_content'
+              `/domo/datastores/v1/collections/${collectionName}/permission/${entity}/${entityId}?permissions=${permissions}`
             ).then(() => console.log('permissions updated'));
       responses:
         '200':
@@ -931,8 +963,12 @@ paths:
         - lang: JavaScript
           label: domo.js
           source: |-
+            const collectionName = 'YourCollection';
+            const entity = 'RYUU_APP'; // USER, GROUP, or RYUU_APP
+            const entityId = 'your-entity-id';
+
             domo.delete(
-              '/domo/datastores/v1/collections/Users/permission/RYUU_APP/733ff55b-387c-472e-b3c7-9911c7057f5f'
+              `/domo/datastores/v1/collections/${collectionName}/permission/${entity}/${entityId}`
             ).then(() => console.log('permissions removed'));
       responses:
         '200':

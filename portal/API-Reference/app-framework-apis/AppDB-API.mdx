@@ -3,26 +3,42 @@ title: AppDB API
 permalink: 1l1fm2g0sfm69-app-db-api
 ---
 
-AppDB allows the storage of arbitrary JSON documents similar to a normal NoSQL database. This enables the ability to store a state within your DomoApp. Optionally, you can also sync the data in AppDB back to a Domo DataSet. Three layers (analogous to traditional storage mechanisms) provide this data storage:
+AppDB is Domo's built-in document store for Custom Apps. It lets apps persist and query arbitrary JSON documents without a developer token — calls are made with `domo.js` using the card's session instead. Data is organized in three layers:
 
-1. Datastores: Analogous to a database. A CustomApp has a single datastore that is created automatically, named with the CustomApp's ID and managed transparently to the CustomApp.
-2. Collections: Analogous to a collection in a NoSQL database or a table in a relational database. A datastore can have multiple collections defined.
-3. Documents: Analogous to documents in a NoSQL database or a table row in a relational database. A collection can have multiple documents.
+| Layer          | Analogy                  | Notes                                                     |
+| -------------- | ------------------------ | --------------------------------------------------------- |
+| **Datastore**  | Database                 | One per app; created automatically. Identified by a UUID. |
+| **Collection** | Table / NoSQL collection | Define in the manifest or create programmatically.        |
+| **Document**   | Row / NoSQL document     | Free-form `content` object inside a system envelope.      |
 
-### Defining Collections in the Manifest
+## App Framework vs. Product API
+
+Two API surfaces exist for AppDB. Choose the right one for your context:
+
+|                                | App Framework API              | Product API                                |
+| ------------------------------ | ------------------------------ | ------------------------------------------ |
+| **Base path**                  | `/domo/datastores/`            | `/api/datastores/`                         |
+| **Auth**                       | Card session (no token needed) | Developer token (`X-DOMO-Developer-Token`) |
+| **Works from**                 | Inside a running Domo app      | Any HTTP client                            |
+| **Datastore management**       | Not exposed                    | Full CRUD                                  |
+| **Download / Import**          | Not exposed                    | Available                                  |
+| **Permission reads**           | Not exposed                    | Available                                  |
+| **Collection & Document CRUD** | ✓                              | ✓                                          |
+| **Export**                     | ✓                              | ✓                                          |
+
+This page covers the **App Framework API**. For the Product API, see [App DB API — Product](/portal/API-Reference/Product-APIs/App-DB).
 
 ---
 
-Within the app manifest, you can define the Collections that you want your app to be able to use by simply listing them in a Collections property as in the following:
+## Defining Collections in the Manifest
+
+You can define collections in your app's manifest and the platform creates them automatically when the app is installed.
 
 ```json
 {
   "name": "Example comments app",
   "version": "1.0",
-  "size": {
-    "width": 2,
-    "height": 2
-  },
+  "size": { "width": 2, "height": 2 },
   "mapping": [],
   "collections": [
     {
@@ -38,1253 +54,292 @@ Within the app manifest, you can define the Collections that you want your app t
     {
       "name": "Users"
     }
-  ],
-  "id": "760ae493-6c29-4e61-8fe3-9c887265ea86"
+  ]
 }
 ```
 
-As you can see, if you do not need to sync a Collection back to Domo, the only property you need to define is the Collection name. If you want it to sync back to Domo, you must also provide the schema you want for the Domo DataSet.
+A collection with no schema can still store any JSON — the schema is only required if you want the collection to sync to a Domo DataSet. The accepted column types are:
 
-**Schema Object**
-
-The schema object takes a list of columns. Each column has a name and a type. The following types are accepted.
-
-- `STRING`
-- `LONG`
-- `DECIMAL`
-- `DOUBLE`
-- `DATE`
-- `DATETIME`
+`STRING` · `LONG` · `DECIMAL` · `DOUBLE` · `DATE` · `DATETIME`
 
 <Note>
-  Documents that contain DATE or DATETIME data must be formatted as YYYY-MM-DD
-  or YYYY-MM-DDTHH:MM:SSZ in order to be successfully synced to a Domo DataSet.
+  Documents containing `DATE` or `DATETIME` data must use the format
+  `YYYY-MM-DD` or `YYYY-MM-DDTHH:MM:SSZ` to sync to a Domo DataSet.
 </Note>
 
 <Warning>
-  Incorrect schema data types prevent DataSet creation. If your AppDB DataSet
-  doesn't appear after 15 minutes, verify your schema uses valid types (STRING,
-  LONG, DECIMAL, DOUBLE, DATE, DATETIME). Common mistakes include using NUMBER
-  or INTEGER.
+  Incorrect schema types prevent DataSet creation. If your AppDB DataSet doesn't
+  appear after 15 minutes, verify your schema uses only the valid types above.
+  Common mistakes include `NUMBER` or `INTEGER`.
 </Warning>
 
 <Warning>
-  Collections won't sync if the owner lacks permissions on the target DataSet.
-  If a user is removed from Domo, their Collection stops syncing. The new owner
-  must have both Collection ownership and Admin Permissions.
+  Collections won't sync if the collection owner lacks permissions on the target
+  DataSet. If that user is removed from Domo, syncing stops. The new owner must
+  have both Collection ownership and Admin Permissions.
 </Warning>
 
-### Making API Calls to Your Collection
-
-Examples of how to make calls to the Collections defined in your manifest are below. For now, you will not be able to make these calls in local dev without including a proxy. Instead, you must publish your app and ensure that it is making calls in an installed app.
-
 <Note>
-  If you make any updates to the manifest and re-publish your app design, **you
-  will need to edit the installed app and re-save it** for the manifest changes
-  to take effect on the installed app (similar to what you would have to do when
-  making changes to the mapping section of your manifest).
+  After updating the manifest and re-publishing your app design, you must **edit
+  the installed app and re-save it** for manifest changes to take effect.
 </Note>
 
-### Create Document
+---
 
-Create a single document in a collection.
+## Endpoint Reference
 
-**Code Example**
-
-The `documentContent` variable in this POST request is equal to the sample request body.
-
-```text
-domo.post(`/domo/datastores/v1/collections/Users/documents/`, documentContent)
-    .then(data => console.log(data));
-```
-
-**Arguments**
-
-| Property Name  | Type   | Required | Description                                      |
-| -------------- | ------ | -------- | ------------------------------------------------ |
-| collectionName | String | Required | The name given to the collection in the manifest |
-
-**HTTP Request**
-
-```text
-POST /domo/datastores/v1/collections/{collectionName}/documents/ HTTP/1.1
-Content-Type: application/json
-Accept: application/json
-```
-
-**Request Body**
-
-The request body accepts a document object. All document content should be wrapped in the content object. The properties of the document within the content object should match the schema of the collection if the schema is provided.
-
-```json
-{
-  "content": {
-    "username": "Bill S. Preston, Esquire"
-  }
-}
-```
-
-**HTTP Response**
-
-Returns the created document.
-
-```json
-HTTP/1.1 200 OK
-Content-Type: application/json;charset=UTF-8
-
-{
-    "id": "b3ea3d2d-86c5-44e6-a2f4-985136bbbce1",
-    "customer": "excellent-adventure",
-    "owner": 1089963280,
-    "datastoreId": "d4a4b9c4-e123-41ce-8f93-dcafbeea4642",
-    "collectionId": "02c3a404-e18c-4f15-ac7f-a96cdb59ad10",
-    "createdOn": "2019-03-04T16:59:25.184+0000",
-    "updatedOn": "2019-03-04T16:59:25.184+0000",
-    "updatedBy": 1089963280,
-    "content": {
-        "username": "Bill S. Preston, Esquire"
-    },
-    "syncRequired": true
-}
-```
-
-**Code Example**
-
-```js
-domo.post(`/domo/datastores/v1/collections/Users/documents`, {
-  content: {
-    username: "Bill S. Preston, Esquire",
-  },
-});
-```
-
-### List Documents
+<CardGroup cols={2}>
+  <Card
+    horizontal
+    arrow
+    title="Create Document"
+    icon="plus"
+    href="/api-reference/appdb-api/create-document"
+  />
+  <Card
+    horizontal
+    arrow
+    title="List Documents"
+    icon="list"
+    href="/api-reference/appdb-api/list-documents"
+  />
+  <Card
+    horizontal
+    arrow
+    title="Get Document"
+    icon="magnifying-glass"
+    href="/api-reference/appdb-api/get-document"
+  />
+  <Card
+    horizontal
+    arrow
+    title="Update Document"
+    icon="pen"
+    href="/api-reference/appdb-api/update-document"
+  />
+  <Card
+    horizontal
+    arrow
+    title="Delete Document"
+    icon="trash"
+    href="/api-reference/appdb-api/delete-document"
+  />
+  <Card
+    horizontal
+    arrow
+    title="Query Documents"
+    icon="filter"
+    href="/api-reference/appdb-api/query-documents"
+  />
+  <Card
+    horizontal
+    arrow
+    title="Partially Update Documents"
+    icon="pen-to-square"
+    href="/api-reference/appdb-api/partially-update-documents"
+  />
+  <Card
+    horizontal
+    arrow
+    title="Create in Bulk"
+    icon="layer-plus"
+    href="/api-reference/appdb-api/create-documents-in-bulk"
+  />
+  <Card
+    horizontal
+    arrow
+    title="Upsert in Bulk"
+    icon="arrows-rotate"
+    href="/api-reference/appdb-api/upsert-documents-in-bulk"
+  />
+  <Card
+    horizontal
+    arrow
+    title="Delete in Bulk"
+    icon="trash-list"
+    href="/api-reference/appdb-api/delete-documents-in-bulk"
+  />
+  <Card
+    horizontal
+    arrow
+    title="Create Collection"
+    icon="folder-plus"
+    href="/api-reference/appdb-api/create-collection"
+  />
+  <Card
+    horizontal
+    arrow
+    title="List Collections"
+    icon="folders"
+    href="/api-reference/appdb-api/list-collections"
+  />
+  <Card
+    horizontal
+    arrow
+    title="Update Collection"
+    icon="folder-pen"
+    href="/api-reference/appdb-api/update-collection"
+  />
+  <Card
+    horizontal
+    arrow
+    title="Delete Collection"
+    icon="folder-minus"
+    href="/api-reference/appdb-api/delete-collection"
+  />
+  <Card
+    horizontal
+    arrow
+    title="Export Collections"
+    icon="arrow-up-from-bracket"
+    href="/api-reference/appdb-api/manually-export-collections"
+  />
+  <Card
+    horizontal
+    arrow
+    title="Modify Permissions"
+    icon="lock-open"
+    href="/api-reference/appdb-api/modify-collection-permissions"
+  />
+  <Card
+    horizontal
+    arrow
+    title="Delete Permissions"
+    icon="lock"
+    href="/api-reference/appdb-api/delete-permissions"
+  />
+</CardGroup>
 
 ---
 
-Lists all documents from a given Collection. There is an upper limit of 10,000 documents per request. Use `limit` and `offset` to paginate through large collections.
+## Query Reference
 
-**Code Example**
-
-```js
-domo
-  .get(`/domo/datastores/v1/collections/Users/documents/`)
-  .then((data) => console.log(data));
-```
-
-**Arguments**
-
-| Property Name  | Type    | Required | Description                                                 |
-| -------------- | ------- | -------- | ----------------------------------------------------------- |
-| collectionName | String  | Required | The name given to the collection in the manifest            |
-| limit          | Integer | Optional | Maximum number of documents to return. Default is 10,000.   |
-| offset         | Integer | Optional | Number of documents to skip before returning. Default is 0. |
-
-**HTTP Request**
-
-```text
-GET /domo/datastores/v1/collections/{collectionName}/documents/?limit={limit}&offset={offset} HTTP/1.1
-Content-Type: application/json
-Accept: application/json
-```
-
-**HTTP Response**
-
-Returns an array of documents.
-
-```json
-HTTP/1.1 200 OK
-Content-Type: application/json;charset=UTF-8
-
-[
-    {
-        "id": "b3ea3d2d-86c5-44e6-a2f4-985136bbbce1",
-        "customer": "excellent-adventure",
-        "owner": 1089963280,
-        "datastoreId": "d4a4b9c4-e123-41ce-8f93-dcafbeea4642",
-        "collectionId": "02c3a404-e18c-4f15-ac7f-a96cdb59ad10",
-        "createdOn": "2019-03-04T16:59:25.184+0000",
-        "updatedOn": "2019-03-04T16:59:25.184+0000",
-        "updatedBy": 1089963280,
-        "content": {
-            "username": "Bill S. Preston, Esquire"
-        },
-        "syncRequired": true
-    },
-    {
-        "id": "1e61d99d-9885-419a-a33e-3be3941ee720",
-        "customer": "excellent-adventure",
-        "owner": 1089963280,
-        "datastoreId": "d4a4b9c4-e123-41ce-8f93-dcafbeea4642",
-        "collectionId": "02c3a404-e18c-4f15-ac7f-a96cdb59ad10",
-        "createdOn": "2019-03-03T17:49:25.72+0000",
-        "updatedOn": "2019-03-03T17:49:25.72+0000",
-        "updatedBy": 1089963280,
-        "content": {
-            "username": "Ted Theodore Logan"
-        },
-        "syncRequired": true
-    }
-]
-```
-
-### Get Document
-
----
-
-Retrieves a single document from a Collection when given its document ID.
-
-**Code Example**
-
-```js
-domo
-  .get(
-    `/domo/datastores/v1/collections/Users/documents/b3ea3d2d-86c5-44e6-a2f4-985136bbbce1`,
-  )
-  .then((data) => console.log(data));
-```
-
-**Arguments**
-
-| Property Name  | Type   | Required | Description                                         |
-| -------------- | ------ | -------- | --------------------------------------------------- |
-| collectionName | String | Required | The name given to the collection in the manifest    |
-| documentId     | UUID   | Required | The id of the document returned when it was created |
-
-**HTTP Request**
-
-```text
-GET /domo/datastores/v1/collections/{collectionName}/documents/{documentId} HTTP/1.1
-Content-Type: application/json
-Accept: application/json
-```
-
-**HTTP Response**
-
-Returns the indicated document.
-
-```json
-HTTP/1.1 200 OK
-Content-Type: application/json;charset=UTF-8
-
-{
-    "id": "b3ea3d2d-86c5-44e6-a2f4-985136bbbce1",
-    "customer": "excellent-adventure",
-    "owner": 1089963280,
-    "datastoreId": "d4a4b9c4-e123-41ce-8f93-dcafbeea4642",
-    "collectionId": "02c3a404-e18c-4f15-ac7f-a96cdb59ad10",
-    "createdOn": "2019-03-04T16:59:25.184+0000",
-    "updatedOn": "2019-03-04T16:59:25.184+0000",
-    "updatedBy": 1089963280,
-    "content": {
-        "username": "Bill S. Preston, Esquire"
-    },
-    "syncRequired": true
-}
-```
-
-### Update Document
-
----
-
-Updates an existing document in a Collection when given its document ID.
-
-**Code Example**
-
-The `documentContent` variable in this PUT request is equal to the sample request body.
-
-```text
-domo.put(`/domo/datastores/v1/collections/Users/documents/b3ea3d2d-86c5-44e6-a2f4-985136bbbce1`, documentContent)
-    .then(data => console.log(data));
-```
-
-**Arguments**
-
-| Property Name  | Type   | Required | Description                                         |
-| -------------- | ------ | -------- | --------------------------------------------------- |
-| collectionName | String | Required | The name given to the collection in the manifest    |
-| documentId     | UUID   | Required | The id of the document returned when it was created |
-
-**HTTP Request**
-
-```text
-PUT /domo/datastores/v1/collections/{collectionName}/documents/{documentId} HTTP/1.1
-Content-Type: application/json
-Accept: application/json
-```
-
-**Request Body**
-
-```json
-{
-  "content": {
-    "username": "Bill S. Preston, Esquire",
-    "Band": "Wyld Stallyns"
-  }
-}
-```
-
-**HTTP Response**
-
-Returns the modified document.
-
-```json
-HTTP/1.1 200 OK
-Content-Type: application/json;charset=UTF-8
-
-{
-    "id": "b3ea3d2d-86c5-44e6-a2f4-985136bbbce1",
-    "customer": "excellent-adventure",
-    "owner": 1089963280,
-    "datastoreId": "d4a4b9c4-e123-41ce-8f93-dcafbeea4642",
-    "collectionId": "02c3a404-e18c-4f15-ac7f-a96cdb59ad10",
-    "createdOn": "2019-03-04T16:59:25.184+0000",
-    "updatedOn": "2019-03-05T15:42:16.115+0000",
-    "updatedBy": 1089963280,
-    "content": {
-        "username": "Bill S. Preston, Esquire",
-        "Band": "Wyld Stallyns"
-    },
-    "syncRequired": true
-}
-```
-
-**Code Example**
-
-```js
-domo
-  .put(
-    `/domo/datastores/v1/collections/Users/documents/b3ea3d2d-86c5-44e6-a2f4-985136bbbce1`,
-    {
-      content: { username: "Bill S. Preston, Esquire", Band: "Wyld Stallyns" },
-    },
-  )
-  .then(console.log);
-```
-
-### Delete Document
-
----
-
-Permanently deletes a document from your application's Collection.
-
-<Danger>
-  **This is destructive and cannot be reversed**. Deleting documents in an AppDB
-  Collection may have performance implications with regard to syncing to its
-  corresponding DataSet in Domo if the `syncEnabled` property is set to `true`
-  for the Collection.
-</Danger>
-
-**Code Example**
-
-```javascript
-domo.delete(
-  `/domo/datastores/v1/collections/Users/documents/1e61d99d-9885-419a-a33e-3be3941ee720`,
-);
-```
-
-**Arguments**
-
-| Property Name  | Type   | Required | Description                                         |
-| -------------- | ------ | -------- | --------------------------------------------------- |
-| collectionName | String | Required | The name given to the collection in the manifest    |
-| documentId     | UUID   | Required | The id of the document returned when it was created |
-
-**HTTP Request**
-
-```text
-DELETE /domo/datastores/v1/collections/{collectionName}/documents/{documentId} HTTP/1.1
-Content-Type: application/json
-Accept: application/json
-```
-
-**HTTP Response**
-
-```text
-HTTP/1.1 200 OK
-```
-
-### Query Documents
-
----
-
-AppDB supports the full range of MongoDB query predicates that can be used in a `find()` function. The following operators are **not** supported:
+The Query Documents endpoint accepts the full range of MongoDB query predicates that work in a `find()` call. The following operators are **not** supported:
 
 - `$where` — JavaScript expression evaluation is disabled server-side.
-- `$near` and `$nearSphere` — proximity searches require a geospatial index, which AppDB collections do not have.
+- `$near` and `$nearSphere` — geospatial proximity searches require an index that AppDB collections do not have.
 
-All other operators in the [official MongoDB query predicate documentation](https://www.mongodb.com/docs/manual/reference/mql/query-predicates/) are supported, including comparison, logical, array, data type, bitwise, `$expr`, `$jsonSchema`, and `$regex` operators. The geospatial shape operators `$geoWithin` and `$geoIntersects` are also supported when your documents contain GeoJSON data.
+All other operators in the [official MongoDB query predicate documentation](https://www.mongodb.com/docs/manual/reference/mql/query-predicates/) are supported, including comparison, logical, array, data type, bitwise, `$expr`, `$jsonSchema`, and `$regex`. The shape operators `$geoWithin` and `$geoIntersects` are also supported when documents contain GeoJSON data.
 
-Example of querying for a document that includes a comment that has the word 'happy' (via a regex operator) or does not include the username 'Eeyore' (via the not equals operator) can be found below. The return value of this call will be an array of documents that matches the query.
+### Querying by Date
 
-**HTTP Request**
-
-```text
-POST /domo/datastores/v1/collections/{collectionName}/documents/query HTTP/1.1
-Content-Type: application/json
-Accept: application/json
-```
-
-**Arguments**
-
-| Property Name  | Type   | Required | Description                                      |
-| -------------- | ------ | -------- | ------------------------------------------------ |
-| collectionName | String | Required | The name given to the collection in the manifest |
-
-**Request Body**
-
-```js
-{
-  $or: [
-    { "content.comments": { $regex: "happy" } },
-    { "content.username": { $ne: "Eeyore" } },
-  ];
-}
-```
-
-**HTTP Response**
-
-Returns an array of documents matching the query.
+Use [MongoDB Extended JSON v2](https://www.mongodb.com/docs/manual/reference/mongodb-extended-json/#bson.Date) `$date` to cast a string to a date object:
 
 ```json
-HTTP/1.1 200 OK
-
-[
-    {
-        "id": "b3ea3d2d-86c5-44e6-a2f4-985136bbbce1",
-        "customer": "excellent-adventure",
-        "owner": 1089963280,
-        "datastoreId": "d4a4b9c4-e123-41ce-8f93-dcafbeea4642",
-        "collectionId": "02c3a404-e18c-4f15-ac7f-a96cdb59ad10",
-        "createdOn": "2019-03-04T16:59:25.184+0000",
-        "updatedOn": "2019-03-05T15:42:16.115+0000",
-        "updatedBy": 1089963280,
-        "content": {
-            "username": "Mickey Mouse",
-            "comments": "Happy Birthday!"
-        },
-        "syncRequired": true
-     },
-     {
-        "id": "b3ea3d2d-86c5-44e6-a2f4-985136bbbce1",
-        "customer": "excellent-adventure",
-        "owner": 1089963280,
-        "datastoreId": "d4a4b9c4-e123-41ce-8f93-dcafbeea4642",
-        "collectionId": "02c3a404-e18c-4f15-ac7f-a96cdb59ad10",
-        "createdOn": "2019-03-04T16:59:25.184+0000",
-        "updatedOn": "2019-03-05T15:42:16.115+0000",
-        "updatedBy": 1089963280,
-        "content": {
-            "username": "Tigger",
-            "comments": "Bouncing makes me so happy!"
-        },
-        "syncRequired": true
-     }
-]
-```
-
-**Querying Based on Dates**
-
-Dates can be queried in AppDB using the [MongoDB Extended JSON v2](https://www.mongodb.com/docs/manual/reference/mongodb-extended-json/) spec shown below. This essentially casts the string provided to the "less than or equal to" operator into a date object. MongoDB documentation on the `$date` operator can be found [here](https://www.mongodb.com/docs/manual/reference/mongodb-extended-json/#bson.Date). The date string provided will need to be in the demonstrated ISO date format.
-
-```js
 {
-    "createdOn" : {
-        "$lte" : {
-            "$date" : "2020-05-12T00:00:00.000Z"
-        }
-    }
+  "createdOn": {
+    "$lte": { "$date": "2020-05-12T00:00:00.000Z" }
+  }
 }
 ```
 
-### Query Documents with Aggregations
+### Aggregation Query Parameters
 
----
+After filtering with the request body, add query string parameters to aggregate results. Any parameter (except `groupby`) accepts an optional alias to avoid name collisions when the same field is aggregated in multiple ways.
 
-After the query limits the documents which will be returned by the API call, you can optionally add query string parameters to the URL to aggregate the query results. Each parameter (excluding `groupby`) has the optional ability to take an alias. While it is not required to alias each property that is being aggregated, it is useful in the event that you need to pass the same property to different aggregations to avoid name collisions.
+Field names use MongoDB dot notation. Fields inside the `content` object must be prefixed with `content.` (e.g., `content.campaignName`). Top-level fields (`owner`, `createdOn`) can be referenced directly.
 
-**HTTP Request**
+| Parameter | Type    | Description                                                       |
+| --------- | ------- | ----------------------------------------------------------------- |
+| `groupby` | String  | Comma-separated properties to group by                            |
+| `count`   | String  | Alias for a count aggregation                                     |
+| `avg`     | String  | `property alias, property alias, …` — average                     |
+| `min`     | String  | `property alias, property alias, …` — minimum                     |
+| `max`     | String  | `property alias, property alias, …` — maximum                     |
+| `sum`     | String  | `property alias, property alias, …` — sum                         |
+| `unwind`  | String  | Comma-separated properties to flatten (one row per array element) |
+| `orderby` | String  | `alias ascending\|descending`                                     |
+| `limit`   | Integer | Max documents to return (default 10,000)                          |
+| `offset`  | Integer | Documents to skip (default 0)                                     |
 
-```text
-POST /domo/datastores/v1/collections/{collectionName}/documents/query?groupby={property1, property2}&count={alias}&{avg|max|min|sum}={property1 alias1, property2 alias2}&orderby={alias1 ascending|descending, alias2 ascending|descending} HTTP/1.1
-Content-Type: application/json
-Accept: application/json
-```
-
-**Arguments**
-
-Any parameter that accepts field names uses standard MongoDB dot notation. Fields inside the `content` object must be prefixed with `content.` (e.g., `content.campaignName`). Top-level document fields (`owner`, `createdOn`, etc.) can be referenced directly without a prefix. The `count`, `limit`, and `offset` parameters take aliases or integers and do not use field names.
-
-| Property Name  | Type    | Required | Description                                                                                                                                  |
-| -------------- | ------- | -------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
-| collectionName | String  | Required | The name given to the collection in the manifest                                                                                             |
-| query          | Object  | Required | The JSON object that represents a Mongo query                                                                                                |
-| groupby        | String  | Optional | The comma-separated list of properties you wish to group by                                                                                  |
-| count          | String  | Optional | The name you wish to alias a count aggregation property                                                                                      |
-| avg            | String  | Optional | The comma-separated list of properties in which you wish to perform an average aggregation followed by the name you wish to alias the result |
-| min            | String  | Optional | The comma-separated list of properties in which you wish to perform a minimum aggregation followed by the name you wish to alias the result  |
-| max            | String  | Optional | The comma-separated list of properties in which you wish to perform a maximum aggregation followed by the name you wish to alias the result  |
-| sum            | String  | Optional | The comma-separated list of properties in which you wish to perform a sum aggregation followed by the name you wish to alias the result      |
-| unwind         | String  | Optional | The comma-separated list of properties that you wish to unwind (the unwind operator flattens nested arrays — one row per array element)      |
-| orderby        | String  | Optional | Field or alias to order by, followed by `ascending` or `descending`. Accepts either an aggregation alias or a field name using dot notation. |
-| limit          | Integer | Optional | The number of documents in which to limit the number of return objects, default is 10,000                                                    |
-| offset         | Integer | Optional | The number of documents in which to skip before returning documents, default is 0                                                            |
-
-**Code Example**
+**Example — campaign aggregation:**
 
 ```js
 const url =
-  "/domo/datastores/v1/collections/campaigns/documents/query?groupby=content.campaignName, content.month&count=documentCount&avg=content.clicks avgClicks, content.impressions avgImps&sum=content.clicks sumClicks, content.impressions sumImps&max=content.clicks maxClicks, content.impressions maxImps&min=content.clicks minClicks, content.impressions minImps&orderby=sumClicks descending";
+  "/domo/datastores/v1/collections/campaigns/documents/query" +
+  "?groupby=content.campaignName,content.month" +
+  "&count=documentCount" +
+  "&avg=content.clicks avgClicks,content.impressions avgImps" +
+  "&sum=content.clicks sumClicks,content.impressions sumImps" +
+  "&max=content.clicks maxClicks,content.impressions maxImps" +
+  "&min=content.clicks minClicks,content.impressions minImps" +
+  "&orderby=sumClicks descending";
 
 domo.post(url, {}).then((data) => console.log(data));
 ```
 
-**Response**
-
 ```json
 [
   {
-    "_id": {
-      "campaignName": "Red Campaign",
-      "month": "February"
-    },
+    "_id": { "campaignName": "Red Campaign", "month": "February" },
     "documentCount": 2,
-    "maxImps": 1250,
     "sumClicks": 210,
-    "sumImps": 2260,
-    "minImps": 1010,
-    "avgImps": 1130.0,
-    "minClicks": 90,
     "avgClicks": 105.0,
-    "maxClicks": 120
+    "minClicks": 90,
+    "maxClicks": 120,
+    "sumImps": 2260,
+    "avgImps": 1130.0,
+    "minImps": 1010,
+    "maxImps": 1250
   },
   {
-    "_id": {
-      "campaignName": "Red Campaign",
-      "month": "January"
-    },
+    "_id": { "campaignName": "Red Campaign", "month": "January" },
     "documentCount": 2,
-    "maxImps": 1150,
     "sumClicks": 190,
-    "sumImps": 2050,
-    "minImps": 900,
-    "avgImps": 1025.0,
-    "minClicks": 85,
     "avgClicks": 95.0,
-    "maxClicks": 105
-  },
-  {
-    "_id": {
-      "campaignName": "Blue Campaign",
-      "month": "January"
-    },
-    "documentCount": 1,
-    "maxImps": 1000,
-    "sumClicks": 100,
-    "sumImps": 1000,
-    "minImps": 1000,
-    "avgImps": 1000.0,
-    "minClicks": 100,
-    "avgClicks": 100.0,
-    "maxClicks": 100
-  },
-  {
-    "_id": {
-      "campaignName": "Blue Campaign",
-      "month": "February"
-    },
-    "documentCount": 1,
-    "maxImps": 500,
-    "sumClicks": 50,
-    "sumImps": 500,
-    "minImps": 500,
-    "avgImps": 500.0,
-    "minClicks": 50,
-    "avgClicks": 50.0,
-    "maxClicks": 50
+    "minClicks": 85,
+    "maxClicks": 105,
+    "sumImps": 2050,
+    "avgImps": 1025.0,
+    "minImps": 900,
+    "maxImps": 1150
   }
 ]
 ```
 
-The `groupby` fields are returned inside the `_id` object when multiple fields are grouped; with a single `groupby` field, `_id` is a scalar value. Aggregation values (`count`, `sum`, `avg`, `min`, `max`) are returned as top-level fields using their configured aliases.
-
-### Partially Update Documents Using Queries
+When multiple fields are grouped, they appear inside the `_id` object. With a single `groupby` field, `_id` is a scalar. Aggregation values are top-level keys using their configured aliases.
 
 ---
 
-Using standard mongo queries and update operations, you can do partial updates on your documents. The query must reference a document, or reference a property in a document.
+## Partial Update Operators
 
-Supported Operators:
+The [Partially Update Documents](/api-reference/appdb-api/partially-update-documents) endpoint supports these MongoDB update operators and modifiers. Refer to the [MongoDB update operator docs](https://www.mongodb.com/docs/manual/reference/mql/update/) for full semantics.
 
-- currentDate
-- inc
-- min
-- max
-- mul
-- rename
-- set
-- unset
-- addToSet
-- pop
-- pull
-- pullAll
-- push
+<Note>
+  `$setOnInsert` has no effect — partial updates do not perform upserts.
+</Note>
 
-Supported Modifiers:
+**Operators:** `$currentDate` · `$inc` · `$min` · `$max` · `$mul` · `$rename` · `$set` · `$unset` · `$addToSet` · `$pop` · `$pull` · `$pullAll` · `$push`
 
-- each
-- position
-- slice
-- sort
+**Modifiers:** `$each` · `$position` · `$slice` · `$sort`
 
-Please refer to the official [mongoDB documentation](https://www.mongodb.com/docs/manual/reference/mql/update/) on Update Operators to better understand these operators and how to create them. Note that the operator `$setOnInsert` has no effect because AppDB partial updates do not perform upserts.
+---
 
-**Code Example**
+## Document-Level Security
 
-```js
-domo
-  .put(`/domo/datastores/v1/collections/Users/documents/update`, body)
-  .then((data) => console.log(data));
-```
-
-**Arguments**
-
-| Property Name  | Type   | Required | Description                                      |
-| -------------- | ------ | -------- | ------------------------------------------------ |
-| collectionName | String | Required | The name given to the collection in the manifest |
-
-**HTTP Request**
-
-```text
-  PUT /domo/datastores/v1/collections/{collectionName}/documents/update
-  Content-Type: application/json
-  Accept: application/json
-```
-
-**Request Body**
-
-Specification
-
-The request body is a single object that must be structured as follows.
-
-```json
-{
-  "query": "{mongo query JSON}",
-  "operation": "{mongo operation JSON}"
-}
-```
-
-Example
-
-```json
-{
-  "query": { "content.username": "Bill S. Preston, Esquire" },
-  "operation": {
-    "$set": {
-      "content.comment": "Excellent!"
-    }
-  }
-}
-```
-
-**HTTP Response**
-
-Returns the number of updated objects or properties.
-
-```text
-HTTP/1.1 200 OK
-Content-Type: application/json;charset=UTF-8
-1
-```
-
-### Bulk Operations
-
-AppDB also allows for the creation, upsertion, and deletion of bulk lists of documents as shown in the examples below.
-
-### Create Documents in Bulk
-
-Create multiple documents in a given collection in a single HTTP request.
-
-**Code Example**
-
-The documents variable in this post request is equal to the sample request body.
-
-```text
-domo.post(`/domo/datastores/v1/collections/Users/documents/bulk`, documents)
-    .then(data => console.log(data));
-```
-
-**Arguments**
-
-| Property Name  | Type   | Required | Description                                      |
-| -------------- | ------ | -------- | ------------------------------------------------ |
-| collectionName | String | Required | The name given to the collection in the manifest |
-
-**HTTP Request**
-
-```text
-POST /domo/datastores/v1/collections/{collectionName}/documents/bulk HTTP/1.1
-Content-Type: application/json
-Accept: application/json
-```
-
-**Request Body**
-
-The request body accepts an array of document objects.
-
-```json
-[
-  {
-    "content": {
-      "username": "Bill S. Preston, Esquire"
-    }
-  },
-  {
-    "content": {
-      "username": "Ted Theodore Logan"
-    }
-  }
-]
-```
-
-**HTTP Response**
-
-Returns the number of documents created successfully.
-
-```json
-HTTP/1.1 200 OK
-Content-Type: application/json;charset=UTF-8
-
-{
-   "Created": 2
-}
-```
-
-### Upsert Documents in Bulk
-
-To upsert documents, you will need to provide the content object for each document and the ID for existing objects that need to be updated. Objects that have an ID will be updated; those with no ID (or where the ID is not found in the Collection) will be created.
-
-**Code Example**
-
-The documents variable in this POST request is equal to the sample request body.
-
-```text
-domo.put(`/domo/datastores/v1/collections/Users/documents/bulk`, documents)
-    .then(data => console.log(data));
-```
-
-**Arguments**
-
-| Property Name  | Type   | Required | Description                                      |
-| -------------- | ------ | -------- | ------------------------------------------------ |
-| collectionName | String | Required | The name given to the collection in the manifest |
-
-**HTTP Request**
-
-```text
-PUT /domo/datastores/v1/collections/{collectionName}/documents/bulk HTTP/1.1
-Content-Type: application/json
-Accept: application/json
-```
-
-**Request Body**
-
-The request body accepts an array of document objects.
-
-```json
-[
-  {
-    "id": "b3ea3d2d-86c5-44e6-a2f4-985136bbbce1",
-    "content": {
-      "username": "Bill S. Preston, Esquire",
-      "Band": "Wyld Stallyns"
-    }
-  },
-  {
-    "id": "1e61d99d-9885-419a-a33e-3be3941ee720",
-    "content": {
-      "username": "Ted Theodore Logan",
-      "Band": "Wyld Stallyns"
-    }
-  },
-  {
-    "content": {
-      "username": "Rufus"
-    }
-  }
-]
-```
-
-**HTTP Response**
-
-Returns the number of documents created and/or updated.
-
-```json
-HTTP/1.1 200 OK
-Content-Type: application/json;charset=UTF-8
-
-{
-    "Updated": 2,
-    "Created": 1
-}
-```
-
-### Delete Documents in Bulk
-
-Provides a list of document IDs to be permanently deleted as a comma-separated query parameter.
-
-<Danger>
-  **This is destructive and cannot be reversed**. Deleting documents in an AppDB
-  collection may have performance implications with regard to syncing to its
-  corresponding DataSet in Domo if the `syncEnabled` property is set to `true`
-  for the Collection.
-</Danger>
-
-```js
-domo
-  .delete(
-    `/domo/datastores/v1/collections/Users/documents/bulk?ids=2bdd6370-85af-4e06-aadb-380839e4de8c,c78ba737-5f84-49c9-8ac9-58615a0f8aa8,1e61d99d-9885-419a-a33e-3be3941ee720`,
-  )
-  .then((data) => console.log(data));
-```
-
-**Arguments**
-
-| Property Name  | Type   | Required | Description                                      |
-| -------------- | ------ | -------- | ------------------------------------------------ |
-| collectionName | String | Required | The name given to the collection in the manifest |
-| idList         | Array  | Required | Comma-separated list of document Ids             |
-
-**HTTP Request**
-
-```text
-DELETE /domo/datastores/v1/collections/{collectionName}/documents/bulk?ids={idList} HTTP/1.1
-Content-Type: application/json
-Accept: application/json
-```
-
-**HTTP Response**
-
-Returns the number of documents deleted.
-
-```json
-HTTP/1.1 200 OK
-Content-Type: application/json;charset=UTF-8
-
-{
-    "Deleted": 3
-}
-```
-
-### Programmatic Operations for Collections
-
-While most of the time you are going to want to define a Collection in your manifest and have the platform automatically create the Collection for you, there is also the option to programmatically manipulate Collections from your app code.
-
-### Create a Collection
-
-To create a Collection programmatically, send a POST request to the below endpoint and provide as the body of the request the same JSON value that you would have provided in your manifest for a Collection. Once created, the Collection can be retrieved by the name you provided as usual.
-
-**Code Example**
-
-The `collection` variable in this code sample is equal to the collection object in the sample request body.
-
-```js
-domo
-  .post(`/domo/datastores/v1/collections`, collection)
-  .then((data) => console.log(data));
-```
-
-**HTTP Request**
-
-```text
-POST /domo/datastores/v1/collections HTTP/1.1
-Content-Type: application/json
-Accept: application/json
-```
-
-**Request Body**
-
-```json
-{
-  "name": "Users",
-  "schema": {
-    "columns": [
-      { "name": "username", "type": "STRING" },
-      { "name": "band", "type": "STRING" }
-    ]
-  },
-  "syncEnabled": true
-}
-```
-
-**HTTP Response**
-
-Returns the created Collection.
-
-```json
-HTTP/1.1 200 OK
-Content-Type: application/json;charset=UTF-8
-
-{
-    "id": "6de8034e-0aa3-4fd9-ac1d-9a1ffeccb759",
-    "customer": "excellent-adventure",
-    "owner": 1089963280,
-    "datastoreId": "d4a4b9c4-e123-41ce-8f93-dcafbeea4642",
-    "name": "Users",
-    "schemaJson": "{\"columns\":[{\"type\":\"STRING\",\"name\":\"username\",\"visible\":true},{\"type\":\"STRING\",\"name\":\"band\",\"visible\":true}]}",
-    "syncRequired": true,
-    "fullReplaceRequired": true,
-    "lastSync": "1970-01-02T00:00:00.000+0000",
-    "updatedBy": 1089963280,
-    "schema": {
-        "columns": [
-            {
-                "type": "STRING",
-                "name": "username",
-                "visible": true
-            },
-            {
-                "type": "STRING",
-                "name": "band",
-                "visible": true
-            }
-        ]
-    },
-    "createdOn": "2019-03-04T18:47:12.327+0000",
-    "updatedOn": "2019-03-04T18:47:12.327+0000",
-    "exportable": true,
-    "syncEnabled": true
-}
-```
-
-### List Collections
-
-Retrieves a list of the existing Collections for your application.
-
-**Code Example**
-
-```js
-domo.get(`/domo/datastores/v1/collections/`).then((data) => console.log(data));
-```
-
-**HTTP Request**
-
-```text
-GET /domo/datastores/v1/collections HTTP/1.1
-Content-Type: application/json
-Accept: application/json
-```
-
-**HTTP Response**
-
-Returns an array of Collection objects.
-
-```json
-HTTP/1.1 200 OK
-Content-Type: application/json;charset=UTF-8
-
-[
-  {
-    "id": "6de8034e-0aa3-4fd9-ac1d-9a1ffeccb759",
-    "customer": "excellent-adventure",
-    "owner": 1089963280,
-    "datastoreId": "d4a4b9c4-e123-41ce-8f93-dcafbeea4642",
-    "name": "Users",
-    "schemaJson": "{\"columns\":[{\"type\":\"STRING\",\"name\":\"username\",\"visible\":true},{\"type\":\"STRING\",\"name\":\"band\",\"visible\":true}]}",
-    "syncRequired": true,
-    "fullReplaceRequired": true,
-    "lastSync": "1970-01-02T00:00:00.000+0000",
-    "updatedBy": 1089963280,
-    "schema": {
-        "columns": [
-            {
-                "type": "STRING",
-                "name": "username",
-                "visible": true
-            },
-            {
-                "type": "STRING",
-                "name": "band",
-                "visible": true
-            }
-        ]
-    },
-    "createdOn": "2019-03-04T18:47:12.327+0000",
-    "updatedOn": "2019-03-04T18:47:12.327+0000",
-    "exportable": true,
-    "syncEnabled": true
-  },
-  {
-        "id": "6b3b7ab7-9e72-483e-bc79-f05011cee5ef",
-        "customer": "excellent-adventure",
-        "owner": 1089963280,
-        "datastoreId": "d4a4b9c4-e123-41ce-8f93-dcafbeea4642",
-        "name": "Comments",
-        "datasourceId": "62b4a99f-a98f-4f01-92f2-b02c35693c97",
-        "schemaJson": "{\"columns\":[{\"type\":\"STRING\",\"name\":\"user\",\"visible\":true},{\"type\":\"STRING\",\"name\":\"comment\",\"visible\":true}]}",
-        "syncRequired": false,
-        "fullReplaceRequired": true,
-        "lastSync": "2019-01-29T19:15:10.239+0000",
-        "updatedBy": 1089963280,
-        "schema": {
-            "columns": [
-                {
-                    "type": "STRING",
-                    "name": "user",
-                    "visible": true
-                },
-                {
-                    "type": "STRING",
-                    "name": "comment",
-                    "visible": true
-                }
-            ]
-        },
-        "createdOn": "2019-01-15T20:17:48.533+0000",
-        "updatedOn": "2019-01-29T19:15:10.255+0000",
-        "exportable": true,
-        "syncEnabled": true
-    }
-]
-```
-
-### Update Collection
-
-This PUT request allows you to modify any of your Collections programmatically.
-
-<Danger>
-  **This is destructive and cannot be reversed**. If you manually override the
-  properties of a Collection that exists in your manifest, then any time an app
-  Card is saved, the Card will revert back to the manifest definition of that
-  Collection. It is best practice to only update Collections that you have
-  created manually. Otherwise, to update a Collection, simply update the
-  manifest.
-</Danger>
-
-**Code Example**
-
-```js
-domo
-  .put(`/domo/datastores/v1/collections/{collectionName}`, collection)
-  .then((data) => console.log(data));
-```
-
-**Arguments**
-
-| Property Name  | Type   | Required | Description                                                         |
-| -------------- | ------ | -------- | ------------------------------------------------------------------- |
-| collectionName | String | Required | The name of the collection provided when the collection was created |
-
-**HTTP Request**
-
-```text
-PUT /domo/datastores/v1/collections/{collectionName} HTTP/1.1
-Content-Type: application/json
-Accept: application/json
-```
-
-**Request Body**
-
-```json
-{
-  "id": "6de8034e-0aa3-4fd9-ac1d-9a1ffeccb759",
-  "schema": {
-    "columns": [
-      {
-        "type": "STRING",
-        "name": "username",
-        "visible": true
-      },
-      {
-        "type": "STRING",
-        "name": "band",
-        "visible": true
-      },
-      {
-        "type": "STRING",
-        "name": "favorite color",
-        "visible": true
-      }
-    ]
-  },
-  "syncEnabled": true
-}
-```
-
-**HTTP Response**
-
-Returns the updated Collection object.
-
-```json
-{
-  "id": "6de8034e-0aa3-4fd9-ac1d-9a1ffeccb759",
-  "customer": "excellent-adventure",
-  "owner": 1089963280,
-  "datastoreId": "d4a4b9c4-e123-41ce-8f93-dcafbeea4642",
-  "name": "Users",
-  "schemaJson": "{\"columns\":[{\"type\":\"STRING\",\"name\":\"username\",\"visible\":true},{\"type\":\"STRING\",\"name\":\"band\",\"visible\":true},{\"type\":\"STRING\",\"name\":\"favorite color\",\"visible\":true}]}",
-  "syncRequired": true,
-  "fullReplaceRequired": false,
-  "lastSync": "1970-01-02T00:00:00.000+0000",
-  "updatedBy": 1089963280,
-  "schema": {
-    "columns": [
-      {
-        "type": "STRING",
-        "name": "username",
-        "visible": true
-      },
-      {
-        "type": "STRING",
-        "name": "band",
-        "visible": true
-      },
-      {
-        "type": "STRING",
-        "name": "favorite color",
-        "visible": true
-      }
-    ]
-  },
-  "createdOn": "2019-03-04T18:47:12.332+0000",
-  "updatedOn": "2019-03-04T18:59:06.168+0000",
-  "exportable": true,
-  "syncEnabled": true
-}
-```
-
-### Delete a Collection
-
-Programmatically deletes a Collection.
-
-<Danger>
-  **This is destructive and cannot be reversed**. Deleting a Collection may have
-  performance implications with regard to syncing to its corresponding DataSet
-  in Domo if the `syncEnabled` property is set to `true` for the Collection.
-</Danger>
-
-**Code Example**
-
-```js
-domo.delete(`/domo/datastores/v1/collections/{collectionName}`);
-```
-
-**Arguments**
-
-| Property Name  | Type   | Required | Description                                                         |
-| -------------- | ------ | -------- | ------------------------------------------------------------------- |
-| collectionName | String | Required | The name of the collection provided when the collection was created |
-
-**HTTP Request**
-
-```text
-DELETE /domo/datastores/v1/collections/{collectionName} HTTP/1.1
-Content-Type: application/json
-Accept: application/json
-```
-
-**HTTP Response**
-
-Returns the parameter of a success or an error.
-
-```text
-HTTP/1.1 200 OK
-```
-
-### Manually Exporting Collections
-
-Collections marked as `syncEnabled` are exported to the Domo instance every 15 minutes automatically. If you need to trigger an export immediately, call the export endpoint manually.
-
-On success you receive a `200 OK` with an empty response body, meaning the export has been accepted and is running asynchronously. If an export is already actively in progress, you will receive `423 LOCKED` instead.
-
-**Code Example**
-
-```js
-domo.post("/domo/datastores/v1/export");
-```
-
-`domo.post()` returns an empty string (`""`) on success.
-
-**HTTP Request**
-
-```text
-POST /domo/datastores/v1/export HTTP/1.1
-Content-Type: application/json
-Accept: application/json
-```
-
-**HTTP Response**
-
-```text
-HTTP/1.1 200 OK
-```
-
-Returns an empty body. The export runs asynchronously after the response is returned.
-
-By default, this endpoint exports the collections in the current card's own datastore. When `includeRelatedCollections=true`, it exports those collections **plus** the related collections this card instance is mapped to through the app's design (its `collectionsMapping`) — for example, a collection shared from another instance of the design.
-
-```javascript
-const exportCollection = async () => {
-  const resp = await fetch(
-    "/domo/datastores/v1/export?includeRelatedCollections=true",
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-      },
-      body: "{}",
-    },
-  );
-  return resp.status; // 200 on success, 423 if export already in progress
-};
-```
-
-### Document Level Security Filtering
-
-While developing your application, you might find yourself creating specific queries to limit users to see or use only certain data that is stored in your AppDB Collections. These queries might be aimed at accomplishing some of the following use-case examples:
-
-- A user should only see data that has been assigned to a certain region or team.
-- A user should only be able to update AppDB documents that they themselves created.
-- Only a manager who belongs to a certain Domo group can delete documents from your Collection.
-
-While your front-end application code can accomplish these examples in an attempt to secure your app, it is also possible for a user to bypass your client-side code and write their own code that interfaces with the AppDB endpoints directly. In order to secure your documents on the server side, document-level filtering rules can be applied to the Collection within the manifest of your application. An example of a Collection with a document-level filter applied is shown below.
+Client-side filtering can be bypassed by users who write their own requests. To enforce filtering server-side, add document-level filter rules to a collection in your manifest:
 
 ```json
 "collections": [
-    {
-      "name": "secureCollection",
-      "filters": [
-        {
-          "name": "defaultFilter",
-          "applyOn": [
-            "READ",
-            "UPDATE",
-            "DELETE"
-          ],
-          "applyTo": [
-            {
-              "type": "GROUP_ID",
-              "values": [
-                12,
-                15
-              ]
-            }
-          ],
-          "applyToAll": false,
-          "limitToOwner": false,
-          "query": {
-            "content.region": "West"
-          }
-        }
-      ]
-    }
-  ]
+  {
+    "name": "secureCollection",
+    "filters": [
+      {
+        "name": "westRegionOnly",
+        "applyOn": ["READ", "UPDATE", "DELETE"],
+        "applyTo": [
+          { "type": "GROUP_ID", "values": [12, 15] }
+        ],
+        "applyToAll": false,
+        "limitToOwner": false,
+        "query": { "content.region": "West" }
+      }
+    ]
+  }
+]
 ```
 
-In this example, any user who belongs to the group with ID `12` or `15` in Domo will only be able to see, modify, or delete documents that have the value of “West” in the document's `content.region` property. As you can see, the `filters` property of this Collection's configuration object takes a list of filter rules. Adding multiple filter rules in the `filters` property will chain together the rules as an `OR` statement as in any standard data query language. There are several properties of a filter rule that are required to secure your documents. The following image groups them together by function.
-
-![Filter Rule](/images/dev/web-assets.domo.com/miyagi/images/product/product-feature-dev-portal-appdbb-security-Filtering.png)
+Users in group `12` or `15` can only see, modify, or delete documents where `content.region` equals `"West"`. Multiple rules in the `filters` array are combined with `OR`.
 
 <Warning>
 **All four core fields are required — even when empty.** Omitting any of them causes the upload to fail.
@@ -1307,127 +362,51 @@ Minimal example — restrict every user to only their own documents:
 
 </Warning>
 
-**Filter Rule**
+### Filter Rule Fields
 
-- `name` – The name of the filter rule that you intend to create. This will be used mainly as a description of what you intend the rule to accomplish.
+**`name`** — A label for the rule. Used for identification only.
 
-**Who**
+**`applyTo`** — Who the rule applies to. An array of condition objects, each with:
 
-- `applyTo` – The property that describes who to apply this filter rule to. This property takes a list of one or more condition objects.
-  - condition – The condition that must be met in order for the filter rule to apply to the current user. The condition contains two properties.
-    - type – The property that determines what kind of condition to compare against the current user:
-      - `USER_ID`
-      - `GROUP_ID`
-    - `values` – The property that takes a list of possible values that the current user will be compared to. For example, if the `type` of the condition is `USER_ID` and the `values` list contains the current user's ID, then the condition will evaluate to true, and this filter rule will apply to the current user. If the list does not contain the user's ID, the condition will evaluate to false, and the filter rule will not apply and will be skipped.
-      - **Wildcards**: In addition to listing static values, this field also supports two wildcards: `%userId%` and `%groupIds%`. An example of using one is, `"query": {"content.user": "%userId%"}`, which would replace the `%userId%` with the ID of the current user.
+- `type`: `USER_ID` or `GROUP_ID`
+- `values`: List of user or group IDs. Wildcards `%userId%` and `%groupIds%` are supported — e.g., `"query": {"content.user": "%userId%"}` substitutes the current user's ID at runtime.
 
-- `applyToAll` – A boolean value that overrides the applyTo property. If this property is set to true, then the current filter rule will apply to all users of the app.
+**`applyToAll`** — When `true`, overrides `applyTo` and applies the rule to all users.
 
-**What**
+**`limitToOwner`** — When `true`, additionally restricts results to documents created by the current user.
 
-- `query` – The AppDB query that should be combined with any query the user is trying to make to further filter their request for documents. For example, let's say the user belongs to the “West Sales” group, as defined in our example Collection, and they write the following query to search for documents:
+**`applyOn`** — Which operations to filter: `READ`, `UPDATE`, `DELETE`.
 
-```json
-{ "content.country": "US" }
-```
+**`query`** — The MongoDB query appended server-side to every matching request. The user's own query and this filter are ANDed together.
 
-In this case, because the user is part of a group defined in the `applyTo` section of the filter rule definition, the condition would be evaluated to true and our additional document-level security filter would be applied. The resulting query to AppDB on the server side would be transformed to look similar to the following:
+If a filter prevents a match on a single-document operation, the response is `404 Not Found`. On a bulk delete, it returns `0 documents deleted`.
 
-```json
-{ "content.country": "US", "content.region": "West" }
-```
+---
 
-So although the user requested all documents from the “US” country, only those documents which are both in the “US” and the “West” region will be returned to the user.
+## Collection-Level Permissions
 
-- `limitToOwner` – This property takes a boolean that determines whether to add another query to any request that limits documents to only those created by the current user. So, if this flag were set to `true`, then the resulting query on the backend would be transformed still further to add the user's ID to the request. In the case of our previous example, even though the user requested documents from the “US”, they would be returned all documents from the “US” that are in the “West” region **and** created by the existing user.
+To restrict access at the collection level, use the [Modify Permissions](/api-reference/appdb-api/modify-collection-permissions) endpoint. By default, all users of the app who own the collection have full permissions until explicitly restricted.
 
-```json
-{ "content.country": "US", "content.region": "West", "owner": "123456" }
-```
+### Entity Types
 
-**When**
+| `entity` path param | `entityId` value                               |
+| ------------------- | ---------------------------------------------- |
+| `USER`              | Domo user ID                                   |
+| `GROUP`             | Domo group ID                                  |
+| `RYUU_APP`          | App instance ID (first UUID in the iframe URL) |
 
-- `applyOn` – Takes a list of HTTP methods that the current filter rule should apply to. The list of methods is as follows:
-  - `READ`
-  - `UPDATE`
-  - `DELETE`
+### Available Permissions
 
-Any AppDB endpoint that performs one of these operations will apply extra filtering prior to executing the request that the user specified. From our previous example: If a user were given the document ID of a document that was not in the “West” region **and** the `DELETE` method existed in a filter rule that applied to those documents, then when they attempt to call the delete endpoint and use that document ID, they would not be allowed to delete it. In this case, if they called the single document's delete endpoint, it would return a '404 not found' error. If they called the bulk endpoint, it would return '0 documents deleted'.
+| Permission       | Grants                                              |
+| ---------------- | --------------------------------------------------- |
+| `admin`          | All permissions to the collection and its documents |
+| `write`          | Update the collection's properties                  |
+| `read`           | Read the collection's properties                    |
+| `share`          | Add or remove permissions this entity already holds |
+| `delete`         | Delete the collection or its documents              |
+| `create_content` | Create documents in the collection                  |
+| `update_content` | Update documents in the collection                  |
+| `read_content`   | Read documents in the collection                    |
+| `delete_content` | Delete documents from the collection                |
 
-### Collection Level Security
-
-Some applications might find it necessary to add security permissions at the Collection level. This could range from adding or removing the ability for a user to modify the definition of a programmatically created Collection to removing the ability of any user of the app to delete any documents from the Collection. By default, all users of the app who own the Collection have all permissions to the Collection and its documents until the permissions are updated to be more specific.
-
-**Modify Permissions**
-
-Assuming you already have permission to modify the Collection, you can change the permissions of a Collection by hitting the following endpoint:
-
-**Code Example**
-
-```js
-domo.put(
-  "/domo/datastores/v1/collections/Users/permission/RYUU_APP/733ff55b-387c-472e-b3c7-9911c7057f5f?permissions=read,create_content,update_content,read_content",
-);
-```
-
-**HTTP Request**
-
-```text
-PUT /domo/datastores/v1/collections/{collectionName}/permission/{entity}/{entityId}?permissions={permissionList} HTTP/1.1
-Content-Type: application/json
-```
-
-**HTTP Response**
-
-```text
-HTTP/1.1 200 OK
-```
-
-**Entity**
-
-The following are the possible entities that can be used in the `entity` path parameter in the above endpoint:
-
-- `USER`
-- `GROUP`
-- `RYUU_APP`
-
-The value you choose for the `entity` path parameter will determine which entity ID you will need to provide for the `entityId` path parameter. For users and groups, you will use either the user ID or the group ID. If you want to modify permissions for anyone who has access to the app as a whole, you can use the `RYUU_APP` path parameter and provide the app instance ID as the `entityId`. The app instance ID is the first UUID provided in the URL of the iframe that houses the app. You should be able to pull down the URL in your JavaScript using `window.location` and parsing the first UUID programmatically.
-
-**Permission List**
-
-The following are the possible permissions that can be added using the `permissions` query parameter:
-
-- `admin` - All permissions to the Collection and its documents
-- `write` - Permission to update properties of the Collection
-- `read` - Permission to read the properties of the Collection
-- `share` - Permission to add or remove any permissions this entity already has
-- `delete` - Permission to delete the Collection or its documents
-- `create_content` - Permission to create documents in the Collection
-- `update_content` - Permission to update documents in the Collection
-- `read_content` - Permission to read documents in the Collection
-- `delete_content` - Permission to delete documents in the Collection
-
-**Delete Permissions**
-
-You can remove all permissions for an entity using the endpoint below. If all entities' permissions are removed, then only users with the Manage AppDB grant will still have access.
-
-**Code Example**
-
-```js
-domo.delete(
-  "/domo/datastores/v1/collections/Users/permission/RYUU_APP/733ff55b-387c-472e-b3c7-9911c7057f5f",
-);
-```
-
-**HTTP Request**
-
-```text
-DELETE /domo/datastores/v1/collections/{collectionName}/permission/{entity}/{entityId} HTTP/1.1
-Content-Type: application/json
-```
-
-**HTTP Response**
-
-```text
-HTTP/1.1 200 OK
-```
+Removing all entity permissions leaves only users with the **Manage AppDB** grant with access.

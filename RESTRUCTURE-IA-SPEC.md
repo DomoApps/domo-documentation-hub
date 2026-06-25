@@ -514,12 +514,15 @@ Release Notes
 The Archive pillar holds deprecated/legacy content that is removed from primary navigation but not deleted. It should be linked from a single "Legacy & Archived Content" page at the bottom of the KB.
 
 ```
-Archive (64 articles)
-├── Legacy Workbench (37)            ← Workbench 4 articles
-├── Deprecated Features (25)         ← various deprecated product features
-├── Legacy Magic ETL (1)
+Archive (~95 articles — updated from 64 with Support KB Audit additions)
+├── Legacy Workbench (37)            ← Workbench 4 articles; D1 confirmed by Support KB Audit
+├── Deprecated Features (~36)         ← DataFusion (11 confirmed), CourseBuilder (4, pending D10),
+│                                        various deprecated product features
+├── Legacy Magic ETL (~17)            ← Old Magic ETL tile interface articles (16 confirmed by Audit) + 1 existing
 └── Legacy Products (1)              ← PopChart contact page
 ```
+
+**Note on defunct-service connectors:** The Support KB Audit confirmed a large population of connectors for services that no longer exist (LinkedIn API v1, Pinterest, StumbleUpon, Simply Measured, Salesforce Desk, IBM Coremetrics, GetThere, Moz, Snowflake Writeback, Adobe Analytics Advanced Legacy, DCM via Google Cloud Storage). These are Phase 4 retirement candidates — move to Archive or remove from Connector Library nav entirely. See `KB-RESTRUCTURE-PLAN.md` Phase 4.2 for the full confirmed list.
 
 ---
 
@@ -527,7 +530,7 @@ Archive (64 articles)
 
 | # | Decision | Recommendation | Who |
 |---|----------|----------------|-----|
-| D1 | Keep or retire Workbench 4 articles (37)? | Archive — EOL product | You |
+| D1 | Keep or retire Workbench 4 articles (37)? | Archive — EOL product. **Confirmed by Support KB Audit:** 118 of 188 Workbench articles flagged Deprecate or Mark as Legacy. Use Audit list as Phase 4 execution plan. | You |
 | D2 | Keep or archive Projects & Tasks (10 articles)? | Check if feature still active | You / PM |
 | D3 | Audit Premium Apps (65 articles) for currency | Many may be outdated apps | You / PM |
 | D4 | "Build Your First Dashboard" — move from Getting Started to Analyze & Visualize? | Yes — move it | You |
@@ -536,6 +539,7 @@ Archive (64 articles)
 | D7 | Data Models section (1 article, Beta) — expand or hold? | Hold until feature ships | You / PM |
 | D8 | Instance Settings (39) — sub-group further or keep flat? | Keep flat for now | You |
 | D9 | Which DataSet Management articles move from Prepare & Transform to Manage Data? | Pipeline articles stay; governance/lifecycle articles move | You / PM |
+| D10 | CourseBuilder articles (4) — Archive or keep in Build Apps & Automate? | Support KB Audit flags CourseBuilder as retired/removed from Domo. Confirm with PM; if confirmed retired, Archive all 4 before Phase 7 nav rebuild. | You / PM |
 
 ---
 

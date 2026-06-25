@@ -435,6 +435,21 @@ These articles require product-level narrative that isn't reliably derivable fro
 - Articles whose excerpt describes a feature no longer in the product
 - Articles fully superseded by a newer article on the same topic (identified by the merge-candidates analysis in Phase 1.3)
 
+**Support KB Audit — confirmed retirement list (use as Phase 4 execution input):**
+
+The Support team's audit of 3,680 articles (completed 2026-04-28, `KB Audit Results.csv`) provides a per-article deprecation/legacy verdict for content the restructure would otherwise need to re-analyze from scratch. Use this data directly as the Phase 4 execution list for these categories:
+
+| Category | Audit finding | Phase 4 action |
+|----------|--------------|----------------|
+| Workbench 4 articles (37) | 118 of 188 total Workbench articles flagged Deprecate or Mark as Legacy | Archive — confirms D1 |
+| DataFusion articles (11) | 6 Deprecate, 5 Mark as Legacy — all flagged; feature confirmed discontinued | Archive all 11 |
+| Old Magic ETL tile articles (16) | Flagged Mark as Legacy — legacy tile interface, not current ETL UI | Archive all 16 |
+| Defunct-service connectors | Confirmed dead: LinkedIn (API v1 disabled 2019), Pinterest (disabled 2018), StumbleUpon (shut down 2018), Simply Measured (shut down 2017), Salesforce Desk (discontinued 2017), IBM Digital Analytics/Coremetrics, GetThere (UI unavailable), Moz (UI unavailable), Snowflake Writeback (deprecated Oct 2025), Adobe Analytics Advanced Legacy (new datasets blocked), DCM via Google Cloud Storage (OAuth deprecated by Google) | Archive or remove from primary nav |
+| CourseBuilder articles (4) | Flagged Critical — tool confirmed retired from Domo (no longer in Appstore) | Confirm with PM → Archive (see D10 in `RESTRUCTURE-IA-SPEC.md`) |
+| Release notes pre-2022 (all languages) | Confirmed negligible self-service value; flagged across all locales | Move to collapsed Archive nav group in Phase 7 |
+
+> **Urgent — fix before Phase 4 begins:** Snowflake connector articles (`Snowflake Connector`, `Snowflake Unload V2 Connector`) document key-pair/password authentication that Snowflake retired November 2025. Customers attempting new connections today are actively failing. Use `update-kb-article` on these two articles immediately to add a deprecation notice and link to the current Cloud Amplifier / OAuth setup path. Do not wait for Phase 4.
+
 ---
 
 ## Phase 5: Interlinking & Pathways

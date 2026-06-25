@@ -3,9 +3,9 @@ info:
   title: Domo AppDB API
   version: v1
   description: |
-    AppDB API for storing arbitrary JSON documents similar to a NoSQL database. This enables storing state within your DomoApp 
+    AppDB API for storing arbitrary JSON documents similar to a NoSQL database. This enables storing state within your DomoApp
     with optional syncing to Domo DataSets.
-    
+
     Three layers provide data storage:
     - **Datastores**: Analogous to a database. A CustomApp has a single datastore created automatically.
     - **Collections**: Analogous to a collection in NoSQL or table in relational databases.
@@ -226,6 +226,13 @@ paths:
             example:
               content:
                 username: "Bill S. Preston, Esquire"
+      x-codeSamples:
+        - lang: JavaScript
+          label: domo.js
+          source: |-
+            domo.post('/domo/datastores/v1/collections/Users/documents', {
+              content: { username: 'Bill S. Preston, Esquire' }
+            }).then(doc => console.log(doc));
       responses:
         '200':
           description: Document created successfully
@@ -252,6 +259,12 @@ paths:
           description: The name given to the collection in the manifest
           schema:
             type: string
+      x-codeSamples:
+        - lang: JavaScript
+          label: domo.js
+          source: |-
+            domo.get('/domo/datastores/v1/collections/Users/documents')
+              .then(docs => console.log(docs));
       responses:
         '200':
           description: Array of documents
@@ -281,6 +294,12 @@ paths:
           schema:
             type: string
             format: uuid
+      x-codeSamples:
+        - lang: JavaScript
+          label: domo.js
+          source: |-
+            domo.get('/domo/datastores/v1/collections/Users/documents/a1b2c3d4-e5f6-7890-abcd-ef1234567890')
+              .then(doc => console.log(doc));
       responses:
         '200':
           description: Document retrieved successfully
@@ -318,6 +337,13 @@ paths:
               content:
                 username: "Bill S. Preston, Esquire"
                 Band: "Wyld Stallyns"
+      x-codeSamples:
+        - lang: JavaScript
+          label: domo.js
+          source: |-
+            domo.put('/domo/datastores/v1/collections/Users/documents/a1b2c3d4-e5f6-7890-abcd-ef1234567890', {
+              content: { username: 'Bill S. Preston, Esquire', Band: 'Wyld Stallyns' }
+            }).then(doc => console.log(doc));
       responses:
         '200':
           description: Document updated successfully
@@ -343,6 +369,12 @@ paths:
           schema:
             type: string
             format: uuid
+      x-codeSamples:
+        - lang: JavaScript
+          label: domo.js
+          source: |-
+            domo.delete('/domo/datastores/v1/collections/Users/documents/a1b2c3d4-e5f6-7890-abcd-ef1234567890')
+              .then(() => console.log('deleted'));
       responses:
         '200':
           description: Document deleted successfully
@@ -436,6 +468,23 @@ paths:
                   createdOn:
                     $lte:
                       $date: "2020-05-12T00:00:00.000Z"
+      x-codeSamples:
+        - lang: JavaScript
+          label: domo.js
+          source: |-
+            // Simple filter
+            domo.post('/domo/datastores/v1/collections/Users/documents/query', {
+              $or: [
+                { 'content.comments': { $regex: 'happy' } },
+                { 'content.username': { $ne: 'Eeyore' } }
+              ]
+            }).then(docs => console.log(docs));
+
+            // With aggregation (query params)
+            domo.post(
+              '/domo/datastores/v1/collections/Users/documents/query?groupby=content.band&count=count',
+              {}
+            ).then(results => console.log(results));
       responses:
         '200':
           description: Array of matching documents
@@ -470,6 +519,14 @@ paths:
               operation:
                 $set:
                   content.comment: "Excellent!"
+      x-codeSamples:
+        - lang: JavaScript
+          label: domo.js
+          source: |-
+            domo.put('/domo/datastores/v1/collections/Users/documents/update', {
+              query: { 'content.username': 'Bill S. Preston, Esquire' },
+              operation: { $set: { 'content.comment': 'Excellent!' } }
+            }).then(count => console.log(count + ' document(s) updated'));
       responses:
         '200':
           description: Number of updated objects
@@ -504,6 +561,14 @@ paths:
                   username: "Bill S. Preston, Esquire"
               - content:
                   username: "Ted Theodore Logan"
+      x-codeSamples:
+        - lang: JavaScript
+          label: domo.js
+          source: |-
+            domo.post('/domo/datastores/v1/collections/Users/documents/bulk', [
+              { content: { username: 'Bill S. Preston, Esquire' } },
+              { content: { username: 'Ted Theodore Logan' } }
+            ]).then(result => console.log(result));
       responses:
         '200':
           description: Bulk creation result
@@ -550,6 +615,15 @@ paths:
                   Band: "Wyld Stallyns"
               - content:
                   username: "Rufus"
+      x-codeSamples:
+        - lang: JavaScript
+          label: domo.js
+          source: |-
+            domo.put('/domo/datastores/v1/collections/Users/documents/bulk', [
+              { id: 'b3ea3d2d-86c5-44e6-a2f4-985136bbbce1', content: { username: 'Bill S. Preston, Esquire', Band: 'Wyld Stallyns' } },
+              { id: '1e61d99d-9885-419a-a33e-3be3941ee720', content: { username: 'Ted Theodore Logan', Band: 'Wyld Stallyns' } },
+              { content: { username: 'Rufus' } }
+            ]).then(result => console.log(result));
       responses:
         '200':
           description: Bulk upsert result
@@ -577,6 +651,13 @@ paths:
           schema:
             type: string
           example: "2bdd6370-85af-4e06-aadb-380839e4de8c,c78ba737-5f84-49c9-8ac9-58615a0f8aa8"
+      x-codeSamples:
+        - lang: JavaScript
+          label: domo.js
+          source: |-
+            const ids = '2bdd6370-85af-4e06-aadb-380839e4de8c,c78ba737-5f84-49c9-8ac9-58615a0f8aa8';
+            domo.delete(`/domo/datastores/v1/collections/Users/documents/bulk?ids=${ids}`)
+              .then(result => console.log(result));
       responses:
         '200':
           description: Bulk deletion result
@@ -606,6 +687,20 @@ paths:
                   - name: "band"
                     type: "STRING"
               syncEnabled: true
+      x-codeSamples:
+        - lang: JavaScript
+          label: domo.js
+          source: |-
+            domo.post('/domo/datastores/v1/collections', {
+              name: 'Users',
+              schema: {
+                columns: [
+                  { name: 'username', type: 'STRING' },
+                  { name: 'band', type: 'STRING' }
+                ]
+              },
+              syncEnabled: true
+            }).then(collection => console.log(collection));
       responses:
         '200':
           description: Collection created successfully
@@ -619,6 +714,12 @@ paths:
       description: Retrieves a list of the existing Collections for your application.
       tags:
       - AppDB API
+      x-codeSamples:
+        - lang: JavaScript
+          label: domo.js
+          source: |-
+            domo.get('/domo/datastores/v1/collections')
+              .then(collections => console.log(collections));
       responses:
         '200':
           description: Array of collections
@@ -669,6 +770,21 @@ paths:
                     name: "favorite color"
                     visible: true
               syncEnabled: true
+      x-codeSamples:
+        - lang: JavaScript
+          label: domo.js
+          source: |-
+            domo.put('/domo/datastores/v1/collections/Users', {
+              id: '6de8034e-0aa3-4fd9-ac1d-9a1ffeccb759',
+              schema: {
+                columns: [
+                  { name: 'username', type: 'STRING', visible: true },
+                  { name: 'band', type: 'STRING', visible: true },
+                  { name: 'favorite color', type: 'STRING', visible: true }
+                ]
+              },
+              syncEnabled: true
+            }).then(collection => console.log(collection));
       responses:
         '200':
           description: Collection updated successfully
@@ -680,7 +796,6 @@ paths:
     delete:
       summary: Delete Collection
       description: "Programmatically deletes a Collection.\n\n<Danger>\n**Warning**\n\nThis is destructive and cannot be reversed.\n</Danger>"
-
       tags:
       - AppDB API
       parameters:
@@ -690,6 +805,12 @@ paths:
           schema:
             type: string
             description: The name of the collection provided when the collection was created
+      x-codeSamples:
+        - lang: JavaScript
+          label: domo.js
+          source: |-
+            domo.delete('/domo/datastores/v1/collections/Users')
+              .then(() => console.log('collection deleted'));
       responses:
         '200':
           description: Collection deleted successfully
@@ -724,6 +845,17 @@ paths:
             schema:
               type: object
             example: {}
+      x-codeSamples:
+        - lang: JavaScript
+          label: domo.js
+          source: |-
+            // Export this card's own collections
+            domo.post('/domo/datastores/v1/export')
+              .then(() => console.log('export started'));
+
+            // Also export related collections (collectionsMapping)
+            domo.post('/domo/datastores/v1/export?includeRelatedCollections=true')
+              .then(() => console.log('export started'));
       responses:
         '200':
           description: Export accepted and running asynchronously. No response body is returned.
@@ -762,13 +894,20 @@ paths:
           schema:
             type: string
           example: "read,create_content,update_content,read_content"
+      x-codeSamples:
+        - lang: JavaScript
+          label: domo.js
+          source: |-
+            domo.put(
+              '/domo/datastores/v1/collections/Users/permission/RYUU_APP/733ff55b-387c-472e-b3c7-9911c7057f5f?permissions=read,create_content,update_content,read_content'
+            ).then(() => console.log('permissions updated'));
       responses:
         '200':
           description: Permissions updated successfully
 
     delete:
       summary: Delete Permissions
-      description: You can remove all permissions for an entity using the endpoint below. If all entities’ permissions are removed, then only users with the Manage AppDB grant will still have access.
+      description: You can remove all permissions for an entity using the endpoint below. If all entities' permissions are removed, then only users with the Manage AppDB grant will still have access.
       tags:
       - AppDB API
       parameters:
@@ -788,6 +927,13 @@ paths:
           required: true
           schema:
             type: string
+      x-codeSamples:
+        - lang: JavaScript
+          label: domo.js
+          source: |-
+            domo.delete(
+              '/domo/datastores/v1/collections/Users/permission/RYUU_APP/733ff55b-387c-472e-b3c7-9911c7057f5f'
+            ).then(() => console.log('permissions removed'));
       responses:
         '200':
           description: Permissions removed successfully

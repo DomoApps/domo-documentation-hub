@@ -86,7 +86,7 @@ These gaps appear in both initiatives. The Audit supplies the specific hit list;
 
 **Restructure:** Phase 1 catalog found `retire-candidate` classification. Phase 4 legacy cleanup is planned.
 
-**Audit:** 16 articles explicitly titled "Old Magic ETL" or referencing legacy Magic ETL tiles flagged as **Mark as Legacy**. The remaining 72 Magic ETL articles in the audit split as: 10 Deprecate, 20 Mark as Legacy, 23 Needs Review. The clear pattern: articles about the "old" Magic ETL tile interface are legacy; articles about new Magic ETL features (Snowflake Pass-Through SQL, AI tiles) are current but may have beta-status confusion.
+**Audit:** 16 articles explicitly titled "Old Magic ETL" or referencing legacy Magic ETL tiles are in the audit. Of these, 15 are flagged Deprecate or Mark as Legacy; 1 (`Create a Recursive/Snapshot Old Magic ETL DataFlow`) is flagged **Keep** and should not be archived. The remaining 72 Magic ETL articles in the audit split as: 10 Deprecate, 20 Mark as Legacy, 23 Needs Review. The clear pattern: articles about the "old" Magic ETL tile interface are legacy; articles about new Magic ETL features (Snowflake Pass-Through SQL, AI tiles) are current but may have beta-status confusion.
 
 **Action for Restructure Phase 4:** Retire the 16 old Magic ETL tile articles to Archive. For the 20 "Mark as Legacy" Magic ETL articles, use Phase 3b article upgrade agents to add a prominent "This article covers the legacy Magic ETL interface. [Link to current]" callout rather than full retirement.
 
@@ -202,9 +202,9 @@ The Audit flags CourseBuilder as a **retired tool no longer available in Domo**,
 - `Importing Files into Your CourseBuilder App Project` — *"The referenced graphic is missing and the entire instructional content is absent."*
 - `Installing CourseBuilder`, `Previewing and Exporting Your CourseBuilder App` — both Mark as Legacy
 
-**Why this is partially Restructure work:** The Restructure IA spec places CourseBuilder under Build Apps & Automate. If the feature is retired, these 4 articles should move to Archive instead. This is a **fast decision** that should be made before Phase 7 nav rebuild.
+**Why this is partially Restructure work:** The Restructure IA spec places CourseBuilder under Build Apps & Automate. If the feature is retired, all 16 articles should move to Archive instead. This is a **fast decision** that should be made before Phase 7 nav rebuild.
 
-**Immediate action:** Confirm with PM that CourseBuilder is retired. If confirmed, move all 4 articles to the Archive group during Phase 4 — this costs nothing extra and cleans the Build Apps & Automate pillar before nav rebuild.
+**Immediate action:** Confirm with PM that CourseBuilder is retired. If confirmed, move all 16 articles to the Archive group during Phase 4 — this costs nothing extra and cleans the Build Apps & Automate pillar before nav rebuild.
 
 ---
 
@@ -287,10 +287,10 @@ The following Audit findings should be incorporated into the Restructure Phase 4
 |------|--------------|-------------------|
 | Workbench 4 retirement | 118 Workbench articles flagged Deprecate/Legacy | Confirms D1: Archive. Use Audit list as execution plan. |
 | DataFusion deprecation | 11 articles flagged Deprecate/Legacy | Add to Phase 4 retirement batch |
-| Old Magic ETL tiles | 16 articles flagged Mark as Legacy | Add to Phase 4 Archive batch |
-| Deprecated connectors (dead services) | ~100+ connectors for long-dead services (Pinterest, StumbleUpon, LinkedIn v1, Simply Measured, Salesforce Desk, IBM Coremetrics, etc.) | Phase 4 retirement execution list |
+| Old Magic ETL tiles | 15 articles flagged Deprecate/Legacy; 1 (`Create a Recursive/Snapshot Old Magic ETL DataFlow`) flagged Keep — do not archive | Add 15 to Phase 4 Archive batch |
+| Deprecated connectors (dead services) | 111 confirmed dead-service connector articles (verified via Audit summaries) | Phase 4 retirement execution list |
 | Legacy release notes (all languages) | Flagged for deprecation | Phase 7: move pre-2022 to collapsed Archive nav group |
-| CourseBuilder retirement | 4 articles flagged Critical/Legacy | Fast D-decision: if PM confirms retired, add to Phase 4 Archive |
+| CourseBuilder retirement | 16 articles (3 Deprecate, 5 Legacy, 4 Needs Review, 4 pending) | Fast D-decision: if PM confirms retired, add all 16 to Phase 4 Archive |
 
 ### Snowflake Auth Deprecation — Treat as Urgent, Pre-Restructure Fix
 

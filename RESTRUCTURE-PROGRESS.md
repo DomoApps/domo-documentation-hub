@@ -168,10 +168,10 @@ Phase 4 has not started, but the Support KB Audit (`KB Audit Results.csv`, compl
 |-------|-------|--------|
 | Workbench 4 articles | 37 (118 total Workbench articles flagged in Audit) | Archive — D1 confirmed |
 | DataFusion articles | 11 (6 Deprecate, 5 Mark as Legacy) | Archive |
-| Old Magic ETL tile articles | 16 (Mark as Legacy) | Archive |
-| Defunct-service connectors | ~50–100 confirmed dead-service articles | Archive / remove from Connector Library nav |
+| Old Magic ETL tile articles | 15 to Archive + 1 Keep (`Create a Recursive/Snapshot Old Magic ETL DataFlow`) | Archive 15; keep 1 |
+| Defunct-service connectors | 111 confirmed dead-service articles (verified via Audit summaries) | Archive / remove from Connector Library nav |
 | Release notes pre-2022 (all languages) | Large volume (all locales) | Move to collapsed Archive group in Phase 7 |
-| CourseBuilder articles | 4 (pending D10 PM confirmation) | Archive if PM confirms retired |
+| CourseBuilder articles | 16 (pending D10 PM confirmation) | Archive if PM confirms retired |
 
 **Urgent pre-Phase 4 fix:** `Snowflake Connector` and `Snowflake Unload V2 Connector` documents key-pair/password auth that Snowflake retired November 2025. Customers are actively failing. Fix these now with `update-kb-article` before Phase 4 starts.
 
@@ -224,8 +224,8 @@ python3 scripts/find_duplicates_and_gaps.py
 | 2026-06-17 | Read/write framing convention added to Connect pillar | Authors must treat read + write as a pair in all Connect section overviews; prevents writeback from being invisible (workshop feedback) |
 | 2026-06-25 | D1 confirmed: Workbench 4 → Archive | Support KB Audit confirms 118 of 188 Workbench articles flagged for Deprecate/Legacy; 37 Workbench 4 articles confirmed for Archive in Phase 4 |
 | 2026-06-25 | DataFusion → Archive (all 11 articles) | Support KB Audit confirms DataFusion is discontinued; all 11 DataFusion articles flagged Deprecate or Legacy — add to Phase 4 retirement batch |
-| 2026-06-25 | Old Magic ETL tile articles → Archive (16 articles) | Support KB Audit flags 16 old Magic ETL tile interface articles as Legacy — add to Phase 4 retirement batch alongside existing 1 Legacy Magic ETL article |
-| 2026-06-25 | Defunct-service connectors → Archive | Support KB Audit confirms ~50–100+ connector articles for services that no longer exist (LinkedIn API v1, Pinterest, StumbleUpon, Simply Measured, Salesforce Desk, IBM Coremetrics, GetThere, Moz, Snowflake Writeback, Adobe Analytics Advanced Legacy, DCM via GCS); use Audit list as Phase 4 execution plan |
-| 2026-06-25 | D10 added: CourseBuilder — pending PM confirmation | Support KB Audit flags CourseBuilder as retired/removed from Domo Appstore; 4 articles flagged Critical; confirm with PM before Phase 7 — Archive if confirmed |
+| 2026-06-25 | Old Magic ETL tile articles → Archive (15 articles; 1 Keep) | Support KB Audit flags 15 old Magic ETL tile interface articles for Archive; 1 (`Create a Recursive/Snapshot Old Magic ETL DataFlow`) is Keep-flagged — do not archive |
+| 2026-06-25 | Defunct-service connectors → Archive (111 confirmed) | 111 connector articles verified via Audit summaries confirming the underlying service no longer exists; use Audit list as Phase 4 execution plan |
+| 2026-06-25 | D10 added: CourseBuilder — pending PM confirmation | Support KB Audit flags CourseBuilder as retired/removed from Domo Appstore; 16 articles (not 4 — initial count missed localized articles); confirm with PM before Phase 7 — Archive if confirmed |
 | 2026-06-25 | Snowflake auth deprecation flagged as urgent pre-Phase fix | Snowflake retired key-pair/password auth November 2025; Snowflake Connector and Snowflake Unload V2 articles are actively misleading customers; fix with update-kb-article before Phase 4 begins |
 | 2026-06-25 | Support KB Audit integrated into Restructure phases | Gap analysis (`Support KB Audit Shared GAP Analysis.md`) cross-referenced Audit against Restructure plan; shared retirement work merged into Phase 4; Audit-only work (API reference quality, connector content accuracy, localization retirement, screenshot refresh) scoped as separate post-restructure project |

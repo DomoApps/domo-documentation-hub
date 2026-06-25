@@ -514,11 +514,12 @@ Release Notes
 The Archive pillar holds deprecated/legacy content that is removed from primary navigation but not deleted. It should be linked from a single "Legacy & Archived Content" page at the bottom of the KB.
 
 ```
-Archive (~95 articles — updated from 64 with Support KB Audit additions)
+Archive (~115 articles — updated from 64 with Support KB Audit additions)
 ├── Legacy Workbench (37)            ← Workbench 4 articles; D1 confirmed by Support KB Audit
-├── Deprecated Features (~36)         ← DataFusion (11 confirmed), CourseBuilder (4, pending D10),
-│                                        various deprecated product features
-├── Legacy Magic ETL (~17)            ← Old Magic ETL tile interface articles (16 confirmed by Audit) + 1 existing
+├── Deprecated Features (~52)         ← DataFusion (11 confirmed), CourseBuilder (16, pending D10),
+│                                        various deprecated product features (original ~25)
+├── Legacy Magic ETL (~16)            ← Old Magic ETL tile articles (15 confirmed for Archive by Audit;
+│                                        1 article flagged Keep — do not archive) + 1 existing
 └── Legacy Products (1)              ← PopChart contact page
 ```
 
@@ -539,7 +540,7 @@ Archive (~95 articles — updated from 64 with Support KB Audit additions)
 | D7 | Data Models section (1 article, Beta) — expand or hold? | Hold until feature ships | You / PM |
 | D8 | Instance Settings (39) — sub-group further or keep flat? | Keep flat for now | You |
 | D9 | Which DataSet Management articles move from Prepare & Transform to Manage Data? | Pipeline articles stay; governance/lifecycle articles move | You / PM |
-| D10 | CourseBuilder articles (4) — Archive or keep in Build Apps & Automate? | Support KB Audit flags CourseBuilder as retired/removed from Domo. Confirm with PM; if confirmed retired, Archive all 4 before Phase 7 nav rebuild. | You / PM |
+| D10 | CourseBuilder articles (16) — Archive or keep in Build Apps & Automate? | Support KB Audit flags CourseBuilder as retired/removed from Domo (16 articles: 3 Deprecate, 5 Mark as Legacy, 4 Needs Review, 4 still flagged for evaluation). Confirm with PM; if confirmed retired, Archive all 16 before Phase 7 nav rebuild. | You / PM |
 
 ---
 

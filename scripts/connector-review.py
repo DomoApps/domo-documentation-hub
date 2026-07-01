@@ -326,12 +326,12 @@ def analyze_jira_ticket(jira_id, my_account_id, templates):
             action_type = "publish"
 
     secondary_ids = {a["accountId"] for a in secondary_approvers}
-    known_approver_names = [n.lower() for n in templates.get("known_approvers", [])]
+    arun_account_id = arun_account["accountId"] if arun_account else None
 
     # Check for secondary approval after Arun's comment.
-    # Accepts approvals from: (a) accounts Arun @-mentioned, or (b) anyone in known_approvers.
-    # Also treats a secondary's publish/migration request as an implicit approval — when a
-    # reviewer says "please publish it" they have approved and are escalating to Jared.
+    # Scan ALL comments after Arun's initial @-mention comment — any non-Arun, non-Jared
+    # commenter who uses an approval phrase counts. This handles cases where someone other
+    # than the @-mentioned reviewer verifies the changes (e.g. a teammate steps in).
     secondary_approved = False
     past_arun = arun_comment is None  # if no arun comment, scan all
     for c in comments:
@@ -339,23 +339,22 @@ def analyze_jira_ticket(jira_id, my_account_id, templates):
             if c.get("id") == arun_comment.get("id"):
                 past_arun = True
             continue
-        author = c.get("author", {})
-        author_id = author.get("accountId", "")
-        author_name = author.get("displayName", "").lower()
-        is_known = any(kn in author_name for kn in known_approver_names)
-        if author_id in secondary_ids or is_known:
-            text = extract_text(c.get("body", {})).lower()
-            if any(p in text for p in approval_phrases):
-                secondary_approved = True
-                break
-            if any(p in text for p in publish_phrases):
-                secondary_approved = True
-                action_type = "publish"
-                break
-            if any(p in text for p in migration_phrases):
-                secondary_approved = True
-                action_type = "migration"
-                break
+        author_id = c.get("author", {}).get("accountId", "")
+        # Skip Arun's own follow-on comments and Jared's follow-up/escalation markers
+        if author_id in (arun_account_id, my_account_id):
+            continue
+        text = extract_text(c.get("body", {})).lower()
+        if any(p in text for p in approval_phrases):
+            secondary_approved = True
+            break
+        if any(p in text for p in publish_phrases):
+            secondary_approved = True
+            action_type = "publish"
+            break
+        if any(p in text for p in migration_phrases):
+            secondary_approved = True
+            action_type = "migration"
+            break
 
     # Track follow-ups and escalation posted by Jared
     follow_up_count = 0

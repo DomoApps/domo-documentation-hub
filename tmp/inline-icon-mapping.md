@@ -25,9 +25,9 @@ Mapping of every inline-icon `<img>` reference (images embedded in articles with
 | Confidence | Entries | Refs covered |
 |---|---:|---:|
 | `high` | 647 | 1603 |
-| `medium` | 147 | 226 |
+| `medium` | 146 | 222 |
 | `low` | 1 | 2 |
-| `not-icon` | 272 | 408 |
+| `not-icon` | 273 | 412 |
 | `needs-review` | 9 | 11 |
 | **Total** | **1076** | **2250** |
 
@@ -179,7 +179,7 @@ _(274 distinct target glyphs total)_
 | 80 | 4 | en, ja | [ja/0EM5w000006vr00.jpg](../images/kb/ja/0EM5w000006vr00.jpg)<br />[0EM5w000006vr00.jpg](../images/kb/0EM5w000006vr00.jpg) | eye outline (unhide) | `icon-eye` | high | alt: unhide.jpg |
 | 81 | 4 | en | [ka05w0000012Aef-00N5w00000Ri7BU-0EM5w000005wEqf.jpg](../images/kb/ka05w0000012Aef-00N5w00000Ri7BU-0EM5w000005wEqf.jpg) | flag/bookmark outline shape | `icon-flag-outline` | medium | Appears to be a flag or bookmark icon |
 | 82 | 4 | en | [ka05w00000128TW-00N5w00000Ri7BU-0EM5w000006ufdc.jpg](../images/kb/ka05w00000128TW-00N5w00000Ri7BU-0EM5w000006ufdc.jpg) |  | `legacy-icon-save` | high |  |
-| 83 | 4 | en, ja | [ja/0EM5w000005vODJ.png](../images/kb/ja/0EM5w000005vODJ.png)<br />[0EM5w000005vODJ.png](../images/kb/0EM5w000005vODJ.png) | share arrow on blue (card share) | `icon-sub-arrow` | medium | alt: group_management_card_share.png - blue card-share arrow |
+| 83 | 4 | en, ja | [ja/0EM5w000005vODJ.png](../images/kb/ja/0EM5w000005vODJ.png)<br />[0EM5w000005vODJ.png](../images/kb/0EM5w000005vODJ.png) | Share Card or Page dialog screenshot | — | not-icon | False positive - 'Share Card or Page' dialog screenshot (card search results), not an icon; remove from articles, do not convert |
 | 84 | 4 | en, ja | [ja/0EMVq000005KDFx.jpg](../images/kb/ja/0EMVq000005KDFx.jpg)<br />[ja/0EMVq000005KDW5.jpg](../images/kb/ja/0EMVq000005KDW5.jpg)<br />[0EMVq000005KDFx.jpg](../images/kb/0EMVq000005KDFx.jpg)<br />[0EMVq000005KDW5.jpg](../images/kb/0EMVq000005KDW5.jpg) | wrench (legacy card edit) | `legacy-icon-wrench` | high | Legacy card-edit wrench icon |
 | 85 | 4 | en, ja | [ka05w00000128SJ-00N5w00000Ri7BU-0EM5w000005vOch.png](../images/kb/ka05w00000128SJ-00N5w00000Ri7BU-0EM5w000005vOch.png)<br />[ja/0EM5w000005vObp.png](../images/kb/ja/0EM5w000005vObp.png) | small zigzag line chart (alert icon) | `icon-chart-line` | medium | alt: alert_icon.png - appears to be a small line chart used as an alert indicator |
 | 86 | 4 | en | [ka0Vq00000010qn-00N5w00000Ri7BU-0EM5w000005vOFT.png](../images/kb/ka0Vq00000010qn-00N5w00000Ri7BU-0EM5w000005vOFT.png) | closed padlock | `legacy-icon-lock-closed` | high | Lock icon |
@@ -193,7 +193,7 @@ _(274 distinct target glyphs total)_
 | 94 | 4 | en | [ka05w00000123q1-00N5w00000Ri7BU-0EM5w000005vPJH.png](../images/kb/ka05w00000123q1-00N5w00000Ri7BU-0EM5w000005vPJH.png) | pie chart | `icon-chart-pie` | high |  |
 | 95 | 4 | en | [ka05w00000123l5-00N5w00000Ri7BU-0EM5w000005vP0C.png](../images/kb/ka05w00000123l5-00N5w00000Ri7BU-0EM5w000005vP0C.png) | database stack with chevron dropdown | `icon-database` | high | Database picker with dropdown |
 | 96 | 4 | de, es | [de/0EM5w000005wJQt.png](../images/kb/de/0EM5w000005wJQt.png)<br />[es/0EM5w000005wKF3.png](../images/kb/es/0EM5w000005wKF3.png) | person silhouette (pdp users icon) | `icon-person` | high | alt: pdp_users_icon.png |
-| 97 | 4 | en, ja | [ja/0EM5w000005vOD9.png](../images/kb/ja/0EM5w000005vOD9.png)<br />[0EM5w000005vOD9.png](../images/kb/0EM5w000005vOD9.png) | share/upload box with up arrow | `icon-upload` | high | alt: group_management_share.png - share icon as upload-style box-with-arrow |
+| 97 | 4 | en, ja | [ja/0EM5w000005vOD9.png](../images/kb/ja/0EM5w000005vOD9.png)<br />[0EM5w000005vOD9.png](../images/kb/0EM5w000005vOD9.png) | share/upload box with up arrow | `icon-arrow-box` | high | alt: group_management_share.png - share icon as upload-style box-with-arrow |
 | 98 | 4 | en, ja | [ja/0EM5w000006vqzC.jpg](../images/kb/ja/0EM5w000006vqzC.jpg)<br />[0EM5w000006vqzC.jpg](../images/kb/0EM5w000006vqzC.jpg) | eye with pupil (preview) | `icon-eye-observed` | high | alt: preview eye.jpg |
 | 99 | 4 | en, ja | [ja/0EM5w000005vOG6.png](../images/kb/ja/0EM5w000005vOG6.png)<br />[0EM5w000005vOG6.png](../images/kb/0EM5w000005vOG6.png) | right-pointing chevron (show subpages) | `icon-chevron-right` | high | alt: show_subpages.png |
 | 100 | 4 | en | [ka05w00000124TS-00N5w00000Ri7BU-0EM5w000005vPJJ.png](../images/kb/ka05w00000124TS-00N5w00000Ri7BU-0EM5w000005vPJJ.png) | funnel with plus (add filter) | `icon-funnel-plus` | medium | Funnel with a small plus icon |

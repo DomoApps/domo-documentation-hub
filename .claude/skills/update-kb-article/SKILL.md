@@ -37,7 +37,15 @@ To find by filename:
 ls s/article/ | grep keyword
 ```
 
-Once the file(s) are identified, ask the user what type of change they need — or confirm it if already stated. The change types are:
+Once the file(s) are identified, look up the PM who owns the article in `Article-PM-Ownership-Reference.mdx`:
+
+```bash
+grep "filename.mdx" Article-PM-Ownership-Reference.mdx
+```
+
+Surface the owning PM and Feature to the user — useful for routing questions, review requests, or approvals before or after the change. If the article isn't in the reference (e.g. a brand-new file), look up the closest matching Feature in `Feature - Owning Squad, PM, Eng, UX.csv`.
+
+Then ask the user what type of change they need — or confirm it if already stated. The change types are:
 
 1. **Rename** — change the article title, filename, or both
 2. **Content update** — edit body text, callouts, or other prose

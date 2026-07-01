@@ -1,4 +1,6 @@
 # Domo Documentation Hub
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2FDomoApps%2Fdomo-documentation-hub.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2FDomoApps%2Fdomo-documentation-hub?ref=badge_shield)
+
 
 Domo's public documentation site — Getting Started guides, the Knowledge Base (\~1,700 articles), API Reference, and topic pages. Content is authored in MDX, navigation is defined in `docs.json`, and the site is built and hosted by [Mintlify](https://mintlify.com).
 
@@ -60,6 +62,10 @@ mintlify dev
 - **`release/**`** — pushes to release branches create a Mintlify preview via `.github/workflows/mint-preview.yml`. Preview URL is posted to any open PR whose head is the release branch.
 - **Any PR** — Mintlify's GitHub App posts a preview link in the PR's Checks tab.
 
+## Contributing
+
+Training on how to contribute to this repository is available in the [KB Contribution App](https://domo.domo.com/app-studio/649552668/pages/1393071293). To request access to the app, contact the Knowledge Base Administrator: Jared Peterson ([jared.peterson@domo.com](mailto:jared.peterson@domo.com)).
+
 ## Writing content
 
 - `CLAUDE.md` — repo conventions and MDX style.
@@ -69,3 +75,7 @@ mintlify dev
 ## Useful Mintlify references
 
 - [Mintlify docs](https://mintlify.com/docs) · [CLI](https://mintlify.com/docs/cli) · [`docs.json` schema](https://mintlify.com/docs/settings/global) · [Components](https://mintlify.com/docs/components/overview)
+
+
+## License
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2FDomoApps%2Fdomo-documentation-hub.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2FDomoApps%2Fdomo-documentation-hub?ref=badge_large)

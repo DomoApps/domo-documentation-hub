@@ -19,7 +19,19 @@ Use the original source material and the Article Intake Summary as the authorita
 
 ---
 
-## Step 2: Gather release information
+## Step 2: Look up PM ownership
+
+Before gathering release information, identify the PM who owns this article's feature area. Search `Article-PM-Ownership-Reference.mdx` for the closest matching Feature name:
+
+```bash
+grep -i "feature keyword" Article-PM-Ownership-Reference.mdx | head -5
+```
+
+If the feature is brand-new and not yet in the reference, find the closest matching Feature in the reference (or in `Feature - Owning Squad, PM, Eng, UX.csv`) and note that PM as the likely owner. Surface the PM name to the user so they can route review, approvals, or follow-up questions.
+
+---
+
+## Step 3: Gather release information
 
 After the Article Intake Summary is confirmed, ask the following two questions before writing:
 
@@ -28,7 +40,7 @@ After the Article Intake Summary is confirmed, ask the following two questions b
 
 ---
 
-## Step 3: Read the style guide and article template
+## Step 4: Read the style guide and article template
 
 Before writing, read both of these files:
 
@@ -37,7 +49,7 @@ Before writing, read both of these files:
 
 ---
 
-## Step 4: Write the article
+## Step 5: Write the article
 
 Once the Article Intake Summary, release information, style guide, and template are all loaded, create the MDX file. Do not ask for any information already answered.
 
@@ -57,7 +69,7 @@ Reuse the existing description verbatim (adjusting only to fit the em-dash forma
 
 ### Apply the beta convention (if applicable)
 
-Use the release-status answer from Step 2 to decide which beta treatment, if any, to apply. The full convention lives in `Domo-KB-Style-Guide.mdx` › **Beta Features** — read it before writing.
+Use the release-status answer from Step 3 to decide which beta treatment, if any, to apply. The full convention lives in `Domo-KB-Style-Guide.mdx` › **Beta Features** — read it before writing.
 
 - **Entire article is beta:** add `tag: "Beta"` to the frontmatter and place the standard beta Note immediately after the frontmatter, above the Intro. Do not append `(Beta)` to the title.
 - **Only certain sections are beta:** append `<Badge className="text-primary bg-primary/10 font-bold">Beta</Badge>` to each beta section's heading. Place the standard beta Note under the **first** beta section only — do not repeat it for subsequent beta sections in the same article. Do not append `(Beta)` to any heading.
@@ -69,7 +81,7 @@ The standard beta Note must be used verbatim — do not paraphrase or change the
 
 ---
 
-## Step 5: Style-guide revision pass
+## Step 6: Style-guide revision pass
 
 Drafting always introduces style drift. Before finalizing, do an explicit pass against the style guide and revise the article in place. **Do not skip this even if the draft looks right** — the most common misses (intro framing, imperative headings, unpadded tables, lowercase Domo terms, future tense) are easy to introduce and easy to miss without a deliberate re-read.
 
@@ -91,7 +103,7 @@ Drafting always introduces style drift. Before finalizing, do an explicit pass a
 
 ---
 
-## Step 6: Add the new article to navigation
+## Step 7: Add the new article to navigation
 
 A new article file does not appear on the site until it is registered in `docs.json`. As the final step, invoke the `add-to-nav` skill to place the article in the navigation — do not edit `docs.json` by hand:
 

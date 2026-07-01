@@ -1,0 +1,136 @@
+---
+title: "Configure Agent Role and Instructions"
+excerpt: "Understand the difference between the Role and Instructions fields when creating a Domo agent, and how each field shapes agent behavior."
+---
+
+## Intro
+
+This article explains the difference between the Role and Instructions fields when creating an agent in Domo, and how to use each field effectively. They serve distinct purposes and work best when they stay focused on their respective jobs.
+
+---
+
+## Understand Each Field
+
+### Role
+
+**Role defines who the agent is.**
+
+It sets the agent's persona, specialty, and point of view. Think of it as the job title and character description — a single sentence or short paragraph that tells the agent what kind of expert it should embody.
+
+The Role is applied as a framing prefix on every user message, so it continuously reinforces the agent's identity throughout a conversation.
+
+**What belongs here:**
+
+- The agent's area of expertise or domain
+- The agent's perspective or professional lens
+- A brief statement of primary purpose
+
+**What does NOT belong here:**
+
+- Numbered steps or procedures (use Instructions)
+- Rules about tone or formatting (use Instructions)
+- Conditional logic or tool guidance (use Instructions)
+
+### Instructions
+
+**Instructions define how the agent operates.**
+
+This is the agent's operating manual: the steps it should follow, the rules it must respect, and the behaviors it should exhibit when responding. Instructions are injected into the agent's system context — the foundational layer that governs every response.
+
+**What belongs here:**
+
+- Step-by-step workflows (e.g., "First check X, then summarize Y")
+- Tone and formatting rules (e.g., "Always respond in bullet points")
+- Guardrails and constraints (e.g., "Only answer questions related to sales data")
+- Tool usage guidance (e.g., "Use the CRM tool before answering pipeline questions")
+- Template variables for dynamic content (e.g., `${userName}`, `${fiscalYear}`)
+
+**What does NOT belong here:**
+
+- The agent's persona or identity (use Role)
+
+## Compare Role and Instructions
+
+| | Role | Instructions |
+| ------------------------ | ---------------------------------- | ----------------------------------- |
+| **Answers the question** | Who is this agent?                 | How does this agent operate?        |
+| **Scope**                | Identity and expertise             | Behaviors, rules, and workflows     |
+| **Applied as**           | Persona framing with user messages | System-level behavioral rules       |
+| **Length**               | 1–3 sentences                      | Can be long — paragraphs or lists   |
+| **Template variables**   | No                                 | Yes                                 |
+
+## Use the Templates
+
+### Role Template
+
+```
+You are a [job title or domain expert] who specializes in [specific area or domain].
+Your primary goal is to help users [accomplish specific outcome].
+```
+
+**Example:**
+
+```
+You are a sales operations analyst who specializes in pipeline health and forecast accuracy.
+Your primary goal is to help users understand deal velocity, identify at-risk opportunities, and improve forecast reliability.
+```
+
+### Instructions Template
+
+```
+When a user asks a question:
+1. [First step — e.g., identify what data is needed]
+2. [Second step — e.g., use the relevant tool to retrieve that data]
+3. [Third step — e.g., summarize findings clearly]
+
+Tone and format:
+- [Formatting rule, e.g., "Always use bullet points for lists of 3 or more items"]
+- [Tone rule, e.g., "Keep responses concise — no more than 3 paragraphs"]
+
+Constraints:
+- [Guardrail, e.g., "Only answer questions that can be answered using available CRM data"]
+- [Guardrail, e.g., "Never speculate beyond what the data shows — say so if data is insufficient"]
+```
+
+**Example:**
+
+```
+When a user asks about pipeline or forecast data:
+1. Use the CRM tool to retrieve relevant deals or metrics.
+2. Filter by the user's current quarter unless they specify a different time range.
+3. Summarize the findings in plain language, leading with the most important insight.
+
+Tone and format:
+- Use bullet points for any list of 3 or more items.
+- Lead with a one-sentence headline before providing detail.
+- Keep responses under 200 words unless the user requests more detail.
+
+Constraints:
+- Only answer questions related to sales pipeline, forecasting, and deal health.
+- If data is unavailable or ambiguous, say so explicitly rather than guessing.
+- Never reference internal system names or tool IDs in your response.
+```
+
+## Follow Best Practices
+
+**Keep Role short.** One to three sentences is enough. The agent's identity should be clear at a glance. If you find yourself writing a paragraph of instructions inside the Role field, move that content to Instructions.
+
+**Make Instructions actionable.** Vague guidance like "be helpful" does not constrain behavior. Concrete rules like "always cite the data source in your response" do.
+
+**Use numbered steps for workflows.** If the agent should follow a sequence of actions, a numbered list is easier for the model to follow than a prose description.
+
+**Use template variables for context injection.** If your agent needs to know the current user, fiscal year, or other runtime values, use template variables in Instructions rather than hardcoding them. Contact your Domo administrator for the variables available in your environment.
+
+**Test both fields together.** Role and Instructions interact. A highly specific Role combined with overly broad Instructions can produce conflicting behavior. Test edge cases — especially questions that are adjacent to but outside the agent's intended scope — to verify guardrails work as expected.
+
+**Separate identity from procedure.** A common mistake is writing the entire agent configuration inside a single field. Keeping them separate makes the agent easier to tune: adjusting tone or workflow steps doesn't require rewriting the persona, and vice versa.
+
+## Avoid Common Mistakes
+
+| Mistake                                  | Why it's a problem                                                                                              | Fix                                                                                          |
+| ---------------------------------------- | --------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
+| Writing procedures inside Role           | Procedures reinforce on every user message, which can cause verbose or repetitive preambles                     | Move step-by-step content to Instructions                                                    |
+| Leaving Instructions blank               | Without behavioral rules, the agent defaults to general-purpose behavior that may not match your use case       | Add at minimum: tone, formatting, and one or two constraints                                 |
+| Using vague constraints                  | "Be professional" and "be helpful" don't meaningfully change model behavior                                     | Use specific, testable rules: "Respond in 3 sentences or fewer unless asked for detail"      |
+| Duplicating the Role inside Instructions | Redundant content makes the agent harder to maintain and can create contradictions if one copy is updated       | Keep identity in Role; keep behavior in Instructions                                         |
+| Skipping guardrails                      | Without out-of-scope constraints, users can redirect the agent into unintended territory                        | Add explicit constraints for what the agent should and should not answer                     |

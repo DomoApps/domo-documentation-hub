@@ -49,7 +49,7 @@ If localized versions already exist for any language, flag this to the user and 
 Ask the user two questions (combine into one message):
 
 1. **Is this a Release Notes article?** (yes/no)
-2. **Which languages?** Localization defaults to all three — Spanish, French, and German — unless the user explicitly requests only specific language(s). Note to the user: Japanese localization is handled on a separate pipeline and is not part of this skill.
+2. **Which languages?** Localization defaults to all four — Spanish, French, German, and Japanese — unless the user explicitly requests only specific language(s).
 
 If the article is Release Notes, also ask:
 
@@ -111,6 +111,7 @@ The localized Release Notes tab names are:
 - Spanish: "Notas de la versión" tab → "Notas de la versión de funciones archivadas" group
 - French: "Notes de version" tab → "Notes de version des fonctionnalités archivées" group
 - German: "Versionshinweise" tab → "Archivierte Versionshinweise zu Funktionen" group
+- Japanese: "リリースノート" tab → "機能に関する過去のリリースノート" group
 
 ### Phase 2: Translate the English Current Release Notes into each language
 
@@ -127,7 +128,7 @@ Key reminders for Current Release Notes translation:
 - Title for the localized Current Release Notes files should be the language's equivalent of "Current Release Notes" (see style guide Release Notes Conventions)
 - Translate "## New Features and Enhancements" to the language-specific header (see style guide)
 - Preserve all `<Frame>`, `<BetaNote />`, `import` statements, and MDX components unchanged
-- For images: check whether localized image versions exist in `/images/kb/{lang}/`; if not, use the English image path
+- For images: check whether localized image versions exist in `/images/kb/{lang}/`; if they exist, use the localized path; if not, use the English image path as-is
 - Apply all language-specific term translations from the style guide glossary
 
 **3. Write the translated content to the pre-existing localized Current Release Notes files** — replacing the content that was just archived:
@@ -169,7 +170,7 @@ Following all rules in `Localization-Style-Guide.mdx`:
 - Translate the `title:` and `excerpt:` frontmatter fields
 - Translate all prose, headings, list items, and callout body text
 - Apply language-specific term translations from the style guide glossary
-- For images: check whether localized images exist; fall back to English paths if not
+- For images: check whether localized images exist; if they exist, use the localized path; if not, use the English image path as-is
 - Internal links: always keep as English paths (`/s/article/...`) — do not prefix with a language code
 - Preserve all MDX components, code blocks, import statements, and formatting exactly — **with two exceptions: BetaNote and legacy TOC blocks** (see below)
 - **Legacy TOC blocks:** Some older English articles were originally migrated with an old-format table-of-contents block immediately after frontmatter — a `---` horizontal rule, then `######` or `##` headings with bullet lists summarizing the article, then another `---`. These blocks have since been removed from English. If the English source article you are translating contains one, do NOT include it in the translation. If an existing localized version you are updating has one, remove it. The pattern to recognize: frontmatter `---` → blank line → `---` → section headings with bullets → `---` → actual content.
@@ -188,6 +189,7 @@ Write each localized version to the corresponding language directory using the *
 es/s/article/FILENAME.mdx
 fr/s/article/FILENAME.mdx
 de/s/article/FILENAME.mdx
+ja/s/article/FILENAME.mdx
 ```
 
 (Write only the files for the requested target languages.)
@@ -220,11 +222,99 @@ python3 -c "import json; json.load(open('docs.json')); print('docs.json is valid
 
 ---
 
-## Step 4: Output
+## Step 4: Quality Review
+
+After writing all translations and before reporting to the user, review every translated file you just wrote against `Localization-Style-Guide.mdx`. This is a mandatory quality checkpoint — catch anything that was hallucinated, mis-applied, or accidentally skipped.
+
+Work through the following checklist for each language. Revise the file in place if you find an issue; do not just note the issue and move on.
+
+### Universal checks (all languages)
+
+- [ ] **Never-translated terms still in English.** Verify that every Domo brand name (DataSet, DataFlow, Beast Mode, Magic ETL, Analyzer, etc.) and every technical acronym (ETL, OAuth, SQL, API, SAML, etc.) appears unchanged in the translation. Search the translated file for any suspicious rendering.
+- [ ] **Callout labels are correct for the language.** Check every `<Note>`, `<Warning>`, and `<Tip>` block. The label inside the callout must match the language-specific form from the style guide (e.g., `**注：**` for Japanese, `**Remarque :**` for French).
+- [ ] **BetaNote uses the correct language export.** If the English source used `<BetaNote />`, confirm the translated file imports and uses `<BetaNoteEs />`, `<BetaNoteFr />`, `<BetaNoteDe />`, or `<BetaNoteJa />` as appropriate.
+- [ ] **No legacy TOC block.** Confirm there is no old-style table-of-contents block (a sequence of `---` / heading bullets / `---`) immediately after frontmatter.
+- [ ] **No content added or removed.** Verify that every section, heading, list item, and callout from the English source is present in the translation, with nothing extra added.
+- [ ] **MDX structure is intact.** Component names, attribute names (except translated `title=` on `<Accordion>` and descriptive `alt=`), import statements, code blocks, and inline code are all unchanged.
+- [ ] **Frontmatter is correct.** `title` and `excerpt` are translated. No fields were added or removed. `tag` fields (if present) are unchanged.
+- [ ] **Internal links are English paths.** No `/s/article/` link was prefixed with a language code.
+- [ ] **Blank lines before callouts.** Every `<Note>`, `<Warning>`, and `<Tip>` is preceded by a blank line in the MDX source.
+- [ ] **Screenshots remain in `<Frame>`.** All block-level images are still wrapped in `<Frame>`. No `<Frame>` was removed.
+- [ ] **Present tense throughout.** No sentence uses future tense (`will`) or conditional tense where the English source used present tense.
+
+### Language-specific checks
+
+**Spanish**
+- [ ] Formal register (usted, not tú); imperative verbs use formal forms ("Seleccione", "Haga clic")
+- [ ] Magic ETL is expanded as "Magic - Extracción, transformación y carga" on first mention in headings/body
+- [ ] Callout labels: `**Nota:**`, `**Importante:**`, `**Sugerencia:**`
+
+**French**
+- [ ] Formal register (vous, not tu); imperative verbs use plural formal forms ("Sélectionnez", "Cliquez")
+- [ ] Space before `:`, `!`, `?`, `;` in French prose (e.g., `**Remarque :**` not `**Remarque:**`)
+- [ ] Callout labels: `**Remarque :**`, `**Important :**`, `**Conseil :**`
+
+**German**
+- [ ] Formal register (Sie, always capitalized); imperative verbs use formal forms ("Wählen Sie", "Klicken Sie")
+- [ ] All nouns are capitalized, including translated common nouns (e.g., "die Berechtigung", "der Bericht")
+- [ ] Hyphenated compounds where one element is English (e.g., "Cloud-Integration", "KI-Chat")
+- [ ] Callout labels: `**Hinweis:**`, `**Wichtig:**`, `**Tipp:**`
+
+**Japanese**
+- [ ] Polite formal (です/ます) style throughout — no plain (だ/である) forms
+- [ ] Steps end with `〜します` or `〜してください`
+- [ ] Correct katakana vs. kanji for translated terms (e.g., 表 for UI table, テーブル for database table)
+- [ ] BetaNote: `<BetaNoteJa />` — never the English `<BetaNote />`
+- [ ] Callout labels: `**注：**`, `**重要：**`, `**ヒント：**`
+
+### If you find an issue
+
+Fix it immediately in the translated file using the Edit tool. Do not accumulate issues for a later pass. After fixing, re-check the specific rule to confirm the fix is correct.
+
+---
+
+## Step 5: Output
 
 Tell the user:
 
 1. **Files created or updated** — list each new or modified file path
 2. **Navigation entries added** — list each `docs.json` insertion (language, tab, group, position)
 3. **Archived files** (Current Release Notes flow only) — what was archived, where, and any languages where the archive was skipped because it already existed
-4. **docs.json validation** — confirm it passed or report the error
+4. **Quality review findings** — briefly note any issues that were found and fixed during the quality checkpoint; if none, say "Quality review passed — no issues found."
+5. **docs.json validation** — confirm it passed or report the error
+
+---
+
+## Step 6: Token Tracking
+
+After reporting to the user, append one row to `tracking/localize-token-usage.csv`.
+
+**Get the values:**
+
+```bash
+# Today's date
+date +%Y-%m-%d
+
+# Git username (the person running the skill)
+git config user.name
+```
+
+**Estimate tokens:**
+Based on the article(s) you just processed, estimate total tokens for this skill run using these rough tiers (includes translation, quality review, nav updates, and prompt overhead):
+
+- Small article (<500 words): ~15,000–25,000 tokens
+- Medium article (500–1,500 words): ~25,000–50,000 tokens
+- Large article (>1,500 words): ~50,000–100,000 tokens
+- Add ~10,000 tokens per additional language beyond the first
+
+Write an integer estimate (e.g., `35000`). For exact counts, check the Anthropic Console API logs for this session.
+
+**Append the row:**
+
+```bash
+echo "$(date +%Y-%m-%d),$(git config user.name),ARTICLE_FILENAME,LANGUAGES_LIST,TOKEN_ESTIMATE" >> tracking/localize-token-usage.csv
+```
+
+For `LANGUAGES_LIST`, use a slash-separated list of language codes (e.g., `es/fr/de/ja`). For `ARTICLE_FILENAME`, use just the filename (e.g., `March-2026-Release.mdx`), not the full path.
+
+Do not leave a blank line before or after the appended row — the CSV must stay valid.

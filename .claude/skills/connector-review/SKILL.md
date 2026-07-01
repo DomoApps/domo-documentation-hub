@@ -48,6 +48,7 @@ its Jira ticket, and prints a status table. Each PR/ticket pair lands in one of 
 | `ESCALATION ≥21 days` | 3 weeks open, 2 follow-ups sent with no response — auto-merge eligible |
 | `PUBLISH REQUEST` | Arun's Jira comment asks to publish the document directly (no secondary approval needed) |
 | `MIGRATION REQUEST` | Arun's Jira comment requests a missed-migration article — see Migration flow below |
+| `ON HOLD` | Ticket is on indefinite hold; excluded from all automatic actions — see On-Hold flow below |
 
 Show the user the dashboard output, including PR numbers, Jira IDs, ages, and states.
 
@@ -160,6 +161,49 @@ When conflicts are reported, resolve them as follows:
 
 4. The script will re-check mergeability and proceed with the normal merge → Jira comment
    → close flow.
+
+## On-Hold Flow
+
+Some tickets need to be paused indefinitely — for example, a PR whose content is blocked
+on a product decision or is no longer being actively reviewed. On-hold tickets appear in a
+separate **ON HOLD** section at the bottom of the dashboard and are skipped by all automatic
+actions including `--auto`.
+
+Hold state is tracked in `tracking/connector-on-hold.json` in the repo root. This file is
+committed to git so the hold list persists across sessions and is visible in history.
+
+### Put a ticket on hold
+```bash
+python3 scripts/connector-review.py --hold DOMO-###### --reason "reason text"
+```
+`--reason` is optional but recommended. The entry is saved with today's date as `held_since`.
+
+### Remove a ticket from hold
+```bash
+python3 scripts/connector-review.py --release-hold DOMO-######
+```
+The ticket reappears in the normal dashboard on the next run with its current Jira/GitHub
+approval state.
+
+### Check held tickets for new Jira activity
+```bash
+python3 scripts/connector-review.py --check-holds
+```
+Fetches Jira comments for each on-hold ticket. If any new comment since `held_since`
+contains an approval phrase, publish request, or migration request, the script flags it and
+suggests running `--release-hold`. It **does not** auto-release — you decide. The
+`last_checked` and `check_notes` fields in the JSON are updated on every run.
+
+### Dashboard display
+On-hold tickets are shown below the main active table, with held-since date, reason, and
+last check notes (e.g., "No new approval activity" or "New activity: Satish: [approval phrase]").
+
+### Guardrails for on-hold tickets
+- `--follow-up` and `--merge` refuse to act on a held ticket; run `--release-hold` first.
+- `--auto` silently skips all on-hold tickets.
+- `--check-holds` is the correct way to monitor held tickets without releasing them.
+
+---
 
 ## Migration Request Flow
 

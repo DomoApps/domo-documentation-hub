@@ -226,10 +226,12 @@ No manual input needed; these are computed fresh on every run.
 **GitHub**: the script checks `gh pr list` reviews for a state of `APPROVED` from the
 authenticated user (Jared).
 
-**Jira**: the script parses Arun's first comment that @-mentions others, extracts the
-mentioned account IDs, then scans subsequent comments from those accounts for approval
-phrases defined in `connector-templates.json` (e.g., "looks good", "verified", "LGTM",
-"KB looks good to me").
+**Jira**: the script parses Arun's first comment that @-mentions others to identify the
+secondary approvers for display. It then scans **all** subsequent comments — from any
+commenter other than Arun and Jared — for approval phrases defined in
+`connector-templates.json` (e.g., "looks good", "verified", "LGTM", "KB looks good to me").
+This means a teammate stepping in to verify on behalf of the @-mentioned reviewer is
+correctly counted as an approval.
 
 ---
 

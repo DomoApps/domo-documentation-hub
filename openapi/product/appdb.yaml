@@ -158,7 +158,7 @@ components:
           description: New name for the collection.
         schema:
           type: object
-          description: Updated column schema. Used when syncing documents to a Domo DataSet.
+          description: "Updated column schema for this collection. Required before enabling DataSet sync. Requires admin privilege. Valid column types: `STRING`, `LONG`, `DECIMAL`, `DOUBLE`, `DATE`, `DATETIME`. The legacy field name `schemaJson` is also accepted."
           properties:
             columns:
               type: array
@@ -166,26 +166,27 @@ components:
                 $ref: '#/components/schemas/CollectionColumn'
         syncEnabled:
           type: boolean
-          description: Whether documents in this collection are synced to a linked Domo DataSet.
-        syncRequired:
-          type: boolean
-          description: Whether a sync is required before the next operation.
+          description: "Whether to enable periodic syncing of documents to a linked Domo DataSet. Returns a 400 if set to `true` and the collection has no schema — set `schema` first."
         fullReplaceRequired:
           type: boolean
           description: Whether the next DataSet sync should fully replace existing rows rather than upsert.
         defaultPermissions:
           type: string
           nullable: true
-          description: "Comma-separated default permission set applied to new app grants on this collection. Example: `READ,CREATE_CONTENT,READ_CONTENT,UPDATE_CONTENT,DELETE_CONTENT`."
-      example:
-        name: "preferences"
-        schema:
-          columns:
-            - type: STRING
-              name: theme
-            - type: STRING
-              name: defaultView
-        syncEnabled: false
+          description: "Comma-separated default permission set for new app grants on this collection. `READ` is always appended even if omitted. When `null` or blank, defaults to `READ,CREATE_CONTENT,READ_CONTENT,UPDATE_CONTENT,DELETE_CONTENT`. Valid values: `ADMIN`, `SHARE`, `DELETE`, `WRITE`, `READ`, `CREATE_CONTENT`, `READ_CONTENT`, `UPDATE_CONTENT`, `DELETE_CONTENT`. Requires admin privilege."
+        owner:
+          type: integer
+          description: "Numeric user ID to set as the collection owner. Requires admin privilege to change."
+        requiredAuthorities:
+          type: object
+          nullable: true
+          description: "Maps `CollectionOperation` names to arrays of authority strings. When set, only users with matching authorities may perform the corresponding operation. Requires admin privilege."
+        filters:
+          type: array
+          nullable: true
+          description: "Array of document-level filter predicates applied to read operations on this collection. Requires WRITE permission on the collection."
+          items:
+            type: object
 
     Datastore:
       type: object
@@ -579,7 +580,7 @@ paths:
                 $ref: '#/components/schemas/Collection'
     put:
       summary: Update Collection
-      description: "Update one or more fields on a collection. All request body fields are optional — only the fields you include are changed. Updatable fields: `name`, `schema`, `syncEnabled`, `syncRequired`, `fullReplaceRequired`, `defaultPermissions`."
+      description: "Update one or more fields on a collection. All request body fields are optional — only the fields you include are changed."
       tags:
         - App DB API (Product)
       parameters:

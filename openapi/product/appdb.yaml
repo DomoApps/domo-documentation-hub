@@ -149,11 +149,16 @@ components:
         datastoreName:
           type: string
 
-    CollectionSchemaRequest:
+    CollectionUpdateRequest:
       type: object
+      description: "All fields are optional. Only the fields you include are updated; omitted fields are left unchanged."
       properties:
+        name:
+          type: string
+          description: New name for the collection.
         schema:
           type: object
+          description: Updated column schema. Used when syncing documents to a Domo DataSet.
           properties:
             columns:
               type: array
@@ -161,6 +166,26 @@ components:
                 $ref: '#/components/schemas/CollectionColumn'
         syncEnabled:
           type: boolean
+          description: Whether documents in this collection are synced to a linked Domo DataSet.
+        syncRequired:
+          type: boolean
+          description: Whether a sync is required before the next operation.
+        fullReplaceRequired:
+          type: boolean
+          description: Whether the next DataSet sync should fully replace existing rows rather than upsert.
+        defaultPermissions:
+          type: string
+          nullable: true
+          description: "Comma-separated default permission set applied to new app grants on this collection. Example: `READ,CREATE_CONTENT,READ_CONTENT,UPDATE_CONTENT,DELETE_CONTENT`."
+      example:
+        name: "preferences"
+        schema:
+          columns:
+            - type: STRING
+              name: theme
+            - type: STRING
+              name: defaultView
+        syncEnabled: false
 
     Datastore:
       type: object
@@ -553,9 +578,9 @@ paths:
               schema:
                 $ref: '#/components/schemas/Collection'
     put:
-      summary: Update Collection Schema
-      description: Update the schema of a collection.
-      tags: 
+      summary: Update Collection
+      description: "Update one or more fields on a collection. All request body fields are optional — only the fields you include are changed. Updatable fields: `name`, `schema`, `syncEnabled`, `syncRequired`, `fullReplaceRequired`, `defaultPermissions`."
+      tags:
         - App DB API (Product)
       parameters:
         - name: collectionId
@@ -568,7 +593,33 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CollectionSchemaRequest'
+              $ref: '#/components/schemas/CollectionUpdateRequest'
+            examples:
+              rename:
+                summary: Rename a collection
+                value:
+                  name: "My new name"
+              update-schema:
+                summary: Update schema
+                value:
+                  schema:
+                    columns:
+                      - type: STRING
+                        name: theme
+                      - type: STRING
+                        name: defaultView
+                  syncEnabled: true
+              rename-and-update-schema:
+                summary: Rename and update schema
+                value:
+                  name: "preferences"
+                  schema:
+                    columns:
+                      - type: STRING
+                        name: theme
+                      - type: STRING
+                        name: defaultView
+                  syncEnabled: false
       responses:
         '200':
           description: OK

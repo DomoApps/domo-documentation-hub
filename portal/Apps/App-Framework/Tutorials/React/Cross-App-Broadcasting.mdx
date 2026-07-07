@@ -15,7 +15,7 @@ This tutorial builds two Custom Apps that communicate in real time using [App Br
 Along the way you'll learn:
 
 - How to declare broadcast channels in `manifest.json`
-- How to use `domo.broadcastState()` for sticky messages that survive late mounts
+- How to use `{ sticky: true }` for state that survives late mounts
 - How to filter messages by source using `domo.onBroadcastFrom()`
 - Best practices for channel naming and payload design
 
@@ -105,12 +105,12 @@ export default function App() {
     setSelectedId(customer.id);
 
     // Publish sticky state — late-mounting subscribers get this immediately
-    domo.broadcastState('selection:changed', {
+    domo.broadcast('selection:changed', {
       id: customer.id,
       name: customer.name,
       region: customer.region,
       revenue: customer.revenue,
-    });
+    }, { sticky: true });
   }
 
   return (
@@ -267,7 +267,7 @@ Real apps often use multiple channels. Here's a Selector App that publishes both
 
 ```javascript
 // Selection is sticky — persists for late subscribers
-domo.broadcastState('selection:changed', { id: row.id, name: row.name });
+domo.broadcast('selection:changed', { id: row.id, name: row.name }, { sticky: true });
 
 // Hover is ephemeral — only relevant right now
 domo.broadcast('chart:hover', { seriesId: 'revenue', index: 3 });
@@ -327,7 +327,7 @@ Rate-limit errors from the host arrive asynchronously. The SDK logs a warning wh
 | Concept | What you learned |
 | --- | --- |
 | `channels` in manifest | Declare what your app publishes and subscribes to |
-| `domo.broadcastState()` | Publish sticky state that late subscribers receive immediately |
+| `domo.broadcast()` | Publish a message; pass `{ sticky: true }` to retain it for late subscribers |
 | `domo.onBroadcast()` | Subscribe to a channel and react to messages |
 | `domo.onBroadcastFrom()` | Filter messages by source app |
 | `domo.onBroadcastOnce()` | Auto-unsubscribe after first delivery |

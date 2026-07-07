@@ -89,7 +89,7 @@ A **sticky** message is retained by the bus. When a new subscriber joins a stick
 
 ```javascript
 // Publisher: send sticky state
-domo.broadcastState('config:theme', { mode: 'dark', accent: '#4A90D9' });
+domo.broadcast('config:theme', { mode: 'dark', accent: '#4A90D9' }, { sticky: true });
 
 // Subscriber (mounts later): receives the last value immediately
 domo.onBroadcast('config:theme', (msg) => {
@@ -104,8 +104,8 @@ Use sticky messages for **state** that late-mounting apps need (theme, selected 
 Apps declare their broadcast channels in `manifest.json`. Declarations serve three purposes:
 
 1. **Discoverability** — The App Store and wiring UIs show what an app publishes and subscribes to
-2. **DevTools validation** — The broadcasting inspector warns when an app uses undeclared channels
-3. **Runtime enforcement** — In production, the host rejects messages on undeclared channels
+2. **Pro Code Editor** — Broadcasting on an undeclared channel logs a `console.warn()`
+3. **Domo page** — Broadcasting on an undeclared channel throws an error
 
 ```json
 {
@@ -143,11 +143,17 @@ The host stamps every message with the publishing app's `sourceAppId`. This valu
 
 ### Rate limiting
 
-Each app instance is limited to **100 messages per second** (configurable by instance admins). Messages exceeding this limit are rejected, and the SDK surfaces an error.
+Each app is limited to **100 messages per second** (configurable by instance admins). Messages exceeding this limit are rejected, and the SDK surfaces an error.
 
 ### Payload size
 
 Each message payload is capped at **64 KB** when serialized. Oversized payloads are rejected client-side by the SDK before reaching the bus.
+
+### Duplicate filtering
+
+The bus tracks the last published payload for each channel and drops messages whose serialized payload is an exact match of the previous value. This prevents redundant subscriber calls when the same state is published repeatedly (for example, clicking the same row twice).
+
+If you need to force a re-delivery of the same value — for example, to re-trigger a side effect — include a sequence number or timestamp in the payload.
 
 ### Page-scoped isolation
 
@@ -196,11 +202,11 @@ The bus exists only within a single page load. There is no cross-page communicat
 import domo from 'ryuu.js';
 
 function onRowClick(row) {
-  domo.broadcastState('selection:changed', {
+  domo.broadcast('selection:changed', {
     id: row.id,
     name: row.name,
     region: row.region
-  });
+  }, { sticky: true });
 }
 ```
 

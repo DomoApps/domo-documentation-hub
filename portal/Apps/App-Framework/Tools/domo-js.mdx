@@ -706,14 +706,14 @@ domo.onAppDataUpdated((data) => {
 **Use Case:** Enable communication between multiple Custom Apps on the same Domo page.
 
 <Note>
-**Note:** For new apps, prefer [App Broadcasting](#broadcasting) over `onAppDataUpdated`. Broadcasting provides topic-based routing, sticky replay, source identity, and manifest-declared channels.
+**Note:** For new apps, prefer [App Broadcasting](#broadcasting) over `onAppDataUpdated`. Broadcasting provides channel-based routing, sticky replay, source identity, and manifest-declared channels.
 </Note>
 
 ---
 
 #### Broadcasting
 
-The broadcasting methods provide a topic-based pub/sub system for cross-app communication. Apps publish named messages and subscribe to topics — the host routes messages between apps on the same page.
+The broadcasting methods provide a channel-based pub/sub system for cross-app communication. Apps publish named messages and subscribe to channels — the host routes messages between apps on the same page.
 
 <Note>
 **Note:** App Broadcasting requires the `app-broadcasting` feature switch. When disabled, all methods are safe no-ops with a one-time `console.warn`.
@@ -723,13 +723,13 @@ See the [App Broadcasting Guide](/portal/Apps/App-Framework/Guides/broadcasting)
 
 ---
 
-#### `domo.onBroadcast(topic, handler)`
+#### `domo.onBroadcast(channel, handler)`
 
-Subscribe to messages on a topic. If the topic is sticky and a value has already been published, the handler fires immediately with the last value.
+Subscribe to messages on a channel. If the channel is sticky and a value has already been published, the handler fires immediately with the last value.
 
 **Parameters:**
 
-- `topic` (string, required) — Topic name to subscribe to. Cannot start with `domo:`.
+- `channel` (string, required) — Channel name to subscribe to. Cannot start with `domo:`.
 - `handler` — `(msg: BroadcastMessage) => void`
 
 **Returns:** `function` — Unsubscribe function. Call it to stop listening.
@@ -738,7 +738,7 @@ Subscribe to messages on a topic. If the topic is sticky and a value has already
 
 ```typescript
 interface BroadcastMessage {
-  topic: string;       // Topic the message was published to
+  channel: string;     // Channel the message was published to
   payload: unknown;    // Data sent by the publisher
   sourceAppId: string; // Host-stamped app instance ID (trustworthy)
   timestamp: number;   // Host-assigned timestamp (ms since epoch)
@@ -757,13 +757,13 @@ unsubscribe();
 
 ---
 
-#### `domo.onBroadcastOnce(topic, handler)`
+#### `domo.onBroadcastOnce(channel, handler)`
 
-Subscribe to a topic and automatically unsubscribe after the first message is received.
+Subscribe to a channel and automatically unsubscribe after the first message is received.
 
 **Parameters:**
 
-- `topic` (string, required) — Topic name
+- `channel` (string, required) — Channel name
 - `handler` — `(msg: BroadcastMessage) => void`
 
 **Returns:** `function` — Unsubscribe function (can cancel before first delivery)
@@ -777,13 +777,13 @@ domo.onBroadcastOnce('init:ready', (msg) => {
 
 ---
 
-#### `domo.onBroadcastFrom(topic, sourceAppId, handler)`
+#### `domo.onBroadcastFrom(channel, sourceAppId, handler)`
 
-Subscribe to a topic but only receive messages from a specific app instance.
+Subscribe to a channel but only receive messages from a specific app instance.
 
 **Parameters:**
 
-- `topic` (string, required) — Topic name
+- `channel` (string, required) — Channel name
 - `sourceAppId` (string, required) — Only deliver messages from this app instance
 - `handler` — `(msg: BroadcastMessage) => void`
 
@@ -861,18 +861,18 @@ domo.requestAppDataUpdate({
 ```
 
 <Note>
-**Note:** For new apps, prefer [`domo.broadcast()`](#domo-broadcast-topic-payload-opts) over `requestAppDataUpdate`. Broadcasting provides topic routing, sticky state, and source identity.
+**Note:** For new apps, prefer [`domo.broadcast()`](#domo-broadcast-channel-payload-opts) over `requestAppDataUpdate`. Broadcasting provides channel routing, sticky state, and source identity.
 </Note>
 
 ---
 
-#### `domo.broadcast(topic, payload, opts?)`
+#### `domo.broadcast(channel, payload, opts?)`
 
-Publish a message to all apps subscribed to the given topic on the same page.
+Publish a message to all apps subscribed to the given channel on the same page.
 
 **Parameters:**
 
-- `topic` (string, required) — Topic name. Cannot start with `domo:`.
+- `channel` (string, required) — Channel name. Cannot start with `domo:`.
 - `payload` (unknown, required) — Any serializable data. Must be under 64 KB when serialized.
 - `opts` (object, optional):
   - `sticky` (boolean) — If `true`, the bus retains this value and replays it to future subscribers. Defaults to `false`.
@@ -894,13 +894,13 @@ domo.broadcast('selection:changed', { id: 42, name: 'Acme Corp' }, { sticky: tru
 
 ---
 
-#### `domo.broadcastState(topic, payload)`
+#### `domo.broadcastState(channel, payload)`
 
-Shorthand for `domo.broadcast(topic, payload, { sticky: true })`. Use this when publishing state that late-mounting apps should receive immediately.
+Shorthand for `domo.broadcast(channel, payload, { sticky: true })`. Use this when publishing state that late-mounting apps should receive immediately.
 
 **Parameters:**
 
-- `topic` (string, required) — Topic name
+- `channel` (string, required) — Channel name
 - `payload` (unknown, required) — State value to broadcast and retain
 
 **Returns:** `void`

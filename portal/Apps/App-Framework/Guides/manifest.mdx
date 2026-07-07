@@ -18,7 +18,7 @@ The manifest file is the configuration file used to provide meta-data about an A
 | `ignore`          | List            | Instructs the CLI to ignore certain files when publishing. | Accepts an array of glob patterns.                                                                                                                                                                                                                             | Optional |
 | `id`              | String          | This is a unique identifier for your App Design.           | It is added to the manifest automatically by the command line tool the first time you publish your design via `domo publish`.                                                                                                                                  | Required |
 | `proxyId`         | String          | This is an id of a card you want to impersonate.           | It is required if you want to be able to develop locally against Domo Workflows, Code Engine, or AppDB.                                                                                                                                                        | Optional | [Getting a proxyId](#getting-a-proxyid-advanced)                                                     |
-| `channels`        | Object          | Declares broadcast topics the app publishes and subscribes to. | Enables cross-app communication via App Broadcasting. Object with `publishes` and `subscribes` arrays.                                                                                                                                                        | Optional | [App Broadcasting](/portal/Apps/App-Framework/Guides/broadcasting)                                   |
+| `channels`        | Object          | Declares broadcast channels the app publishes and subscribes to. | Enables cross-app communication via App Broadcasting. Object with `publishes` and `subscribes` arrays.                                                                                                                                                        | Optional | [App Broadcasting](/portal/Apps/App-Framework/Guides/broadcasting)                                   |
 
 ### Example Manifest
 
@@ -523,7 +523,7 @@ This is the actual name of the column in the DataSet that the field alias gets m
 
 ---
 
-The `channels` property declares the broadcast topics your app uses for cross-app communication via [App Broadcasting](/portal/Apps/App-Framework/Guides/broadcasting). Declaring channels enables the wiring UI in App Studio, makes your app discoverable in the App Store, and allows DevTools to validate message traffic.
+The `channels` property declares the broadcast channels your app uses for cross-app communication via [App Broadcasting](/portal/Apps/App-Framework/Guides/broadcasting). Declaring channels enables the wiring UI in App Studio, makes your app discoverable in the App Store, and allows DevTools to validate message traffic.
 
 ```json
 "channels": {
@@ -546,26 +546,26 @@ The `channels` property declares the broadcast topics your app uses for cross-ap
 
 #### publishes
 
-An array of topics this app sends messages to. Each entry has:
+An array of channels this app sends messages to. Each entry has:
 
 | Property | Type | Description | Required |
 | --- | --- | --- | --- |
-| `name` | String | Topic name (exact string, no wildcards). Cannot start with `domo:`. | Required |
-| `description` | String | Human-readable description of what this topic carries | Required |
+| `name` | String | Channel name (exact string, no wildcards). Cannot start with `domo:`. | Required |
+| `description` | String | Human-readable description of what this channel carries | Required |
 | `sticky` | Boolean | If `true`, the last published value is retained and replayed to late subscribers. Defaults to `false`. | Optional |
 | `schema` | Object | JSON Schema describing the payload shape. Advisory in v1 — DevTools warns on mismatches but the runtime stays permissive. | Optional |
 
 #### subscribes
 
-An array of topics this app listens to. Each entry has:
+An array of channels this app listens to. Each entry has:
 
 | Property | Type | Description | Required |
 | --- | --- | --- | --- |
-| `name` | String | Topic name to subscribe to. Cannot start with `domo:`. | Required |
-| `description` | String | Human-readable description of how this app uses the topic | Required |
+| `name` | String | Channel name to subscribe to. Cannot start with `domo:`. | Required |
+| `description` | String | Human-readable description of how this app uses the channel | Required |
 
 <Note>
-**Note:** Channel declarations are required capability declarations. In production, the host rejects messages on undeclared topics. During local development (WIDE mode), undeclared topics produce a console warning but are not blocked.
+**Note:** Channel declarations are required capability declarations. In production, the host rejects messages on undeclared channels. During local development (WIDE mode), undeclared channels produce a console warning but are not blocked.
 </Note>
 
 ### Getting a proxyId (Advanced)

@@ -17,7 +17,7 @@ Along the way you'll learn:
 - How to declare broadcast channels in `manifest.json`
 - How to use `domo.broadcastState()` for sticky messages that survive late mounts
 - How to filter messages by source using `domo.onBroadcastFrom()`
-- Best practices for topic naming and payload design
+- Best practices for channel naming and payload design
 
 <Note>
 **Prerequisites:** Complete the [Setup and Installation](/portal/Apps/App-Framework/Quickstart/Setup-and-Installation) guide. You'll need two app designs published to the same Domo page.
@@ -74,7 +74,7 @@ Open `selector-app/manifest.json` and add the `channels` and `datasetsMapping` p
 Key decisions:
 
 - **`sticky: true`** — The Detail App might mount after the user has already clicked a row. Sticky ensures it receives the last selection immediately.
-- **Topic naming** — `selection:changed` uses the `namespace:event` convention. The namespace groups related topics; the event describes what happened.
+- **Channel naming** — `selection:changed` uses the `namespace:event` convention. The namespace groups related channels; the event describes what happened.
 
 ### Step 3: Build the Selector App component
 
@@ -224,14 +224,14 @@ Because the Selector App publishes with `sticky: true`, if the Detail App mounts
 
 ---
 
-Publish both apps and place them on the same Domo page:
+Publish both apps and place them on the same App Studio page:
 
 ```bash
 cd selector-app && domo publish
 cd ../detail-app && domo publish
 ```
 
-Create a new Dashboard in Domo and add both apps as cards. Click a row in the Selector App — the Detail App updates instantly.
+In Domo, create a new App Studio page and add both apps as cards. Broadcasting happens automatically — you don't need to configure anything in the Wiring Screen for message routing, though the Wiring Screen will display the channel declarations from your manifests for visibility. Click a row in the Selector App — the Detail App updates instantly.
 
 ### Pattern: Filtering by source
 
@@ -248,11 +248,11 @@ domo.onBroadcastFrom('selection:changed', 'target-app-instance-id', (msg) => {
 
 You can find an app's instance ID in the `sourceAppId` field of any message it sends, or in the App Broadcasting DevTools inspector.
 
-### Pattern: Multi-topic coordination
+### Pattern: Multi-channel coordination
 
 ---
 
-Real apps often use multiple topics. Here's a Selector App that publishes both selection state and hover events:
+Real apps often use multiple channels. Here's a Selector App that publishes both selection state and hover events:
 
 ```json
 {
@@ -273,7 +273,7 @@ domo.broadcastState('selection:changed', { id: row.id, name: row.name });
 domo.broadcast('chart:hover', { seriesId: 'revenue', index: 3 });
 ```
 
-The subscriber decides which topics it cares about:
+The subscriber decides which channels it cares about:
 
 ```javascript
 // Subscribe to selection (sticky — gets last value immediately)
@@ -328,7 +328,7 @@ Rate-limit errors from the host arrive asynchronously. The SDK logs a warning wh
 | --- | --- |
 | `channels` in manifest | Declare what your app publishes and subscribes to |
 | `domo.broadcastState()` | Publish sticky state that late subscribers receive immediately |
-| `domo.onBroadcast()` | Subscribe to a topic and react to messages |
+| `domo.onBroadcast()` | Subscribe to a channel and react to messages |
 | `domo.onBroadcastFrom()` | Filter messages by source app |
 | `domo.onBroadcastOnce()` | Auto-unsubscribe after first delivery |
 | Sticky vs. ephemeral | Use sticky for state, ephemeral for events |

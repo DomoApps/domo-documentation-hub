@@ -3,7 +3,7 @@ title: App Broadcasting
 description: Enable real-time communication between Custom Apps on the same page using a host-mediated pub/sub message bus.
 ---
 
-App Broadcasting lets Custom Apps on the same Domo page exchange named messages in real time. One app publishes a message to a **topic**; any app subscribed to that topic receives it instantly. The system is built on a host-mediated pub/sub bus — apps never communicate directly with each other.
+App Broadcasting lets Custom Apps on the same Domo page exchange named messages in real time. One app publishes a message to a **channel**; any app subscribed to that channel receives it instantly. The system is built on a host-mediated pub/sub bus — apps never communicate directly with each other.
 
 <Note>
 **Note:** App Broadcasting requires the `app-broadcasting` feature switch to be enabled on your instance. When the switch is off, all SDK methods are safe no-ops.
@@ -17,8 +17,8 @@ Use App Broadcasting when your apps need **free-form, real-time coordination** t
 | --- | --- | --- |
 | Page filters | Shared filter state across all cards | Coarse — only filter shapes; clears on first registration |
 | Page variables | Shared key-value state | Limited to primitive values; no event signaling |
-| `requestAppDataUpdate` | Simple one-way notifications | No topic routing; no sticky replay; no type safety |
-| **App Broadcasting** | Typed, topic-based pub/sub with sticky replay | Scoped to a single page; cleared on navigation |
+| `requestAppDataUpdate` | Simple one-way notifications | No channel routing; no sticky replay; no type safety |
+| **App Broadcasting** | Typed, channel-based pub/sub with sticky replay | Scoped to a single page; cleared on navigation |
 
 Choose broadcasting when you need:
 
@@ -53,20 +53,20 @@ Key architectural properties:
 
 ## Core concepts
 
-### Topics
+### Channels
 
-A **topic** is a named string that identifies a message channel. Apps publish to and subscribe on topics.
+A **channel** is a named string that apps publish to and subscribe on.
 
 ```javascript
 domo.broadcast('selection:changed', { rowId: 42 });
 domo.onBroadcast('selection:changed', (msg) => { /* ... */ });
 ```
 
-Topic naming conventions:
+Channel naming conventions:
 
 - Use `namespace:event` format (e.g., `filter:region`, `chart:hover`, `config:theme`)
-- Topics are exact strings — no wildcards
-- Topics starting with `domo:` are **reserved** for system events and cannot be used by apps
+- Channels are exact strings — no wildcards
+- Channels starting with `domo:` are **reserved** for system events and cannot be used by apps
 
 ### Messages
 
@@ -74,7 +74,7 @@ Every delivered message has this shape:
 
 ```typescript
 interface BroadcastMessage {
-  topic: string;       // The topic this message was published to
+  channel: string;     // The channel this message was published to
   payload: unknown;    // The data sent by the publisher
   sourceAppId: string; // Host-stamped ID of the publishing app instance
   timestamp: number;   // Host-assigned timestamp (ms since epoch)
@@ -85,7 +85,7 @@ The `sourceAppId` is stamped by the host and cannot be spoofed. Use it to identi
 
 ### Sticky messages
 
-A **sticky** message is retained by the bus. When a new subscriber joins a sticky topic, it immediately receives the last published value — even if that value was published before the subscriber existed.
+A **sticky** message is retained by the bus. When a new subscriber joins a sticky channel, it immediately receives the last published value — even if that value was published before the subscriber existed.
 
 ```javascript
 // Publisher: send sticky state
@@ -104,8 +104,8 @@ Use sticky messages for **state** that late-mounting apps need (theme, selected 
 Apps declare their broadcast channels in `manifest.json`. Declarations serve three purposes:
 
 1. **Discoverability** — The App Store and wiring UIs show what an app publishes and subscribes to
-2. **DevTools validation** — The broadcasting inspector warns when an app uses undeclared topics
-3. **Runtime enforcement** — In production, the host rejects messages on undeclared topics
+2. **DevTools validation** — The broadcasting inspector warns when an app uses undeclared channels
+3. **Runtime enforcement** — In production, the host rejects messages on undeclared channels
 
 ```json
 {
@@ -135,7 +135,7 @@ App Broadcasting enforces several security primitives at the host level:
 
 ### Reserved namespace
 
-Topic names starting with `domo:` are reserved for host-emitted system events. The SDK rejects these client-side before any message is sent, and the host rejects them server-side as a defense-in-depth measure.
+Channel names starting with `domo:` are reserved for host-emitted system events. The SDK rejects these client-side before any message is sent, and the host rejects them server-side as a defense-in-depth measure.
 
 ### Source identity
 
@@ -159,20 +159,20 @@ The bus exists only within a single page load. There is no cross-page communicat
 | --- | --- | --- | --- |
 | Data shape | Any serializable value (up to 64 KB) | Primitive values | Filter objects |
 | Persistence | Page load only | Saved with page | Saved with page |
-| Late-subscriber replay | Yes (sticky topics) | Yes (always current) | Yes (current state) |
-| Multiple channels | Yes (unlimited topics) | Yes (named variables) | Single filter set |
+| Late-subscriber replay | Yes (sticky channels) | Yes (always current) | Yes (current state) |
+| Multiple channels | Yes (unlimited channels) | Yes (named variables) | Single filter set |
 | Source identity | Yes (`sourceAppId`) | No | No |
 | Event semantics | Pub/sub (fire and forget) | State (always last value) | State |
 | Cross-page | No | Yes | Yes |
 
-**Rule of thumb:** Use variables or filters when you need state that persists across navigation. Use broadcasting when you need real-time, topic-based coordination within a single page session.
+**Rule of thumb:** Use variables or filters when you need state that persists across navigation. Use broadcasting when you need real-time, channel-based coordination within a single page session.
 
 ## Lifecycle
 
 1. **Page loads** — The bus is created (empty, no subscriptions)
-2. **Apps mount** — Each app subscribes to its declared topics via `domo.onBroadcast()`
+2. **Apps mount** — Each app subscribes to its declared channels via `domo.onBroadcast()`
 3. **Messages flow** — Apps publish and receive messages in real time
-4. **Sticky replay** — Late-mounting apps receive the last sticky value for each topic they subscribe to
+4. **Sticky replay** — Late-mounting apps receive the last sticky value for each channel they subscribe to
 5. **Page navigates** — The bus is destroyed; all subscriptions and sticky state are cleared
 
 ## Quick start

@@ -166,52 +166,12 @@ If the user reports a specific mis-assignment (e.g. "article X should be Feature
 
 ---
 
-## Step 7: Update CODEOWNERS
-
-After regenerating `Article-PM-Ownership-Reference.mdx`, update `.github/CODEOWNERS` to reflect any changes.
-
-**When PM assignments change (articles reassigned to a different PM):**
-
-1. For each reassigned article, find its current line in `.github/CODEOWNERS` and update the login:
-   ```
-   s/article/filename.mdx @old-login  →  s/article/filename.mdx @new-login
-   ```
-2. If the new PM doesn't have a GitHub login in the mapping table at the top of CODEOWNERS, add a placeholder comment under "Skipped PMs" and skip their entries for now.
-
-**When new articles are added:**
-
-For each new article that belongs to a PM with a confirmed GitHub login, add a line under that PM's section:
-```
-s/article/new-filename.mdx @github-login
-```
-
-Consult the PM → GitHub login mapping table at the top of `.github/CODEOWNERS` to find the correct login.
-
-**When articles are renamed or removed:**
-
-Update or delete the corresponding line in `.github/CODEOWNERS`.
-
-**When a new PM is added or an existing PM gets a GitHub login:**
-
-1. Add the PM to the mapping table at the top of `.github/CODEOWNERS`:
-   ```
-   #   New PM Name   → @their-github-login
-   ```
-2. Remove their name from the "Skipped PMs" comment if present.
-3. Add article entries for all of their articles under a new section header:
-   ```
-   # ── New PM Name (@their-github-login) ────────────────────────────────────
-   s/article/filename.mdx @their-github-login
-   ```
-
----
-
-## Step 8: Commit
+## Step 7: Commit
 
 After the user confirms the output looks correct:
 
 ```bash
-git add Article-PM-Ownership-Reference.mdx scripts/build-pm-ownership.py .github/CODEOWNERS
+git add Article-PM-Ownership-Reference.mdx scripts/build-pm-ownership.py
 ```
 
 Commit message format:

@@ -89,7 +89,6 @@ Every article in `s/article/` is mapped to a **Feature** (using the same nomencl
 - **Reference file:** `Article-PM-Ownership-Reference.mdx` — searchable table of Feature, Article Title, Article File Name, PM.
 - **Source CSV:** `Feature - Owning Squad, PM, Eng, UX.csv` — authoritative squad/PM roster; the Feature column is the canonical identifier used in the reference.
 - **Generation script:** `scripts/build-pm-ownership.py` — regenerates the reference by cross-referencing the CSV against `docs.json` navigation hierarchy and article frontmatter. Re-run whenever articles are added in bulk or the CSV changes.
-- **CODEOWNERS:** `.github/CODEOWNERS` — maps article files to GitHub logins for notification-only review routing. When a PR touches a listed file, GitHub auto-requests a review from the assigned PM. The PM → GitHub login mapping table is in the file header. Update this file whenever `Article-PM-Ownership-Reference.mdx` is regenerated (see the `update-pm-ownership` skill).
 
 To look up who owns a specific article:
 ```bash
@@ -163,3 +162,4 @@ This activates a `post-merge` hook that warns you when a `git pull` leaves track
 |release-notes|Generate user-friendly internal release notes by diffing the latest git tag against the previous tag|
 |mintlify-preview-workflow|Working on `.github/workflows/mint-preview.yml` — the Mintlify preview deployment GitHub Action|
 |openapi-sync-workflow|Working on the OpenAPI sync GitHub Action (`sync-api-docs.yml`) — YAML detection, sync scripts, or `docs.json` nav-generation integration|
+|connector-review|Manage the connector PR/Jira review lifecycle: run the dashboard, post follow-ups on stale tickets, merge approved PRs, post release-date comments, close Jira tickets, and handle publish/migration requests from Arun|

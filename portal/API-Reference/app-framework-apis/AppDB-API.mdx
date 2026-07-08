@@ -840,6 +840,12 @@ Provides a list of document IDs to be permanently deleted as a comma-separated q
   for the Collection.
 </Danger>
 
+<Note>
+  **Note:** Keep requests under approximately 700 document IDs (~26 KB URL) to avoid
+  HTTP 414 URI Too Long errors from the framework proxy. For larger batches, split the
+  IDs across multiple requests.
+</Note>
+
 ```js
 domo
   .delete(
@@ -1193,9 +1199,9 @@ HTTP/1.1 200 OK
 
 ### Manually Exporting Collections
 
-Collections marked as `syncEnabled` are exported to the Domo instance every 15 minutes automatically. If you need to trigger an export immediately, call the export endpoint manually.
+Collections marked as `syncEnabled` are exported to the Domo instance every 15 minutes automatically. If you need to trigger an export immediately, call the export endpoint manually. Only collections that have a linked DataSet and pending changes are synced.
 
-On success you receive a `200 OK` with an empty response body, meaning the export has been accepted and is running asynchronously. If an export is already actively in progress, you will receive `423 LOCKED` instead.
+On success you receive a `200 OK` with an empty response body, meaning the export has been accepted and is running asynchronously. If an export is already actively in progress, you will receive `423 LOCKED` — retry once the current export completes.
 
 **Code Example**
 
@@ -1203,7 +1209,7 @@ On success you receive a `200 OK` with an empty response body, meaning the expor
 domo.post("/domo/datastores/v1/export");
 ```
 
-`domo.post()` returns an empty string (`""`) on success.
+The request body is optional. `domo.post()` returns an empty string (`""`) on success.
 
 **HTTP Request**
 

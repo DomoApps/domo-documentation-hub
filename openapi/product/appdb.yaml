@@ -73,7 +73,7 @@ components:
           description: Whether the document is pending a sync to the underlying dataset.
         owner:
           type: string
-          description: User ID of the document owner.
+          description: "User ID of the document owner. v2 endpoints return this as a string; v1 endpoints (List, Get, Query, Update) return it as a numeric integer. This differs from Collection and Datastore owner fields, which are always integers."
         createdBy:
           type: string
           description: "User ID of the user who created the document. v2 endpoints always return this field. v1 endpoints return it only from Create Document; all other v1 endpoints (List, Get, Query, Update) omit it."
@@ -87,7 +87,7 @@ components:
           description: ISO 8601 timestamp when the document was last updated.
         updatedBy:
           type: string
-          description: User ID of the user who last updated the document.
+          description: "User ID of the user who last updated the document. v2 endpoints return this as a string; v1 endpoints return it as a numeric integer."
         content:
           type: object
           additionalProperties: true
@@ -130,6 +130,7 @@ components:
           format: uuid
         owner:
           type: integer
+          description: "Numeric user ID of the collection owner. Note: Collection and Datastore owner fields are always integers; Document owner fields differ by endpoint version (see Document schema)."
         name:
           type: string
         syncEnabled:

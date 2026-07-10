@@ -1,0 +1,235 @@
+---
+title: App Broadcasting
+description: Enable real-time communication between Custom Apps on the same page using a host-mediated pub/sub message bus.
+---
+
+App Broadcasting lets Custom Apps on the same Domo page exchange named messages in real time. One app publishes a message to a **topic**; any app subscribed to that topic receives it instantly. The system is built on a host-mediated pub/sub bus — apps never communicate directly with each other.
+
+<Note>
+**Note:** App Broadcasting requires the `app-broadcasting` feature switch to be enabled on your instance. When the switch is off, all SDK methods are safe no-ops.
+</Note>
+
+## When to use broadcasting
+
+Use App Broadcasting when your apps need **free-form, real-time coordination** that goes beyond what page filters or variables provide:
+
+| Mechanism | Best for | Limitations |
+| --- | --- | --- |
+| Page filters | Shared filter state across all cards | Coarse — only filter shapes; clears on first registration |
+| Page variables | Shared key-value state | Limited to primitive values; no event signaling |
+| `requestAppDataUpdate` | Simple one-way notifications | No topic routing; no sticky replay; no type safety |
+| **App Broadcasting** | Typed, topic-based pub/sub with sticky replay | Scoped to a single page; cleared on navigation |
+
+Choose broadcasting when you need:
+
+- **Multiple independent channels** between apps (e.g., selection events separate from configuration changes)
+- **Sticky state** that late-mounting apps can read immediately
+- **Source identity** — knowing which app sent a message
+- **Structured coordination** declared in the manifest for discoverability
+
+## Architecture
+
+```
+┌─────────────────────────────────────────────────────┐
+│                    Domo Page (host)                  │
+│                                                     │
+│   ┌───────────┐     PageBus      ┌───────────┐     │
+│   │  App A    │◄────────────────►│  App B    │     │
+│   │ (iframe)  │    (broker)      │ (iframe)  │     │
+│   └───────────┘        ▲        └───────────┘     │
+│                        │                           │
+│                  ┌─────┴─────┐                     │
+│                  │  App C    │                     │
+│                  │ (iframe)  │                     │
+│                  └───────────┘                     │
+└─────────────────────────────────────────────────────┘
+```
+
+Key architectural properties:
+
+- **Host-mediated** — All messages route through the Domo page (DomoWeb). Apps never see each other's iframes or postMessage traffic directly.
+- **Per-page lifecycle** — The bus is created when the first app mounts and cleared entirely on page navigation. Subscriptions and sticky values do not persist across pages.
+- **Broker-only** — The host validates, stamps, rate-limits, and routes. It does not transform payloads.
+
+## Core concepts
+
+### Topics
+
+A **topic** is a named string that identifies a message channel. Apps publish to and subscribe on topics.
+
+```javascript
+domo.broadcast('selection:changed', { rowId: 42 });
+domo.onBroadcast('selection:changed', (msg) => { /* ... */ });
+```
+
+Topic naming conventions:
+
+- Use `namespace:event` format (e.g., `filter:region`, `chart:hover`, `config:theme`)
+- Topics are exact strings — no wildcards
+- Topics starting with `domo:` are **reserved** for system events and cannot be used by apps
+
+### Messages
+
+Every delivered message has this shape:
+
+```typescript
+interface BroadcastMessage {
+  topic: string;       // The topic this message was published to
+  payload: unknown;    // The data sent by the publisher
+  sourceAppId: string; // Host-stamped ID of the publishing app instance
+  timestamp: number;   // Host-assigned timestamp (ms since epoch)
+}
+```
+
+The `sourceAppId` is stamped by the host and cannot be spoofed. Use it to identify which app sent a message or to filter messages from a specific source.
+
+### Sticky messages
+
+A **sticky** message is retained by the bus. When a new subscriber joins a sticky topic, it immediately receives the last published value — even if that value was published before the subscriber existed.
+
+```javascript
+// Publisher: send sticky state
+domo.broadcastState('config:theme', { mode: 'dark', accent: '#4A90D9' });
+
+// Subscriber (mounts later): receives the last value immediately
+domo.onBroadcast('config:theme', (msg) => {
+  applyTheme(msg.payload);
+});
+```
+
+Use sticky messages for **state** that late-mounting apps need (theme, selected record, configuration). Use non-sticky messages for **events** that are only relevant at the moment they fire (hover, click, transient notifications).
+
+### Manifest declarations
+
+Apps declare their broadcast channels in `manifest.json`. Declarations serve three purposes:
+
+1. **Discoverability** — The App Store and wiring UIs show what an app publishes and subscribes to
+2. **DevTools validation** — The broadcasting inspector warns when an app uses undeclared topics
+3. **Runtime enforcement** — In production, the host rejects messages on undeclared topics
+
+```json
+{
+  "channels": {
+    "publishes": [
+      {
+        "name": "selection:changed",
+        "description": "Fires when the user selects a data point",
+        "sticky": false
+      }
+    ],
+    "subscribes": [
+      {
+        "name": "filter:region",
+        "description": "Applies a region filter to the visualization"
+      }
+    ]
+  }
+}
+```
+
+See [The Manifest File](/portal/Apps/App-Framework/Guides/manifest#channels) for the full schema.
+
+## Security model
+
+App Broadcasting enforces several security primitives at the host level:
+
+### Reserved namespace
+
+Topic names starting with `domo:` are reserved for host-emitted system events. The SDK rejects these client-side before any message is sent, and the host rejects them server-side as a defense-in-depth measure.
+
+### Source identity
+
+The host stamps every message with the publishing app's `sourceAppId`. This value is derived from the iframe's registration — apps cannot set or override it. Subscribers can trust `msg.sourceAppId` to identify the true sender.
+
+### Rate limiting
+
+Each app instance is limited to **100 messages per second** (configurable by instance admins). Messages exceeding this limit are rejected, and the SDK surfaces an error.
+
+### Payload size
+
+Each message payload is capped at **64 KB** when serialized. Oversized payloads are rejected client-side by the SDK before reaching the bus.
+
+### Page-scoped isolation
+
+The bus exists only within a single page load. There is no cross-page communication, no persistence, and no way for apps on different pages to exchange messages. Navigating away clears all subscriptions and sticky state.
+
+## Comparison with variables and filters
+
+| Feature | Broadcasting | Variables | Filters |
+| --- | --- | --- | --- |
+| Data shape | Any serializable value (up to 64 KB) | Primitive values | Filter objects |
+| Persistence | Page load only | Saved with page | Saved with page |
+| Late-subscriber replay | Yes (sticky topics) | Yes (always current) | Yes (current state) |
+| Multiple channels | Yes (unlimited topics) | Yes (named variables) | Single filter set |
+| Source identity | Yes (`sourceAppId`) | No | No |
+| Event semantics | Pub/sub (fire and forget) | State (always last value) | State |
+| Cross-page | No | Yes | Yes |
+
+**Rule of thumb:** Use variables or filters when you need state that persists across navigation. Use broadcasting when you need real-time, topic-based coordination within a single page session.
+
+## Lifecycle
+
+1. **Page loads** — The bus is created (empty, no subscriptions)
+2. **Apps mount** — Each app subscribes to its declared topics via `domo.onBroadcast()`
+3. **Messages flow** — Apps publish and receive messages in real time
+4. **Sticky replay** — Late-mounting apps receive the last sticky value for each topic they subscribe to
+5. **Page navigates** — The bus is destroyed; all subscriptions and sticky state are cleared
+
+## Quick start
+
+**Publisher app** (`manifest.json`):
+
+```json
+{
+  "name": "Data Selector",
+  "channels": {
+    "publishes": [
+      { "name": "selection:changed", "description": "User selected a row", "sticky": true }
+    ]
+  }
+}
+```
+
+**Publisher app** (`app.js`):
+
+```javascript
+import domo from 'ryuu.js';
+
+function onRowClick(row) {
+  domo.broadcastState('selection:changed', {
+    id: row.id,
+    name: row.name,
+    region: row.region
+  });
+}
+```
+
+**Subscriber app** (`manifest.json`):
+
+```json
+{
+  "name": "Detail Viewer",
+  "channels": {
+    "subscribes": [
+      { "name": "selection:changed", "description": "Show detail for selected row" }
+    ]
+  }
+}
+```
+
+**Subscriber app** (`app.js`):
+
+```javascript
+import domo from 'ryuu.js';
+
+domo.onBroadcast('selection:changed', (msg) => {
+  document.getElementById('detail-name').textContent = msg.payload.name;
+  document.getElementById('detail-region').textContent = msg.payload.region;
+});
+```
+
+## Next steps
+
+- [Broadcast SDK Reference](/portal/Apps/App-Framework/Tools/domo-js#broadcasting) — Full API documentation for `domo.broadcast()`, `domo.onBroadcast()`, and helper methods
+- [The Manifest File](/portal/Apps/App-Framework/Guides/manifest#channels) — Channel declaration schema
+- [Cross-App Broadcasting Tutorial](/portal/Apps/App-Framework/Tutorials/React/Cross-App-Broadcasting) — Step-by-step tutorial building a filter-and-chart coordination pattern

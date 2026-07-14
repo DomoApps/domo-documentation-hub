@@ -13,6 +13,7 @@ file at the start of any restructure work to orient themselves before doing anyt
 
 **Active phase:** Phase 3a — Net-New Articles (synthesizable)
 **Blocked on:** 8 human decisions (see Phase 2 Decision Required table in `RESTRUCTURE-IA-SPEC.md`)
+**Phase 1/2 re-run:** Complete 2026-07-14 on branch `update/fullRestructure`
 
 ---
 
@@ -20,8 +21,8 @@ file at the start of any restructure work to orient themselves before doing anyt
 
 | Phase | Status | Notes |
 |-------|--------|-------|
-| **1: Audit & Inventory** | ♻️ Redo pending | 13 new articles since original run; re-run all four scripts before Phase 3 |
-| **2: IA Design** | ♻️ Redo pending | Will output directly into `docs.json`; see Phase 2 redo approach below |
+| **1: Audit & Inventory** | ✅ Complete (re-run 2026-07-14) | 1,832 articles; 2 orphaned; 842 merge candidates (23 exact); see updated findings below |
+| **2: IA Design** | ✅ Complete (re-run 2026-07-14) | 11 pillars in `docs.json` KB tab; 1,832 articles assigned; see Phase 2 outputs below |
 | **3a: Net-New Articles (~26)** | 🔲 Not started | Synthesizable from existing content; see article list below |
 | **3a-PM: PM Input Articles (4)** | 🔲 Blocked — awaiting PM | See PM Input section below |
 | **3a-Forum: Forum-Driven New Articles (~57)** | 🔲 Not started | Community forum gaps; see Forum Gap Analysis section below |
@@ -37,25 +38,25 @@ file at the start of any restructure work to orient themselves before doing anyt
 
 ---
 
-## Phase 1 Outputs (Complete — needs re-run)
+## Phase 1 Outputs (Complete — re-run 2026-07-14)
 
 All files are in `scripts/output/` (gitignored; must re-run scripts before Phase 3):
 
 | File | Description | Key stats |
 |------|-------------|-----------|
-| `catalog.json` | Master article inventory | 1,819 articles; 1 missing excerpt |
+| `catalog.json` | Master article inventory | 1,832 articles; 2 missing excerpt |
 | `catalog-classified.json` | Inventory + Diátaxis type per article | See distribution below |
 | `orphans.json` | Articles not appearing in docs.json nav | 2 articles |
-| `merge-candidates.json` | Near-duplicate title pairs (Jaccard ≥ 0.55) | 838 pairs; 22 exact (1.00) |
+| `merge-candidates.json` | Near-duplicate title pairs (Jaccard ≥ 0.55) | 842 pairs; 23 exact (1.00) |
 | `gap-analysis.json` | Missing tutorial/explanation coverage per pillar | 6 of 10 pillars missing tutorials |
 
 ### Classification Distribution
 
 | Type | Count | Notes |
 |------|-------|-------|
-| connector | 971 | ~53% of all content |
-| howto | 564 | ~31% — the main article bulk |
-| explanation | 70 | conceptual/overview articles |
+| connector | 977 | ~53% of all content |
+| howto | 570 | ~31% — the main article bulk |
+| explanation | 71 | conceptual/overview articles |
 | reference | 69 | properties tables, function lists, etc. |
 | release-notes | 65 | current + archived |
 | retire-candidate | 62 | legacy/deprecated content |
@@ -82,30 +83,22 @@ All files are in `scripts/output/` (gitignored; must re-run scripts before Phase
 
 ---
 
-## Phase 2 — Complete (redo pending)
+## Phase 2 — Complete (re-run 2026-07-14)
 
 All 1,819 articles assigned to 11 pillars + Archive. Full spec in `RESTRUCTURE-IA-SPEC.md`.
 
 **Note:** Phase 2 will be re-run after Phase 1 completes on this branch. See "Phase 2 Redo Approach" below.
 
-**Outputs:**
+**Outputs (re-run 2026-07-14):**
 - `scripts/output/ia-spec.json` — every article → `{pillar, group, sub_group}`
-- `scripts/output/ia-mapping.json` — pillar → list of articles
+- `scripts/output/ia-mapping.json` — article filename → `{pillar, group, sub_group}`
+- `docs.json` — KB tab rebuilt with 11 pillar groups (1,832 page refs; up from 1,772)
+- `scripts/build_docs_nav.py` — new script; reads `ia-mapping.json` + `catalog.json`, rebuilds KB tab in-place; preserves Developer Portal, Release Notes, and all localized tabs
 - `RESTRUCTURE-IA-SPEC.md` — human-readable nav spec with full hierarchy, new articles to write, and 8 open decisions
 
-### Phase 2 Redo Approach (execute after plan updates are finalized)
+**Nav structure:** 11 pillars as top-level groups inside the single **Knowledge Base** tab. Each pillar contains its groups as nested sub-groups. Archive appended last. `s/topic/` files excluded (not relevant to restructure). Developer Portal and Release Notes tabs, and all localized tabs (ja/fr/de/es), untouched.
 
-Phase 2 re-run will output the new IA **directly into `docs.json`** so the full restructured nav is immediately previewable in Mintlify — not just stored in JSON artifacts.
-
-**Nav structure decision:** 11 pillars as groups inside the existing single **Knowledge Base** tab. Developer Portal and Release Notes tabs, and all localized tabs (ja/fr/de/es), are untouched.
-
-**Execution order:**
-1. Re-run Phase 1 scripts first (see Phase 1 section above for commands)
-2. `python3 scripts/build_ia_spec.py` → regenerates `ia-spec.json` + `ia-mapping.json` (reference artifacts)
-3. `python3 scripts/build_docs_nav.py` *(new script, written at execution time)* → reads `ia-mapping.json`, restructures the KB tab in `docs.json` into 11 pillar groups, preserves all existing file paths
-4. Stub MDX files created for Phase 3a articles so they appear in nav immediately; content added as articles are written
-
-**Article count as of 2026-07-14:** 1,832 in `s/article/` + 126 in `s/topic/` (up from 1,819 at original Phase 1 — 13 new articles added since).
+**Article count:** 1,832 in `s/article/` (up from 1,819 at original Phase 1 — 13 new articles added since).
 
 ---
 
@@ -645,7 +638,9 @@ All restructure scripts live in `scripts/`. Run from repo root with `python3`.
 | `scripts/classify_catalog.py` | 1.2 | Classify articles by Diátaxis type (heuristics + optional API) |
 | `scripts/apply_manual_classifications.py` | 1.2 | Apply hand-reviewed classifications for ambiguous articles |
 | `scripts/find_duplicates_and_gaps.py` | 1.3–1.4 | Find orphans, near-duplicates, and per-pillar content gaps |
-| `scripts/build_ia_spec.py` | 2 | Assign all 1,819 articles to 11 pillars; outputs `ia-spec.json` + `ia-mapping.json` |
+| `scripts/build_ia_spec.py` | 2 | Assign all 1,832 articles to 11 pillars; outputs `ia-spec.json` + `ia-mapping.json` |
+| `scripts/build_docs_nav.py` | 2 | Rebuild KB tab in `docs.json` with 11-pillar groups from `ia-mapping.json`; preserves all other tabs |
+| `scripts/build-pm-review-briefs.py` | 4.5 | Generate per-PM meeting briefs + `RESTRUCTURE-TASKS.md` checklist; run right before PM review meetings |
 
 **To rebuild catalog from scratch** (if articles have changed since last run):
 ```bash

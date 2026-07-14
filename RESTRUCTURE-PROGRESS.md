@@ -20,8 +20,8 @@ file at the start of any restructure work to orient themselves before doing anyt
 
 | Phase | Status | Notes |
 |-------|--------|-------|
-| **1: Audit & Inventory** | ✅ Complete | All outputs written to `scripts/output/` |
-| **2: IA Design** | ✅ Complete | See `RESTRUCTURE-IA-SPEC.md`; 8 decisions need human sign-off |
+| **1: Audit & Inventory** | ♻️ Redo pending plan updates | 13 new articles since original run; outputs in `scripts/output/` (gitignored, must re-run) |
+| **2: IA Design** | ♻️ Redo pending plan updates | Will output directly to `docs.json`; see Phase 2 redo approach below |
 | **2.5: PM Review System** | 🔧 Built — run before PM meetings | Script ready: `scripts/build-pm-review-briefs.py`; generates per-PM meeting briefs |
 | **3a: Net-New Articles (~26)** | 🔲 Not started | Synthesizable from existing content; see article list below |
 | **3a-PM: PM Input Articles (4)** | 🔲 Blocked — awaiting PM | See PM Input section below |
@@ -80,14 +80,30 @@ All files are in `scripts/output/`:
 
 ---
 
-## Phase 2 — Complete
+## Phase 2 — Complete (redo pending additional plan updates)
 
 All 1,819 articles assigned to 11 pillars + Archive. Full spec in `RESTRUCTURE-IA-SPEC.md`.
+
+**Note:** Phase 2 will be re-run once pending plan updates are finalized. See "Phase 2 Redo Approach" below.
 
 **Outputs:**
 - `scripts/output/ia-spec.json` — every article → `{pillar, group, sub_group}`
 - `scripts/output/ia-mapping.json` — pillar → list of articles
 - `RESTRUCTURE-IA-SPEC.md` — human-readable nav spec with full hierarchy, new articles to write, and 8 open decisions
+
+### Phase 2 Redo Approach (execute after plan updates are finalized)
+
+Phase 2 re-run will output the new IA **directly into `docs.json`** so the full restructured nav is immediately previewable in Mintlify — not just stored in JSON artifacts.
+
+**Nav structure decision:** 11 pillars as groups inside the existing single **Knowledge Base** tab. Developer Portal and Release Notes tabs, and all localized tabs (ja/fr/de/es), are untouched.
+
+**Execution order:**
+1. Re-run Phase 1 scripts first (see Phase 1 section above for commands)
+2. `python3 scripts/build_ia_spec.py` → regenerates `ia-spec.json` + `ia-mapping.json` (reference artifacts)
+3. `python3 scripts/build_docs_nav.py` *(new script, written at execution time)* → reads `ia-mapping.json`, restructures the KB tab in `docs.json` into 11 pillar groups, preserves all existing file paths
+4. Stub MDX files created for Phase 3a articles so they appear in nav immediately; content added as articles are written
+
+**Article count as of 2026-07-14:** 1,832 in `s/article/` + 126 in `s/topic/` (up from 1,819 at original Phase 1 — 13 new articles added since).
 
 **8 decisions need human sign-off before Phase 7 (nav rebuild):**
 | # | Decision |

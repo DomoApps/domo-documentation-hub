@@ -22,6 +22,7 @@ file at the start of any restructure work to orient themselves before doing anyt
 |-------|--------|-------|
 | **1: Audit & Inventory** | ✅ Complete | All outputs written to `scripts/output/` |
 | **2: IA Design** | ✅ Complete | See `RESTRUCTURE-IA-SPEC.md`; 8 decisions need human sign-off |
+| **2.5: PM Review System** | 🔧 Built — run before PM meetings | Script ready: `scripts/build-pm-review-briefs.py`; generates per-PM meeting briefs |
 | **3a: Net-New Articles (~26)** | 🔲 Not started | Synthesizable from existing content; see article list below |
 | **3a-PM: PM Input Articles (4)** | 🔲 Blocked — awaiting PM | See PM Input section below |
 | **3a-Forum: Forum-Driven New Articles (~57)** | 🔲 Not started | Community forum gaps; see Forum Gap Analysis section below |
@@ -102,6 +103,60 @@ All 1,819 articles assigned to 11 pillars + Archive. Full spec in `RESTRUCTURE-I
 | D9 | Which DataSet Management articles (currently in Prepare & Transform) move to new Manage Data pillar? |
 
 These decisions don't block Phase 3a article writing — they only block the nav rebuild in Phase 7.
+
+---
+
+## Phase 2.5 — PM Review System
+
+**Status:** Built — run right before PM review meetings (not now)
+**Script:** `scripts/build-pm-review-briefs.py`
+**Output:** `pm-review-briefs/<PM-Name>.md` — one file per PM, generated on demand
+
+This phase is a tool, not a content milestone. It doesn't block Phase 3a and shouldn't be run until enough restructure work has been completed to make the meetings productive. The right trigger: **run it once Phase 3a is substantially complete and before scheduling PM review meetings.**
+
+### What the system generates
+
+For each of the 12 PMs, one meeting-ready Markdown brief containing:
+
+1. **Content reorganization** — table of every feature they own → new pillar assignment + article count; plus any notable structural nav changes (CDW merge, DataFusion retirement, Workbench consolidation, etc.)
+2. **AI-generated articles to fact-check** — the Phase 3a synthesis articles in their area; filename, what it was synthesized from, and specific claims to verify
+3. **Gap articles — meeting required** — articles that can't be written without PM input: original 3a-PM articles + all Critical/High forum-gap new articles in their area (each with what information is needed)
+4. **Support gap integration changes** — Section 4a: Support KB Audit retirements and urgent fixes in their area; Section 4b: Critical + High forum update targets with specific additions needed and fact-check guidance
+
+### When to run
+
+```bash
+python3 scripts/build-pm-review-briefs.py
+```
+
+Run from the repo root right before scheduling PM meetings. The script reads:
+- `Article-PM-Ownership-Reference.mdx` — PM → feature → article ownership
+- `_gaps_with_support.json` — community forum gap analysis (all 361 gaps)
+- Hardcoded constants from `RESTRUCTURE-IA-SPEC.md` and `RESTRUCTURE-PROGRESS.md` (phases, article lists, retirement batches)
+
+As phases are executed, update the hardcoded phase data in the script so Section 4 reflects what has actually been completed vs. what is still planned. This is especially important for:
+- Phase 3b-Forum critical update targets (Sections 4b) — once executed, PMs need to review the actual changes
+- Phase 4 retirements (Section 4a) — once executed, PMs need to acknowledge what was archived in their area
+- Any urgent pre-Phase 4 fixes (e.g., Snowflake auth fix) — if completed, note it as done so the PM knows to verify
+
+### PM roster
+
+| PM | Features | GitHub Login | Status |
+|----|----------|-------------|--------|
+| Andrea Henderson | Auto ML, Data Flows, Magic ETL | @ahenderson-domo | ✅ Confirmed |
+| Beth Saenz | Accessibility | — | Unconfirmed |
+| Chris Wright | Analyzer, Charting, Doc Cards, Export to CSV, Mobile - iOS, Slideshows, Worksheets | — | Unconfirmed |
+| Dan Brinton | Admin, Alerts/NLG/Smart Alerts, ABAC, Buzz, Consumption, DomoStats, Goals, Profile, SSO | @OriginalDanB | ✅ Confirmed |
+| Jordan Jensen | AppStore, Cloud Amplifier, DataSets, Education, Federated, Onboarding | @mnwhitepine | ✅ Confirmed |
+| Ken Boyer | AI Services, CLI, Documents-Filesets, Jupyter Notebooks | @bikene1 | ✅ Confirmed |
+| Khushboo | App Dev Framework, App Studio, Bricks/Templates, MS Office Plugins/Addins, Publication Groups | — | Unconfirmed |
+| Mamta Bolaki | Domo Everywhere, Sandbox | @mamtabolaki-gif | ✅ Confirmed |
+| Mark Adams | Freemium | — | Unconfirmed |
+| Phil Fuchs | Beast Mode, Combined Schema, Data Center, Data Views, Fusions, Period over Period | @phil-fuchs-domo | ✅ Confirmed |
+| Ryan Despain | Approvals, Governance Toolkit, Projects & Tasks, Workflows | @RyanDespain | ✅ Confirmed |
+| Tasleema Lallmamode | Connectors 1.0, Third Party Connectors, Workbench | — | Unconfirmed |
+
+*GitHub logins source: `.github/CODEOWNERS`*
 
 ---
 
@@ -398,3 +453,4 @@ python3 scripts/find_duplicates_and_gaps.py
 | 2026-06-25 | Support KB Audit integrated into Restructure phases | Gap analysis (`Support KB Audit Shared GAP Analysis.md`) cross-referenced Audit against Restructure plan; shared retirement work merged into Phase 4; Audit-only work (API reference quality, connector content accuracy, localization retirement, screenshot refresh) scoped as separate post-restructure project |
 | 2026-07-14 | Community forum gap analysis (`_gaps_with_support.json`) integrated as Phase 3a/3b input | 5,452 forum records → 361 scored gaps; 57 net-new articles and 304 article updates identified. Cross-diffed against existing restructure plan: no Critical/High gaps were already addressed (only Snowflake auth fix and DataFusion archival had partial overlap). Two new phases added to tracking: 3a-Forum (~57 new articles) and 3b-Forum (~68 Critical+High update targets). Medium/Low gaps are Phase 3b bulk input. |
 | 2026-07-14 | DataFusion Phase 4 archival must include migration guidance article | Forum gap analysis (rank 198) confirms users actively searching for ETL replacement guidance after DataFusion removal. Phase 4 archival should add `DataFusion-Migration-Guide.mdx` pointing users to Magic ETL equivalents before or alongside archiving the 11 DataFusion articles. |
+| 2026-07-14 | PM Review System built as Phase 2.5 | `scripts/build-pm-review-briefs.py` generates per-PM meeting briefs from IA spec + forum gap data + ownership reference. Run right before PM review meetings (not now). Section 4 of each brief covers both Audit gap-fill changes and forum update targets in that PM's area — executed changes should be updated in the script's hardcoded phase data so the brief reflects reality when run. |

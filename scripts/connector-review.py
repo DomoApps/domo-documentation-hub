@@ -9,6 +9,7 @@ Automates the connector documentation review workflow:
   - Merges ready-to-merge PRs, posts merge confirmation, closes Jira tickets
   - Escalates to auto-merge after 3 weeks with 2 unanswered follow-ups
   - Detects publish-request and migration-request action types in Arun's comments
+  - Tracks tickets on indefinite hold in tracking/connector-on-hold.json
 
 Usage:
     python3 scripts/connector-review.py              # Dashboard only
@@ -17,6 +18,9 @@ Usage:
     python3 scripts/connector-review.py --follow-up DOMO-123456
     python3 scripts/connector-review.py --merge DOMO-123456
     python3 scripts/connector-review.py --find-tasks  # Jira search: publish/migration requests
+    python3 scripts/connector-review.py --hold DOMO-123456 [--reason "reason text"]
+    python3 scripts/connector-review.py --release-hold DOMO-123456
+    python3 scripts/connector-review.py --check-holds  # Check held tickets for new Jira activity
 """
 
 import base64
@@ -35,6 +39,7 @@ REPO = "DomoApps/domo-documentation-hub"
 JIRA_BASE = "https://domoinc.atlassian.net"
 BRANCH_PATTERN = re.compile(r"arun\.raj/connectors?-(DOMO-\d+)", re.IGNORECASE)
 TEMPLATES_PATH = Path(__file__).parent / "connector-templates.json"
+HOLDS_PATH = Path(__file__).parent.parent / "tracking" / "connector-on-hold.json"
 
 # ── Credentials ────────────────────────────────────────────────────────────────
 
@@ -58,6 +63,26 @@ def check_credentials():
 
 def load_templates():
     return json.loads(TEMPLATES_PATH.read_text())
+
+
+# ── On-hold tracking ────────────────────────────────────────────────────────────
+
+def load_holds():
+    if HOLDS_PATH.exists():
+        return json.loads(HOLDS_PATH.read_text()).get("held", [])
+    return []
+
+
+def save_holds(held_list):
+    HOLDS_PATH.parent.mkdir(exist_ok=True)
+    HOLDS_PATH.write_text(json.dumps({"held": held_list}, indent=2) + "\n")
+
+
+def get_held_entry(jira_id, held_list):
+    for entry in held_list:
+        if entry.get("jira_id") == jira_id:
+            return entry
+    return None
 
 
 # ── Jira REST API ───────────────────────────────────────────────────────────────
@@ -326,10 +351,12 @@ def analyze_jira_ticket(jira_id, my_account_id, templates):
             action_type = "publish"
 
     secondary_ids = {a["accountId"] for a in secondary_approvers}
-    known_approver_names = [n.lower() for n in templates.get("known_approvers", [])]
+    arun_account_id = arun_account["accountId"] if arun_account else None
 
     # Check for secondary approval after Arun's comment.
-    # Accepts approvals from: (a) accounts Arun @-mentioned, or (b) anyone in known_approvers.
+    # Scan ALL comments after Arun's initial @-mention comment — any non-Arun, non-Jared
+    # commenter who uses an approval phrase counts. This handles cases where someone other
+    # than the @-mentioned reviewer verifies the changes (e.g. a teammate steps in).
     secondary_approved = False
     past_arun = arun_comment is None  # if no arun comment, scan all
     for c in comments:
@@ -337,15 +364,22 @@ def analyze_jira_ticket(jira_id, my_account_id, templates):
             if c.get("id") == arun_comment.get("id"):
                 past_arun = True
             continue
-        author = c.get("author", {})
-        author_id = author.get("accountId", "")
-        author_name = author.get("displayName", "").lower()
-        is_known = any(kn in author_name for kn in known_approver_names)
-        if author_id in secondary_ids or is_known:
-            text = extract_text(c.get("body", {})).lower()
-            if any(p in text for p in approval_phrases):
-                secondary_approved = True
-                break
+        author_id = c.get("author", {}).get("accountId", "")
+        # Skip Arun's own follow-on comments and Jared's follow-up/escalation markers
+        if author_id in (arun_account_id, my_account_id):
+            continue
+        text = extract_text(c.get("body", {})).lower()
+        if any(p in text for p in approval_phrases):
+            secondary_approved = True
+            break
+        if any(p in text for p in publish_phrases):
+            secondary_approved = True
+            action_type = "publish"
+            break
+        if any(p in text for p in migration_phrases):
+            secondary_approved = True
+            action_type = "migration"
+            break
 
     # Track follow-ups and escalation posted by Jared
     follow_up_count = 0
@@ -435,6 +469,7 @@ STATE_DISPLAY = {
     "escalation":       "🚨  ESCALATION ≥21 days — auto-merge eligible",
     "publish-request":  "📢  PUBLISH REQUEST — Arun asking to publish directly",
     "migration-request": "🔀  MIGRATION REQUEST — article needs to be migrated first",
+    "on-hold":          "🔒  ON HOLD — excluded from auto-actions",
     "no-jira":          "❓  Jira ticket not found or inaccessible",
 }
 
@@ -696,11 +731,14 @@ def print_dashboard(items):
     print("  CONNECTOR PR DASHBOARD")
     print("=" * 72)
 
-    if not items:
+    active_items = [i for i in items if i["state"] != "on-hold"]
+    held_items   = [i for i in items if i["state"] == "on-hold"]
+
+    if not active_items and not held_items:
         print("  No open connector PRs found.\n")
         return
 
-    for item in items:
+    for item in active_items:
         pr = item["pr"]
         state = item["state"]
         jdata = item.get("jira_data", {})
@@ -715,6 +753,22 @@ def print_dashboard(items):
               f"|  Action type: {jdata.get('action_type', 'review')}")
         print(f"  State: {STATE_DISPLAY.get(state, state)}")
         print(f"  URL:   {pr['url']}")
+
+    if held_items:
+        print(f"\n  {'─' * 68}")
+        print("  ON HOLD")
+        print(f"  {'─' * 68}")
+        for item in held_items:
+            pr = item["pr"]
+            entry = item.get("hold_entry", {})
+            print(f"\n  PR #{pr['number']}: {pr['title'][:58]}")
+            print(f"  Jira: {item['jira_id']}  |  Age: {item['pr_age']} days  |  "
+                  f"Held since: {entry.get('held_since', '?')}")
+            print(f"  Reason: {entry.get('reason', '—')}")
+            if entry.get("check_notes"):
+                print(f"  Last check: {entry.get('last_checked', '?')} — {entry['check_notes']}")
+            print(f"  State: {STATE_DISPLAY['on-hold']}")
+            print(f"  URL:   {pr['url']}")
 
     print("\n" + "=" * 72)
 
@@ -751,6 +805,101 @@ def print_suggested_actions(items):
     print(f"\n  Run all due actions at once:")
     print(f"    python3 scripts/connector-review.py --auto")
     print()
+
+
+# ── On-hold CLI actions ───────────────────────────────────────────────────────────
+
+def do_hold(jira_id, reason, pr_number, pr_title):
+    held = load_holds()
+    if get_held_entry(jira_id, held):
+        print(f"  ℹ️  {jira_id} is already on hold.")
+        return
+    today = datetime.now().date().isoformat()
+    held.append({
+        "jira_id": jira_id,
+        "pr_number": pr_number,
+        "pr_title": pr_title,
+        "reason": reason or "No reason given",
+        "held_since": today,
+        "held_by": "Jared Peterson",
+        "last_checked": today,
+        "check_notes": "Hold placed.",
+    })
+    save_holds(held)
+    print(f"  🔒 {jira_id} placed on hold. Edit tracking/connector-on-hold.json to update the reason.")
+
+
+def do_release_hold(jira_id):
+    held = load_holds()
+    before = len(held)
+    held = [e for e in held if e.get("jira_id") != jira_id]
+    if len(held) == before:
+        print(f"  ℹ️  {jira_id} was not on hold.")
+        return
+    save_holds(held)
+    print(f"  ✅ {jira_id} removed from hold. It will appear normally on the next dashboard run.")
+
+
+def do_check_holds(jared_jira_id, templates):
+    held = load_holds()
+    if not held:
+        print("  No tickets currently on hold.")
+        return
+
+    today = datetime.now().date().isoformat()
+    approval_phrases = templates.get("approval_phrases", ["looks good", "lgtm", "approved", "verified"])
+    publish_phrases = templates.get("publish_request_phrases", ["please publish"])
+    migration_phrases = templates.get("migration_request_phrases", ["please migrate"])
+
+    any_activity = False
+    for entry in held:
+        jira_id = entry["jira_id"]
+        held_since = entry.get("held_since", "2000-01-01")
+        print(f"\n  Checking {jira_id} (held since {held_since})...")
+
+        try:
+            data = jira_get(f"/rest/api/3/issue/{jira_id}/comment?maxResults=200&orderBy=created")
+        except RuntimeError as e:
+            print(f"    ⚠️  Could not fetch Jira: {e}")
+            entry["last_checked"] = today
+            entry["check_notes"] = f"Jira fetch failed: {e}"
+            continue
+
+        comments = data.get("comments", [])
+        new_activity = []
+        for c in comments:
+            created = c.get("created", "")
+            try:
+                if parse_date(created).date().isoformat() < held_since:
+                    continue
+            except Exception:
+                continue
+            author = c.get("author", {}).get("displayName", "unknown")
+            text = extract_text(c.get("body", {})).lower()
+            flags = []
+            if any(p in text for p in approval_phrases):
+                flags.append("approval phrase")
+            if any(p in text for p in publish_phrases):
+                flags.append("publish request")
+            if any(p in text for p in migration_phrases):
+                flags.append("migration request")
+            if flags:
+                new_activity.append(f"{author}: [{', '.join(flags)}]")
+
+        entry["last_checked"] = today
+        if new_activity:
+            any_activity = True
+            note = "; ".join(new_activity)
+            entry["check_notes"] = f"New activity: {note}"
+            print(f"    ⚡ New activity detected — {note}")
+            print(f"    Consider running: python3 scripts/connector-review.py --release-hold {jira_id}")
+        else:
+            entry["check_notes"] = "No new approval activity since hold was placed."
+            print(f"    ✓ No new approval activity. Hold stands.")
+
+    save_holds(held)
+    if not any_activity:
+        print("\n  All held tickets unchanged.")
 
 
 # ── Main ─────────────────────────────────────────────────────────────────────────
@@ -816,10 +965,27 @@ def main():
         close_jira_ticket(jira_id, dry_run)
         return
 
+    # On-hold management (no PR fetch needed)
+    if "--release-hold" in args:
+        idx = args.index("--release-hold")
+        target = args[idx + 1] if idx + 1 < len(args) else None
+        if not target:
+            print("Usage: --release-hold DOMO-123456")
+            sys.exit(1)
+        do_release_hold(target)
+        return
+
+    if "--check-holds" in args:
+        jared_jira = my_jira_account()
+        jared_jira_id = jared_jira.get("accountId", "")
+        do_check_holds(jared_jira_id, templates)
+        return
+
     print("🔍 Fetching open connector PRs...")
     jared_login = my_github_login()
     jared_jira = my_jira_account()
     jared_jira_id = jared_jira.get("accountId", "")
+    held_list = load_holds()
 
     prs = get_open_connector_prs()
     if not prs:
@@ -834,6 +1000,19 @@ def main():
         if not jira_id:
             continue
         pr_age = days_since(pr["createdAt"])
+
+        # Check hold before fetching Jira data
+        hold_entry = get_held_entry(jira_id, held_list)
+        if hold_entry:
+            items.append({
+                "pr": pr, "jira_id": jira_id, "state": "on-hold",
+                "pr_age": pr_age,
+                "gh": {"jared_approved": False, "changes_requested": False},
+                "jira_data": {},
+                "hold_entry": hold_entry,
+            })
+            continue
+
         gh_analysis = analyze_github_pr(pr, jared_login)
         jira_data = analyze_jira_ticket(jira_id, jared_jira_id, templates)
 
@@ -856,6 +1035,23 @@ def main():
             "pr_age": pr_age, "gh": gh_analysis, "jira_data": jira_data,
         })
 
+    # --hold needs the PR list to be populated, so handle it here
+    if "--hold" in args:
+        idx = args.index("--hold")
+        target = args[idx + 1] if idx + 1 < len(args) else None
+        if not target:
+            print("Usage: --hold DOMO-123456 [--reason 'reason text']")
+            sys.exit(1)
+        reason = None
+        if "--reason" in args:
+            ridx = args.index("--reason")
+            reason = args[ridx + 1] if ridx + 1 < len(args) else None
+        matches = [i for i in items if i["jira_id"] == target]
+        pr_number = matches[0]["pr"]["number"] if matches else None
+        pr_title = matches[0]["pr"]["title"] if matches else ""
+        do_hold(target, reason, pr_number, pr_title)
+        return
+
     print_dashboard(items)
 
     # -- Handle specific ticket override flags
@@ -865,6 +1061,9 @@ def main():
             target = args[idx + 1] if idx + 1 < len(args) else None
             if not target:
                 print(f"Usage: {flag} DOMO-123456")
+                sys.exit(1)
+            if get_held_entry(target, held_list):
+                print(f"  🔒 {target} is on hold. Run --release-hold {target} first.")
                 sys.exit(1)
             matches = [i for i in items if i["jira_id"] == target]
             if not matches:
@@ -879,11 +1078,13 @@ def main():
                 do_merge(item, templates, escalation=escalation, approve_first=approve_first, dry_run=dry_run)
             return
 
-    # -- Auto mode: act on everything that's due
+    # -- Auto mode: act on everything that's due (skip on-hold)
     if auto:
         print(f"{'[DRY RUN] ' if dry_run else ''}Running automatic actions...\n")
         for item in items:
             s = item["state"]
+            if s == "on-hold":
+                continue
             jira_id = item["jira_id"]
             pr_num = item["pr"]["number"]
             if s == "ready-to-merge":

@@ -89,7 +89,6 @@ Every article in `s/article/` is mapped to a **Feature** (using the same nomencl
 - **Reference file:** `Article-PM-Ownership-Reference.mdx` — searchable table of Feature, Article Title, Article File Name, PM.
 - **Source CSV:** `Feature - Owning Squad, PM, Eng, UX.csv` — authoritative squad/PM roster; the Feature column is the canonical identifier used in the reference.
 - **Generation script:** `scripts/build-pm-ownership.py` — regenerates the reference by cross-referencing the CSV against `docs.json` navigation hierarchy and article frontmatter. Re-run whenever articles are added in bulk or the CSV changes.
-- **CODEOWNERS:** `.github/CODEOWNERS` — maps article files to GitHub logins for notification-only review routing. When a PR touches a listed file, GitHub auto-requests a review from the assigned PM. The PM → GitHub login mapping table is in the file header. Update this file whenever `Article-PM-Ownership-Reference.mdx` is regenerated (see the `update-pm-ownership` skill).
 
 To look up who owns a specific article:
 ```bash

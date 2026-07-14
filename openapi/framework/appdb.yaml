@@ -350,7 +350,98 @@ paths:
   /domo/datastores/v1/collections/{collectionName}/documents/query:
     post:
       summary: Query Documents
-      description: Query documents using MongoDB query syntax
+      description: |
+        Query documents using MongoDB query syntax.
+
+        **Aggregation examples**
+
+        The following examples use this sample movie collection:
+        ```json
+        [
+          {
+            "content": {
+              "title": "Inception", "genre": "sci-fi",
+              "year": 2010, "rating": 8.8,
+              "tags": ["mind-bending", "action"]
+            }
+          },
+          {
+            "content": {
+              "title": "Interstellar", "genre": "sci-fi",
+              "year": 2014, "rating": 8.6,
+              "tags": ["mind-bending", "emotional"]
+            }
+          },
+          {
+            "content": {
+              "title": "The Notebook", "genre": "romance",
+              "year": 2004, "rating": 7.9,
+              "tags": ["romantic", "drama"]
+            }
+          },
+          {
+            "content": {
+              "title": "Titanic", "genre": "romance",
+              "year": 1997, "rating": 7.8,
+              "tags": ["romantic", "drama", "action"]
+            }
+          },
+          {
+            "content": {
+              "title": "The Avengers", "genre": "action",
+              "year": 2012, "rating": 8.0,
+              "tags": ["action", "superhero"]
+            }
+          }
+        ]
+        ```
+
+        **Average rating per genre for movies released since 2010**
+        ```
+        ?groupby=content.genre&avg=content.rating avgRating&orderby=avgRating descending
+        ```
+        Body:
+        ```json
+        {"content.year": {"$gte": 2010}}
+        ```
+        Response:
+        ```json
+        [
+          {"_id": "sci-fi", "avgRating": 8.7},
+          {"_id": "action", "avgRating": 8.0}
+        ]
+        ```
+
+        **Movie count per genre**
+        ```
+        ?groupby=content.genre&count=count
+        ```
+        Body: `{}`
+        ```json
+        [
+          {"_id": "sci-fi",  "count": 2},
+          {"_id": "romance", "count": 2},
+          {"_id": "action",  "count": 1}
+        ]
+        ```
+
+        **Tag frequency across all movies**
+
+        `unwind` produces one document per tag value before grouping, so a movie with `["action", "romantic"]` counts once toward each group.
+        ```
+        ?unwind=content.tags&groupby=content.tags&count=count&orderby=count descending
+        ```
+        Body: `{}`
+        ```json
+        [
+          {"_id": "action",       "count": 3},
+          {"_id": "romantic",     "count": 2},
+          {"_id": "drama",        "count": 2},
+          {"_id": "mind-bending", "count": 2},
+          {"_id": "superhero",    "count": 1},
+          {"_id": "emotional",    "count": 1}
+        ]
+        ```
       tags:
       - AppDB API
       parameters:

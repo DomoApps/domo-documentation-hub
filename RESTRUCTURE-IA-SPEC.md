@@ -511,19 +511,65 @@ Release Notes
 
 ## Pillar 12: Archive (not in primary nav)
 
-The Archive pillar holds deprecated/legacy content that is removed from primary navigation but not deleted. It should be linked from a single "Legacy & Archived Content" page at the bottom of the KB.
+> **Archive vs. Legacy vs. Deleted — Three distinct categories:**
+>
+> | Category | File fate | Nav fate | YAML | Visual indicator |
+> |----------|-----------|----------|------|-----------------|
+> | **Deleted** | File removed from repo | Removed from docs.json | — | None (content merged/rewritten elsewhere) |
+> | **Archived** | File kept in repo | Moved to Archive nav group (bottom of KB) | `archived: true` + `tag: "Archived"` | `<ArchivedNote />` snippet at top of article |
+> | **Legacy** | File kept in pillar | Stays in its pillar nav group | `legacy: true` + `tag: "Legacy"` | `<LegacyNote />` snippet at top of article |
+>
+> **Use Archive for:** Genuinely retired content with no living successor — EOL products, removed features, historical docs preserved only for reference. No PM sign-off needed if feature is confirmed EOL.
+>
+> **Use Legacy for:** Features still present in Domo but no longer actively maintained or recommended — old UI paths, superseded workflows. **PM sign-off required** before applying Legacy marking.
+>
+> **Use Deleted for:** Articles whose content has been restructured, merged, or rewritten into other articles. The source file is removed; its content lives on in a new or updated article.
+
+The Archive group is not a "Pillar 12" — it is a single **Archive** nav group appended after all 11 content pillars at the bottom of the Knowledge Base tab. Articles in Archive remain published (no `hidden: true`) so existing links still resolve, but the group is visually separated from active content.
 
 ```
 Archive (~115 articles — updated from 64 with Support KB Audit additions)
 ├── Legacy Workbench (37)            ← Workbench 4 articles; D1 confirmed by Support KB Audit
+│                                       Status: ARCHIVED (files stay, `archived: true` + `<ArchivedNote />`)
 ├── Deprecated Features (~52)         ← DataFusion (11 confirmed), CourseBuilder (16, pending D10),
 │                                        various deprecated product features (original ~25)
+│                                       Status: ARCHIVED (same treatment)
 ├── Legacy Magic ETL (~16)            ← Old Magic ETL tile articles (15 confirmed for Archive by Audit;
 │                                        1 article flagged Keep — do not archive) + 1 existing
+│                                       Status: ARCHIVED (files stay, `archived: true` + `<ArchivedNote />`)
 └── Legacy Products (1)              ← PopChart contact page
+                                       Status: ARCHIVED
 ```
 
-**Note on defunct-service connectors:** The Support KB Audit confirmed a large population of connectors for services that no longer exist (LinkedIn API v1, Pinterest, StumbleUpon, Simply Measured, Salesforce Desk, IBM Coremetrics, GetThere, Moz, Snowflake Writeback, Adobe Analytics Advanced Legacy, DCM via Google Cloud Storage). These are Phase 4 retirement candidates — move to Archive or remove from Connector Library nav entirely. See `KB-RESTRUCTURE-PLAN.md` Phase 4.2 for the full confirmed list.
+**Note on defunct-service connectors:** The Support KB Audit confirmed a large population of connectors for services that no longer exist (LinkedIn API v1, Pinterest, StumbleUpon, Simply Measured, Salesforce Desk, IBM Coremetrics, GetThere, Moz, Snowflake Writeback, Adobe Analytics Advanced Legacy, DCM via Google Cloud Storage). These are Phase 4 retirement candidates — move to Archive group or delete from Connector Library nav entirely depending on whether any content is worth preserving. See `KB-RESTRUCTURE-PLAN.md` Phase 4.2 for the full confirmed list.
+
+### Legacy (in-pillar, not archived)
+
+Legacy articles stay in their content pillar but are visually flagged. These are features that still exist in Domo but are no longer actively maintained or recommended as the primary workflow.
+
+**YAML spec for Legacy articles:**
+```yaml
+---
+title: "Article Title"
+legacy: true
+tag: "Legacy"
+---
+```
+
+**Body treatment:** Import and place `<LegacyNote />` at the top of the article body (after the intro paragraph if one exists). The snippet renders a `<Warning>` callout identifying the article as legacy and pointing to the current recommended approach.
+
+**Snippet to create at Phase 4:** `snippets/LegacyNote.mdx`
+```mdx
+<Warning>**Legacy:** This article describes a feature that is no longer actively maintained. It remains functional but may not reflect current best practices or the recommended approach. See the current documentation for [replacement feature].</Warning>
+```
+Replace `[replacement feature]` with a link to the current recommended article when applicable.
+
+**PM sign-off required** before applying Legacy marking to any article. Add a `[legacy]` task in `RESTRUCTURE-TASKS.md` for each article and mark it `[pm-input]` until confirmed.
+
+**Known Legacy candidates (pending PM confirmation):**
+- Workbench 5.1 articles that overlap with current Workbench 5.x functionality
+- Projects & Tasks articles (if feature confirmed pre-Workflows era only — see D2)
+- Old DataFlow articles where Magic ETL is now the preferred path
 
 ---
 

@@ -20,24 +20,26 @@ file at the start of any restructure work to orient themselves before doing anyt
 
 | Phase | Status | Notes |
 |-------|--------|-------|
-| **1: Audit & Inventory** | ♻️ Redo pending plan updates | 13 new articles since original run; outputs in `scripts/output/` (gitignored, must re-run) |
-| **2: IA Design** | ♻️ Redo pending plan updates | Will output directly to `docs.json`; see Phase 2 redo approach below |
-| **2.5: PM Review System** | 🔧 Built — run before PM meetings | Script ready: `scripts/build-pm-review-briefs.py`; generates per-PM meeting briefs |
+| **1: Audit & Inventory** | ♻️ Redo pending | 13 new articles since original run; re-run all four scripts before Phase 3 |
+| **2: IA Design** | ♻️ Redo pending | Will output directly into `docs.json`; see Phase 2 redo approach below |
 | **3a: Net-New Articles (~26)** | 🔲 Not started | Synthesizable from existing content; see article list below |
 | **3a-PM: PM Input Articles (4)** | 🔲 Blocked — awaiting PM | See PM Input section below |
 | **3a-Forum: Forum-Driven New Articles (~57)** | 🔲 Not started | Community forum gaps; see Forum Gap Analysis section below |
 | **3b: Article Upgrades (~200)** | 🔲 Not started | Bulk agent edit pass |
-| **3b-Forum: Forum-Driven Article Updates (Critical+High, ~68)** | 🔲 Not started | Priority targets for Phase 3b bulk agent pass; see Forum Gap Analysis section |
-| **4: Consolidation & Retirement** | 🔲 Not started | Address duplicates + legacy content |
-| **5: Interlinking** | 🔲 Not started | Next Steps + Related Articles bulk pass |
-| **6: Rename to Slugs** | 🔲 Not started | Script-driven; run after Phase 3a |
-| **7: Nav Rebuild** | 🔲 Not started | Rebuild docs.json after Phase 6 |
+| **3b-Forum: Forum-Driven Article Updates (Critical+High, ~68)** | 🔲 Not started | Priority targets for Phase 3b bulk agent pass |
+| **4: Consolidation, Retirement & Archive** | 🔲 Not started | Duplicates, true archival, legacy marking; see Archive/Legacy Standards below |
+| **4.5: PM Review System** | 🔧 Built — run after Phase 4 | Script ready: `scripts/build-pm-review-briefs.py`; generates per-PM task checklists + meeting briefs |
+| **5: Interlinking** | 🔲 Not started | Next Steps + Related Articles bulk pass — runs after PM sign-off |
+| **6: Slug Rename + Redirects + Localization** | 🔲 Not started | Enhanced: CSV map, localized file rename, docs.json redirects, internal link updates |
+| **7: Nav Rebuild** | 🔲 Not started | Rebuild docs.json nav groups after Phase 6 slug changes |
+| **8: Style Guide & Template Update** | 🔲 Not started | Update `Domo-KB-Style-Guide.mdx` + `New-Article-Template.mdx` for new standards |
+| **9: Restructure Artifacts Cleanup** | 🔲 Not started | Move all planning/analysis artifacts to `restructure/` folder |
 
 ---
 
-## Phase 1 Outputs (Complete)
+## Phase 1 Outputs (Complete — needs re-run)
 
-All files are in `scripts/output/`:
+All files are in `scripts/output/` (gitignored; must re-run scripts before Phase 3):
 
 | File | Description | Key stats |
 |------|-------------|-----------|
@@ -80,11 +82,11 @@ All files are in `scripts/output/`:
 
 ---
 
-## Phase 2 — Complete (redo pending additional plan updates)
+## Phase 2 — Complete (redo pending)
 
 All 1,819 articles assigned to 11 pillars + Archive. Full spec in `RESTRUCTURE-IA-SPEC.md`.
 
-**Note:** Phase 2 will be re-run once pending plan updates are finalized. See "Phase 2 Redo Approach" below.
+**Note:** Phase 2 will be re-run after Phase 1 completes on this branch. See "Phase 2 Redo Approach" below.
 
 **Outputs:**
 - `scripts/output/ia-spec.json` — every article → `{pillar, group, sub_group}`
@@ -105,6 +107,60 @@ Phase 2 re-run will output the new IA **directly into `docs.json`** so the full 
 
 **Article count as of 2026-07-14:** 1,832 in `s/article/` + 126 in `s/topic/` (up from 1,819 at original Phase 1 — 13 new articles added since).
 
+---
+
+## Archive / Legacy Standards
+
+These standards apply throughout Phases 3–4 and must be reflected in Phase 8 (Style Guide update).
+
+### Three categories of "removal"
+
+| Category | What it means | File fate | Nav fate | YAML | Visual indicator |
+|----------|--------------|-----------|----------|------|-----------------|
+| **Deleted** | Article is restructured into other content — its info lives elsewhere (merged, rewritten, split) | File deleted | Removed from nav | — | — |
+| **Archived** | Content is genuinely retired: feature removed, content truly unnecessary AND its info is not used elsewhere, PM or Audit confirmed | File kept | Moved to "Archive" group at bottom of KB tab | `archived: true` | `<ArchivedNote />` callout at top of article |
+| **Legacy** | Feature still exists and is functional but is no longer actively maintained; superseded by a newer approach | File kept | Stays in its pillar group with `(Legacy)` sidebar tag | `legacy: true`, `tag: "Legacy"` | `<LegacyNote />` callout at top of article |
+
+**Key rule:** If an article's content is used elsewhere in any form — merged into another article, its information rewritten into a new article — the original file is **deleted**, not archived. Archive is reserved for content with no living successor.
+
+### YAML frontmatter spec
+
+**Archived article:**
+```yaml
+---
+title: "Article Title"
+archived: true
+tag: "Archived"
+---
+```
+
+**Legacy article:**
+```yaml
+---
+title: "Article Title"
+legacy: true
+tag: "Legacy"
+---
+```
+
+The `tag` field is a native Mintlify frontmatter property that renders a visible label next to the article title in the sidebar. The `archived` and `legacy` fields are custom metadata used by restructure tooling (PM review script, task tracker).
+
+### Snippets to create at Phase 4 execution time
+
+- `snippets/LegacyNote.mdx` — renders a `<Warning>` callout: "**Legacy:** This article describes a feature that is no longer actively maintained. It remains functional but may not reflect current best practices. For the current approach, see [replacement link]."
+- `snippets/ArchivedNote.mdx` — renders a `<Warning>` callout: "**Archived:** This content has been retired and may no longer reflect current product behavior. It is preserved for historical reference only."
+
+Both follow the existing `snippets/BetaNote.mdx` pattern (import at top of MDX, use as `<LegacyNote />` or `<ArchivedNote />`).
+
+### Determining archive vs legacy — PM confirmation required
+
+Legacy marking requires PM sign-off. During Phase 4 and Phase 4.5, articles in a PM's area that are candidates for Legacy designation will appear in their PM review brief as a decision item. PM must confirm:
+- Feature still exists in Domo
+- Feature is not being actively developed/maintained
+- The feature has a recommended successor (which the LegacyNote should link to)
+
+The PM review brief script (`scripts/build-pm-review-briefs.py`) should be updated before Phase 4.5 to include a "Legacy Candidates" section per PM, surfacing articles from the Support KB Audit that were flagged as potential legacy but not yet confirmed.
+
 **8 decisions need human sign-off before Phase 7 (nav rebuild):**
 | # | Decision |
 |---|----------|
@@ -122,38 +178,63 @@ These decisions don't block Phase 3a article writing — they only block the nav
 
 ---
 
-## Phase 2.5 — PM Review System
+## Phase 4.5 — PM Review System
 
-**Status:** Built — run right before PM review meetings (not now)
+**Status:** Built — run after Phase 4 is complete, before Phase 5 begins
 **Script:** `scripts/build-pm-review-briefs.py`
-**Output:** `pm-review-briefs/<PM-Name>.md` — one file per PM, generated on demand
+**Output:** `pm-review-briefs/<PM-Name>.md` + `RESTRUCTURE-TASKS.md` — generated on demand
 
-This phase is a tool, not a content milestone. It doesn't block Phase 3a and shouldn't be run until enough restructure work has been completed to make the meetings productive. The right trigger: **run it once Phase 3a is substantially complete and before scheduling PM review meetings.**
+Phase 4.5 is the human sign-off gate. All content work (Phases 3a–4) is complete before this runs. PMs review every change made to their product area and either sign off, provide fact-check corrections, or schedule follow-up meetings for remaining information gaps. No interlinking, renaming, or nav rebuild happens until this phase is complete.
 
 ### What the system generates
 
-For each of the 12 PMs, one meeting-ready Markdown brief containing:
+Run the script after Phase 4 to produce two outputs:
 
-1. **Content reorganization** — table of every feature they own → new pillar assignment + article count; plus any notable structural nav changes (CDW merge, DataFusion retirement, Workbench consolidation, etc.)
-2. **AI-generated articles to fact-check** — the Phase 3a synthesis articles in their area; filename, what it was synthesized from, and specific claims to verify
-3. **Gap articles — meeting required** — articles that can't be written without PM input: original 3a-PM articles + all Critical/High forum-gap new articles in their area (each with what information is needed)
-4. **Support gap integration changes** — Section 4a: Support KB Audit retirements and urgent fixes in their area; Section 4b: Critical + High forum update targets with specific additions needed and fact-check guidance
+**1. Per-PM meeting brief** (`pm-review-briefs/<PM-Name>.md`) — one file per PM covering:
+- Content reorganization: every feature → new pillar assignment + article count + structural nav changes
+- All Phase 3a/3a-Forum/3b/3b-Forum changes in their area (new articles written, articles updated) with fact-check prompts
+- All Phase 4 archival and legacy marking actions in their area requiring sign-off
+- Pending items: PM-input articles still needing information, outstanding D1–D10 decisions
+- Legacy candidates: articles flagged as potential legacy needing PM yes/no confirmation
+- Support gap integration summary: Audit retirements + forum update targets executed in their area
+
+**2. Granular task checklist** (`RESTRUCTURE-TASKS.md`) — the working checklist for post-PM-review execution, organized:
+```
+Pillar → Product Group → [ ] Individual task
+```
+Each task is one discrete change with a type tag:
+- `[new-article]` — new article written; needs fact-check
+- `[update]` — existing article updated; needs PM review if significant
+- `[archive]` — article archived; needs PM sign-off
+- `[legacy]` — article marked legacy; needs PM confirmation
+- `[deleted]` — article deleted (content moved elsewhere); PM awareness only
+- `[pm-input]` — article pending PM information before it can be written
+- `[decision]` — open D1–D10 architectural decision needing resolution
+- `[fact-check]` — specific claim in a written article needs PM verification
+
+Example checklist entries:
+```markdown
+## Pillar 4: Prepare & Transform Data
+### Magic ETL (Andrea Henderson)
+- [ ] [fact-check] `What-is-Magic-ETL.mdx` — verify: capabilities, 400k preview limit, vs SQL DataFlows
+- [ ] [new-article] `Beast-Mode-Window-Functions.mdx` — verify: window function behavior, filter limitation still accurate?
+- [ ] [update] Magic ETL troubleshooting: editor-level failures added — verify: error messages current?
+- [ ] [archive] Old Magic ETL tile articles (15) — sign-off required
+- [ ] [pm-input] `Choosing-the-Right-Data-Prep-Tool.mdx` — need: ETL vs DataFlow vs SQL positioning
+- [ ] [legacy] DataFusion articles (11) — confirm: DataFusion fully replaced by Magic ETL?
+```
+
+This checklist is the working document for PM meetings. Query it at any time: "what's left for Connectors?", "how many tasks remain for Phil Fuchs?", etc.
 
 ### When to run
 
 ```bash
+# After Phase 4 is complete:
 python3 scripts/build-pm-review-briefs.py
+# Also generates RESTRUCTURE-TASKS.md (update script before running to reflect completed work)
 ```
 
-Run from the repo root right before scheduling PM meetings. The script reads:
-- `Article-PM-Ownership-Reference.mdx` — PM → feature → article ownership
-- `_gaps_with_support.json` — community forum gap analysis (all 361 gaps)
-- Hardcoded constants from `RESTRUCTURE-IA-SPEC.md` and `RESTRUCTURE-PROGRESS.md` (phases, article lists, retirement batches)
-
-As phases are executed, update the hardcoded phase data in the script so Section 4 reflects what has actually been completed vs. what is still planned. This is especially important for:
-- Phase 3b-Forum critical update targets (Sections 4b) — once executed, PMs need to review the actual changes
-- Phase 4 retirements (Section 4a) — once executed, PMs need to acknowledge what was archived in their area
-- Any urgent pre-Phase 4 fixes (e.g., Snowflake auth fix) — if completed, note it as done so the PM knows to verify
+Before running, update the script's hardcoded phase data to reflect what was actually completed vs. planned in Phases 3–4. The brief and task list should show real completed changes, not plans.
 
 ### PM roster
 
@@ -417,6 +498,143 @@ See `Support KB Audit Shared GAP Analysis.md` (repo root) for the full analysis 
 
 ---
 
+---
+
+## Phase 5 — Interlinking
+
+**Runs after:** Phase 4.5 (PM sign-off complete)
+
+Bulk agent pass to add **Next Steps** and **Related Articles** sections to every article in the restructured KB. This phase cannot run before PM review because article titles and paths must be stable — content still being updated during PM review would produce stale links.
+
+**Scope:**
+- Every article in Pillars 1–10 gets a `## Next Steps` section pointing to logical follow-on articles
+- Every article gets a `## Related Articles` section pointing to sibling articles in the same product group
+- Cross-pillar links added where a KB how-to touches a portal/developer equivalent
+- AI callout (`<Tip>**Try it with AI:**...`) added to applicable how-tos where a GA AI feature exists for the same task (see Cross-Cutting Concerns in `RESTRUCTURE-IA-SPEC.md`)
+
+---
+
+## Phase 6 — Slug Rename + Redirects + Localization
+
+**Runs after:** Phase 5
+
+Enhanced from original plan. Full sub-step sequence:
+
+### 6.1 Generate rename CSV
+Script reads all `s/article/` and `s/topic/` files and outputs `slug-rename-map.csv` (repo root):
+```
+original_filename,new_slug,article_title
+000005874.mdx,What-is-Domo.mdx,What is Domo?
+000042925394.mdx,Connect-to-Snowflake.mdx,Connect to Snowflake
+...
+```
+
+### 6.2 Rename English article files
+Apply all renames in `slug-rename-map.csv` to `s/article/` and `s/topic/`. Run in a single script pass to avoid partial-rename conflicts.
+
+### 6.3 Rename localized files to match English slugs
+The `ja/`, `de/`, `es/`, `fr/` directories use the same numeric filename scheme as English. Use `slug-rename-map.csv` to find matching localized files and rename them to the English slug. This creates exact filename parity across all languages — prerequisite for any future localization automation.
+
+### 6.4 Update docs.json nav references
+Replace all old numeric paths in docs.json with new slug paths. Run after 6.2/6.3 so the nav and files are in sync.
+
+### 6.5 Add redirects to docs.json
+For every renamed file, add a permanent (308) redirect entry to `docs.json`:
+```json
+"redirects": [
+  { "source": "/s/article/000005874", "destination": "/s/article/What-is-Domo" },
+  ...
+]
+```
+Mintlify applies redirects at request time — goes live on next deploy. Preserves SEO and prevents broken external links.
+
+### 6.6 Update all internal links in the repository
+Grep all `.mdx` files for old numeric path strings. Use `slug-rename-map.csv` to replace each with the new slug path. This covers:
+- Inline links in article bodies
+- `existing_related_articles` references (if any remain in frontmatter)
+- Any portal/ articles that link to s/article/ numeric paths
+
+---
+
+## Phase 7 — Nav Rebuild
+
+**Runs after:** Phase 6 (all slugs stable and redirects in place)
+
+Final rebuild of the `docs.json` Knowledge Base tab with correct slug-based paths. At this point, Phase 2's IA-spec-driven nav is already in place (pillar groups, etc.) — Phase 7 verifies integrity and cleans up any remaining issues.
+
+**Checklist:**
+- Run `mintlify broken-links` CLI — fix any remaining broken refs
+- Verify Archive group is at the bottom of the KB tab
+- Verify Legacy-tagged articles appear with `tag: "Legacy"` sidebar labels
+- Verify all Phase 3a stub files have been replaced with real content
+- Verify localized tab structures mirror the English KB structure
+
+---
+
+## Phase 8 — Style Guide & Template Update
+
+**Runs after:** Phase 7
+
+Update `Domo-KB-Style-Guide.mdx` and `New-Article-Template.mdx` to reflect every structural standard introduced by this restructure.
+
+**`Domo-KB-Style-Guide.mdx` — expected additions:**
+- **Archive vs Legacy vs Deleted** — the three categories, YAML spec, when to use each, LegacyNote/ArchivedNote snippet usage
+- **Wheel-and-spoke product group structure** — standard pattern: one Overview/hub article + How-To articles + Reference articles (optional) + FAQ (in Accordion at bottom of hub); typical article counts per product group
+- **Pillar hub articles** — what they are, when a new product area needs one, how they link to product group articles
+- **New article types added by this restructure** — "What is X?" overview articles, pillar hub articles, getting-started-for-role articles; what makes each distinct
+- **AI callout pattern** — when to add `<Tip>**Try it with AI:**...`; links to AI & Data Science pillar articles
+- **Cross-pillar linking conventions** — KB ↔ Developer Portal cross-links; how to reference portal articles from KB
+
+**`New-Article-Template.mdx` — expected additions:**
+- Optional YAML fields for legacy/archived articles (`legacy: true`, `archived: true`, `tag: "Legacy"/"Archived"`)
+- LegacyNote/ArchivedNote import/usage example (commented out — uncomment when applicable)
+- Minor: verify existing template structure still matches the updated style guide
+
+Run a diff of the current template against the style guide after Phase 7 to confirm exactly what needs updating — do not over-engineer this step.
+
+**`CLAUDE.md` — review and update:**
+CLAUDE.md is the AI-facing project instructions. After the restructure is complete, it references file paths, nav structure, and workflows that will have changed. Review and update:
+- File path references (e.g., `s/article/` numeric IDs now have slug equivalents; portal/ paths for Phase 3a articles)
+- Architecture section — update to reflect the new pillar-based `portal/` structure and the distinction between `s/article/` (legacy KB articles) and `portal/` (restructured pillar content)
+- Navigation section — update to reflect that docs.json now uses pillar groups rather than the old flat KB structure
+- Any script references that have moved (if `scripts/output/` contents are now under `restructure/`)
+- Add guidance on Archive vs Legacy article handling for future contributors
+- Remove references to planning files that have moved to `restructure/`
+
+CLAUDE.md stays at the repo root (not moved to `restructure/`) — it must be at root to be picked up by Claude Code.
+
+---
+
+## Phase 9 — Restructure Artifacts Cleanup
+
+**Final phase — runs after Phase 8**
+
+Move all planning and analysis artifacts generated during the restructure into a single folder named `restructure/` at the repo root. These files are not documentation — they are project records. Keeping them at the repo root clutters the working directory.
+
+**Files to move to `restructure/`:**
+- `KB-RESTRUCTURE-PLAN.md`
+- `RESTRUCTURE-PROGRESS.md`
+- `RESTRUCTURE-IA-SPEC.md`
+- `RESTRUCTURE-TASKS.md` (generated at Phase 4.5)
+- `slug-rename-map.csv` (generated at Phase 6)
+- `Article-PM-Ownership-Reference.mdx`
+- `Support KB Audit Shared GAP Analysis.md`
+- `_gaps_with_support.json`
+- `KB Audit Results.csv`
+- `Feature - Owning Squad, PM, Eng, UX.csv`
+- `pm-review-briefs/` directory (entire folder)
+- `scripts/output/` JSON artifacts (catalog, ia-spec, ia-mapping, etc.)
+
+**Files NOT moved:**
+- `Domo-KB-Style-Guide.mdx` — stays at root; it's a live writer-facing reference
+- `New-Article-Template.mdx` — stays at root; it's a live writer tool
+- `snippets/` — stays; active MDX components
+- `scripts/` — stays; active tooling
+
+After moving, update `CLAUDE.md` to reflect the new location of these files (the Claude project instructions reference some of them by root-relative path).
+
+---
+
 ## Scripts Reference
 
 All restructure scripts live in `scripts/`. Run from repo root with `python3`.
@@ -470,3 +688,10 @@ python3 scripts/find_duplicates_and_gaps.py
 | 2026-07-14 | Community forum gap analysis (`_gaps_with_support.json`) integrated as Phase 3a/3b input | 5,452 forum records → 361 scored gaps; 57 net-new articles and 304 article updates identified. Cross-diffed against existing restructure plan: no Critical/High gaps were already addressed (only Snowflake auth fix and DataFusion archival had partial overlap). Two new phases added to tracking: 3a-Forum (~57 new articles) and 3b-Forum (~68 Critical+High update targets). Medium/Low gaps are Phase 3b bulk input. |
 | 2026-07-14 | DataFusion Phase 4 archival must include migration guidance article | Forum gap analysis (rank 198) confirms users actively searching for ETL replacement guidance after DataFusion removal. Phase 4 archival should add `DataFusion-Migration-Guide.mdx` pointing users to Magic ETL equivalents before or alongside archiving the 11 DataFusion articles. |
 | 2026-07-14 | PM Review System built as Phase 2.5 | `scripts/build-pm-review-briefs.py` generates per-PM meeting briefs from IA spec + forum gap data + ownership reference. Run right before PM review meetings (not now). Section 4 of each brief covers both Audit gap-fill changes and forum update targets in that PM's area — executed changes should be updated in the script's hardcoded phase data so the brief reflects reality when run. |
+| 2026-07-14 | Phase 2.5 (PM Review System) moved to Phase 4.5 | PM review now runs AFTER Phases 3a–4 (all content work complete) rather than before Phase 3a. PMs review actual completed changes, not plans. This makes the review actionable: fact-checks, sign-offs, and legacy confirmations all happen against real written/updated articles. |
+| 2026-07-14 | Archive vs Legacy vs Deleted distinction defined | Three explicit categories for content removal: (1) Deleted — restructured into other content, file removed; (2) Archived — genuinely retired, no living successor, file kept in Archive nav group with `archived: true` + `<ArchivedNote />`; (3) Legacy — feature still functional but unmaintained, file stays in pillar with `legacy: true` + `tag: "Legacy"` + `<LegacyNote />`. PM sign-off required for Legacy marking. |
+| 2026-07-14 | Legacy frontmatter approach confirmed | Mintlify native `tag:` frontmatter field renders a visible sidebar label — use `tag: "Legacy"` for legacy articles and `tag: "Archived"` for archived articles. Custom fields `legacy: true` / `archived: true` serve tooling. `<LegacyNote />` and `<ArchivedNote />` snippets (to build at Phase 4 time) provide body-level callouts. Do NOT use `deprecated: true` for Legacy articles — "deprecated" implies a removal date which Legacy explicitly does not. |
+| 2026-07-14 | Phase 6 (Slug Rename) significantly enhanced | Original plan was: rename files, rebuild nav. New plan adds 4 sub-steps: (6.1) generate slug-rename-map.csv; (6.3) rename localized files (ja/de/es/fr) to English slug for exact filename parity; (6.5) add permanent 308 redirects to docs.json for all renamed paths; (6.6) update all internal links in the repo using the CSV mapping. |
+| 2026-07-14 | Phase 8 (Style Guide + Template + CLAUDE.md) added | Final human-facing standards update: Domo-KB-Style-Guide.mdx gets Archive/Legacy standards, wheel-and-spoke product group structure, pillar hub article guidance, AI callout pattern, and cross-pillar linking conventions. New-Article-Template.mdx gets legacy/archived YAML fields. CLAUDE.md gets full review and update to reflect the restructured repo — stays at root (not moved to restructure/). |
+| 2026-07-14 | Phase 9 (Restructure Artifacts Cleanup) added | All planning/analysis/tracking artifacts (KB-RESTRUCTURE-PLAN.md, RESTRUCTURE-PROGRESS.md, RESTRUCTURE-IA-SPEC.md, RESTRUCTURE-TASKS.md, slug-rename-map.csv, ownership reference, audit/gap files, pm-review-briefs/, scripts/output/) move to restructure/ folder at repo root after Phase 8. Keeps live documentation directory clean post-restructure. |
+| 2026-07-14 | RESTRUCTURE-TASKS.md granular checklist system defined | Generated at Phase 4.5 by updated build-pm-review-briefs.py. Organized Pillar → Product Group → discrete tasks with type tags: [new-article], [update], [archive], [legacy], [deleted], [pm-input], [decision], [fact-check]. This is the working document for PM meetings and post-PM execution — query it at any time for remaining tasks by pillar, PM, or type. |

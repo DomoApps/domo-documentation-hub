@@ -1,0 +1,73 @@
+---
+title: "What Is Beast Mode?"
+excerpt: "Beast Mode is Domo's calculated field tool. Write formulas directly in Analyzer to create new columns, metrics, and data transformations without modifying the underlying DataSet."
+---
+
+## Intro
+
+Beast Mode is Domo's formula-based calculated field tool. Instead of modifying a DataSet, you write a formula in Analyzer that creates a new virtual column—visible only to that card—using the data already in the DataSet. Beast Mode uses a function syntax similar to SQL, with 200+ built-in functions covering math, text, dates, conditional logic, and more. This article explains what Beast Mode is, how to use it, and links to the reference materials.
+
+---
+
+## Required Grants
+
+To create and edit Beast Mode calculations, the following grants must be enabled for your role:
+
+- **Edit Cards —** Build and modify cards in Analyzer, including Beast Mode calculations.
+
+Learn more about [grants](/s/article/360043438973).
+
+## What Beast Mode Can Do
+
+Beast Mode calculations can:
+
+- **Compute new metrics —** Combine existing columns arithmetically (`SUM`, `AVG`, `[Revenue] / [Units]`).
+- **Transform text —** Concatenate, split, extract, and reformat string columns.
+- **Work with dates —** Convert, format, diff, and bucket date columns.
+- **Apply conditional logic —** Use `CASE WHEN` and `IF` expressions to create category columns.
+- **Bucket continuous values —** Group numeric ranges into labeled tiers (for example, "Low", "Medium", "High").
+- **Aggregate across rows —** Compute `SUM`, `COUNT`, `DISTINCT COUNT`, and other aggregations.
+
+## Create a Beast Mode Calculation
+
+1. In Analyzer, select **<i className="icon-plus sm" aria-hidden="true" /> Add Calculated Field** (or open an existing field).
+2. Enter a name for the new column.
+3. Write the formula in the editor. Functions auto-complete as you type.
+4. Select **Validate** to check for syntax errors, then **Save**.
+
+The new column appears in the DataSet columns panel and can be used in the chart like any other column. See [Create a Beast Mode Calculation](/s/article/360043429913) for the full walkthrough.
+
+## Beast Mode Manager
+
+Beast Mode Manager (accessible from the Data Center) shows every Beast Mode calculation across your instance. Use it to find, audit, lock, reassign, or archive calculations at scale. See [Beast Mode Manager](/s/article/360042925474).
+
+## Reference and Examples
+
+- [Beast Mode Functions Reference Guide](/s/article/360043429933) — Complete function list with syntax and examples.
+- [Sample Beast Mode Calculations: Date Transforms](/s/article/360042925494) — Common date formatting, bucketing, and diff patterns.
+- [Sample Beast Mode Calculations: Mathematical Transforms](/s/article/360042925514) — Common numeric calculations and ratios.
+- [Bucketing Data Using Beast Mode](/s/article/360042925434) — Group continuous values into labeled categories with `CASE WHEN`.
+- [Beast Mode AI Assistant](/s/article/000005304) — Ask an AI to write Beast Mode formulas in natural language.
+- [Nested Calculations](/s/article/000005307) — Reference one Beast Mode calculation inside another.
+
+## FAQ
+
+<AccordionGroup>
+
+<Accordion title="Does a Beast Mode calculation modify the DataSet?">
+  No. Beast Mode calculations are stored on the card, not in the DataSet. They create a virtual column that only exists in the context of that card. The underlying DataSet is never modified. To create a persistent calculated column that multiple cards can share, use a Magic ETL tile or a SQL DataFlow instead.
+</Accordion>
+
+<Accordion title="Can I reuse a Beast Mode calculation across multiple cards?">
+  Yes, using Beast Mode Manager or by sharing the calculation. You can also promote a frequently reused Beast Mode to a "certified" calculation. See [Beast Mode Manager](/s/article/360042925474) for details.
+</Accordion>
+
+<Accordion title="What is the Beast Mode AI Assistant?">
+  Beast Mode AI Assistant lets you describe in plain language what calculation you want, and Domo generates the Beast Mode formula for you. See [Beast Mode AI Assistant](/s/article/000005304).
+</Accordion>
+
+<Accordion title="Can Beast Mode join data from a different DataSet?">
+  No. Beast Mode operates only on the columns of the card's connected DataSet. To combine data from multiple DataSets, use DataFusion, Magic ETL, or a SQL DataFlow first, then power the card from the combined output DataSet.
+</Accordion>
+
+</AccordionGroup>

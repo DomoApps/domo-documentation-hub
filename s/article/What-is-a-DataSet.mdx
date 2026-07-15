@@ -1,0 +1,93 @@
+---
+title: "What Is a DataSet?"
+excerpt: "A DataSet is a table of data stored in Domo that powers cards, feeds DataFlows, and drives every analysis and visualization in your instance."
+---
+
+## Intro
+
+A DataSet is Domo's term for a data table—a structured set of rows and columns stored in Domo and made available to the entire platform. Every card (chart, table, metric), every DataFlow, and every Domo AI insight is powered by one or more DataSets. This article explains what a DataSet is, how data gets into one, how DataSets update, and points to the key articles for managing and transforming them.
+
+---
+
+## Required Grants
+
+To add DataSets to Domo, the following grant must be enabled for your role:
+
+- **Can Create DataSets —** Create DataSets by connecting to data sources through connectors, file upload, or API.
+
+Learn more about [grants](/s/article/360043438973).
+
+## What a DataSet Contains
+
+A DataSet is a table with:
+
+- **Rows —** One record per data point (a transaction, a daily aggregate, a CRM contact, and so on).
+- **Columns —** Named fields with a data type: text, number, date, or Boolean.
+- **Metadata —** Owner, update schedule, last-run status, and lineage information visible in the Data Center.
+
+DataSets are schema-aware. Domo detects column types when the DataSet is first created and validates them on each subsequent update.
+
+## How Data Gets Into a DataSet
+
+You can bring data into Domo in several ways:
+
+- **Connectors —** The most common path. Select a connector from the Data Center, authenticate to the source (Salesforce, Snowflake, Google Analytics, and 1,000+ others), configure what data to pull, and schedule automatic refreshes. See [Adding a DataSet Using a Connector](/s/article/360042926274).
+- **File upload —** Drag and drop a CSV or Excel file directly into Domo. Best for one-time imports or flat files without an API. See [File Upload Connector](/s/article/360043436573).
+- **Writeback Connectors —** Send data from Domo back to an external system (such as Snowflake or a REST endpoint). See [Writeback Connectors](/s/article/Connect-and-Bring-In-Data-Overview).
+- **API —** Upload DataSets programmatically using the Domo API, Python SDK, R SDK, or CLI. See [Domo APIs](/s/article/360043439793).
+- **Magic ETL and DataFlows —** Transform existing DataSets into new ones. See [What Is Magic ETL?](/s/article/What-is-Magic-ETL) and [What Is a DataFlow?](/s/article/What-is-a-DataFlow).
+
+## How DataSets Update
+
+DataSets can stay current with four update methods. The right choice depends on your data volume and pipeline design:
+
+- **Replace —** Overwrites the DataSet with fresh data on every run. Simple and self-correcting; best when the source always returns the full dataset.
+- **Append —** Adds new rows without removing existing ones. Best for log or transaction data where history accumulates over time.
+- **Merge —** Upserts rows based on a key column: updates matching rows, inserts new ones. Best when the source sends only changed records.
+- **Partition —** Replaces a date-range slice of the DataSet rather than the whole table. Best for large historical DataSets where only recent data changes.
+
+See [DataSet Update Methods](/s/article/360043430733) for detailed guidance on choosing the right method.
+
+## Manage and Share DataSets
+
+After data is in Domo, you can:
+
+- [Change the owner of a DataSet](/s/article/360042926074)
+- [Share a DataSet](/s/article/360043430713)
+- [Set the expected update frequency for a DataSet](/s/article/360042926114)
+- [Export a DataSet](/s/article/360042926134)
+- [Delete a DataSet](/s/article/360042926194)
+- [View the impact of changes to DataSets](/s/article/360042926234)
+
+For an overview of the Data Center where all DataSets live, see [Data Center Layout](/s/article/360047553253).
+
+## Transform DataSets
+
+Raw data often needs cleaning or joining before analysis. Domo's transformation tools read one or more DataSets and write the result to a new DataSet:
+
+- **Magic ETL —** Visual, drag-and-drop data pipeline. See [What Is Magic ETL?](/s/article/What-is-Magic-ETL).
+- **SQL DataFlows —** Write SQL to transform data. See [What Is a DataFlow?](/s/article/What-is-a-DataFlow).
+- **DataFusion —** Join DataSets without writing code. See [Edit a DataFusion](/s/article/360043428313).
+- **DataSet Views —** Create a filtered or projected view of a DataSet without duplicating data. See [Manage DataSet Views](/s/article/360046074774).
+
+## FAQ
+
+<AccordionGroup>
+
+<Accordion title="How many DataSets can I have in Domo?">
+  The number of DataSets you can create depends on your Domo plan and the consumption credits associated with your contract. See [What Are Consumption Credits and How Do They Work?](/s/article/000005280) for details on how DataSet volume affects credit usage.
+</Accordion>
+
+<Accordion title="What is the difference between a DataSet and a DataFlow?">
+  A DataSet is a table of data—the input and output of any transformation. A DataFlow is a transformation process that reads one or more DataSets, applies logic (joins, filters, aggregations), and writes the result to a new DataSet. DataSets are the data; DataFlows are the pipelines.
+</Accordion>
+
+<Accordion title="Can I connect a single DataSet to multiple cards?">
+  Yes. One DataSet can power as many cards as you want. When the DataSet refreshes, all cards powered by it update automatically.
+</Accordion>
+
+<Accordion title="What happens to cards if a DataSet is deleted?">
+  Cards powered by a deleted DataSet lose their data connection and display an error. Before deleting a DataSet, use [Viewing the Impact of Changes to DataSets](/s/article/360042926234) to see which cards and DataFlows depend on it.
+</Accordion>
+
+</AccordionGroup>

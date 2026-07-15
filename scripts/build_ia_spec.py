@@ -92,6 +92,50 @@ OVERRIDES = {
     "Use-Worksheets.mdx": ("Analyze & Visualize", "Cards", None),
     # Goals tutorial
     "4578278680855.mdx": ("Administer & Govern", "Goals", None),
+
+    # ---------------------------------------------------------------------------
+    # D9 resolution (2026-07-14): DataSet Management split
+    # Governance/lifecycle articles → Manage Data
+    # Pipeline/transformation articles stay in Prepare & Transform Data (no override needed)
+    # ---------------------------------------------------------------------------
+
+    # Manage Data > Data Center
+    "360047553253.mdx": ("Manage Data", "Data Center", None),       # Data Center Layout
+    "360043430413.mdx": ("Manage Data", "Data Center", None),       # Using the Data Warehouse to Manage Data
+    "360051558694.mdx": ("Manage Data", "Data Center", None),       # Understanding the Connector Options Menu Items
+
+    # Manage Data > DataSet Lifecycle
+    "360042926054.mdx": ("Manage Data", "DataSet Lifecycle", None), # Manage Connector/Adapter Accounts
+    "360042926074.mdx": ("Manage Data", "DataSet Lifecycle", None), # Change the Owner of a DataSet
+    "360042926114.mdx": ("Manage Data", "DataSet Lifecycle", None), # Setting the Expected Update Frequency for a DataSet
+    "360042926134.mdx": ("Manage Data", "DataSet Lifecycle", None), # Exporting DataSets
+    "360042926154.mdx": ("Manage Data", "DataSet Lifecycle", None), # Best Practices for Managing DataSets
+    "360042926194.mdx": ("Manage Data", "DataSet Lifecycle", None), # Deleting DataSets
+    "360042926214.mdx": ("Manage Data", "DataSet Lifecycle", None), # Executing DataSets
+    "360042926234.mdx": ("Manage Data", "DataSet Lifecycle", None), # Viewing the Impact of Changes to DataSets
+    "360042935314.mdx": ("Manage Data", "DataSet Lifecycle", None), # Best Practices for Designing and Structuring Your Domo Instance
+    "360042935354.mdx": ("Manage Data", "DataSet Lifecycle", None), # Best Practices for Sharing Content in Domo
+    "360043430653.mdx": ("Manage Data", "DataSet Lifecycle", None), # Connecting Cards to a Different DataSet
+    "360043430713.mdx": ("Manage Data", "DataSet Lifecycle", None), # Share a DataSet
+    "360043435533.mdx": ("Manage Data", "DataSet Lifecycle", None), # Public DataSet Connectors
+    "360046074774.mdx": ("Manage Data", "DataSet Lifecycle", None), # Manage DataSet Views
+    "360056727214.mdx": ("Manage Data", "DataSet Lifecycle", None), # Non-queryable DataSets
+    "4405337525783.mdx": ("Manage Data", "DataSet Lifecycle", None),# Data Fundamentals: Understanding Relational Data...
+    "4434784751767.mdx": ("Manage Data", "DataSet Lifecycle", None),# Optimizing Data Performance
+
+    # PDP → Administer & Govern (data-access governance feature)
+    "360042934614.mdx": ("Administer & Govern", "Governance", None),# Personalized Data Permissions (PDP)
+
+    # Developer tools → Develop & Integrate
+    "360043437693.mdx": ("Develop & Integrate", "APIs & SDKs", None),# Domo ODBC Data Driver
+    "360043437733.mdx": ("Develop & Integrate", "APIs & SDKs", None),# Domo CLI (Command Line Interface) Tool
+
+    # Cloud integration migration guide → Connect & Bring In Data
+    "000005675.mdx": ("Connect & Bring In Data", "Cloud Data Warehouses", None), # Migrate from Federated to Cloud Integrations
+
+    # Visualization articles → Analyze & Visualize
+    "4402058407191.mdx": ("Analyze & Visualize", "Analyzer", None), # Analyzer and DataSet Views Integration
+    "360043428693.mdx": ("Analyze & Visualize", "Analyzer", None),  # Understanding Chart Data
 }
 
 # ---------------------------------------------------------------------------

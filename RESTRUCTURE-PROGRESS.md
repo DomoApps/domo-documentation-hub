@@ -74,18 +74,19 @@ All files are in `scripts/output/` (gitignored; must re-run scripts before Phase
 - Notable examples: Amazon S3 (43 vs 121 lines), PostgreSQL (41 vs 185 lines), Adaptive Insights (63 vs 642 lines)
 
 **Gap analysis — pillars missing tutorials (highest priority for Phase 3a):**
-- **Connect & Bring In Data** — 1,064 articles, 0 tutorials (largest gap)
-- **Prepare & Transform Data** — 109 articles, 0 tutorials
-- **Administer & Govern** — 70 articles, 0 tutorials
-- **Share & Collaborate** — 15 articles, 0 tutorials
-- **Develop & Integrate** — 3 articles, 0 tutorials, 0 explanations (severely underdocumented)
+- **Connect & Bring In Data** — 1,057 articles, 0 tutorials (largest gap)
+- **Prepare & Transform Data** — 75 articles, 0 tutorials (was 109; 34 articles reclassified to Manage Data + other pillars via D9)
+- **Manage Data** — 20 articles, 0 tutorials (new pillar, populated by D9 resolution)
+- **Administer & Govern** — 73 articles, 0 tutorials
+- **Share & Collaborate** — 51 articles, 0 tutorials
+- **Develop & Integrate** — 7 articles, 0 tutorials, 0 explanations (still underdocumented; gained CLI + ODBC from D9)
 - **Other** — 64 articles, 0 tutorials (catch-all bucket needing categorization)
 
 ---
 
-## Phase 2 — Complete (re-run 2026-07-14)
+## Phase 2 — Complete (re-run 2026-07-14; D9 resolved 2026-07-14)
 
-All 1,819 articles assigned to 11 pillars + Archive. Full spec in `RESTRUCTURE-IA-SPEC.md`.
+All 1,832 articles assigned to 11 pillars + Archive. Full spec in `RESTRUCTURE-IA-SPEC.md`.
 
 **Note:** Phase 2 will be re-run after Phase 1 completes on this branch. See "Phase 2 Redo Approach" below.
 
@@ -154,7 +155,7 @@ Legacy marking requires PM sign-off. During Phase 4 and Phase 4.5, articles in a
 
 The PM review brief script (`scripts/build-pm-review-briefs.py`) should be updated before Phase 4.5 to include a "Legacy Candidates" section per PM, surfacing articles from the Support KB Audit that were flagged as potential legacy but not yet confirmed.
 
-**8 decisions need human sign-off before Phase 7 (nav rebuild):**
+**7 decisions need human sign-off before Phase 7 (nav rebuild):**
 | # | Decision |
 |---|----------|
 | D1 | Workbench 4 articles (37) — Archive or keep? |
@@ -165,7 +166,7 @@ The PM review brief script (`scripts/build-pm-review-briefs.py`) should be updat
 | D6 | Develop & Integrate scope — KB how-tos vs. link-out to developer.domo.com? |
 | D7 | Data Models (1 article, Beta) — expand or hold until feature ships? |
 | D8 | Instance Settings (39) — sub-group further or keep flat? |
-| D9 | Which DataSet Management articles (currently in Prepare & Transform) move to new Manage Data pillar? |
+| ~~D9~~ | ~~DataSet Management split~~ — **Resolved 2026-07-14.** 20 governance/lifecycle articles → Manage Data (3 Data Center, 17 DataSet Lifecycle). 5 pipeline articles stay in Prepare & Transform. PDP → Administer & Govern. Domo CLI + ODBC → Develop & Integrate. Analyzer/Chart articles → Analyze & Visualize. See decision log. |
 
 These decisions don't block Phase 3a article writing — they only block the nav rebuild in Phase 7.
 
@@ -691,3 +692,4 @@ python3 scripts/find_duplicates_and_gaps.py
 | 2026-07-14 | Phase 9 (Restructure Artifacts Cleanup) added | All planning/analysis/tracking artifacts (KB-RESTRUCTURE-PLAN.md, RESTRUCTURE-PROGRESS.md, RESTRUCTURE-IA-SPEC.md, RESTRUCTURE-TASKS.md, slug-rename-map.csv, ownership reference, audit/gap files, pm-review-briefs/, scripts/output/) move to restructure/ folder at repo root after Phase 8. Keeps live documentation directory clean post-restructure. |
 | 2026-07-14 | RESTRUCTURE-TASKS.md granular checklist system defined | Generated at Phase 4.5 by updated build-pm-review-briefs.py. Organized Pillar → Product Group → discrete tasks with type tags: [new-article], [update], [archive], [legacy], [deleted], [pm-input], [decision], [fact-check]. This is the working document for PM meetings and post-PM execution — query it at any time for remaining tasks by pillar, PM, or type. |
 | 2026-07-14 | Restructure scope confirmed: s/article/ only; portal/ is out of scope | Phase 3a article paths corrected from portal/ subdirectories to s/article/. The portal/ directory (Developer Portal) is entirely out of scope for this restructure — no new portal/ files, no portal/ nav changes. The only portal/ work is Phase 5 interlinking, which adds links FROM s/article/ how-tos TO existing portal/ pages. Phase 8 CLAUDE.md review language updated to remove incorrect portal/ references. Phases 1 and 2 were unaffected (already scoped to s/article/ throughout). |
+| 2026-07-14 | D9 resolved — Manage Data pillar populated | 31 DataSet Management articles split: 20 → Manage Data (3 in "Data Center" group: Data Center Layout, Using the Data Warehouse, Understanding Connector Options; 17 in "DataSet Lifecycle" group: ownership, sharing, health, lifecycle how-tos). 5 pipeline articles stay in Prepare & Transform (DataSet Update Methods, DataFusion ×2, Enterprise Stacker, Advanced Tools Launch Center). 1 (PDP) → Administer & Govern > Governance. 2 developer tools (CLI, ODBC) → Develop & Integrate > APIs & SDKs. 1 (Migrate from Federated to Cloud) → Connect & Bring In Data > Cloud Data Warehouses. 2 visualization articles → Analyze & Visualize > Analyzer. `scripts/build_ia_spec.py` OVERRIDES section updated; Phase 2 re-run confirms 1,832/1,832 articles assigned. |

@@ -14,16 +14,16 @@ Counts in parentheses are existing articles moving to that location.
 
 | Pillar | Existing articles | New articles needed | Priority |
 |--------|-------------------|---------------------|----------|
-| Getting Started | 34 | 5 (3 role-based + 2 concept) | 🔴 Critical |
-| Connect & Bring In Data | 1,050 | 4 (hub + 3 concept) | 🟡 Medium |
-| Manage Data | 0–31 (pending D9) | 3 (hub + 2 concept) | 🔴 Critical |
-| Prepare & Transform Data | 101 (or ~70 pending D9) | 4 (hub + 3 concept) | 🔴 Critical |
-| Analyze & Visualize | 230 | 4 (hub + 3 concept) | 🔴 Critical |
+| Getting Started | 35 | 5 (3 role-based + 2 concept) | 🔴 Critical |
+| Connect & Bring In Data | 1,057 | 4 (hub + 3 concept) | 🟡 Medium |
+| Manage Data | 20 *(D9 resolved 2026-07-14)* | 1 (hub) | 🔴 Critical |
+| Prepare & Transform Data | 75 *(D9 resolved 2026-07-14)* | 4 (hub + 3 concept) | 🔴 Critical |
+| Analyze & Visualize | 232 | 4 (hub + 3 concept) | 🔴 Critical |
 | Build Apps & Automate | 106 | 3 (hub + 2 concept) | 🟡 Medium |
 | Share & Collaborate | 51 | 2 (hub + 1 concept) | 🟡 Medium |
-| AI & Data Science | 41 | 3 (hub + 2 concept) | 🟡 Medium |
-| Administer & Govern | 72 | 3 (hub + 2 concept) | 🟡 Medium |
-| Develop & Integrate | 5 | 4 (hub + 3 concept) | 🟠 High — severely thin |
+| AI & Data Science | 47 | 3 (hub + 2 concept) | 🟡 Medium |
+| Administer & Govern | 73 | 3 (hub + 2 concept) | 🟡 Medium |
+| Develop & Integrate | 7 | 4 (hub + 3 concept) | 🟠 High — severely thin |
 | Release Notes | 65 | 0 | — |
 | Archive | 64 | 0 | — |
 
@@ -170,22 +170,44 @@ Connect & Bring In Data
 
 **Story:** You've connected your data. Now find it, understand it, and put it to work — navigate the Data Center, discover what's available, manage dataset health, and share data with the right people.
 
+**D9 resolved 2026-07-14.** 20 existing articles assigned; 3 hub articles to write in Phase 3a.
+
 ```
-Manage Data
-├── [NEW] Overview: Manage Your Data in Domo         ← hub article
-├── [NEW] What is the Data Center?                    ← synthesize from connector + DataSet articles
-│   (data list view, dataset cards, status indicators)
-├── [NEW] Find and Manage Your DataSets               ← how to search, filter, favorite, share datasets
-├── DataSet Management (31)                           ← [DECISION D9: some articles may stay in Pillar 4]
-│   ├── DataSet Update Methods
-│   ├── Export DataSets
-│   ├── DataSet Backup
-│   ├── Virtual DataSets
-│   └── [remaining DataSet management how-tos]
-└── [articles covering Data Center navigation, dataset lifecycle, workspaces/favorites — TBD pending D9]
+Manage Data (20 existing + 3 new)
+├── [NEW] s/article/Manage-Data-Overview.mdx
+├── Data Center (3)
+│   ├── Data Center Layout
+│   ├── Understanding the Connector Options Menu Items
+│   └── Using the Data Warehouse to Manage Data
+└── DataSet Lifecycle (17)
+    ├── Best Practices for Designing and Structuring Your Domo Instance
+    ├── Best Practices for Managing DataSets
+    ├── Best Practices for Sharing Content in Domo
+    ├── Change the Owner of a DataSet
+    ├── Connecting Cards to a Different DataSet
+    ├── Data Fundamentals: Understanding Relational Data, Domo Architecture, and Data Pipeline Optimization
+    ├── Deleting DataSets
+    ├── Executing DataSets
+    ├── Exporting DataSets
+    ├── Manage Connector/Adapter Accounts
+    ├── Manage DataSet Views
+    ├── Non-queryable DataSets
+    ├── Optimizing Data Performance
+    ├── Public DataSet Connectors
+    ├── Setting the Expected Update Frequency for a DataSet
+    ├── Share a DataSet
+    └── Viewing the Impact of Changes to DataSets
 ```
 
-**[DECISION D9]** Which existing DataSet Management articles (currently in Prepare & Transform Data) belong in Manage Data vs. staying in Prepare & Transform? Pipeline-oriented articles (update methods, virtual datasets) likely stay in Prepare & Transform; governance-adjacent articles (backup, sharing, lifecycle) likely move here. Resolve before Phase 7 nav rebuild.
+**Phase 3a new articles for this pillar:**
+- `s/article/Manage-Data-Overview.mdx` — pillar hub (What is the Data Center? How do I find and manage my data?)
+
+**What moved OUT of DataSet Management in Phase 2 (D9):**
+- 5 pipeline articles stayed in Prepare & Transform (DataSet Update Methods, Edit/Perf DataFusion ×2, Enterprise Stacker, Advanced Tools Launch Center)
+- PDP → Administer & Govern > Governance
+- Domo CLI + ODBC → Develop & Integrate > APIs & SDKs
+- Migrate from Federated to Cloud → Connect & Bring In Data > Cloud Data Warehouses
+- Analyzer+DataSet Views, Understanding Chart Data → Analyze & Visualize > Analyzer
 
 ---
 
@@ -212,12 +234,12 @@ Prepare & Transform Data
 │   ├── Create and Manage DataFlows
 │   ├── SQL DataFlows
 │   └── [remaining DataFlow how-tos]
-├── DataSet Management (31)
+├── DataSet Management (5)    ← pipeline/transformation articles only; lifecycle articles moved to Pillar 3
+│   ├── Advanced Tools Launch Center
 │   ├── DataSet Update Methods
-│   ├── Export DataSets
-│   ├── DataSet Backup
-│   ├── Virtual DataSets
-│   └── [remaining DataSet management how-tos]
+│   ├── Edit a DataFusion
+│   ├── DataFusion Performance Recommendations
+│   └── Enterprise Stacker
 └── Data Models (1 + needs expansion)
     ├── [NEW] What is a Data Model?                   ← synthesize from existing 1 article
     └── Create and Use Data Models (Beta)             ← existing 1 article
@@ -585,7 +607,7 @@ Replace `[replacement feature]` with a link to the current recommended article w
 | D6 | Confirm Develop & Integrate scope — KB how-tos vs. link-out to developer.domo.com? | Clarify with dev relations | You / Dev PM |
 | D7 | Data Models section (1 article, Beta) — expand or hold? | Hold until feature ships | You / PM |
 | D8 | Instance Settings (39) — sub-group further or keep flat? | Keep flat for now | You |
-| D9 | Which DataSet Management articles move from Prepare & Transform to Manage Data? | Pipeline articles stay; governance/lifecycle articles move | You / PM |
+| ~~D9~~ | ~~DataSet Management split~~ | **Resolved 2026-07-14.** 20 articles → Manage Data (3 Data Center, 17 DataSet Lifecycle). 5 pipeline articles stay in P&T. PDP → Admin. CLI+ODBC → Develop. Analyzer/Chart articles → A&V. See RESTRUCTURE-PROGRESS.md decision log. | Done |
 | D10 | CourseBuilder articles (16) — Archive or keep in Build Apps & Automate? | Support KB Audit flags CourseBuilder as retired/removed from Domo (16 articles: 3 Deprecate, 5 Mark as Legacy, 4 Needs Review, 4 still flagged for evaluation). Confirm with PM; if confirmed retired, Archive all 16 before Phase 7 nav rebuild. | You / PM |
 
 ---

@@ -258,37 +258,37 @@ Write the ~26 new articles that can be synthesized from existing KB content. All
 
 | Priority | Filename | Synthesize from | Skill |
 |----------|---------|-----------------|-------|
-| 1 | `portal/getting-started/What-is-Domo.mdx` | 000005874 + role guides | `new-overview-article` |
-| 2 | `portal/getting-started/Getting-Started-for-Admins.mdx` | Admin how-tos | `new-kb-article` |
-| 3 | `portal/getting-started/Getting-Started-for-App-Builders.mdx` | App Studio/Workflows overview | `new-kb-article` |
-| 4 | `portal/getting-started/Getting-Started-for-Developers.mdx` | API articles, Access Tokens | `new-kb-article` |
-| 5 | `portal/prepare-transform/What-is-a-DataSet.mdx` | Connector + ETL articles | `new-overview-article` |
-| 6 | `portal/prepare-transform/What-is-Magic-ETL.mdx` | Magic ETL overview articles | `new-overview-article` |
-| 7 | `portal/prepare-transform/What-is-a-DataFlow.mdx` | DataFlow articles | `new-overview-article` |
-| 8 | `portal/prepare-transform/Prepare-and-Transform-Overview.mdx` | All ETL/DataFlow articles | `new-overview-article` |
-| 9 | `portal/analyze-visualize/What-is-a-Card.mdx` | Analyzer articles | `new-overview-article` |
-| 10 | `portal/analyze-visualize/What-is-a-Dashboard.mdx` | Dashboard articles | `new-overview-article` |
-| 11 | `portal/analyze-visualize/What-is-Beast-Mode.mdx` | Beast Mode FAQ + functions ref | `new-overview-article` |
-| 12 | `portal/analyze-visualize/Analyze-and-Visualize-Overview.mdx` | All analyzer/chart articles | `new-overview-article` |
-| 13 | `portal/share-collaborate/What-is-an-Alert.mdx` | Alerts Overview + alert articles | `new-overview-article` |
-| 14 | `portal/connect/What-is-a-Connector.mdx` | General Connector Info (12 articles) | `new-overview-article` |
-| 15 | `portal/connect/Connect-and-Bring-In-Data-Overview.mdx` | All connector articles; frames read + write | `new-overview-article` |
-| 16 | `portal/manage-data/Manage-Data-Overview.mdx` | DataSet articles, Data Center context | `new-overview-article` |
-| 17 | `portal/manage-data/What-is-the-Data-Center.mdx` | DataSet management articles | `new-overview-article` |
-| 18 | `portal/manage-data/Find-and-Manage-Your-DataSets.mdx` | DataSet management, sharing, workspace articles | `new-kb-article` |
-| 19 | `portal/ai-data-science/What-is-Domo-AI.mdx` | Domo AI FAQ + AI articles | `new-overview-article` |
-| 20 | `portal/ai-data-science/AI-and-Data-Science-Overview.mdx` | All AI/DomoStats/Jupyter articles | `new-overview-article` |
-| 21 | `portal/build-automate/What-is-App-Studio.mdx` | App Studio Overview | `new-overview-article` |
-| 22 | `portal/build-automate/Build-Apps-and-Automate-Overview.mdx` | App Studio/Workflows/Code Engine | `new-overview-article` |
-| 23 | `portal/connect/What-is-Workbench.mdx` | Workbench 5.2 overview | `new-overview-article` |
-| 24 | `portal/share-collaborate/Share-and-Collaborate-Overview.mdx` | Sharing/Buzz/Publications articles | `new-overview-article` |
-| 25 | `portal/administer-govern/Domo-User-Roles.mdx` | Roles/grants articles | `new-overview-article` |
-| 26 | `portal/administer-govern/Security-and-Permissions-Overview.mdx` | PDP, OAuth, security articles | `new-overview-article` |
-| 27 | `portal/administer-govern/Administer-and-Govern-Overview.mdx` | All admin articles | `new-overview-article` |
-| 28 | `portal/administer-govern/Domo-Sandbox-Overview.mdx` | Sandbox article | `new-overview-article` |
-| 29 | `portal/develop-integrate/Develop-and-Integrate-Overview.mdx` | Existing 5 API articles | `new-overview-article` |
+| 1 | `s/article/What-is-Domo.mdx` | 000005874 + role guides | `new-overview-article` |
+| 2 | `s/article/Getting-Started-for-Admins.mdx` | Admin how-tos | `new-kb-article` |
+| 3 | `s/article/Getting-Started-for-App-Builders.mdx` | App Studio/Workflows overview | `new-kb-article` |
+| 4 | `s/article/Getting-Started-for-Developers.mdx` | API articles, Access Tokens | `new-kb-article` |
+| 5 | `s/article/What-is-a-DataSet.mdx` | Connector + ETL articles | `new-overview-article` |
+| 6 | `s/article/What-is-Magic-ETL.mdx` | Magic ETL overview articles | `new-overview-article` |
+| 7 | `s/article/What-is-a-DataFlow.mdx` | DataFlow articles | `new-overview-article` |
+| 8 | `s/article/Prepare-and-Transform-Overview.mdx` | All ETL/DataFlow articles | `new-overview-article` |
+| 9 | `s/article/What-is-a-Card.mdx` | Analyzer articles | `new-overview-article` |
+| 10 | `s/article/What-is-a-Dashboard.mdx` | Dashboard articles | `new-overview-article` |
+| 11 | `s/article/What-is-Beast-Mode.mdx` | Beast Mode FAQ + functions ref | `new-overview-article` |
+| 12 | `s/article/Analyze-and-Visualize-Overview.mdx` | All analyzer/chart articles | `new-overview-article` |
+| 13 | `s/article/What-is-an-Alert.mdx` | Alerts Overview + alert articles | `new-overview-article` |
+| 14 | `s/article/What-is-a-Connector.mdx` | General Connector Info (12 articles) | `new-overview-article` |
+| 15 | `s/article/Connect-and-Bring-In-Data-Overview.mdx` | All connector articles; frames read + write | `new-overview-article` |
+| 16 | `s/article/Manage-Data-Overview.mdx` | DataSet articles, Data Center context | `new-overview-article` |
+| 17 | `s/article/What-is-the-Data-Center.mdx` | DataSet management articles | `new-overview-article` |
+| 18 | `s/article/Find-and-Manage-Your-DataSets.mdx` | DataSet management, sharing, workspace articles | `new-kb-article` |
+| 19 | `s/article/What-is-Domo-AI.mdx` | Domo AI FAQ + AI articles | `new-overview-article` |
+| 20 | `s/article/AI-and-Data-Science-Overview.mdx` | All AI/DomoStats/Jupyter articles | `new-overview-article` |
+| 21 | `s/article/What-is-App-Studio.mdx` | App Studio Overview | `new-overview-article` |
+| 22 | `s/article/Build-Apps-and-Automate-Overview.mdx` | App Studio/Workflows/Code Engine | `new-overview-article` |
+| 23 | `s/article/What-is-Workbench.mdx` | Workbench 5.2 overview | `new-overview-article` |
+| 24 | `s/article/Share-and-Collaborate-Overview.mdx` | Sharing/Buzz/Publications articles | `new-overview-article` |
+| 25 | `s/article/Domo-User-Roles.mdx` | Roles/grants articles | `new-overview-article` |
+| 26 | `s/article/Security-and-Permissions-Overview.mdx` | PDP, OAuth, security articles | `new-overview-article` |
+| 27 | `s/article/Administer-and-Govern-Overview.mdx` | All admin articles | `new-overview-article` |
+| 28 | `s/article/Domo-Sandbox-Overview.mdx` | Sandbox article | `new-overview-article` |
+| 29 | `s/article/Develop-and-Integrate-Overview.mdx` | Existing 5 API articles | `new-overview-article` |
 
-**Note on file paths:** The `portal/` sub-paths above are proposed — they don't exist yet. They'll be created when Phase 3a articles are written. Confirm directory structure before first write.
+**Scope note:** All Phase 3a articles go in `s/article/`. The `portal/` directory is entirely out of scope for this restructure — it is Developer Portal content with its own structure and audience. The only portal/ work in this restructure is Phase 5 interlinking, which adds links *from* `s/article/` how-tos *to* existing `portal/` reference pages (no new portal/ files, no portal/ nav changes).
 
 ---
 
@@ -587,8 +587,8 @@ Run a diff of the current template against the style guide after Phase 7 to conf
 
 **`CLAUDE.md` — review and update:**
 CLAUDE.md is the AI-facing project instructions. After the restructure is complete, it references file paths, nav structure, and workflows that will have changed. Review and update:
-- File path references (e.g., `s/article/` numeric IDs now have slug equivalents; portal/ paths for Phase 3a articles)
-- Architecture section — update to reflect the new pillar-based `portal/` structure and the distinction between `s/article/` (legacy KB articles) and `portal/` (restructured pillar content)
+- File path references (e.g., `s/article/` numeric IDs now have slug equivalents; new Phase 3a hub article slugs added)
+- Architecture section — update to reflect the pillar-based navigation structure in docs.json and the addition of hub articles in `s/article/`
 - Navigation section — update to reflect that docs.json now uses pillar groups rather than the old flat KB structure
 - Any script references that have moved (if `scripts/output/` contents are now under `restructure/`)
 - Add guidance on Archive vs Legacy article handling for future contributors
@@ -690,3 +690,4 @@ python3 scripts/find_duplicates_and_gaps.py
 | 2026-07-14 | Phase 8 (Style Guide + Template + CLAUDE.md) added | Final human-facing standards update: Domo-KB-Style-Guide.mdx gets Archive/Legacy standards, wheel-and-spoke product group structure, pillar hub article guidance, AI callout pattern, and cross-pillar linking conventions. New-Article-Template.mdx gets legacy/archived YAML fields. CLAUDE.md gets full review and update to reflect the restructured repo — stays at root (not moved to restructure/). |
 | 2026-07-14 | Phase 9 (Restructure Artifacts Cleanup) added | All planning/analysis/tracking artifacts (KB-RESTRUCTURE-PLAN.md, RESTRUCTURE-PROGRESS.md, RESTRUCTURE-IA-SPEC.md, RESTRUCTURE-TASKS.md, slug-rename-map.csv, ownership reference, audit/gap files, pm-review-briefs/, scripts/output/) move to restructure/ folder at repo root after Phase 8. Keeps live documentation directory clean post-restructure. |
 | 2026-07-14 | RESTRUCTURE-TASKS.md granular checklist system defined | Generated at Phase 4.5 by updated build-pm-review-briefs.py. Organized Pillar → Product Group → discrete tasks with type tags: [new-article], [update], [archive], [legacy], [deleted], [pm-input], [decision], [fact-check]. This is the working document for PM meetings and post-PM execution — query it at any time for remaining tasks by pillar, PM, or type. |
+| 2026-07-14 | Restructure scope confirmed: s/article/ only; portal/ is out of scope | Phase 3a article paths corrected from portal/ subdirectories to s/article/. The portal/ directory (Developer Portal) is entirely out of scope for this restructure — no new portal/ files, no portal/ nav changes. The only portal/ work is Phase 5 interlinking, which adds links FROM s/article/ how-tos TO existing portal/ pages. Phase 8 CLAUDE.md review language updated to remove incorrect portal/ references. Phases 1 and 2 were unaffected (already scoped to s/article/ throughout). |

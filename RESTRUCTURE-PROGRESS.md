@@ -5,15 +5,16 @@ Update it at the end of every work session. Future Claude sessions should read t
 file at the start of any restructure work to orient themselves before doing anything.
 
 **Plan document:** `KB-RESTRUCTURE-PLAN.md`
-**Last updated:** 2026-07-14
+**Last updated:** 2026-07-14 (Phase 3a complete)
 
 ---
 
 ## Current Status
 
-**Active phase:** Phase 3a — Net-New Articles (synthesizable)
-**Blocked on:** 8 human decisions (see Phase 2 Decision Required table in `RESTRUCTURE-IA-SPEC.md`)
+**Active phase:** Phase 3a-PM (4 articles blocked on PM input); Phase 3a-Forum next
+**Blocked on:** 4 PM-input articles; 8 human decisions (see Phase 2 Decision Required table in `RESTRUCTURE-IA-SPEC.md`)
 **Phase 1/2 re-run:** Complete 2026-07-14 on branch `update/fullRestructure`
+**Phase 3a core:** ✅ Complete 2026-07-14 — all 29 synthesizable articles written and in docs.json
 
 ---
 
@@ -23,7 +24,7 @@ file at the start of any restructure work to orient themselves before doing anyt
 |-------|--------|-------|
 | **1: Audit & Inventory** | ✅ Complete (re-run 2026-07-14) | 1,832 articles; 2 orphaned; 842 merge candidates (23 exact); see updated findings below |
 | **2: IA Design** | ✅ Complete (re-run 2026-07-14) | 11 pillars in `docs.json` KB tab; 1,832 articles assigned; see Phase 2 outputs below |
-| **3a: Net-New Articles (~26)** | 🔲 Not started | Synthesizable from existing content; see article list below |
+| **3a: Net-New Articles (~29)** | ✅ Complete (2026-07-14) | 29 articles written; all registered in docs.json; MCP group fixed |
 | **3a-PM: PM Input Articles (4)** | 🔲 Blocked — awaiting PM | See PM Input section below |
 | **3a-Forum: Forum-Driven New Articles (~57)** | 🔲 Not started | Community forum gaps; see Forum Gap Analysis section below |
 | **3b: Article Upgrades (~200)** | 🔲 Not started | Bulk agent edit pass |
@@ -251,9 +252,9 @@ Before running, update the script's hardcoded phase data to reflect what was act
 
 ---
 
-## Phase 3a — Next Steps (Start Here Next Session)
+## Phase 3a — Complete ✅ (2026-07-14)
 
-Write the ~26 new articles that can be synthesized from existing KB content. All require the `new-kb-article` or `new-overview-article` skill. Net-new files must be written in the **main session** (sub-agents cannot Write new files).
+All 29 synthesizable articles were written and registered in docs.json. MCP articles were also extracted from the Domo AI group into their own sibling MCP group.
 
 **Priority order for Phase 3a:**
 

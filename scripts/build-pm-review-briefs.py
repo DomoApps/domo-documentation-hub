@@ -119,6 +119,8 @@ STRUCTURAL_NOTES = {
     "Phil Fuchs": [
         "**DataFusion/Fusions:** Fusions (DataFusion) articles are being archived in Phase 4. If any Beast Mode or Combined Schema articles reference DataFusion, they'll need updating.",
         "**Data Views (D9):** Data Views articles may shift between Pillar 3 (Manage Data) and Pillar 4 (Prepare & Transform Data) depending on D9 resolution.",
+        "**Window function filter limitation workaround (Beast-Mode-Window-Functions.mdx):** The new window functions article notes that Beast Mode window function columns cannot be used as chart filters due to order-of-operations. A workaround exists but is not yet confirmed. Please confirm the recommended approach (e.g., materialize the calculation in Magic ETL before bringing into Analyzer, restructure logic to avoid post-aggregation filtering, or other). The FAQ accordion in the article has a `[pm-input]` placeholder — provide the confirmed steps and we'll replace it.",
+        "**Review new article: 'Use Window Functions in Beast Mode' (s/article/Beast-Mode-Window-Functions.mdx):** Published 2026-07-15 as the #1 Critical gap from forum analysis. Covers RANK/DENSE_RANK, LAG/LEAD, SUM(SUM(x)) OVER running totals, Top N + Others. Please review for accuracy and completeness before the article is widely promoted.",
     ],
     "Mamta Bolaki": [
         "**Domo Everywhere positioning:** Domo Everywhere content lives in Pillar 7 (Share & Collaborate) with its own sub-section. The embed framing (public vs. private, SSO + PDP interaction) should be consistent across all Domo Everywhere articles.",

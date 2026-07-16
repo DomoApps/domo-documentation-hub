@@ -1,0 +1,218 @@
+---
+title: "Use Window Functions in Beast Mode"
+excerpt: "How to write RANK, DENSE_RANK, LAG, LEAD, and running-total window function patterns in Beast Mode, including the required double-aggregate syntax and the filter limitation."
+---
+
+## Intro
+
+This article explains how to write the four most common window function patterns in Beast Mode: ranking rows, comparing values across periods, calculating running totals, and building a Top N + Others grouping.
+
+---
+
+## Required Grants
+
+To create and edit Beast Mode calculations, the following grant must be enabled for your role:
+
+- **Edit Cards —** Build and modify cards in Analyzer, including Beast Mode calculations.
+
+Learn more about [grants](/s/article/360043438973).
+
+## Understand the Double-Aggregate Syntax
+
+Beast Mode window functions require a different syntax than standard SQL. In a chart, Domo has already aggregated your DataSet rows into chart rows—one row per combination of your chart's dimensions. A window function must operate on those aggregated chart rows, so you wrap the aggregation inside the window function call:
+
+```
+SUM(SUM([Revenue])) OVER (PARTITION BY [Category] ORDER BY [Date])
+```
+
+- The **inner** `SUM([Revenue])` is the per-chart-row aggregate (revenue per date, per category).
+- The **outer** `SUM(...) OVER (...)` is the window function that accumulates those aggregated values.
+
+This pattern applies to all window functions in Beast Mode: `RANK`, `DENSE_RANK`, `LAG`, `LEAD`, and cumulative aggregates. If you write `SUM([Revenue]) OVER (...)` without the inner aggregate, Beast Mode applies the window function to raw DataSet rows before chart grouping—which produces incorrect results for most use cases.
+
+<Frame>
+  <img
+    alt="The Beast Mode editor open in the DataSet panel in Analyzer, showing the formula input field and column name field."
+    src="/images/kb/ka0Vq0000005Tm9-00N5w00000Ri7BU-0EMVq000005fQOf.jpg"
+  />
+</Frame>
+
+## Rank Rows with RANK and DENSE_RANK
+
+Use `RANK()` to assign a position to each chart row based on a metric. Use `DENSE_RANK()` when you want tied rows to share a rank without gaps in the sequence.
+
+**Syntax:**
+
+```
+RANK() OVER (ORDER BY SUM([metric]) DESC)
+DENSE_RANK() OVER (PARTITION BY [dimension] ORDER BY SUM([metric]) DESC)
+```
+
+**Example — Rank products by total revenue:**
+
+1. Open a card in Analyzer and select **Beast Mode**.
+2. Name the calculation `Revenue Rank`.
+3. Enter the formula:
+
+   ```
+   RANK() OVER (ORDER BY SUM([Revenue]) DESC)
+   ```
+
+4. Select **Save & Close**.
+
+   The chart adds a column showing each product's rank from highest to lowest revenue.
+
+**Example — Rank products within each category:**
+
+```
+DENSE_RANK() OVER (PARTITION BY [Category] ORDER BY SUM([Revenue]) DESC)
+```
+
+`PARTITION BY [Category]` restarts the ranking for each category. `DENSE_RANK` assigns rank 2 to both items that tie for second—the next item receives rank 3, not rank 4.
+
+<Note>**Note:** Removing a dimension from the chart changes the grouping that the window function sees, which changes rank results. Always verify ranking output after changing chart dimensions.</Note>
+
+## Compare Values across Periods with LAG and LEAD
+
+Use `LAG` to reference a value from a previous row and `LEAD` to reference a value from a future row. These are most commonly used for period-over-period comparisons.
+
+**Syntax:**
+
+```
+LAG(SUM([metric]), offset) OVER (PARTITION BY [dimension] ORDER BY [date_col])
+LEAD(SUM([metric]), offset) OVER (PARTITION BY [dimension] ORDER BY [date_col])
+```
+
+The `offset` is the number of rows to look backward (LAG) or forward (LEAD).
+
+**Example — Show last month's revenue alongside this month's:**
+
+1. Open a card in Analyzer that has `[Month]` on the X-axis and `SUM([Revenue])` as the Y-axis metric.
+2. Select **Beast Mode** and name the calculation `Prior Month Revenue`.
+3. Enter the formula:
+
+   ```
+   LAG(SUM([Revenue]), 1) OVER (ORDER BY [Month])
+   ```
+
+4. Select **Save & Close**, then add `Prior Month Revenue` to your chart as a second series.
+
+   The chart shows the current month's revenue and the prior month's revenue side by side.
+
+**Example — Calculate month-over-month change:**
+
+```
+SUM([Revenue]) - LAG(SUM([Revenue]), 1) OVER (ORDER BY [Month])
+```
+
+**Example — Compare to the same month last year (12-month offset):**
+
+```
+LAG(SUM([Revenue]), 12) OVER (ORDER BY [Month])
+```
+
+<Note>**Note:** The first row (or first N rows for an offset greater than one) returns NULL because there is no prior row to reference. Use `COALESCE` to substitute a default if needed: `COALESCE(LAG(SUM([Revenue]), 1) OVER (ORDER BY [Month]), 0)`.</Note>
+
+## Calculate Running Totals
+
+Use `SUM(SUM([metric])) OVER (ORDER BY ...)` to accumulate a metric across chart rows in order.
+
+**Syntax:**
+
+```
+SUM(SUM([metric])) OVER (PARTITION BY [dimension] ORDER BY [date_col])
+```
+
+**Example — Cumulative revenue by month:**
+
+1. Open a card in Analyzer with `[Month]` on the X-axis.
+2. Select **Beast Mode** and name the calculation `Cumulative Revenue`.
+3. Enter the formula:
+
+   ```
+   SUM(SUM([Revenue])) OVER (ORDER BY [Month])
+   ```
+
+4. Select **Save & Close**.
+
+   The chart shows total revenue accumulated from the first month through each subsequent month.
+
+**Example — Running total that resets each year:**
+
+```
+SUM(SUM([Revenue])) OVER (PARTITION BY YEAR([Date]) ORDER BY [Month])
+```
+
+`PARTITION BY YEAR([Date])` resets the running total at the start of each year.
+
+**Example — Running count of orders:**
+
+```
+SUM(COUNT([Order ID])) OVER (ORDER BY [Date])
+```
+
+## Build a Top N + Others Grouping
+
+Combine `RANK()` with a `CASE WHEN` expression to group the lowest-ranked items into a single "Others" bucket.
+
+**Example — Show the top 10 products by revenue, group the rest as "Others":**
+
+1. Open a card in Analyzer that breaks down revenue by `[Product]`.
+2. Select **Beast Mode** and name the calculation `Product Group`.
+3. Enter the formula:
+
+   ```
+   CASE
+     WHEN RANK() OVER (ORDER BY SUM([Revenue]) DESC) <= 10
+     THEN [Product]
+     ELSE 'Others'
+   END
+   ```
+
+4. Select **Save & Close**, then replace `[Product]` on the chart dimension with `Product Group`.
+
+   The chart shows the top 10 products individually, with all remaining products combined into one "Others" row.
+
+**Variation — Top 5 by count:**
+
+```
+CASE
+  WHEN RANK() OVER (ORDER BY COUNT([Order ID]) DESC) <= 5
+  THEN [Category]
+  ELSE 'Others'
+END
+```
+
+<Note>**Note:** If two products are tied at rank 10, both receive rank 10 and both appear individually. The next item receives rank 12. Use `DENSE_RANK` if you want to include exactly 10 distinct items including ties.</Note>
+
+## FAQ
+
+<AccordionGroup>
+
+<Accordion title="Why do I need SUM(SUM([Revenue])) instead of SUM([Revenue]) OVER?">
+  Beast Mode formulas are evaluated in the context of a chart that has already aggregated your DataSet rows. Writing `SUM([Revenue]) OVER (...)` applies the window function to raw DataSet rows before chart grouping, which produces one result per raw row—not per chart row—and typically yields incorrect output. The double-aggregate pattern (`SUM(SUM([Revenue])) OVER (...)`) tells Domo to first aggregate revenue to the chart row level, then apply the window function across those chart rows. The inner aggregate matches your chart's existing aggregation; the outer `SUM` (or `RANK`, `LAG`, and so on) is the window operation.
+</Accordion>
+
+<Accordion title="What is the difference between RANK and DENSE_RANK?">
+  Both functions assign a position to each row based on an ordered metric. The difference is how they handle ties. `RANK` skips numbers after a tie: if two rows tie for second, the next row receives rank 4. `DENSE_RANK` does not skip: if two rows tie for second, the next row receives rank 3. Use `RANK` when the gap matters (for example, in competitive ranking where tied items occupy two slots). Use `DENSE_RANK` when you want a compact sequence with no gaps.
+</Accordion>
+
+<Accordion title="Why can't I filter my chart by a window function result?">
+  Chart Filters in Domo are applied before aggregation, but window functions are evaluated after aggregation. Because of this order-of-operations conflict, a Beast Mode column that uses a window function cannot be used as a chart Filter. This is a known limitation.
+
+  A workaround exists and is being documented. For guidance in the meantime, see the [Domo Community Forums](https://community-forums.domo.com) or contact your Domo account team.
+
+  {/* [pm-input] Phil Fuchs — confirm the supported workaround for filtering on window function results. Options likely include materializing the calculation in Magic ETL before bringing into Analyzer, or restructuring logic to avoid the post-aggregation filter. Add workaround steps here and remove this note. */}
+</Accordion>
+
+<Accordion title="Do window functions work on date dimensions that are formatted as strings?">
+  `ORDER BY [date_col]` in a window function sorts lexicographically if the column is a string. A date stored as "2025-01-01" sorts correctly, but a date stored as "January 2025" does not. If your ORDER BY results are out of sequence, convert the column to a date type in Magic ETL before using it as the window ORDER BY key.
+</Accordion>
+
+</AccordionGroup>
+
+## Related Articles
+
+- [What Is Beast Mode?](/s/article/What-is-Beast-Mode)
+- [Create a Beast Mode Calculation](/s/article/360043429913)
+- [Beast Mode Functions Reference Guide](/s/article/360043429933)

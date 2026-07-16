@@ -5,14 +5,20 @@ Update it at the end of every work session. Future Claude sessions should read t
 file at the start of any restructure work to orient themselves before doing anything.
 
 **Plan document:** `KB-RESTRUCTURE-PLAN.md`
-**Last updated:** 2026-07-14 (Phase 3a complete)
+**Disposition log:** `RESTRUCTURE-MANIFEST.md` — running record of what happened to every article; updated throughout all phases; Phase 9 converts it to the final audit report
+**Last updated:** 2026-07-15 (quality gates complete; Snowflake urgent fix; Beast Mode Window Functions article)
 
 ---
 
 ## Current Status
 
-**Active phase:** Phase 3a-PM (4 articles blocked on PM input); Phase 3a-Forum next
-**Blocked on:** 4 PM-input articles; 8 human decisions (see Phase 2 Decision Required table in `RESTRUCTURE-IA-SPEC.md`)
+**Active phase:** Phase 3a-Forum (net-new articles from forum gap analysis)
+**Blocked on:** 8 human decisions (see Phase 2 Decision Required table in `RESTRUCTURE-IA-SPEC.md`)
+**Phase 3a quality gates:** ✅ Complete 2026-07-15 — all 3 gates passed on all 31 articles; 15+ factual fixes, 30 screenshots added, see `RESTRUCTURE-MANIFEST.md`
+**Snowflake urgent fix:** ✅ Complete 2026-07-15 — 7 Snowflake connector articles updated (retirement language, `<Note>` → `<Warning>`, migration section rewritten); PM: Tasleema Lallmamode; see Phase 3b section in `RESTRUCTURE-MANIFEST.md`
+**Phase 3a-Forum:** 🔄 In progress (2026-07-15) — 1 of ~57 articles written (`Beast-Mode-Window-Functions.mdx`); PM: Phil Fuchs; 2 items flagged for Phil Fuchs PM brief (see PM Input section below)
+
+**Standing rule — pending articles:** Any article that cannot be completed without PM or human context (missing feature details, unclear positioning, unconfirmed scope) is automatically added as a `[pm-input]` item in the relevant PM's Phase 4.5 meeting brief. It is never tracked as a blocker to the current phase. Write what can be written from existing KB content; note the gap in the PM brief.
 **Phase 1/2 re-run:** Complete 2026-07-14 on branch `update/fullRestructure`
 **Phase 3a core:** ✅ Complete 2026-07-14 — all 29 synthesizable articles written and in docs.json
 
@@ -25,8 +31,8 @@ file at the start of any restructure work to orient themselves before doing anyt
 | **1: Audit & Inventory** | ✅ Complete (re-run 2026-07-14) | 1,832 articles; 2 orphaned; 842 merge candidates (23 exact); see updated findings below |
 | **2: IA Design** | ✅ Complete (re-run 2026-07-14) | 11 pillars in `docs.json` KB tab; 1,832 articles assigned; see Phase 2 outputs below |
 | **3a: Net-New Articles (~29)** | ✅ Complete (2026-07-14) | 29 articles written; all registered in docs.json; MCP group fixed |
-| **3a-PM: PM Input Articles (4)** | 🔲 Blocked — awaiting PM | See PM Input section below |
-| **3a-Forum: Forum-Driven New Articles (~57)** | 🔲 Not started | Community forum gaps; see Forum Gap Analysis section below |
+| **3a-PM: PM Input Articles (4)** | ➡️ Moved to Phase 4.5 PM briefs | [pm-input] items in per-PM meeting briefs; see PM Input section below |
+| **3a-Forum: Forum-Driven New Articles (~57)** | 🔄 In progress (2026-07-15) | 1 of ~57 written: `Beast-Mode-Window-Functions.mdx`; see Forum Gap Analysis section below |
 | **3b: Article Upgrades (~200)** | 🔲 Not started | Bulk agent edit pass |
 | **3b-Forum: Forum-Driven Article Updates (Critical+High, ~68)** | 🔲 Not started | Priority targets for Phase 3b bulk agent pass |
 | **4: Consolidation, Retirement & Archive** | 🔲 Not started | Duplicates, true archival, legacy marking; see Archive/Legacy Standards below |
@@ -35,7 +41,59 @@ file at the start of any restructure work to orient themselves before doing anyt
 | **6: Slug Rename + Redirects + Localization** | 🔲 Not started | Enhanced: CSV map, localized file rename, docs.json redirects, internal link updates |
 | **7: Nav Rebuild** | 🔲 Not started | Rebuild docs.json nav groups after Phase 6 slug changes |
 | **8: Style Guide & Template Update** | 🔲 Not started | Update `Domo-KB-Style-Guide.mdx` + `New-Article-Template.mdx` for new standards |
-| **9: Restructure Artifacts Cleanup** | 🔲 Not started | Move all planning/analysis artifacts to `restructure/` folder |
+| **9: Restructure Artifacts Cleanup** | 🔲 Not started | Move all planning/analysis artifacts to `restructure/` folder; generate final disposition report from `RESTRUCTURE-MANIFEST.md` |
+
+---
+
+## Quality Gates — Required for Every Net-New or Significantly Updated Article
+
+Every article written or meaningfully updated during Phases 3a, 3a-Forum, 3b, 3b-Forum, and 4 must pass all three gates **in order** before it is considered done. Do not skip or reorder.
+
+### Gate 1 — Fact-Check (runs first)
+
+Verify claims against source KB articles. The goal is to catch hallucinations and ensure nothing was misrepresented when synthesizing from existing content.
+
+**Checklist:**
+- Read each source article the new article was synthesized from (listed in RESTRUCTURE-MANIFEST.md `source_articles` column)
+- Verify every named feature, capability, and limitation against the source
+- Verify every grant name matches its canonical wording (search existing articles: `grep -rn "Grant Name —" s/article/`)
+- Verify every internal link resolves to a real file (`ls s/article/<slug>.mdx`)
+- Flag any claim that cannot be verified as `{/* FACT-CHECK: [claim] — could not verify against source */}`
+
+### Gate 2 — Screenshot Audit (runs second)
+
+Screenshots are first-class content. Walls of text are not acceptable. Every article must make its best effort to include applicable screenshots from source material.
+
+**Checklist:**
+- Read all source articles and collect every `<img>` or `<Frame>` reference
+- For each screenshot: does it illustrate something covered in the new article?
+  - **Yes → include it**, wrapped in `<Frame>`, with original alt text preserved
+  - **Maybe → include it speculatively**; human reviewer decides whether to keep it
+  - **No → omit it** (no TODO markers; clean articles only)
+- For overview/hub articles: include at minimum one screenshot of the feature's main UI
+- For how-to articles: include all applicable step screenshots from source material
+- Do not leave `{/* TODO: screenshot */}` or similar markers in article files — either include it or don't; human reviewers can add screenshots during manual verification
+- For split articles (one source → multiple targets): assign each screenshot to exactly one target article in RESTRUCTURE-MANIFEST.md; do not leave any screenshot unassigned
+
+### Gate 3 — Style Guide Review (runs last)
+
+Structural and formatting compliance check against `Domo-KB-Style-Guide.mdx`.
+
+**Checklist:**
+- `title:` and `excerpt:` both present in frontmatter
+- Intro section is H2, succinct, uses "This article explains/covers…" format
+- Horizontal rule (`---`) follows the Intro section
+- `## Required Grants` section present (if feature requires grants); uses exact format from style guide
+- Task/action headings use imperative mood (no gerund form); topic/category labels may use noun phrases
+- All headings use Title Case (Chicago 18th: all prepositions lowercase regardless of length)
+- FAQ section uses `<AccordionGroup>` + `<Accordion title="...">` format; located at bottom
+- All callout labels are bolded: `**Note:**`, `**Warning:**`, `**Tip:**`
+- All internal links use root-relative format `/s/article/slug` (no `.mdx` extension)
+- All block-level screenshots wrapped in `<Frame>`
+
+### Decomposition Record (for splits only)
+
+When a large source article is split into multiple new articles, create a decomposition record in RESTRUCTURE-MANIFEST.md for the source article. Before the source article is deleted or archived, every section in its decomposition record must be marked as addressed in a specific target article. No source article may be removed until its decomposition record is 100% complete.
 
 ---
 
@@ -215,7 +273,7 @@ Example checklist entries:
 - [ ] [new-article] `Beast-Mode-Window-Functions.mdx` — verify: window function behavior, filter limitation still accurate?
 - [ ] [update] Magic ETL troubleshooting: editor-level failures added — verify: error messages current?
 - [ ] [archive] Old Magic ETL tile articles (15) — sign-off required
-- [ ] [pm-input] `Choosing-the-Right-Data-Prep-Tool.mdx` — need: ETL vs DataFlow vs SQL positioning
+- [ ] [pm-input] `Choose-the-Right-Data-Prep-Tool.mdx` — need: ETL vs DataFlow vs SQL positioning
 - [ ] [legacy] DataFusion articles (11) — confirm: DataFusion fully replaced by Magic ETL?
 ```
 
@@ -294,16 +352,21 @@ All 29 synthesizable articles were written and registered in docs.json. MCP arti
 
 ---
 
-## PM Input Required (Blocking Phase 3a-PM)
+## PM Input Required (Phase 4.5 PM Brief Items)
 
-These 4 articles cannot be written without PM input. Track separately from main Phase 3a work.
+These 4 articles need PM input before they can be written. They are **not blocking Phase 3a-Forum** — they will appear as `[pm-input]` items in the per-PM Phase 4.5 meeting briefs so they can be addressed during PM review meetings.
 
-| Article | What PM needs to provide | Status |
-|---------|--------------------------|--------|
-| `How-Data-Flows-Through-Domo.mdx` | Canonical end-to-end pipeline narrative; sign off on how connect → prepare → analyze → share → govern is described | ⏳ Not requested |
-| `Choosing-the-Right-Data-Prep-Tool.mdx` | Positioning: when to use Magic ETL vs SQL DataFlow vs Python/R vs Data Models | ⏳ Not requested |
-| `Understanding-DataSet-Joins-and-Relationships.mdx` | Decision guidance: when to use ETL joins vs Data Models vs DataFlows | ⏳ Not requested |
-| `Domo-for-Mobile-Overview.mdx` | Confirm current mobile feature scope before writing overview | ⏳ Not requested |
+In addition, the items below were flagged during article writing and need specific PM answers before the articles can be finalized.
+
+| Article | What PM needs to provide | PM |
+|---------|--------------------------|-----|
+| `How-Data-Flows-Through-Domo.mdx` | Canonical end-to-end pipeline narrative; sign off on how connect → prepare → analyze → share → govern is described | TBD |
+| `Choose-the-Right-Data-Prep-Tool.mdx` | Positioning: when to use Magic ETL vs SQL DataFlow vs Python/R vs Data Models | Andrea Henderson |
+| `Understand-DataSet-Joins-and-Relationships.mdx` | Decision guidance: when to use ETL joins vs Data Models vs DataFlows | Phil Fuchs / Andrea Henderson |
+| `Domo-for-Mobile-Overview.mdx` | Confirm current mobile feature scope before writing overview | TBD |
+| `Beast-Mode-Window-Functions.mdx` | Confirm the supported workaround for filtering on window function results (options: materialize in Magic ETL, restructure logic to avoid post-aggregation filter, other?) — replace FAQ placeholder once confirmed | Phil Fuchs |
+| `Beast-Mode-Window-Functions.mdx` | Awareness: new article published covering RANK/DENSE_RANK, LAG/LEAD, running totals, Top N + Others — request review for accuracy and completeness | Phil Fuchs |
+| Getting Started articles (all 4 role variants) | Confirm correct eLearning course URLs per role — all 4 articles currently link to the same `data-consumer-training` URL which is likely wrong for Admins, App Builders, Developers | Education team / PM TBD |
 
 ---
 
@@ -360,7 +423,7 @@ Address Critical `rec=update` items during Phase 3b alongside or immediately aft
 
 | Rank | Suggested filename | Topic summary |
 |------|--------------------|---------------|
-| 1 | `Beast-Mode-Window-Functions.mdx` | RANK/DENSE_RANK, LAG/LEAD, SUM(SUM(x)) OVER running totals, Top N + Others; "can't filter by window function" limitation and workarounds |
+| 1 | `Beast-Mode-Window-Functions.mdx` | ✅ **Done 2026-07-15** — RANK/DENSE_RANK, LAG/LEAD, SUM(SUM(x)) OVER running totals, Top N + Others; filter limitation noted; PM brief item logged for Phil Fuchs |
 | 6 | `Workflows-Write-Data-Back.mdx` | Append / Multiline Append / AppDB write from Workflows; dynamic row handling |
 | 7 | `Activity-Log-Event-Reference.mdx` | All Activity Log event types defined; VIEWED vs EXPORTED vs DOWNLOADED; DomoStats field mapping |
 | 9 | `Restore-a-Deleted-Dashboard.mdx` | No self-service restore; contact support path; prevention via snapshot/copy |
@@ -374,12 +437,12 @@ Address Critical `rec=update` items during Phase 3b alongside or immediately aft
 | 14 | `Dataset-Column-Rename-Impact.mdx` | Renaming a dataset/dataflow column silently breaks card filters, sorts, and downstream references — safe rename procedure |
 | 17 | `Embed-Domo-in-Third-Party-Platforms.mdx` | Confluence, NetSuite, HubSpot, SharePoint, Salesforce embed methods and iframe constraints |
 | 21 | `Filter-Funnel-and-PDP-Shield-Icons.mdx` | Hiding/showing the filter funnel and PDP shield on cards; page-variable behavior; Admin setting |
-| 22 | `Filtering-on-Null-and-Empty-Values.mdx` | NULL vs empty string; IS NULL / IS NOT NULL filter; NOT IN behavior; Beast Mode IFNULL workarounds |
+| 22 | `Filter-Null-and-Empty-Values.mdx` | NULL vs empty string; IS NULL / IS NOT NULL filter; NOT IN behavior; Beast Mode IFNULL workarounds |
 | 25 | `Card-Refresh-Timing-After-Dataset-Update.mdx` | How long cards take to reflect dataset changes; cache warm-up; force-refresh approach |
 | 26 | `DomoStats-vs-Governance-Datasets-Connector.mdx` | When to use DomoStats connector vs Domo Governance Datasets connector; field-level reference; deprecation status |
 | 27 | `Trigger-Workbench-from-External-Scripts.mdx` | `wb.exe` CLI command syntax; triggering a Workbench job from Task Scheduler or CI scripts |
 | 28 | `Embedded-Dashboard-Unfiltered-Data-Flash.mdx` | Why embedded/public-share dashboards briefly show unfiltered data on load; SSO and PDP timing fix |
-| 32 | `Connecting-Unsupported-Data-Sources.mdx` | No native connector options: JSON No Code, HTTP connector, SFTP, Workbench ODBC, custom connector builder |
+| 32 | `Connect-Unsupported-Data-Sources.mdx` | No native connector options: JSON No Code, HTTP connector, SFTP, Workbench ODBC, custom connector builder |
 | 33 | `Zero-Fill-Missing-Date-Gaps-in-Charts.mdx` | Date densification in Magic ETL; zero-filling time series; empty pivot rows; calendar join pattern |
 | 44 | `Dataset-Archived-Lifecycle-State.mdx` | What the "archived/not accessed" state means; how it blocks AI Readiness lineage; how to reactivate |
 | 47 | `Troubleshoot-Cards-Not-Updating.mdx` | Cards showing stale data after dataset refresh; color rules not applying; cache and permission causes |
@@ -458,8 +521,8 @@ Medium gaps include 15 `rec=new` and 192 `rec=update`. Low gaps are all 59 `rec=
 | 117 | `Split-Multi-Value-Fields-into-Rows.mdx` | Comma-separated / multi-value field expansion in Magic ETL |
 | 118 | `Editor-Dataset-Access-Scope.mdx` | What datasets Editors can see: cards/dashboards shared vs direct dataset sharing |
 | 127 | `Alert-on-Stuck-Dataset-Refresh.mdx` | Alerting when a dataset stops refreshing; DomoStats refresh frequency monitoring |
-| 139 | `Choosing-How-to-Share-Outside-Domo.mdx` | Decision guide: embed types vs publication groups vs Domo Everywhere vs scheduled reports |
-| 142 | `Choosing-a-Cloud-Data-Warehouse.mdx` | CDW comparison for Domo; Cloud Amplifier cost/credit consumption guide |
+| 139 | `Choose-How-to-Share-Outside-Domo.mdx` | Decision guide: embed types vs publication groups vs Domo Everywhere vs scheduled reports |
+| 142 | `Choose-a-Cloud-Data-Warehouse.mdx` | CDW comparison for Domo; Cloud Amplifier cost/credit consumption guide |
 | 144 | `AI-Chat-API-Session-ID.mdx` | Ask Chat / AI API requires a Domo-generated session ID — how to obtain and use it |
 | 146 | `Domo-Certification-Exam-Logistics.mdx` | Domo Professional Certification: registration, exam format, retake policy |
 | 152 | `Find-Which-Dashboard-a-Card-Lives-On.mdx` | Card-to-page/app lineage via Governance Toolkit / DomoStats |
@@ -604,12 +667,29 @@ CLAUDE.md stays at the repo root (not moved to `restructure/`) — it must be at
 
 **Final phase — runs after Phase 8**
 
+### Step 9.1 — Generate Final Disposition Report
+
+Before moving any files, generate the **Article Disposition Report** from `RESTRUCTURE-MANIFEST.md`. This is the audit document used to verify that every article in the pre-restructure KB has been accounted for — nothing dropped, nothing accidentally deleted.
+
+The report should list every article (pre-restructure + net-new) with:
+- **Filename** and **Title**
+- **Disposition**: `new` | `same-regrouped` | `updated` | `split` | `merged-into` | `archived` | `legacy` | `deleted`
+- **Source articles** (for new/updated articles: what they were synthesized from)
+- **Target articles** (for split/merged: where the content went)
+- **Screenshot status**: `included` | `todo-markers-left` | `n/a`
+- **Notes**: any PM-flagged items, fact-check TODOs, or open questions
+
+Run a final human audit against this report before calling the restructure complete. Only after the audit is signed off should artifacts move to `restructure/`.
+
+### Step 9.2 — Move Artifacts to `restructure/`
+
 Move all planning and analysis artifacts generated during the restructure into a single folder named `restructure/` at the repo root. These files are not documentation — they are project records. Keeping them at the repo root clutters the working directory.
 
 **Files to move to `restructure/`:**
 - `KB-RESTRUCTURE-PLAN.md`
 - `RESTRUCTURE-PROGRESS.md`
 - `RESTRUCTURE-IA-SPEC.md`
+- `RESTRUCTURE-MANIFEST.md`
 - `RESTRUCTURE-TASKS.md` (generated at Phase 4.5)
 - `slug-rename-map.csv` (generated at Phase 6)
 - `Article-PM-Ownership-Reference.mdx`

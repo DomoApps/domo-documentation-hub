@@ -29,6 +29,12 @@ OWNERSHIP_FILE = REPO_ROOT / "Article-PM-Ownership-Reference.mdx"
 GAPS_FILE = REPO_ROOT / "_gaps_with_support.json"
 OUTPUT_DIR = REPO_ROOT / "pm-review-briefs"
 
+# Features excluded from PM briefs entirely — their articles are outside
+# the scope of the restructure and require no PM review action.
+EXCLUDED_FEATURES = {
+    "Release Management",  # Historical release notes — not restructured
+}
+
 
 # ─────────────────────────────────────────────────────────────────────────────
 # FEATURE → NEW PILLAR MAPPING
@@ -666,6 +672,9 @@ def load_ownership_reference(path: Path) -> dict:
         if feature.lower() in ("feature", "---", "") or "---" in feature:
             continue
         if not pm or pm.lower() == "pm" or "---" in pm:
+            continue
+        # Skip features excluded from the restructure scope
+        if feature in EXCLUDED_FEATURES:
             continue
         # Strip markdown links from title/filename
         title = re.sub(r"\[([^\]]+)\]\([^)]+\)", r"\1", title)

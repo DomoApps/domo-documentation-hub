@@ -664,10 +664,17 @@ def load_ownership_reference(path: Path) -> dict:
     with open(path, encoding="utf-8") as f:
         content = f.read()
 
+    # Replace escaped pipes (\|) in cell content with a placeholder so the
+    # column-splitting regex treats them as literal characters, not separators.
+    PIPE_PLACEHOLDER = "\x00PIPE\x00"
+    content = content.replace(r"\|", PIPE_PLACEHOLDER)
+
     # Match pipe-table rows: | Feature | Title | Filename | PM |
     row_pattern = re.compile(r"^\|\s*([^|]+?)\s*\|\s*([^|]+?)\s*\|\s*([^|]+?)\s*\|\s*([^|]+?)\s*\|", re.MULTILINE)
     for match in row_pattern.finditer(content):
-        feature, title, filename, pm = (c.strip() for c in match.groups())
+        feature, title, filename, pm = (
+            c.strip().replace(PIPE_PLACEHOLDER, "|") for c in match.groups()
+        )
         # Skip header rows and separator rows
         if feature.lower() in ("feature", "---", "") or "---" in feature:
             continue

@@ -119,8 +119,6 @@ STRUCTURAL_NOTES = {
     "Phil Fuchs": [
         "**DataFusion/Fusions:** Fusions (DataFusion) articles are being archived in Phase 4. If any Beast Mode or Combined Schema articles reference DataFusion, they'll need updating.",
         "**Data Views (D9):** Data Views articles may shift between Pillar 3 (Manage Data) and Pillar 4 (Prepare & Transform Data) depending on D9 resolution.",
-        "**Window function filter limitation workaround (Beast-Mode-Window-Functions.mdx):** The new window functions article notes that Beast Mode window function columns cannot be used as chart filters due to order-of-operations. A workaround exists but is not yet confirmed. Please confirm the recommended approach (e.g., materialize the calculation in Magic ETL before bringing into Analyzer, restructure logic to avoid post-aggregation filtering, or other). The FAQ accordion in the article has a `[pm-input]` placeholder — provide the confirmed steps and we'll replace it.",
-        "**Review new article: 'Use Window Functions in Beast Mode' (s/article/Beast-Mode-Window-Functions.mdx):** Published 2026-07-15 as the #1 Critical gap from forum analysis. Covers RANK/DENSE_RANK, LAG/LEAD, SUM(SUM(x)) OVER running totals, Top N + Others. Please review for accuracy and completeness before the article is widely promoted.",
     ],
     "Mamta Bolaki": [
         "**Domo Everywhere positioning:** Domo Everywhere content lives in Pillar 7 (Share & Collaborate) with its own sub-section. The embed framing (public vs. private, SSO + PDP interaction) should be consistent across all Domo Everywhere articles.",
@@ -133,6 +131,57 @@ STRUCTURAL_NOTES = {
         "**Develop & Integrate (Pillar 10):** Currently only 5 articles — severely thin. This pillar cannot tell a story until Phase 3a content is written. The pillar may largely function as an entry ramp to the Developer Portal (developer.domo.com).",
         "**D6 scope question:** Confirm: should Develop & Integrate be KB how-tos, or primarily a link-out to developer.domo.com?",
     ],
+}
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# ARTICLE CHECKPOINTS — specific open items flagged during article writing
+#
+# These are [pm-input] comments embedded in article files that need a PM answer
+# before the placeholder can be replaced with final content. They are rendered
+# as explicit Markdown checkboxes (- [ ]) in Section 3d of the PM brief so they
+# can't be accidentally skimmed over.
+#
+# To add a new checkpoint: append a tuple to the PM's list.
+# Format: (article_filename, specific_ask, estimated_effort)
+# ─────────────────────────────────────────────────────────────────────────────
+
+ARTICLE_CHECKPOINTS = {
+    "Phil Fuchs": [
+        (
+            "Beast-Mode-Window-Functions.mdx",
+            "Confirm the supported workaround for filtering on window function results. "
+            "Because Beast Mode window functions are evaluated after chart aggregation, they "
+            "cannot be used as chart Filters. A workaround exists but has not been confirmed "
+            "for documentation. Options likely include: materialize the calculation in Magic "
+            "ETL before bringing into Analyzer; restructure the formula to avoid a "
+            "post-aggregation filter; or other. Please provide the confirmed steps — the FAQ "
+            "accordion in the article has a `[pm-input]` placeholder waiting to be replaced.",
+            "15 min",
+        ),
+        (
+            "Beast-Mode-Window-Functions.mdx",
+            "Review the article for accuracy and completeness. Published 2026-07-15 as the "
+            "#1 Critical gap from community forum analysis. Covers RANK/DENSE_RANK, LAG/LEAD, "
+            "SUM(SUM(x)) OVER running totals, and Top N + Others. Focus especially on whether "
+            "the double-aggregate syntax description is correct and whether any window function "
+            "behaviors have changed recently.",
+            "30 min",
+        ),
+    ],
+    # eLearning course URL placeholder — assign to the Education team PM once confirmed
+    # "TBD — Education team": [
+    #     ("Getting-Started-for-Admins.mdx",
+    #      "Confirm the correct eLearning course URL for Admin roles. Currently all four "
+    #      "Getting Started role articles link to the same 'data-consumer-training' URL.",
+    #      "5 min"),
+    #     ("Getting-Started-for-App-Builders.mdx",
+    #      "Confirm the correct eLearning course URL for App Builder roles.", "5 min"),
+    #     ("Getting-Started-for-Data-Engineers.mdx",
+    #      "Confirm the correct eLearning course URL for Data Engineer roles.", "5 min"),
+    #     ("Getting-Started-for-Developers.mdx",
+    #      "Confirm the correct eLearning course URL for Developer roles.", "5 min"),
+    # ],
 }
 
 
@@ -735,6 +784,7 @@ def generate_brief(pm_name: str, pm_ownership: dict, all_gaps: list) -> str:
     pm_input = [(fn, title, what) for fn, title, pm, what in PHASE3A_PM_ARTICLES if pm == pm_name]
     pm_forum_critical_new = [(r, fn, summary, fc) for r, fn, summary, pm, fc in FORUM_NEW_CRITICAL if pm == pm_name]
     pm_forum_high_new = [(r, fn, summary) for r, fn, summary, pm in FORUM_NEW_HIGH if pm == pm_name]
+    pm_checkpoints = ARTICLE_CHECKPOINTS.get(pm_name, [])
 
     lines += [
         "## 3. Gap Articles — Information-Gathering Meeting Required",
@@ -744,7 +794,7 @@ def generate_brief(pm_name: str, pm_ownership: dict, all_gaps: list) -> str:
         "",
     ]
 
-    has_gaps = pm_input or pm_forum_critical_new or pm_forum_high_new
+    has_gaps = pm_input or pm_forum_critical_new or pm_forum_high_new or pm_checkpoints
 
     if pm_input:
         lines += [
@@ -791,6 +841,22 @@ def generate_brief(pm_name: str, pm_ownership: dict, all_gaps: list) -> str:
             "_No dedicated info-gathering articles are currently assigned to your area._",
             "",
         ]
+
+    if pm_checkpoints:
+        lines += [
+            "### 3d. Open Article Placeholders — Your Answer Required",
+            "",
+            "The articles below have already been drafted but contain `[pm-input]` placeholders",
+            "where specific information from you is needed before the content can be finalized.",
+            "Each item is a checkbox — check it off once you've provided the answer.",
+            "",
+        ]
+        for fn, ask, effort in pm_checkpoints:
+            lines += [
+                f"- [ ] **`{fn}`** _(est. {effort})_",
+                f"  {ask}",
+                "",
+            ]
 
     lines += ["---", ""]
 
@@ -920,6 +986,12 @@ def generate_brief(pm_name: str, pm_ownership: dict, all_gaps: list) -> str:
     # Critical new articles
     for rank, fn, _, fc in pm_forum_critical_new:
         lines.append(f"| {action_num} | Review/validate `{fn}` (Rank {rank} community request) | Fact-check | 20–30 min |")
+        action_num += 1
+
+    # Open article placeholders (inline [pm-input] checkpoints)
+    for fn, ask, effort in pm_checkpoints:
+        short_ask = ask.split(".")[0][:80]
+        lines.append(f"| {action_num} | **Open placeholder in `{fn}`:** {short_ask} | **Answer required** | {effort} |")
         action_num += 1
 
     # Critical update validations

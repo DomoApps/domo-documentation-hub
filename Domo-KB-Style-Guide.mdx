@@ -528,6 +528,224 @@ This report lists all PDP row policies by ID...
 This report shows the conditions that make up each row of the policy...
 ```
 
+## Product Lifecycle Status
+
+Every Knowledge Base article has a lifecycle status that tells readers — and the tooling that processes the KB — where a feature stands in its lifespan. Status is recorded in the article's YAML frontmatter using the `status` field and, for non-active states, reflected visually in the published article and the sidebar.
+
+### The Five Lifecycle States
+
+| Status | What it means | Sidebar label | In-article callout | Nav placement |
+| ------ | ------------- | ------------- | ------------------ | ------------- |
+| **Active** | Current, fully supported feature. Receives updates and bug fixes. | None | None | Normal pillar group |
+| **Deprecated** | Still functional but officially discouraged. Users should migrate to a replacement before the feature is removed. | `Deprecated` | `<DeprecatedNote />` | Normal pillar group |
+| **Legacy** | Kept alive for backwards compatibility only. No active development; no planned removal date. | `Legacy` | `<LegacyNote />` | Archive group |
+| **Sunset** | End-of-life countdown in progress. EOL date is announced; support has ended or is ending. | `Sunset` | `<SunsetNote />` | Archive group |
+| **Retired** | Completely removed from the product. Feature no longer runs or accepts traffic. | None | None | Not in nav (article exists in repo for reference only) |
+
+### YAML Frontmatter
+
+The `status` field is the canonical identifier. For states that need a sidebar label, also add the `tag` field — a native Mintlify field that renders any string as a badge next to the article title in the sidebar.
+
+**Active** (may be omitted — active is the implicit default for all articles):
+
+```mdx
+---
+title: "Article Title"
+excerpt: "One-sentence summary."
+status: "active"
+---
+```
+
+**Deprecated:**
+
+```mdx
+---
+title: "Article Title"
+excerpt: "One-sentence summary."
+status: "deprecated"
+tag: "Deprecated"
+---
+```
+
+**Legacy:**
+
+```mdx
+---
+title: "Article Title"
+excerpt: "One-sentence summary."
+status: "legacy"
+tag: "Legacy"
+---
+```
+
+**Sunset** (include `sunset_date` for reference — pass it to the `<SunsetNote />` as the `date` prop):
+
+```mdx
+---
+title: "Article Title"
+excerpt: "One-sentence summary."
+status: "sunset"
+tag: "Sunset"
+sunset_date: "2026-12-31"
+---
+```
+
+**Retired:**
+
+```mdx
+---
+title: "Article Title"
+excerpt: "One-sentence summary."
+status: "retired"
+---
+```
+
+### Callout Snippets
+
+Deprecated, Legacy, and Sunset articles each require a standardized warning callout placed immediately after the frontmatter (and any imports), before the `## Intro` section. The three snippets live in `/snippets/` alongside the Beta snippet and follow the same import pattern.
+
+If only a section of an article is affected — not the entire article — place the callout as the first element under the relevant section heading instead of at the top of the article.
+
+#### Deprecated Note
+
+Import and usage:
+
+```mdx
+import { DeprecatedNote } from '/snippets/DeprecatedNote.mdx';
+
+<DeprecatedNote />
+```
+
+With a link to the replacement article:
+
+```mdx
+<DeprecatedNote replacement="/s/article/Replacement-Article-Title" />
+```
+
+With custom link text:
+
+```mdx
+<DeprecatedNote
+  replacement="/s/article/Replacement-Article-Title"
+  replacementLabel="Magic ETL"
+/>
+```
+
+**Rendered callout text (no replacement prop):**
+
+> **Deprecated:** This feature is officially deprecated. It remains functional but is no longer recommended. Please migrate to the recommended replacement to avoid disruption when this feature is removed.
+
+**Rendered callout text (with `replacement` prop):**
+
+> **Deprecated:** This feature is officially deprecated. It remains functional but is no longer recommended. Please migrate to [the recommended replacement](#) to avoid disruption when this feature is removed.
+
+#### Legacy Note
+
+Import and usage:
+
+```mdx
+import { LegacyNote } from '/snippets/LegacyNote.mdx';
+
+<LegacyNote />
+```
+
+With a link to the replacement:
+
+```mdx
+<LegacyNote replacement="/s/article/Replacement-Article-Title" />
+```
+
+With custom link text:
+
+```mdx
+<LegacyNote
+  replacement="/s/article/Replacement-Article-Title"
+  replacementLabel="Workbench 5"
+/>
+```
+
+**Rendered callout text (no replacement prop):**
+
+> **Legacy:** This feature is no longer actively maintained and is kept available for backwards compatibility only. For the current recommended approach, see your Domo account team.
+
+**Rendered callout text (with `replacement` prop):**
+
+> **Legacy:** This feature is no longer actively maintained and is kept available for backwards compatibility only. For the current recommended approach, see [the recommended approach](#).
+
+#### Sunset Note
+
+Import and usage (always pass `date`; `replacement` is optional):
+
+```mdx
+import { SunsetNote } from '/snippets/SunsetNote.mdx';
+
+<SunsetNote date="December 31, 2026" />
+```
+
+With a link to the replacement:
+
+```mdx
+<SunsetNote
+  date="December 31, 2026"
+  replacement="/s/article/Replacement-Article-Title"
+/>
+```
+
+With custom link text:
+
+```mdx
+<SunsetNote
+  date="December 31, 2026"
+  replacement="/s/article/Replacement-Article-Title"
+  replacementLabel="the new connector"
+/>
+```
+
+**Rendered callout text (date only):**
+
+> **Sunset:** This feature has reached end of life and will be shut down on **December 31, 2026**. Support and updates have ended. Please migrate to the recommended replacement to avoid disruption.
+
+**Rendered callout text (date + replacement):**
+
+> **Sunset:** This feature has reached end of life and will be shut down on **December 31, 2026**. Support and updates have ended. Please migrate to [the recommended replacement](#) before that date to avoid disruption.
+
+### Full Article Example
+
+```mdx
+---
+title: "DataFusion Overview"
+excerpt: "Learn what DataFusion is and how it combined multiple DataSets into a single view."
+status: "legacy"
+tag: "Legacy"
+---
+
+import { LegacyNote } from '/snippets/LegacyNote.mdx';
+
+<LegacyNote
+  replacement="/s/article/What-is-Magic-ETL"
+  replacementLabel="Magic ETL"
+/>
+
+## Intro
+
+This article explains how DataFusion combined multiple DataSets into a unified view.
+
+...
+```
+
+### PM Sign-Off Requirements
+
+Any status other than **Active** requires PM confirmation before the article is marked. PMs are asked to confirm the following during Phase 4.5 PM review:
+
+| Status | PM must confirm |
+| ------ | --------------- |
+| **Deprecated** | Feature is still functional; a recommended replacement exists; migration guidance is available |
+| **Legacy** | Feature still exists in Domo; it is not actively developed or maintained; no planned removal date; a successor approach exists |
+| **Sunset** | Feature has an announced EOL date; support has ended or is ending; migration path exists |
+| **Retired** | Feature is completely gone from Domo — no longer runs, no longer accessible to customers |
+
+Do not mark an article Deprecated, Legacy, Sunset, or Retired without PM sign-off. If you are unsure which state applies, leave the article Active and flag it in the PM review brief.
+
 ## Tooltips
 
 Use the `<Tooltip>` component to display hover text over a word or phrase. The `tip` prop contains the text shown on hover.

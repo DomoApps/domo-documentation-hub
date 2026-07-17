@@ -6,7 +6,7 @@ file at the start of any restructure work to orient themselves before doing anyt
 
 **Plan document:** `KB-RESTRUCTURE-PLAN.md`
 **Disposition log:** `RESTRUCTURE-MANIFEST.md` — running record of what happened to every article; updated throughout all phases; Phase 9 converts it to the final audit report
-**Last updated:** 2026-07-15 (quality gates complete; Snowflake urgent fix; Beast Mode Window Functions article)
+**Last updated:** 2026-07-16 (Phase 3c Main Branch Sync added; five-state product lifecycle system; Phase 4.6 Lifecycle Status Application added; snippets + Style Guide updated)
 
 ---
 
@@ -35,8 +35,10 @@ file at the start of any restructure work to orient themselves before doing anyt
 | **3a-Forum: Forum-Driven New Articles (~57)** | 🔄 In progress (2026-07-15) | 1 of ~57 written: `Beast-Mode-Window-Functions.mdx`; see Forum Gap Analysis section below |
 | **3b: Article Upgrades (~200)** | 🔲 Not started | Bulk agent edit pass |
 | **3b-Forum: Forum-Driven Article Updates (Critical+High, ~68)** | 🔲 Not started | Priority targets for Phase 3b bulk agent pass |
-| **4: Consolidation, Retirement & Archive** | 🔲 Not started | Duplicates, true archival, legacy marking; see Archive/Legacy Standards below |
+| **3c: Main Branch Content Sync** | 🔲 Not started | Runs after 3b/3b-Forum; cherry-pick new articles + factual updates from main; see Phase 3c section below |
+| **4: Consolidation, Retirement & Archive** | 🔲 Not started | Duplicates, lifecycle classification; see Product Lifecycle Standards below |
 | **4.5: PM Review System** | 🔧 Built — run after Phase 4 | Script ready: `scripts/build-pm-review-briefs.py`; generates per-PM task checklists + meeting briefs |
+| **4.6: Lifecycle Status Application** | 🔲 Not started | Bulk-add `status: "active"` to all articles; apply PM-confirmed non-Active states; move Legacy/Sunset to Archive group; remove Retired from nav |
 | **5: Interlinking** | 🔲 Not started | Next Steps + Related Articles bulk pass — runs after PM sign-off |
 | **6: Slug Rename + Redirects + Localization** | 🔲 Not started | Enhanced: CSV map, localized file rename, docs.json redirects, internal link updates |
 | **7: Nav Rebuild** | 🔲 Not started | Rebuild docs.json nav groups after Phase 6 slug changes |
@@ -162,57 +164,112 @@ All 1,832 articles assigned to 11 pillars + Archive. Full spec in `RESTRUCTURE-I
 
 ---
 
-## Archive / Legacy Standards
+## Product Lifecycle Standards
 
-These standards apply throughout Phases 3–4 and must be reflected in Phase 8 (Style Guide update).
+These standards replace the previous Archive/Legacy two-state system. They apply throughout Phases 3–4 and must be reflected in Phase 8 (Style Guide update).
 
-### Three categories of "removal"
+### Five lifecycle states
 
-| Category | What it means | File fate | Nav fate | YAML | Visual indicator |
-|----------|--------------|-----------|----------|------|-----------------|
-| **Deleted** | Article is restructured into other content — its info lives elsewhere (merged, rewritten, split) | File deleted | Removed from nav | — | — |
-| **Archived** | Content is genuinely retired: feature removed, content truly unnecessary AND its info is not used elsewhere, PM or Audit confirmed | File kept | Moved to "Archive" group at bottom of KB tab | `archived: true` | `<ArchivedNote />` callout at top of article |
-| **Legacy** | Feature still exists and is functional but is no longer actively maintained; superseded by a newer approach | File kept | Stays in its pillar group with `(Legacy)` sidebar tag | `legacy: true`, `tag: "Legacy"` | `<LegacyNote />` callout at top of article |
+| State | What it means | File fate | Nav fate | YAML | Visual indicator |
+|-------|--------------|-----------|----------|------|-----------------|
+| **Active** | Current, fully supported. Receives updates and bug fixes. | File kept | Normal position in KB nav | `status: "active"` | None — this is the default, implicit state |
+| **Deprecated** | Still functional but officially discouraged. Users should migrate to a replacement. | File kept | Stays in its **normal pillar group** (not archived) | `status: "deprecated"`, `tag: "Deprecated"` | `<DeprecatedNote />` callout just below title, before intro |
+| **Legacy** | Deeply integrated old technology kept alive solely for critical backwards compatibility. No active development. | File kept | Moved to **Archive group** at bottom of KB tab | `status: "legacy"`, `tag: "Legacy"` | `<LegacyNote />` callout just below title, before intro |
+| **Sunset** | Official end-of-life countdown in progress. EOL date announced. Support drops on a known date. | File kept | Moved to **Archive group** at bottom of KB tab | `status: "sunset"`, `tag: "Sunset"`, `sunset_date: "YYYY-MM-DD"` | `<SunsetNote />` callout just below title, before intro |
+| **Retired** | Completely removed or shut down. Feature no longer runs or accepts traffic. | File kept | **Not in nav at all** — exists in repo for reference only | `status: "retired"` | None — article is unpublished |
 
-**Key rule:** If an article's content is used elsewhere in any form — merged into another article, its information rewritten into a new article — the original file is **deleted**, not archived. Archive is reserved for content with no living successor.
+**Deleted** is a separate disposition (not a lifecycle state) for articles whose content has been fully absorbed into other articles. Deleted files are removed from the repo and nav entirely. See Key Rule below.
+
+**Key rule:** If an article's content is used elsewhere in any form — merged into another article, its information rewritten into a new article — the original file is **deleted**, not given a lifecycle status. Lifecycle states are only for articles whose content still serves readers in its current form.
 
 ### YAML frontmatter spec
 
-**Archived article:**
+The `status` field is the canonical lifecycle identifier used by restructure tooling (PM review script, task tracker, disposition report). The `tag` field is a native Mintlify frontmatter property that renders a visible label next to the article title in the sidebar — it accepts any string.
+
+**Active article** (explicit; may be omitted — active is the implicit default):
 ```yaml
 ---
 title: "Article Title"
-archived: true
-tag: "Archived"
+status: "active"
 ---
 ```
 
-**Legacy article:**
+**Deprecated article** (stays in normal nav, visible "Deprecated" sidebar label, warning callout):
 ```yaml
 ---
 title: "Article Title"
-legacy: true
+status: "deprecated"
+tag: "Deprecated"
+---
+```
+
+**Legacy article** (Archive group, visible "Legacy" sidebar label, warning callout):
+```yaml
+---
+title: "Article Title"
+status: "legacy"
 tag: "Legacy"
 ---
 ```
 
-The `tag` field is a native Mintlify frontmatter property that renders a visible label next to the article title in the sidebar. The `archived` and `legacy` fields are custom metadata used by restructure tooling (PM review script, task tracker).
+**Sunset article** (Archive group, visible "Sunset" sidebar label, warning callout, EOL date):
+```yaml
+---
+title: "Article Title"
+status: "sunset"
+tag: "Sunset"
+sunset_date: "2026-12-31"
+---
+```
+
+**Retired article** (not in nav; metadata only; no callout needed):
+```yaml
+---
+title: "Article Title"
+status: "retired"
+---
+```
 
 ### Snippets to create at Phase 4 execution time
 
-- `snippets/LegacyNote.mdx` — renders a `<Warning>` callout: "**Legacy:** This article describes a feature that is no longer actively maintained. It remains functional but may not reflect current best practices. For the current approach, see [replacement link]."
-- `snippets/ArchivedNote.mdx` — renders a `<Warning>` callout: "**Archived:** This content has been retired and may no longer reflect current product behavior. It is preserved for historical reference only."
+All three follow the `snippets/BetaNote.mdx` pattern. Import at the top of the MDX file, use as a standalone component just below the YAML frontmatter block and before the `## Intro` section. For partial-article deprecation/legacy/sunset (where only one section is affected), place the callout as the first element under the relevant section heading instead.
 
-Both follow the existing `snippets/BetaNote.mdx` pattern (import at top of MDX, use as `<LegacyNote />` or `<ArchivedNote />`).
+- `snippets/DeprecatedNote.mdx` — renders a `<Warning>` callout: "**Deprecated:** This feature is officially deprecated. It remains functional but is no longer recommended. Please migrate to [replacement link] to avoid disruption when this feature is removed."
+- `snippets/LegacyNote.mdx` — renders a `<Warning>` callout: "**Legacy:** This article describes a feature that is no longer actively maintained. It remains functional for backwards compatibility only. For the current approach, see [replacement link]."
+- `snippets/SunsetNote.mdx` — renders a `<Warning>` callout: "**Sunset:** This feature is scheduled for end of life on [sunset_date]. Support and updates have ended. Please migrate to [replacement link] before that date."
 
-### Determining archive vs legacy — PM confirmation required
+All three accept an optional `replacement` prop (a URL or article path) used to generate the "see [replacement link]" anchor. When no replacement exists yet, the prop is omitted and the sentence is dropped from the callout.
 
-Legacy marking requires PM sign-off. During Phase 4 and Phase 4.5, articles in a PM's area that are candidates for Legacy designation will appear in their PM review brief as a decision item. PM must confirm:
-- Feature still exists in Domo
-- Feature is not being actively developed/maintained
-- The feature has a recommended successor (which the LegacyNote should link to)
+### Determining lifecycle state — PM confirmation required
 
-The PM review brief script (`scripts/build-pm-review-briefs.py`) should be updated before Phase 4.5 to include a "Legacy Candidates" section per PM, surfacing articles from the Support KB Audit that were flagged as potential legacy but not yet confirmed.
+Lifecycle state beyond **Active** requires PM sign-off. During Phase 4 and Phase 4.5, articles in a PM's area that are candidates for Deprecated/Legacy/Sunset/Retired designation will appear in their PM review brief as decision items. PM must confirm:
+
+| State being assigned | PM must confirm |
+|----------------------|----------------|
+| Deprecated | Feature is still functional; a recommended replacement exists; migration timeline or guidance is available |
+| Legacy | Feature still exists in Domo; it is not actively developed/maintained; no planned removal date; a successor approach exists |
+| Sunset | Feature has an announced EOL date; support has ended or is ending; migration path exists |
+| Retired | Feature is completely gone from Domo — no longer runs, no longer accessible to customers |
+
+The PM review brief script (`scripts/build-pm-review-briefs.py`) should be updated before Phase 4.5 to include a "Lifecycle Candidates" section per PM, surfacing articles from the Support KB Audit flagged for any non-Active state.
+
+The task checklist type tags for Phase 4.5 expand to:
+- `[deprecated]` — article marked Deprecated; PM must confirm replacement exists
+- `[legacy]` — article marked Legacy; PM must confirm feature still runs, no removal date
+- `[sunset]` — article marked Sunset; PM must provide EOL date
+- `[retired]` — article marked Retired; PM must confirm feature is gone from product
+
+### Applying lifecycle states to existing retirement batches (Phase 4 guidance)
+
+| Batch | Default state | Rationale |
+|-------|---------------|-----------|
+| Workbench 4 articles (37) | **Legacy** | WB4 still installed at some sites; WB5 is the replacement; no announced removal date |
+| DataFusion articles (11) | **Retired** | DataFusion was discontinued and removed from the product |
+| Old Magic ETL tile articles (15) | **Retired** | Old tile interface fully replaced; no longer accessible |
+| Defunct-service connectors (111) | **Retired** | Underlying third-party services no longer exist |
+| CourseBuilder articles (16) | **Retired** (pending D10 confirmation) | Audit flags as removed from Domo AppStore; confirm with PM |
+
+These assignments are defaults for Phase 4 planning. PM sign-off in Phase 4.5 may change any individual article's state.
 
 **7 decisions need human sign-off before Phase 7 (nav rebuild):**
 | # | Decision |
@@ -535,20 +592,82 @@ Medium gaps include 15 `rec=new` and 192 `rec=update`. Low gaps are all 59 `rec=
 
 ---
 
+## Phase 3c — Main Branch Content Sync
+
+**Runs after:** Phase 3b and 3b-Forum (all article writing complete)
+**Runs before:** Phase 4 (retirement/archive decisions)
+
+The restructure branch (`update/fullRestructure`) has been diverging from `main` for months. During that time, new articles have been published and existing articles have been updated on `main`. Phase 3c ensures the restructure does not lose that new content — while preserving every rewrite, reorganization, and structural improvement made in the restructure branch.
+
+**This is NOT a merge.** Do not run `git merge main`. Merging main back in would overwrite restructure rewrites with original pre-restructure versions. The goal is to surgically apply the new *content* without restoring old *structure*.
+
+### Step-by-step procedure
+
+**1. Find the divergence point**
+```bash
+git merge-base update/fullRestructure main
+```
+This gives the commit SHA where the branches last shared history. Call it `<BASE>`.
+
+**2. List all files changed on main since divergence**
+```bash
+git log <BASE>..main --name-only --pretty=format: -- s/article/ s/topic/ | sort -u | grep '\.mdx$'
+```
+This lists every article file that has been added or modified on main after the branch cut.
+
+**3. Categorize each changed file**
+
+For each file in the list, determine which category it falls into:
+
+| Category | Condition | Action |
+|----------|-----------|--------|
+| **New article** | File exists on `main` but not in the restructure branch | Cherry-pick the new file into `s/article/` and register it in `docs.json` under the appropriate pillar (use the same IA-spec pillar assignment logic from Phase 2) |
+| **Content update to an unrewritten article** | File exists in both branches; the restructure branch version is essentially the same as the pre-restructure version | Directly apply the main-branch version — no restructure rewrite conflicts |
+| **Content update to a rewritten article** | File exists in both; the restructure branch has a significant rewrite | Manually review the main-branch diff (`git diff <BASE>..main -- <file>`) and incorporate only the factual changes (new steps, corrected info, added features) into the rewritten version |
+| **Structural change only** | File was reorganized or renamed on main but not content-updated | Skip — restructure nav and slugs take precedence |
+
+**4. Commands to inspect each file's diff**
+```bash
+# See what changed on main for a specific file:
+git diff <BASE>..main -- s/article/FileName.mdx
+
+# See the current main version:
+git show main:s/article/FileName.mdx
+
+# Cherry-pick a net-new file from main:
+git checkout main -- s/article/NewFile.mdx
+```
+
+**5. Register new articles in docs.json**
+For each net-new article cherry-picked from main, use the `add-to-nav` skill to place it in the correct pillar group. Do not add it to the old flat nav structure — place it in the restructure's 11-pillar IA.
+
+**6. Update the RESTRUCTURE-MANIFEST.md**
+Log each synced file with disposition `main-sync` so the Phase 9 audit can account for it.
+
+### What to watch for
+
+- Articles on `main` may have been added with numeric filenames (e.g., `000042925394.mdx`). These should be cherry-picked as-is now and renamed during Phase 6 along with everything else.
+- New articles on `main` that fall into a Phase 3a/3b topic area (gap already addressed by the restructure) should be reviewed: if the restructure's new article already covers the content, the main-branch article is a duplicate candidate for Phase 4 consolidation.
+- If `docs.json` on `main` has nav changes: extract only the new article registrations (not the nav structure), since the restructure's nav structure is the one being built.
+
+---
+
 ## Phase 4 — Inputs and Pre-Work
 
 Phase 4 has not started, but the Support KB Audit (`KB Audit Results.csv`, completed 2026-04-28) provides a confirmed retirement hit list that should be used directly as the Phase 4 execution plan for several categories. Do not re-run agent retirement analysis for these — the Audit already did it.
 
+For lifecycle state definitions and YAML/callout specs, see **Product Lifecycle Standards** above.
+
 **Confirmed retirement batches ready for Phase 4:**
 
-| Batch | Count | Action |
-|-------|-------|--------|
-| Workbench 4 articles | 37 (118 total Workbench articles flagged in Audit) | Archive — D1 confirmed |
-| DataFusion articles | 11 (6 Deprecate, 5 Mark as Legacy) | Archive |
-| Old Magic ETL tile articles | 15 to Archive + 1 Keep (`Create a Recursive/Snapshot Old Magic ETL DataFlow`) | Archive 15; keep 1 |
-| Defunct-service connectors | 111 confirmed dead-service articles (verified via Audit summaries) | Archive / remove from Connector Library nav |
-| Release notes pre-2022 (all languages) | Large volume (all locales) | Move to collapsed Archive group in Phase 7 |
-| CourseBuilder articles | 16 (pending D10 PM confirmation) | Archive if PM confirms retired |
+| Batch | Count | Lifecycle State | Action |
+|-------|-------|-----------------|--------|
+| Workbench 4 articles | 37 (118 total Workbench articles flagged in Audit) | **Legacy** | Move to Archive group; add `<LegacyNote />`; D1 confirmed |
+| DataFusion articles | 11 | **Retired** | Remove from nav; metadata only; no callout |
+| Old Magic ETL tile articles | 15 to retire + 1 Keep | **Retired** | Remove from nav; keep 1 (`Create a Recursive/Snapshot Old Magic ETL DataFlow`) |
+| Defunct-service connectors | 111 confirmed dead-service articles (verified via Audit summaries) | **Retired** | Remove from Connector Library nav |
+| Release notes pre-2022 (all languages) | Large volume (all locales) | **Retired** | Remove from nav; collapse into Archive group in Phase 7 |
+| CourseBuilder articles | 16 (pending D10 PM confirmation) | **Retired** (pending) | Remove from nav if PM confirms retired (D10) |
 
 **Urgent pre-Phase 4 fix:** `Snowflake Connector` and `Snowflake Unload V2 Connector` documents key-pair/password auth that Snowflake retired November 2025. Customers are actively failing. Fix these now with `update-kb-article` before Phase 4 starts.
 
@@ -556,11 +675,64 @@ See `Support KB Audit Shared GAP Analysis.md` (repo root) for the full analysis 
 
 ---
 
+## Phase 4.6 — Lifecycle Status Application
+
+**Runs after:** Phase 4.5 (all PM lifecycle confirmations received)
+**Runs before:** Phase 5 (interlinking requires stable article states)
+
+With PM sign-off complete, this phase stamps every article with its confirmed lifecycle status and puts the nav in the correct state for the lifecycle system.
+
+### Step 1 — Bulk-add `status: "active"` to all articles without a status field
+
+Every article in `s/article/` that does not already have a `status:` field in its frontmatter gets `status: "active"` added. This is a mechanical find-and-update pass — no content changes.
+
+```bash
+# Find articles missing a status field
+grep -rL "^status:" s/article/*.mdx
+```
+
+For each file in that list, insert `status: "active"` into the frontmatter directly below `excerpt:`. A script is the right tool here — do not manually edit 1,800+ files.
+
+### Step 2 — Apply PM-confirmed non-Active states
+
+Using the completed `RESTRUCTURE-TASKS.md` checklist (all `[deprecated]`, `[legacy]`, `[sunset]`, `[retired]` items checked off by PMs), apply the confirmed lifecycle state to each article:
+
+**For each Deprecated article:**
+1. Add `status: "deprecated"` and `tag: "Deprecated"` to frontmatter
+2. Add `import { DeprecatedNote } from '/snippets/DeprecatedNote.mdx';` below the frontmatter
+3. Place `<DeprecatedNote replacement="..." />` as the first body element (before `## Intro`)
+4. Article stays in its current nav group — no docs.json move needed
+
+**For each Legacy article:**
+1. Add `status: "legacy"` and `tag: "Legacy"` to frontmatter
+2. Add `import { LegacyNote } from '/snippets/LegacyNote.mdx';` below the frontmatter
+3. Place `<LegacyNote replacement="..." />` as the first body element
+4. Move the article's entry in `docs.json` from its current pillar group to the Archive group at the bottom of the KB tab
+
+**For each Sunset article:**
+1. Add `status: "sunset"`, `tag: "Sunset"`, and `sunset_date: "YYYY-MM-DD"` to frontmatter
+2. Add `import { SunsetNote } from '/snippets/SunsetNote.mdx';` below the frontmatter
+3. Place `<SunsetNote date="Month DD, YYYY" replacement="..." />` as the first body element
+4. Move the article's entry in `docs.json` to the Archive group
+
+**For each Retired article:**
+1. Add `status: "retired"` to frontmatter
+2. Remove the article's entry from `docs.json` nav entirely — the file stays in the repo
+3. No callout needed
+
+### Step 3 — Verify Archive group structure in docs.json
+
+After all moves, confirm the Archive group at the bottom of the KB tab contains exactly the Legacy and Sunset articles (and only those). Retired articles should have no nav entry. Deprecated articles should appear in their pillar groups.
+
+### Step 4 — Update RESTRUCTURE-MANIFEST.md
+
+For every article whose status changed in this phase, update its disposition record to reflect its final lifecycle state.
+
 ---
 
 ## Phase 5 — Interlinking
 
-**Runs after:** Phase 4.5 (PM sign-off complete)
+**Runs after:** Phase 4.6 (all lifecycle states applied and nav updated)
 
 Bulk agent pass to add **Next Steps** and **Related Articles** sections to every article in the restructured KB. This phase cannot run before PM review because article titles and paths must be stable — content still being updated during PM review would produce stale links.
 
@@ -622,8 +794,10 @@ Final rebuild of the `docs.json` Knowledge Base tab with correct slug-based path
 
 **Checklist:**
 - Run `mintlify broken-links` CLI — fix any remaining broken refs
-- Verify Archive group is at the bottom of the KB tab
-- Verify Legacy-tagged articles appear with `tag: "Legacy"` sidebar labels
+- Verify Archive group is at the bottom of the KB tab containing only Legacy- and Sunset-state articles
+- Verify Legacy articles have `tag: "Legacy"` and Sunset articles have `tag: "Sunset"` sidebar labels
+- Verify Deprecated articles have `tag: "Deprecated"` and remain in their normal pillar group (not in Archive)
+- Verify Retired articles have `status: "retired"` and are absent from docs.json nav entirely
 - Verify all Phase 3a stub files have been replaced with real content
 - Verify localized tab structures mirror the English KB structure
 
@@ -636,7 +810,7 @@ Final rebuild of the `docs.json` Knowledge Base tab with correct slug-based path
 Update `Domo-KB-Style-Guide.mdx` and `New-Article-Template.mdx` to reflect every structural standard introduced by this restructure.
 
 **`Domo-KB-Style-Guide.mdx` — expected additions:**
-- **Archive vs Legacy vs Deleted** — the three categories, YAML spec, when to use each, LegacyNote/ArchivedNote snippet usage
+- **Product Lifecycle States** — the five states (Active, Deprecated, Legacy, Sunset, Retired), full YAML spec for each, when to use each state, snippet usage for DeprecatedNote/LegacyNote/SunsetNote, nav placement rules (Deprecated stays in pillar; Legacy/Sunset move to Archive group; Retired not in nav), and PM sign-off requirements
 - **Wheel-and-spoke product group structure** — standard pattern: one Overview/hub article + How-To articles + Reference articles (optional) + FAQ (in Accordion at bottom of hub); typical article counts per product group
 - **Pillar hub articles** — what they are, when a new product area needs one, how they link to product group articles
 - **New article types added by this restructure** — "What is X?" overview articles, pillar hub articles, getting-started-for-role articles; what makes each distinct
@@ -644,8 +818,8 @@ Update `Domo-KB-Style-Guide.mdx` and `New-Article-Template.mdx` to reflect every
 - **Cross-pillar linking conventions** — KB ↔ Developer Portal cross-links; how to reference portal articles from KB
 
 **`New-Article-Template.mdx` — expected additions:**
-- Optional YAML fields for legacy/archived articles (`legacy: true`, `archived: true`, `tag: "Legacy"/"Archived"`)
-- LegacyNote/ArchivedNote import/usage example (commented out — uncomment when applicable)
+- Optional `status:` YAML field with all five lifecycle values documented in a comment block
+- All three lifecycle snippet imports (DeprecatedNote, LegacyNote, SunsetNote) commented out at the top — uncomment the applicable one when needed
 - Minor: verify existing template structure still matches the updated style guide
 
 Run a diff of the current template against the style guide after Phase 7 to confirm exactly what needs updating — do not over-engineer this step.
@@ -656,7 +830,7 @@ CLAUDE.md is the AI-facing project instructions. After the restructure is comple
 - Architecture section — update to reflect the pillar-based navigation structure in docs.json and the addition of hub articles in `s/article/`
 - Navigation section — update to reflect that docs.json now uses pillar groups rather than the old flat KB structure
 - Any script references that have moved (if `scripts/output/` contents are now under `restructure/`)
-- Add guidance on Archive vs Legacy article handling for future contributors
+- Add guidance on the five product lifecycle states and when to use each
 - Remove references to planning files that have moved to `restructure/`
 
 CLAUDE.md stays at the repo root (not moved to `restructure/`) — it must be at root to be picked up by Claude Code.
@@ -673,7 +847,7 @@ Before moving any files, generate the **Article Disposition Report** from `RESTR
 
 The report should list every article (pre-restructure + net-new) with:
 - **Filename** and **Title**
-- **Disposition**: `new` | `same-regrouped` | `updated` | `split` | `merged-into` | `archived` | `legacy` | `deleted`
+- **Disposition**: `new` | `same-regrouped` | `updated` | `split` | `merged-into` | `main-sync` | `deprecated` | `legacy` | `sunset` | `retired` | `deleted`
 - **Source articles** (for new/updated articles: what they were synthesized from)
 - **Target articles** (for split/merged: where the content went)
 - **Screenshot status**: `included` | `todo-markers-left` | `n/a`
@@ -766,11 +940,16 @@ python3 scripts/find_duplicates_and_gaps.py
 | 2026-07-14 | DataFusion Phase 4 archival must include migration guidance article | Forum gap analysis (rank 198) confirms users actively searching for ETL replacement guidance after DataFusion removal. Phase 4 archival should add `DataFusion-Migration-Guide.mdx` pointing users to Magic ETL equivalents before or alongside archiving the 11 DataFusion articles. |
 | 2026-07-14 | PM Review System built as Phase 2.5 | `scripts/build-pm-review-briefs.py` generates per-PM meeting briefs from IA spec + forum gap data + ownership reference. Run right before PM review meetings (not now). Section 4 of each brief covers both Audit gap-fill changes and forum update targets in that PM's area — executed changes should be updated in the script's hardcoded phase data so the brief reflects reality when run. |
 | 2026-07-14 | Phase 2.5 (PM Review System) moved to Phase 4.5 | PM review now runs AFTER Phases 3a–4 (all content work complete) rather than before Phase 3a. PMs review actual completed changes, not plans. This makes the review actionable: fact-checks, sign-offs, and legacy confirmations all happen against real written/updated articles. |
-| 2026-07-14 | Archive vs Legacy vs Deleted distinction defined | Three explicit categories for content removal: (1) Deleted — restructured into other content, file removed; (2) Archived — genuinely retired, no living successor, file kept in Archive nav group with `archived: true` + `<ArchivedNote />`; (3) Legacy — feature still functional but unmaintained, file stays in pillar with `legacy: true` + `tag: "Legacy"` + `<LegacyNote />`. PM sign-off required for Legacy marking. |
-| 2026-07-14 | Legacy frontmatter approach confirmed | Mintlify native `tag:` frontmatter field renders a visible sidebar label — use `tag: "Legacy"` for legacy articles and `tag: "Archived"` for archived articles. Custom fields `legacy: true` / `archived: true` serve tooling. `<LegacyNote />` and `<ArchivedNote />` snippets (to build at Phase 4 time) provide body-level callouts. Do NOT use `deprecated: true` for Legacy articles — "deprecated" implies a removal date which Legacy explicitly does not. |
+| 2026-07-14 | Archive vs Legacy vs Deleted distinction defined | Three explicit categories for content removal: (1) Deleted — restructured into other content, file removed; (2) Archived — genuinely retired, no living successor, file kept in Archive nav group with `archived: true` + `<ArchivedNote />`; (3) Legacy — feature still functional but unmaintained, file stays in pillar with `legacy: true` + `tag: "Legacy"` + `<LegacyNote />`. PM sign-off required for Legacy marking. **Superseded 2026-07-16 — see five-state lifecycle system.** |
+| 2026-07-14 | Legacy frontmatter approach confirmed | Mintlify native `tag:` frontmatter field renders a visible sidebar label — use `tag: "Legacy"` for legacy articles and `tag: "Archived"` for archived articles. Custom fields `legacy: true` / `archived: true` serve tooling. `<LegacyNote />` and `<ArchivedNote />` snippets (to build at Phase 4 time) provide body-level callouts. Do NOT use `deprecated: true` for Legacy articles — "deprecated" implies a removal date which Legacy explicitly does not. **Superseded 2026-07-16 — see five-state lifecycle system.** |
 | 2026-07-14 | Phase 6 (Slug Rename) significantly enhanced | Original plan was: rename files, rebuild nav. New plan adds 4 sub-steps: (6.1) generate slug-rename-map.csv; (6.3) rename localized files (ja/de/es/fr) to English slug for exact filename parity; (6.5) add permanent 308 redirects to docs.json for all renamed paths; (6.6) update all internal links in the repo using the CSV mapping. |
 | 2026-07-14 | Phase 8 (Style Guide + Template + CLAUDE.md) added | Final human-facing standards update: Domo-KB-Style-Guide.mdx gets Archive/Legacy standards, wheel-and-spoke product group structure, pillar hub article guidance, AI callout pattern, and cross-pillar linking conventions. New-Article-Template.mdx gets legacy/archived YAML fields. CLAUDE.md gets full review and update to reflect the restructured repo — stays at root (not moved to restructure/). |
 | 2026-07-14 | Phase 9 (Restructure Artifacts Cleanup) added | All planning/analysis/tracking artifacts (KB-RESTRUCTURE-PLAN.md, RESTRUCTURE-PROGRESS.md, RESTRUCTURE-IA-SPEC.md, RESTRUCTURE-TASKS.md, slug-rename-map.csv, ownership reference, audit/gap files, pm-review-briefs/, scripts/output/) move to restructure/ folder at repo root after Phase 8. Keeps live documentation directory clean post-restructure. |
-| 2026-07-14 | RESTRUCTURE-TASKS.md granular checklist system defined | Generated at Phase 4.5 by updated build-pm-review-briefs.py. Organized Pillar → Product Group → discrete tasks with type tags: [new-article], [update], [archive], [legacy], [deleted], [pm-input], [decision], [fact-check]. This is the working document for PM meetings and post-PM execution — query it at any time for remaining tasks by pillar, PM, or type. |
+| 2026-07-14 | RESTRUCTURE-TASKS.md granular checklist system defined | Generated at Phase 4.5 by updated build-pm-review-briefs.py. Organized Pillar → Product Group → discrete tasks with type tags: [new-article], [update], [archive], [legacy], [deleted], [pm-input], [decision], [fact-check]. This is the working document for PM meetings and post-PM execution — query it at any time for remaining tasks by pillar, PM, or type. **Updated 2026-07-16 — task tags expand to include [deprecated], [sunset], [retired] per five-state lifecycle system.** |
 | 2026-07-14 | Restructure scope confirmed: s/article/ only; portal/ is out of scope | Phase 3a article paths corrected from portal/ subdirectories to s/article/. The portal/ directory (Developer Portal) is entirely out of scope for this restructure — no new portal/ files, no portal/ nav changes. The only portal/ work is Phase 5 interlinking, which adds links FROM s/article/ how-tos TO existing portal/ pages. Phase 8 CLAUDE.md review language updated to remove incorrect portal/ references. Phases 1 and 2 were unaffected (already scoped to s/article/ throughout). |
 | 2026-07-14 | D9 resolved — Manage Data pillar populated | 31 DataSet Management articles split: 20 → Manage Data (3 in "Data Center" group: Data Center Layout, Using the Data Warehouse, Understanding Connector Options; 17 in "DataSet Lifecycle" group: ownership, sharing, health, lifecycle how-tos). 5 pipeline articles stay in Prepare & Transform (DataSet Update Methods, DataFusion ×2, Enterprise Stacker, Advanced Tools Launch Center). 1 (PDP) → Administer & Govern > Governance. 2 developer tools (CLI, ODBC) → Develop & Integrate > APIs & SDKs. 1 (Migrate from Federated to Cloud) → Connect & Bring In Data > Cloud Data Warehouses. 2 visualization articles → Analyze & Visualize > Analyzer. `scripts/build_ia_spec.py` OVERRIDES section updated; Phase 2 re-run confirms 1,832/1,832 articles assigned. |
+| 2026-07-16 | Five-state product lifecycle system replaces two-state Archive/Legacy | Previous system had only Archived and Legacy. New system: Active (metadata only, default), Deprecated (stays in normal nav, `tag: "Deprecated"`, `<DeprecatedNote />`), Legacy (Archive group, `tag: "Legacy"`, `<LegacyNote />`), Sunset (Archive group, `tag: "Sunset"`, `sunset_date:`, `<SunsetNote />`), Retired (not in nav, `status: "retired"`, no callout). All five use a canonical `status:` YAML field; Deprecated/Legacy/Sunset also get Mintlify `tag:` for sidebar labels and a snippet callout just below the title. Retired articles exist in repo but are unpublished. |
+| 2026-07-16 | Phase 3c (Main Branch Content Sync) added | New phase runs after 3b/3b-Forum, before Phase 4. Purpose: find all new articles and content updates merged to main after the restructure branch diverged, and apply the new content without reverting restructure rewrites. Procedure: git merge-base to find divergence point; git log to list changed files; categorize each as net-new, unrewritten update, or rewritten-article update; cherry-pick or manually merge accordingly. Not a git merge. |
+| 2026-07-16 | Workbench 4 reclassified: Archive → Legacy | Under the new lifecycle system, Workbench 4 maps to Legacy (still installed at some sites, WB5 is the replacement, no announced removal date). Will move to Archive group in nav with `<LegacyNote />` and `tag: "Legacy"`. |
+| 2026-07-16 | DataFusion, old Magic ETL tile articles, defunct connectors reclassified: Archive → Retired | These features/services are completely gone — DataFusion discontinued, old tile UI replaced, third-party services shut down. Under the new lifecycle system they are Retired: `status: "retired"`, removed from nav entirely, no callout. |
+| 2026-07-16 | Phase 4.6 (Lifecycle Status Application) added | New phase between 4.5 and 5. Bulk-adds `status: "active"` to every article without a status field; applies PM-confirmed Deprecated/Legacy/Sunset/Retired states (frontmatter + snippet imports + callout placement + docs.json nav moves); verifies Archive group contains only Legacy and Sunset articles. Must complete before Phase 5 so interlinking does not add Next Steps/Related links to articles that are about to be moved or removed from nav. |

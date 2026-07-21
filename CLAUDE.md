@@ -124,6 +124,24 @@ All scripts live in `scripts/`. They are optional dev-quality tools — non-tech
 | `update_kb_articles.py` | Entry point for the bulk Salesforce CSV import pipeline. |
 | `remark-domo-style.mjs` | Remark lint plugin enforcing Domo style rules (optional; runs via `yarn lint`). |
 
+## Localization Resources
+
+All localization reference files and the token-usage tracking log live in **`localization/`**:
+
+| File | Purpose |
+| ---- | ------- |
+| `localization/Localization-Style-Guide.mdx` | Authoritative translation standards for ES, FR, DE, JA — register, glossary, callout labels, MDX rules |
+| `localization/Japanese-Localization-Reference.mdx` | XTM Translation Memory–derived reference for JA — expanded glossary, structural phrase patterns, UI bracket conventions (`「 」` vs `［ ］`), and the LQA log |
+| `localization/localize-token-usage.csv` | Per-run token tracking for the `/localize` skill |
+
+The `/localize` skill reads `localization/Localization-Style-Guide.mdx` at the start of every localization run, and additionally reads `localization/Japanese-Localization-Reference.mdx` when Japanese is a target language. The reference file supersedes the style guide for Japanese where they conflict.
+
+To register nuances from a human-reviewed Japanese article back into the TM reference:
+```bash
+# After the reviewer's edits are committed on the branch:
+/localize lqa-update ja/s/article/FILENAME.mdx
+```
+
 ## Style Standards
 
 See `Domo-KB-Style-Guide.mdx` for full standards. Key points:

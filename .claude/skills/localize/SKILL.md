@@ -17,7 +17,7 @@ The user has provided: $ARGUMENTS
 
 ```bash
 # Confirm the file exists and read it
-cat Localization-Style-Guide.mdx
+cat localization/Localization-Style-Guide.mdx
 ```
 
 The style guide is the authoritative reference for every translation decision in this skill. Do not rely on memory or general translation knowledge. Every term, header, and convention must follow what is documented there.
@@ -25,10 +25,10 @@ The style guide is the authoritative reference for every translation decision in
 **If Japanese is one of the target languages (or if `$ARGUMENTS` specifies `ja` only), also read the Japanese TM Reference immediately after the style guide — before any translation work begins:**
 
 ```bash
-cat Japanese-Localization-Reference.mdx
+cat localization/Japanese-Localization-Reference.mdx
 ```
 
-`Japanese-Localization-Reference.mdx` contains the XTM Translation Memory–derived term glossary, structural phrase patterns, UI element naming conventions, and the running LQA log. For Japanese translations, this file supersedes the style guide wherever the two conflict.
+`localization/Japanese-Localization-Reference.mdx` contains the XTM Translation Memory–derived term glossary, structural phrase patterns, UI element naming conventions, and the running LQA log. For Japanese translations, this file supersedes the style guide wherever the two conflict.
 
 ---
 
@@ -57,7 +57,7 @@ cat s/article/FILENAME.mdx
 **3. Compare and identify LQA-worthy findings.**
 
 A finding is LQA-worthy if it represents:
-- A term choice that differs from the TM glossary in `Japanese-Localization-Reference.mdx`
+- A term choice that differs from the TM glossary in `localization/Japanese-Localization-Reference.mdx`
 - A structural or phrasing pattern not yet documented in the reference
 - A Domo-specific UI element name, field label, or product term being translated in a way not captured elsewhere
 - Any translation decision that a future translator would need to know to be consistent
@@ -75,9 +75,9 @@ Ignore findings that are already covered by the style guide or reference file.
 - **Rule update**: [state a new rule if this should generalize; otherwise "none — one-off context-specific choice"]
 ```
 
-**5. Append entries to `Japanese-Localization-Reference.mdx`:**
+**5. Append entries to `localization/Japanese-Localization-Reference.mdx`:**
 
-Use the Edit tool to append each finding under the `## LQA Log` section at the bottom of `Japanese-Localization-Reference.mdx`. Do not overwrite existing entries.
+Use the Edit tool to append each finding under the `## LQA Log` section at the bottom of `localization/Japanese-Localization-Reference.mdx`. Do not overwrite existing entries.
 
 If a finding implies a rule that should be added to the term glossary table (not just the log), also update that table in the same file.
 
@@ -186,7 +186,7 @@ The localized Release Notes tab names are:
 cat s/article/Current-Release-Notes.mdx
 ```
 
-**2. Translate into each target language** following all rules in `Localization-Style-Guide.mdx` and (for Japanese) `Japanese-Localization-Reference.mdx`.
+**2. Translate into each target language** following all rules in `Localization-Style-Guide.mdx` and (for Japanese) `localization/Japanese-Localization-Reference.mdx`.
 
 Key reminders for Current Release Notes translation:
 - Translate the `title:` and `excerpt:` frontmatter fields
@@ -230,12 +230,12 @@ cat s/article/FILENAME.mdx
 
 ### 2. Translate into each target language
 
-Following all rules in `Localization-Style-Guide.mdx` and (for Japanese) `Japanese-Localization-Reference.mdx`:
+Following all rules in `Localization-Style-Guide.mdx` and (for Japanese) `localization/Japanese-Localization-Reference.mdx`:
 
 - Translate the `title:` and `excerpt:` frontmatter fields
 - Translate all prose, headings, list items, and callout body text
 - Apply language-specific term translations from the style guide glossary
-- **For Japanese specifically:** Apply the expanded term glossary from `Japanese-Localization-Reference.mdx` — it supersedes the style guide glossary where they conflict. Pay special attention to:
+- **For Japanese specifically:** Apply the expanded term glossary from `localization/Japanese-Localization-Reference.mdx` — it supersedes the style guide glossary where they conflict. Pay special attention to:
   - `<Note>` callout label → `**注記：**` (not `**注：**`)
   - "Chart" (generic) → `チャート` (not `グラフ`)
   - "Role" (agent field) → `権限` with `［ ］` brackets; "Instructions" (agent field) → `説明` with `［ ］` brackets
@@ -334,7 +334,7 @@ Work through the following checklist for each language. Revise the file in place
 
 **Japanese — TM-augmented checklist**
 
-Run all of the following for every Japanese article. These are sourced from `Japanese-Localization-Reference.mdx` and supersede any contradictory items in the base style guide checklist above.
+Run all of the following for every Japanese article. These are sourced from `localization/Japanese-Localization-Reference.mdx` and supersede any contradictory items in the base style guide checklist above.
 
 - [ ] `<Note>` callout label is `**注記：**` — **not** `**注：**` (critical TM correction)
 - [ ] `<Tip>` label is `**ヒント：**`
@@ -364,13 +364,13 @@ Tell the user:
 3. **Archived files** (Current Release Notes flow only) — what was archived, where, and any languages where the archive was skipped because it already existed
 4. **Quality review findings** — briefly note any issues that were found and fixed during the quality checkpoint; if none, say "Quality review passed — no issues found."
 5. **docs.json validation** — confirm it passed or report the error
-6. **Next step for Japanese articles:** Remind the user that after a human reviewer has edited and approved the Japanese translation, running `/localize lqa-update ja/s/article/FILENAME.mdx` will extract any reviewer-made changes and register them as LQA entries in `Japanese-Localization-Reference.mdx` for future translations.
+6. **Next step for Japanese articles:** Remind the user that after a human reviewer has edited and approved the Japanese translation, running `/localize lqa-update ja/s/article/FILENAME.mdx` will extract any reviewer-made changes and register them as LQA entries in `localization/Japanese-Localization-Reference.mdx` for future translations.
 
 ---
 
 ## Step 6: Token Tracking
 
-After reporting to the user, append one row to `tracking/localize-token-usage.csv`.
+After reporting to the user, append one row to `localization/localize-token-usage.csv`.
 
 **Get the values:**
 
@@ -389,14 +389,14 @@ Based on the article(s) you just processed, estimate total tokens for this skill
 - Medium article (500–1,500 words): ~25,000–50,000 tokens
 - Large article (>1,500 words): ~50,000–100,000 tokens
 - Add ~10,000 tokens per additional language beyond the first
-- Add ~5,000 tokens when `Japanese-Localization-Reference.mdx` was read (Japanese target)
+- Add ~5,000 tokens when `localization/Japanese-Localization-Reference.mdx` was read (Japanese target)
 
 Write an integer estimate (e.g., `35000`). For exact counts, check the Anthropic Console API logs for this session.
 
 **Append the row:**
 
 ```bash
-echo "$(date +%Y-%m-%d),$(git config user.name),ARTICLE_FILENAME,LANGUAGES_LIST,TOKEN_ESTIMATE" >> tracking/localize-token-usage.csv
+echo "$(date +%Y-%m-%d),$(git config user.name),ARTICLE_FILENAME,LANGUAGES_LIST,TOKEN_ESTIMATE" >> localization/localize-token-usage.csv
 ```
 
 For `LANGUAGES_LIST`, use a slash-separated list of language codes (e.g., `es/fr/de/ja`). For `ARTICLE_FILENAME`, use just the filename (e.g., `March-2026-Release.mdx`), not the full path.

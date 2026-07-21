@@ -2,7 +2,7 @@
 name: localize
 user-invocable: true
 description: "localize an article, translate an article into Spanish French German, localize release notes, translate release notes, translate KB article"
-argument-hint: "article filename or path (e.g., s/article/March-2026-Release.mdx)"
+argument-hint: "article filename or path (e.g., s/article/March-2026-Release.mdx) — or 'lqa-update ja/s/article/FILENAME.mdx' to run the LQA capture pass on an already-committed Japanese article"
 ---
 
 Localize a Domo KB article into Spanish, French, and German.
@@ -21,6 +21,71 @@ cat Localization-Style-Guide.mdx
 ```
 
 The style guide is the authoritative reference for every translation decision in this skill. Do not rely on memory or general translation knowledge. Every term, header, and convention must follow what is documented there.
+
+**If Japanese is one of the target languages (or if `$ARGUMENTS` specifies `ja` only), also read the Japanese TM Reference immediately after the style guide — before any translation work begins:**
+
+```bash
+cat Japanese-Localization-Reference.mdx
+```
+
+`Japanese-Localization-Reference.mdx` contains the XTM Translation Memory–derived term glossary, structural phrase patterns, UI element naming conventions, and the running LQA log. For Japanese translations, this file supersedes the style guide wherever the two conflict.
+
+---
+
+## LQA Capture Mode
+
+**If `$ARGUMENTS` starts with `lqa-update`**, skip Steps 1–6 and run the LQA Capture Pass instead.
+
+### LQA Capture Pass
+
+This mode is run after a human reviewer has edited and committed a Japanese article to the branch. It reads the approved version, compares it against the English source and the existing TM reference, and registers any new nuances.
+
+**1. Parse the target path:**
+
+```
+$ARGUMENTS = "lqa-update ja/s/article/FILENAME.mdx"
+                          ↑ this is the localized file to inspect
+```
+
+**2. Read the approved Japanese article and its English source:**
+
+```bash
+cat ja/s/article/FILENAME.mdx
+cat s/article/FILENAME.mdx
+```
+
+**3. Compare and identify LQA-worthy findings.**
+
+A finding is LQA-worthy if it represents:
+- A term choice that differs from the TM glossary in `Japanese-Localization-Reference.mdx`
+- A structural or phrasing pattern not yet documented in the reference
+- A Domo-specific UI element name, field label, or product term being translated in a way not captured elsewhere
+- Any translation decision that a future translator would need to know to be consistent
+
+Ignore findings that are already covered by the style guide or reference file.
+
+**4. For each finding, draft an LQA entry in this format:**
+
+```
+### [YYYY-MM-DD] [article filename]
+- **Finding**: [description]
+- **English source**: "[original text]"
+- **Initial/prior translation**: "[what was written before the reviewer's edit, if known; otherwise omit]"
+- **Approved translation**: "[what the human reviewer approved]"
+- **Rule update**: [state a new rule if this should generalize; otherwise "none — one-off context-specific choice"]
+```
+
+**5. Append entries to `Japanese-Localization-Reference.mdx`:**
+
+Use the Edit tool to append each finding under the `## LQA Log` section at the bottom of `Japanese-Localization-Reference.mdx`. Do not overwrite existing entries.
+
+If a finding implies a rule that should be added to the term glossary table (not just the log), also update that table in the same file.
+
+**6. Report to the user:**
+
+- Number of findings registered
+- Brief summary of each finding
+- Whether any glossary entries were updated
 
 ---
 
@@ -121,7 +186,7 @@ The localized Release Notes tab names are:
 cat s/article/Current-Release-Notes.mdx
 ```
 
-**2. Translate into each target language** following all rules in `Localization-Style-Guide.mdx`.
+**2. Translate into each target language** following all rules in `Localization-Style-Guide.mdx` and (for Japanese) `Japanese-Localization-Reference.mdx`.
 
 Key reminders for Current Release Notes translation:
 - Translate the `title:` and `excerpt:` frontmatter fields
@@ -165,11 +230,18 @@ cat s/article/FILENAME.mdx
 
 ### 2. Translate into each target language
 
-Following all rules in `Localization-Style-Guide.mdx`:
+Following all rules in `Localization-Style-Guide.mdx` and (for Japanese) `Japanese-Localization-Reference.mdx`:
 
 - Translate the `title:` and `excerpt:` frontmatter fields
 - Translate all prose, headings, list items, and callout body text
 - Apply language-specific term translations from the style guide glossary
+- **For Japanese specifically:** Apply the expanded term glossary from `Japanese-Localization-Reference.mdx` — it supersedes the style guide glossary where they conflict. Pay special attention to:
+  - `<Note>` callout label → `**注記：**` (not `**注：**`)
+  - "Chart" (generic) → `チャート` (not `グラフ`)
+  - "Role" (agent field) → `権限` with `［ ］` brackets; "Instructions" (agent field) → `説明` with `［ ］` brackets
+  - UI menu names use `「 」` brackets; UI field names use `［ ］` brackets
+  - Default verb form for instructions: `〜します` (not `〜してください` unless imperative)
+  - "For more information" → `詳細については`; "Step N:" → `ステップ N：`
 - For images: check whether localized images exist; if they exist, use the localized path; if not, use the English image path as-is
 - Internal links: always keep as English paths (`/s/article/...`) — do not prefix with a language code
 - Preserve all MDX components, code blocks, import statements, and formatting exactly — **with two exceptions: BetaNote and legacy TOC blocks** (see below)
@@ -231,7 +303,7 @@ Work through the following checklist for each language. Revise the file in place
 ### Universal checks (all languages)
 
 - [ ] **Never-translated terms still in English.** Verify that every Domo brand name (DataSet, DataFlow, Beast Mode, Magic ETL, Analyzer, etc.) and every technical acronym (ETL, OAuth, SQL, API, SAML, etc.) appears unchanged in the translation. Search the translated file for any suspicious rendering.
-- [ ] **Callout labels are correct for the language.** Check every `<Note>`, `<Warning>`, and `<Tip>` block. The label inside the callout must match the language-specific form from the style guide (e.g., `**注：**` for Japanese, `**Remarque :**` for French).
+- [ ] **Callout labels are correct for the language.** Check every `<Note>`, `<Warning>`, and `<Tip>` block. The label inside the callout must match the language-specific form from the style guide (e.g., `**注記：**` for Japanese, `**Remarque :**` for French).
 - [ ] **BetaNote uses the correct language export.** If the English source used `<BetaNote />`, confirm the translated file imports and uses `<BetaNoteEs />`, `<BetaNoteFr />`, `<BetaNoteDe />`, or `<BetaNoteJa />` as appropriate.
 - [ ] **No legacy TOC block.** Confirm there is no old-style table-of-contents block (a sequence of `---` / heading bullets / `---`) immediately after frontmatter.
 - [ ] **No content added or removed.** Verify that every section, heading, list item, and callout from the English source is present in the translation, with nothing extra added.
@@ -260,12 +332,22 @@ Work through the following checklist for each language. Revise the file in place
 - [ ] Hyphenated compounds where one element is English (e.g., "Cloud-Integration", "KI-Chat")
 - [ ] Callout labels: `**Hinweis:**`, `**Wichtig:**`, `**Tipp:**`
 
-**Japanese**
+**Japanese — TM-augmented checklist**
+
+Run all of the following for every Japanese article. These are sourced from `Japanese-Localization-Reference.mdx` and supersede any contradictory items in the base style guide checklist above.
+
+- [ ] `<Note>` callout label is `**注記：**` — **not** `**注：**` (critical TM correction)
+- [ ] `<Tip>` label is `**ヒント：**`
+- [ ] `<Warning>` label is `**重要：**`
+- [ ] "Chart" in a generic context is `チャート` — not `グラフ` (specific chart-type names with グラフ suffix are fine)
+- [ ] "Role" (Domo Agent configuration field) is translated as `権限`, displayed as `**［権限］**` or `［権限］`
+- [ ] "Instructions" (Domo Agent configuration field) is translated as `説明`, displayed as `**［説明］**` or `［説明］`
+- [ ] UI menu/page/dialog names are wrapped in `「 」`; UI field/button labels are wrapped in `［ ］`
+- [ ] Instructional verb form defaults to `〜します` — use `〜してください` only when the English is explicitly imperative or urgent
+- [ ] "Step N:" formatted as `ステップ N：` (full-width colon, half-width space after)
+- [ ] "For more information" / "learn more" → `詳細については` or `詳細`
 - [ ] Polite formal (です/ます) style throughout — no plain (だ/である) forms
-- [ ] Steps end with `〜します` or `〜してください`
-- [ ] Correct katakana vs. kanji for translated terms (e.g., 表 for UI table, テーブル for database table)
-- [ ] BetaNote: `<BetaNoteJa />` — never the English `<BetaNote />`
-- [ ] Callout labels: `**注：**`, `**重要：**`, `**ヒント：**`
+- [ ] `DataSet`, `DataFlow`, `Magic ETL`, `Beast Mode`, `Analyzer`, `Buzz`, `Domo`, `API`, `CRM`, `SQL`, `OAuth`, `SAML` kept in English
 
 ### If you find an issue
 
@@ -282,6 +364,7 @@ Tell the user:
 3. **Archived files** (Current Release Notes flow only) — what was archived, where, and any languages where the archive was skipped because it already existed
 4. **Quality review findings** — briefly note any issues that were found and fixed during the quality checkpoint; if none, say "Quality review passed — no issues found."
 5. **docs.json validation** — confirm it passed or report the error
+6. **Next step for Japanese articles:** Remind the user that after a human reviewer has edited and approved the Japanese translation, running `/localize lqa-update ja/s/article/FILENAME.mdx` will extract any reviewer-made changes and register them as LQA entries in `Japanese-Localization-Reference.mdx` for future translations.
 
 ---
 
@@ -306,6 +389,7 @@ Based on the article(s) you just processed, estimate total tokens for this skill
 - Medium article (500–1,500 words): ~25,000–50,000 tokens
 - Large article (>1,500 words): ~50,000–100,000 tokens
 - Add ~10,000 tokens per additional language beyond the first
+- Add ~5,000 tokens when `Japanese-Localization-Reference.mdx` was read (Japanese target)
 
 Write an integer estimate (e.g., `35000`). For exact counts, check the Anthropic Console API logs for this session.
 

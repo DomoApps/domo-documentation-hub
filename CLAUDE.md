@@ -154,7 +154,7 @@ This activates a `post-merge` hook that warns you when a `git pull` leaves track
 |add-to-nav|Adding a page to docs.json navigation or moving an existing page to a different location in docs.json|
 |update-kb-article|Any update to an existing KB article: renames, content edits, image swaps, content removal, file path updates, cross-file changes, step/process edits, navigation moves, merges, or splits|
 |mintlify-design|Mintlify component/page-design expert: choosing components, composing custom layouts, building rich pages, "is there a component for X" questions, or authoring reusable snippets in `/snippets/`|
-|fix-ja-formatting|Fixing structural formatting issues in queued Japanese articles: inline image placement, block vs. inline `<img>` mismatches, callout wrapping, and redundant blank lines|
+|fix-ja-formatting|Fix MDX syntax and structural formatting issues in Japanese articles WITHOUT touching translation: bold-label rendering (space after `**` when preceded by fullwidth punctuation or em-dash), HTML-escaped component tags, callouts containing list items, broken links, broken bold spans, English translation artifacts, and inline icon replacement. Run after any JA article edit to catch MDX mis-formatting before merge.|
 |update-pm-ownership|Regenerate `Article-PM-Ownership-Reference.mdx` after the squad CSV or article list changes|
 |csv-to-mdx|Review and audit an MDX article produced by the Salesforce-to-Domo programmatic conversion pipeline (`scripts/html_to_mdx.py`)|
 |migrate-html|Migrate a single HTML article to a repo-ready MDX file: convert with pandoc, apply Domo style rules, save to `s/article/`, and register in `docs.json`|

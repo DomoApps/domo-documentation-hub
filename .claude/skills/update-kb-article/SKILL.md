@@ -37,7 +37,15 @@ To find by filename:
 ls s/article/ | grep keyword
 ```
 
-Once the file(s) are identified, ask the user what type of change they need — or confirm it if already stated. The change types are:
+Once the file(s) are identified, look up the PM who owns the article in `Article-PM-Ownership-Reference.mdx`:
+
+```bash
+grep "filename.mdx" Article-PM-Ownership-Reference.mdx
+```
+
+Surface the owning PM and Feature to the user — useful for routing questions, review requests, or approvals before or after the change. If the article isn't in the reference (e.g. a brand-new file), look up the closest matching Feature in `Feature - Owning Squad, PM, Eng, UX.csv`.
+
+Then ask the user what type of change they need — or confirm it if already stated. The change types are:
 
 1. **Rename** — change the article title, filename, or both
 2. **Content update** — edit body text, callouts, or other prose
@@ -149,6 +157,16 @@ Edit the `title:` field in the article's frontmatter. The filename and all links
 
 Use the Edit tool with enough surrounding context (2–3 lines) to make `old_string` unique. Never rewrite more than what was approved.
 
+### Writing or editing a Required Grants section
+
+When an edit adds or changes a **Required Grants** section, use the grant's canonical wording — don't invent a description. Most grants are already described in the standard format elsewhere in the KB; search for and reuse the existing wording so the grant reads consistently across articles:
+
+```bash
+grep -rn "Grant Name —" s/article/
+```
+
+Reuse the existing description verbatim (adjusting only to fit the em-dash format). If no article describes the grant, write a concise one-sentence description and flag it to the user as newly authored rather than presenting it as canonical. See `Domo-KB-Style-Guide.mdx` › **Required Grants** › _Use canonical grant wording_.
+
 ### Image/screenshot swap
 
 Update the `src` attribute in the `<Frame>` or `<img>` tag. Update `alt` text if appropriate. Do not move or delete image files — note to the user that the image asset itself must be updated separately in `images/kb/`.
@@ -170,6 +188,8 @@ When you're already updating an article and notice an image-based icon, propose 
 ```
 
 **Stale-screenshot upgrade case.** If the article describes the *current* Domo UI but the original `<img>` showed a legacy-style glyph, that screenshot is just out of date — swap to the phosphor `icon-*` version (not `legacy-icon-*`) so the article reflects what users see today.
+
+**Third-party brand logos** (AWS, OpenAI, Anthropic, GitHub, …) are a different swap — they're *not* in the Domo icon font, and a monochrome logo `<img>` disappears in dark mode. Swap to a coded icon that inherits text color: Font Awesome's `brands` family via `<Icon icon="{slug}" iconType="brands" aria-hidden="true" />` (the one correct use of `<Icon>` — it resolves a font glyph, not a local SVG), or, when FA's free set lacks the brand (e.g. Anthropic), an inline `<svg fill="currentColor">` with a path from a source like [Simple Icons](https://simpleicons.org). See `Domo-KB-Style-Guide.mdx` › **Brand and Third-Party Logos**.
 
 Don't open a wholesale icon migration as a side effect of an unrelated update; only swap icons in the section the user asked you to change, plus any that read awkwardly inconsistent next to the change.
 
@@ -219,7 +239,28 @@ The Badge `className` must be exactly `text-primary bg-primary/10 font-bold`. Th
 
 ---
 
-## Step 5: Verify
+## Step 5: Style-guide revision pass
+
+Editing introduces style drift just as drafting does. After making the approved changes, do an explicit pass against the style guide over the content you changed and revise it in place.
+
+1. **Re-read `Domo-KB-Style-Guide.mdx` now, in full** — not from memory.
+2. **Audit the content you added or rewrote** against this checklist and fix every violation. Scope this to what you changed: fix style errors in your edited content and any clearly broken style directly adjacent to it, but do not silently rewrite untouched sections. If you spot broader pre-existing violations outside your edit, note them to the user rather than rewriting them (consistent with this skill's conservative-execution principle). This pass is EN-only — never touch the localized directories.
+   - **Intro** (if touched) — opens with "This article explains…" or "This article covers…", states only what the article covers, and is followed by a `---` horizontal rule.
+   - **Headings** — imperative mood at every level; the structural labels (Intro, Required Grants, Prerequisites, FAQ, Troubleshoot, Related Articles) are exempt. Top-level sections H2, subsections H3+.
+   - **Required Grants** — exact format and canonical grant wording, with the em-dash inside the bold and a space on each side (`**Grant —** description`).
+   - **Callouts** — `<Note>`/`<Warning>`/`<Tip>` with the label and its colon bolded (`**Note:**`), and a blank line before the callout (except inside table cells).
+   - **Tables** — every pipe table you touched padded so columns align. Run `python3 scripts/pad_md_tables.py <file>` to do this mechanically. Normalize any HTML table you edited (one tag per line, data rows in `<tbody>`).
+   - **Links** — internal links use the file path with no `.mdx` extension and no full URL.
+   - **Em-dashes** — no spaces in prose; spaces only in the bolded-term list exception.
+   - **Voice and word choice** — present tense, not "will"; active voice; "after", not causal "once"; no "utilize"; spell out numbers under 10; "allowlist"/"blocklist"; "select", not "click"; Oxford comma; no exclamation points.
+   - **Domo terms** — `DataSet`, `DataFlow`, `DataFusion`, `Beast Mode`, `Workbench`; `dashboard` lowercase except at the start of a sentence or with a type; never "Page" (use "dashboard"). Verify any product term against the **Domo-Specific Terms and Usage** table.
+   - **Frontmatter** — if the article still has a `description` field, replace it with a single-sentence `excerpt`.
+   - **Images** — block screenshots wrapped in `<Frame>` with a native `<img>` and descriptive `alt`, no inline `width`/`height`; inline glyphs use the icon font or the inline `<img>` style; never `<Frame>` inside a table cell.
+3. **Revise in place.** Run `python3 scripts/pad_md_tables.py <file>` on any file whose tables you touched.
+
+---
+
+## Step 6: Verify
 
 After all edits:
 
@@ -237,9 +278,20 @@ Report any remaining references to the user.
 
 ---
 
-## Step 6: Output
+## Step 7: Output
 
 Tell the user:
 - What was changed, created, or deleted
 - Any follow-up actions they need to handle manually (e.g., uploading new image assets, updating absolute links on the live Salesforce support site)
 - Any files that were intentionally left unchanged and why
+
+---
+
+## Step 8: Offer localization
+
+After delivering the output above, ask the user:
+
+> "Would you like to localize this article (or your changes to it) into Spanish, French, and German? (Note: Japanese localization is handled on a separate pipeline — no action needed there.)"
+
+- **If yes:** invoke the `localize` skill, passing the updated article's file path as the argument.
+- **If no:** the skill ends here.

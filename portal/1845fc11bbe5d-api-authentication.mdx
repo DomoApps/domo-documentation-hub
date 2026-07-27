@@ -25,7 +25,7 @@ Once a user has been authenticated, they can then create an `access token` to au
 <Note>
 #### Best Practice
 
-The Domo SDKs (Java or Python) are often the recommended approach to leveraging the above Domo APIs: that's because they provide a nice wrapper for each endpoint and automatically handle refreshing your access token. Learn more about our SDKs sdks.md.
+The Domo SDKs (Java or Python) are often the recommended approach to leveraging the above Domo APIs: that's because they provide a nice wrapper for each endpoint and automatically handle refreshing your access token. Learn more about our [SDKs](/portal/Getting-Started/sdks).
 </Note>
 
 <Note>
@@ -36,7 +36,7 @@ A Client ID is a public identifier while the Client secret is considered confide
 
 Ensure these credentials are not placed in client or server-side code and are not committed to repositories. If accidentally posted to a public repo, rotate them ASAP. Do not store or transmit the secrets in insecure locations, server configuration files, log files, emails, messaging apps, etc.
 
-The clidntid and secret will be used in authorization requests to obtain access tokens. Always use secure protocols for such requests.
+The client id and secret will be used in authorization requests to obtain access tokens. Always use secure protocols for such requests.
 
 ## Quickstart
 - - -
@@ -55,10 +55,10 @@ To generate a **client ID** and **client secret**, visit the Admin section of yo
 ### Step 2: Create access token
 - - -
 
-Once you obtain your client ID and client secret you will then need to obtain your access token. You can do so in our [interactive documentation using the Get Access Token endpoint](https://developer.domo.com/portal/d9520f5752d56-get-access-token) or using the example `curl` requst below.
+Once you obtain your client ID and client secret you will then need to obtain your access token. You can do so in our [interactive documentation using the Get Access Token endpoint](https://developer.domo.com/portal/d9520f5752d56-get-access-token) or using the example `curl` request below.
 
 ```sh
-curl -v -u {CLIENT\_ID}:{CLIENT\_SECRET} "https://api.domo.com/oauth/token?grant\_type=client\_credentials&scope={SCOPE}"
+curl -v -u {CLIENT_ID}:{CLIENT_SECRET} "https://api.domo.com/oauth/token?grant_type=client_credentials&scope={SCOPE}"
 ```
 
 Please note that in the above example, when using the -u command line option, cURL correctly formats the client id and secret to a basic authorization header. If you are programmatically requesting access tokens, make sure that you are correctly including the basic authorization header with your Base64 encoded credentials. See the [OAuth client credential grant type access token request specification](https://tools.ietf.org/html/rfc6749#section-4.4.2) and the [HTTP Basic Authentication Scheme specification](https://tools.ietf.org/html/rfc2617#section-2) for more information.
@@ -66,7 +66,7 @@ Please note that in the above example, when using the -u command line option, cU
 An example with your `scope`,`client_ID`, and `client_secret` would look similar to below:
 
 ```sh
-curl -v -u 441e307a-b2a1-4a99-8561-174e5b153fsa:f103fc453d08bdh049edc9a1913e3f5266447a06d1d2751258c89771fbcc8087 "https://api.domo.com/oauth/token?grant\_type=client\_credentials&scope=data%20user"
+curl -v -u 441e307a-b2a1-4a99-8561-174e5b153fsa:f103fc453d08bdh049edc9a1913e3f5266447a06d1d2751258c89771fbcc8087 "https://api.domo.com/oauth/token?grant_type=client_credentials&scope=data%20user"
 ```
 
 Once you request a token with the curl command, you should receive the following response with an associated access token:
@@ -110,19 +110,22 @@ Domo's SDKs simplify the authentication process. Obtain a Client ID and Client S
 Now that you have received your access token, you will use it for each of your request. It is recommended to simplify the process with the following request with:
 
 ```sh
-export ACCESS\_TOKEN\=<your-valid-oauth-access-token\>
+export ACCESS_TOKEN=<your-valid-oauth-access-token>
 ```
 
 Below is an example of a request with an example token:
 
 ```sh
-export ACCESS\_TOKEN\=<your-valid-oauth-access-token\>
+export ACCESS_TOKEN=<your-valid-oauth-access-token>
 ```
 
 Now that you've exported your token, you can dynamically populate when making calls to any of Domo's API like in the example below:
 
 ```sh
-echo '{"name": "Sales Operations Team", "default": false}' | http -v POST https://api.domo.com/v1/groups Authorization:"bearer $ACCESS\_TOKEN" --pretty\=format
+curl -v -X POST "https://api.domo.com/v1/groups" \
+  -H "Authorization: bearer $ACCESS_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"name": "Sales Operations Team", "default": false}'
 ```
 
 ### Important terms
@@ -149,7 +152,7 @@ echo '{"name": "Sales Operations Team", "default": false}' | http -v POST https:
 Start experimenting with the Domo OAuth APIs. In addition to the above approach from the command line, you can also generate an access token and test using directly within the Domo Developer Portal.
 
 <Frame>
-![getauthtokenpage.png](/assets/images/getauthtokenpage.png)
+![getauthtokenpage.png](/images/dev/stoplight.io/images/getauthtokenpage.png)
 </Frame>
 
 ### Need additional help?

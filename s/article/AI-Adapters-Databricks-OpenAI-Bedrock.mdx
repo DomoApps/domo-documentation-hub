@@ -1,0 +1,116 @@
+---
+title: "AI Adapters | Databricks, OpenAI, and Bedrock"
+excerpt: "Set up Databricks, OpenAI, and Amazon Bedrock adapter accounts in the Data Center so you can bring third-party models into Domo.AI."
+---
+
+## Intro
+
+This article explains how to set up a Databricks, OpenAI, or Amazon Bedrock adapter account in the Data Center, enter the credentials each provider requires, and make the adapter available when you create a new AI model.
+
+---
+
+## Set Up an Adapter Account
+
+You set up each adapter account in the Data Center under **Accounts**. Each provider requires different credentials, described in the sections below.
+
+1. In the navigation header, select **Data** to open the Data Center.
+   The Data Center opens to your accounts and DataSets.
+2. In the left sidebar, select **Accounts**.
+3. Select **Add New** > **Account**.
+   The **Add Account** modal opens.
+4. From the dropdown, select the adapter you want to connect: Databricks, OpenAI, or Amazon Bedrock.
+5. Enter the credentials required for the provider you selected. See the provider sections below for the required fields.
+
+   <Note>**Note:** To ask someone else to connect the account, select **Assign Someone**, then find the user in Domo or invite them to your Domo instance.</Note>
+
+6. Select **Connect**.
+
+After you connect your account, it appears in the available account list when you create a new model. Learn how to [add and test new models](/s/article/000005502).
+
+<Tip>**Tip:** To edit, share, or delete an existing account, see [Manage Connector/Adapter Accounts](/s/article/360042926054).</Tip>
+
+After you add a model, it appears in the list of AI Models in the scrollable, searchable sidebar. Select **Endpoint** to see the **Test Endpoint** input and output. To test your model, enter the input, then select **Test Model**.
+
+## Connect Databricks
+
+Build models and workspaces in Databricks and bring them into Domo as MLflow models.
+
+To add your Databricks account and make it available as a model, you need the following:
+
+- **Host name —** Your Databricks host name.
+- **Personal access token —** Your Databricks personal access token.
+
+After you connect your Databricks account, you can add your Databricks models into Domo in the Domo.AI section. Learn how to [add new models](/s/article/000005502).
+
+## Connect OpenAI
+
+To add your OpenAI account and make it available as a model, you need the following:
+
+- **API key —** Your OpenAI API key.
+
+## Connect Amazon Bedrock
+
+Domo uses Amazon Bedrock's authorizing and versioning when bringing a model into Domo.
+
+To add your Amazon Bedrock account and make it available as a model, you need the following for your AWS account:
+
+- **Access key —** Your AWS access key.
+- **Region —** The region your AWS account resides in.
+- **Secret key —** Your AWS secret key.
+
+### Connect with Amazon Bedrock Assume Role
+
+To add an Amazon Bedrock Assume Role account, configure an AWS IAM role in your AWS account with an external ID that lets Domo assume that role.
+
+Enter the following fields when you add the account:
+
+- **Region —** The region your AWS account resides in.
+- **External Id —** The external ID that verifies the account Domo assumes, which provides an added security measure. Select **Generate Code** to generate a random external ID, then paste it into your AWS security policy for the assumed role.
+- **Role Session Name —** Identifies the session while Domo assumes the role. You can set this to any value.
+- **Role ARN —** The ARN of the role you want Domo to assume. It looks something like this:
+
+  ```
+  arn:aws:iam::{accountId}:role/{roleToAssume}
+  ```
+
+The role you assume needs a policy configuration that includes the following:
+
+```json
+{
+    "Effect": "Allow",
+    "Principal": {
+        "AWS": "arn:aws:iam::{domoAccountId}:root"
+    },
+    "Action": "sts:AssumeRole",
+    "Condition": {
+        "StringEquals": {
+            "sts:ExternalId": "chosenExternalId"
+        }
+    }
+}
+```
+
+In this policy:
+
+- `chosenExternalId` is your generated ID that Domo uses to verify that the correct role is assumed. Select **Generate Code** in the Domo account menu, then copy and paste the value here. The value here must match the value in the Domo account.
+- `domoAccountId` is the account ID for Domo that assumes the role, based on your region.
+
+<Warning>**Important:** The value in the `sts:ExternalId` condition must exactly match the external ID you entered in the Domo account. If the values do not match, Domo cannot assume the role.</Warning>
+
+The account IDs for Domo environments are as follows:
+
+| Region    | Domo account ID |
+| --------- | --------------- |
+| US        | 339405024189    |
+| AU        | 010251424122    |
+| EMEA (IE) | 687132894031    |
+| JP        | 622384692065    |
+| CA        | 710710207408    |
+
+The Amazon Bedrock adapter currently provides access to these providers:
+
+- AI21
+- Anthropic
+- Amazon Titan
+- Meta
+- Cohere

@@ -1,5 +1,6 @@
 ---
 title: "DomoのSCIM（System for Cross-domain Identity Management）"
+excerpt: "Domo の SCIM エンドポイントを使用して、アイデンティティープロバイダーから Domo へのユーザーとグループの作成・更新を自動化する方法を説明します。"
 ---
 
 ## はじめに
@@ -68,16 +69,18 @@ IdPとDomoの間のSCIM統合は、IdP側で設定されています。開始す
 
 設定の間、IdPからDomoに同期するユーザー属性を設定する必要があります。DomoのSCIMエンドポイントは、以下の6つのSCIMスキーマの要素をマップします。
 
-### ユーザーエンドポイント
+### ユーザー
 
 * ``` コア（urn:ietf:params:scim:schemas:core:2.0:User） ```
 * ``` エンタープライズ（urn:ietf:params:scim:schemas:extension:enterprise:2.0:User） ```
-
 * ``` カスタム（urn:ietf:params:scim:schemas:extension:custom:2.0:User） ```
-
-### グループエンドポイント
-
 * ``` Domo （urn:ietf:params:scim:schemas:extension:domo:2.0:User） ```
+
+<Warning>
+  **重要：** `active` 属性は、ユーザーがDomoでアクティブかどうかを示します。PUTまたはPATCHリクエストで `active` 属性をfalseに設定すると、Domoユーザーが削除されます。この削除は、ユーザーがDataSetまたはDataFlowを所有している場合は失敗するという、ユーザーの削除と同じ制限を受けます。
+</Warning>
+
+### グループ
 
 * ``` グループ（urn:ietf:params:scim:schemas:core:2.0:Group） ```
 * ``` Domoグループ（urn:ietf:params:scim:schemas:extension:domo:2.0:Group） ```

@@ -44,26 +44,26 @@ python scripts/docs_cli.py export --project-dir /path/to/domo-documentation-hub
 
 #### Options
 
-| Option | Default | What it does |
-|---|---|---|
-| `--language` | `en` | Language section to extract from `docs.json` (`en`, `jp`, `fr`, `de`, `es`) |
-| `--base-url` | `https://docs.domo.com` | Base URL prepended to each file path to build the full page URL |
-| `--output` | `scripts/reports/doc_structure.csv` | Where to write the CSV file |
-| `--project-dir` | `.` | Project root containing `docs.json` and the MDX files |
+| Option          | Default                             | What it does                                                                |
+| --------------- | ----------------------------------- | --------------------------------------------------------------------------- |
+| `--language`    | `en`                                | Language section to extract from `docs.json` (`en`, `jp`, `fr`, `de`, `es`) |
+| `--base-url`    | `https://docs.domo.com`             | Base URL prepended to each file path to build the full page URL             |
+| `--output`      | `scripts/reports/doc_structure.csv` | Where to write the CSV file                                                 |
+| `--project-dir` | `.`                                 | Project root containing `docs.json` and the MDX files                       |
 
 #### CSV Output
 
 The CSV has five columns:
 
-| Column | Example |
-|---|---|
-| `tab` | `Knowledge Base` |
-| `group` | `Connect & Integrate > Connect Data to Domo > Cloud Data Warehouses` |
-| `file_path` | `s/article/4412849158167` |
-| `title` | `Cloud Amplifier Overview` |
-| `url` | `https://docs.domo.com/s/article/4412849158167` |
+| Column      | Example                                                              |
+| ----------- | -------------------------------------------------------------------- |
+| `tab`       | `Knowledge Base`                                                     |
+| `group`     | `Connect & Integrate > Connect Data to Domo > Cloud Data Warehouses` |
+| `file_path` | `s/article/4412849158167`                                            |
+| `title`     | `Cloud Amplifier Overview`                                           |
+| `url`       | `https://docs.domo.com/s/article/4412849158167`                      |
 
-- **group** uses ` > ` to show nesting. Pages that aren't inside a group have an empty group column.
+- **group** uses `>` to show nesting. Pages that aren't inside a group have an empty group column.
 - **title** is pulled from the MDX file's YAML frontmatter.
 
 After the CSV is written, a summary prints to the terminal showing how many pages were exported, how many titles were found, and any warnings about missing files.

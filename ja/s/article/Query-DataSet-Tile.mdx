@@ -1,0 +1,183 @@
+---
+title: "Query DataSet タイル"
+excerpt: "Query DataSet タイルを使用して Magic ETL で Databricks DataSet に対して SQL クエリを実行し、結果を小さなロードに分割することで、大きな DataSet でのタイムアウトエラーやメモリエラーを回避します。"
+---
+
+## はじめに
+
+**Query DataSet** タイルを使用すると、標準の **Input DataSet** タイルの代わりに、Magic ETL DataFlowの最初のステップとしてDatabricks DataSetに対してSQLクエリを記述できます。クエリが返す行のみを読み込み、結果を小さなバッチに分割できるため、大きなCloud Integrations DataSetを扱う際のパフォーマンスが向上し、タイムアウトエラーやメモリ不足エラーを防止できます。
+
+Magic ETLでは **Input DataSet** タイルが最初のステップとして最もよく使用されますが、ほかのタイルで代用することもできます。例えば **SQL** タイルでは、カスタムの `SELECT` ステートメントを記述できます。 **Query DataSet** タイルはさらに、結果セットを小さなロードに分割する機能を備えており、単一のロードが基盤となるCloud Data Warehouse（CDW）のリソース制限を超える場合に役立ちます。
+
+**Query DataSet** タイルはさまざまなデータソースで使用できますが、Databricksでの使用を強く推奨します。このタイルを適切に使用すると、大きなDataSetが引き起こす次のようなエラーを解決できます。
+
+- ソケットタイムアウトエラー。大きなDataSetに対するクエリの応答に時間がかかりすぎる場合に発生します。
+- メモリ不足エラー。単一のロードがCDWで処理するには大きすぎる場合（最大ヒープサイズの16 GBを超える場合など）に発生します。
+
+カスタムの `SELECT` ステートメントに加えて、このタイルには2つの設定フィールドがあります。
+
+- **Query partition key —** 結果セットをバッチに分割するために使用する列。
+- **# of Loads —** 処理するバッチの数。
+
+<Warning>**重要：** **Query partition key** として選択する列に `NULL` 値が含まれていてはいけません。パーティションキーの値が `NULL` である行は無視されます。すべての行で非NULLであることが保証されている列のみを選択してください。</Warning>
+
+---
+
+## 必要な許可
+
+Databricks上でMagic ETL DataFlowを作成するために必要な許可と同じものが必要です。 **Query DataSet** タイル自体には、追加の許可は必要ありません。
+
+## Query DataSet タイルにアクセスする
+
+Magic ETLのオーサリングキャンバスで、 **Query DataSet** タイルは左側のActionsペインの **DataSets** セクションにあります。
+
+<Note>**注記：** **Query DataSet** タイルは、Databricksユーザーのみが使用できます。</Note>
+
+## Query DataSet タイルを使用する
+
+タイルを設定するには、次の手順を実行します。
+
+1. **Query DataSet** タイルを左側のActionsペインからオーサリングキャンバスにドラッグします。
+2. **Input DataSet** メニューからDatabricks DataSetを選択します。
+3. DataFlowに読み込む行を識別する `SELECT` ステートメントを記述します。
+
+   <Note>**注記：** クエリは単一の `SELECT` である必要があります。共通テーブル式（CTE）はサポートされていません。</Note>
+
+4. **Query partition key** を設定します。タイルが結果セットをバッチに分割するために使用する列を選択します。
+
+   <Warning>**重要：** パーティションキーの列に `NULL` 値が含まれていてはいけません。ガイダンスについては、「パーティションキーを選択する」を参照してください。</Warning>
+
+5. **# of Loads** を設定します。これは結果セットを分割するバッチの数です。推奨される上限については、「ロードのサイズを設定する」を参照してください。
+
+## パーティション分割の仕組みを理解する
+
+`SELECT` ステートメントの結果セットは、 **Query partition key** 列の個別の値によってパーティション分割され、 **# of Loads** で指定した数のバッチに分割されます。
+
+ボトルネックを回避するには、最大のバッチがCDWのリソース制限内に収まるくらい小さくなければなりません。バッチは、行数やデータ量で同じサイズになることは保証されていません。分布は、選択するパーティションキーの列によって異なります。
+
+**例。** **Query partition key** として選択した列に317個の個別の値があり、 **# of Loads** を30に設定したとします。最初の30個の個別の値が最初のバッチを形成し、次の30個の値が2番目のバッチを形成し、以降も同様に続きます。317 ÷ 30 は10と11の間であるため、合計11個のバッチになります。
+
+実際には、パーティションキーの値ごとの行数が均一であることはまれです。データは多くの場合偏っており、例えば全行の50%がパーティションキーの値のわずか10%に関連していることがあります。そのため、行数の多い値を含むバッチは不釣り合いに大きくなります。パーティションキーとして適切な列を選択することが重要です。値ごとの行数が均等に分布しているほど、パーティション分割の動作は良好になります。
+
+## ロードのサイズを設定する
+
+Databricksの場合、最大のバッチが4 GB以下になるように **Query partition key** を選択し、 **# of Loads** を設定します。次の手順では、特定のパーティションキー候補に対して4 GBの上限を満たす最小の **# of Loads** を求めます。
+
+1. テーブルの合計サイズを確認します。Databricksの UI を使用するか、次を実行します。
+
+   ```sql
+   DESCRIBE DETAIL <catalog>.<schema>.<table>;
+   ```
+
+2. `sizeInBytes` をGBに変換し、4 GBで割って、予備的な分割数を見積もります。
+
+   ```
+   divisions = (sizeInBytes / 2^30) / 4
+   ```
+
+   これは中間値です。すべてのパーティションキーの値に行が完全に均等に分布している場合にのみ、目的の **# of Loads** と等しくなりますが、そうなることはまれです。
+
+3. テーブルの合計行数を取得します。
+
+4. 単一の4 GBバッチの行数の上限を見積もります。
+
+   ```
+   max_rows = row_count / divisions
+   ```
+
+5. パーティションキーの候補列を選択します。 `NULL` 値が含まれていてはいけません。
+
+6. 候補列の個別の値の数をカウントします。
+
+   ```sql
+   SELECT COUNT(DISTINCT <column>) AS distinct_count
+   FROM <table>;
+   ```
+
+7. 候補列に沿ってテーブルがどの程度偏っているかを確認するため、候補列全体の行数の分布を調べます。
+
+   ```sql
+   SELECT <column>, COUNT(*) AS row_count
+   FROM <table>
+   GROUP BY <column>
+   ORDER BY row_count DESC;
+   ```
+
+8. 最悪のケースの累計（行数の多いパーティションキーの値から順にバッチを満たすと仮定した場合の累積行数）を計算します。
+
+   ```sql
+   WITH grouped_counts AS (
+     SELECT <column>, COUNT(*) AS row_count
+     FROM <table>
+     GROUP BY <column>
+   )
+   SELECT
+     <column>,
+     row_count,
+     SUM(row_count) OVER (
+       ORDER BY row_count DESC
+       ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
+     ) AS cumulative_row_count
+   FROM grouped_counts
+   ORDER BY row_count DESC;
+   ```
+
+   例えば、ある日付列をパーティションキーの候補として評価するとします。
+
+   | `<column>` | `row_count` | `cumulative_row_count` |
+   | ---------- | ----------- | ---------------------- |
+   | 2024-10-13 | 100         | 100                    |
+   | 2024-02-21 | 80          | 180                    |
+   | 2024-05-17 | 60          | 240                    |
+   | 2024-08-19 | 50          | 290                    |
+   | 2024-03-06 | 30          | 320                    |
+   | 2024-02-10 | 20          | 340                    |
+   | 2024-11-30 | 10          | 350                    |
+
+9. 手順4の `max_rows` の上限内に収まる個別の値の数を求めます。
+
+   ```sql
+   WITH grouped_counts AS (
+     SELECT <column>, COUNT(*) AS row_count
+     FROM <table>
+     GROUP BY <column>
+   ),
+   ranked_counts AS (
+     SELECT
+       <column>,
+       row_count,
+       SUM(row_count) OVER (
+         ORDER BY row_count DESC
+         ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
+       ) AS cumulative_row_count
+     FROM grouped_counts
+   )
+   SELECT COUNT(*) AS max_column_values
+   FROM ranked_counts
+   WHERE cumulative_row_count < max_rows;
+   ```
+
+   `max_rows` を手順4で計算した値に置き換えます。
+
+10. 最大のバッチを4 GB未満に保つために必要な最小の **# of Loads** を、切り上げて計算します。
+
+    ```
+    # of Loads >= distinct_count / max_column_values
+    ```
+
+必要な **# of Loads** は、パーティションキーとして選択する列によって異なります。 **# of Loads** を小さくするには、値がテーブル全体により均等に分布している列を選択します。
+
+## パーティションキーを選択する
+
+適切なパーティションキーの列には、次の特徴があります。
+
+- `NULL` 値が含まれていない。これは必須です。パーティションキーの値が `NULL` である行はスキップされるためです。
+- 個別の値が多い。これにより、結果セットを十分な数のバッチに分割し、各バッチをCDWの制限内に収めることができます。
+- 個別の値ごとの行数が比較的均等に分布している。これにより、バッチサイズが予測可能になります。
+
+少数の値が行の大部分を占めるような偏りの大きい列は、非常に不均一なバッチを生成し、タイルの効果を低下させます。
+
+## 関連記事
+
+- [Domo on Databricks](/s/article/000005289)
+- [Cloud Integrations Overview](/s/article/4412849158167)

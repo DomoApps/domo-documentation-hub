@@ -1,5 +1,6 @@
 ---
 title: "Domo on Databricks"
+excerpt: "Set up a Databricks Cloud Integration in Domo for read-only or read/write access so you can build cards, alerts, and Magic ETL DataFlows on Databricks data."
 ---
 
 With Cloud Integrations, you can power your Domo instance using Databricks. Use this guide to set up a Databricks integration for read-only and read/write access.
@@ -50,7 +51,7 @@ For more information about roles and grants, see [Manage User Roles and Grants](
          **Important:** Copy the token before leaving the page—Databricks does not display it again.
        </Warning>
 
-     - **M2M OAuth**—Enter your Databricks OAuth application's **Client ID** and **Client Secret** in the **Client ID** and **Client Secret** fields.
+     - **M2M OAuth**—Enter your Databricks OAuth application's **Client ID** and **Client Secret** in the **Client ID** and **Client Secret** fields. This authentication method is used by the service account and supports write-back and native transforms, since those operations run under the service account regardless of how it authenticates.
 
        <Frame>![New Databricks Service Account modal with M2M OAuth selected, showing Client ID and Client Secret fields.](/images/kb/databricks-kb-06.png)</Frame>
 
@@ -92,6 +93,10 @@ After creating your integration, connect Databricks tables as DataSets in Domo. 
 ## Configure OAuth
 
 (Optional) Configure OAuth to require users to sign in with their own Databricks credentials when they view cards or DataSets connected through that integration. OAuth does not currently apply to Magic ETL, write-back, or native transforms.
+
+<Note>
+  **Note:** This refers to per-user OAuth configured here for card and DataSet viewing. It does not apply to M2M OAuth used to authenticate the service account itself. If your service account authenticates via M2M OAuth, write-back and native transforms continue to work normally, since those operations always run under the service account.
+</Note>
 
 1. From the Databricks Cloud Integrations list, select the **wrench** icon on the integration you want to configure, then select **Settings**.
 
@@ -156,7 +161,10 @@ If your catalog or schema does not appear in the dropdowns during write & native
 </Accordion>
 
 <Accordion title="How do Databricks-sourced DataSets work?">
-When a DataFlow uses a Databricks-sourced DataSet, Domo queries the data live from Databricks when the DataFlow runs. Domo checks Databricks-sourced DataSets for updates every 15 minutes using the table's `LAST_ALTERED` timestamp. If Domo detects an update, it triggers any DataFlows that use that table.
+When a DataFlow uses a Databricks-sourced DataSet, Domo queries the data live from Databricks when the DataFlow runs. Domo checks Databricks-sourced DataSets for updates at the configured freshness interval using the `lastModified` field returned by Databricks's `DESCRIBE DETAIL` command. If Domo detects an update, it triggers any DataFlows that use that table.
+
+
+<Note>**Note:** Change detection via `DESCRIBE DETAIL` applies to tables only. Databricks views do not support this check, so Domo treats views as updated on every freshness check cycle — meaning any DataFlow using a Databricks view will be triggered every interval regardless of whether the underlying data changed.</Note>
 </Accordion>
 
 </AccordionGroup>

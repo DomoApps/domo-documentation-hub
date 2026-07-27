@@ -1,80 +1,62 @@
 ---
 title: "OktaでSSOを有効にする"
+excerpt: "Okta で Domo App を追加して SAML 2.0 を設定し、Okta グループのインポートを含めたシングルサインオンを Domo で有効にします。"
 ---
 
-Domo用にOktaを設定するには、このトピックの手順に従います。SAMLを有効にするには、「管理者」のデフォルトのセキュリティ権限か、「全てのカンパニー設定を管理」が有効になっているカスタマイズされた権限が必要です。デフォルトの権限の詳細については、「[ユーザーの権限と許可を管理する](/s/article/360043438973)」を参照してください。
+このトピックの手順に従って、DomoのSAML 2.0 IDプロバイダーとしてOktaを設定します。SAMLを設定するには、「管理者」のデフォルトのセキュリティ権限か、「全てのカンパニー設定を管理」が有効になっているカスタマイズされた権限が必要です。デフォルトの権限の詳細については、「[ユーザーの権限と許可を管理する](/s/article/360043438973)」を参照してください。
 
 **DomoでOktaを設定するには：**
 
-1. okta.com/domoにアクセスします。
-2. **［Give Okta a spin］**フォームのフィールドに入力して、送信します。  
-   Oktaから一時パスワードを知らせるメールが届きます。
-3. 送られてきたメールに従ってOktaアカウントの初期設定を完了させます。
-4. Oktaアカウントの右上にある**［Admin］**をクリックします。
-5. **［Applications］**タブをクリックします。
-6. **［Add Application］**をクリックします。  
+1. Oktaテナントをまだお持ちでない場合は、[okta.com](https://www.okta.com)からサインアップし、Oktaから送信されるアクティベーションメールを完了させます。
+2. `https://<your-org>-admin.okta.com`でOkta Admin Consoleにサインインします。
      
+   {/* TODO[screenshot]: Okta Admin Console home page showing the left-hand navigation with Applications expanded */}
+3. 左側のナビゲーションで、**［Applications］**＞**［Applications］**に移動し、**［Create App Integration］**をクリックします。
+     
+   {/* TODO[screenshot]: Applications list page with the Create App Integration button highlighted */}
+4. **［Create a new app integration］**ダイアログで**［SAML 2.0］**を選択し、**［Next］**をクリックします。
+     
+   {/* TODO[screenshot]: Create a new app integration dialog with SAML 2.0 selected */}
+5. **［General Settings］**ステップで、**［App name］**フィールドに「Domo」と入力し、必要に応じてアプリのロゴをアップロードして、**［Next］**をクリックします。
+6. **［Configure SAML］**ステップでは、Domoの**［管理者設定］**＞**［セキュリティ］**＞**［SAML］**にあるSAML設定ページの値を使用してSAMLフィールドに入力します。少なくとも以下を設定します。
 
-   <Frame>![Screenshot](/images/kb/ja/0EM5w000005vNrp.png)</Frame>
-7. **［Application label］**フィールドに「Domo」と入力します。
-8. **［Subdomain］**フィールドにDomoドメインを入力します。  
-   例えば、Domo URLが「videotraining.domo.com」の場合、サブドメインとして「videotraining」を入力します。<img alt="okta_setup_step3.png" src="/images/kb/ja/0EM5w000005vNrt.png" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/>
-9. **［Next］**をクリックして**［Sign-On Options］**画面に進みます。
-10. サインオン方法のリストから**［SAML 2.0］**を選択します。  
+   * **［Single sign-on URL］** — DomoのAssertion Consumer Service（ACS）URL。
+   * **［Audience URI (SP Entity ID)］** — DomoのエンティティID（通常はDomoサブドメイン、例えば「videotraining」）。
+   * **［Name ID format］** — **［EmailAddress］**。
+   * **［Application username］** — **［Email］**。
+
+   <Note>
+     **注記：**Domo URLによってサブドメイン値が決まります。例えば、Domo URLが「videotraining.domo.com」の場合、サブドメインは「videotraining」になります。
+   </Note>
+7. （オプション）OktaのグループメンバーシップをDomoに送信するには、**［Group Attribute Statements］**までスクロールして属性を追加します。**［Name］**を「groups」、**［Name format］**を**［Unspecified］**、**［Filter］**を**［Regex］**に設定し、フィルター値を「.*」にしてすべてのグループを送信します。**［Next］**をクリックします。
+     
+   詳細については、SAMLグループ属性の設定に関するOktaのドキュメントを参照してください。
+8. **［Feedback］**ステップで、**［I'm an Okta customer adding an internal app］**を選択し、**［Finish］**をクリックします。Oktaは新しいDomoアプリの**［Sign On］**タブを開きます。
+9. **［Sign On］**タブで、**［View SAML setup instructions］**（右側の**［SAML Signing Certificates］**セクション内）をクリックし、**［Identity Provider Single Sign-On URL］**、**［Identity Provider Issuer］**、**［X.509 Certificate］**をDomoのSAML設定ページの対応するフィールドにコピーします。DomoでSAML設定を保存します。
+     
+   {/* TODO[screenshot]: Okta Sign On tab for the Domo app with the View SAML setup instructions link visible */}
+10. （条件付き）手順7で`groups`属性ステートメントを設定し、Domoにそれらのグループをインポートする場合は、DomoのSAML設定ページで**［Import groups from identity provider］**をチェックして保存します。
+11. Okta Admin Consoleに戻り、Domoアプリを開いて**［Assignments］**タブをクリックし、ユーザーとグループにアクセス権を付与します。
       
-
-    <Frame>![Screenshot](/images/kb/ja/0EM5w000005vNre.png)</Frame>
-11. **［View Setup Instructions］**をクリックして指示に従って進み、SAML 2.0設定を完了させます。
-12. **［Save］**をクリックします。
-13. **［Directory］**タブをクリックします。
-14. （条件付き）Oktaからグループをインポートするには、以下を実行します。
-
-    1. **［Import groups from identity provider］**チェックボックスを選択します。
-    2. OktaでDomo Appの**［Sign On］**タブを選択します。
-    3. **［Edit］**をクリックします。
-    4. ドロップダウンリストから目的の**［Group］**フィルターを選択します。すべてのグループをDomoインスタンスに送信するには、「.\*」値の正規表現ルールを使用します。
-    5. **［Save］**をクリックします。  
-         
-       詳細については、[http://saml-doc.okta.com/SAML\_Docs/How-to-Configure-SAML-2.0-for-Domo-Groups.html](http://saml-doc.okta.com/SAML_Docs/How-to-Configure-SAML-2.0-for-Domo-Groups.html)を参照してください。
-15. **［Add Group］**をクリックし、グループの名前と説明をフォームに入力してグループを追加します。  
+    {/* TODO[screenshot]: Assignments tab of the Domo app in Okta showing the Assign dropdown */}
+12. ユーザーを割り当てるには、**［Assign］**＞**［Assign to People］**をクリックし、各ユーザーを検索して**［Assign］**をクリックし、ユーザー属性を確認して**［Save and Go Back］**をクリックします。完了したら**［Done］**をクリックします。
+13. グループを割り当てるには、**［Assign］**＞**［Assign to Groups］**をクリックし、Domoへのアクセスを付与する各グループの横にある**［Assign］**をクリックします。完了したら**［Done］**をクリックします。
       
-
-    <Frame>![Screenshot](/images/kb/ja/0EM5w000005vNro.png)</Frame>
-
-<Note>    **注記：**各クライアントに対してグループを1つ設定するのがベストプラクティスです。グループに各クライアントからユーザーを追加すると、そのユーザーのカードにアクセスできるようになります。ある社員がクライアントと無関係になったら、そのグループからその社員を外すことで、アクセス権を取り消すことができます。
-16. **［Add Person］**をクリックし、フォームのフィールドに入力してユーザーを追加します。  
-    **［Groups］**フィールドにグループ名を入力すると、ユーザーをグループに追加できます。  </Note>
+    <Note>
+      **注記：**クライアントまたはチームごとに1つのOktaグループを維持し、そのグループをDomoアプリに割り当てるのがベストプラクティスです。グループにユーザーを追加または削除すると、そのユーザーのDomoへのアクセス権が自動的に付与または取り消されます。
+    </Note>
+14. （オプション）Oktaで新しいグループを作成するには、**［Directory］**＞**［Groups］**に移動し、**［Add group］**をクリックして名前と説明を入力し、**［Save］**をクリックします。次にそのグループを開き、**［Applications］**タブをクリックして、**［Assign applications］**をクリックすると、そのグループにDomoアプリへのアクセス権を付与できます。
       
+    {/* TODO[screenshot]: Directory > Groups page with the Add group button visible */}
+15. （オプション）Oktaで新規ユーザーを作成するには、**［Directory］**＞**［People］**に移動し、**［Add person］**をクリックして、フォームに入力し（**［Groups］**フィールドにユーザーが所属するグループも含めます）、**［Save］**をクリックします。新規ユーザーにはOktaからアクティベーションメールが届き、パスワードを設定するとステータスが**［Active］**になります。
+      
+    {/* TODO[screenshot]: Directory > People page with the Add person dialog open */}
 
-    <Frame>![Screenshot](/images/kb/ja/0EM5w000005vNrv.png)</Frame>
-17. （オプション）グループを管理するには、以下を実行します。
+SSO設定が完了すると、Domoのパブリケーショングループ設定に新しいオプションが表示されます。**［Add Group］**セクションで、OktaでDomoへのアクセス権を持つ個人ユーザーのメール、またはDomoアプリへのアクセス権を持つOktaグループを入力できます。
 
-    1. **［Groups］**リストでそのグループをクリックします。  
-         
+ユーザーは、以下のいずれかの方法でDomoにアクセスできます。
 
-       <Frame>![Screenshot](/images/kb/ja/0EM5w000005vNrd.png)</Frame>
-    2. **［Manage People］**を使うと、新規ユーザーにアクセス権を付与したり、古いユーザーをグループから除外したりすることができます。<img alt="okta_setup_step10.png" src="/images/kb/ja/0EM5w000005vNrr.png" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/><img alt="okta_setup_step11.png" src="/images/kb/ja/0EM5w000005vNrs.png" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/>
-    3. 新規グループにDomoへのアクセス権を付与するには、**［Manage Apps］**を使います。  
-       Domoへのアクセスが許可されたら、以下のように、グループの**［Apps］**タブに表示されるようになります。  
-         
-
-       <Frame>![Screenshot](/images/kb/ja/0EM5w000005vNrl.png)</Frame>
-18. 新規ユーザーをDomoに追加するには、以下を実行します。
-
-    1. **［People］**サブページで、Domoに追加したいユーザーをクリックします。
-    2. **［Assign Applications］**をクリックします。
-    3. そのユーザーまたはそのユーザーが所属するグループに、Domoへのアクセスを許可します。<img alt="okta_setup_step12.png" src="/images/kb/ja/0EM5w000005vNrk.png" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/>
-
-<Note>       **注記：**Oktaの**［People］**タブで、すべてのユーザーの現在のステータスを見ることができます。ユーザーが追加されると、固有のパスワードを作成するよう、Oktaからメールが届きます。パスワードを作成すると、ステータスが「Active」になり、アクセスが許可されます。</Note>
-
-SSO設定が完了すると、Domoのパブリケーショングループ設定に新しいボックスが表示されます。**［Add Group］**セクションで、OktaからDomoアプリケーションへのアクセス権を持つ個人ユーザーのメール、あるいはグループを入力できるようになります。
-
-<Frame>![Screenshot](/images/kb/ja/0EM5w000005vNrq.png)</Frame>
-
-クライアントは、以下のいずれかを実行するとアクセスできるようになります。
-
-- Oktaインスタンスに移動し（URLは設定中に入力した会社名になります）、Domoアプリケーションをクリックします。Domoのビューが開きます。  
+* `https://<your-org>.okta.com`でOktaにサインインし、ダッシュボードの**［Domo］**タイルをクリックします。直接Domoに移動します。
     
-
-  <Frame>![Screenshot](/images/kb/ja/0EM5w000005vNru.png)</Frame>
-- Domoインスタンスにログインします。そして、シングルサインオンを選択します。その後、Okta認証情報（メールアドレスとOktaのために作成したパスワード）を入力するよう求められるか、ポータルから自動的にログインされます。
+  {/* TODO[screenshot]: Okta end-user dashboard showing the Domo app tile */}
+* Domoインスタンスのドメインにサインインし、**［シングルサインオン］**を選択します。Okta認証情報の入力を求められます（または、すでにアクティブなOktaセッションがある場合は自動的にサインインされます）。

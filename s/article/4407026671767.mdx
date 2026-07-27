@@ -1,5 +1,6 @@
 ---
 title: "Workbench 5.1 FAQs"
+excerpt: "Frequently asked questions about Domo Workbench 5.1, covering supported data sources, languages, behavior, and security."
 ---
 
 ## Intro
@@ -56,6 +57,17 @@ Workbench stores access credentials for ODBC DataSets. To properly protect these
 <Accordion title="How are access controls configured for Workbench?">
 
 Workbench is configured by the client from an access control perspective. Workbench allows users to upload DataSets into Domo to enable KPI card creation and automated updates. Users select DataSets (System DSNs, flat files, Microsoft Excel spreadsheets, JIRA, QuickBooks, JSON, XML namespaces) to which they already have access. Workbench can connect to DataSets only if the Microsoft Windows system running the software can reach the DataSet, and if the machine has access to read the DataSet files or databases.
+</Accordion>
+
+<Accordion title="Can I run the Workbench service under a Windows service account while individual users run the Workbench client with their own logins?">
+
+Yes, and this is a recommended setup. Have an IT administrator (or whoever manages the server) install Workbench on the machine and authenticate it with a Domo service account so that it isn't tied to an individual user.
+
+Then add each user who needs to use Workbench to the **Workbench Users** local security group. For more information, see [Active Directory security groups](https://learn.microsoft.com/en-us/windows-server/identity/ad-ds/manage/understand-security-groups) on Microsoft Learn. After a user is added to the group, they can access Workbench to create, run, and monitor jobs.
+
+<Note>
+**Note:** This works well as long as multiple users aren't editing the same things at the same time. When that happens, Workbench displays **Live updates are not available** in red text at the top of the window.
+</Note>
 </Accordion>
 
 <Accordion title="Is any of the data transmitted by Workbench cached on the local machine?">
@@ -276,5 +288,27 @@ This could mean a few different things. If another person is running Workbench o
 <Accordion title="Can I run jobs more frequently than every 15 minutes?">
 
 Yes, if you need this ability, please reach out to your account team for evaluation.
+</Accordion>
+
+<Accordion title="Can Workbench match filenames by 'contains' instead of an exact filename?">
+
+Workbench does not support a "contains" match on filenames directly, but you can achieve the same result by pointing the job at a directory rather than a specific file. Workbench uploads any file that lands in that directory.
+
+**To set up a path-only (directory) source:**
+
+1. Create a new directory dedicated to the incoming file.
+2. In the Workbench job, on the **Configure** tab, click **Edit** under **Source**.
+3. For the **Path**, enter the directory only — do not include a filename.
+4. Configure the rest of the job normally and save.
+
+When a file appears in the directory, Workbench uploads it on the next run.
+
+<Warning>
+**Warning:** Every file that lands in the directory must have a schema identical to the file uploaded previously. If schemas differ, the job fails or produces unexpected results.
+</Warning>
+
+<Note>
+**Note:** Only one file should reside in the directory at a time. Workbench uploads every file present in the directory on each run, so if multiple files are waiting, all of them are uploaded. Use Windows Task Scheduler (or similar) to delete or move each file after it has been uploaded.
+</Note>
 </Accordion>
 </AccordionGroup>

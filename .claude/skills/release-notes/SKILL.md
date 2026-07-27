@@ -1,6 +1,6 @@
 ---
 name: release-notes
-description: Generate user-friendly release notes by diffing the latest git tag against the previous tag and summarizing the changes. Use when the user asks to "generate release notes", "write release notes for the latest release", "summarize the latest release", or similar. Saves a shareable text file to `releaseNotes/`.
+description: Generate user-friendly release notes by diffing the latest git tag against the previous tag and summarizing the changes. Use when the user asks to "generate release notes", "write release notes for the latest release", "summarize the latest release", or similar. Saves a shareable MDX file to `releaseNotes/` and a sanitized external version to `releaseNotesExternal/`.
 ---
 
 # Release Notes Generator
@@ -12,10 +12,21 @@ Produce a friendly, email/Slack-ready release notes summary for the most recent 
 ### 1. Identify the release range
 
 ```bash
-git tag --sort=-creatordate | head -5
+git tag --sort=-creatordate | head -10
 ```
 
-The top tag is the **latest release**; the next tag is the **previous release**. Confirm with the user only if the intended target is ambiguous (e.g. multiple tags on the same day, or user mentions a specific version).
+The top tag is the **latest release**. The **base** for the diff is **not** simply the previous tag — it is the tag that corresponds to the most recent version for which release notes have already been generated.
+
+**Finding the base tag:**
+
+1. List the files already in `releaseNotes/` to see which versions have notes:
+   ```bash
+   ls releaseNotes/
+   ```
+2. The highest version with an existing release notes file is the base. For example, if `releaseNotes/` contains `v2.6.0.mdx` and the tags are `v2.7.0 → v2.6.2 → v2.6.1 → v2.6.0`, the diff range is `v2.6.0..v2.7.0` — spanning all three intervening patch tags.
+3. If every tag already has release notes (i.e., the previous tag is also the base), use the previous tag as normal.
+
+Confirm with the user only if the intended target is ambiguous (e.g. multiple tags on the same day, or the user mentions a specific version).
 
 Also grab tag dates for context:
 
@@ -89,40 +100,113 @@ Worked example (Cloud Integrations Overhaul, v2.4.0):
 
 ### 6. Write the file
 
-Save to `releaseNotes/v<version>.txt` (plain text, not MDX — this is meant to be copy/pasted into email or Slack).
+Save to `releaseNotes/v<version>.mdx`. The file is MDX so it renders cleanly when viewed in the repo or pasted into Mintlify, but it's also written to read well when copy/pasted into email or Slack — keep prose plain and avoid Mintlify-only components (no `<Frame>`, `<Note>`, `<Accordion>`, etc.).
 
 Follow this structure:
 
-```
+````mdx
+---
+title: "Domo Documentation Hub v<X.Y.Z> Release Notes"
+---
+
 Hello everyone!
 
-We're excited to announce that version <X.Y.Z> of the Domo Documentation Hub is now available! <one-sentence framing of the release's overall theme> You can view these changes in our knowledge base at www.domo.com/docs.
+We're excited to announce that version <X.Y.Z> of the Domo Documentation Hub is now available! <one-sentence framing of the release's overall theme> You can view these changes in our knowledge base at [www.domo.com/docs](https://www.domo.com/docs).
 
+## 🌟 What's New
 
-🌟 What's New
+### <emoji> <Theme Title>
 
-<emoji> <Theme Title>
 <1–3 sentences describing the change and its value.>
+
 Thanks to <Contributor> for <brief reason>.
 
-<repeat for each theme>
+<repeat `###` block for each theme>
 
-
-🙏 Thank You
+## 🙏 Thank You
 
 A heartfelt thank you to everyone who contributed to this release. <one warm closing sentence>
 
 If you have questions or feedback, please reach out — we're always happy to help!
-```
+````
 
-Keep tone warm and appreciative. Use bullets (`  •`) for sub-lists inside a theme when listing many discrete items.
+Formatting rules:
 
-### 7. Confirm
+- YAML frontmatter with a `title` field is required.
+- Top-level sections use `##`; per-theme headings use `###`. The emoji stays inline in the heading.
+- Use markdown `-` bullets (not `•`) for sub-lists inside a theme.
+- Links use markdown syntax `[anchor](https://www.domo.com/docs/...)` — never bare URLs in prose (the intro `www.domo.com/docs` mention is the one exception and should also be linkified).
+- Leave a blank line between paragraphs, between a paragraph and a list, and between consecutive headings — MDX rendering needs the breathing room.
 
-Tell the user the file path and offer to adjust tone, detail, or framing.
+Keep tone warm and appreciative.
+
+### 7. Generate the external version
+
+After saving the internal file, produce a sanitized copy for external audiences (customers, partners, public-facing channels) and save it to `releaseNotesExternal/v<version>.mdx`.
+
+**What to strip or omit:**
+
+- **Contributor attribution** — remove every "Thanks to [Name] for…" sentence. The closing "Thank You" section may be kept but must not name individuals; replace with a generic warm sign-off (e.g., "A heartfelt thank you to everyone who helped make this release possible.").
+- **Internal-only themes** — drop entire `###` sections whose subject matter is not visible to or useful for Domo customers. Examples of internal-only content:
+  - New or updated Claude AI skills, slash commands, or documentation-team workflows
+  - GitHub Actions or CI/CD pipeline changes
+  - Internal scripts, tooling, or developer-experience improvements that don't affect the public docs site
+  - Changes to `CLAUDE.md`, `.claude/`, or other repo-meta files
+- **Everything else stays** — all customer-facing article additions and updates remain, including links.
+
+**Title and intro:** Keep the same version number and framing. The title field does not need to change. Adjust the intro only if it references themes you've dropped.
+
+**File location:** `releaseNotesExternal/v<version>.mdx` — the `Write` tool creates the directory automatically.
+
+### 8. Confirm
+
+Tell the user both file paths and offer to adjust tone, detail, or framing for either version. Wait for explicit approval before proceeding to step 9.
+
+### 9. Open a branch, commit, and open a PR
+
+Once the user approves the generated notes, publish them without further prompting:
+
+1. **Derive the branch name** from `git config user.name` — lowercase it and convert spaces to dots to get `firstname.lastname`, then append the version:
+   ```bash
+   git config user.name
+   # "Jared Peterson" → jared.peterson/release-notes-v<X.Y.Z>
+   ```
+
+2. **Create and switch to the branch:**
+   ```bash
+   git checkout -b jared.peterson/release-notes-v<X.Y.Z>
+   ```
+
+3. **Stage and commit both files:**
+   ```bash
+   git add releaseNotes/v<X.Y.Z>.mdx releaseNotesExternal/v<X.Y.Z>.mdx
+   git commit -m "docs: add v<X.Y.Z> release notes (internal + external)
+
+   Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>"
+   ```
+
+4. **Push and open a PR immediately after the commit:**
+   ```bash
+   git push -u origin jared.peterson/release-notes-v<X.Y.Z>
+   gh pr create \
+     --title "docs: add v<X.Y.Z> release notes" \
+     --body "$(cat <<'EOF'
+   ## Summary
+   - Adds internal release notes to `releaseNotes/v<X.Y.Z>.mdx`
+   - Adds sanitized external release notes to `releaseNotesExternal/v<X.Y.Z>.mdx`
+
+   ## Test plan
+   - [ ] Verify both files render correctly on the Mintlify preview
+
+   🤖 Generated with [Claude Code](https://claude.com/claude-code)
+   EOF
+   )"
+   ```
+
+5. Return the PR URL to the user so they can approve it through GitHub.
 
 ## Notes
 
-- Always create `releaseNotes/` if it doesn't exist — `Write` handles this automatically.
-- Do **not** include internal ticket IDs (DOMO-XXXXXX) in the final notes unless the user asks; parenthetical attribution is fine.
-- Do **not** commit the file unless the user asks.
+- Always create `releaseNotes/` and `releaseNotesExternal/` if they don't exist — `Write` handles this automatically.
+- Do **not** include internal ticket IDs (DOMO-XXXXXX) in either version unless the user asks; parenthetical attribution is fine in the internal version.
+- Do **not** commit either file unless the user asks.

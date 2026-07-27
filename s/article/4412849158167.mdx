@@ -1,5 +1,6 @@
 ---
 title: "Cloud Integrations Overview"
+excerpt: "Overview of Domo Cloud Integrations, including required grants for managing cloud accounts and overriding the default storage cloud."
 ---
 
 Cloud Integrations provides a native integration with cross-cloud systems to unlock data products at the speed your business needs them.
@@ -16,9 +17,9 @@ Cloud Integrations addresses the following common data challenges:
 
 After Cloud Integrations is enabled for your Domo environment, you can assign the following Cloud Integrations grants to manage access to these features:
 
-- **Manage Cloud Accounts** — Allows you to add or remove cloud accounts and tables from a cloud account, and change the default storage cloud. Requires the Manage DataSet grant.
+- **Manage Cloud Accounts** — Allows you to add or remove cloud accounts, manage the tables exposed by a cloud account, and choose which cloud integration a new DataSet uses (selected from Domo or any cloud integration that has been shared with you). This grant does **not** allow you to change the instance-wide default storage cloud in **Admin** > **Features** > **Cloud Integrations**. Requires the Manage DataSet grant.
 
-- **Override Default Cloud** — Allows you to use any shared storage cloud account instead of the default cloud. If you do not have this grant, you cannot use any other cloud besides the default cloud. Requires the Edit DataSet or Manage DataSet grant.
+- **Override Default Cloud** — Allows you to change the instance-wide default storage cloud in **Admin** > **Features** > **Cloud Integrations**. This grant does **not** allow you to change which cloud integration an individual new DataSet uses. Requires the Edit DataSet or Manage DataSet grant.
 
 ## Setup
 
@@ -30,20 +31,20 @@ After Cloud Integrations is enabled for your account, you can connect your exist
 
 ![The Create a Cloud Integration modal showing all available provider tiles](/images/kb/cloud-integrations-03.png)
 
-| Provider                                                           | Available support                                              |
-| ------------------------------------------------------------------ | -------------------------------------------------------------- |
-| [Amazon Athena](/s/article/000005744)                              | Read-only                                                      |
-| [Amazon Redshift](/s/article/000005312)                            | Read-only                                                      |
-| [Azure SQL Database](/s/article/000005471)                         | Read-only                                                      |
-| [Databricks](/s/article/000005289)                                 | Read, Writeback, Pushdown (Beta), OAuth (read-only operations) |
-| [Dremio](https://domo-support.domo.com/s/article/000005139)        | Read, Writeback                                                |
-| [Google BigQuery](/s/article/000005237)                            | Read, Writeback, Pushdown (Beta), OAuth (read-only operations) |
-| [Lakebase](/s/article/Domo-on-Lakebase)                            | Read-only                                                      |
-| [MySQL](/s/article/000005451)                                      | Read-only                                                      |
-| [Oracle ADW](/s/article/000005586)                                 | Read-only                                                      |
-| [Oracle NetSuite](/s/article/000005586)                            | Read-only                                                      |
-| [PostgreSQL](/s/article/000005756)                                 | Read-only                                                      |
-| [Snowflake](https://domo-support.domo.com/s/article/4402322966807) | Read, Writeback, Pushdown, OAuth (read-only operations)        |
+| Provider                                                           | Available support                |
+| ------------------------------------------------------------------ | -------------------------------- |
+| [Amazon Athena](/s/article/000005744)                              | Read-only                        |
+| [Amazon Redshift](/s/article/000005312)                            | Read-only                        |
+| [Azure SQL Database](/s/article/000005471)                         | Read-only                        |
+| [Databricks](/s/article/000005289)                                 | Read, Writeback, Pushdown (Beta) |
+| [Dremio](https://domo-support.domo.com/s/article/000005139)        | Read, Writeback                  |
+| [Google BigQuery](/s/article/000005237)                            | Read, Writeback, Pushdown (Beta) |
+| [Lakebase](/s/article/Domo-on-Lakebase)                            | Read-only                        |
+| [MySQL](/s/article/000005451)                                      | Read-only                        |
+| [Oracle ADW](/s/article/000005586)                                 | Read-only                        |
+| [Oracle NetSuite](/s/article/000005586)                            | Read-only                        |
+| [PostgreSQL](/s/article/000005756)                                 | Read-only                        |
+| [Snowflake](https://domo-support.domo.com/s/article/4402322966807) | Read, Writeback, Pushdown        |
 
 ## Set a Default Storage Cloud
 
@@ -84,7 +85,7 @@ The table below compares federated data to Cloud Integrations read and read/writ
 | Get updated metadata from source tables — last updated time, updated row count    | ❌                             | ✅ (Every 15 minutes, Configurable) | ✅ (Every 15 minutes, Configurable)     |
 | Card Alerts                                                                       | Scheduled only                 | ✅ (Every 15 minutes, Configurable) | ✅ (Every 15 minutes, Configurable)     |
 | DataSet Alerts                                                                    | ❌                             | ✅ (Every 15 minutes, Configurable) | ✅ (Every 15 minutes, Configurable)     |
-| DataSet Views                                                                     | ✅                             | ✅                                  | ✅                                      |
+| DataSet Views                                                                     | ✅                             | △ (See note below)                  | △ (See note below)                      |
 | Use data from existing tables in Magic ETL as inputs                              | ❌                             | ✅                                  | ✅                                      |
 | Use data updates from existing tables to trigger other DataFlows                  | ❌                             | ✅                                  | ✅                                      |
 | Custom fiscal calendar for source table data (one per instance)                   | ❌                             | ❌                                  | ✅                                      |
@@ -94,6 +95,22 @@ The table below compares federated data to Cloud Integrations read and read/writ
 | Domo App Support                                                                  | ✅                             | ✅                                  | ✅                                      |
 | Jupyter Workspace Support                                                         | ✅                             | ✅                                  | ✅                                      |
 | Domo auto-caching of card loads                                                   | Set static TTL on each DataSet | ✅                                  | ✅                                      |
+
+<Note>
+  **Note:** DataSet View support for Cloud Integrations DataSets is limited:
+
+- ✅ Supported: DataSet Views (Standard Views and SQL Views) that join Cloud Integrations DataSets from the **same** cloud connection.
+- ❌ Not supported: DataSet Views that join a Cloud Integrations DataSet with a Domo DataSet (a standard Domo DataSet) or with a Cloud Integrations DataSet from a different cloud connection.
+
+When creating a DataSet View, make sure every DataSet in the join is a Cloud Integrations DataSet from the same cloud connection.
+
+</Note>
+
+<Note>
+  **Note:** Custom fiscal calendars are not loaded automatically when you add a
+  new Cloud Integration. If your instance uses a custom fiscal calendar, contact
+  Domo Support to have it loaded on the new integration.
+</Note>
 
 ## Share a Cloud Integrations Account
 
@@ -177,11 +194,20 @@ Find answers to frequently asked questions about general topics and external clo
   Integrations.
 </Accordion>
 
-  <Accordion title="Why are old dates in a DataSet shifting by one hour?">
-    Old dates may shift by one hour due to daylight saving time (DST) adjustments.
-    Domo ensures correct time zone conversions for dates on or after January 1,
-    1970. For dates before that, time zone adjustments may be inaccurate depending
-    on when daylight saving time was adopted in the relevant time zone.
+<Accordion title="Why are old dates in a DataSet shifting by one hour?">
+  Old dates may shift by one hour due to daylight saving time (DST) adjustments.
+  Domo ensures correct time zone conversions for dates on or after January 1,
+  1970. For dates before that, time zone adjustments may be inaccurate depending
+  on when daylight saving time was adopted in the relevant time zone.
+</Accordion>
+
+  <Accordion title="Why doesn't my Cloud Integrations DataSet show a row count or a last updated date?">
+    When a Cloud Integrations DataSet is backed by a database View (rather than a
+    table), Domo does not display a row count or a last updated date. External
+    cloud databases do not expose row counts or modification timestamps for Views
+    the same way they do for tables, so Domo has no value to surface. This is
+    expected behavior and does not affect the DataSet's ability to power cards or
+    DataFlows.
   </Accordion>
 </AccordionGroup>
 

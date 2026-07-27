@@ -1,5 +1,6 @@
 ---
 title: "Manage Your Federated Data Connection"
+excerpt: "Configure a Federated Data connection to render Domo cards against an external database without uploading the data into Domo."
 ---
 
 ## Intro
@@ -41,7 +42,7 @@ The current list of supported Federated databases includes:
 * Trino
 * Vertica
 
-\*We recommend using the new cloud-native federated experience for these providers. See the [Cloud Amplifier documentation](https://domo-support.domo.com/s/topic/0TO5w000000Zjd3GAC/cloud-amplifier?language=en_US).
+\*We recommend using the new cloud-native federated experience for these providers. See the [Cloud Integrations documentation](https://domo-support.domo.com/s/topic/0TO5w000000Zjd3GAC/cloud-amplifier?language=en_US).
 
 ### Known Limitations
 
@@ -114,7 +115,7 @@ The **Connect a Federated DataSet** modal displays. See [Configure New Account](
 
 <Frame><img alt="IMAGE3.png" src="/images/kb/ka0Vq0000006bRV-00N5w00000Ri7BU-0EM5w000005vNui.png"/></Frame>
 
-The Federated Agent option is ideal for databases that cannot allow access to queries from Domo. Typically, these are on-premise databases. Under this architecture, an intermediate agent is installed in a location that has access to the database. Typically within the firewall of the database. This agent utilizes a socket connection to Domo to capture the queries, connects to the database and executes the queries, and returns the results to Domo. A configuration file is used to manage the connection to Domo and the target database.
+The Federated Agent option is ideal for databases that cannot allow access to queries from Domo. Typically, these are on-premise databases. Under this architecture, an intermediate agent is installed in a location that has access to the database. Typically within the firewall of the database. This agent uses a socket connection to Domo to capture the queries, connects to the database and executes the queries, and returns the results to Domo. A configuration file is used to manage the connection to Domo and the target database.
 
 ### Benefits
 
@@ -220,7 +221,13 @@ Your agent must be authorized to accept connections.
 
 <Accordion title="How does caching work?">
 
-Results are cached at a DataSet & SQL query level. Every card, Custom App, and DataFlow produces SQL used to select results from an underlying DataSet. The combination of the produced SQL and the DataSet serves as a cache key. If multiple cards produce the same SQL to retrieve data from the same DataSet, they may utilize the same cache. The same goes for multiple users that access a card or cards producing the same SQL against the same DataSet.
+Results are cached at a DataSet & SQL query level. Every card, Custom App, and DataFlow produces SQL used to select results from an underlying DataSet. The combination of the produced SQL and the DataSet serves as a cache key. If multiple cards produce the same SQL to retrieve data from the same DataSet, they may use the same cache.
+
+<Note>
+**Note:** Queries that contain dynamic functions — such as NOW(), CURRENT_DATE(), or CURRENT_TIMESTAMP() — produce a different SQL string on every card load. Because the cache key is the exact SQL text paired with the DataSet, these queries generate a new cache key each time and effectively bypass caching. If cache efficiency matters, consider filtering by a date column in a Beast Mode formula instead of using dynamic functions directly in SQL.
+</Note>
+
+The same goes for multiple users that access a card or cards producing the same SQL against the same DataSet.
 </Accordion>
 
 <Accordion title="How is caching impacted by filtering and/or PDP?">

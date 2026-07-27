@@ -1,5 +1,6 @@
 ---
 title: "Domo KB Style Guide"
+excerpt: "Standards and conventions for writing clear, consistent Domo Knowledge Base documentation."
 ---
 
 ## Intro
@@ -16,6 +17,21 @@ If you can't find an answer in any of these sources, consult with the Knowledge 
 ## Article Design
 
 This section includes content and page design standards for creating Knowledge Base content. These standards are not exhaustive and can be added to as needed.
+
+### Frontmatter
+
+Every article must include an `excerpt` field in its YAML frontmatter, directly below the `title`. The excerpt is a single sentence summarizing what the article covers — think of it as the "what's in this file" hint for future writers, PMs scanning the repo, and AI tools that need quick, accurate context without parsing the full article body. A well-written excerpt vastly improves how AI tools use the article in context and significantly boosts search engine optimization, since both rely on a concise, accurate summary to surface the article appropriately.
+
+````mdx
+---
+title: "Create and Use Data Models"
+excerpt: "Define relationships between DataSets once and reuse them across Domo for consistent metrics and faster analysis."
+---
+````
+
+Keep the excerpt to a single sentence and use the same terminology as the article body, so the summary stays accurate as the article evolves.
+
+Do not use a `description` field in place of `excerpt`. Mintlify renders `description` on the published page, which duplicates the Intro section. The `excerpt` field, by contrast, is invisible on the rendered site and exists purely as repo-level metadata.
 
 ### Article Structure
 
@@ -50,7 +66,7 @@ The **Required Grants** section must always follow this exact format:
 
 1. The heading: `## Required Grants`
 2. A lead-in sentence: `To access [Feature], the following grants must be enabled for your role:`
-3. A bulleted list of grants. Bold the grant name and include the em-dash inside the bold formatting, with a space on either side of the em-dash. Follow with a one-sentence description of what the grant allows.
+3. A bulleted list of grants. Bold the grant name and include the em-dash inside the bold formatting, with a space on either side of the em-dash. Follow with a one-sentence description of what the grant allows. Use the grant's **canonical wording** — see _Use canonical grant wording_ below.
 4. A closing line linking to the general grants article: `Learn more about [grants](/s/article/360043438973).`
 
 ```mdx
@@ -64,6 +80,18 @@ To access Documents, the following grants must be enabled for your role:
 
 Learn more about [grants](/s/article/360043438973).
 ```
+
+#### Use canonical grant wording
+
+Don't invent a grant description. Most grants are already described in the standard format somewhere in the Knowledge Base — reuse that wording so the same grant reads consistently across articles. Search for an existing description before writing your own:
+
+```bash
+grep -rn "Grant Name —" s/article/
+```
+
+For example, [Brand Kit](/s/article/5428851518999) describes **Manage All Company Settings** as "Manage company metadata, security rules and SSO, publishing, and licenses." Reuse wording like this verbatim (adjusting only to fit the em-dash format) rather than paraphrasing.
+
+If no existing article describes the grant, write a concise one-sentence description, and flag it to the user as newly authored rather than presenting it as canonical.
 
 ### FAQ
 
@@ -104,6 +132,19 @@ The frontmatter `title` field renders as H1. This means:
 - Subsections should be H3, H4, and so on
 
 The table of contents renders through H4. If you find yourself going three or more levels deep, consider reorganizing your content.
+
+### Versioned Articles
+
+When two or more versions of a feature are documented simultaneously — both remaining available to users — append a version label to the article title using the format `Feature Name v[number]`. The `v` is always lowercase; do not capitalize it, do not spell it out as "Version," and do not add a space between `v` and the number.
+
+- **Correct:** "AI Chat v2", "AI Chat v1"
+- **Incorrect:** "AI Chat V2", "AI Chat Version 2", "AI Chat v 2"
+
+Apply the label consistently to **all** coexisting articles for the same feature, including the older one. Never leave one version unlabeled when another exists — this makes it ambiguous which article is which.
+
+The same format applies to filenames and `docs.json` paths: `AI-Chat-v2.mdx`, `"s/article/AI-Chat-v2"`. Do not append `(Beta)` or `(Legacy)` to distinguish versions; use the version label instead.
+
+In body copy, spell out "version" in lowercase when referring to a version by number: "AI Chat version 2 supports cross-DataSet queries."
 
 ## Process Instructions
 
@@ -213,6 +254,34 @@ Treat this as a last resort. Whenever the icon sits inside normal prose, the rew
 
 Domo's icon font is large but not exhaustive. If the UI element you're trying to depict isn't represented in the font, fall back to a regular inline image — see *Inline images* below for how to format it. Just remember that the font version is preferred whenever a matching icon exists.
 
+One special case: if what you need is a third-party brand logo — AWS, OpenAI, Anthropic, GitHub, and the like — don't reach for an uploaded image right away. Those usually have a *coded* option too. See *Brand and Third-Party Logos* below.
+
+### Brand and Third-Party Logos
+
+Company and product logos aren't part of the Domo icon font, but you usually don't need to upload an image for them either — and you shouldn't if you can avoid it. A logo saved as an image is almost always a solid-color mark, so it vanishes against a dark background. Prefer a *coded* icon that inherits the surrounding text color, the same way the Domo icon font does, so it stays visible in both light and dark mode.
+
+There are two ways to do this. Try them in order:
+
+1. **Font Awesome brand icon.** Most major company logos are built into Font Awesome's *brands* set, which is available in every article. Reference one with the `<Icon>` component and `iconType="brands"`:
+
+   ```mdx
+   See the [OpenAI guide](https://platform.openai.com/docs/guides/text) <Icon icon="openai" iconType="brands" aria-hidden="true" />.
+   ```
+
+   The icon name is the brand's slug — `aws`, `openai`, `github`, and so on. Browse the set at [Font Awesome Brands](https://fontawesome.com/search?f=brands). This is the one case where `<Icon>` is the right tool: it's pulling a font glyph, not loading an uploaded image, so the dark-mode problem described under *Inline images* doesn't apply.
+
+2. **Inline SVG with `fill="currentColor"`.** A few brands — Anthropic is one — aren't in the free Font Awesome set. For those, paste the logo's SVG straight into the article and set `fill="currentColor"` so it picks up the text color. Vector logo libraries such as [Simple Icons](https://simpleicons.org) provide ready-to-paste paths:
+
+   ```mdx
+   See the [Anthropic guide](https://docs.anthropic.com) <svg aria-hidden="true" viewBox="0 0 24 24" fill="currentColor" style={{height: '1.1em', width: '1.1em', display: 'inline', verticalAlign: '-0.15em', margin: '0'}}><path d="M17.3041 3.541h-3.6718l6.696 16.918H24Zm-10.6082 0L0 20.459h3.7442l1.3693-3.5527h7.0052l1.3693 3.5528h3.7442L10.5363 3.5409Zm-.3712 10.2232 2.2914-5.9456 2.2914 5.9456Z" /></svg>.
+   ```
+
+   This is raw inline SVG, *not* the `<Icon>` component pointing at an uploaded file. The `fill="currentColor"` is what makes it adapt to the theme, which is why the dark-mode caveat under *Inline images* doesn't apply here either.
+
+Only fall back to an uploaded image (see *Inline images*) if a logo exists in neither place and you can't get its SVG — and if you do, pick a version that's legible on both light and dark backgrounds.
+
+For accessibility, follow the same rule as *Always Pair an Icon with a Text Label*: when the logo sits next to text that already names the brand — a link reading "OpenAI," for example — hide the icon from screen readers with `aria-hidden="true"` so it isn't announced twice. Reserve `role="img"` with `aria-label` for a logo that stands completely alone with nothing else naming it.
+
 ### Legacy Icons (`legacy-icon-*`)
 
 Domo also has a second icon font available, called `legacy-icon-*`. It contains the same set of icons as the standard `icon-*` font, but is styled to match Domo's older UI. The current font (`icon-*`) uses Phosphor icons, which are part of the design refresh.
@@ -254,6 +323,85 @@ The `height` value controls how big the image appears relative to the surroundin
 
 Keep the other three style values — `display: 'inline'`, `verticalAlign: 'start'`, and `margin: '0'` — the same across every inline image. They're what keep the image aligned with the text baseline and prevent extra vertical space from creeping in.
 
+## Videos
+
+Articles can include two kinds of video. Pick the one that matches what the reader needs from the clip.
+
+- **Inline looping video** — a short, silent clip that plays automatically on loop, like an animated screenshot. Use this when you want to show a small interaction in motion (a drag, a hover state, a connect-the-dots gesture) without making the reader stop and watch a full video. There are no playback controls, no audio, and no progress bar — the clip just plays.
+- **Embedded video** — a full video player from YouTube (or another host) that the reader presses play on. Use this for narrated walkthroughs, longer demos, or any clip with audio. The reader sees a standard video window with play/pause, volume, fullscreen, and a progress bar.
+
+When in doubt, prefer the inline looping video — it gives the reader the visual without interrupting their reading flow. Reserve embedded videos for content that genuinely needs audio or runs longer than ~30 seconds.
+
+### Inline Looping Video
+
+Wrap an HTML5 `<video>` element in a `<Frame>`. The `autoPlay`, `muted`, `loop`, and `playsInline` attributes are all required — together they let the clip play automatically on every browser, including mobile Safari, without prompting the reader.
+
+```mdx
+<Frame>
+  <video
+    autoPlay
+    muted
+    loop
+    playsInline
+    className="w-full aspect-video rounded-xl"
+    src="/images/kb/example-clip.mp4"
+  ></video>
+</Frame>
+```
+
+Keep clips short — 5 to 15 seconds is usually enough — and store them under `/images/kb/` alongside screenshots.
+
+### Embedded Video
+
+Wrap a YouTube (or other host) embed `<iframe>` in a `<Frame>`. Use the host's standard embed URL — for YouTube, that's `https://www.youtube.com/embed/VIDEO_ID`.
+
+```mdx
+<Frame>
+  <iframe
+    allowfullscreen=""
+    frameborder="0"
+    height="315"
+    width="560"
+    src="https://www.youtube.com/embed/VIDEO_ID"
+    title="YouTube video player"
+  ></iframe>
+</Frame>
+```
+
+Always include a descriptive `title` attribute — screen readers announce it, and it's what appears if the embed fails to load.
+
+## Embedded Domo Content
+
+Use the `DomoEmbed` snippet to embed live Domo content—dashboards, pages, or cards—directly inside a documentation article. Unlike a screenshot or video, an embedded view reflects current data and lets readers interact with it in context.
+
+The component handles sizing automatically: Domo's embed runtime sends a `postMessage` with the rendered page height, and `DomoEmbed` updates the iframe height accordingly, preventing scroll traps and double scrollbars.
+
+**When to use:** Reserve `DomoEmbed` for situations where live, interactive Domo content adds genuine value—a product overview, a walkthrough that references a live dashboard, or a reference page that benefits from real data context. For static illustration, a screenshot is simpler and more reliable.
+
+### Import and Use
+
+Add the import directly below the frontmatter (alongside any other imports):
+
+```mdx
+import { DomoEmbed } from '/snippets/DomoEmbed.mdx';
+```
+
+Then place the component wherever the embed should appear:
+
+```mdx
+<DomoEmbed src="https://embed.domo.com/embed/pages/XXXXX" />
+```
+
+Three props are available:
+
+| Prop            | Required | Default  | Description                                         |
+| --------------- | -------- | -------- | --------------------------------------------------- |
+| `src`           | Yes      | —        | The Domo embed URL (cards or pages endpoint).       |
+| `width`         | No       | `"100%"` | CSS width of the iframe.                            |
+| `initialHeight` | No       | `"600"`  | Starting height in pixels before auto-resize fires. |
+
+<Note>**Note:** The Domo instance that hosts the embed must allow your documentation domain in its embed allowlist. If the iframe appears blank, check the source instance's CSP / embed allowlist settings.</Note>
+
 ## Callouts
 
 Use React callout elements for notes, warnings, and tips — not plain text or HTML. Always bold the label and its colon, for example `**Note:**`.
@@ -274,23 +422,60 @@ Beta features must be marked using one of two conventions, depending on whether 
 
 ### Standard Beta Note
 
-Use this exact callout — verbatim — wherever a beta Note is required. Do not paraphrase, shorten, or change the links.
+The standard beta Note is stored once as a reusable snippet at `/snippets/BetaNote.mdx`, so its wording, links, and feedback email stay identical in every article and only ever change in one place. Don't paste the Note text into an article — import the snippet instead.
+
+Add this import line once, on its own line directly below the frontmatter (the closing `---`):
 
 ```mdx
-<Note>
-  **Note:** This feature is in beta. Beta Program participants can enable
-  features [here](https://embed.domo.com/embed/pages/DQ8Ek). To join the Beta
-  Program, fill out [this form](https://embed.domo.com/embed/pages/K8GMx). For beta questions or feedback, email
-  [beta.admin@domo.com](mailto:beta.admin@domo.com).
-</Note>
+import { BetaNote } from '/snippets/BetaNote.mdx';
 ```
+
+Then write this wherever the beta Note should appear:
+
+```mdx
+<BetaNote />
+```
+
+For a Note that introduces a **group** of beta features rather than one specific feature — typically a release-notes roundup, where the Note sits above a list of beta items — add the `generic` prop. This drops the leading "This feature is in beta." sentence, which doesn't fit that context:
+
+```mdx
+<BetaNote generic />
+```
+
+The snippet renders a Note about enabling beta features, with links to enable beta features, to join the Beta Program, and an address for beta questions or feedback (and, unless `generic` is set, a leading "This feature is in beta." sentence). To see or change the exact text, open `/snippets/BetaNote.mdx` — remember that a change there updates every article that imports it.
+
+### Localized Beta Notes
+
+For articles in Spanish, French, German, or Japanese, import and use the language-specific named export from the same snippet file. Both `<LangBetaNote />` (feature-level) and `<LangBetaNote generic />` (release-notes roundup) work identically to their English equivalents.
+
+| Language | Import name | Component usage |
+| -------- | ----------- | --------------- |
+| English  | `BetaNote`    | `<BetaNote />` / `<BetaNote generic />` |
+| Spanish  | `BetaNoteEs`  | `<BetaNoteEs />` / `<BetaNoteEs generic />` |
+| French   | `BetaNoteFr`  | `<BetaNoteFr />` / `<BetaNoteFr generic />` |
+| German   | `BetaNoteDe`  | `<BetaNoteDe />` / `<BetaNoteDe generic />` |
+| Japanese | `BetaNoteJa`  | `<BetaNoteJa />` / `<BetaNoteJa generic />` |
+
+Example import for a Spanish article:
+
+```mdx
+import { BetaNoteEs } from '/snippets/BetaNote.mdx';
+```
+
+Example usage (Spanish, release-notes roundup above a list of beta features):
+
+```mdx
+<BetaNoteEs generic />
+```
+
+Do not use the English `<BetaNote />` in a localized article. Do not paste raw beta text inline — always use the snippet so that wording, links, and the email address stay consistent and can be updated in one place.
 
 ### Whole-Article Beta Features
 
 When the entire article covers a beta feature:
 
 1. Add `tag: "Beta"` to the frontmatter. This renders a Beta badge next to the article title in the sidebar.
-2. Place the standard beta Note immediately after the frontmatter, above the Intro section.
+2. Add the `import { BetaNote } from '/snippets/BetaNote.mdx';` line directly below the frontmatter, then place `<BetaNote />` immediately after it, above the Intro section.
 3. Do not append `(Beta)` to the article title.
 
 ```mdx
@@ -300,16 +485,32 @@ tag: "Beta"
 sidebarTitle: "MCP Server"
 ---
 
-<Note>
-  **Note:** This feature is in beta. Beta Program participants can enable
-  features [here](https://embed.domo.com/embed/pages/DQ8Ek). To join the Beta
-  Program, fill out [this form](https://embed.domo.com/embed/pages/K8GMx). For beta questions or feedback, email
-  [beta.admin@domo.com](mailto:beta.admin@domo.com).
-</Note>
+import { BetaNote } from '/snippets/BetaNote.mdx';
+
+<BetaNote />
 
 ## Intro
 
 ...
+```
+
+### Whole-Section Beta Features
+
+When an entire multi-page section is in beta — typically an API reference that appears as a dropdown group in the sidebar — tag the group heading instead of each page:
+
+1. Add `"tag": "Beta"` to the group's object in the navigation file (`docs.json`). This renders the Beta badge next to the dropdown heading.
+2. Do not also add `tag: "Beta"` to that group's Overview (landing) page — the badge would then appear twice in the same expanded section. Tag the heading only.
+3. Still place `<BetaNote />` on the Overview page (and any other beta pages in the group) per the rules above.
+
+```json
+{
+  "group": "FileSets API",
+  "tag": "Beta",
+  "pages": [
+    "portal/b939448cde9d5-file-sets-api",
+    ...
+  ]
+}
 ```
 
 ### Section-Level Beta Features
@@ -317,18 +518,21 @@ sidebarTitle: "MCP Server"
 When only a section of an otherwise-GA article covers a beta feature:
 
 1. Append a Badge to the section heading: `<Badge className="text-primary bg-primary/10 font-bold">Beta</Badge>`. The `className` is required — it matches the styling of the sidebar `tag` badge so the two are visually consistent.
-2. Place the standard beta Note immediately under the **first** beta section in the article. Do not repeat the Note for any additional beta sections in the same article — one Note per article is enough.
+2. Add the `import { BetaNote } from '/snippets/BetaNote.mdx';` line directly below the frontmatter, then place `<BetaNote />` immediately under the **first** beta section in the article. Don't repeat it for additional beta sections in the same article — one Note per article is enough.
 3. Do not append `(Beta)` or `(BETA)` to the heading text.
 
 ```mdx
+---
+title: "..."
+---
+
+import { BetaNote } from '/snippets/BetaNote.mdx';
+
+...
+
 ### PDP—Row Policies <Badge className="text-primary bg-primary/10 font-bold">Beta</Badge>
 
-<Note>
-  **Note:** This feature is in beta. Beta Program participants can enable
-  features [here](https://embed.domo.com/embed/pages/DQ8Ek). To join the Beta
-  Program, fill out [this form](https://embed.domo.com/embed/pages/K8GMx). For beta questions or feedback, email
-  [beta.admin@domo.com](mailto:beta.admin@domo.com).
-</Note>
+<BetaNote />
 
 This report lists all PDP row policies by ID...
 

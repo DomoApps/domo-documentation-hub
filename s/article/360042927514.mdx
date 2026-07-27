@@ -1,5 +1,6 @@
 ---
 title: "X Ads Connector"
+excerpt: "Use the X Ads Connector to retrieve account, campaign, funding instrument, line item, and tweet statistics from the X advertising platform into Domo."
 ---
 
 ## Intro
@@ -10,66 +11,594 @@ The X Ads connector is a "Cloud App" connector, meaning it retrieves data stored
 
 This topic discusses the fields and menus that are specific to the X Ads connector user interface. For general information about adding DataSets, setting update schedules, and editing DataSet information, see [Adding a DataSet Using a Data Connector](https://domo-support.domo.com/s/article/360042926274?language=en_US "Adding a DataSet Using a Data Connector").
 
-<table class="mt-responsive-table" data-aura-rendered-by="33:195;a"><tbody><tr><td class="mt-noheading" colspan="1" rowspan="1"><p><b> Primary Use Cases </b></p></td><td class="mt-noheading" colspan="1" rowspan="1"><p> This connector lets you discover impressions, who is interacting with your X ads, and the kind of reach you're getting. </p></td></tr><tr><td class="mt-noheading" colspan="1" rowspan="1"><p><b> Primary Metrics </b></p></td><td class="mt-noheading" colspan="1" rowspan="1"><ul><li><p> Total number of engagements </p></li><li><p> Total number of impressions </p></li><li><p> Total number of retweets </p></li><li><p> Total number of replies </p></li><li><p> Total number of likes </p></li><li><p> Total number of follows </p></li><li><p> Total number of clicks, including favorites and other engagements </p></li><li><p> Total number of qualified impressions </p></li></ul></td></tr><tr><td class="mt-noheading" colspan="1" rowspan="1"><p><b> Primary Company Roles </b></p></td><td class="mt-noheading" colspan="1" rowspan="1"> All marketing roles </td></tr><tr><td class="mt-noheading" colspan="1" rowspan="1"><p><b> Average Implementation Time </b></p></td><td class="mt-noheading" colspan="1" rowspan="1"><p> 10 minutes or less </p></td></tr><tr><td class="mt-noheading" colspan="1" rowspan="1"><p><b> Ease of Use (on a 1-to-10 scale with 1 being easiest) </b></p></td><td class="mt-noheading" colspan="1" rowspan="1"><p> 2 </p></td></tr></tbody></table>
+<table class="mt-responsive-table" data-aura-rendered-by="33:195;a">
+  <tbody>
+    <tr>
+      <td class="mt-noheading" colspan="1" rowspan="1">
+        <p>
+          <b> Primary Use Cases </b>
+        </p>
+      </td>
+      <td class="mt-noheading" colspan="1" rowspan="1">
+        <p>
+          {" "}
+          This connector lets you discover impressions, who is interacting with
+          your X ads, and the kind of reach you're getting.{" "}
+        </p>
+      </td>
+    </tr>
+    <tr>
+      <td class="mt-noheading" colspan="1" rowspan="1">
+        <p>
+          <b> Primary Metrics </b>
+        </p>
+      </td>
+      <td class="mt-noheading" colspan="1" rowspan="1">
+        <ul>
+          <li>
+            <p> Total number of engagements </p>
+          </li>
+          <li>
+            <p> Total number of impressions </p>
+          </li>
+          <li>
+            <p> Total number of retweets </p>
+          </li>
+          <li>
+            <p> Total number of replies </p>
+          </li>
+          <li>
+            <p> Total number of likes </p>
+          </li>
+          <li>
+            <p> Total number of follows </p>
+          </li>
+          <li>
+            <p>
+              {" "}
+              Total number of clicks, including favorites and other
+              engagements{" "}
+            </p>
+          </li>
+          <li>
+            <p> Total number of qualified impressions </p>
+          </li>
+        </ul>
+      </td>
+    </tr>
+    <tr>
+      <td class="mt-noheading" colspan="1" rowspan="1">
+        <p>
+          <b> Primary Company Roles </b>
+        </p>
+      </td>
+      <td class="mt-noheading" colspan="1" rowspan="1">
+        {" "}
+        All marketing roles{" "}
+      </td>
+    </tr>
+    <tr>
+      <td class="mt-noheading" colspan="1" rowspan="1">
+        <p>
+          <b> Average Implementation Time </b>
+        </p>
+      </td>
+      <td class="mt-noheading" colspan="1" rowspan="1">
+        <p> 10 minutes or less </p>
+      </td>
+    </tr>
+    <tr>
+      <td class="mt-noheading" colspan="1" rowspan="1">
+        <p>
+          <b> Ease of Use (on a 1-to-10 scale with 1 being easiest) </b>
+        </p>
+      </td>
+      <td class="mt-noheading" colspan="1" rowspan="1">
+        <p> 2 </p>
+      </td>
+    </tr>
+  </tbody>
+</table>
 
 ## Best Practices
 
-* Create DataSets that use **Replace** instead of **Append**, and only pull the last 3-7 days at a time.
-* Use a recursive DataFlow to deduplicate and append data. For more information, see [Creating a Recursive/Snapshot Magic ETL DataFlow](https://domo-support.domo.com/s/article/360043428113?language=en_US "Creating a Recursive/Snapshot Magic ETL DataFlow").
-* To collect historical promoted Tweet Statistics and then update them with the latest tweet data, follow these steps:
+- Create DataSets that use **Replace** instead of **Append**, and only pull the last 3-7 days at a time.
+- Use a recursive DataFlow to deduplicate and append data. For more information, see [Creating a Recursive/Snapshot Magic ETL DataFlow](https://domo-support.domo.com/s/article/360043428113?language=en_US "Creating a Recursive/Snapshot Magic ETL DataFlow").
+- To collect historical promoted Tweet Statistics and then update them with the latest tweet data, follow these steps:
+  1.  Create a new X Ads DataSet.
 
-   1. Create a new X Ads DataSet.
-         
       <Tip>
-      **Tip:** You may want to configure more settings than what is shown here; feel free to add settings according to your needs. Keep in mind that we will be selecting two different reports, the Promoted Tweet Statistics v.1 and Recent Promoted Tweets Statistics v.1. Make sure your settings match for both of these.
+        **Tip:** You may want to configure more settings than what is shown
+        here; feel free to add settings according to your needs. Keep in mind
+        that we will be selecting two different reports, the Promoted Tweet
+        Statistics v.1 and Recent Promoted Tweets Statistics v.1. Make sure your
+        settings match for both of these.
       </Tip>
 
-   2. Configure the connector for the first run, making sure to configure settings as follows:
-      
+  2.  Configure the connector for the first run, making sure to configure settings as follows:
       1. For the **Report**, select "Promoted Tweets Statistics v.1."
       2. For the duration of the report, choose to pull data for the past 90 days (the connector limits you to 90 days of data; if you need more then that, we suggest selecting the first date of history you want and then selecting 90 days after that, running the report on Append, selecting the next 90 days, then running the DataSet again on Append, etc. until you have collected all the history you want).
 
-   3. Save the configurations.
-   4. Schedule the connector to "Append" instead of "Replace."
-   5. Run the connector.
-   6. Once the run has completed, reconfigure the connector for the second run as follows:
-
+  3.  Save the configurations.
+  4.  Schedule the connector to "Append" instead of "Replace."
+  5.  Run the connector.
+  6.  Once the run has completed, reconfigure the connector for the second run as follows:
       1. For the **Report**, select "Recent Promoted Tweets Statistics v.2."
       2. For **Tweets Selection Window**, select **Past 3 Months**.
       3. For the duration of the report, choose to pull data for yesterday.
 
          <Note>
-         **Note:** The other settings should match how you had them in the configuration of the first run; the only difference is you have no promoted tweets to select as this report will bring in tweet activity on all the promoted tweets that had activity yesterday.
+           **Note:** The other settings should match how you had them in the
+           configuration of the first run; the only difference is you have no
+           promoted tweets to select as this report will bring in tweet activity
+           on all the promoted tweets that had activity yesterday.
          </Note>
 
-   7. Save the configuration.
-   8. Make sure the scheduling is set to "Append."
-   9. Let the connector run on the next schedule—you want it to run tomorrow to collect the most recent tweet activity from the previous day.
-         
+  7.  Save the configuration.
+  8.  Make sure the scheduling is set to "Append."
+  9.  Let the connector run on the next schedule—you want it to run tomorrow to collect the most recent tweet activity from the previous day.
       Congratulations, you have just selected the promoted tweet history and configured the DataSet to collect yesterday's promoted tweet activity, appending it to the history you just collected.
 
 ## Prerequisites
 
 To connect to your X Ads account and create a X Ads DataSet, you must have the following:
 
-* The X account to use to log into your X Ads account.
-* The password you use to log into your X account.
+- The X account to use to log into your X Ads account.
+- The password you use to log into your X account.
 
 ## Connecting to your X Ads account
 
-This section enumerates the options in the **Credentials** and **Details** panes in the X Ads connector page. The components of the other panes in this page, **Scheduling** and **Name & Describe Your DataSet**, are universal across most connector types and are discussed in greater length in [Adding a DataSet Using a Data Connector](https://domo-support.domo.com/s/article/360042926274?language=en_US "Adding a DataSet Using a Data Connector").
+This section enumerates the options in the **Credentials** and **Details** panes in the X Ads connector page. The components of the other panes in this page, **Scheduling** and **Name & Describe Your DataSet**, are universal across most connector types and are discussed in greater length in [Adding a DataSet Using a Data Connector](/s/article/360042926274).
 
 ## Credentials Pane
 
 The Domo X Ads connector uses OAuth to connect to X Ads. Click **Connect** (or select **Add Account** if you have existing X Ads accounts in Domo) to open the X Ads OAuth screen where you can enter the credentials associated with your X account. After you have entered valid X credentials, you can use the same account in Domo any time you create a X Ads DataSet.
 
-You can manage connector accounts in the **Accounts** tab in the Data Center. For more information about this tab, see [Creating and Managing User Groups](https://domo-support.domo.com/s/article/360043428113?language=en_US "Creating and Managing User Groups").
+You can manage connector accounts in the **Accounts** tab in the Data Center. For more information about this tab, see [Manage Connector/Adapter Accounts](/s/article/360042926054).
 
 ## Details Pane
 
 This pane includes a primary menu, **Report**, and other menus that appear depending on the report you select.
 
-<table border="1" cellpadding="1" cellspacing="1" data-aura-rendered-by="33:195;a"><thead><tr><th colspan="1" rowspan="1"><p> Menu </p></th><th colspan="1" rowspan="1"><p> Description </p></th></tr></thead><tbody><tr><td colspan="1" rowspan="1"><p> Report </p></td><td colspan="1" rowspan="1"><p> Select the X Ads report. The following reports are available: </p><table border="1" cellpadding="1" cellspacing="1"><tbody><tr><td colspan="1" rowspan="1"> Account Media </td><td colspan="1" rowspan="1"> Retrieves details about all account media associated with the specified account. </td></tr><tr><td colspan="1" rowspan="1"> Account Statistics </td><td colspan="1" rowspan="1"> Retrieves the summary of analytics about the campaigns executed by the specified account. </td></tr><tr><td colspan="1" rowspan="1"> All Campaigns </td><td colspan="1" rowspan="1"> Retrieves all campaigns executed by the specified account. </td></tr><tr><td colspan="1" rowspan="1"> All Funding Instruments </td><td colspan="1" rowspan="1"> Retrieves all Funding Instruments for the specified account. </td></tr><tr><td colspan="1" rowspan="1"> All Line Items </td><td colspan="1" rowspan="1"> Retrieves all Line Items for the specified account. </td></tr><tr><td colspan="1" rowspan="1"> All Promoted Tweets </td><td colspan="1" rowspan="1"> Retrieves all Promoted Tweets for the specified account. </td></tr><tr><td colspan="1" rowspan="1"> Campaign Reach </td><td colspan="1" rowspan="1"> Retrieves reach and average frequency analytics for specified campaigns. </td></tr><tr><td colspan="1" rowspan="1"> Campaign Statistics </td><td colspan="1" rowspan="1"> Retrieves summary analytics about campaigns executed by the specified account. </td></tr><tr><td colspan="1" rowspan="1"> Funding Instruments Reach </td><td colspan="1" rowspan="1"> Retrieves reach and average frequency analytics for specified funding instruments. </td></tr><tr><td colspan="1" rowspan="1"> Funding Instruments Statistics </td><td colspan="1" rowspan="1"> Retrieves summary analytics about specific funding instruments with the specified account. </td></tr><tr><td colspan="1" rowspan="1"> Line Item Statistics </td><td colspan="1" rowspan="1"> Retrieves summary analytics about Line Items accessible by the current user. </td></tr><tr><td colspan="1" rowspan="1"> Media Creatives </td><td colspan="1" rowspan="1"> Retrieves details for media creatives associated with the specified account. </td></tr><tr><td colspan="1" rowspan="1"> Media Creatives Statistics </td><td colspan="1" rowspan="1"> Retrieves summary analytics about specific media creatives with the specified account. </td></tr><tr><td colspan="1" rowspan="1"> Media Library </td><td colspan="1" rowspan="1"> Retrieves details for media library objects associated with the account. </td></tr><tr><td colspan="1" rowspan="1"> Organic Tweet Statistics </td><td colspan="1" rowspan="1"> Retrieves the organic summary analytics about Promoted Tweets accessible by the current user. </td></tr><tr><td colspan="1" rowspan="1"> Promoted Tweet Statistics </td><td colspan="1" rowspan="1"> Retrieves the summary analytics about Promoted Tweets accessible by the current user. </td></tr><tr><td colspan="1" rowspan="1"> Reach Estimate (deprecated) </td><td colspan="1" rowspan="1"> Determines the approximate reach of the campaigns for the specified account. <br/> This report will no longer be available from September 1, 2020. </td></tr><tr><td colspan="1" rowspan="1"> Recent Organic Tweet Statistics </td><td colspan="1" rowspan="1"> Retrieves the organic summary analytics about recent Promoted Tweets accessible by the current user. </td></tr><tr><td colspan="1" rowspan="1"> Recent Promoted Tweet Statistics </td><td colspan="1" rowspan="1"> Retrieves the summary analytics about recent Active Promoted Tweets accessible by the current user. </td></tr><tr><td colspan="1" rowspan="1"> Tweets </td><td colspan="1" rowspan="1"> Retrieve Tweet details for the account. </td></tr></tbody></table></td></tr><tr><td colspan="1" rowspan="1"><p> Account </p></td><td colspan="1" rowspan="1"><p> Select the X Ads account to query data from. </p></td></tr><tr><td colspan="1" rowspan="1"><p> Duration </p></td><td colspan="1" rowspan="1"><p> Select whether to pull data for a single date or a date range. </p></td></tr><tr><td colspan="1" rowspan="1"> Report Date </td><td colspan="1" rowspan="1"> Select whether to pull data for a specific date or a given number of days back (offset). </td></tr><tr><td colspan="1" rowspan="1"> Specific Date </td><td colspan="1" rowspan="1"> Select the date you want to pull data for. </td></tr><tr><td colspan="1" rowspan="1"> Days Back </td><td colspan="1" rowspan="1"> Enter the number of days back you want to pull data for. </td></tr><tr><td colspan="1" rowspan="1"> Start Date </td><td colspan="1" rowspan="1"> Specify whether the first date in your date range is a specific date or a given number of days back (offset). </td></tr><tr><td colspan="1" rowspan="1"> Specific Start Date </td><td colspan="1" rowspan="1"> Select the start date for your date range. </td></tr><tr><td colspan="1" rowspan="1"> End Date </td><td colspan="1" rowspan="1"> Specify whether the last date in your date range is a specific date or a given number of days back (offset). </td></tr><tr><td colspan="1" rowspan="1"> Specific End Date </td><td colspan="1" rowspan="1"> Select the end date for your date range. </td></tr><tr><td colspan="1" rowspan="1"> Days Back to Start From </td><td colspan="1" rowspan="1"> Enter the number of days back (offset) for the start date in your date range. For example, if you entered <span class="mt-font-courier-new"> 10 </span> for <b> Days Back to Start From </b> and <span class="mt-font-courier-new"> 5 </span> for <b> Days Back to End At </b>, each time the report ran it would pull data for the last 10 days up until the last 5 days. </td></tr><tr><td colspan="1" rowspan="1"> Days Back to End At </td><td colspan="1" rowspan="1"> Enter the number of days back (offset) for the end date in your date range. For example, if you entered <span class="mt-font-courier-new"> 10 </span> for <b> Days Back to Start From </b> and <span class="mt-font-courier-new"> 5 </span> for <b> Days Back to End At </b>, each time the report ran it would pull data for the last 10 days up until the last 5 days. </td></tr><tr><td colspan="1" rowspan="1"><p> Granularity </p></td><td colspan="1" rowspan="1"><p> Select the required granularity. For example, if the granularity is <b> Hour </b>, data is presented by hour between the <b> Start Date </b> and the <b> End Date </b>. </p></td></tr><tr><td colspan="1" rowspan="1"><p> Segmentation Type </p></td><td colspan="1" rowspan="1"><p> Select the required segmentation type. </p></td></tr><tr><td colspan="1" rowspan="1"><p> Placement </p></td><td colspan="1" rowspan="1"><p><span> Select the required Placement from the available options. </span></p><p><span> For example, if the placement is </span><b> ALL ON X </b><span>, data is presented by all possible placement types on X. If placement is </span><b> Publisher Network </b><span>, data is presented by the X Audience Platform. </span><b> Total </b><span> will total the result for both the Publisher Network and All On X. </span></p></td></tr><tr><td colspan="1" rowspan="1"><p> Country </p></td><td colspan="1" rowspan="1"><p><span> Select the country that should have data returned. </span></p></td></tr><tr><td colspan="1" rowspan="1"><p> Platform </p></td><td colspan="1" rowspan="1"><p><span> Select the platform that should have data returned. </span></p></td></tr></tbody></table>
+<table
+  border="1"
+  cellpadding="1"
+  cellspacing="1"
+  data-aura-rendered-by="33:195;a"
+>
+  <thead>
+    <tr>
+      <th colspan="1" rowspan="1">
+        <p> Menu </p>
+      </th>
+      <th colspan="1" rowspan="1">
+        <p> Description </p>
+      </th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td colspan="1" rowspan="1">
+        <p> Report </p>
+      </td>
+      <td colspan="1" rowspan="1">
+        <p> Select the X Ads report. The following reports are available: </p>
+        <table border="1" cellpadding="1" cellspacing="1">
+          <tbody>
+            <tr>
+              <td colspan="1" rowspan="1">
+                {" "}
+                Account Media{" "}
+              </td>
+              <td colspan="1" rowspan="1">
+                {" "}
+                Retrieves details about all account media associated with the
+                specified account.{" "}
+              </td>
+            </tr>
+            <tr>
+              <td colspan="1" rowspan="1">
+                {" "}
+                Account Statistics{" "}
+              </td>
+              <td colspan="1" rowspan="1">
+                {" "}
+                Retrieves the summary of analytics about the campaigns executed
+                by the specified account.{" "}
+              </td>
+            </tr>
+            <tr>
+              <td colspan="1" rowspan="1">
+                {" "}
+                All Campaigns{" "}
+              </td>
+              <td colspan="1" rowspan="1">
+                {" "}
+                Retrieves all campaigns executed by the specified account.{" "}
+              </td>
+            </tr>
+            <tr>
+              <td colspan="1" rowspan="1">
+                {" "}
+                All Funding Instruments{" "}
+              </td>
+              <td colspan="1" rowspan="1">
+                {" "}
+                Retrieves all Funding Instruments for the specified
+                account.{" "}
+              </td>
+            </tr>
+            <tr>
+              <td colspan="1" rowspan="1">
+                {" "}
+                All Line Items{" "}
+              </td>
+              <td colspan="1" rowspan="1">
+                {" "}
+                Retrieves all Line Items for the specified account.{" "}
+              </td>
+            </tr>
+            <tr>
+              <td colspan="1" rowspan="1">
+                {" "}
+                All Promoted Tweets{" "}
+              </td>
+              <td colspan="1" rowspan="1">
+                {" "}
+                Retrieves all Promoted Tweets for the specified account.{" "}
+              </td>
+            </tr>
+            <tr>
+              <td colspan="1" rowspan="1">
+                {" "}
+                Campaign Reach{" "}
+              </td>
+              <td colspan="1" rowspan="1">
+                {" "}
+                Retrieves reach and average frequency analytics for specified
+                campaigns.{" "}
+              </td>
+            </tr>
+            <tr>
+              <td colspan="1" rowspan="1">
+                {" "}
+                Campaign Statistics{" "}
+              </td>
+              <td colspan="1" rowspan="1">
+                {" "}
+                Retrieves summary analytics about campaigns executed by the
+                specified account.{" "}
+              </td>
+            </tr>
+            <tr>
+              <td colspan="1" rowspan="1">
+                {" "}
+                Funding Instruments Reach{" "}
+              </td>
+              <td colspan="1" rowspan="1">
+                {" "}
+                Retrieves reach and average frequency analytics for specified
+                funding instruments.{" "}
+              </td>
+            </tr>
+            <tr>
+              <td colspan="1" rowspan="1">
+                {" "}
+                Funding Instruments Statistics{" "}
+              </td>
+              <td colspan="1" rowspan="1">
+                {" "}
+                Retrieves summary analytics about specific funding instruments
+                with the specified account.{" "}
+              </td>
+            </tr>
+            <tr>
+              <td colspan="1" rowspan="1">
+                {" "}
+                Line Item Statistics{" "}
+              </td>
+              <td colspan="1" rowspan="1">
+                {" "}
+                Retrieves summary analytics about Line Items accessible by the
+                current user.{" "}
+              </td>
+            </tr>
+            <tr>
+              <td colspan="1" rowspan="1">
+                {" "}
+                Media Creatives{" "}
+              </td>
+              <td colspan="1" rowspan="1">
+                {" "}
+                Retrieves details for media creatives associated with the
+                specified account.{" "}
+              </td>
+            </tr>
+            <tr>
+              <td colspan="1" rowspan="1">
+                {" "}
+                Media Creatives Statistics{" "}
+              </td>
+              <td colspan="1" rowspan="1">
+                {" "}
+                Retrieves summary analytics about specific media creatives with
+                the specified account.{" "}
+              </td>
+            </tr>
+            <tr>
+              <td colspan="1" rowspan="1">
+                {" "}
+                Media Library{" "}
+              </td>
+              <td colspan="1" rowspan="1">
+                {" "}
+                Retrieves details for media library objects associated with the
+                account.{" "}
+              </td>
+            </tr>
+            <tr>
+              <td colspan="1" rowspan="1">
+                {" "}
+                Organic Tweet Statistics{" "}
+              </td>
+              <td colspan="1" rowspan="1">
+                {" "}
+                Retrieves the organic summary analytics about Promoted Tweets
+                accessible by the current user.{" "}
+              </td>
+            </tr>
+            <tr>
+              <td colspan="1" rowspan="1">
+                {" "}
+                Promoted Tweet Statistics{" "}
+              </td>
+              <td colspan="1" rowspan="1">
+                {" "}
+                Retrieves the summary analytics about Promoted Tweets accessible
+                by the current user.{" "}
+              </td>
+            </tr>
+            <tr>
+              <td colspan="1" rowspan="1">
+                {" "}
+                Reach Estimate (deprecated){" "}
+              </td>
+              <td colspan="1" rowspan="1">
+                {" "}
+                Determines the approximate reach of the campaigns for the
+                specified account. <br /> This report will no longer be
+                available from September 1, 2020.{" "}
+              </td>
+            </tr>
+            <tr>
+              <td colspan="1" rowspan="1">
+                {" "}
+                Recent Organic Tweet Statistics{" "}
+              </td>
+              <td colspan="1" rowspan="1">
+                {" "}
+                Retrieves the organic summary analytics about recent Promoted
+                Tweets accessible by the current user.{" "}
+              </td>
+            </tr>
+            <tr>
+              <td colspan="1" rowspan="1">
+                {" "}
+                Recent Promoted Tweet Statistics{" "}
+              </td>
+              <td colspan="1" rowspan="1">
+                {" "}
+                Retrieves the summary analytics about recent Active Promoted
+                Tweets accessible by the current user.{" "}
+              </td>
+            </tr>
+            <tr>
+              <td colspan="1" rowspan="1">
+                {" "}
+                Tweets{" "}
+              </td>
+              <td colspan="1" rowspan="1">
+                {" "}
+                Retrieve Tweet details for the account.{" "}
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1">
+        <p> Account </p>
+      </td>
+      <td colspan="1" rowspan="1">
+        <p> Select the X Ads account to query data from. </p>
+      </td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1">
+        <p> Duration </p>
+      </td>
+      <td colspan="1" rowspan="1">
+        <p> Select whether to pull data for a single date or a date range. </p>
+      </td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1">
+        {" "}
+        Report Date{" "}
+      </td>
+      <td colspan="1" rowspan="1">
+        {" "}
+        Select whether to pull data for a specific date or a given number of
+        days back (offset).{" "}
+      </td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1">
+        {" "}
+        Specific Date{" "}
+      </td>
+      <td colspan="1" rowspan="1">
+        {" "}
+        Select the date you want to pull data for.{" "}
+      </td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1">
+        {" "}
+        Days Back{" "}
+      </td>
+      <td colspan="1" rowspan="1">
+        {" "}
+        Enter the number of days back you want to pull data for.{" "}
+      </td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1">
+        {" "}
+        Start Date{" "}
+      </td>
+      <td colspan="1" rowspan="1">
+        {" "}
+        Specify whether the first date in your date range is a specific date or
+        a given number of days back (offset).{" "}
+      </td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1">
+        {" "}
+        Specific Start Date{" "}
+      </td>
+      <td colspan="1" rowspan="1">
+        {" "}
+        Select the start date for your date range.{" "}
+      </td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1">
+        {" "}
+        End Date{" "}
+      </td>
+      <td colspan="1" rowspan="1">
+        {" "}
+        Specify whether the last date in your date range is a specific date or a
+        given number of days back (offset).{" "}
+      </td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1">
+        {" "}
+        Specific End Date{" "}
+      </td>
+      <td colspan="1" rowspan="1">
+        {" "}
+        Select the end date for your date range.{" "}
+      </td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1">
+        {" "}
+        Days Back to Start From{" "}
+      </td>
+      <td colspan="1" rowspan="1">
+        {" "}
+        Enter the number of days back (offset) for the start date in your date
+        range. For example, if you entered{" "}
+        <span class="mt-font-courier-new"> 10 </span> for{" "}
+        <b> Days Back to Start From </b> and{" "}
+        <span class="mt-font-courier-new"> 5 </span> for{" "}
+        <b> Days Back to End At </b>, each time the report ran it would pull
+        data for the last 10 days up until the last 5 days.{" "}
+      </td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1">
+        {" "}
+        Days Back to End At{" "}
+      </td>
+      <td colspan="1" rowspan="1">
+        {" "}
+        Enter the number of days back (offset) for the end date in your date
+        range. For example, if you entered{" "}
+        <span class="mt-font-courier-new"> 10 </span> for{" "}
+        <b> Days Back to Start From </b> and{" "}
+        <span class="mt-font-courier-new"> 5 </span> for{" "}
+        <b> Days Back to End At </b>, each time the report ran it would pull
+        data for the last 10 days up until the last 5 days.{" "}
+      </td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1">
+        <p> Granularity </p>
+      </td>
+      <td colspan="1" rowspan="1">
+        <p>
+          {" "}
+          Select the required granularity. For example, if the granularity is{" "}
+          <b> Hour </b>, data is presented by hour between the{" "}
+          <b> Start Date </b> and the <b> End Date </b>.{" "}
+        </p>
+      </td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1">
+        <p> Segmentation Type </p>
+      </td>
+      <td colspan="1" rowspan="1">
+        <p> Select the required segmentation type. </p>
+      </td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1">
+        <p> Placement </p>
+      </td>
+      <td colspan="1" rowspan="1">
+        <p>
+          <span>
+            {" "}
+            Select the required Placement from the available options.{" "}
+          </span>
+        </p>
+        <p>
+          <span> For example, if the placement is </span>
+          <b> ALL ON X </b>
+          <span>
+            , data is presented by all possible placement types on X. If
+            placement is{" "}
+          </span>
+          <b> Publisher Network </b>
+          <span>, data is presented by the X Audience Platform. </span>
+          <b> Total </b>
+          <span>
+            {" "}
+            will total the result for both the Publisher Network and All On
+            X.{" "}
+          </span>
+        </p>
+      </td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1">
+        <p> Country </p>
+      </td>
+      <td colspan="1" rowspan="1">
+        <p>
+          <span> Select the country that should have data returned. </span>
+        </p>
+      </td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1">
+        <p> Platform </p>
+      </td>
+      <td colspan="1" rowspan="1">
+        <p>
+          <span> Select the platform that should have data returned. </span>
+        </p>
+      </td>
+    </tr>
+  </tbody>
+</table>
 
 ### Other Panes
 
@@ -96,7 +625,220 @@ The base URL for the X Ads connector is https://ads-api.X.com/.
 
 <Accordion title="Which endpoint(s) does each report call in this connector?">
 
-<table data-aura-rendered-by="33:195;a"><tbody><tr><th colspan="1" rowspan="1" width="30%"> Report Name </th><th colspan="1" rowspan="1" width="70%"> Endpoint(s) </th></tr><tr><td colspan="1" rowspan="1"> Account Media </td><td colspan="1" rowspan="1"> /10/accounts/{account_id}/account_media </td></tr><tr><td colspan="1" rowspan="1"> Account Statistics </td><td colspan="1" rowspan="1"> /10/stats/accounts/{account_id}?entity=ACCOUNT </td></tr><tr><td colspan="1" rowspan="1"> All Campaigns </td><td colspan="1" rowspan="1"> /10/accounts/{account_id}/campaigns </td></tr><tr><td colspan="1" rowspan="1"> All Funding Instruments </td><td colspan="1" rowspan="1"> /10/accounts/{account_id}/funding_instruments </td></tr><tr><td colspan="1" rowspan="1"> All Line Items </td><td colspan="1" rowspan="1"> /10/accounts/{account_id}/line_items </td></tr><tr><td colspan="1" rowspan="1"> All Promoted Tweets </td><td colspan="1" rowspan="1"> /10/accounts/{account_id}/promoted_tweets?with_deleted=true </td></tr><tr><td colspan="1" rowspan="1"> Campaign Reach </td><td colspan="1" rowspan="1"> /10/stats/accounts/{account_id}/reach/campaigns </td></tr><tr><td colspan="1" rowspan="1"> Campaign Statistics </td><td colspan="1" rowspan="1"> /10/stats/accounts/{account_id}?entity=CAMPAIGN </td></tr><tr><td colspan="1" rowspan="1"> Funding Instruments Reach </td><td colspan="1" rowspan="1"> /10/stats/accounts/{account_id}/reach/funding_instruments </td></tr><tr><td colspan="1" rowspan="1"> Funding Instruments Statistics </td><td colspan="1" rowspan="1"> /10/stats/accounts/{account_id}?entity=funding_instruments </td></tr><tr><td colspan="1" rowspan="1"> Line Item Statistics </td><td colspan="1" rowspan="1"> /10/stats/accounts/{account_id}?entity=LINE_ITEM </td></tr><tr><td colspan="1" rowspan="1"> Media Creatives </td><td colspan="1" rowspan="1"> /10/accounts/{account_id}/media_creatives </td></tr><tr><td colspan="1" rowspan="1"> Media Creatives Statistics </td><td colspan="1" rowspan="1"> /10/stats/accounts/{account_id}?entity=MEDIA_CREATIVES </td></tr><tr><td colspan="1" rowspan="1"> Media Library </td><td colspan="1" rowspan="1"> /10/accounts/{account_id}/media_library </td></tr><tr><td colspan="1" rowspan="1"> Organic Tweet Statistics </td><td colspan="1" rowspan="1"> /10/stats/accounts/{account_id}?entity=ORGANIC_TWEET </td></tr><tr><td colspan="1" rowspan="1"> Promoted Tweet Statistics </td><td colspan="1" rowspan="1"> /10/stats/accounts/{account_id}?entity=PROMOTED_TWEET </td></tr><tr><td colspan="1" rowspan="1"> Reach Estimate (deprecated) </td><td colspan="1" rowspan="1"> /6/accounts/{account_id}/reach_estimate </td></tr><tr><td colspan="1" rowspan="1"> Recent Organic Tweet Statistics </td><td colspan="1" rowspan="1"> /10/stats/accounts/{account_id}?entity=ORGANIC_TWEET </td></tr><tr><td colspan="1" rowspan="1"> Recent Promoted Tweet Statistics </td><td colspan="1" rowspan="1"> /10/accounts/{account_id}?entity=PROMOTED_TWEET </td></tr><tr><td colspan="1" rowspan="1"> Tweets </td><td colspan="1" rowspan="1"> /10/accounts/{account_id}/tweets </td></tr></tbody></table>
+<table data-aura-rendered-by="33:195;a">
+  <tbody>
+    <tr>
+      <th colspan="1" rowspan="1" width="30%">
+        {" "}
+        Report Name{" "}
+      </th>
+      <th colspan="1" rowspan="1" width="70%">
+        {" "}
+        Endpoint(s){" "}
+      </th>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1">
+        {" "}
+        Account Media{" "}
+      </td>
+      <td colspan="1" rowspan="1">
+        {" "}
+        /10/accounts/{account_id}/account_media{" "}
+      </td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1">
+        {" "}
+        Account Statistics{" "}
+      </td>
+      <td colspan="1" rowspan="1">
+        {" "}
+        /10/stats/accounts/{account_id}?entity=ACCOUNT{" "}
+      </td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1">
+        {" "}
+        All Campaigns{" "}
+      </td>
+      <td colspan="1" rowspan="1">
+        {" "}
+        /10/accounts/{account_id}/campaigns{" "}
+      </td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1">
+        {" "}
+        All Funding Instruments{" "}
+      </td>
+      <td colspan="1" rowspan="1">
+        {" "}
+        /10/accounts/{account_id}/funding_instruments{" "}
+      </td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1">
+        {" "}
+        All Line Items{" "}
+      </td>
+      <td colspan="1" rowspan="1">
+        {" "}
+        /10/accounts/{account_id}/line_items{" "}
+      </td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1">
+        {" "}
+        All Promoted Tweets{" "}
+      </td>
+      <td colspan="1" rowspan="1">
+        {" "}
+        /10/accounts/{account_id}/promoted_tweets?with_deleted=true{" "}
+      </td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1">
+        {" "}
+        Campaign Reach{" "}
+      </td>
+      <td colspan="1" rowspan="1">
+        {" "}
+        /10/stats/accounts/{account_id}/reach/campaigns{" "}
+      </td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1">
+        {" "}
+        Campaign Statistics{" "}
+      </td>
+      <td colspan="1" rowspan="1">
+        {" "}
+        /10/stats/accounts/{account_id}?entity=CAMPAIGN{" "}
+      </td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1">
+        {" "}
+        Funding Instruments Reach{" "}
+      </td>
+      <td colspan="1" rowspan="1">
+        {" "}
+        /10/stats/accounts/{account_id}/reach/funding_instruments{" "}
+      </td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1">
+        {" "}
+        Funding Instruments Statistics{" "}
+      </td>
+      <td colspan="1" rowspan="1">
+        {" "}
+        /10/stats/accounts/{account_id}?entity=funding_instruments{" "}
+      </td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1">
+        {" "}
+        Line Item Statistics{" "}
+      </td>
+      <td colspan="1" rowspan="1">
+        {" "}
+        /10/stats/accounts/{account_id}?entity=LINE_ITEM{" "}
+      </td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1">
+        {" "}
+        Media Creatives{" "}
+      </td>
+      <td colspan="1" rowspan="1">
+        {" "}
+        /10/accounts/{account_id}/media_creatives{" "}
+      </td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1">
+        {" "}
+        Media Creatives Statistics{" "}
+      </td>
+      <td colspan="1" rowspan="1">
+        {" "}
+        /10/stats/accounts/{account_id}?entity=MEDIA_CREATIVES{" "}
+      </td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1">
+        {" "}
+        Media Library{" "}
+      </td>
+      <td colspan="1" rowspan="1">
+        {" "}
+        /10/accounts/{account_id}/media_library{" "}
+      </td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1">
+        {" "}
+        Organic Tweet Statistics{" "}
+      </td>
+      <td colspan="1" rowspan="1">
+        {" "}
+        /10/stats/accounts/{account_id}?entity=ORGANIC_TWEET{" "}
+      </td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1">
+        {" "}
+        Promoted Tweet Statistics{" "}
+      </td>
+      <td colspan="1" rowspan="1">
+        {" "}
+        /10/stats/accounts/{account_id}?entity=PROMOTED_TWEET{" "}
+      </td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1">
+        {" "}
+        Reach Estimate (deprecated){" "}
+      </td>
+      <td colspan="1" rowspan="1">
+        {" "}
+        /6/accounts/{account_id}/reach_estimate{" "}
+      </td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1">
+        {" "}
+        Recent Organic Tweet Statistics{" "}
+      </td>
+      <td colspan="1" rowspan="1">
+        {" "}
+        /10/stats/accounts/{account_id}?entity=ORGANIC_TWEET{" "}
+      </td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1">
+        {" "}
+        Recent Promoted Tweet Statistics{" "}
+      </td>
+      <td colspan="1" rowspan="1">
+        {" "}
+        /10/accounts/{account_id}?entity=PROMOTED_TWEET{" "}
+      </td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1">
+        {" "}
+        Tweets{" "}
+      </td>
+      <td colspan="1" rowspan="1">
+        {" "}
+        /10/accounts/{account_id}/tweets{" "}
+      </td>
+    </tr>
+  </tbody>
+</table>
 
 </Accordion>
 

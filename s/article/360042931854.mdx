@@ -1,5 +1,6 @@
 ---
 title: "Snowflake Key Pair Authentication Connector"
+excerpt: "Use Domo's Snowflake Key Pair Authentication Connector to retrieve data from Snowflake with a 2048-bit RSA key pair instead of username/password."
 ---
 
 ## Intro
@@ -27,133 +28,87 @@ To connect to a Snowflake database and create a DataSet, you must have the follo
 * Your Snowflake private key
 * The passphrase used to encrypt the private key file, if you created an encrypted key
 
-### Configuring the public/private key pair
+### Configure the Public/Private Key Pair
 
-To configure the public/private key pair, follow these steps:
+Follow these steps to configure a public/private key pair.
 
-1. From the command line in a terminal window, generate a private key.
-   
-   You can generate either an encrypted version of the private key or an unencrypted version of the private key.
-   
-   * To generate an unencrypted version, use the following command:
-      
-      `$ openssl genrsa -out rsa_key.pem 2048`
-   * To generate an encrypted version, use the following command:
-      
-      `$ openssl genrsa 2048 | openssl pkcs8 -topk8 -inform PEM -out rsa_key.p8`
-         
-      It is typically safer to generate an encrypted version.
-         
-      If you use the second command to encrypt the private key, then OpenSSL prompts for a passphrase used to encrypt the private key file. We recommend using a strong passphrase to protect the private key. Record this passphrase in a secure location. You will input it when connecting to Snowflake. Note that the passphrase is only used for protecting the private key and will never be sent to Snowflake.
-         
-      The following is a sample PEM private key:
-         
-      ```
+#### Generate a Private Key
+
+1. Open a terminal window.
+2. Generate a private key.
+
+   You can create either an unencrypted or encrypted private key.
+
+   - **For Unencrypted private key, use the following command:**
+
+     ```bash
+     openssl genrsa 2048 | openssl pkcs8 -topk8 -inform PEM -out rsa_key.p8 -nocrypt
+     ```
+
+   - **For Encrypted private key, use the following command:**
+
+     ```bash
+     openssl genrsa 2048 | openssl pkcs8 -topk8 -v2 des3 -inform PEM -out rsa_key.p8
+     ```
+
+The commands generate a private key in PEM format:
+
+  ```
       -----BEGIN ENCRYPTED PRIVATE KEY-----
-      MIIE6TAbBgkqhkiG9w0BBQMwDgQILYPyCppzOwECAggABIIEyLiGSpeeGSe3xHP1
-      wHLjfCYycUPennlX2bd8yX8xOxGSGfvB+99+PmSlex0FmY9ov1J8H1H9Y3lMWXbL
-      ...
+      MIIE6T...
       -----END ENCRYPTED PRIVATE KEY-----
-      ```
-2. From the command line, generate the public key by referencing the private key. Assuming the private key is encrypted and contained in the file named “rsa\_key.p8”, use the following command:
+  ```
 
-   `$ openssl rsa -in rsa_key.p8 -pubout -out rsa_key.pub`
-   
-   The following is a sample PEM public key:
-   
-   ```
-   -----BEGIN PUBLIC KEY-----
-   MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAy+Fw2qv4Roud3l6tjPH4
-   zxybHjmZ5rhtCz9jppCV8UTWvEXxa88IGRIHbJ/PwKW/mR8LXdfI7l/9vCMXX4mk
-   ...
-   -----END PUBLIC KEY-----
-   ```
-3. Copy the public and private key files to a local directory for storage. Record the path to the files. Note that the private key is stored using the PKCS#8 (Public Key Cryptography Standards) format and is encrypted using the passphrase you specified in the previous step; however, the file should still be protected from unauthorized access using the file permission mechanism provided by your operating system. It is your responsibility to secure the file when it is not being used.
-4. Assign the public key to the Snowflake user using
-   ALTER USER. For example:
+#### Generate a Public Key
 
-   `alter user jsmith set rsa_public_key='MIIBIjANBgkqh...';`
+Generate the public key from the command line by referencing the private key. This example assumes the private key is encrypted and stored in the file ```rsa_key.p8```.
 
-   <Note>
-   **Notes:**
+Generate a public key from the private key:
 
-   * Only security administrators (i.e. users with the SECURITYADMIN role) or higher can alter a user.
-   * Exclude the public key header and footer in the SQL statement.
+```bash
+openssl rsa -in rsa_key.p8 -pubout -out rsa_key.pub
+```
 
-   </Note>
+The command generates the public key in PEM format:
 
-5. Verify the user's public key fingerprint using DESCRIBE USER:
-     
-   <table class="mt-responsive-table"><thead><tr><th colspan="1" rowspan="1"> Property </th><th colspan="1" rowspan="1"> Value </th><th colspan="1" rowspan="1"> Default </th><th colspan="1" rowspan="1"> Description </th></tr></thead><tbody><tr><td colspan="1" rowspan="1"><span class="mt-font-courier-new"> Name </span></td><td colspan="1" rowspan="1"><span class="mt-font-courier-new"> JSMITH </span></td><td colspan="1" rowspan="1"> null </td><td colspan="1" rowspan="1"> Name </td></tr><tr><td colspan="1" rowspan="1"><span class="mt-font-courier-new"> RSA_PUBLIC_KEY_FP </span></td><td colspan="1" rowspan="1"><span class="mt-font-courier-new"> SHA256:nvnONUsfiuycCLMXIEWG4eTp4FjhVUZQUQbNpbSHXiA= </span></td><td colspan="1" rowspan="1"> null </td><td colspan="1" rowspan="1"> Fingerprint of user's RSA public key. </td></tr><tr><td colspan="1" rowspan="1"><span class="mt-font-courier-new"> RSA_PUBLIC_KEY_2_FP </span></td><td colspan="1" rowspan="1"><span class="mt-font-courier-new"> null </span></td><td colspan="1" rowspan="1"> null </td><td colspan="1" rowspan="1"> Fingerprint of user's second RSA public key. </td></tr></tbody></table>
+  ```
+      -----BEGIN PUBLIC KEY-----
+      MIIBIj...
+      -----END PUBLIC KEY-----
+  ```
 
-   <Note>
-   **Note:** For more information about the RSA\_PUBLIC\_KEY\_2\_FP property, see Key Rotation.
+#### Store the Keys Securely
 
-   </Note>
+* Store the private and public key files in a secure local directory. 
+* Record the file paths for future reference.
+* The private key uses the PKCS#8 (Public Key Cryptography Standards) format and is encrypted with the specified passphrase.
 
-6. Modify and execute the sample code, below. The code decrypts the private key file and passes it to the Snowflake driver to create a connection:
-   * Update the security parameters:
-     + `<path>` specifies the local path to the private key file you created.
-   * Update the session parameters:
-     + `<user>` specifies your Snowflake login name.
-     + `<account>` specifies the name of your account (provided by Snowflake).
-   * The sample code is as follows:
+#### Assign the Public Key to a Snowflake User
 
-     ```java
-      import java.util.Properties;
-      import java.sql.Connection;
-      import java.sql.Statement;
-      import java.sql.ResultSet;
-      import java.sql.DriverManager;
-      import java.io.File;
-      import java.io.FileInputStream;
-      import java.io.DataInputStream;
-      import java.util.Base64;
-      import java.security.spec.PKCS8EncodedKeySpec;
-      import java.security.KeyFactory;
-      import java.security.PrivateKey;
-      import javax.crypto.EncryptedPrivateKeyInfo;
-      import javax.crypto.SecretKeyFactory;
-      import javax.crypto.spec.PBEKeySpec;
+Use the [ALTER USER](https://docs.snowflake.com/en/sql-reference/sql/alter-user) command to assign the public key to the user by setting the RSA_PUBLIC_KEY property. For example:
 
-      public class TestJdbc
-      {
-         public static void main(String[] args)
-            throws Exception
-         {
-            File f = new File("<path>/rsa_key.p8");
-            FileInputStream fis = new FileInputStream(f);
-            DataInputStream dis = new DataInputStream(fis);
-            byte[] keyBytes = new byte[(int) f.length()];
-            dis.readFully(keyBytes);
-            dis.close();
+```ALTER USER example_user SET RSA_PUBLIC_KEY='MIIBIjANBgkqh...';```
 
-            String encrypted = new String(keyBytes);
-            String passphrase = System.getenv("PRIVATE_KEY_PASSPHRASE");
-            encrypted = encrypted.replace("-----BEGIN ENCRYPTED PRIVATE KEY-----", "");
-            encrypted = encrypted.replace("-----END ENCRYPTED PRIVATE KEY-----", "");
-            EncryptedPrivateKeyInfo pkInfo = new EncryptedPrivateKeyInfo(Base64.getMimeDecoder().decode(encrypted));
-            PBEKeySpec keySpec = new PBEKeySpec(passphrase.toCharArray());
-            SecretKeyFactory pbeKeyFactory = SecretKeyFactory.getInstance(pkInfo.getAlgName());
-            PKCS8EncodedKeySpec encodedKeySpec = pkInfo.getKeySpec(pbeKeyFactory.generateSecret(keySpec));
-            KeyFactory keyFactory = KeyFactory.getInstance("RSA");
-            PrivateKey encryptedPrivateKey = keyFactory.generatePrivate(encodedKeySpec);
+#### Verify the Public Key Fingerprint
 
-            String url = "jdbc:snowflake://<account>.snowflakecomputing.com";
-            Properties prop = new Properties();
-            prop.put("user", "<user>");
-            prop.put("account", "<account>");
-            prop.put("privateKey", encryptedPrivateKey);
+1. Run the following command to retrieve the users public key fingerprint, and then copy the output.
 
-            Connection conn = DriverManager.getConnection(url, prop);
-            Statement stat = conn.createStatement();
-            ResultSet res = stat.executeQuery("select 1");
-            res.next();
-            System.out.println(res.getString(1));
-            conn.close();
-         }
-      }
-      ```
+```bash
+DESC USER example_user
+  ->> SELECT SUBSTR(
+    (SELECT "value" FROM $1
+     WHERE "property" = 'RSA_PUBLIC_KEY_FP'),
+    LEN('SHA256:') + 1) AS key;
+```
+
+2. Run the following command on the command line and copy the output.
+
+```bash
+openssl rsa -pubin -in rsa_key.pub -outform DER | openssl dgst -sha256 -binary | openssl enc -base64
+```
+
+3. Compare both outputs.
+If the values match, the configuration is correct.
 
 #### Key Rotation
 
@@ -242,4 +197,3 @@ If you do not enter a role in Snowflake, the SYSADMIN role is used by default.
 
 </Accordion>
 </AccordionGroup>
-

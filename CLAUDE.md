@@ -124,6 +124,34 @@ All scripts live in `scripts/`. They are optional dev-quality tools — non-tech
 | `update_kb_articles.py` | Entry point for the bulk Salesforce CSV import pipeline. |
 | `remark-domo-style.mjs` | Remark lint plugin enforcing Domo style rules (optional; runs via `yarn lint`). |
 
+## DomoStats Schema Sync
+
+`s/article/360043433813.mdx` (DomoStats Connector) is kept in step with the connector source
+automatically. Do not hand-diff Java against MDX.
+
+- **Source of truth:** `domo-development/domostats` emits `domostats-schema.json` from a Gradle
+  task (`./gradlew generateSchemaManifest`, implemented in
+  `src/tooling/java/com/domo/connector/domostats/tooling/SchemaManifestGenerator.java`) and
+  commits it. It lists every report, its gating, and its columns with types and descriptions.
+- **This side:** `.github/workflows/sync-domostats-schema.yml` clones that repo, runs
+  `.github/scripts/reconcile_domostats.py`, and opens a draft PR. Read
+  `.github/scripts/README.md` before touching either.
+- **The two sides are deliberately not byte-identical.** Java descriptions are plain text; the
+  article keeps Markdown presentation. Comparison is on a normalized form (backticks stripped,
+  whitespace collapsed, trailing periods dropped, case-insensitive). When editing these tables
+  by hand, keep house style (backticks on enum values, terminal periods, `DataSet` not
+  "dataset"). Never "fix" a table to match Java verbatim, and keep field order in schema order.
+- **An empty source description never overwrites the article.** Most columns still have no
+  description in Java.
+- Callouts in that article were hand-audited; the sync never adds, removes, or rewords one.
+- **This repo is public and the connector repo is not.** Two consequences, both load-bearing:
+  the manifest records gating as a *kind* (`customer-allowlist`, `environment-allowlist`,
+  `runtime-check`) and never the customer or environment names behind it; and a report the
+  connector has but this article does not is **opt-in**, because a connector report can exist
+  weeks before its feature ships. Until a human adds its key to `documentedReportKeys` in
+  `.github/domostats-sync-config.json`, the report's name is withheld from the PR body. Do not
+  pass `--no-redact` in CI and do not upload the report JSON as an artifact.
+
 ## Style Standards
 
 See `Domo-KB-Style-Guide.mdx` for full standards. Key points:

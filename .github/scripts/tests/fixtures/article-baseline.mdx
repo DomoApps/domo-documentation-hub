@@ -1,0 +1,278 @@
+---
+title: "DomoStats Connector"
+excerpt: "Use the DomoStats connector to explore team activities, DataSets, Projects, and Buzz conversations from your Domo instance."
+---
+
+## Connecting to DomoStats DataSets
+
+### Details Pane
+
+This pane contains a single **Report** menu from which to select your desired DomoStats DataSet. See the list of available reports below.
+
+| Report Name                     | Description                                                         |
+| ------------------------------- | ------------------------------------------------------------------- |
+| Accounts                        | Returns information for the Accounts report.                        |
+| Activity Log                    | Returns information for the Activity Log report.                    |
+| Beast Modes used in Beast Modes | Returns information for the Beast Modes used in Beast Modes report. |
+| Certified Content               | Returns information for the Certified Content report.               |
+| Domo Goals &#124; Goals         | Returns information for the Domo Goals &#124; Goals report.         |
+| Domo Goals &#124; Goal Owners   | Returns information for the Domo Goals &#124; Goal Owners report.   |
+| PDP - Column Policies           | Returns information for the PDP - Column Policies report.           |
+| PDP - Row Policies              | Returns information for the PDP - Row Policies report.              |
+| People                          | Returns information for the People report.                          |
+| Role Grants                     | Returns information for the Role Grants report.                     |
+| Roles                           | Returns information for the Roles report.                           |
+| Task Center                     | Returns information for the Task Center report.                     |
+| Upgrade Path Conversions        | Returns information for the Upgrade Path Conversions report.        |
+| Usage Metrics                   | Returns information for the Usage Metrics report.                   |
+
+## DataSet Fields
+
+This section provides field-by-field descriptions for specific DomoStats report DataSets. Reports that require a feature to be enabled are noted; if such a report doesn't appear in the **Report** menu, contact your Domo account team.
+
+### Accounts
+
+| Field            | Description                                                                                                                                         |
+| ---------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Account_Id       | The numeric identifier for the account.                                                                                                             |
+| Owner_Id         | The numeric user ID of the account owner.                                                                                                           |
+| Name             | The name of the account.                                                                                                                            |
+| Display_Name     | The display name shown for the account in Domo.                                                                                                     |
+| Type             | The account type. Values include `data`, `profile`, `messaging`, and `sftp`.                                                                        |
+| Valid            | Indicates whether the account's credentials are currently valid (`true` or `false`).                                                                |
+| Data_Provider    | The data provider (connector) the account is for. Example values: `salesforce`, `google-spreadsheets`, `mysql`, `microsoft-sharepoint`, `domo-csv`. |
+| Credentials_Type | The type of credentials stored for the account. Values include `oauth`, `fields`, `oauth-metadata`, `key`, and `username-password`.                 |
+| Created_Date     | The date and time the account was created.                                                                                                          |
+| Modified_Date    | The date and time the account was last modified.                                                                                                    |
+| Account_Id_text  | The account identifier as text.                                                                                                                     |
+| Owner_Id_text    | The owner user ID as text.                                                                                                                          |
+| Account_Type     | The account's authorization classification. Values: `AUTHORIZATION`, `OAUTH_CONFIGURATION`.                                                         |
+
+### Activity Log
+
+| **Field**             | **Description**                                                                                                                                                                |
+| --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Object_Name           | The name of the object that received an action.                                                                                                                                |
+| User_ID               | The ID of the person or thing that performed an action.                                                                                                                        |
+| Source_ID             | The ID of the source entity that performed the action, interpreted according to the Type field (for example, a user ID when Type is `USER`, or a card ID when Type is `CARD`). |
+| Name                  | The name of the object that performed an action.                                                                                                                               |
+| Action                | The action that took place, such as a login, view, creation, or update. The specific action values are documented separately.                                                  |
+| Object_Type           | Clarifies what the object is.                                                                                                                                                  |
+| Object_ID             | The ID of the object.                                                                                                                                                          |
+| Type                  | The type of person or thing that performed an action.                                                                                                                          |
+| Event_Time            | The time at which the event occurred. The audit endpoint records/returns it in UTC, but the connector converts it to the user's time zone.                                     |
+| Authentication_Method | This column may contain data for historical records but is `NULL` for newly logged activities.                                                                                 |
+| IP_Address            | The IP address from which the action originated.                                                                                                                               |
+| Device                | The device used to perform the action.                                                                                                                                         |
+| Browser_Details       | Details about the browser used to perform the action.                                                                                                                          |
+| Event_ID              | The unique identifier of the logged event.                                                                                                                                     |
+| Client_ID             | The identifier of the client application that generated the event.                                                                                                             |
+| \_BATCH_ID\_          | The identifier for the batch.                                                                                                                                                  |
+| \_BATCH_LAST_RUN\_    | The date and time when the batch was last run.                                                                                                                                 |
+
+### Beast Modes used in Beast Modes
+
+Learn about [nested calculations](/s/article/000005307).
+
+| Field                 | Description                                                            |
+| --------------------- | ---------------------------------------------------------------------- |
+| ReferencedBeastModeId | The ID of the Beast Mode that is referenced inside another Beast Mode. |
+| BeastModeId           | The ID of the Beast Mode that contains the reference.                  |
+
+### Certified Content
+
+| Field                 | Description                                                                                                         |
+| --------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| Certification ID      | The unique ID of the certification request                                                                          |
+| Certification Process | The selected certification process (template) used for the request                                                  |
+| Certification Status  | The status of the certification request                                                                             |
+| Date Last Modified    | The last date an update was made to the certification                                                               |
+| Date Created          | The date the certification request was initiated                                                                    |
+| Object ID             | The ID of the object that is being requested for certification                                                      |
+| Object Type           | The type of object that is being requested for certification. It will either be a `CARD` or `DATA_SOURCE` (Dataset) |
+| Object Name           | The name of the object being requested for certification                                                            |
+| Requestor ID          | The ID of the person who is requesting the certification                                                            |
+| Submitter ID          | The ID of the person submitting the certification for approval                                                      |
+| Expirer ID            | The ID of the person that made a change to the card or dataset object causing the certification to expire           |
+| Remover ID            | The ID of the person that manually removed the certification from the card or dataset                               |
+
+There is a limitation if you attempt to combine a Certified Content DomoStats DataSet with an Activity Log DomoStats DataSet.
+
+### Domo Goals | Goals
+
+<Note>
+  **Note:** This report is available when the **Domo Goals** feature is enabled
+  for your instance. If it doesn't appear in the **Report** menu, contact your
+  Domo account team.
+</Note>
+
+The fields in this section use "Goals" and "Metrics" (formerly "Objectives" and "Key Results"). Your organization may refer to them as goals, metrics, or something else depending on your Goals Admin Settings. For more information about using the DomoStats Connector with Goals, see [Accessing Goals Data](/s/article/4577793742615).
+
+| Field                    | Description                                                                              |
+| ------------------------ | ---------------------------------------------------------------------------------------- |
+| ID                       | The unique identifier of the goal.                                                       |
+| Name                     | The name of the goal.                                                                    |
+| Description              | The description of the goal.                                                             |
+| State                    | The current state of the goal. Values: `OPEN`, `EXPIRED`, `CLOSED`.                      |
+| Type                     | The type of goal. Values: `PERSONAL`, `TEAM`, `COMPANY`.                                 |
+| Self Assessment          | The optional self-assessment submitted when completing the goal.                         |
+| Start Date               | The start date of the goal.                                                              |
+| Expire Date              | The end date of the goal.                                                                |
+| Created Date             | The date the goal was created.                                                           |
+| Creator ID               | The user ID of the person who created the goal.                                          |
+| Modified Date            | The date the goal was last modified.                                                     |
+| Modifier ID              | The user ID of the person who last modified the goal.                                    |
+| Status                   | The status of the goal. Values: `GOOD`, `WARNING`, `POOR`, `NOT_STARTED`.                |
+| Auto Status              | Indicates whether the goal's status is set automatically (`true`) or manually (`false`). |
+| Status Modified At       | The date and time the status was last changed.                                           |
+| Progress Modified At     | The date and time progress was last updated.                                             |
+| Progress                 | The progress toward the goal.                                                            |
+| Good Status Label        | The label configured for the "good" status.                                              |
+| Warning Status Label     | The label configured for the "warning" status.                                           |
+| Poor Status Label        | The label configured for the "poor" status.                                              |
+| Not Started Status Label | The label configured for the "not started" status.                                       |
+| Is Draft                 | Indicates whether the goal is a draft (`true` or `false`).                               |
+
+### Domo Goals | Goal Owners
+
+<Note>
+  **Note:** This report is available when the **Domo Goals** feature is enabled
+  for your instance. If it doesn't appear in the **Report** menu, contact your
+  Domo account team.
+</Note>
+
+| Field      | Description                                                      |
+| ---------- | ---------------------------------------------------------------- |
+| Goal Id    | The unique identifier of the goal.                               |
+| Owner Id   | The ID of a user or group that owns the goal.                    |
+| Owner Type | Whether the owner is a user or a group. Values: `USER`, `GROUP`. |
+
+### PDP - Column Policies
+
+| Field        | Description                                         |
+| ------------ | --------------------------------------------------- |
+| ID           | The unique identifier of the column policy.         |
+| Name         | The name of the column policy.                      |
+| Data Type    | The data type of the masked column.                 |
+| Is Mapped    | Indicates whether the policy is mapped to a column. |
+| DataSet ID   | The ID of the DataSet the policy is defined on.     |
+| DataSet Name | The name of the DataSet the policy is defined on.   |
+
+### PDP - Row Policies
+
+<Note>
+  **Note:** This report is controlled by a feature switch. If it doesn't appear
+  in the **Report** menu, contact your Domo account team to enable it for your
+  instance.
+</Note>
+
+| Field           | Description                                         |
+| --------------- | --------------------------------------------------- |
+| ID              | The unique identifier of the row policy.            |
+| Name            | The name of the row policy.                         |
+| DataSet ID      | The ID of the DataSet the policy is defined on.     |
+| DataSet Name    | The name of the DataSet the policy is defined on.   |
+| Policy Enforced | Indicates whether the policy is currently enforced. |
+
+### People
+
+If any of the "personal information" fields (name, email, location, etc.) return blank in this DataSet, you can fill in the missing information in the user's Profile page or their page in **Admin Settings > People**. For more information, see [Specifying Your Personal Profile Information](/s/article/360043439413).
+
+| **Field**           | **Description**                                                                                                                                                                                                                                                                                                   |
+| ------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Display Name        | The name used to represent the user within Domo.                                                                                                                                                                                                                                                                  |
+| Role ID             | A Domo-generated ID for a specific role.                                                                                                                                                                                                                                                                          |
+| Role                | The user's role within your organization.                                                                                                                                                                                                                                                                         |
+| Title               | The user's title within your organization.                                                                                                                                                                                                                                                                        |
+| Email               | The user's email address.                                                                                                                                                                                                                                                                                         |
+| Alternate Email     | The user's alternate email address.                                                                                                                                                                                                                                                                               |
+| Profile Picture URL | The URL of the user's profile picture.                                                                                                                                                                                                                                                                            |
+| Phone Number        | The user's personal phone number.                                                                                                                                                                                                                                                                                 |
+| Desk Phone Number   | The user's desk phone number.                                                                                                                                                                                                                                                                                     |
+| Employee Number     | The user's employee number within your organization.                                                                                                                                                                                                                                                              |
+| Employee ID         | The user's employee ID.                                                                                                                                                                                                                                                                                           |
+| Location            | The company location the user has been assigned to.                                                                                                                                                                                                                                                               |
+| Locale              | UNDER CONSTRUCTION                                                                                                                                                                                                                                                                                                |
+| Timezone            | The user's time zone.                                                                                                                                                                                                                                                                                             |
+| Department          | The user's department within your organization.                                                                                                                                                                                                                                                                   |
+| User ID             | A Domo-generated user ID for each person.                                                                                                                                                                                                                                                                         |
+| Last Login          | A timestamp for the last time this user logged in. Login is measured by any regular, SSO, or mobile login. To count as a login for mobile, a person must actually log out of the instance and log back in. Opening and closing the app does not count as a login.                                                 |
+| Password Created    | A timestamp for when a user's password was created. This gets updated when the password is updated.                                                                                                                                                                                                               |
+| Account Locked      | Returns `true` or `false` indicating whether the account is locked.                                                                                                                                                                                                                                               |
+| Profile Picture     | Returns `true` or `false` indicating whether a profile picture has been added in the user's Profile page or on their page in **Admin Settings > Governance > People**.                                                                                                                                            |
+| Org Chart           | Returns `true` or `false` indicating whether the user has been added as a report on their company org chart in the Profile page.                                                                                                                                                                                  |
+| Two Factor Enabled  | Returns `true` or `false` indicating whether the company has enabled two-factor authentication as an option in **Admin Settings > Authentication > Authentication** and the user has chosen to have two-factor enabled in their Settings menu (available via clicking the Gear menu under their profile picture). |
+| Created Date        | A timestamp for the date the user was added to the system.                                                                                                                                                                                                                                                        |
+| Last Updated Date   | A timestamp for the date the user's information was last updated.                                                                                                                                                                                                                                                 |
+| Created By User ID  | The user ID of the person who created this user.                                                                                                                                                                                                                                                                  |
+| Reports To          | The user ID of the person this user reports to on the company org chart.                                                                                                                                                                                                                                          |
+
+### Role Grants
+
+| Field             | Description                                                                                                                                                                    |
+| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Role ID           | Unique identifier of the role that the grant is assigned to.                                                                                                                   |
+| Grant Name        | Display name of the grant as it appears in the UI, such as Manage DataFlow.                                                                                                    |
+| Grant Description | Detailed explanation of the capabilities the grant confers on a member of the role.                                                                                            |
+| Grant ID          | The authority key that identifies the grant in the API and backend.                                                                                                            |
+| Category          | The grant's category as a raw enum value. The role editor UI shows a localized label instead, for example `USERS_GROUPS` (Users and Groups) or `SAASAAS` (Publication Groups). |
+| Admin Level       | Whether the grant confers admin-level capability, as `true` or `false`.                                                                                                        |
+
+### Roles
+
+| Field             | Description                                  |
+| ----------------- | -------------------------------------------- |
+| ID                | The unique identifier of the role.           |
+| Name              | The name of the role.                        |
+| Description       | A description of the role.                   |
+| Created Date      | The date and time the role was created.      |
+| Last Updated Date | The date and time the role was last updated. |
+
+### Task Center
+
+|                   |                                                                                                            |
+| ----------------- | ---------------------------------------------------------------------------------------------------------- |
+| **Field**         | **Description**                                                                                            |
+| Task ID           | The unique numeric identifier for the task.                                                                |
+| Task identifier   | The field value(s) configured as task identifier(s). Learn about [task identifiers](/s/article/000005171). |
+| Form Name         | The name of the form being used in the task.                                                               |
+| Form ID           | The unique identifier for the form.                                                                        |
+| Task status       | The current status of the task. Values: `COMPLETED`, `OPEN`, `VOIDED`.                                     |
+| Queue             | The name of the queue where the task is located.                                                           |
+| Queue ID          | The unique identifier for the queue.                                                                       |
+| Created On        | The date the task was created.                                                                             |
+| Completed On      | The date the task was completed.                                                                           |
+| Completed By      | The unique identifier for the person who completed the task.                                               |
+| Assignee          | The unique identifier for the person or group assigned to the task.                                        |
+| Assignee Type     | The type of assignee assigned to the task. Options include: `User` or `Group`                              |
+| Source ID         | The unique identifier for the source that generated the task.                                              |
+| Source Entity     | The entity type of the source that generated the task. Example: `Workflow`                                 |
+| Queue Archived    | Indicates whether the queue the task belongs to has been archived.                                         |
+| Assignee Security | The security/visibility setting for the task assignee.                                                     |
+| Updated On        | The date of the most recent update to the task.                                                            |
+
+### Upgrade Path Conversions
+
+<Note>
+  **Note:** This report is available when the **Viral Expansion** feature is
+  enabled for your instance. If it doesn't appear in the **Report** menu,
+  contact your Domo account team. The field schema for this report is built
+  dynamically at run time.
+</Note>
+
+### Usage Metrics
+
+<Note>
+  **Note:** This report is available when the **Usage Reporting** feature is
+  enabled for your instance. If it doesn't appear in the **Report** menu,
+  contact your Domo account team.
+</Note>
+
+| Field          | Description                                                                                                                                                                  |
+| -------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Date           | The date of the usage.                                                                                                                                                       |
+| SKU            | The consumption SKU.                                                                                                                                                         |
+| Entity Type    | The type of entity that generated the usage. Example values: `DataSet`, `Repository`, `Workflow`, `Publish Subscriber`, `Jupyter Workspace`, `DATAFLOW`, `USER`, `AI Model`. |
+| Entity ID      | The ID of the entity that generated the usage.                                                                                                                               |
+| Usage Unit     | The unit of measure for the usage. Values: `Rows`, `Executions`, `Objects`, `Tokens`, `Days`, `Requests`, `Minutes`, `Bytes`, `Queries`.                                     |
+| Usage Quantity | The number of units used.                                                                                                                                                    |

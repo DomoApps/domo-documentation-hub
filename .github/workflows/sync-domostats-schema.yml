@@ -1,0 +1,237 @@
+# Sync the DomoStats Connector reference from the connector's schema manifest
+#
+# Reads domostats-schema.json out of domo-development/domostats (generated there by
+# `./gradlew generateSchemaManifest` and committed by Jenkins), reconciles it against
+# s/article/360043433813.mdx, and opens a draft PR with the field tables updated and
+# everything a human must still decide listed in the PR body.
+#
+# Modelled on sync-api-docs.yml: upstream notify -> App token -> clone source ->
+# reconcile -> PR. Unlike that workflow there is exactly one target article, so there is
+# no matrix fan-out and no docs.json conflict window to cap parallelism for.
+
+name: Sync DomoStats Schema
+
+# ============================================================================
+# CONFIGURATION
+# ============================================================================
+env:
+  # Source repository (where the generated manifest lives)
+  SOURCE_OWNER: domo-development
+  SOURCE_REPO: domostats
+  SOURCE_MANIFEST: domostats-schema.json
+
+  # Destination paths (in this repo)
+  ARTICLE: s/article/360043433813.mdx
+  JA_ARTICLE: ja/s/article/360043433813.mdx
+  SYNC_CONFIG: .github/domostats-sync-config.json
+
+  # A stable branch name means a re-run updates the open PR instead of stacking
+  # duplicates.
+  SYNC_BRANCH: domostats-sync/schema
+  BASE_BRANCH: main
+
+  # Pin the SDK: this is the repo's first CI pip install.
+  ANTHROPIC_SDK: "anthropic==0.69.0"
+  DRAFT_MODEL: claude-sonnet-5
+# ============================================================================
+
+on:
+  # Fired by Jenkins after it commits a changed manifest on master:
+  #   curl -X POST -H "Authorization: Bearer $TOKEN" \
+  #     -H "Accept: application/vnd.github+json" \
+  #     https://api.github.com/repos/DomoApps/domo-documentation-hub/dispatches \
+  #     -d '{"event_type":"domostats-schema-updated"}'
+  repository_dispatch:
+    types: [domostats-schema-updated]
+
+  # Nightly safety net, in case the dispatch is not wired up or a run was missed.
+  schedule:
+    - cron: "23 9 * * *"
+
+  workflow_dispatch:
+    inputs:
+      force:
+        description: "Open a PR even when the article needs no changes"
+        required: false
+        type: boolean
+        default: false
+      descriptions:
+        description: "How to treat connector descriptions that differ from the article"
+        required: false
+        type: choice
+        default: safe
+        options:
+          - safe
+          - source-wins
+          - report-only
+      draft_descriptions:
+        description: "Ask Claude to draft descriptions for new columns the connector left blank"
+        required: false
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      # The App must be installed on domo-development/domostats for this to resolve.
+      # If it is not (or SAML/SSO authorization is missing) the clone below fails with
+      # a 404, which is the one external prerequisite for this workflow.
+      - name: Generate Source Repo Token
+        uses: actions/create-github-app-token@v1
+        id: source-token
+        with:
+          app-id: ${{ secrets.APP_ID }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY }}
+          owner: ${{ env.SOURCE_OWNER }}
+          repositories: ${{ env.SOURCE_REPO }}
+
+      # A separate dest-scoped token, so the PR is opened by the App rather than by
+      # GITHUB_TOKEN. PRs opened with GITHUB_TOKEN do not trigger other workflows, so
+      # mint-preview.yml would never fire on them. See the comment at
+      # sync-video-library.yml:89.
+      - name: Generate Destination Repo Token
+        uses: actions/create-github-app-token@v1
+        id: dest-token
+        with:
+          app-id: ${{ secrets.APP_ID }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY }}
+
+      - name: Checkout Destination Repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Clone Source Repo
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ env.SOURCE_OWNER }}/${{ env.SOURCE_REPO }}
+          token: ${{ steps.source-token.outputs.token }}
+          path: source-repo
+
+      - name: Check the manifest exists
+        id: manifest
+        run: |
+          set -euo pipefail
+          MANIFEST="source-repo/${{ env.SOURCE_MANIFEST }}"
+          if [ ! -f "$MANIFEST" ]; then
+            echo "::error::$MANIFEST not found. Has \`./gradlew generateSchemaManifest\`" \
+                 "run and been committed on ${{ env.SOURCE_OWNER }}/${{ env.SOURCE_REPO }}?"
+            exit 1
+          fi
+          SHA=$(python3 -c "import json,sys;print(json.load(open(sys.argv[1])).get('generatedFrom') or 'unknown')" "$MANIFEST")
+          echo "path=$MANIFEST" >> $GITHUB_OUTPUT
+          echo "sha=$SHA" >> $GITHUB_OUTPUT
+          echo "Manifest generated from domostats@$SHA"
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install the Anthropic SDK
+        if: inputs.draft_descriptions != 'false'
+        run: pip install "${{ env.ANTHROPIC_SDK }}"
+
+      - name: Run the reconciler tests
+        run: python3 -m unittest discover -s .github/scripts/tests -t .github/scripts/tests
+
+      - name: Reconcile the article
+        id: reconcile
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          set -euo pipefail
+          DRAFT=""
+          if [ "${{ inputs.draft_descriptions }}" != "false" ] && [ -n "${ANTHROPIC_API_KEY:-}" ]; then
+            DRAFT="--draft-descriptions"
+          elif [ "${{ inputs.draft_descriptions }}" != "false" ]; then
+            echo "::warning::ANTHROPIC_API_KEY is not set; new column descriptions will be left as TODO."
+          fi
+
+          python3 .github/scripts/reconcile_domostats.py \
+            --manifest "${{ steps.manifest.outputs.path }}" \
+            --article "${{ env.ARTICLE }}" \
+            --ja-article "${{ env.JA_ARTICLE }}" \
+            --config "${{ env.SYNC_CONFIG }}" \
+            --descriptions "${{ inputs.descriptions || 'safe' }}" \
+            --pr-body domostats-pr-body.md \
+            --model "${{ env.DRAFT_MODEL }}" \
+            $DRAFT
+
+      - name: Decide whether to open a PR
+        id: decide
+        run: |
+          set -euo pipefail
+          if [ "${{ steps.reconcile.outputs.has_changes }}" == "true" ]; then
+            echo "open=true" >> $GITHUB_OUTPUT
+          elif [ "${{ inputs.force }}" == "true" ]; then
+            echo "open=true" >> $GITHUB_OUTPUT
+            echo "No article changes, but force was requested."
+          else
+            echo "open=false" >> $GITHUB_OUTPUT
+            echo "The article already matches the connector; nothing to open."
+          fi
+
+      # The PR body is generated by the reconciler, so it is read from disk here rather
+      # than inlined. create-pull-request has no body-file input, so it goes through the
+      # step output. The reconciler redacts undocumented report names by default; do not
+      # add --no-redact here, and do not upload the report JSON as an artifact, because
+      # artifacts and logs on a public repository are world-readable.
+      - name: Load the PR body
+        id: body
+        if: steps.decide.outputs.open == 'true'
+        run: |
+          {
+            echo "text<<PR_BODY_EOF"
+            cat domostats-pr-body.md
+            echo "PR_BODY_EOF"
+          } >> $GITHUB_OUTPUT
+
+      - name: Create Pull Request
+        id: pr
+        if: steps.decide.outputs.open == 'true'
+        uses: peter-evans/create-pull-request@v5
+        with:
+          token: ${{ steps.dest-token.outputs.token }}
+          base: ${{ env.BASE_BRANCH }}
+          branch: ${{ env.SYNC_BRANCH }}
+          delete-branch: true
+          draft: true
+          commit-message: |
+            docs: sync DomoStats Connector field tables from the connector schema
+
+            Generated from ${{ env.SOURCE_OWNER }}/${{ env.SOURCE_REPO }}@${{ steps.manifest.outputs.sha }}
+            by .github/workflows/sync-domostats-schema.yml.
+          title: "docs: sync DomoStats Connector field tables from the connector schema"
+          body: ${{ steps.body.outputs.text }}
+          # Only the English article. The Japanese mirror is reported on, never edited.
+          add-paths: |
+            ${{ env.ARTICLE }}
+
+      - name: Summary
+        if: always()
+        run: |
+          echo "## DomoStats Schema Sync" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Manifest from \`${{ env.SOURCE_OWNER }}/${{ env.SOURCE_REPO }}@${{ steps.manifest.outputs.sha }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          if [ "${{ steps.decide.outputs.open }}" == "true" ]; then
+            if [ -n "${{ steps.pr.outputs.pull-request-number }}" ]; then
+              echo "Draft PR [#${{ steps.pr.outputs.pull-request-number }}](${{ steps.pr.outputs.pull-request-url }}) is ready for review." >> $GITHUB_STEP_SUMMARY
+            else
+              echo "A PR was requested but none was produced; check the step log." >> $GITHUB_STEP_SUMMARY
+            fi
+          else
+            echo "No changes: the article already matches the connector schema." >> $GITHUB_STEP_SUMMARY
+          fi
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          echo "${{ steps.reconcile.outputs.summary }}" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY

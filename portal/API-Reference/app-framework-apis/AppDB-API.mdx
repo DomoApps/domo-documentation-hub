@@ -40,7 +40,7 @@ Go to **Asset Library** (`your-instance.domo.com/assetlibrary`) and click **Pro 
 
 ### 2. Add a collection
 
-In the **Resources** pane (bottom-left), expand **Collections** and add a new collection named `Inventory`. This opens a new tab showing the collection configuration — save that tab. Your `manifest.json` now includes the collection:
+In the **Resources** pane (bottom-left), expand **Collections** and create a new collection named `Inventory`. This opens a new tab showing the collection configuration — save that tab. Your `manifest.json` now includes the collection:
 
 ```json
 {
@@ -70,7 +70,11 @@ Add an output container to `index.html`:
   </head>
   <body>
     <div id="output"></div>
-    <script src="https://unpkg.com/ryuu.js@4.6.0/dist/domo.js" integrity="sha384-YYsd9wQ+wDlUWhvpfGdptxmNYIqBC+52oJtWgPKJadbs3sSFTY/+ZotPbEHTTRWz" crossorigin="anonymous"></script>
+    <script
+      src="https://unpkg.com/ryuu.js@4.6.0/dist/domo.js"
+      integrity="sha384-YYsd9wQ+wDlUWhvpfGdptxmNYIqBC+52oJtWgPKJadbs3sSFTY/+ZotPbEHTTRWz"
+      crossorigin="anonymous"
+    ></script>
     <script src="app.js"></script>
   </body>
 </html>
@@ -81,17 +85,54 @@ Add an output container to `index.html`:
 Documents are flexible JSON — `tags` is a real array, nested fields just work, and no schema is required. Replace `app.js`:
 
 ```js
-const output = document.getElementById('output');
+const output = document.getElementById("output");
 
-domo.post('/domo/datastores/v1/collections/Inventory/documents/bulk', [
-  { content: { name: 'Laptop',   category: 'electronics', qty: 12, tags: ['portable', 'computing'] } },
-  { content: { name: 'Mouse',    category: 'electronics', qty: 5,  tags: ['portable', 'input']     } },
-  { content: { name: 'Desk',     category: 'furniture',   qty: 8,  tags: ['office']                } },
-  { content: { name: 'Chair',    category: 'furniture',   qty: 3,  tags: ['office', 'ergonomic']   } },
-  { content: { name: 'Notebook', category: 'stationery',  qty: 50, tags: ['writing', 'portable']   } }
-]).then(result => {
-  output.textContent = `Created ${result.Created} items.`;
-});
+domo
+  .post("/domo/datastores/v1/collections/Inventory/documents/bulk", [
+    {
+      content: {
+        name: "Laptop",
+        category: "electronics",
+        qty: 12,
+        tags: ["portable", "computing"],
+      },
+    },
+    {
+      content: {
+        name: "Mouse",
+        category: "electronics",
+        qty: 5,
+        tags: ["portable", "input"],
+      },
+    },
+    {
+      content: {
+        name: "Desk",
+        category: "furniture",
+        qty: 8,
+        tags: ["office"],
+      },
+    },
+    {
+      content: {
+        name: "Chair",
+        category: "furniture",
+        qty: 3,
+        tags: ["office", "ergonomic"],
+      },
+    },
+    {
+      content: {
+        name: "Notebook",
+        category: "stationery",
+        qty: 50,
+        tags: ["writing", "portable"],
+      },
+    },
+  ])
+  .then((result) => {
+    output.textContent = `Created ${result.Created} items.`;
+  });
 ```
 
 Save and verify the preview shows **Created 5 items.**
@@ -101,15 +142,21 @@ Save and verify the preview shows **Created 5 items.**
 MongoDB query operators like `$lt` work on any field without defining indexes. Replace `app.js`:
 
 ```js
-const output = document.getElementById('output');
+const output = document.getElementById("output");
 
-domo.post('/domo/datastores/v1/collections/Inventory/documents/query', {
-  'content.qty': { $lt: 10 }
-}).then(docs => {
-  output.innerHTML = '<p>Low stock (under 10):</p>' + docs
-    .map(doc => `<p>${doc.content.name} — ${doc.content.qty} remaining</p>`)
-    .join('');
-});
+domo
+  .post("/domo/datastores/v1/collections/Inventory/documents/query", {
+    "content.qty": { $lt: 10 },
+  })
+  .then((docs) => {
+    output.innerHTML =
+      "<p>Low stock (under 10):</p>" +
+      docs
+        .map(
+          (doc) => `<p>${doc.content.name} — ${doc.content.qty} remaining</p>`,
+        )
+        .join("");
+  });
 ```
 
 Save. The preview lists Mouse (5), Desk (8), and Chair (3).
@@ -119,20 +166,27 @@ Save. The preview lists Mouse (5), Desk (8), and Chair (3).
 `$inc` atomically increments a field — no read-then-write required, and only `qty` is touched. The rest of the document is unchanged. Replace `app.js`:
 
 ```js
-const output = document.getElementById('output');
+const output = document.getElementById("output");
 
-domo.put('/domo/datastores/v1/collections/Inventory/documents/update', {
-  query: { 'content.name': 'Mouse' },
-  operation: { $inc: { 'content.qty': 20 } }
-})
-.then(() => domo.post('/domo/datastores/v1/collections/Inventory/documents/query', {
-  'content.qty': { $lt: 10 }
-}))
-.then(docs => {
-  output.innerHTML = '<p>Low stock after restock:</p>' + docs
-    .map(doc => `<p>${doc.content.name} — ${doc.content.qty} remaining</p>`)
-    .join('');
-});
+domo
+  .put("/domo/datastores/v1/collections/Inventory/documents/update", {
+    query: { "content.name": "Mouse" },
+    operation: { $inc: { "content.qty": 20 } },
+  })
+  .then(() =>
+    domo.post("/domo/datastores/v1/collections/Inventory/documents/query", {
+      "content.qty": { $lt: 10 },
+    }),
+  )
+  .then((docs) => {
+    output.innerHTML =
+      "<p>Low stock after restock:</p>" +
+      docs
+        .map(
+          (doc) => `<p>${doc.content.name} — ${doc.content.qty} remaining</p>`,
+        )
+        .join("");
+  });
 ```
 
 Save. Mouse is gone from the low-stock list — only Desk (8) and Chair (3) remain.
@@ -142,16 +196,18 @@ Save. Mouse is gone from the low-stock list — only Desk (8) and Chair (3) rema
 Aggregation runs server-side on live data — no DataSet refresh needed. Replace `app.js`:
 
 ```js
-const output = document.getElementById('output');
+const output = document.getElementById("output");
 
-domo.post(
-  '/domo/datastores/v1/collections/Inventory/documents/query?groupby=content.category&sum=content.qty totalQty&orderby=totalQty descending',
-  {}
-).then(groups => {
-  output.innerHTML = '<p>Total inventory by category:</p>' + groups
-    .map(g => `<p>${g._id}: ${g.totalQty} units</p>`)
-    .join('');
-});
+domo
+  .post(
+    "/domo/datastores/v1/collections/Inventory/documents/query?groupby=content.category&sum=content.qty totalQty&orderby=totalQty descending",
+    {},
+  )
+  .then((groups) => {
+    output.innerHTML =
+      "<p>Total inventory by category:</p>" +
+      groups.map((g) => `<p>${g._id}: ${g.totalQty} units</p>`).join("");
+  });
 ```
 
 Save. The preview shows totals per category, sorted highest first.
@@ -371,18 +427,18 @@ After filtering with the request body, add query string parameters to aggregate 
 
 Field names use MongoDB dot notation. Fields inside the `content` object must be prefixed with `content.` (e.g., `content.campaignName`). Top-level fields (`owner`, `createdOn`) can be referenced directly.
 
-| Parameter | Type    | Description                                                       |
-| --------- | ------- | ----------------------------------------------------------------- |
-| `groupby` | String  | Comma-separated properties to group by                            |
-| `count`   | String  | Alias for a count aggregation                                     |
-| `avg`     | String  | `property alias, property alias, …` — average                     |
-| `min`     | String  | `property alias, property alias, …` — minimum                     |
-| `max`     | String  | `property alias, property alias, …` — maximum                     |
-| `sum`     | String  | `property alias, property alias, …` — sum                         |
-| `unwind`  | String  | Comma-separated fields to unwind (deconstructs an array field, producing one document per element). Must be combined with at least one of `count`, `groupby`, `avg`, `min`, `max`, or `sum`. |
+| Parameter | Type    | Description                                                                                                                                                                                                                                        |
+| --------- | ------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `groupby` | String  | Comma-separated properties to group by                                                                                                                                                                                                             |
+| `count`   | String  | Alias for a count aggregation                                                                                                                                                                                                                      |
+| `avg`     | String  | `property alias, property alias, …` — average                                                                                                                                                                                                      |
+| `min`     | String  | `property alias, property alias, …` — minimum                                                                                                                                                                                                      |
+| `max`     | String  | `property alias, property alias, …` — maximum                                                                                                                                                                                                      |
+| `sum`     | String  | `property alias, property alias, …` — sum                                                                                                                                                                                                          |
+| `unwind`  | String  | Comma-separated fields to unwind (deconstructs an array field, producing one document per element). Must be combined with at least one of `count`, `groupby`, `avg`, `min`, `max`, or `sum`.                                                       |
 | `orderby` | String  | Field or alias to sort by, followed by `ascending` or `descending`. Works with or without aggregation parameters. When used with aggregation, accepts aliases defined by other parameters; when used without, accepts field names in dot notation. |
-| `limit`   | Integer | Max documents to return (default 10,000)                          |
-| `offset`  | Integer | Documents to skip (default 0)                                     |
+| `limit`   | Integer | Max documents to return (default 10,000)                                                                                                                                                                                                           |
+| `offset`  | Integer | Documents to skip (default 0)                                                                                                                                                                                                                      |
 
 **Example — campaign aggregation:**
 
@@ -513,7 +569,10 @@ Minimal example — restrict every user to only their own documents:
 
 If a filter prevents a match on a single-document operation, the response is `404 Not Found`. On a bulk delete, it returns `0 documents deleted`.
 
-<Note>**Note:** Filters do not apply to CREATE operations. Documents can always be created regardless of any filter rules defined on the collection.</Note>
+<Note>
+  **Note:** Filters do not apply to CREATE operations. Documents can always be
+  created regardless of any filter rules defined on the collection.
+</Note>
 
 ---
 

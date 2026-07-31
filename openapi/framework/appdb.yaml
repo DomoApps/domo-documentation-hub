@@ -333,12 +333,6 @@ paths:
                 updatedBy: 870010733
                 content:
                   username: "Bill S. Preston, Esquire"
-        '400':
-          description: Bad request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
 
     get:
       summary: List Documents
@@ -573,10 +567,6 @@ paths:
           - `$near` and `$nearSphere` — geospatial proximity searches require an index that AppDB collections do not have.
         </Warning>
 
-        **Aggregation query parameters**
-
-        Field names use dot notation; fields inside `content` must be prefixed with `content.` (e.g., `content.campaignName`). Top-level fields like `owner` and `createdOn` can be referenced directly.
-
         **Examples**
 
         The following examples use this sample movie collection:
@@ -664,6 +654,24 @@ paths:
           To confirm the stored type of any field, use the `$type` operator. If `{"someField": {"$type": "date"}}` returns documents, use `$date` syntax. If `{"someField": {"$type": "string"}}` returns documents, use string comparison or `$expr` + `$toDate`.
         </Warning>
 
+        **Movie count per genre**
+        ```
+        ?groupby=content.genre&count=count
+        ```
+        Body: `{}`
+        ```json
+        [
+          {"_id": "sci-fi",  "count": 2},
+          {"_id": "romance", "count": 2},
+          {"_id": "action",  "count": 1}
+        ]
+        ```
+        <Info>
+        **Aggregation query parameters**
+
+        Field names use dot notation; fields inside `content` must be prefixed with `content.` (e.g., `content.genre`). Top-level fields like `owner` and `createdOn` can be referenced directly.
+        </Info>
+
         **Average rating per genre for movies released since 2010**
         ```
         ?groupby=content.genre&avg=content.rating avgRating&orderby=avgRating descending
@@ -680,18 +688,7 @@ paths:
         ]
         ```
 
-        **Movie count per genre**
-        ```
-        ?groupby=content.genre&count=count
-        ```
-        Body: `{}`
-        ```json
-        [
-          {"_id": "sci-fi",  "count": 2},
-          {"_id": "romance", "count": 2},
-          {"_id": "action",  "count": 1}
-        ]
-        ```
+
 
         **Tag frequency across all movies**
 

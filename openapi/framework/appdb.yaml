@@ -564,30 +564,20 @@ paths:
 
         **Supported operators**
 
-        All MongoDB query predicates supported in a `find()` call are available, including comparison, logical, array, data type, bitwise, `$expr`, `$jsonSchema`, `$regex`, `$geoWithin`, and `$geoIntersects`. The following operators are **not** supported:
+        All MongoDB query predicates supported in a `find()` call are available, including comparison, logical, array, data type, bitwise, `$expr`, `$jsonSchema`, `$regex`, `$geoWithin`, and `$geoIntersects`. See the [MongoDB query predicate documentation](https://www.mongodb.com/docs/manual/reference/mql/query-predicates/) for the full operator list.
 
-        - `$where` — JavaScript evaluation is disabled server-side.
-        - `$near` and `$nearSphere` — geospatial proximity searches require an index that AppDB collections do not have.
+        <Warning>
+          **Unsupported operators**
 
-        See the [MongoDB query predicate documentation](https://www.mongodb.com/docs/manual/reference/mql/query-predicates/) for the full operator list.
-
-        **Querying by date**
-
-        Use [MongoDB Extended JSON v2](https://www.mongodb.com/docs/manual/reference/mongodb-extended-json/#bson.Date) `$date` to compare against a date value:
-
-        ```json
-        {
-          "createdOn": {
-            "$lte": { "$date": "2020-05-12T00:00:00.000Z" }
-          }
-        }
-        ```
+          - `$where` — JavaScript evaluation is disabled server-side.
+          - `$near` and `$nearSphere` — geospatial proximity searches require an index that AppDB collections do not have.
+        </Warning>
 
         **Aggregation query parameters**
 
         Field names use dot notation; fields inside `content` must be prefixed with `content.` (e.g., `content.campaignName`). Top-level fields like `owner` and `createdOn` can be referenced directly.
 
-        **Aggregation examples**
+        **Examples**
 
         The following examples use this sample movie collection:
         ```json
@@ -595,40 +585,84 @@ paths:
           {
             "content": {
               "title": "Inception", "genre": "sci-fi",
-              "year": 2010, "rating": 8.8,
+              "rating": 8.8, "releaseDate": "2010-07-16T00:00:00.000Z",
               "tags": ["mind-bending", "action"]
             }
           },
           {
             "content": {
               "title": "Interstellar", "genre": "sci-fi",
-              "year": 2014, "rating": 8.6,
+              "rating": 8.6, "releaseDate": "2014-11-05T00:00:00.000Z",
               "tags": ["mind-bending", "emotional"]
             }
           },
           {
             "content": {
               "title": "The Notebook", "genre": "romance",
-              "year": 2004, "rating": 7.9,
+              "rating": 7.9, "releaseDate": "2004-06-25T00:00:00.000Z",
               "tags": ["romantic", "drama"]
             }
           },
           {
             "content": {
               "title": "Titanic", "genre": "romance",
-              "year": 1997, "rating": 7.8,
+              "rating": 7.8, "releaseDate": "1997-12-19T00:00:00.000Z",
               "tags": ["romantic", "drama", "action"]
             }
           },
           {
             "content": {
               "title": "The Avengers", "genre": "action",
-              "year": 2012, "rating": 8.0,
+              "rating": 8.0, "releaseDate": "2012-05-04T00:00:00.000Z",
               "tags": ["action", "superhero"]
             }
           }
         ]
         ```
+
+        **Querying by date**
+
+        AppDB has two categories of date fields that require different query approaches. Using the wrong approach for a field type fails silently — no error, just incorrect results.
+
+        **System date fields** (`createdOn`, `updatedOn`) are stored as BSON DateTime by AppDB. Query them using [MongoDB Extended JSON v2](https://www.mongodb.com/docs/manual/reference/mongodb-extended-json/#bson.Date) `$date` syntax:
+        ```json
+        {"createdOn": {"$lt": {"$date": "2026-01-01T00:00:00.000Z"}}}
+        ```
+
+        **Content date fields** are stored as whatever JSON primitive you write. An ISO 8601 string like `"2010-07-16T00:00:00.000Z"` is stored as a BSON String. Two approaches work:
+
+        **String comparison** — ISO 8601 strings in `YYYY-MM-DDTHH:MM:SSZ` format sort lexicographically in date order, so standard comparison operators work directly:
+        ```json
+        {"content.releaseDate": {"$lt": "2010-01-01T00:00:00.000Z"}}
+        ```
+
+        **`$expr` + `$toDate`** — converts the string to a date at query time, enabling `$date` comparisons and handling mixed-precision strings correctly:
+        ```json
+        {
+          "$expr": {
+            "$lt": [
+              {"$toDate": "$content.releaseDate"},
+              {"$date": "2010-01-01T00:00:00.000Z"}
+            ]
+          }
+        }
+        ```
+
+        Both content field approaches return the same result — movies released before 2010:
+        ```json
+        [
+          {"content": {"title": "Titanic",      "releaseDate": "1997-12-19T00:00:00.000Z", ...}},
+          {"content": {"title": "The Notebook", "releaseDate": "2004-06-25T00:00:00.000Z", ...}}
+        ]
+        ```
+
+        <Warning>
+          **Mixing up these approaches produces wrong results without an error.**
+
+          Using `$date` against a content string field always returns empty — BSON DateTime never matches BSON String. Using plain string comparison against a system field like `createdOn` also produces wrong results: MongoDB's BSON type ordering ranks DateTime above String, so `$lt: "2026-..."` against a DateTime field matches nothing, while `$gt: "2026-..."` matches everything.
+
+          To confirm the stored type of any field, use the `$type` operator. If `{"someField": {"$type": "date"}}` returns documents, use `$date` syntax. If `{"someField": {"$type": "string"}}` returns documents, use string comparison or `$expr` + `$toDate`.
+        </Warning>
 
         **Average rating per genre for movies released since 2010**
         ```
@@ -636,7 +670,7 @@ paths:
         ```
         Body:
         ```json
-        {"content.year": {"$gte": 2010}}
+        {"content.releaseDate": {"$gte": "2010-01-01T00:00:00.000Z"}}
         ```
         Response:
         ```json
@@ -677,36 +711,7 @@ paths:
         ]
         ```
 
-        **Rating statistics by genre**
-
-        ```
-        ?groupby=content.genre&sum=content.rating totalRating&min=content.rating minRating&max=content.rating maxRating&orderby=maxRating descending
-        ```
-        Body: `{}`
-        ```json
-        [
-          {
-            "_id": "sci-fi",
-            "minRating": 8.6,
-            "maxRating": 8.8,
-            "totalRating": 17.4
-          },
-          {
-            "_id": "action",
-            "minRating": 8,
-            "maxRating": 8,
-            "totalRating": 8
-          },
-          {
-            "_id": "romance",
-            "minRating": 7.8,
-            "maxRating": 7.9,
-            "totalRating": 15.7
-          }
-        ]
-        ```
-
-        When grouping by multiple fields, `_id` is an object instead of a scalar — e.g., `{"_id": {"genre": "sci-fi", "year": 2010}}`. Aggregation values are top-level keys using their configured aliases.
+        To group by multiple fields, pass a comma-separated list: `groupby=content.genre,content.releaseDate`. The `_id` in each result becomes an object — `{"_id": {"genre": "sci-fi", "releaseDate": "2010-07-16T00:00:00.000Z"}}` — instead of a scalar. Aggregation values remain top-level keys using their configured aliases.
       tags:
       - AppDB API
       parameters:

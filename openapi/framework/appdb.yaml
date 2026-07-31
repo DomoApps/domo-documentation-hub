@@ -69,8 +69,16 @@ components:
         updatedOn: "2026-06-25T01:33:56.332Z"
         updatedBy: 870010733
         content:
-          username: "Bill S. Preston, Esquire"
-          score: 42
+          name: "Harry Potter"
+          house: "Gryffindor"
+          wand:
+            wood: "holly"
+            core: "phoenix feather"
+            length: 11
+          courses:
+            - "Defense Against the Dark Arts"
+            - "Potions"
+            - "Transfiguration"
 
     DocumentCreate:
       type: object
@@ -199,11 +207,7 @@ components:
       additionalProperties: true
       description: MongoDB query object
       example:
-        $or:
-          - content.comments:
-              $regex: "happy"
-          - content.username:
-              $ne: "Eeyore"
+        content.wand.core: "phoenix feather"
 
     PartialUpdateRequest:
       type: object
@@ -269,15 +273,29 @@ paths:
               $ref: '#/components/schemas/DocumentCreate'
             example:
               content:
-                username: "Bill S. Preston, Esquire"
+                name: "Harry Potter"
+                house: "Gryffindor"
+                wand:
+                  wood: "holly"
+                  core: "phoenix feather"
+                  length: 11
+                courses:
+                  - "Defense Against the Dark Arts"
+                  - "Potions"
+                  - "Transfiguration"
       x-codeSamples:
         - lang: JavaScript
           label: domo.js
           source: |-
-            const collectionName = 'YourCollection';
+            const collectionName = 'Students';
 
             domo.post(`/domo/datastores/v1/collections/${collectionName}/documents`, {
-              content: { username: 'Bill S. Preston, Esquire' }
+              content: {
+                name: 'Harry Potter',
+                house: 'Gryffindor',
+                wand: { wood: 'holly', core: 'phoenix feather', length: 11 },
+                courses: ['Defense Against the Dark Arts', 'Potions', 'Transfiguration']
+              }
             }).then(doc => console.log(doc));
         - &stub_curl
           lang: cURL
@@ -323,16 +341,25 @@ paths:
               schema:
                 $ref: '#/components/schemas/Document'
               example:
-                id: "c023b254-647e-4839-b74b-b050d4c17447"
-                datastoreId: "5565fecc-a852-4799-83bf-f9423c0f7687"
-                collectionId: "a3aaeeed-5210-4048-9ff0-d88fa0de4eda"
+                id: "402778f6-bc8d-4aa5-a581-e08e3fc98c05"
+                datastoreId: "daee775a-3be4-410d-ba20-bb0d94ce51cb"
+                collectionId: "2148c830-14c2-478f-bb14-5c3019de46b4"
                 syncRequired: true
-                owner: 870010733
-                createdOn: "2026-06-25T01:33:56.332Z"
-                updatedOn: "2026-06-25T01:33:56.332Z"
-                updatedBy: 870010733
+                owner: 540824222
+                createdOn: "2026-07-31T23:09:34.542Z"
+                updatedOn: "2026-07-31T23:09:34.542Z"
+                updatedBy: 540824222
                 content:
-                  username: "Bill S. Preston, Esquire"
+                  name: "Harry Potter"
+                  house: "Gryffindor"
+                  wand:
+                    wood: "holly"
+                    core: "phoenix feather"
+                    length: 11
+                  courses:
+                    - "Defense Against the Dark Arts"
+                    - "Potions"
+                    - "Transfiguration"
 
     get:
       summary: List Documents
@@ -370,28 +397,45 @@ paths:
                 items:
                   $ref: '#/components/schemas/Document'
               example:
-                - id: "c023b254-647e-4839-b74b-b050d4c17447"
-                  datastoreId: "5565fecc-a852-4799-83bf-f9423c0f7687"
-                  collectionId: "a3aaeeed-5210-4048-9ff0-d88fa0de4eda"
+                - id: "402778f6-bc8d-4aa5-a581-e08e3fc98c05"
+                  datastoreId: "daee775a-3be4-410d-ba20-bb0d94ce51cb"
+                  collectionId: "2148c830-14c2-478f-bb14-5c3019de46b4"
                   syncRequired: true
-                  owner: 870010733
-                  createdOn: "2026-06-25T01:33:56.332Z"
-                  updatedOn: "2026-06-25T01:33:56.332Z"
-                  updatedBy: 870010733
+                  owner: 540824222
+                  createdOn: "2026-07-31T23:09:34.542Z"
+                  updatedOn: "2026-07-31T23:09:34.542Z"
+                  updatedBy: 540824222
                   content:
-                    username: "Bill S. Preston, Esquire"
-                    score: 42
-                - id: "6d2138c7-cb4a-4cda-9515-bd8a406b5270"
-                  datastoreId: "5565fecc-a852-4799-83bf-f9423c0f7687"
-                  collectionId: "a3aaeeed-5210-4048-9ff0-d88fa0de4eda"
-                  syncRequired: false
-                  owner: 870010733
-                  createdOn: "2026-06-25T01:34:10.201Z"
-                  updatedOn: "2026-06-25T01:34:10.201Z"
-                  updatedBy: 870010733
+                    name: "Harry Potter"
+                    house: "Gryffindor"
+                    wand:
+                      wood: "holly"
+                      core: "phoenix feather"
+                      length: 11
+                    courses:
+                      - "Defense Against the Dark Arts"
+                      - "Potions"
+                      - "Transfiguration"
+                - id: "dd363c89-60d2-4f70-89cb-c3c175be625b"
+                  datastoreId: "daee775a-3be4-410d-ba20-bb0d94ce51cb"
+                  collectionId: "2148c830-14c2-478f-bb14-5c3019de46b4"
+                  syncRequired: true
+                  owner: 540824222
+                  createdOn: "2026-07-31T23:11:11.564Z"
+                  updatedOn: "2026-07-31T23:11:11.564Z"
+                  updatedBy: 540824222
                   content:
-                    username: "Ted Theodore Logan"
-                    score: 77
+                    name: "Hermione Granger"
+                    house: "Gryffindor"
+                    wand:
+                      wood: "vine"
+                      core: "dragon heartstring"
+                      length: 10.75
+                    courses:
+                      - "Potions"
+                      - "Transfiguration"
+                      - "Arithmancy"
+                      - "Care of Magical Creatures"
 
   /domo/datastores/v1/collections/{collectionName}/documents/{documentId}:
     get:
@@ -435,17 +479,25 @@ paths:
               schema:
                 $ref: '#/components/schemas/Document'
               example:
-                id: "c023b254-647e-4839-b74b-b050d4c17447"
-                datastoreId: "5565fecc-a852-4799-83bf-f9423c0f7687"
-                collectionId: "a3aaeeed-5210-4048-9ff0-d88fa0de4eda"
+                id: "402778f6-bc8d-4aa5-a581-e08e3fc98c05"
+                datastoreId: "daee775a-3be4-410d-ba20-bb0d94ce51cb"
+                collectionId: "2148c830-14c2-478f-bb14-5c3019de46b4"
                 syncRequired: true
-                owner: 870010733
-                createdOn: "2026-06-25T01:33:56.332Z"
-                updatedOn: "2026-06-25T01:33:56.332Z"
-                updatedBy: 870010733
+                owner: 540824222
+                createdOn: "2026-07-31T23:09:34.542Z"
+                updatedOn: "2026-07-31T23:09:34.542Z"
+                updatedBy: 540824222
                 content:
-                  username: "Bill S. Preston, Esquire"
-                  score: 42
+                  name: "Harry Potter"
+                  house: "Gryffindor"
+                  wand:
+                    wood: "holly"
+                    core: "phoenix feather"
+                    length: 11
+                  courses:
+                    - "Defense Against the Dark Arts"
+                    - "Potions"
+                    - "Transfiguration"
         '404':
           description: Document not found
 
@@ -474,17 +526,34 @@ paths:
               $ref: '#/components/schemas/DocumentUpdate'
             example:
               content:
-                username: "Bill S. Preston, Esquire"
-                Band: "Wyld Stallyns"
+                name: "Harry Potter"
+                house: "Gryffindor"
+                wand:
+                  wood: "holly"
+                  core: "phoenix feather"
+                  length: 11
+                courses:
+                  - "Defense Against the Dark Arts"
+                  - "Potions"
+                  - "Transfiguration"
+                prefect: false
       x-codeSamples:
         - lang: JavaScript
           label: domo.js
           source: |-
-            const collectionName = 'YourCollection';
-            const documentId = 'your-document-id';
+            const collectionName = 'Students';
+            const documentId = '402778f6-bc8d-4aa5-a581-e08e3fc98c05';
 
+            // PUT replaces the entire document — include all fields, not just the ones changing.
+            // Harry was notably never made a prefect (that honor went to Ron in book 5).
             domo.put(`/domo/datastores/v1/collections/${collectionName}/documents/${documentId}`, {
-              content: { username: 'Bill S. Preston, Esquire', Band: 'Wyld Stallyns' }
+              content: {
+                name: 'Harry Potter',
+                house: 'Gryffindor',
+                wand: { wood: 'holly', core: 'phoenix feather', length: 11 },
+                courses: ['Defense Against the Dark Arts', 'Potions', 'Transfiguration'],
+                prefect: false
+              }
             }).then(doc => console.log(doc));
         - *stub_curl
         - *stub_python
@@ -500,17 +569,26 @@ paths:
               schema:
                 $ref: '#/components/schemas/Document'
               example:
-                id: "c023b254-647e-4839-b74b-b050d4c17447"
-                datastoreId: "5565fecc-a852-4799-83bf-f9423c0f7687"
-                collectionId: "a3aaeeed-5210-4048-9ff0-d88fa0de4eda"
+                id: "402778f6-bc8d-4aa5-a581-e08e3fc98c05"
+                datastoreId: "daee775a-3be4-410d-ba20-bb0d94ce51cb"
+                collectionId: "2148c830-14c2-478f-bb14-5c3019de46b4"
                 syncRequired: true
-                owner: 870010733
-                createdOn: "2026-06-25T01:33:56.332Z"
-                updatedOn: "2026-06-25T01:33:58.316Z"
-                updatedBy: 870010733
+                owner: 540824222
+                createdOn: "2026-07-31T23:09:34.542Z"
+                updatedOn: "2026-07-31T23:14:23.209Z"
+                updatedBy: 540824222
                 content:
-                  username: "Bill S. Preston, Esquire"
-                  Band: "Wyld Stallyns"
+                  name: "Harry Potter"
+                  house: "Gryffindor"
+                  wand:
+                    wood: "holly"
+                    core: "phoenix feather"
+                    length: 11
+                  courses:
+                    - "Defense Against the Dark Arts"
+                    - "Potions"
+                    - "Transfiguration"
+                  prefect: false
 
     delete:
       summary: Delete Document
@@ -569,45 +647,57 @@ paths:
 
         **Examples**
 
-        The following examples use this sample movie collection:
+        The following examples use this sample Students collection:
         ```json
         [
           {
             "content": {
-              "title": "Inception", "genre": "sci-fi",
-              "rating": 8.8, "releaseDate": "2010-07-16T00:00:00.000Z",
-              "tags": ["mind-bending", "action"]
+              "name": "Harry Potter", "house": "Gryffindor",
+              "wand": { "wood": "holly", "core": "phoenix feather", "length": 11 },
+              "courses": ["Defense Against the Dark Arts", "Potions", "Transfiguration"],
+              "prefect": false, "enrolledOn": "1991-09-01T00:00:00.000Z"
             }
           },
           {
             "content": {
-              "title": "Interstellar", "genre": "sci-fi",
-              "rating": 8.6, "releaseDate": "2014-11-05T00:00:00.000Z",
-              "tags": ["mind-bending", "emotional"]
+              "name": "Hermione Granger", "house": "Gryffindor",
+              "wand": { "wood": "vine", "core": "dragon heartstring", "length": 10.75 },
+              "courses": ["Potions", "Transfiguration", "Arithmancy", "Care of Magical Creatures"],
+              "prefect": true, "enrolledOn": "1991-09-01T00:00:00.000Z"
             }
           },
           {
             "content": {
-              "title": "The Notebook", "genre": "romance",
-              "rating": 7.9, "releaseDate": "2004-06-25T00:00:00.000Z",
-              "tags": ["romantic", "drama"]
+              "name": "Ron Weasley", "house": "Gryffindor",
+              "wand": { "wood": "willow", "core": "unicorn hair", "length": 14 },
+              "courses": ["Defense Against the Dark Arts", "Potions", "Divination"],
+              "prefect": true, "enrolledOn": "1991-09-01T00:00:00.000Z"
             }
           },
           {
             "content": {
-              "title": "Titanic", "genre": "romance",
-              "rating": 7.8, "releaseDate": "1997-12-19T00:00:00.000Z",
-              "tags": ["romantic", "drama", "action"]
+              "name": "Draco Malfoy", "house": "Slytherin",
+              "wand": { "wood": "hawthorn", "core": "unicorn hair", "length": 10 },
+              "courses": ["Potions", "Transfiguration", "Defense Against the Dark Arts"],
+              "prefect": true, "enrolledOn": "1991-09-01T00:00:00.000Z"
             }
           },
           {
             "content": {
-              "title": "The Avengers", "genre": "action",
-              "rating": 8.0, "releaseDate": "2012-05-04T00:00:00.000Z",
-              "tags": ["action", "superhero"]
+              "name": "Luna Lovegood", "house": "Ravenclaw",
+              "wand": { "wood": "unknown", "core": "thestral tail hair", "length": 13 },
+              "courses": ["Charms", "Defense Against the Dark Arts", "Care of Magical Creatures"],
+              "enrolledOn": "1992-09-01T00:00:00.000Z"
             }
           }
         ]
+        ```
+
+        **Querying nested fields**
+
+        AppDB stores documents as arbitrary JSON, so nested objects like `wand` are queryable directly using dot notation — no joins or schema changes needed. To find all students whose wand core is phoenix feather:
+        ```json
+        {"content.wand.core": "phoenix feather"}
         ```
 
         **Querying by date**
@@ -619,31 +709,28 @@ paths:
         {"createdOn": {"$lt": {"$date": "2026-01-01T00:00:00.000Z"}}}
         ```
 
-        **Content date fields** are stored as whatever JSON primitive you write. An ISO 8601 string like `"2010-07-16T00:00:00.000Z"` is stored as a BSON String. Two approaches work:
+        **Content date fields** are stored as whatever JSON primitive you write. An ISO 8601 string like `"2026-09-01T00:00:00.000Z"` is stored as a BSON String. Two approaches work:
 
-        **String comparison** — ISO 8601 strings in `YYYY-MM-DDTHH:MM:SSZ` format sort lexicographically in date order, so standard comparison operators work directly:
+        **String comparison** — ISO 8601 strings in `YYYY-MM-DDTHH:MM:SSZ` format sort lexicographically in date order, so standard comparison operators work directly. To find students who enrolled after the original 1991 cohort:
         ```json
-        {"content.releaseDate": {"$lt": "2010-01-01T00:00:00.000Z"}}
+        {"content.enrolledOn": {"$gt": "1991-09-01T00:00:00.000Z"}}
+        ```
+        ```json
+        [
+          {"content": {"name": "Luna Lovegood", "house": "Ravenclaw", "enrolledOn": "1992-09-01T00:00:00.000Z", ...}}
+        ]
         ```
 
         **`$expr` + `$toDate`** — converts the string to a date at query time, enabling `$date` comparisons and handling mixed-precision strings correctly:
         ```json
         {
           "$expr": {
-            "$lt": [
-              {"$toDate": "$content.releaseDate"},
-              {"$date": "2010-01-01T00:00:00.000Z"}
+            "$gt": [
+              {"$toDate": "$content.enrolledOn"},
+              {"$date": "1991-09-01T00:00:00.000Z"}
             ]
           }
         }
-        ```
-
-        Both content field approaches return the same result — movies released before 2010:
-        ```json
-        [
-          {"content": {"title": "Titanic",      "releaseDate": "1997-12-19T00:00:00.000Z", ...}},
-          {"content": {"title": "The Notebook", "releaseDate": "2004-06-25T00:00:00.000Z", ...}}
-        ]
         ```
 
         <Warning>
@@ -654,61 +741,59 @@ paths:
           To confirm the stored type of any field, use the `$type` operator. If `{"someField": {"$type": "date"}}` returns documents, use `$date` syntax. If `{"someField": {"$type": "string"}}` returns documents, use string comparison or `$expr` + `$toDate`.
         </Warning>
 
-        **Movie count per genre**
+        **Students per house**
         ```
-        ?groupby=content.genre&count=count
+        ?groupby=content.house&count=count
         ```
         Body: `{}`
         ```json
         [
-          {"_id": "sci-fi",  "count": 2},
-          {"_id": "romance", "count": 2},
-          {"_id": "action",  "count": 1}
+          {"_id": "Slytherin",  "count": 1},
+          {"_id": "Gryffindor", "count": 3},
+          {"_id": "Ravenclaw",  "count": 1}
         ]
         ```
         <Info>
         **Aggregation query parameters**
 
-        Field names use dot notation; fields inside `content` must be prefixed with `content.` (e.g., `content.genre`). Top-level fields like `owner` and `createdOn` can be referenced directly.
+        Field names use dot notation; fields inside `content` must be prefixed with `content.` (e.g., `content.house`). Nested fields like `content.wand.length` also work. Top-level fields like `owner` and `createdOn` can be referenced directly.
         </Info>
 
-        **Average rating per genre for movies released since 2010**
-        ```
-        ?groupby=content.genre&avg=content.rating avgRating&orderby=avgRating descending
-        ```
-        Body:
-        ```json
-        {"content.releaseDate": {"$gte": "2010-01-01T00:00:00.000Z"}}
-        ```
-        Response:
-        ```json
-        [
-          {"_id": "sci-fi", "avgRating": 8.7},
-          {"_id": "action", "avgRating": 8}
-        ]
-        ```
+        **Average wand length per house**
 
-
-
-        **Tag frequency across all movies**
-
-        `unwind` produces one document per tag value before grouping, so a movie with `["action", "romantic"]` counts once toward each group.
+        Because `wand` is a nested object, `content.wand.length` works as an aggregation target directly — no joins or flattening needed.
         ```
-        ?unwind=content.tags&groupby=content.tags&count=count&orderby=count descending
+        ?groupby=content.house&avg=content.wand.length avgWandLength&orderby=avgWandLength descending
         ```
         Body: `{}`
         ```json
         [
-          {"_id": "action",       "count": 3},
-          {"_id": "romantic",     "count": 2},
-          {"_id": "drama",        "count": 2},
-          {"_id": "mind-bending", "count": 2},
-          {"_id": "superhero",    "count": 1},
-          {"_id": "emotional",    "count": 1}
+          {"_id": "Ravenclaw",  "avgWandLength": 13},
+          {"_id": "Gryffindor", "avgWandLength": 11.916666666666666},
+          {"_id": "Slytherin",  "avgWandLength": 10}
         ]
         ```
 
-        To group by multiple fields, pass a comma-separated list: `groupby=content.tags,content.genre`. The `_id` in each result becomes an object — `{"_id": { "tags": "drama", "genre": "romance" }, "count": 2}` — instead of a scalar. Aggregation values remain top-level keys using their configured aliases.
+        **Course enrollment frequency**
+
+        `unwind` produces one document per course value before grouping, so a student enrolled in `["Potions", "Transfiguration"]` counts once toward each group.
+        ```
+        ?unwind=content.courses&groupby=content.courses&count=count&orderby=count descending
+        ```
+        Body: `{}`
+        ```json
+        [
+          {"_id": "Potions",                       "count": 4},
+          {"_id": "Defense Against the Dark Arts", "count": 4},
+          {"_id": "Transfiguration",               "count": 3},
+          {"_id": "Care of Magical Creatures",     "count": 2},
+          {"_id": "Divination",                    "count": 1},
+          {"_id": "Arithmancy",                    "count": 1},
+          {"_id": "Charms",                        "count": 1}
+        ]
+        ```
+
+        To group by multiple fields, pass a comma-separated list: `groupby=content.house,content.prefect`. The `_id` in each result becomes an object — `{"_id": {"house": "Gryffindor", "prefect": true}, "count": 1}` — instead of a scalar. Aggregation values remain top-level keys using their configured aliases.
       tags:
       - AppDB API
       parameters:
@@ -783,37 +868,29 @@ paths:
             schema:
               $ref: '#/components/schemas/MongoQuery'
             examples:
-              simpleQuery:
-                summary: Simple query example
+              nestedFieldQuery:
+                summary: Query by nested field
                 value:
-                  $or:
-                    - content.comments:
-                        $regex: "happy"
-                    - content.username:
-                        $ne: "Eeyore"
+                  content.wand.core: "phoenix feather"
               dateQuery:
-                summary: Query with date filter
+                summary: Query by content date field
                 value:
-                  createdOn:
-                    $lte:
-                      $date: "2020-05-12T00:00:00.000Z"
+                  content.enrolledOn:
+                    $gt: "1991-09-01T00:00:00.000Z"
       x-codeSamples:
         - lang: JavaScript
           label: domo.js
           source: |-
-            const collectionName = 'YourCollection';
+            const collectionName = 'Students';
 
-            // Simple filter
+            // Query by nested field — no joins needed
             domo.post(`/domo/datastores/v1/collections/${collectionName}/documents/query`, {
-              $or: [
-                { 'content.comments': { $regex: 'happy' } },
-                { 'content.username': { $ne: 'Eeyore' } }
-              ]
+              'content.wand.core': 'phoenix feather'
             }).then(docs => console.log(docs));
 
-            // With aggregation (query params)
+            // Count students per house (aggregation)
             domo.post(
-              `/domo/datastores/v1/collections/${collectionName}/documents/query?groupby=content.band&count=count`,
+              `/domo/datastores/v1/collections/${collectionName}/documents/query?groupby=content.house&count=count`,
               {}
             ).then(results => console.log(results));
         - *stub_curl
@@ -832,18 +909,26 @@ paths:
                 items:
                   $ref: '#/components/schemas/Document'
               example:
-                - id: "c023b254-647e-4839-b74b-b050d4c17447"
-                  datastoreId: "5565fecc-a852-4799-83bf-f9423c0f7687"
-                  collectionId: "a3aaeeed-5210-4048-9ff0-d88fa0de4eda"
+                - id: "402778f6-bc8d-4aa5-a581-e08e3fc98c05"
+                  datastoreId: "daee775a-3be4-410d-ba20-bb0d94ce51cb"
+                  collectionId: "2148c830-14c2-478f-bb14-5c3019de46b4"
                   syncRequired: true
-                  owner: 870010733
-                  createdOn: "2026-06-25T01:33:56.332Z"
-                  updatedOn: "2026-06-25T01:33:58.316Z"
-                  updatedBy: 870010733
+                  owner: 540824222
+                  createdOn: "2026-07-31T23:09:34.542Z"
+                  updatedOn: "2026-07-31T23:16:41.776Z"
+                  updatedBy: 540824222
                   content:
-                    username: "Bill S. Preston, Esquire"
-                    score: 99
-                    band: "Wyld Stallyns"
+                    name: "Harry Potter"
+                    house: "Gryffindor"
+                    wand:
+                      wood: "holly"
+                      core: "phoenix feather"
+                      length: 11
+                    courses:
+                      - "Defense Against the Dark Arts"
+                      - "Potions"
+                      - "Transfiguration"
+                    prefect: false
 
   /domo/datastores/v1/collections/{collectionName}/documents/update:
     put:
@@ -880,19 +965,19 @@ paths:
               $ref: '#/components/schemas/PartialUpdateRequest'
             example:
               query:
-                content.username: "Bill S. Preston, Esquire"
+                content.name: "Hermione Granger"
               operation:
                 $set:
-                  content.comment: "Excellent!"
+                  content.prefect: true
       x-codeSamples:
         - lang: JavaScript
           label: domo.js
           source: |-
-            const collectionName = 'YourCollection';
+            const collectionName = 'Students';
 
             domo.put(`/domo/datastores/v1/collections/${collectionName}/documents/update`, {
-              query: { 'content.username': 'Bill S. Preston, Esquire' },
-              operation: { $set: { 'content.comment': 'Excellent!' } }
+              query: { 'content.name': 'Hermione Granger' },
+              operation: { $set: { 'content.prefect': true } }
             }).then(count => console.log(count + ' document(s) updated'));
         - *stub_curl
         - *stub_python
@@ -932,18 +1017,52 @@ paths:
                 $ref: '#/components/schemas/DocumentCreate'
             example:
               - content:
-                  username: "Bill S. Preston, Esquire"
+                  name: "Draco Malfoy"
+                  house: "Slytherin"
+                  wand:
+                    wood: "hawthorn"
+                    core: "unicorn hair"
+                    length: 10
+                  courses:
+                    - "Potions"
+                    - "Transfiguration"
+                    - "Defense Against the Dark Arts"
+                  prefect: true
               - content:
-                  username: "Ted Theodore Logan"
+                  name: "Luna Lovegood"
+                  house: "Ravenclaw"
+                  wand:
+                    wood: "unknown"
+                    core: "thestral tail hair"
+                    length: 13
+                  courses:
+                    - "Charms"
+                    - "Defense Against the Dark Arts"
+                    - "Care of Magical Creatures"
       x-codeSamples:
         - lang: JavaScript
           label: domo.js
           source: |-
-            const collectionName = 'YourCollection';
+            const collectionName = 'Students';
 
             domo.post(`/domo/datastores/v1/collections/${collectionName}/documents/bulk`, [
-              { content: { username: 'Bill S. Preston, Esquire' } },
-              { content: { username: 'Ted Theodore Logan' } }
+              {
+                content: {
+                  name: 'Draco Malfoy',
+                  house: 'Slytherin',
+                  wand: { wood: 'hawthorn', core: 'unicorn hair', length: 10 },
+                  courses: ['Potions', 'Transfiguration', 'Defense Against the Dark Arts'],
+                  prefect: true
+                }
+              },
+              {
+                content: {
+                  name: 'Luna Lovegood',
+                  house: 'Ravenclaw',
+                  wand: { wood: 'unknown', core: 'thestral tail hair', length: 13 },
+                  courses: ['Charms', 'Defense Against the Dark Arts', 'Care of Magical Creatures']
+                }
+              }
             ]).then(result => console.log(result));
         - *stub_curl
         - *stub_python
@@ -989,26 +1108,79 @@ paths:
                     type: object
                     additionalProperties: true
             example:
-              - id: "b3ea3d2d-86c5-44e6-a2f4-985136bbbce1"
+              - id: "402778f6-bc8d-4aa5-a581-e08e3fc98c05"
                 content:
-                  username: "Bill S. Preston, Esquire"
-                  Band: "Wyld Stallyns"
-              - id: "1e61d99d-9885-419a-a33e-3be3941ee720"
+                  name: "Harry Potter"
+                  house: "Gryffindor"
+                  wand:
+                    wood: "holly"
+                    core: "phoenix feather"
+                    length: 11
+                  courses:
+                    - "Defense Against the Dark Arts"
+                    - "Potions"
+                    - "Transfiguration"
+                  prefect: false
+              - id: "dd363c89-60d2-4f70-89cb-c3c175be625b"
                 content:
-                  username: "Ted Theodore Logan"
-                  Band: "Wyld Stallyns"
+                  name: "Hermione Granger"
+                  house: "Gryffindor"
+                  wand:
+                    wood: "vine"
+                    core: "dragon heartstring"
+                    length: 10.75
+                  courses:
+                    - "Potions"
+                    - "Transfiguration"
+                    - "Arithmancy"
+                    - "Care of Magical Creatures"
+                  prefect: true
               - content:
-                  username: "Rufus"
+                  name: "Ron Weasley"
+                  house: "Gryffindor"
+                  wand:
+                    wood: "willow"
+                    core: "unicorn hair"
+                    length: 14
+                  courses:
+                    - "Defense Against the Dark Arts"
+                    - "Potions"
+                    - "Divination"
       x-codeSamples:
         - lang: JavaScript
           label: domo.js
           source: |-
-            const collectionName = 'YourCollection';
+            const collectionName = 'Students';
 
             domo.put(`/domo/datastores/v1/collections/${collectionName}/documents/bulk`, [
-              { id: 'b3ea3d2d-86c5-44e6-a2f4-985136bbbce1', content: { username: 'Bill S. Preston, Esquire', Band: 'Wyld Stallyns' } },
-              { id: '1e61d99d-9885-419a-a33e-3be3941ee720', content: { username: 'Ted Theodore Logan', Band: 'Wyld Stallyns' } },
-              { content: { username: 'Rufus' } }
+              {
+                id: '402778f6-bc8d-4aa5-a581-e08e3fc98c05',
+                content: {
+                  name: 'Harry Potter',
+                  house: 'Gryffindor',
+                  wand: { wood: 'holly', core: 'phoenix feather', length: 11 },
+                  courses: ['Defense Against the Dark Arts', 'Potions', 'Transfiguration'],
+                  prefect: false
+                }
+              },
+              {
+                id: 'dd363c89-60d2-4f70-89cb-c3c175be625b',
+                content: {
+                  name: 'Hermione Granger',
+                  house: 'Gryffindor',
+                  wand: { wood: 'vine', core: 'dragon heartstring', length: 10.75 },
+                  courses: ['Potions', 'Transfiguration', 'Arithmancy', 'Care of Magical Creatures'],
+                  prefect: true
+                }
+              },
+              {
+                content: {
+                  name: 'Ron Weasley',
+                  house: 'Gryffindor',
+                  wand: { wood: 'willow', core: 'unicorn hair', length: 14 },
+                  courses: ['Defense Against the Dark Arts', 'Potions', 'Divination']
+                }
+              }
             ]).then(result => console.log(result));
         - *stub_curl
         - *stub_python

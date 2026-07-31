@@ -32,7 +32,7 @@ This page covers the **App Framework API**. For the Product API, see [App DB API
 
 ## Quick Start
 
-This walkthrough builds a live inventory tracker using AppDB. Unlike a Domo DataSet, AppDB data is written and read directly by your app — no connector, no refresh cycle. Documents are flexible JSON that can hold nested arrays and objects, and under the hood AppDB runs on MongoDB, which means rich query operators, atomic field-level updates, and server-side aggregation.
+This walkthrough builds a live inventory tracker using AppDB. Unlike a Domo DataSet, AppDB data is written and read directly by your app — no connector, no refresh cycle. Documents are flexible JSON that can hold nested arrays and objects, and under the hood AppDB runs on MongoDB, which means [rich query operators](https://www.mongodb.com/docs/manual/reference/mql/query-predicates/), [atomic field-level updates](https://www.mongodb.com/docs/manual/reference/mql/update/), and server-side aggregation.
 
 ### 1. Create the app
 
@@ -143,7 +143,7 @@ Save and verify the preview shows **Created 5 items.**
 
 ### 5. Query low-stock items
 
-MongoDB query operators like `$lt` work on any field without defining indexes. Replace `app.js`:
+[MongoDB query operators](https://www.mongodb.com/docs/manual/reference/mql/query-predicates/) like `$lt` work on any field without defining indexes. Replace `app.js`:
 
 ```js
 const output = document.getElementById("output");
@@ -163,11 +163,11 @@ domo
   });
 ```
 
-Save. The preview lists Desk (8), Chair (3), Mouse (5).
+Save. The preview lists Desk (8), Chair (3), Mouse (5). See [Query Documents](/api-reference/appdb-api/query-documents) for the full filter syntax.
 
 ### 6. Restock an item
 
-`$inc` atomically increments a field — no read-then-write required, and only `qty` is touched. The rest of the document is unchanged. Replace `app.js`:
+[`$inc`](https://www.mongodb.com/docs/manual/reference/mql/update/) atomically increments a field — no read-then-write required, and only `qty` is touched. The rest of the document is unchanged. Replace `app.js`:
 
 ```js
 const output = document.getElementById("output");
@@ -193,7 +193,7 @@ domo
   });
 ```
 
-Save. Mouse is gone from the low-stock list — only Desk (8) and Chair (3) remain.
+Save. Mouse is gone from the low-stock list — only Desk (8) and Chair (3) remain. See [Partially Update Documents](/api-reference/appdb-api/partially-update-documents) for all supported operators.
 
 ### 7. Aggregate by category
 
@@ -214,7 +214,7 @@ domo
   });
 ```
 
-Save. The preview shows totals per category, sorted highest first.
+Save. The preview shows totals per category, sorted highest first. See [Aggregation Query Parameters](#aggregation-query-parameters) for `groupby`, `sum`, `avg`, `orderby`, and more.
 
 ### Next steps
 

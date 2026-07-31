@@ -587,55 +587,7 @@ paths:
 
         Field names use dot notation; fields inside `content` must be prefixed with `content.` (e.g., `content.campaignName`). Top-level fields like `owner` and `createdOn` can be referenced directly.
 
-        **Campaign aggregation example**
-
-        ```js
-        const url =
-          "/domo/datastores/v1/collections/campaigns/documents/query" +
-          "?groupby=content.campaignName,content.month" +
-          "&count=documentCount" +
-          "&avg=content.clicks avgClicks,content.impressions avgImps" +
-          "&sum=content.clicks sumClicks,content.impressions sumImps" +
-          "&max=content.clicks maxClicks,content.impressions maxImps" +
-          "&min=content.clicks minClicks,content.impressions minImps" +
-          "&orderby=sumClicks descending";
-
-        domo.post(url, {}).then((data) => console.log(data));
-        ```
-
-        Response:
-        ```json
-        [
-          {
-            "_id": { "campaignName": "Red Campaign", "month": "February" },
-            "documentCount": 2,
-            "sumClicks": 210,
-            "avgClicks": 105.0,
-            "minClicks": 90,
-            "maxClicks": 120,
-            "sumImps": 2260,
-            "avgImps": 1130.0,
-            "minImps": 1010,
-            "maxImps": 1250
-          },
-          {
-            "_id": { "campaignName": "Red Campaign", "month": "January" },
-            "documentCount": 2,
-            "sumClicks": 190,
-            "avgClicks": 95.0,
-            "minClicks": 85,
-            "maxClicks": 105,
-            "sumImps": 2050,
-            "avgImps": 1025.0,
-            "minImps": 900,
-            "maxImps": 1150
-          }
-        ]
-        ```
-
-        When multiple fields are grouped, they appear inside the `_id` object. With a single `groupby` field, `_id` is a scalar. Aggregation values are top-level keys using their configured aliases.
-
-        **More aggregation examples**
+        **Aggregation examples**
 
         The following examples use this sample movie collection:
         ```json
@@ -724,6 +676,22 @@ paths:
           {"_id": "emotional",    "count": 1}
         ]
         ```
+
+        **Rating statistics by genre**
+
+        ```
+        ?groupby=content.genre&sum=content.rating totalRating&min=content.rating minRating&max=content.rating maxRating&orderby=maxRating descending
+        ```
+        Body: `{}`
+        ```json
+        [
+          {"_id": "sci-fi",  "totalRating": 17.4, "minRating": 8.6, "maxRating": 8.8},
+          {"_id": "action",  "totalRating": 8.0,  "minRating": 8.0, "maxRating": 8.0},
+          {"_id": "romance", "totalRating": 15.7, "minRating": 7.8, "maxRating": 7.9}
+        ]
+        ```
+
+        When grouping by multiple fields, `_id` is an object instead of a scalar — e.g., `{"_id": {"genre": "sci-fi", "year": 2010}}`. Aggregation values are top-level keys using their configured aliases.
       tags:
       - AppDB API
       parameters:

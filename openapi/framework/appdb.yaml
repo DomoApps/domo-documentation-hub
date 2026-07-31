@@ -585,20 +585,7 @@ paths:
 
         **Aggregation query parameters**
 
-        After filtering with the request body, add query string parameters to aggregate results. Any parameter (except `groupby`) accepts an optional alias to avoid name collisions. Field names use dot notation; fields inside `content` must be prefixed with `content.` (e.g., `content.campaignName`). Top-level fields (`owner`, `createdOn`) can be referenced directly.
-
-        | Parameter | Format |
-        | --------- | ------ |
-        | `groupby` | Comma-separated properties to group by |
-        | `count`   | Alias for a count aggregation |
-        | `avg`     | `property alias, property alias, …` — average |
-        | `min`     | `property alias, property alias, …` — minimum |
-        | `max`     | `property alias, property alias, …` — maximum |
-        | `sum`     | `property alias, property alias, …` — sum |
-        | `unwind`  | Comma-separated fields to unwind (produces one document per array element). Must be combined with at least one of `count`, `groupby`, `avg`, `min`, `max`, or `sum`. |
-        | `orderby` | Field or alias followed by `ascending` or `descending`. Accepts aliases from other parameters when used with aggregation. |
-        | `limit`   | Max documents to return (default 10,000) |
-        | `offset`  | Documents to skip (default 0) |
+        Field names use dot notation; fields inside `content` must be prefixed with `content.` (e.g., `content.campaignName`). Top-level fields like `owner` and `createdOn` can be referenced directly.
 
         **Campaign aggregation example**
 
@@ -759,25 +746,28 @@ paths:
             type: string
         - name: avg
           in: query
-          description: Comma-separated list of properties for average aggregation
+          description: "`property alias` pairs, comma-separated — computes the average of each property. Alias is used as the key in the response."
           schema:
             type: string
           example: "content.clicks avgClicks,content.impressions avgImps"
         - name: min
           in: query
-          description: Comma-separated list of properties for minimum aggregation
+          description: "`property alias` pairs, comma-separated — computes the minimum of each property."
           schema:
             type: string
+          example: "content.clicks minClicks,content.impressions minImps"
         - name: max
           in: query
-          description: Comma-separated list of properties for maximum aggregation
+          description: "`property alias` pairs, comma-separated — computes the maximum of each property."
           schema:
             type: string
+          example: "content.clicks maxClicks,content.impressions maxImps"
         - name: sum
           in: query
-          description: Comma-separated list of properties for sum aggregation
+          description: "`property alias` pairs, comma-separated — computes the sum of each property."
           schema:
             type: string
+          example: "content.clicks sumClicks,content.impressions sumImps"
         - name: unwind
           in: query
           description: "Comma-separated list of properties to unwind (deconstructs an array field, producing one document per element). Must be combined with at least one of `count`, `groupby`, `avg`, `min`, `max`, or `sum`."
@@ -785,7 +775,7 @@ paths:
             type: string
         - name: orderby
           in: query
-          description: Alias of aggregation to order by (ascending or descending)
+          description: "Field name or aggregation alias to sort by, followed by `ascending` or `descending`. Without aggregation, accepts field names in dot notation; with aggregation, accepts aliases defined by other parameters."
           schema:
             type: string
           example: "sumClicks descending"

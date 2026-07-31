@@ -40,7 +40,7 @@ You can define collections in your app's manifest and the platform creates them 
   "version": "1.0",
   "size": { "width": 2, "height": 2 },
   "mapping": [],
-  "collections": [
+  "collectionsMapping": [
     {
       "name": "CommentsTable",
       "schema": {
@@ -83,6 +83,111 @@ A collection with no schema can still store any JSON — the schema is only requ
   After updating the manifest and re-publishing your app design, you must **edit
   the installed app and re-save it** for manifest changes to take effect.
 </Note>
+
+---
+
+## Quick Start
+
+This walkthrough builds a simple product catalog — you'll store products, list them, and filter by price, all from inside a Domo Custom App using `domo.js`.
+
+### 1. Create the app
+
+Go to **Asset Library** (`your-instance.domo.com/assetlibrary`) and click **Pro Code Editor** in the top-right corner. Select the **Hello World** template.
+
+### 2. Add a collection
+
+In the **Resources** pane (bottom-left), expand **Collections** and add a new collection named `Products`. This opens a new tab showing the collection configuration — save that tab. Your `manifest.json` now includes the collection:
+
+```json
+{
+  "id": "d9e480f1-0625-42e7-aedf-2f19eabb81e2",
+  "name": "Hello World",
+  "version": "0.0.1",
+  "datasetsMapping": [],
+  "size": { "width": 1, "height": 1 },
+  "collectionsMapping": [
+    {
+      "id": "89c6a829-479a-4533-8e1b-6746df0de4ad",
+      "name": "Products",
+      "syncEnabled": false
+    }
+  ]
+}
+```
+
+### 3. Prepare the HTML
+
+Add an output container to `index.html`:
+
+```html
+<html>
+  <head>
+    <link rel="stylesheet" href="app.css" />
+  </head>
+  <body>
+    <div id="output"></div>
+    <script src="https://unpkg.com/ryuu.js@4.6.0/dist/domo.js" integrity="sha384-YYsd9wQ+wDlUWhvpfGdptxmNYIqBC+52oJtWgPKJadbs3sSFTY/+ZotPbEHTTRWz" crossorigin="anonymous"></script>
+    <script src="app.js"></script>
+  </body>
+</html>
+```
+
+### 4. Create documents
+
+Replace `app.js` with the following. This adds three products in a single request:
+
+```js
+const output = document.getElementById('output');
+
+domo.post('/domo/datastores/v1/collections/Products/documents/bulk', [
+  { content: { name: 'Widget',    price: 9.99  } },
+  { content: { name: 'Gadget',    price: 24.99 } },
+  { content: { name: 'Doohickey', price: 4.99  } }
+]).then(result => {
+  output.textContent = `Created ${result.Created} products.`;
+});
+```
+
+Save and verify the preview shows **Created 3 products.**
+
+### 5. Read all documents
+
+Replace `app.js` with:
+
+```js
+const output = document.getElementById('output');
+
+domo.get('/domo/datastores/v1/collections/Products/documents')
+  .then(docs => {
+    output.innerHTML = docs
+      .map(doc => `<p>${doc.content.name} — $${doc.content.price}</p>`)
+      .join('');
+  });
+```
+
+Save. The preview lists all three products.
+
+### 6. Query documents
+
+Replace `app.js` with a filtered query — only products priced under $15:
+
+```js
+const output = document.getElementById('output');
+
+domo.post('/domo/datastores/v1/collections/Products/documents/query', {
+  'content.price': { $lt: 15 }
+}).then(docs => {
+  output.innerHTML = '<p>Under $15:</p>' + docs
+    .map(doc => `<p>${doc.content.name} — $${doc.content.price}</p>`)
+    .join('');
+});
+```
+
+Save. The preview shows **Widget** ($9.99) and **Doohickey** ($4.99).
+
+### Next steps
+
+The Pro Code Editor includes two other templates that use AppDB collections: **calendar-edit** and **to-do-list**. Return to the template picker to explore them — they show more complete patterns for building real apps with AppDB.
 
 ---
 

@@ -562,7 +562,92 @@ paths:
       description: |
         Query documents using MongoDB query syntax.
 
-        **Aggregation examples**
+        **Supported operators**
+
+        All MongoDB query predicates supported in a `find()` call are available, including comparison, logical, array, data type, bitwise, `$expr`, `$jsonSchema`, `$regex`, `$geoWithin`, and `$geoIntersects`. The following operators are **not** supported:
+
+        - `$where` — JavaScript evaluation is disabled server-side.
+        - `$near` and `$nearSphere` — geospatial proximity searches require an index that AppDB collections do not have.
+
+        See the [MongoDB query predicate documentation](https://www.mongodb.com/docs/manual/reference/mql/query-predicates/) for the full operator list.
+
+        **Querying by date**
+
+        Use [MongoDB Extended JSON v2](https://www.mongodb.com/docs/manual/reference/mongodb-extended-json/#bson.Date) `$date` to compare against a date value:
+
+        ```json
+        {
+          "createdOn": {
+            "$lte": { "$date": "2020-05-12T00:00:00.000Z" }
+          }
+        }
+        ```
+
+        **Aggregation query parameters**
+
+        After filtering with the request body, add query string parameters to aggregate results. Any parameter (except `groupby`) accepts an optional alias to avoid name collisions. Field names use dot notation; fields inside `content` must be prefixed with `content.` (e.g., `content.campaignName`). Top-level fields (`owner`, `createdOn`) can be referenced directly.
+
+        | Parameter | Format |
+        | --------- | ------ |
+        | `groupby` | Comma-separated properties to group by |
+        | `count`   | Alias for a count aggregation |
+        | `avg`     | `property alias, property alias, …` — average |
+        | `min`     | `property alias, property alias, …` — minimum |
+        | `max`     | `property alias, property alias, …` — maximum |
+        | `sum`     | `property alias, property alias, …` — sum |
+        | `unwind`  | Comma-separated fields to unwind (produces one document per array element). Must be combined with at least one of `count`, `groupby`, `avg`, `min`, `max`, or `sum`. |
+        | `orderby` | Field or alias followed by `ascending` or `descending`. Accepts aliases from other parameters when used with aggregation. |
+        | `limit`   | Max documents to return (default 10,000) |
+        | `offset`  | Documents to skip (default 0) |
+
+        **Campaign aggregation example**
+
+        ```js
+        const url =
+          "/domo/datastores/v1/collections/campaigns/documents/query" +
+          "?groupby=content.campaignName,content.month" +
+          "&count=documentCount" +
+          "&avg=content.clicks avgClicks,content.impressions avgImps" +
+          "&sum=content.clicks sumClicks,content.impressions sumImps" +
+          "&max=content.clicks maxClicks,content.impressions maxImps" +
+          "&min=content.clicks minClicks,content.impressions minImps" +
+          "&orderby=sumClicks descending";
+
+        domo.post(url, {}).then((data) => console.log(data));
+        ```
+
+        ```json
+        [
+          {
+            "_id": { "campaignName": "Red Campaign", "month": "February" },
+            "documentCount": 2,
+            "sumClicks": 210,
+            "avgClicks": 105.0,
+            "minClicks": 90,
+            "maxClicks": 120,
+            "sumImps": 2260,
+            "avgImps": 1130.0,
+            "minImps": 1010,
+            "maxImps": 1250
+          },
+          {
+            "_id": { "campaignName": "Red Campaign", "month": "January" },
+            "documentCount": 2,
+            "sumClicks": 190,
+            "avgClicks": 95.0,
+            "minClicks": 85,
+            "maxClicks": 105,
+            "sumImps": 2050,
+            "avgImps": 1025.0,
+            "minImps": 900,
+            "maxImps": 1150
+          }
+        ]
+        ```
+
+        When multiple fields are grouped, they appear inside the `_id` object. With a single `groupby` field, `_id` is a scalar. Aggregation values are top-level keys using their configured aliases.
+
+        **More aggregation examples**
 
         The following examples use this sample movie collection:
         ```json
@@ -787,7 +872,22 @@ paths:
   /domo/datastores/v1/collections/{collectionName}/documents/update:
     put:
       summary: Partially Update Documents
-      description: Update documents using MongoDB query and update operations
+      description: |
+        Partially updates documents matching a query using MongoDB update operators.
+
+        **Supported operators**
+
+        `$currentDate` · `$inc` · `$min` · `$max` · `$mul` · `$rename` · `$set` · `$unset` · `$addToSet` · `$pop` · `$pull` · `$pullAll` · `$push`
+
+        **Supported modifiers**
+
+        `$each` · `$position` · `$slice` · `$sort`
+
+        <Note>
+          `$setOnInsert` has no effect — partial updates do not perform upserts.
+        </Note>
+
+        See the [MongoDB update operator documentation](https://www.mongodb.com/docs/manual/reference/mql/update/) for full semantics.
       tags:
       - AppDB API
       parameters:
@@ -1299,7 +1399,32 @@ paths:
   /domo/datastores/v1/collections/{collectionName}/permission/{entity}/{entityId}:
     put:
       summary: Modify Collection Permissions
-      description: Assuming you already have permission to modify the Collection, you can change the permissions of a Collection by hitting the following endpoint
+      description: |
+        Modify the permissions for a user, group, or app instance on a collection.
+
+        **Entity types**
+
+        | `entity` path param | `entityId` value |
+        | ------------------- | ---------------- |
+        | `USER`              | Domo user ID |
+        | `GROUP`             | Domo group ID |
+        | `RYUU_APP`          | App instance ID (first UUID in the iframe URL) |
+
+        **Available permissions**
+
+        | Permission       | Grants |
+        | ---------------- | ------ |
+        | `admin`          | All permissions to the collection and its documents |
+        | `write`          | Update the collection's properties |
+        | `read`           | Read the collection's properties |
+        | `share`          | Add or remove permissions this entity already holds |
+        | `delete`         | Delete the collection or its documents |
+        | `create_content` | Create documents in the collection |
+        | `update_content` | Update documents in the collection |
+        | `read_content`   | Read documents in the collection |
+        | `delete_content` | Delete documents from the collection |
+
+        Removing all entity permissions leaves only users with the **Manage AppDB** grant with access.
       tags:
       - AppDB API
       parameters:

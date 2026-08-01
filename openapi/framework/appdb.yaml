@@ -154,14 +154,14 @@ components:
         defaultPermissions: null
         requiredAuthorities: null
         owner: 870010733
-        name: "Users"
+        name: "Students"
         datasourceId: null
         schema:
           columns:
             - type: "STRING"
-              name: "username"
+              name: "name"
             - type: "STRING"
-              name: "band"
+              name: "house"
         filters: null
         syncEnabled: false
         syncRequired: false
@@ -184,6 +184,9 @@ components:
         syncEnabled:
           type: boolean
           default: false
+          description: >-
+            Turning this property on causes the documents in your collection to be converted into rows in a DataSet every 15 minutes.
+            Only the properties defined in the schema are synced.
 
     Schema:
       type: object
@@ -198,6 +201,7 @@ components:
               type:
                 type: string
                 enum: [STRING, LONG, DECIMAL, DOUBLE, DATE, DATETIME]
+                description: The type of value. Dates must be formatted as `YYYY-MM-DD`. DateTimes must be formatted as `YYYY-MM-DDTHH:MM:SSZ`.
               visible:
                 type: boolean
                 default: true
@@ -969,7 +973,10 @@ paths:
               $ref: '#/components/schemas/PartialUpdateRequest'
             example:
               query:
-                content.name: "Hermione Granger"
+                content.name:
+                  $in:
+                    - "Hermione Granger"
+                    - "Ron Weasley"
               operation:
                 $set:
                   content.prefect: true
@@ -980,7 +987,7 @@ paths:
             const collectionName = 'Students';
 
             domo.put(`/domo/datastores/v1/collections/${collectionName}/documents/update`, {
-              query: { 'content.name': 'Hermione Granger' },
+              query: { 'content.name': { $in: ['Hermione Granger', 'Ron Weasley'] } },
               operation: { $set: { 'content.prefect': true } }
             }).then(count => console.log(count + ' document(s) updated'));
         - *stub_curl
@@ -1250,7 +1257,22 @@ paths:
   /domo/datastores/v1/collections:
     post:
       summary: Create Collection
-      description: To create a Collection programmatically, provide as the body of the request the same JSON value that you would have provided in your manifest for a Collection when creating a custom app. Once created, the Collection can be retrieved by the name you provided as usual.
+      description: |
+        To create a Collection programmatically, provide as the body of the request the same JSON value that you would have provided in your manifest for a Collection when creating a custom app. Once created, the Collection can be retrieved by the name you provided as usual.
+
+        Setting `syncEnabled: true` causes the Collection's documents to be converted into rows in a Domo DataSet every 15 minutes. The `schema` you define controls which fields appear as DataSet columns — only the listed properties are synced. If you plan to use sync, note the following:
+
+        <Note>
+        Documents containing `DATE` or `DATETIME` data must use the format `YYYY-MM-DD` or `YYYY-MM-DDTHH:MM:SSZ` to sync correctly.
+        </Note>
+
+        <Warning>
+        **Incorrect schema types prevent DataSet creation.** The accepted column types are `STRING` · `LONG` · `DECIMAL` · `DOUBLE` · `DATE` · `DATETIME`. If your AppDB DataSet doesn't appear after 15 minutes, verify your schema uses only these values — common mistakes include `NUMBER` or `INTEGER`.
+        </Warning>
+
+        <Warning>
+        **Collections won't sync if the collection owner lacks permissions on the target DataSet.** If that user is removed from Domo, syncing stops. The new owner must have both Collection ownership and Admin Permissions.
+        </Warning>
       tags:
       - AppDB API
       requestBody:
@@ -1260,24 +1282,30 @@ paths:
             schema:
               $ref: '#/components/schemas/CollectionCreate'
             example:
-              name: "Users"
+              name: "Students"
               schema:
                 columns:
-                  - name: "username"
+                  - name: "name"
                     type: "STRING"
-                  - name: "band"
+                  - name: "house"
                     type: "STRING"
+                  - name: "wand.length"
+                    type: "DOUBLE"
+                  - name: "enrolledOn"
+                    type: "DATETIME"
               syncEnabled: true
       x-codeSamples:
         - lang: JavaScript
           label: domo.js
           source: |-
             domo.post('/domo/datastores/v1/collections', {
-              name: 'YourCollection',
+              name: 'Students',
               schema: {
                 columns: [
-                  { name: 'username', type: 'STRING' },
-                  { name: 'band', type: 'STRING' }
+                  { name: 'name', type: 'STRING' },
+                  { name: 'house', type: 'STRING' },
+                  { name: 'wand.length', type: 'DOUBLE' },
+                  { name: 'enrolledOn', type: 'DATETIME' }
                 ]
               },
               syncEnabled: true
@@ -1296,27 +1324,31 @@ paths:
               schema:
                 $ref: '#/components/schemas/Collection'
               example:
-                id: "a3aaeeed-5210-4048-9ff0-d88fa0de4eda"
-                datastoreId: "5565fecc-a852-4799-83bf-f9423c0f7687"
+                id: "757a1a2a-8d97-4c7e-875d-1bb5909df783"
+                datastoreId: "a7363c9d-77ad-4ffa-8926-8295c8464f51"
                 defaultPermissions: null
                 requiredAuthorities: null
-                owner: 870010733
-                name: "Users"
+                owner: 540824222
+                name: "Students"
                 datasourceId: null
                 schema:
                   columns:
                     - type: "STRING"
-                      name: "username"
+                      name: "name"
                     - type: "STRING"
-                      name: "band"
+                      name: "house"
+                    - type: "DOUBLE"
+                      name: "wand.length"
+                    - type: "DATETIME"
+                      name: "enrolledOn"
                 filters: null
-                syncEnabled: false
-                syncRequired: false
+                syncEnabled: true
+                syncRequired: true
                 fullReplaceRequired: false
                 lastSync: null
-                createdOn: "2026-06-25T01:26:34.744Z"
-                updatedOn: "2026-06-25T01:26:34.744Z"
-                updatedBy: 870010733
+                createdOn: "2026-08-01T00:10:52.952Z"
+                updatedOn: "2026-08-01T00:10:52.952Z"
+                updatedBy: 540824222
 
     get:
       summary: List Collections
@@ -1350,14 +1382,14 @@ paths:
                   defaultPermissions: null
                   requiredAuthorities: null
                   owner: 870010733
-                  name: "Users"
+                  name: "Students"
                   datasourceId: null
                   schema:
                     columns:
                       - type: "STRING"
-                        name: "username"
+                        name: "name"
                       - type: "STRING"
-                        name: "band"
+                        name: "house"
                   filters: null
                   syncEnabled: false
                   syncRequired: false
@@ -1370,7 +1402,26 @@ paths:
   /domo/datastores/v1/collections/{collectionName}:
     put:
       summary: Update Collection
-      description: "\n\n<Danger>\n**Warning**\n\n If you manually override the properties of a Collection that exists in your manifest, then any time an app Card is saved, the Card will revert back to the manifest definition of that Collection. It is best practice to only update Collections that you have created manually. Otherwise, to update a Collection, simply update the manifest.\n</Danger>"
+      description: |
+        <Danger>
+        **Warning**
+
+        If you manually override the properties of a Collection that exists in your manifest, then any time an app Card is saved, the Card will revert back to the manifest definition of that Collection. It is best practice to only update Collections that you have created manually. Otherwise, to update a Collection, simply update the manifest.
+        </Danger>
+
+        <Note>
+        After updating the manifest and re-publishing your app design, you must **edit the installed app and re-save it** for manifest changes to take effect.
+        </Note>
+
+        If the collection has `syncEnabled`, updating the `schema` changes which fields are synced to the linked Domo DataSet. Note the following when modifying a synced collection's schema:
+
+        <Note>
+        Documents containing `DATE` or `DATETIME` data must use the format `YYYY-MM-DD` or `YYYY-MM-DDTHH:MM:SSZ` to sync correctly.
+        </Note>
+
+        <Warning>
+        **Incorrect schema types prevent DataSet creation.** The accepted column types are `STRING` · `LONG` · `DECIMAL` · `DOUBLE` · `DATE` · `DATETIME`. If your AppDB DataSet doesn't appear after 15 minutes, verify your schema uses only these values — common mistakes include `NUMBER` or `INTEGER`.
+        </Warning>
       tags:
       - AppDB API
       parameters:
@@ -1398,13 +1449,13 @@ paths:
               schema:
                 columns:
                   - type: "STRING"
-                    name: "username"
+                    name: "name"
                     visible: true
                   - type: "STRING"
-                    name: "band"
+                    name: "house"
                     visible: true
                   - type: "STRING"
-                    name: "favorite color"
+                    name: "enrolledOn"
                     visible: true
               syncEnabled: true
       x-codeSamples:
@@ -1417,9 +1468,9 @@ paths:
               id: 'your-collection-id',
               schema: {
                 columns: [
-                  { name: 'username', type: 'STRING', visible: true },
-                  { name: 'band', type: 'STRING', visible: true },
-                  { name: 'favorite color', type: 'STRING', visible: true }
+                  { name: 'name', type: 'STRING', visible: true },
+                  { name: 'house', type: 'STRING', visible: true },
+                  { name: 'enrolledOn', type: 'DATETIME', visible: true }
                 ]
               },
               syncEnabled: true
@@ -1443,18 +1494,18 @@ paths:
                 defaultPermissions: null
                 requiredAuthorities: null
                 owner: 870010733
-                name: "Users"
+                name: "Students"
                 datasourceId: null
                 schema:
                   columns:
                     - type: "STRING"
-                      name: "username"
+                      name: "name"
                       visible: true
                     - type: "STRING"
-                      name: "band"
+                      name: "house"
                       visible: true
                     - type: "STRING"
-                      name: "favorite color"
+                      name: "enrolledOn"
                       visible: true
                 filters: null
                 syncEnabled: true
@@ -1498,7 +1549,7 @@ paths:
   /domo/datastores/v1/export:
     post:
       summary: Manually Export Collections
-      description: >-
+      description: |
         Manually trigger an asynchronous export (sync) of this card's collections to
         their linked Domo DataSets. Only collections that have a linked DataSet and
         pending changes are synced. By default, only the collections in this card's own
@@ -1506,6 +1557,10 @@ paths:
         export the related collections this card instance is mapped to through the app's
         design manifest (its `collectionsMapping`), such as collections shared from
         another instance. Returns an empty body on success.
+
+        <Warning>
+        **Collections won't sync if the collection owner lacks permissions on the target DataSet.** If that user is removed from Domo, syncing stops. The new owner must have both Collection ownership and Admin Permissions.
+        </Warning>
       tags:
       - AppDB API
       parameters:

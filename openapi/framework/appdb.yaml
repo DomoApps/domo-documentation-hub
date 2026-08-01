@@ -106,33 +106,40 @@ components:
         id:
           type: string
           format: uuid
+          description: Unique identifier for the collection.
         owner:
           type: integer
           format: int64
+          description: User ID of the collection owner.
         datastoreId:
           type: string
           format: uuid
+          description: ID of the datastore this collection belongs to.
         name:
           type: string
+          description: Name of the collection.
         datasourceId:
           type: string
           format: uuid
           nullable: true
+          description: ID of the linked Domo DataSet, or null if not yet linked.
         defaultPermissions:
           nullable: true
-          description: Default permissions for the collection. Null when not configured.
+          description: "Comma-separated default permission set for new app grants on this collection, or null if not set."
         requiredAuthorities:
           nullable: true
-          description: Required authorities for access. Null when not configured.
+          description: "Maps CollectionOperation names to required authority strings, or null if not set."
         filters:
           nullable: true
-          description: Collection-level filters. Null when not configured.
+          description: "Array of document-level filter predicates applied to read operations, or null if not set."
         schema:
           $ref: '#/components/schemas/Schema'
         syncEnabled:
           type: boolean
+          description: Whether documents are periodically synced to the linked DataSet.
         syncRequired:
           type: boolean
+          description: Whether a sync is pending.
         fullReplaceRequired:
           type: boolean
         lastSync:
@@ -187,6 +194,7 @@ components:
           description: >-
             Turning this property on causes the documents in your collection to be converted into rows in a DataSet every 15 minutes.
             Only the properties defined in the schema are synced.
+            Requires `schema` to be provided — returns a 400 if `syncEnabled: true` is passed without a schema.
 
     Schema:
       type: object
@@ -202,9 +210,6 @@ components:
                 type: string
                 enum: [STRING, LONG, DECIMAL, DOUBLE, DATE, DATETIME]
                 description: The type of value. Dates must be formatted as `YYYY-MM-DD`. DateTimes must be formatted as `YYYY-MM-DDTHH:MM:SSZ`.
-              visible:
-                type: boolean
-                default: true
 
     MongoQuery:
       type: object
@@ -1348,6 +1353,8 @@ paths:
                 createdOn: "2026-08-01T00:10:52.952Z"
                 updatedOn: "2026-08-01T00:10:52.952Z"
                 updatedBy: 540824222
+        '400':
+          description: "`syncEnabled: true` was passed without a `schema`."
 
     get:
       summary: List Collections
@@ -1455,13 +1462,10 @@ paths:
                 columns:
                   - type: "STRING"
                     name: "name"
-                    visible: true
                   - type: "STRING"
                     name: "house"
-                    visible: true
                   - type: "STRING"
                     name: "enrolledOn"
-                    visible: true
               syncEnabled: true
       x-codeSamples:
         - lang: JavaScript
@@ -1470,12 +1474,11 @@ paths:
             const collectionName = 'YourCollection';
 
             domo.put(`/domo/datastores/v1/collections/${collectionName}`, {
-              id: 'your-collection-id',
               schema: {
                 columns: [
-                  { name: 'name', type: 'STRING', visible: true },
-                  { name: 'house', type: 'STRING', visible: true },
-                  { name: 'enrolledOn', type: 'DATETIME', visible: true }
+                  { name: 'name', type: 'STRING' },
+                  { name: 'house', type: 'STRING' },
+                  { name: 'enrolledOn', type: 'DATETIME' }
                 ]
               },
               syncEnabled: true
@@ -1505,13 +1508,10 @@ paths:
                   columns:
                     - type: "STRING"
                       name: "name"
-                      visible: true
                     - type: "STRING"
                       name: "house"
-                      visible: true
                     - type: "STRING"
                       name: "enrolledOn"
-                      visible: true
                 filters: null
                 syncEnabled: true
                 syncRequired: true

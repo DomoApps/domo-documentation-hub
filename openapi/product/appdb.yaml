@@ -382,7 +382,26 @@ paths:
                   updatedBy: 870010733
     post:
       summary: Create Collection
-      description: Create a new collection in a datastore. Pass `datastoreId` as a query parameter.
+      description: |
+        Create a new collection in a datastore. Pass `datastoreId` as a query parameter.
+
+        If you plan to use sync, note the following:
+
+        <Note>
+        **Date formatting:** Documents containing `DATE` or `DATETIME` data must use the format `YYYY-MM-DD` or `YYYY-MM-DDTHH:MM:SSZ` to sync correctly.
+        </Note>
+
+        <Warning>
+        **Only top-level fields can be synced.** Column names must be **top-level keys** in the document's `content` object; dot notation does not traverse nested objects during sync.
+        </Warning>
+
+        <Warning>
+        **Incorrect schema types prevent DataSet creation.** The accepted column types are `STRING` · `LONG` · `DECIMAL` · `DOUBLE` · `DATE` · `DATETIME`. If your AppDB DataSet doesn't appear after 15 minutes, verify your schema uses only these values — common mistakes include `NUMBER` or `INTEGER`.
+        </Warning>
+
+        <Warning>
+        **Collections won't sync if the collection owner lacks permissions on the target DataSet.** If that user is removed from Domo, syncing stops. The new owner must have both Collection ownership and Admin Permissions.
+        </Warning>
       tags:
         - App DB API (Product)
       parameters:
@@ -427,6 +446,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Collection'
+        '400':
+          description: "`syncEnabled: true` was passed without a `schema`."
 
   /api/datastores/v1/collections/query:
     post:

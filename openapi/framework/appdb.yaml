@@ -1263,8 +1263,12 @@ paths:
         Setting `syncEnabled: true` causes the Collection's documents to be converted into rows in a Domo DataSet every 15 minutes. The `schema` you define controls which fields appear as DataSet columns — only the listed properties are synced. If you plan to use sync, note the following:
 
         <Note>
-        Documents containing `DATE` or `DATETIME` data must use the format `YYYY-MM-DD` or `YYYY-MM-DDTHH:MM:SSZ` to sync correctly.
+        **Date formatting:** Documents containing `DATE` or `DATETIME` data must use the format `YYYY-MM-DD` or `YYYY-MM-DDTHH:MM:SSZ` to sync correctly.
         </Note>
+
+        <Warning>
+        **Only top-level fields can be synced.** Column names must be **top-level keys** in the document's `content` object; dot notation does not traverse nested objects during sync.
+        </Warning>
 
         <Warning>
         **Incorrect schema types prevent DataSet creation.** The accepted column types are `STRING` · `LONG` · `DECIMAL` · `DOUBLE` · `DATE` · `DATETIME`. If your AppDB DataSet doesn't appear after 15 minutes, verify your schema uses only these values — common mistakes include `NUMBER` or `INTEGER`.
@@ -1289,8 +1293,6 @@ paths:
                     type: "STRING"
                   - name: "house"
                     type: "STRING"
-                  - name: "wand.length"
-                    type: "DOUBLE"
                   - name: "enrolledOn"
                     type: "DATETIME"
               syncEnabled: true
@@ -1304,7 +1306,6 @@ paths:
                 columns: [
                   { name: 'name', type: 'STRING' },
                   { name: 'house', type: 'STRING' },
-                  { name: 'wand.length', type: 'DOUBLE' },
                   { name: 'enrolledOn', type: 'DATETIME' }
                 ]
               },
@@ -1337,8 +1338,6 @@ paths:
                       name: "name"
                     - type: "STRING"
                       name: "house"
-                    - type: "DOUBLE"
-                      name: "wand.length"
                     - type: "DATETIME"
                       name: "enrolledOn"
                 filters: null
@@ -1403,8 +1402,10 @@ paths:
     put:
       summary: Update Collection
       description: |
+        You can update the schema and other properties of a collection. To see their current value, use the List Collections endpoint.
+        
         <Danger>
-        **Warning**
+        **Update Manifest Instead Of Collection**
 
         If you manually override the properties of a Collection that exists in your manifest, then any time an app Card is saved, the Card will revert back to the manifest definition of that Collection. It is best practice to only update Collections that you have created manually. Otherwise, to update a Collection, simply update the manifest.
         </Danger>
@@ -1416,8 +1417,12 @@ paths:
         If the collection has `syncEnabled`, updating the `schema` changes which fields are synced to the linked Domo DataSet. Note the following when modifying a synced collection's schema:
 
         <Note>
-        Documents containing `DATE` or `DATETIME` data must use the format `YYYY-MM-DD` or `YYYY-MM-DDTHH:MM:SSZ` to sync correctly.
+        **Date formatting:** Documents containing `DATE` or `DATETIME` data must use the format `YYYY-MM-DD` or `YYYY-MM-DDTHH:MM:SSZ` to sync correctly.
         </Note>
+
+        <Warning>
+        **Only top-level fields can be synced.** Column names must be **top-level keys** in the document's `content` object; dot notation does not traverse nested objects during sync.
+        </Warning>
 
         <Warning>
         **Incorrect schema types prevent DataSet creation.** The accepted column types are `STRING` · `LONG` · `DECIMAL` · `DOUBLE` · `DATE` · `DATETIME`. If your AppDB DataSet doesn't appear after 15 minutes, verify your schema uses only these values — common mistakes include `NUMBER` or `INTEGER`.

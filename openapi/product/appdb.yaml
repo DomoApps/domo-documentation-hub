@@ -667,9 +667,9 @@ paths:
 
   /api/datastores/v1/collections/{collectionId}/permission/RYUU_APP/{proxyId}:
     put:
-      summary: Update Collection Permissions
-      description: Update permissions for a collection as it relates to a specific Custom App.
-      tags: 
+      summary: Update App Permissions
+      description: "Grant or replace permissions for a Custom App (proxy) on a collection. To grant permissions to a user or group instead, use the USER or GROUP variants of this endpoint."
+      tags:
         - App DB API (Product)
       parameters:
         - name: collectionId
@@ -685,10 +685,66 @@ paths:
         - name: permissions
           in: query
           required: true
-          description: "Comma-separated list of permissions (e.g., read,create_content)."
+          description: "Comma-separated list of permissions (e.g., read,create_content,read_content,update_content,delete_content)."
           schema:
             type: string
-            example: "read,create_content,read_content"
+            example: "read,create_content,read_content,update_content,delete_content"
+      responses:
+        '204':
+          description: No Content
+
+  /api/datastores/v1/collections/{collectionId}/permission/USER/{userId}:
+    put:
+      summary: Update User Permissions
+      description: "Grant or replace permissions for a specific user on a collection."
+      tags:
+        - App DB API (Product)
+      parameters:
+        - name: collectionId
+          in: path
+          required: true
+          schema: { type: string }
+          description: The ID of the collection.
+        - name: userId
+          in: path
+          required: true
+          schema: { type: string }
+          description: Numeric user ID.
+        - name: permissions
+          in: query
+          required: true
+          description: "Comma-separated list of permissions (e.g., read,write,admin,share,delete,create_content,read_content,update_content,delete_content)."
+          schema:
+            type: string
+            example: "read,write"
+      responses:
+        '204':
+          description: No Content
+
+  /api/datastores/v1/collections/{collectionId}/permission/GROUP/{groupId}:
+    put:
+      summary: Update Group Permissions
+      description: "Grant or replace permissions for a group on a collection."
+      tags:
+        - App DB API (Product)
+      parameters:
+        - name: collectionId
+          in: path
+          required: true
+          schema: { type: string }
+          description: The ID of the collection.
+        - name: groupId
+          in: path
+          required: true
+          schema: { type: string }
+          description: Numeric group ID.
+        - name: permissions
+          in: query
+          required: true
+          description: "Comma-separated list of permissions (e.g., read,write,admin,share,delete,create_content,read_content,update_content,delete_content)."
+          schema:
+            type: string
+            example: "read,read_content"
       responses:
         '204':
           description: No Content

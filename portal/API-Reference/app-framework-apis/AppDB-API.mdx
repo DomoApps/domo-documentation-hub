@@ -88,7 +88,7 @@ Documents in the same collection don't need the same shape. Electronics carry a 
 const output = document.getElementById("output");
 
 domo
-  .post("/domo/datastores/v1/collections/Inventory/documents/bulk", [
+  .post("/domo/datastores/v2/collections/Inventory/documents/bulk", [
     {
       content: {
         name: "Laptop",
@@ -149,7 +149,7 @@ Save and verify the preview shows **Created 5 items.**
 const output = document.getElementById("output");
 
 domo
-  .post("/domo/datastores/v1/collections/Inventory/documents/query", {
+  .post("/domo/datastores/v2/collections/Inventory/documents/query", {
     "content.qty": { $lt: 10 },
   })
   .then((docs) => {
@@ -173,12 +173,12 @@ Save. The preview lists Desk (8), Chair (3), Mouse (5). See [Query Documents](/a
 const output = document.getElementById("output");
 
 domo
-  .put("/domo/datastores/v1/collections/Inventory/documents/update", {
+  .put("/domo/datastores/v2/collections/Inventory/documents/update", {
     query: { "content.name": "Mouse" },
     operation: { $inc: { "content.qty": 20 } },
   })
   .then(() =>
-    domo.post("/domo/datastores/v1/collections/Inventory/documents/query", {
+    domo.post("/domo/datastores/v2/collections/Inventory/documents/query", {
       "content.qty": { $lt: 10 },
     }),
   )
@@ -204,7 +204,7 @@ const output = document.getElementById("output");
 
 domo
   .post(
-    "/domo/datastores/v1/collections/Inventory/documents/query?groupby=content.category&sum=content.qty totalQty&orderby=totalQty descending",
+    "/domo/datastores/v2/collections/Inventory/documents/query?groupby=content.category&sum=content.qty totalQty&orderby=totalQty descending",
     {},
   )
   .then((groups) => {
@@ -452,4 +452,3 @@ If a filter prevents a match on a single-document operation, the response is `40
   **Note:** Filters do not apply to CREATE operations. Documents can always be
   created regardless of any filter rules defined on the collection.
 </Note>
-

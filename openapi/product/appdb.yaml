@@ -1167,7 +1167,41 @@ paths:
 
         All other operators in the [official MongoDB query predicate documentation](https://www.mongodb.com/docs/manual/reference/mql/query-predicates/) are supported, including comparison, logical, array, data type, bitwise, `$expr`, `$jsonSchema`, and `$regex` operators. The geospatial shape operators `$geoWithin` and `$geoIntersects` are also supported when your documents contain GeoJSON data.
 
-        Dates can be queried using MongoDB Extended JSON v2: `{ "createdOn": { "$lte": { "$date": "2020-05-12T00:00:00.000Z" } } }`
+        **Querying by date**
+
+        AppDB has two categories of date fields that require different query approaches. Using the wrong approach for a field type fails silently — no error, just incorrect results.
+
+        **System date fields** (`createdOn`, `updatedOn`) are stored as BSON DateTime by AppDB. Query them using [MongoDB Extended JSON v2](https://www.mongodb.com/docs/manual/reference/mongodb-extended-json/#mongodb-bsontype-Date) `$date` syntax:
+        ```json
+        {"createdOn": {"$gt": {"$date": "2026-01-01"}}}
+        ```
+
+        **Content date fields** are stored as whatever JSON primitive you write. An ISO 8601 string like `"2026-09-01T18:30:00Z"` is stored as a BSON String. Two approaches work:
+
+        **String comparison** — ISO 8601 strings sort lexicographically in date order, so standard comparison operators work directly for both date-only (`YYYY-MM-DD`) and datetime (`YYYY-MM-DDTHH:MM:SSZ`) strings:
+        ```json
+        {"content.startDate": {"$gt": "2026-01-01"}}
+        ```
+
+        **`$expr` + `$toDate`** — converts the string to a date at query time, enabling `$date` comparisons and handling mixed-precision strings correctly:
+        ```json
+        {
+          "$expr": {
+            "$gt": [
+              {"$toDate": "$content.startDate"},
+              {"$date": "2026-01-01"}
+            ]
+          }
+        }
+        ```
+
+        <Warning>
+          **Mixing up these approaches produces wrong results without an error.**
+
+          Using `$date` against a content string field always returns empty — BSON DateTime never matches BSON String. Using plain string comparison against a system field like `createdOn` also always returns empty — BSON String never compares against BSON DateTime regardless of the operator used.
+
+          To confirm the stored type of any field, use the `$type` operator. If `{"someField": {"$type": "date"}}` returns documents, use `$date` syntax. If `{"someField": {"$type": "string"}}` returns documents, use string comparison or `$expr` + `$toDate`.
+        </Warning>
 
         **Aggregation examples**
 
@@ -1482,7 +1516,7 @@ paths:
 
     put:
       summary: Update Document
-      description: Modify an existing document in a collection.
+      description: "Modify an existing document in a collection. **This is a full replace** — the entire `content` object is overwritten with whatever you send. To update individual fields without replacing the whole document, use the Partially Update Documents endpoint instead."
       tags:
         - App DB API (Product)
       parameters:

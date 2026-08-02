@@ -36,8 +36,11 @@ components:
           format: uuid
           description: Unique identifier for the document
         owner:
-          type: integer
-          format: int64
+          type: string
+          description: "User ID of the document owner."
+        createdBy:
+          type: string
+          description: "User ID of the user who created the document."
         datastoreId:
           type: string
           format: uuid
@@ -51,8 +54,8 @@ components:
           type: string
           format: date-time
         updatedBy:
-          type: integer
-          format: int64
+          type: string
+          description: "User ID of the user who last updated the document."
         content:
           type: object
           additionalProperties: true
@@ -64,10 +67,11 @@ components:
         datastoreId: "5565fecc-a852-4799-83bf-f9423c0f7687"
         collectionId: "a3aaeeed-5210-4048-9ff0-d88fa0de4eda"
         syncRequired: true
-        owner: 870010733
+        owner: "870010733"
+        createdBy: "870010733"
         createdOn: "2026-06-25T01:33:56.332Z"
         updatedOn: "2026-06-25T01:33:56.332Z"
-        updatedBy: 870010733
+        updatedBy: "870010733"
         content:
           name: "Harry Potter"
           house: "Gryffindor"
@@ -265,7 +269,8 @@ components:
 paths:
   /domo/datastores/v1/collections/{collectionName}/documents:
     post:
-      summary: Create Document
+      x-excluded: true
+      summary: Create Document (v1)
       description: Creates a single document in a collection
       tags:
       - AppDB API
@@ -377,8 +382,9 @@ paths:
                   lastDetention: "1994-06-08T20:00:00Z"
 
     get:
-      summary: List Documents
-      description: Lists all documents from a given collection
+      x-excluded: true
+      summary: List Documents (v1)
+      description: Lists all documents from a given collection. There is an upper limit of 10,000 documents per request.
       tags:
       - AppDB API
       parameters:
@@ -388,6 +394,18 @@ paths:
           description: The name given to the collection in the manifest
           schema:
             type: string
+        - name: limit
+          in: query
+          description: Maximum number of documents to return
+          schema:
+            type: integer
+            default: 10000
+        - name: offset
+          in: query
+          description: Number of documents to skip
+          schema:
+            type: integer
+            default: 0
       x-codeSamples:
         - lang: JavaScript
           label: domo.js
@@ -458,7 +476,8 @@ paths:
 
   /domo/datastores/v1/collections/{collectionName}/documents/{documentId}:
     get:
-      summary: Get Document
+      x-excluded: true
+      summary: Get Document (v1)
       description: Retrieves a single document from a collection
       tags:
       - AppDB API
@@ -523,7 +542,8 @@ paths:
           description: Document not found
 
     put:
-      summary: Update Document
+      x-excluded: true
+      summary: Update Document (v1)
       description: Updates an existing document in a collection
       tags:
       - AppDB API
@@ -614,7 +634,8 @@ paths:
                   lastDetention: "1994-06-08T20:00:00Z"
 
     delete:
-      summary: Delete Document
+      x-excluded: true
+      summary: Delete Document (v1)
       description: Permanently deletes a document from the collection. Returns an empty response body on success.
       tags:
       - AppDB API
@@ -653,7 +674,8 @@ paths:
 
   /domo/datastores/v1/collections/{collectionName}/documents/query:
     post:
-      summary: Query Documents
+      x-excluded: true
+      summary: Query Documents (v1)
       description: |
         Query documents using MongoDB query syntax.
 
@@ -933,7 +955,7 @@ paths:
             const collectionName = 'Students';
 
             // Query by nested field — no joins needed
-            domo.post(`/domo/datastores/v1/collections/${collectionName}/documents/query`, 
+            domo.post(`/domo/datastores/v1/collections/${collectionName}/documents/query`,
                 {
                   'content.wand.core': 'phoenix feather',
                 }
@@ -986,7 +1008,8 @@ paths:
 
   /domo/datastores/v1/collections/{collectionName}/documents/update:
     put:
-      summary: Partially Update Documents
+      x-excluded: true
+      summary: Partially Update Documents (v1)
       description: |
         Partially updates documents matching a query using MongoDB update operators.
 
@@ -1087,8 +1110,9 @@ paths:
 
   /domo/datastores/v1/collections/{collectionName}/documents/bulk:
     post:
-      summary: Create Documents in Bulk
-      description: Create multiple documents in a given collection in a single HTTP request.
+      x-excluded: true
+      summary: Create Documents in Bulk (v1)
+      description: Create multiple documents in a given collection in a single HTTP request. Each document is limited to 2 MB.
       tags:
       - AppDB API
       parameters:
@@ -1167,8 +1191,9 @@ paths:
                 Created: 2
 
     put:
-      summary: Upsert Documents in Bulk
-      description: Update existing documents or create new ones in bulk.
+      x-excluded: true
+      summary: Upsert Documents in Bulk (v1)
+      description: "Update existing documents or create new ones in bulk. Documents with a matching `id` are updated; documents without a matching `id` are created. Each document is limited to 2 MB."
       tags:
       - AppDB API
       parameters:
@@ -1290,7 +1315,8 @@ paths:
                 Created: 1
 
     delete:
-      summary: Delete Documents in Bulk
+      x-excluded: true
+      summary: Delete Documents in Bulk (v1)
       description: "Remove multiple documents from a collection in a single request. IDs are passed as a comma-separated `ids` query parameter. Keep requests under approximately 700 UUIDs (~26 KB URL) to avoid HTTP 414 URI Too Long errors from the framework proxy; split larger deletes across multiple requests.\n\n<Danger>\n**Warning**\n\n This is destructive and cannot be reversed. Deleting documents in an AppDB collection may have performance implications with regard to syncing to its corresponding DataSet in Domo if the syncEnabled property is set to true for the Collection.\n</Danger>"
       tags:
       - AppDB API
@@ -1332,6 +1358,771 @@ paths:
                 $ref: '#/components/schemas/BulkDeleteResponse'
               example:
                 Deleted: 3
+
+  # ========= Document Endpoints (v2) =========
+  # (not integers), and createdBy is always included in every response document.
+
+  /domo/datastores/v2/collections/{collectionName}/documents:
+    post:
+      summary: Create Document
+      description: "Creates a single document in a collection."
+      tags:
+      - AppDB API
+      parameters:
+        - name: collectionName
+          in: path
+          required: true
+          description: The name given to the collection in the manifest
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DocumentCreate'
+            example:
+              content:
+                name: "Harry Potter"
+                house: "Gryffindor"
+                wand:
+                  wood: "holly"
+                  core: "phoenix feather"
+                  length: 11
+                courses:
+                  - "Defense Against the Dark Arts"
+                  - "Potions"
+                  - "Transfiguration"
+                enrolledOn: "1991-09-01"
+                lastDetention: "1994-06-08T20:00:00Z"
+      x-codeSamples:
+        - lang: JavaScript
+          label: domo.js
+          source: |-
+            const collectionName = 'Students';
+
+            domo.post(`/domo/datastores/v2/collections/${collectionName}/documents`, {
+              content: {
+                name: 'Harry Potter',
+                house: 'Gryffindor',
+                wand: { wood: 'holly', core: 'phoenix feather', length: 11 },
+                courses: ['Defense Against the Dark Arts', 'Potions', 'Transfiguration'],
+                enrolledOn: '1991-09-01',
+                lastDetention: '1994-06-08T20:00:00Z'
+              }
+            }).then(doc => console.log(doc));
+        - *stub_curl
+        - *stub_python
+        - *stub_php
+        - *stub_go
+        - *stub_java
+        - *stub_ruby
+      responses:
+        '200':
+          description: Document created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Document'
+              example:
+                id: "402778f6-bc8d-4aa5-a581-e08e3fc98c05"
+                datastoreId: "daee775a-3be4-410d-ba20-bb0d94ce51cb"
+                collectionId: "2148c830-14c2-478f-bb14-5c3019de46b4"
+                syncRequired: true
+                owner: "540824222"
+                createdBy: "540824222"
+                createdOn: "2026-07-31T23:09:34.542Z"
+                updatedOn: "2026-07-31T23:09:34.542Z"
+                updatedBy: "540824222"
+                content:
+                  name: "Harry Potter"
+                  house: "Gryffindor"
+                  wand:
+                    wood: "holly"
+                    core: "phoenix feather"
+                    length: 11
+                  courses:
+                    - "Defense Against the Dark Arts"
+                    - "Potions"
+                    - "Transfiguration"
+                  enrolledOn: "1991-09-01"
+                  lastDetention: "1994-06-08T20:00:00Z"
+
+    get:
+      summary: List Documents
+      description: "Lists all documents from a given collection. There is an upper limit of 10,000 documents per request."
+      tags:
+      - AppDB API
+      parameters:
+        - name: collectionName
+          in: path
+          required: true
+          description: The name given to the collection in the manifest
+          schema:
+            type: string
+        - name: limit
+          in: query
+          description: Maximum number of documents to return
+          schema:
+            type: integer
+            default: 10000
+        - name: offset
+          in: query
+          description: Number of documents to skip
+          schema:
+            type: integer
+            default: 0
+      x-codeSamples:
+        - lang: JavaScript
+          label: domo.js
+          source: |-
+            const collectionName = 'Students';
+
+            domo.get(`/domo/datastores/v2/collections/${collectionName}/documents`)
+              .then(docs => console.log(docs));
+        - *stub_curl
+        - *stub_python
+        - *stub_php
+        - *stub_go
+        - *stub_java
+        - *stub_ruby
+      responses:
+        '200':
+          description: Array of documents
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Document'
+              example:
+                - id: "402778f6-bc8d-4aa5-a581-e08e3fc98c05"
+                  datastoreId: "daee775a-3be4-410d-ba20-bb0d94ce51cb"
+                  collectionId: "2148c830-14c2-478f-bb14-5c3019de46b4"
+                  syncRequired: true
+                  owner: "540824222"
+                  createdBy: "540824222"
+                  createdOn: "2026-07-31T23:09:34.542Z"
+                  updatedOn: "2026-07-31T23:09:34.542Z"
+                  updatedBy: "540824222"
+                  content:
+                    name: "Harry Potter"
+                    house: "Gryffindor"
+                    wand:
+                      wood: "holly"
+                      core: "phoenix feather"
+                      length: 11
+                    courses:
+                      - "Defense Against the Dark Arts"
+                      - "Potions"
+                      - "Transfiguration"
+                    enrolledOn: "1991-09-01"
+                    lastDetention: "1994-06-08T20:00:00Z"
+                - id: "dd363c89-60d2-4f70-89cb-c3c175be625b"
+                  datastoreId: "daee775a-3be4-410d-ba20-bb0d94ce51cb"
+                  collectionId: "2148c830-14c2-478f-bb14-5c3019de46b4"
+                  syncRequired: true
+                  owner: "540824222"
+                  createdBy: "540824222"
+                  createdOn: "2026-07-31T23:11:11.564Z"
+                  updatedOn: "2026-07-31T23:11:11.564Z"
+                  updatedBy: "540824222"
+                  content:
+                    name: "Hermione Granger"
+                    house: "Gryffindor"
+                    wand:
+                      wood: "vine"
+                      core: "dragon heartstring"
+                      length: 10.75
+                    courses:
+                      - "Potions"
+                      - "Transfiguration"
+                      - "Arithmancy"
+                      - "Care of Magical Creatures"
+                    enrolledOn: "1991-09-01"
+                    lastDetention: "1995-10-15T15:30:00Z"
+
+  /domo/datastores/v2/collections/{collectionName}/documents/{documentId}:
+    get:
+      summary: Get Document
+      description: "Retrieves a single document from a collection."
+      tags:
+      - AppDB API
+      parameters:
+        - name: collectionName
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: documentId
+          in: path
+          required: true
+          description: The UUID of the document
+          schema:
+            type: string
+            format: uuid
+      x-codeSamples:
+        - lang: JavaScript
+          label: domo.js
+          source: |-
+            const collectionName = 'Students';
+            const documentId = '402778f6-bc8d-4aa5-a581-e08e3fc98c05';
+
+            domo.get(`/domo/datastores/v2/collections/${collectionName}/documents/${documentId}`)
+              .then(doc => console.log(doc));
+        - *stub_curl
+        - *stub_python
+        - *stub_php
+        - *stub_go
+        - *stub_java
+        - *stub_ruby
+      responses:
+        '200':
+          description: Document retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Document'
+              example:
+                id: "402778f6-bc8d-4aa5-a581-e08e3fc98c05"
+                datastoreId: "daee775a-3be4-410d-ba20-bb0d94ce51cb"
+                collectionId: "2148c830-14c2-478f-bb14-5c3019de46b4"
+                syncRequired: true
+                owner: "540824222"
+                createdBy: "540824222"
+                createdOn: "2026-07-31T23:09:34.542Z"
+                updatedOn: "2026-07-31T23:09:34.542Z"
+                updatedBy: "540824222"
+                content:
+                  name: "Harry Potter"
+                  house: "Gryffindor"
+                  wand:
+                    wood: "holly"
+                    core: "phoenix feather"
+                    length: 11
+                  courses:
+                    - "Defense Against the Dark Arts"
+                    - "Potions"
+                    - "Transfiguration"
+                  enrolledOn: "1991-09-01"
+                  lastDetention: "1994-06-08T20:00:00Z"
+        '404':
+          description: Document not found
+
+    put:
+      summary: Update Document
+      description: "Updates an existing document in a collection. **This is a full replace** — the entire `content` object is overwritten with whatever you send. To update individual fields without replacing the whole document, use Partially Update Documents instead."
+      tags:
+      - AppDB API
+      parameters:
+        - name: collectionName
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: documentId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DocumentUpdate'
+            example:
+              content:
+                name: "Harry Potter"
+                house: "Gryffindor"
+                wand:
+                  wood: "holly"
+                  core: "phoenix feather"
+                  length: 11
+                courses:
+                  - "Defense Against the Dark Arts"
+                  - "Potions"
+                  - "Transfiguration"
+                prefect: false
+      x-codeSamples:
+        - lang: JavaScript
+          label: domo.js
+          source: |-
+            const collectionName = 'Students';
+            const documentId = '402778f6-bc8d-4aa5-a581-e08e3fc98c05';
+
+            // PUT replaces the entire document — include all fields, not just the ones changing.
+            domo.put(`/domo/datastores/v2/collections/${collectionName}/documents/${documentId}`, {
+              content: {
+                name: 'Harry Potter',
+                house: 'Gryffindor',
+                wand: { wood: 'holly', core: 'phoenix feather', length: 11 },
+                courses: ['Defense Against the Dark Arts', 'Potions', 'Transfiguration'],
+                prefect: false
+              }
+            }).then(doc => console.log(doc));
+        - *stub_curl
+        - *stub_python
+        - *stub_php
+        - *stub_go
+        - *stub_java
+        - *stub_ruby
+      responses:
+        '200':
+          description: Document updated successfully. Returns the full updated document.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Document'
+              example:
+                id: "402778f6-bc8d-4aa5-a581-e08e3fc98c05"
+                datastoreId: "daee775a-3be4-410d-ba20-bb0d94ce51cb"
+                collectionId: "2148c830-14c2-478f-bb14-5c3019de46b4"
+                syncRequired: true
+                owner: "540824222"
+                createdBy: "540824222"
+                createdOn: "2026-07-31T23:09:34.542Z"
+                updatedOn: "2026-08-01T09:14:23.209Z"
+                updatedBy: "540824222"
+                content:
+                  name: "Harry Potter"
+                  house: "Gryffindor"
+                  wand:
+                    wood: "holly"
+                    core: "phoenix feather"
+                    length: 11
+                  courses:
+                    - "Defense Against the Dark Arts"
+                    - "Potions"
+                    - "Transfiguration"
+                  prefect: false
+
+    delete:
+      summary: Delete Document
+      description: Permanently deletes a document from the collection. Returns an empty response body on success.
+      tags:
+      - AppDB API
+      parameters:
+        - name: collectionName
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: documentId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      x-codeSamples:
+        - lang: JavaScript
+          label: domo.js
+          source: |-
+            const collectionName = 'Students';
+            const documentId = '402778f6-bc8d-4aa5-a581-e08e3fc98c05';
+
+            domo.delete(`/domo/datastores/v2/collections/${collectionName}/documents/${documentId}`)
+              .then(() => console.log('deleted'));
+        - *stub_curl
+        - *stub_python
+        - *stub_php
+        - *stub_go
+        - *stub_java
+        - *stub_ruby
+      responses:
+        '200':
+          description: Document deleted successfully. No response body is returned.
+        '404':
+          description: Document not found
+
+  /domo/datastores/v2/collections/{collectionName}/documents/query:
+    post:
+      summary: Query Documents
+      description: |
+        Query documents using MongoDB query syntax.
+      tags:
+      - AppDB API
+      parameters:
+        - name: collectionName
+          in: path
+          required: true
+          schema:
+            type: string
+            description: The name given to the collection in the manifest
+        - name: groupby
+          in: query
+          description: Comma-separated list of properties to group by
+          schema:
+            type: string
+        - name: count
+          in: query
+          description: Alias for a count aggregation
+          schema:
+            type: string
+        - name: avg
+          in: query
+          description: "`property alias` pairs, comma-separated — computes the average of each property."
+          schema:
+            type: string
+        - name: min
+          in: query
+          description: "`property alias` pairs, comma-separated — computes the minimum of each property."
+          schema:
+            type: string
+        - name: max
+          in: query
+          description: "`property alias` pairs, comma-separated — computes the maximum of each property."
+          schema:
+            type: string
+        - name: sum
+          in: query
+          description: "`property alias` pairs, comma-separated — computes the sum of each property."
+          schema:
+            type: string
+        - name: unwind
+          in: query
+          description: Comma-separated list of array properties to unwind.
+          schema:
+            type: string
+        - name: orderby
+          in: query
+          description: "Field name or aggregation alias to sort by, followed by `ascending` or `descending`."
+          schema:
+            type: string
+        - name: limit
+          in: query
+          description: Maximum number of documents to return
+          schema:
+            type: integer
+            default: 10000
+        - name: offset
+          in: query
+          description: Number of documents to skip
+          schema:
+            type: integer
+            default: 0
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MongoQuery'
+            example:
+              "content.wand.core": "phoenix feather"
+      x-codeSamples:
+        - lang: JavaScript
+          label: domo.js
+          source: |-
+            const collectionName = 'Students';
+
+            domo.post(
+                `/domo/datastores/v2/collections/${collectionName}/documents/query`,
+                { 'content.wand.core': 'phoenix feather' }
+              )
+              .then(docs => console.log(docs));
+        - *stub_curl
+        - *stub_python
+        - *stub_php
+        - *stub_go
+        - *stub_java
+        - *stub_ruby
+      responses:
+        '200':
+          description: Array of matching documents
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Document'
+              example:
+                - id: "402778f6-bc8d-4aa5-a581-e08e3fc98c05"
+                  datastoreId: "daee775a-3be4-410d-ba20-bb0d94ce51cb"
+                  collectionId: "2148c830-14c2-478f-bb14-5c3019de46b4"
+                  syncRequired: true
+                  owner: "540824222"
+                  createdBy: "540824222"
+                  createdOn: "2026-07-31T23:09:34.542Z"
+                  updatedOn: "2026-07-31T23:09:34.542Z"
+                  updatedBy: "540824222"
+                  content:
+                    name: "Harry Potter"
+                    house: "Gryffindor"
+                    wand:
+                      wood: "holly"
+                      core: "phoenix feather"
+                      length: 11
+                    courses:
+                      - "Defense Against the Dark Arts"
+                      - "Potions"
+                      - "Transfiguration"
+                    enrolledOn: "1991-09-01"
+                    lastDetention: "1994-06-08T20:00:00Z"
+
+  /domo/datastores/v2/collections/{collectionName}/documents/update:
+    put:
+      summary: Partially Update Documents
+      description: |
+        Partially updates documents matching a query using MongoDB update operators.
+
+        **Supported operators**
+
+        `$currentDate` · `$inc` · `$min` · `$max` · `$mul` · `$rename` · `$set` · `$unset` · `$addToSet` · `$pop` · `$pull` · `$pullAll` · `$push`
+
+        **Supported modifiers**
+
+        `$each` · `$position` · `$slice` · `$sort`
+
+        <Note>
+          `$setOnInsert` has no effect — partial updates do not perform upserts.
+        </Note>
+      tags:
+      - AppDB API
+      parameters:
+        - name: collectionName
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PartialUpdateRequest'
+            example:
+              query:
+                "content.name":
+                  $in:
+                    - "Hermione Granger"
+                    - "Ron Weasley"
+              operation:
+                $set:
+                  "content.prefect": true
+      x-codeSamples:
+        - lang: JavaScript
+          label: domo.js
+          source: |-
+            const collectionName = 'Students';
+
+            domo.put(
+                `/domo/datastores/v2/collections/${collectionName}/documents/update`,
+                {
+                  query: { 'content.name': { $in: ['Hermione Granger', 'Ron Weasley'] } },
+                  operation: { $set: { 'content.prefect': true } }
+                }
+              )
+              .then(count => console.log(count + ' document(s) updated'));
+        - *stub_curl
+        - *stub_python
+        - *stub_php
+        - *stub_go
+        - *stub_java
+        - *stub_ruby
+      responses:
+        '200':
+          description: Number of documents updated
+          content:
+            application/json:
+              schema:
+                type: integer
+              example: 2
+
+  /domo/datastores/v2/collections/{collectionName}/documents/bulk:
+    post:
+      summary: Create Documents in Bulk
+      description: "Create multiple documents in a given collection in a single HTTP request. Each document is limited to 2 MB."
+      tags:
+      - AppDB API
+      parameters:
+        - name: collectionName
+          in: path
+          required: true
+          schema:
+            type: string
+            description: The name given to the collection in the manifest
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/DocumentCreate'
+            example:
+              - content:
+                  name: "Draco Malfoy"
+                  house: "Slytherin"
+                  wand:
+                    wood: "hawthorn"
+                    core: "unicorn hair"
+                    length: 10
+                  courses:
+                    - "Potions"
+                    - "Transfiguration"
+                    - "Defense Against the Dark Arts"
+                  prefect: true
+              - content:
+                  name: "Luna Lovegood"
+                  house: "Ravenclaw"
+                  courses:
+                    - "Charms"
+                    - "Defense Against the Dark Arts"
+                    - "Care of Magical Creatures"
+      x-codeSamples:
+        - lang: JavaScript
+          label: domo.js
+          source: |-
+            const collectionName = 'Students';
+
+            domo.post(`/domo/datastores/v2/collections/${collectionName}/documents/bulk`, [
+              {
+                content: {
+                  name: 'Draco Malfoy',
+                  house: 'Slytherin',
+                  wand: { wood: 'hawthorn', core: 'unicorn hair', length: 10 },
+                  courses: ['Potions', 'Transfiguration', 'Defense Against the Dark Arts'],
+                  prefect: true
+                }
+              },
+              {
+                content: {
+                  name: 'Luna Lovegood',
+                  house: 'Ravenclaw',
+                  courses: ['Charms', 'Defense Against the Dark Arts', 'Care of Magical Creatures']
+                }
+              }
+            ]).then(result => console.log(result));
+        - *stub_curl
+        - *stub_python
+        - *stub_php
+        - *stub_go
+        - *stub_java
+        - *stub_ruby
+      responses:
+        '200':
+          description: Bulk creation result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BulkCreateResponse'
+              example:
+                Created: 2
+
+    put:
+      summary: Upsert Documents in Bulk
+      description: "Update existing documents or create new ones in bulk. Documents with a matching `id` are updated; documents without a matching `id` are created. Each document is limited to 2 MB."
+      tags:
+      - AppDB API
+      parameters:
+        - name: collectionName
+          in: path
+          required: true
+          schema:
+            type: string
+            description: The name given to the collection in the manifest
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: uuid
+                  content:
+                    type: object
+                    additionalProperties: true
+            example:
+              - id: "402778f6-bc8d-4aa5-a581-e08e3fc98c05"
+                content:
+                  name: "Harry Potter"
+                  house: "Gryffindor"
+                  prefect: false
+              - content:
+                  name: "Ron Weasley"
+                  house: "Gryffindor"
+      x-codeSamples:
+        - lang: JavaScript
+          label: domo.js
+          source: |-
+            const collectionName = 'Students';
+
+            domo.put(`/domo/datastores/v2/collections/${collectionName}/documents/bulk`, [
+              {
+                id: '402778f6-bc8d-4aa5-a581-e08e3fc98c05',
+                content: { name: 'Harry Potter', house: 'Gryffindor', prefect: false }
+              },
+              {
+                content: { name: 'Ron Weasley', house: 'Gryffindor' }
+              }
+            ]).then(result => console.log(result));
+        - *stub_curl
+        - *stub_python
+        - *stub_php
+        - *stub_go
+        - *stub_java
+        - *stub_ruby
+      responses:
+        '200':
+          description: Bulk upsert result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BulkUpsertResponse'
+              example:
+                Updated: 1
+                Created: 1
+
+    delete:
+      summary: Delete Documents in Bulk
+      description: "Remove multiple documents from a collection in a single request. IDs are passed as a comma-separated `ids` query parameter. Keep requests under approximately 700 UUIDs (~26 KB URL) to avoid HTTP 414 URI Too Long errors from the framework proxy; split larger deletes across multiple requests.\n\n<Danger>\n**Warning**\n\n This is destructive and cannot be reversed.\n</Danger>"
+      tags:
+      - AppDB API
+      parameters:
+        - name: collectionName
+          in: path
+          required: true
+          schema:
+            type: string
+            description: The name given to the collection in the manifest
+        - name: ids
+          in: query
+          required: true
+          description: Comma-separated list of document IDs to delete
+          schema:
+            type: string
+          example: "2bdd6370-85af-4e06-aadb-380839e4de8c,c78ba737-5f84-49c9-8ac9-58615a0f8aa8"
+      x-codeSamples:
+        - lang: JavaScript
+          label: domo.js
+          source: |-
+            const collectionName = 'Students';
+            const ids = 'id-one,id-two';
+
+            domo.delete(`/domo/datastores/v2/collections/${collectionName}/documents/bulk?ids=${ids}`)
+              .then(result => console.log(result));
+        - *stub_curl
+        - *stub_python
+        - *stub_php
+        - *stub_go
+        - *stub_java
+        - *stub_ruby
+      responses:
+        '200':
+          description: Bulk deletion result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BulkDeleteResponse'
+              example:
+                Deleted: 3
+
+  # ========= Collection Endpoints =========
 
   /domo/datastores/v1/collections:
     post:
@@ -1528,15 +2319,14 @@ paths:
             schema:
               type: object
               properties:
-                id:
+                name:
                   type: string
-                  format: uuid
+                  description: "Rename the collection. Note: renaming only changes the stored name — your app's `collectionsMapping` still routes calls using the original name from the manifest. The app will continue to work, but the name shown in AppDB Admin and returned by List Collections will reflect the new name."
                 schema:
                   $ref: '#/components/schemas/Schema'
                 syncEnabled:
                   type: boolean
             example:
-              id: "6de8034e-0aa3-4fd9-ac1d-9a1ffeccb759"
               schema:
                 columns:
                   - type: "STRING"

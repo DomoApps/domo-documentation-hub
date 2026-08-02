@@ -1417,6 +1417,22 @@ paths:
                 lastDetention: '1994-06-08T20:00:00Z'
               }
             }).then(doc => console.log(doc));
+        - lang: JavaScript
+          label: domo.js v6
+          source: |-
+            // domo.js v6
+            const collectionName = 'Students';
+
+            // create auto-wraps content — pass content fields directly.
+            const doc = await domo.appdb.create(collectionName, {
+              name: 'Harry Potter',
+              house: 'Gryffindor',
+              wand: { wood: 'holly', core: 'phoenix feather', length: 11 },
+              courses: ['Defense Against the Dark Arts', 'Potions', 'Transfiguration'],
+              enrolledOn: '1991-09-01',
+              lastDetention: '1994-06-08T20:00:00Z'
+            });
+            console.log(doc);
         - *stub_curl
         - *stub_python
         - *stub_php
@@ -1486,6 +1502,14 @@ paths:
 
             domo.get(`/domo/datastores/v2/collections/${collectionName}/documents`)
               .then(docs => console.log(docs));
+        - lang: JavaScript
+          label: domo.js v6
+          source: |-
+            // domo.js v6
+            const collectionName = 'Students';
+
+            const docs = await domo.appdb.list(collectionName);
+            console.log(docs);
         - *stub_curl
         - *stub_python
         - *stub_php
@@ -1576,6 +1600,15 @@ paths:
 
             domo.get(`/domo/datastores/v2/collections/${collectionName}/documents/${documentId}`)
               .then(doc => console.log(doc));
+        - lang: JavaScript
+          label: domo.js v6
+          source: |-
+            // domo.js v6
+            const collectionName = 'Students';
+            const documentId = '402778f6-bc8d-4aa5-a581-e08e3fc98c05';
+
+            const doc = await domo.appdb.get(collectionName, documentId);
+            console.log(doc);
         - *stub_curl
         - *stub_python
         - *stub_php
@@ -1670,6 +1703,23 @@ paths:
                 prefect: false
               }
             }).then(doc => console.log(doc));
+        - lang: JavaScript
+          label: domo.js v6
+          source: |-
+            // domo.js v6
+            const collectionName = 'Students';
+            const documentId = '402778f6-bc8d-4aa5-a581-e08e3fc98c05';
+
+            // update auto-wraps content — pass content fields directly.
+            // PUT replaces the entire document — include all fields, not just the ones changing.
+            const doc = await domo.appdb.update(collectionName, documentId, {
+              name: 'Harry Potter',
+              house: 'Gryffindor',
+              wand: { wood: 'holly', core: 'phoenix feather', length: 11 },
+              courses: ['Defense Against the Dark Arts', 'Potions', 'Transfiguration'],
+              prefect: false
+            });
+            console.log(doc);
         - *stub_curl
         - *stub_python
         - *stub_php
@@ -1734,6 +1784,15 @@ paths:
 
             domo.delete(`/domo/datastores/v2/collections/${collectionName}/documents/${documentId}`)
               .then(() => console.log('deleted'));
+        - lang: JavaScript
+          label: domo.js v6
+          source: |-
+            // domo.js v6
+            const collectionName = 'Students';
+            const documentId = '402778f6-bc8d-4aa5-a581-e08e3fc98c05';
+
+            await domo.appdb.remove(collectionName, documentId);
+            console.log('deleted');
         - *stub_curl
         - *stub_python
         - *stub_php
@@ -2040,6 +2099,24 @@ paths:
               `/domo/datastores/v2/collections/${collectionName}/documents/query?groupby=content.house&count=count`,
               {}
             ).then(results => console.log(results));
+        - lang: JavaScript
+          label: domo.js v6
+          source: |-
+            // domo.js v6
+            const collectionName = 'Students';
+
+            // Query by nested field — no joins needed
+            const docs = await domo.appdb.query(collectionName, {
+              'content.wand.core': 'phoenix feather'
+            });
+            console.log(docs);
+
+            // Count students per house (aggregation)
+            const results = await domo.appdb.query(collectionName, {}, {
+              groupby: 'content.house',
+              count: 'count'
+            });
+            console.log(results);
         - *stub_curl
         - *stub_python
         - *stub_php
@@ -2166,6 +2243,49 @@ paths:
               query: { 'content.house': 'Gryffindor' },
               operation: { $unset: { 'content.lastDetention': '' } }
             }).then(count => console.log(count + ' document(s) updated'));
+        - lang: JavaScript
+          label: domo.js v6
+          source: |-
+            // domo.js v6
+            const collectionName = 'Students';
+
+            // $set — appoint Hermione and Ron as prefects
+            await domo.appdb.partialUpdate(collectionName,
+              { 'content.name': { $in: ['Hermione Granger', 'Ron Weasley'] } },
+              { $set: { 'content.prefect': true } }
+            ).then(count => console.log(count + ' document(s) updated'));
+
+            // $addToSet — add a course only if Harry isn't already enrolled
+            await domo.appdb.partialUpdate(collectionName,
+              { 'content.name': 'Harry Potter' },
+              { $addToSet: { 'content.courses': 'Remedial Potions' } }
+            ).then(count => console.log(count + ' document(s) updated'));
+
+            // $push + $each + $sort — enroll Harry in two electives and keep the list alphabetical
+            await domo.appdb.partialUpdate(collectionName,
+              { 'content.name': 'Harry Potter' },
+              { $push: { 'content.courses': { $each: ['Divination', 'Astronomy'], $sort: 1 } } }
+            ).then(count => console.log(count + ' document(s) updated'));
+
+            // $currentDate — stamp the moment Harry was caught out after curfew.
+            // Note: $currentDate stores a BSON Date, not a string. Query it with
+            // {"content.caughtAfterCurfewAt": {"$lt": {"$date": "..."}}} not plain string comparison.
+            await domo.appdb.partialUpdate(collectionName,
+              { 'content.name': 'Harry Potter' },
+              { $currentDate: { 'content.caughtAfterCurfewAt': true } }
+            ).then(count => console.log(count + ' document(s) updated'));
+
+            // $pull — Draco drops Defense Against the Dark Arts
+            await domo.appdb.partialUpdate(collectionName,
+              { 'content.name': 'Draco Malfoy' },
+              { $pull: { 'content.courses': 'Defense Against the Dark Arts' } }
+            ).then(count => console.log(count + ' document(s) updated'));
+
+            // $unset — clear detention records for all Gryffindors at year end
+            await domo.appdb.partialUpdate(collectionName,
+              { 'content.house': 'Gryffindor' },
+              { $unset: { 'content.lastDetention': '' } }
+            ).then(count => console.log(count + ' document(s) updated'));
         - *stub_curl
         - *stub_python
         - *stub_php
@@ -2246,6 +2366,28 @@ paths:
                 }
               }
             ]).then(result => console.log(result));
+        - lang: JavaScript
+          label: domo.js v6
+          source: |-
+            // domo.js v6
+            const collectionName = 'Students';
+
+            // bulkCreate auto-wraps content — pass content fields directly.
+            const result = await domo.appdb.bulkCreate(collectionName, [
+              {
+                name: 'Draco Malfoy',
+                house: 'Slytherin',
+                wand: { wood: 'hawthorn', core: 'unicorn hair', length: 10 },
+                courses: ['Potions', 'Transfiguration', 'Defense Against the Dark Arts'],
+                prefect: true
+              },
+              {
+                name: 'Luna Lovegood',
+                house: 'Ravenclaw',
+                courses: ['Charms', 'Defense Against the Dark Arts', 'Care of Magical Creatures']
+              }
+            ]);
+            console.log(result);
         - *stub_curl
         - *stub_python
         - *stub_php
@@ -2368,6 +2510,39 @@ paths:
                 }
               }
             ]).then(result => console.log(result));
+        - lang: JavaScript
+          label: domo.js v6
+          source: |-
+            // domo.js v6
+            const collectionName = 'Students';
+
+            // bulkUpsert auto-wraps content — pass content fields directly.
+            // Documents with a matching id are updated; those without are created.
+            const result = await domo.appdb.bulkUpsert(collectionName, [
+              {
+                id: '402778f6-bc8d-4aa5-a581-e08e3fc98c05',
+                name: 'Harry Potter',
+                house: 'Gryffindor',
+                wand: { wood: 'holly', core: 'phoenix feather', length: 11 },
+                courses: ['Defense Against the Dark Arts', 'Potions', 'Transfiguration'],
+                prefect: false
+              },
+              {
+                id: 'dd363c89-60d2-4f70-89cb-c3c175be625b',
+                name: 'Hermione Granger',
+                house: 'Gryffindor',
+                wand: { wood: 'vine', core: 'dragon heartstring', length: 10.75 },
+                courses: ['Potions', 'Transfiguration', 'Arithmancy', 'Care of Magical Creatures'],
+                prefect: true
+              },
+              {
+                name: 'Ron Weasley',
+                house: 'Gryffindor',
+                wand: { wood: 'willow', core: 'unicorn hair', length: 14 },
+                courses: ['Defense Against the Dark Arts', 'Potions', 'Divination']
+              }
+            ]);
+            console.log(result);
         - *stub_curl
         - *stub_python
         - *stub_php
@@ -2413,6 +2588,14 @@ paths:
 
             domo.delete(`/domo/datastores/v2/collections/${collectionName}/documents/bulk?ids=${ids}`)
               .then(result => console.log(result));
+        - lang: JavaScript
+          label: domo.js v6
+          source: |-
+            // domo.js v6
+            const collectionName = 'Students';
+            const ids = ['id-one', 'id-two'];
+
+            await domo.appdb.bulkDelete(collectionName, ids);
         - *stub_curl
         - *stub_python
         - *stub_php
@@ -2491,6 +2674,23 @@ paths:
               },
               syncEnabled: true
             }).then(collection => console.log(collection));
+        - lang: JavaScript
+          label: domo.js v6
+          source: |-
+            // domo.js v6
+            const collection = await domo.appdb.createCollection({
+              name: 'Students',
+              schema: {
+                columns: [
+                  { name: 'name', type: 'STRING' },
+                  { name: 'house', type: 'STRING' },
+                  { name: 'enrolledOn', type: 'DATE' },
+                  { name: 'lastDetention', type: 'DATETIME' }
+                ]
+              },
+              syncEnabled: true
+            });
+            console.log(collection);
         - *stub_curl
         - *stub_python
         - *stub_php
@@ -2544,6 +2744,12 @@ paths:
           source: |-
             domo.get('/domo/datastores/v1/collections')
               .then(collections => console.log(collections));
+        - lang: JavaScript
+          label: domo.js v6
+          source: |-
+            // domo.js v6
+            const collections = await domo.appdb.listCollections();
+            console.log(collections);
         - *stub_curl
         - *stub_python
         - *stub_php
@@ -2662,6 +2868,24 @@ paths:
               },
               syncEnabled: true
             }).then(collection => console.log(collection));
+        - lang: JavaScript
+          label: domo.js v6
+          source: |-
+            // domo.js v6
+            const collectionName = 'Students';
+
+            const collection = await domo.appdb.updateCollection(collectionName, {
+              schema: {
+                columns: [
+                  { name: 'name', type: 'STRING' },
+                  { name: 'house', type: 'STRING' },
+                  { name: 'enrolledOn', type: 'DATE' },
+                  { name: 'lastDetention', type: 'DATETIME' }
+                ]
+              },
+              syncEnabled: true
+            });
+            console.log(collection);
         - *stub_curl
         - *stub_python
         - *stub_php
@@ -2722,6 +2946,14 @@ paths:
 
             domo.delete(`/domo/datastores/v1/collections/${collectionName}`)
               .then(() => console.log('collection deleted'));
+        - lang: JavaScript
+          label: domo.js v6
+          source: |-
+            // domo.js v6
+            const collectionName = 'Students';
+
+            await domo.appdb.deleteCollection(collectionName);
+            console.log('collection deleted');
         - *stub_curl
         - *stub_python
         - *stub_php
@@ -2777,6 +3009,14 @@ paths:
             // Also export related collections (collectionsMapping)
             domo.post('/domo/datastores/v1/export?includeRelatedCollections=true')
               .then(() => console.log('export started'));
+        - lang: JavaScript
+          label: domo.js v6
+          source: |-
+            // domo.js v6
+
+            // Export this card's own collections
+            await domo.appdb.export();
+            console.log('export started');
         - *stub_curl
         - *stub_python
         - *stub_php

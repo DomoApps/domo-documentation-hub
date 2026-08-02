@@ -17,7 +17,7 @@ from pathlib import Path
 SPEC_PATH = Path(__file__).parent.parent / "openapi/framework/appdb.yaml"
 
 # Fields that are expected to differ and aren't worth flagging every time
-SKIP_KEYS = {"x-excluded", "x-codeSamples"}
+SKIP_KEYS = {"x-excluded"}
 
 # v1 path → v2 path (operation pairs to compare)
 PAIRS = [

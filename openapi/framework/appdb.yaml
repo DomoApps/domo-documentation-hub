@@ -2127,15 +2127,45 @@ paths:
           label: domo.js
           source: |-
             const collectionName = 'Students';
+            const url = `/domo/datastores/v2/collections/${collectionName}/documents/update`;
 
-            domo.put(
-                `/domo/datastores/v2/collections/${collectionName}/documents/update`,
-                {
-                  query: { 'content.name': { $in: ['Hermione Granger', 'Ron Weasley'] } },
-                  operation: { $set: { 'content.prefect': true } }
-                }
-              )
-              .then(count => console.log(count + ' document(s) updated'));
+            // $set — appoint Hermione and Ron as prefects
+            domo.put(url, {
+              query: { 'content.name': { $in: ['Hermione Granger', 'Ron Weasley'] } },
+              operation: { $set: { 'content.prefect': true } }
+            }).then(count => console.log(count + ' document(s) updated'));
+
+            // $addToSet — add a course only if Harry isn't already enrolled
+            domo.put(url, {
+              query: { 'content.name': 'Harry Potter' },
+              operation: { $addToSet: { 'content.courses': 'Care of Magical Creatures' } }
+            }).then(count => console.log(count + ' document(s) updated'));
+
+            // $push + $each + $sort — enroll Harry in two electives and keep the list alphabetical
+            domo.put(url, {
+              query: { 'content.name': 'Harry Potter' },
+              operation: { $push: { 'content.courses': { $each: ['Divination', 'Astronomy'], $sort: 1 } } }
+            }).then(count => console.log(count + ' document(s) updated'));
+
+            // $currentDate — stamp the moment Harry was caught out after curfew.
+            // Note: $currentDate stores a BSON Date, not a string. Query it with
+            // {"content.caughtAfterCurfewAt": {"$lt": {"$date": "..."}}} not plain string comparison.
+            domo.put(url, {
+              query: { 'content.name': 'Harry Potter' },
+              operation: { $currentDate: { 'content.caughtAfterCurfewAt': true } }
+            }).then(count => console.log(count + ' document(s) updated'));
+
+            // $pull — Draco drops Defense Against the Dark Arts
+            domo.put(url, {
+              query: { 'content.name': 'Draco Malfoy' },
+              operation: { $pull: { 'content.courses': 'Defense Against the Dark Arts' } }
+            }).then(count => console.log(count + ' document(s) updated'));
+
+            // $unset — clear detention records for all Gryffindors at year end
+            domo.put(url, {
+              query: { 'content.house': 'Gryffindor' },
+              operation: { $unset: { 'content.lastDetention': '' } }
+            }).then(count => console.log(count + ' document(s) updated'));
         - *stub_curl
         - *stub_python
         - *stub_php

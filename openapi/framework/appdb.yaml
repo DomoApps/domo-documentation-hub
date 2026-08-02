@@ -79,6 +79,8 @@ components:
             - "Defense Against the Dark Arts"
             - "Potions"
             - "Transfiguration"
+          enrolledOn: "1991-09-01"
+          lastDetention: "1994-06-08T20:00:00Z"
 
     DocumentCreate:
       type: object
@@ -303,7 +305,9 @@ paths:
                 name: 'Harry Potter',
                 house: 'Gryffindor',
                 wand: { wood: 'holly', core: 'phoenix feather', length: 11 },
-                courses: ['Defense Against the Dark Arts', 'Potions', 'Transfiguration']
+                courses: ['Defense Against the Dark Arts', 'Potions', 'Transfiguration'],
+                enrolledOn: '1991-09-01',
+                lastDetention: '1992-05-26T20:00:00Z'
               }
             }).then(doc => console.log(doc));
         - &stub_curl
@@ -369,6 +373,8 @@ paths:
                     - "Defense Against the Dark Arts"
                     - "Potions"
                     - "Transfiguration"
+                  enrolledOn: "1991-09-01"
+                  lastDetention: "1994-06-08T20:00:00Z"
 
     get:
       summary: List Documents
@@ -425,6 +431,8 @@ paths:
                       - "Defense Against the Dark Arts"
                       - "Potions"
                       - "Transfiguration"
+                    enrolledOn: "1991-09-01"
+                    lastDetention: "1994-06-08T20:00:00Z"
                 - id: "dd363c89-60d2-4f70-89cb-c3c175be625b"
                   datastoreId: "daee775a-3be4-410d-ba20-bb0d94ce51cb"
                   collectionId: "2148c830-14c2-478f-bb14-5c3019de46b4"
@@ -445,6 +453,8 @@ paths:
                       - "Transfiguration"
                       - "Arithmancy"
                       - "Care of Magical Creatures"
+                    enrolledOn: "1991-09-01"
+                    lastDetention: "1995-10-15T15:30:00Z"
 
   /domo/datastores/v1/collections/{collectionName}/documents/{documentId}:
     get:
@@ -507,6 +517,8 @@ paths:
                     - "Defense Against the Dark Arts"
                     - "Potions"
                     - "Transfiguration"
+                  enrolledOn: "1991-09-01"
+                  lastDetention: "1994-06-08T20:00:00Z"
         '404':
           description: Document not found
 
@@ -598,6 +610,8 @@ paths:
                     - "Potions"
                     - "Transfiguration"
                   prefect: false
+                  enrolledOn: "1991-09-01"
+                  lastDetention: "1994-06-08T20:00:00Z"
 
     delete:
       summary: Delete Document
@@ -665,7 +679,8 @@ paths:
               "wand": { "wood": "holly", "core": "phoenix feather", "length": 11 },
               "courses": ["Defense Against the Dark Arts", "Potions", "Transfiguration"],
               "prefect": false,
-              "enrolledOn": "1991-09-01T00:00:00.000Z"
+              "enrolledOn": "1991-09-01",
+              "lastDetention": "1994-06-08T20:00:00Z"
             }
           },
           {
@@ -674,7 +689,8 @@ paths:
               "wand": { "wood": "vine", "core": "dragon heartstring", "length": 10.75 },
               "courses": ["Potions", "Transfiguration", "Arithmancy", "Care of Magical Creatures"],
               "prefect": true,
-              "enrolledOn": "1991-09-01T00:00:00.000Z"
+              "enrolledOn": "1991-09-01",
+              "lastDetention": "1995-10-15T15:30:00Z"
             }
           },
           {
@@ -683,7 +699,8 @@ paths:
               "wand": { "wood": "willow", "core": "unicorn hair", "length": 14 },
               "courses": ["Defense Against the Dark Arts", "Potions", "Divination"],
               "prefect": true,
-              "enrolledOn": "1991-09-01T00:00:00.000Z"
+              "enrolledOn": "1991-09-01",
+              "lastDetention": "1994-06-08T20:00:00Z"
             }
           },
           {
@@ -692,7 +709,8 @@ paths:
               "wand": { "wood": "hawthorn", "core": "unicorn hair", "length": 10 },
               "courses": ["Potions", "Transfiguration", "Defense Against the Dark Arts"],
               "prefect": true,
-              "enrolledOn": "1991-09-01T00:00:00.000Z"
+              "enrolledOn": "1991-09-01",
+              "lastDetention": "1996-03-12T19:00:00Z"
             }
           },
           {
@@ -700,7 +718,7 @@ paths:
               "name": "Luna Lovegood", "house": "Ravenclaw",
               "wand": { "wood": "unknown", "core": "thestral tail hair", "length": 13 },
               "courses": ["Charms", "Defense Against the Dark Arts", "Care of Magical Creatures"],
-              "enrolledOn": "1992-09-01T00:00:00.000Z"
+              "enrolledOn": "1992-09-01"
             }
           }
         ]
@@ -709,38 +727,58 @@ paths:
         **Querying nested fields**
 
         AppDB stores documents as arbitrary JSON, so nested objects like `wand` are queryable directly using dot notation — no joins or schema changes needed. To find all students whose wand core is phoenix feather:
-        ```json
-        {"content.wand.core": "phoenix feather"}
+        ```js
+            domo.post(`/domo/datastores/v1/collections/Students/documents/query`, 
+                {
+                  'content.wand.core': 'phoenix feather',
+                }
+              )
+              .then((docs) => console.log(docs));
         ```
 
         **Querying by date**
 
         AppDB has two categories of date fields that require different query approaches. Using the wrong approach for a field type fails silently — no error, just incorrect results.
 
-        **System date fields** (`createdOn`, `updatedOn`) are stored as BSON DateTime by AppDB. Query them using [MongoDB Extended JSON v2](https://www.mongodb.com/docs/manual/reference/mongodb-extended-json/#bson.Date) `$date` syntax:
+        **System date fields** (`createdOn`, `updatedOn`) are stored as BSON DateTime by AppDB. Query them using [MongoDB Extended JSON v2](https://www.mongodb.com/docs/manual/reference/mongodb-extended-json/#mongodb-bsontype-Date) `$date` syntax:
         ```json
-        {"createdOn": {"$lt": {"$date": "2026-01-01T00:00:00.000Z"}}}
+        {"createdOn": {"$gt": {"$date": "2026-01-01"}}}
         ```
 
-        **Content date fields** are stored as whatever JSON primitive you write. An ISO 8601 string like `"2026-09-01T00:00:00.000Z"` is stored as a BSON String. Two approaches work:
+        **Content date fields** are stored as whatever JSON primitive you write. An ISO 8601 string like `"2026-09-01T18:30:00Z"` is stored as a BSON String. Two approaches work:
 
-        **String comparison** — ISO 8601 strings in `YYYY-MM-DDTHH:MM:SSZ` format sort lexicographically in date order, so standard comparison operators work directly. To find students who enrolled after the original 1991 cohort:
+        **String comparison** — ISO 8601 strings sort lexicographically in date order, so standard comparison operators work directly for both date-only (`YYYY-MM-DD`) and datetime (`YYYY-MM-DDTHH:MM:SSZ`) strings. To find students who enrolled after the original 1991 cohort:
         ```json
-        {"content.enrolledOn": {"$gt": "1991-09-01T00:00:00.000Z"}}
+        {"content.enrolledOn": {"$gt": "1991-09-01"}}
         ```
         ```json
         [
-          {"content": {"name": "Luna Lovegood", "house": "Ravenclaw", "enrolledOn": "1992-09-01T00:00:00.000Z", ...}}
+          {"content": {"name": "Luna Lovegood", "house": "Ravenclaw", "enrolledOn": "1992-09-01", ...}}
         ]
         ```
 
-        **`$expr` + `$toDate`** — converts the string to a date at query time, enabling `$date` comparisons and handling mixed-precision strings correctly:
+        To find students with a detention after a specific datetime:
+        ```json
+        {"content.lastDetention": {"$gt": "1995-01-01T00:00:00Z"}}
+        ```
+
+        **`$expr` + `$toDate`** — converts the string to a date at query time, enabling `$date` comparisons and handling mixed-precision strings correctly. Works for both date-only and datetime strings:
         ```json
         {
           "$expr": {
             "$gt": [
               {"$toDate": "$content.enrolledOn"},
-              {"$date": "1991-09-01T00:00:00.000Z"}
+              {"$date": "1992-08-30"}
+            ]
+          }
+        }
+        ```
+        ```json
+        {
+          "$expr": {
+            "$gt": [
+              {"$toDate": "$content.lastDetention"},
+              {"$date": "1995-01-01T00:00:00Z"}
             ]
           }
         }
@@ -749,7 +787,7 @@ paths:
         <Warning>
           **Mixing up these approaches produces wrong results without an error.**
 
-          Using `$date` against a content string field always returns empty — BSON DateTime never matches BSON String. Using plain string comparison against a system field like `createdOn` also produces wrong results: MongoDB's BSON type ordering ranks DateTime above String, so `$lt: "2026-..."` against a DateTime field matches nothing, while `$gt: "2026-..."` matches everything.
+          Using `$date` against a content string field always returns empty — BSON DateTime never matches BSON String. Using plain string comparison against a system field like `createdOn` also always returns empty — BSON String never compares against BSON DateTime regardless of the operator used.
 
           To confirm the stored type of any field, use the `$type` operator. If `{"someField": {"$type": "date"}}` returns documents, use `$date` syntax. If `{"someField": {"$type": "string"}}` returns documents, use string comparison or `$expr` + `$toDate`.
         </Warning>
@@ -889,7 +927,12 @@ paths:
                 summary: Query by content date field
                 value:
                   content.enrolledOn:
-                    $gt: "1991-09-01T00:00:00.000Z"
+                    $gt: "1991-09-01"
+              datetimeQuery:
+                summary: Query by content datetime field
+                value:
+                  content.lastDetention:
+                    $gt: "1995-01-01T00:00:00Z"
       x-codeSamples:
         - lang: JavaScript
           label: domo.js
@@ -897,9 +940,12 @@ paths:
             const collectionName = 'Students';
 
             // Query by nested field — no joins needed
-            domo.post(`/domo/datastores/v1/collections/${collectionName}/documents/query`, {
-              'content.wand.core': 'phoenix feather'
-            }).then(docs => console.log(docs));
+            domo.post(`/domo/datastores/v1/collections/${collectionName}/documents/query`, 
+                {
+                  'content.wand.core': 'phoenix feather',
+                }
+              )
+              .then((docs) => console.log(docs));
 
             // Count students per house (aggregation)
             domo.post(
@@ -942,6 +988,8 @@ paths:
                       - "Potions"
                       - "Transfiguration"
                     prefect: false
+                    enrolledOn: "1991-09-01"
+                    lastDetention: "1994-06-08T20:00:00Z"
 
   /domo/datastores/v1/collections/{collectionName}/documents/update:
     put:
@@ -1137,6 +1185,8 @@ paths:
                     - "Potions"
                     - "Transfiguration"
                   prefect: false
+                  enrolledOn: "1991-09-01"
+                  lastDetention: "1994-06-08T20:00:00Z"
               - id: "dd363c89-60d2-4f70-89cb-c3c175be625b"
                 content:
                   name: "Hermione Granger"
@@ -1151,6 +1201,8 @@ paths:
                     - "Arithmancy"
                     - "Care of Magical Creatures"
                   prefect: true
+                  enrolledOn: "1991-09-01"
+                  lastDetention: "1995-10-15T15:30:00Z"
               - content:
                   name: "Ron Weasley"
                   house: "Gryffindor"
@@ -1299,6 +1351,8 @@ paths:
                   - name: "house"
                     type: "STRING"
                   - name: "enrolledOn"
+                    type: "DATE"
+                  - name: "lastDetention"
                     type: "DATETIME"
               syncEnabled: true
       x-codeSamples:
@@ -1311,7 +1365,8 @@ paths:
                 columns: [
                   { name: 'name', type: 'STRING' },
                   { name: 'house', type: 'STRING' },
-                  { name: 'enrolledOn', type: 'DATETIME' }
+                  { name: 'enrolledOn', type: 'DATE' },
+                  { name: 'lastDetention', type: 'DATETIME' }
                 ]
               },
               syncEnabled: true
@@ -1343,8 +1398,10 @@ paths:
                       name: "name"
                     - type: "STRING"
                       name: "house"
-                    - type: "DATETIME"
+                    - type: "DATE"
                       name: "enrolledOn"
+                    - type: "DATETIME"
+                      name: "lastDetention"
                 filters: null
                 syncEnabled: true
                 syncRequired: true
@@ -1464,8 +1521,10 @@ paths:
                     name: "name"
                   - type: "STRING"
                     name: "house"
-                  - type: "STRING"
+                  - type: "DATE"
                     name: "enrolledOn"
+                  - type: "DATETIME"
+                    name: "lastDetention"
               syncEnabled: true
       x-codeSamples:
         - lang: JavaScript
@@ -1478,7 +1537,8 @@ paths:
                 columns: [
                   { name: 'name', type: 'STRING' },
                   { name: 'house', type: 'STRING' },
-                  { name: 'enrolledOn', type: 'DATETIME' }
+                  { name: 'enrolledOn', type: 'DATE' },
+                  { name: 'lastDetention', type: 'DATETIME' }
                 ]
               },
               syncEnabled: true
@@ -1510,8 +1570,10 @@ paths:
                       name: "name"
                     - type: "STRING"
                       name: "house"
-                    - type: "STRING"
+                    - type: "DATE"
                       name: "enrolledOn"
+                    - type: "DATETIME"
+                      name: "lastDetention"
                 filters: null
                 syncEnabled: true
                 syncRequired: true

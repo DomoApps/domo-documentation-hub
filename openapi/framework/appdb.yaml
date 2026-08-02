@@ -34,35 +34,38 @@ components:
         id:
           type: string
           format: uuid
-          description: Unique identifier for the document
+          description: Unique identifier for the Document
         owner:
           type: string
-          description: "User ID of the document owner."
+          description: "User ID of the Document owner."
         createdBy:
           type: string
-          description: "User ID of the user who created the document."
+          description: "User ID of the user who created the Document."
         datastoreId:
           type: string
           format: uuid
+          description: "Unique identifier of the Datastore that this Document's Collection belongs to."
         collectionId:
           type: string
           format: uuid
         createdOn:
           type: string
           format: date-time
+          description: "The ISO-8601 timestamp showing when this Document was created."
         updatedOn:
           type: string
           format: date-time
+          description: "The ISO-8601 timestamp showing when this Document was last updated."
         updatedBy:
           type: string
-          description: "User ID of the user who last updated the document."
+          description: "User ID of the user who last updated the Document."
         content:
           type: object
           additionalProperties: true
-          description: The actual document content
+          description: The actual Document content
         syncRequired:
           type: boolean
-          description: Whether or not this document needs to be synced by Domo to the associated DataSet; only applies if the `syncEnabled` option is on for the Collection.
+          description: Whether or not this Document needs to be synced by Domo to the associated DataSet; only applies if the `syncEnabled` option is on for the Collection.
       example:
         id: "c023b254-647e-4839-b74b-b050d4c17447"
         datastoreId: "5565fecc-a852-4799-83bf-f9423c0f7687"
@@ -272,7 +275,7 @@ paths:
     post:
       x-excluded: true
       summary: Create Document (v1)
-      description: Creates a single document in a collection
+      description: Creates a single document in a collection.
       tags:
       - AppDB API
       parameters:
@@ -479,7 +482,7 @@ paths:
     get:
       x-excluded: true
       summary: Get Document (v1)
-      description: Retrieves a single document from a collection
+      description: Retrieves a single document from a collection.
       tags:
       - AppDB API
       parameters:
@@ -545,7 +548,7 @@ paths:
     put:
       x-excluded: true
       summary: Update Document (v1)
-      description: Updates an existing document in a collection
+      description: Updates an existing document in a collection.
       tags:
       - AppDB API
       parameters:
@@ -1361,7 +1364,8 @@ paths:
                 Deleted: 3
 
   # ========= Document Endpoints (v2) =========
-  # (not integers), and createdBy is always included in every response document.
+  # Largely the same as v1, but the ids that were integers in v1 (`owner` and `updatedBy`) are now integer strings. 
+  # v2 also includes a string integer `createdBy` user id.
 
   /domo/datastores/v2/collections/{collectionName}/documents:
     post:
@@ -1646,6 +1650,8 @@ paths:
                   - "Potions"
                   - "Transfiguration"
                 prefect: false
+                enrolledOn: "1991-09-01"
+                lastDetention: "1994-06-08T20:00:00Z"
       x-codeSamples:
         - lang: JavaScript
           label: domo.js
@@ -1698,6 +1704,8 @@ paths:
                     - "Potions"
                     - "Transfiguration"
                   prefect: false
+                  enrolledOn: "1991-09-01"
+                  lastDetention: "1994-06-08T20:00:00Z"
 
     delete:
       summary: Delete Document
@@ -1742,6 +1750,188 @@ paths:
       summary: Query Documents
       description: |
         Query documents using MongoDB query syntax.
+
+        **Supported operators**
+
+        All MongoDB query predicates supported in a `find()` call are available, including comparison, logical, array, data type, bitwise, `$expr`, `$jsonSchema`, `$regex`, `$geoWithin`, and `$geoIntersects`. See the [MongoDB query predicate documentation](https://www.mongodb.com/docs/manual/reference/mql/query-predicates/) for the full operator list.
+
+        <Warning>
+          **Unsupported operators**
+
+          - `$where` — JavaScript evaluation is disabled server-side.
+          - `$near` and `$nearSphere` — geospatial proximity searches require an index that AppDB collections do not have.
+        </Warning>
+
+        **Examples**
+
+        The following examples use this sample Students collection:
+        ```json
+        [
+          {
+            "content": {
+              "name": "Harry Potter", "house": "Gryffindor",
+              "wand": { "wood": "holly", "core": "phoenix feather", "length": 11 },
+              "courses": ["Defense Against the Dark Arts", "Potions", "Transfiguration"],
+              "prefect": false,
+              "enrolledOn": "1991-09-01",
+              "lastDetention": "1994-06-08T20:00:00Z"
+            }
+          },
+          {
+            "content": {
+              "name": "Hermione Granger", "house": "Gryffindor",
+              "wand": { "wood": "vine", "core": "dragon heartstring", "length": 10.75 },
+              "courses": ["Potions", "Transfiguration", "Arithmancy", "Care of Magical Creatures"],
+              "prefect": true,
+              "enrolledOn": "1991-09-01",
+              "lastDetention": "1995-10-15T15:30:00Z"
+            }
+          },
+          {
+            "content": {
+              "name": "Ron Weasley", "house": "Gryffindor",
+              "wand": { "wood": "willow", "core": "unicorn hair", "length": 14 },
+              "courses": ["Defense Against the Dark Arts", "Potions", "Divination"],
+              "prefect": true,
+              "enrolledOn": "1991-09-01",
+              "lastDetention": "1994-06-08T20:00:00Z"
+            }
+          },
+          {
+            "content": {
+              "name": "Draco Malfoy", "house": "Slytherin",
+              "wand": { "wood": "hawthorn", "core": "unicorn hair", "length": 10 },
+              "courses": ["Potions", "Transfiguration", "Defense Against the Dark Arts"],
+              "prefect": true,
+              "enrolledOn": "1991-09-01",
+              "lastDetention": "1996-03-12T19:00:00Z"
+            }
+          },
+          {
+            "content": {
+              "name": "Luna Lovegood", "house": "Ravenclaw",
+              "courses": ["Charms", "Defense Against the Dark Arts", "Care of Magical Creatures"],
+              "enrolledOn": "1992-09-01"
+            }
+          }
+        ]
+        ```
+
+        **Querying nested fields**
+
+        AppDB stores documents as arbitrary JSON, so nested objects like `wand` are queryable directly using dot notation — no joins or schema changes needed. To find all students whose wand core is phoenix feather:
+        ```js
+        domo.post(`/domo/datastores/v2/collections/Students/documents/query`,
+            {
+              'content.wand.core': 'phoenix feather',
+            }
+          )
+          .then((docs) => console.log(docs));
+        ```
+
+        **Querying by date**
+
+        AppDB has two categories of date fields that require different query approaches. Using the wrong approach for a field type fails silently — no error, just incorrect results.
+
+        **System date fields** (`createdOn`, `updatedOn`) are stored as BSON DateTime by AppDB. Query them using [MongoDB Extended JSON v2](https://www.mongodb.com/docs/manual/reference/mongodb-extended-json/#mongodb-bsontype-Date) `$date` syntax:
+        ```json
+        {"createdOn": {"$gt": {"$date": "2026-01-01"}}}
+        ```
+
+        **Content date fields** are stored as whatever JSON primitive you write. An ISO 8601 string like `"2026-09-01T18:30:00Z"` is stored as a BSON String. Two approaches work:
+
+        **String comparison** — ISO 8601 strings sort lexicographically in date order, so standard comparison operators work directly for both date-only (`YYYY-MM-DD`) and datetime (`YYYY-MM-DDTHH:MM:SSZ`) strings. To find students who enrolled after the original 1991 cohort:
+        ```json
+        {"content.enrolledOn": {"$gt": "1991-09-01"}}
+        ```
+
+        To find students with a detention after a specific datetime:
+        ```json
+        {"content.lastDetention": {"$gt": "1995-01-01T00:00:00Z"}}
+        ```
+
+        **`$expr` + `$toDate`** — converts the string to a date at query time, enabling `$date` comparisons and handling mixed-precision strings correctly. Works for both date-only and datetime strings:
+        ```json
+        {
+          "$expr": {
+            "$gt": [
+              {"$toDate": "$content.enrolledOn"},
+              {"$date": "1992-08-30"}
+            ]
+          }
+        }
+        ```
+        ```json
+        {
+          "$expr": {
+            "$gt": [
+              {"$toDate": "$content.lastDetention"},
+              {"$date": "1995-01-01T00:00:00Z"}
+            ]
+          }
+        }
+        ```
+
+        <Warning>
+          **Mixing up these approaches produces wrong results without an error.**
+
+          Using `$date` against a content string field always returns empty — BSON DateTime never matches BSON String. Using plain string comparison against a system field like `createdOn` also always returns empty — BSON String never compares against BSON DateTime regardless of the operator used.
+
+          To confirm the stored type of any field, use the `$type` operator. If `{"someField": {"$type": "date"}}` returns documents, use `$date` syntax. If `{"someField": {"$type": "string"}}` returns documents, use string comparison or `$expr` + `$toDate`.
+        </Warning>
+
+        **Students per house**
+        ```
+        ?groupby=content.house&count=count
+        ```
+        Body: `{}`
+        ```json
+        [
+          {"_id": "Slytherin",  "count": 1},
+          {"_id": "Gryffindor", "count": 3},
+          {"_id": "Ravenclaw",  "count": 1}
+        ]
+        ```
+        <Info>
+        **Aggregation query parameters**
+
+        Field names use dot notation; fields inside `content` must be prefixed with `content.` (e.g., `content.house`). Nested fields like `content.wand.length` also work. Top-level fields like `owner` and `createdOn` can be referenced directly.
+        </Info>
+
+        **Average wand length per house**
+
+        Because `wand` is a nested object, `content.wand.length` works as an aggregation target directly — no joins or flattening needed.
+        ```
+        ?groupby=content.house&avg=content.wand.length avgWandLength&orderby=avgWandLength descending
+        ```
+        Body: `{}`
+        ```json
+        [
+          {"_id": "Gryffindor", "avgWandLength": 11.916666666666666},
+          {"_id": "Slytherin",  "avgWandLength": 10}
+        ]
+        ```
+
+        **Course enrollment frequency**
+
+        `unwind` produces one document per course value before grouping, so a student enrolled in `["Potions", "Transfiguration"]` counts once toward each group.
+        ```
+        ?unwind=content.courses&groupby=content.courses&count=count&orderby=count descending
+        ```
+        Body: `{}`
+        ```json
+        [
+          {"_id": "Potions",                       "count": 4},
+          {"_id": "Defense Against the Dark Arts", "count": 4},
+          {"_id": "Transfiguration",               "count": 3},
+          {"_id": "Care of Magical Creatures",     "count": 2},
+          {"_id": "Divination",                    "count": 1},
+          {"_id": "Arithmancy",                    "count": 1},
+          {"_id": "Charms",                        "count": 1}
+        ]
+        ```
+
+        To group by multiple fields, pass a comma-separated list: `groupby=content.house,content.prefect`. The `_id` in each result becomes an object — `{"_id": {"house": "Gryffindor", "prefect": false}, "count": 1}` — instead of a scalar. Aggregation values remain top-level keys using their configured aliases.
       tags:
       - AppDB API
       parameters:
@@ -1756,41 +1946,47 @@ paths:
           description: Comma-separated list of properties to group by
           schema:
             type: string
+          example: "content.campaignName,content.month"
         - name: count
           in: query
-          description: Alias for a count aggregation
+          description: Alias for count aggregation
           schema:
             type: string
         - name: avg
           in: query
-          description: "`property alias` pairs, comma-separated — computes the average of each property."
+          description: "`property alias` pairs, comma-separated — computes the average of each property. Alias is used as the key in the response."
           schema:
             type: string
+          example: "content.clicks avgClicks,content.impressions avgImps"
         - name: min
           in: query
           description: "`property alias` pairs, comma-separated — computes the minimum of each property."
           schema:
             type: string
+          example: "content.clicks minClicks,content.impressions minImps"
         - name: max
           in: query
           description: "`property alias` pairs, comma-separated — computes the maximum of each property."
           schema:
             type: string
+          example: "content.clicks maxClicks,content.impressions maxImps"
         - name: sum
           in: query
           description: "`property alias` pairs, comma-separated — computes the sum of each property."
           schema:
             type: string
+          example: "content.clicks sumClicks,content.impressions sumImps"
         - name: unwind
           in: query
-          description: Comma-separated list of array properties to unwind.
+          description: "Comma-separated list of properties to unwind (deconstructs an array field, producing one document per element). Must be combined with at least one of `count`, `groupby`, `avg`, `min`, `max`, or `sum`."
           schema:
             type: string
         - name: orderby
           in: query
-          description: "Field name or aggregation alias to sort by, followed by `ascending` or `descending`."
+          description: "Field name or aggregation alias to sort by, followed by `ascending` or `descending`. Without aggregation, accepts field names in dot notation; with aggregation, accepts aliases defined by other parameters."
           schema:
             type: string
+          example: "sumClicks descending"
         - name: limit
           in: query
           description: Maximum number of documents to return
@@ -1809,19 +2005,40 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/MongoQuery'
-            example:
-              "content.wand.core": "phoenix feather"
+            examples:
+              nestedFieldQuery:
+                summary: Query by nested field
+                value:
+                  content.wand.core: "phoenix feather"
+              dateQuery:
+                summary: Query by content date field
+                value:
+                  content.enrolledOn:
+                    $gt: "1991-09-01"
+              datetimeQuery:
+                summary: Query by content datetime field
+                value:
+                  content.lastDetention:
+                    $gt: "1995-01-01T00:00:00Z"
       x-codeSamples:
         - lang: JavaScript
           label: domo.js
           source: |-
             const collectionName = 'Students';
 
-            domo.post(
-                `/domo/datastores/v2/collections/${collectionName}/documents/query`,
-                { 'content.wand.core': 'phoenix feather' }
+            // Query by nested field — no joins needed
+            domo.post(`/domo/datastores/v2/collections/${collectionName}/documents/query`,
+                {
+                  'content.wand.core': 'phoenix feather',
+                }
               )
-              .then(docs => console.log(docs));
+              .then((docs) => console.log(docs));
+
+            // Count students per house (aggregation)
+            domo.post(
+              `/domo/datastores/v2/collections/${collectionName}/documents/query?groupby=content.house&count=count`,
+              {}
+            ).then(results => console.log(results));
         - *stub_curl
         - *stub_python
         - *stub_php
@@ -1845,7 +2062,7 @@ paths:
                   owner: "540824222"
                   createdBy: "540824222"
                   createdOn: "2026-07-31T23:09:34.542Z"
-                  updatedOn: "2026-07-31T23:09:34.542Z"
+                  updatedOn: "2026-07-31T23:16:41.776Z"
                   updatedBy: "540824222"
                   content:
                     name: "Harry Potter"
@@ -1858,6 +2075,7 @@ paths:
                       - "Defense Against the Dark Arts"
                       - "Potions"
                       - "Transfiguration"
+                    prefect: false
                     enrolledOn: "1991-09-01"
                     lastDetention: "1994-06-08T20:00:00Z"
 
@@ -1878,6 +2096,8 @@ paths:
         <Note>
           `$setOnInsert` has no effect — partial updates do not perform upserts.
         </Note>
+
+        See the [MongoDB update operator documentation](https://www.mongodb.com/docs/manual/reference/mql/update/) for full semantics.
       tags:
       - AppDB API
       parameters:
@@ -2043,10 +2263,44 @@ paths:
                 content:
                   name: "Harry Potter"
                   house: "Gryffindor"
+                  wand:
+                    wood: "holly"
+                    core: "phoenix feather"
+                    length: 11
+                  courses:
+                    - "Defense Against the Dark Arts"
+                    - "Potions"
+                    - "Transfiguration"
                   prefect: false
+                  enrolledOn: "1991-09-01"
+                  lastDetention: "1994-06-08T20:00:00Z"
+              - id: "dd363c89-60d2-4f70-89cb-c3c175be625b"
+                content:
+                  name: "Hermione Granger"
+                  house: "Gryffindor"
+                  wand:
+                    wood: "vine"
+                    core: "dragon heartstring"
+                    length: 10.75
+                  courses:
+                    - "Potions"
+                    - "Transfiguration"
+                    - "Arithmancy"
+                    - "Care of Magical Creatures"
+                  prefect: true
+                  enrolledOn: "1991-09-01"
+                  lastDetention: "1995-10-15T15:30:00Z"
               - content:
                   name: "Ron Weasley"
                   house: "Gryffindor"
+                  wand:
+                    wood: "willow"
+                    core: "unicorn hair"
+                    length: 14
+                  courses:
+                    - "Defense Against the Dark Arts"
+                    - "Potions"
+                    - "Divination"
       x-codeSamples:
         - lang: JavaScript
           label: domo.js
@@ -2056,10 +2310,31 @@ paths:
             domo.put(`/domo/datastores/v2/collections/${collectionName}/documents/bulk`, [
               {
                 id: '402778f6-bc8d-4aa5-a581-e08e3fc98c05',
-                content: { name: 'Harry Potter', house: 'Gryffindor', prefect: false }
+                content: {
+                  name: 'Harry Potter',
+                  house: 'Gryffindor',
+                  wand: { wood: 'holly', core: 'phoenix feather', length: 11 },
+                  courses: ['Defense Against the Dark Arts', 'Potions', 'Transfiguration'],
+                  prefect: false
+                }
               },
               {
-                content: { name: 'Ron Weasley', house: 'Gryffindor' }
+                id: 'dd363c89-60d2-4f70-89cb-c3c175be625b',
+                content: {
+                  name: 'Hermione Granger',
+                  house: 'Gryffindor',
+                  wand: { wood: 'vine', core: 'dragon heartstring', length: 10.75 },
+                  courses: ['Potions', 'Transfiguration', 'Arithmancy', 'Care of Magical Creatures'],
+                  prefect: true
+                }
+              },
+              {
+                content: {
+                  name: 'Ron Weasley',
+                  house: 'Gryffindor',
+                  wand: { wood: 'willow', core: 'unicorn hair', length: 14 },
+                  courses: ['Defense Against the Dark Arts', 'Potions', 'Divination']
+                }
               }
             ]).then(result => console.log(result));
         - *stub_curl
@@ -2076,12 +2351,12 @@ paths:
               schema:
                 $ref: '#/components/schemas/BulkUpsertResponse'
               example:
-                Updated: 1
+                Updated: 2
                 Created: 1
 
     delete:
       summary: Delete Documents in Bulk
-      description: "Remove multiple documents from a collection in a single request. IDs are passed as a comma-separated `ids` query parameter. Keep requests under approximately 700 UUIDs (~26 KB URL) to avoid HTTP 414 URI Too Long errors from the framework proxy; split larger deletes across multiple requests.\n\n<Danger>\n**Warning**\n\n This is destructive and cannot be reversed.\n</Danger>"
+      description: "Remove multiple documents from a collection in a single request. IDs are passed as a comma-separated `ids` query parameter. Keep requests under approximately 700 UUIDs (~26 KB URL) to avoid HTTP 414 URI Too Long errors from the framework proxy; split larger deletes across multiple requests.\n\n<Danger>\n**Warning**\n\n This is destructive and cannot be reversed. Deleting documents in an AppDB collection may have performance implications with regard to syncing to its corresponding DataSet in Domo if the syncEnabled property is set to true for the Collection.\n</Danger>"
       tags:
       - AppDB API
       parameters:

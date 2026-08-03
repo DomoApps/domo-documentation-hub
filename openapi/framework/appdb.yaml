@@ -3049,7 +3049,9 @@ paths:
 
         `RYUU_APP` controls what the app instance itself can do when it makes requests server-side — it treats the app as an actor, not a user. The `entityId` is the app instance UUID, which is the same as the datastore UUID and appears as the subdomain of the app's origin (e.g., `https://<instance-uuid>.domoapps.domo.com`).
 
-        When a collection is created inside an app's own datastore, the platform automatically grants the app instance `read`, `create_content`, `read_content`, `update_content`, and `delete_content`. You only need to call this endpoint to override that default — for example, to make the app read-only on a shared collection, or to revoke `delete_content`.
+        When a collection is created inside an app's own datastore, the platform automatically grants the app instance `read`, `create_content`, `read_content`, `update_content`, and `delete_content`. Use this endpoint to grant additional permissions to any entity.
+
+        **This endpoint adds to existing permissions — it does not replace them.** To reduce or revoke an entity's access, first call [Delete Permissions](#delete-permissions) to remove the current permission set, then re-grant only the permissions you want.
 
         **Available permissions**
 
@@ -3106,7 +3108,8 @@ paths:
               `/domo/datastores/v1/collections/${collectionName}/permission/USER/${userId}?permissions=read,create_content,read_content,update_content,delete_content`
             ).then(() => console.log('user permissions updated'));
 
-            // Restrict the app instance itself to read-only document access.
+            // Grant the app instance read-only document access.
+            // To reduce permissions, call Delete Permissions first, then re-grant.
             // The instance UUID is the subdomain of the app's origin URL.
             const instanceId = window.location.hostname.split('.')[0];
             domo.put(

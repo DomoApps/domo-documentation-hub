@@ -3,30 +3,40 @@ title: AppDB API
 permalink: 1l1fm2g0sfm69-app-db-api
 ---
 
-AppDB is Domo's built-in document store for Custom Apps. It lets apps persist and query arbitrary JSON documents without a developer token — calls are made with `domo.js` using the card's session instead. Data is organized in three layers:
+AppDB is Domo's built-in document store for Custom Apps. Your app reads and writes JSON documents directly using `domo.js` — no connector setup, no refresh schedule, no separate credentials. Data is organized in three layers:
 
-| Layer          | Analogy                  | Notes                                                     |
-| -------------- | ------------------------ | --------------------------------------------------------- |
-| **Datastore**  | Database                 | One per app; created automatically. Identified by a UUID. |
-| **Collection** | Table / NoSQL collection | Define in the manifest or create programmatically.        |
-| **Document**   | Row / NoSQL document     | Free-form `content` object inside a system envelope.      |
+```mermaid
+flowchart LR
+    DS[Datastore\nyour-app-uuid]
 
-## App Framework vs. Product API
+    DS --> C1[Collection: Inventory]
+    DS -.-> C2[Collection: UserPrefs]
 
-Two API surfaces exist for AppDB. Choose the right one for your context:
+    C1 --> D1["{ name: 'Laptop', qty: 12, category: 'electronics' }"]
+    C1 --> D2["{ name: 'Chair', qty: 3, category: 'furniture' }"]
 
-|                                | App Framework API              | Product API                                |
-| ------------------------------ | ------------------------------ | ------------------------------------------ |
-| **Base path**                  | `/domo/datastores/`            | `/api/datastores/`                         |
-| **Auth**                       | Card session (no token needed) | Developer token (`X-DOMO-Developer-Token`) |
-| **Works from**                 | Inside a running Domo app      | Any HTTP client                            |
-| **Datastore management**       | Not exposed                    | Full CRUD                                  |
-| **Download / Import**          | Not exposed                    | Available                                  |
-| **Permission reads**           | Not exposed                    | Available                                  |
-| **Collection & Document CRUD** | ✓                              | ✓                                          |
-| **Export**                     | ✓                              | ✓                                          |
+    classDef dim fill:#f5f5f5,stroke:#ccc,color:#bbb
+    class C2 dim
+```
 
-This page covers the **App Framework API**. For the Product API, see [App DB API — Product](/portal/API-Reference/Product-APIs/App-DB).
+| Layer          | Analogy  | Notes                                                     |
+| -------------- | -------- | --------------------------------------------------------- |
+| **Datastore**  | Database | One per app; created automatically. Identified by a UUID. |
+| **Collection** | Table    | Define in the manifest or create programmatically.        |
+| **Document**   | Row      | Free-form `content` object inside a system envelope.      |
+
+## When to Use AppDB
+
+Use AppDB when your app needs to write and manage its own data. Collections can optionally sync to Domo DataSets (via `syncEnabled: true` in the manifest), so you can use AppDB for app state and still expose that data for reporting. DataSets are the better starting point when data comes from a connector, Workbench, or ETL — rather than being written directly by your app.
+
+|                    | AppDB                                                                     | Domo DataSet                                              |
+| ------------------ | ------------------------------------------------------------------------- | --------------------------------------------------------- |
+| **Best for**       | App-owned state, user-generated content, real-time reads/writes           | BI and visualization, connector-fed or ETL-processed data |
+| **Data structure** | Flexible JSON — nested objects, arrays, variable shape per document       | Fixed columns and rows                                    |
+| **Written by**     | Your app (via `domo.js`)                                                  | Connectors, Workbench, or the API                         |
+| **Latency**        | Immediate reads/writes                                                    | Depends on connector refresh schedule                     |
+| **Accessible to**  | All instances of your app; sync to a DataSet to expose data for reporting | Any card, connector, or app across the instance           |
+| **Update style**   | Atomic field-level operators (`$inc`, `$set`, `$push`)                    | Full row replace                                          |
 
 ---
 
@@ -222,40 +232,6 @@ To inspect your collections, run queries, and manage documents outside your app,
 
 ---
 
-## Defining Collections in the Manifest
-
-You can define collections in your app's manifest and the platform creates them automatically when the app is installed.
-
-```json
-{
-  "name": "Example comments app",
-  "version": "1.0",
-  "size": { "width": 2, "height": 2 },
-  "mapping": [],
-  "collectionsMapping": [
-    {
-      "name": "CommentsTable",
-      "schema": {
-        "columns": [
-          { "name": "user", "type": "STRING" },
-          { "name": "comment", "type": "STRING" }
-        ]
-      },
-      "syncEnabled": true
-    },
-    {
-      "name": "Users"
-    }
-  ]
-}
-```
-
-A collection with no schema can still store any JSON — the schema is only required if you want the collection to sync to a Domo DataSet. The accepted column types are:
-
-`STRING` · `LONG` · `DECIMAL` · `DOUBLE` · `DATE` · `DATETIME`
-
----
-
 ## Endpoint Reference
 
 <CardGroup cols={2}>
@@ -382,6 +358,58 @@ A collection with no schema can still store any JSON — the schema is only requ
 
 ---
 
+## Working with the Manifest
+
+Defining collections in your app's manifest is the standard way to set up your app's data model. When a card is created from your app, you can either choose existing collections or have the platform create the listed collections automatically.
+
+```json
+{
+  "collectionsMapping": [
+    {
+      "name": "Inventory"
+    },
+    {
+      "name": "AuditLog",
+      "schema": {
+        "columns": [
+          { "name": "user", "type": "STRING" },
+          { "name": "action", "type": "STRING" },
+          { "name": "timestamp", "type": "DATETIME" }
+        ]
+      },
+      "syncEnabled": true
+    }
+  ]
+}
+```
+
+A collection with no `schema` can store any JSON shape. A `schema` is only required if you want the collection to sync its documents to a Domo DataSet — in which case the column names must be **top-level keys** in each document's `content` object. Dot notation does not traverse nested fields during sync. Accepted column types: `STRING` · `LONG` · `DECIMAL` · `DOUBLE` · `DATE` · `DATETIME`.
+
+### The manifest is the source of truth
+
+<Warning>
+**Do not use the Update Collection API on manifest-defined collections.** Every time the card is saved, the platform reverts the collection's properties back to what the manifest says. Changes made through the API will be silently overwritten.
+
+To change a manifest-defined collection — add a field to its schema, enable sync — update the manifest instead.
+
+</Warning>
+
+After editing `manifest.json` and re-publishing your app design, **you must edit the installed card and re-save it** for the changes to take effect on existing installations.
+
+### Creating collections programmatically
+
+If your app needs collections that aren't known at design time — for example, per-user collections or collections created based on runtime data — use the [Create Collection](/api-reference/appdb-api/create-collection) endpoint instead of defining them in the manifest. Collections created this way are not subject to the manifest override rule and can be safely updated or deleted through the API.
+
+---
+
+## Collection-Level Security
+
+AppDB collections support fine-grained access control over who can read, write, and manage a collection or its documents. Permissions can be granted to individual users, Domo groups, or the app instance itself.
+
+See [Modify Permissions](/api-reference/appdb-api/modify-collection-permissions) for the full list of available permissions and how to apply them, and [Delete Permissions](/api-reference/appdb-api/delete-permissions) to remove an entity's access.
+
+---
+
 ## Document-Level Security
 
 Client-side filtering can be bypassed by users who write their own requests. To enforce filtering server-side, add document-level filter rules to a collection in your manifest:
@@ -452,3 +480,22 @@ If a filter prevents a match on a single-document operation, the response is `40
   **Note:** Filters do not apply to CREATE operations. Documents can always be
   created regardless of any filter rules defined on the collection.
 </Note>
+
+---
+
+## App Framework vs. Product API
+
+Two API surfaces exist for AppDB. Choose the right one for your context:
+
+|                                | App Framework API              | Product API                                |
+| ------------------------------ | ------------------------------ | ------------------------------------------ |
+| **Base path**                  | `/domo/datastores/`            | `/api/datastores/`                         |
+| **Auth**                       | Card session (no token needed) | Developer token (`X-DOMO-Developer-Token`) |
+| **Works from**                 | Inside a running Domo app      | Any HTTP client                            |
+| **Datastore management**       | Not exposed                    | Full CRUD                                  |
+| **Download / Import**          | Not exposed                    | Available                                  |
+| **Permission reads**           | Not exposed                    | Available                                  |
+| **Collection & Document CRUD** | ✓                              | ✓                                          |
+| **Export**                     | ✓                              | ✓                                          |
+
+This page covers the **App Framework API**. For the Product API, see [App DB API — Product](/portal/API-Reference/Product-APIs/App-DB).

@@ -3037,11 +3037,19 @@ paths:
 
         **Entity types**
 
-        | `entity` path param | `entityId` value |
-        | ------------------- | ---------------- |
-        | `USER`              | Domo user ID |
-        | `GROUP`             | Domo group ID |
-        | `RYUU_APP`          | App instance ID (first UUID in the iframe URL) |
+        | `entity` path param | `entityId` value | Who this controls |
+        | ------------------- | ---------------- | ----------------- |
+        | `USER`              | Domo user ID | An individual user's access |
+        | `GROUP`             | Domo group ID | A Domo group's access |
+        | `RYUU_APP`          | App instance UUID | The running app's own server-side access |
+
+        **USER vs RYUU_APP**
+
+        `USER` and `GROUP` control what human users can do when they interact with the collection through the API or AppDB Admin.
+
+        `RYUU_APP` controls what the app instance itself can do when it makes requests server-side — it treats the app as an actor, not a user. The `entityId` is the app instance UUID, which is the same as the datastore UUID and appears as the subdomain of the app's origin (e.g., `https://<instance-uuid>.domoapps.domo.com`).
+
+        When a collection is created inside an app's own datastore, the platform automatically grants the app instance `read`, `create_content`, `read_content`, `update_content`, and `delete_content`. You only need to call this endpoint to override that default — for example, to make the app read-only on a shared collection, or to revoke `delete_content`.
 
         **Available permissions**
 
@@ -3091,13 +3099,19 @@ paths:
           label: domo.js
           source: |-
             const collectionName = 'YourCollection';
-            const entity = 'RYUU_APP'; // USER, GROUP, or RYUU_APP
-            const entityId = 'your-entity-id';
-            const permissions = 'read,create_content,update_content,read_content';
 
+            // Grant a user read/write access to the collection's documents
+            const userId = '540824222';
             domo.put(
-              `/domo/datastores/v1/collections/${collectionName}/permission/${entity}/${entityId}?permissions=${permissions}`
-            ).then(() => console.log('permissions updated'));
+              `/domo/datastores/v1/collections/${collectionName}/permission/USER/${userId}?permissions=read,create_content,read_content,update_content,delete_content`
+            ).then(() => console.log('user permissions updated'));
+
+            // Restrict the app instance itself to read-only document access.
+            // The instance UUID is the subdomain of the app's origin URL.
+            const instanceId = window.location.hostname.split('.')[0];
+            domo.put(
+              `/domo/datastores/v1/collections/${collectionName}/permission/RYUU_APP/${instanceId}?permissions=read,read_content`
+            ).then(() => console.log('app permissions updated'));
         - *stub_curl
         - *stub_python
         - *stub_php

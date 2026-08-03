@@ -3045,9 +3045,11 @@ paths:
 
         **USER vs RYUU_APP**
 
-        `USER` and `GROUP` control what human users can do when they interact with the collection through the API or AppDB Admin.
+        `USER` and `GROUP` control what individual users and groups can do when they interact with the collection directly through the API or AppDB Admin.
 
-        `RYUU_APP` controls what the app instance itself can do when it makes requests server-side — it treats the app as an actor, not a user. The `entityId` is the app instance UUID, which is the same as the datastore UUID and appears as the subdomain of the app's origin (e.g., `https://<instance-uuid>.domoapps.domo.com`).
+        `RYUU_APP` controls access at the app level. Any user who has the app card shared with them inherits the app's permissions on the collection — they can do whatever the app is allowed to do, even if they have no direct `USER` or `GROUP` permission on the collection. If the app has no permissions, users fall back to their own direct permissions.
+
+        The `entityId` for `RYUU_APP` is the app instance UUID, which is the same as the datastore UUID and appears as the subdomain of the app's origin (e.g., `https://<instance-uuid>.domoapps.domo.com`).
 
         When a collection is created inside an app's own datastore, the platform automatically grants the app instance `read`, `create_content`, `read_content`, `update_content`, and `delete_content`. Use this endpoint to grant additional permissions to any entity.
 

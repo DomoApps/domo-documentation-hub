@@ -1,0 +1,247 @@
+openapi: 3.1.0
+info:
+  title: dataProcessing
+  version: "1.0.313_master"
+servers:
+- url: http://dev3.maestro.domosoftware.net:8730
+  description: Generated server url
+tags:
+- name: DataFlows
+  description: Domo DataFlow APIs
+- name: DataFlows
+  description: Domo DataFlows APIs
+paths:
+  /api/dataprocessing/v1/dataflows/permissions/share/{dataFlowId}:
+    put:
+      tags:
+      - DataFlows
+      summary: Share a Dataflow
+      description: Share a DataFlow with users or groups.  May also optionally share
+        DataSources.
+      operationId: share
+      parameters:
+      - name: dataFlowId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DataFlowShareRequest"
+            examples:
+              Basic:
+                description: Basic DataFlow share request.
+                value:
+                  dataFlowPermissions:
+                  - type: USER
+                    id: "987"
+                    accessLevel: CAN_EDIT_AND_SHARE
+                  dataSetPermissions:
+                    "96f5ddab-dfea-4833-a547-c48a1b1d49e2":
+                      permissions:
+                      - type: USER
+                        id: "987"
+                        accessLevel: CAN_SHARE
+                    "10ad5706-73dd-4c6d-b575-6a3d8fd58568":
+                      permissions:
+                      - type: USER
+                        id: "987"
+                        accessLevel: CAN_SHARE
+                  sendEmail: true
+                  message: I have shared my dataflow with you
+              DataFlow View and Execute:
+                description: "DataFlow only, at view and execute level."
+                value:
+                  dataFlowPermissions:
+                  - type: USER
+                    id: "123"
+                    accessLevel: VIEW_AND_EXECUTE
+                  sendEmail: false
+              DataFlow View Only:
+                description: "DataFlow, at view-only level."
+                value:
+                  dataFlowPermissions:
+                  - type: USER
+                    id: "456"
+                    accessLevel: CAN_VIEW
+                  sendEmail: false
+        required: true
+      responses:
+        "409":
+          description: Conflict
+        "403":
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: boolean
+      security:
+      - domo-developer-token: []
+components:
+  schemas:
+    DataFlowPermissionChangeEntity:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+          - UNKNOWN
+          - SYSTEM
+          - USER
+          - VIRTUAL_USER
+          - GROUP
+          - CUSTOMER
+          - DOMO_ROLE
+          - CUSTOMER_ROLE
+          - AUTHORITY
+          - CARD
+          - PAGE
+          - DATA_APP_VIEW
+          - REPORT_VIEW_PAGE
+          - REPORT_VIEW
+          - DOMOTALK
+          - BUZZ_CHANNEL
+          - BUZZ_INTEGRATION
+          - PROJECT
+          - PROJECT_TASK
+          - FILE
+          - DATA_SOURCE
+          - METRIC
+          - DATA_MODEL
+          - ACCOUNT
+          - ACCOUNT_TEMPLATE
+          - CREDENTIAL_REQUEST
+          - STREAM
+          - DATAFLOW
+          - DATAFLOW_RECIPE
+          - DATAFLOW_RECIPE_VERSION
+          - DATAFLOW_ENV_IMAGE
+          - ADC_POLICY
+          - ADC_POLICY_GROUP
+          - APPROVAL
+          - APPROVAL_TEMPLATE
+          - CERTIFICATION
+          - ALERT
+          - CONTROL_GROUP
+          - FUSION
+          - BEAST_MODE
+          - DATA_DEFINITION
+          - STORY
+          - SS_SPEC
+          - SS_ACCESS_GROUP
+          - SS_SSO_GROUP
+          - DATA_SCIENCE_NOTEBOOK
+          - FILESHARE
+          - DATA_SCIENCE_PROJECT
+          - DATA_SCIENCE_MODEL
+          - VECTOR_INDEX
+          - FILE_SET
+          - CONVERSATIONAL_AGENT
+          - CONVERSATIONAL_AGENT_PACKAGE
+          - TOOLKIT
+          - MAGNUM_COLLECTION
+          - RYUU_APP
+          - RYUU_DESIGN
+          - ODYSSEY_WORKFLOW_MODEL
+          - ODYSSEY_WORKFLOW_DEPLOYMENT
+          - ODYSSEY_BUCKET
+          - PIPELINE_EXECUTOR_JOB
+          - REPOSITORY
+          - VERSION_DEPLOYMENT
+          - CODEENGINE_FUNCTION
+          - ENIGMA_FORM
+          - ENIGMA_FORM_INSTANCE
+          - ENIGMA_ADVANCED_FORM
+          - HOPPER_QUEUE
+          - DATA_APP
+          - WORKBENCH_JOB
+          - WORKBENCH_GROUP
+          - WORKBENCH_CREDENTIAL
+          - WORKBENCH_SCHEDULED_GROUP
+          - CONFIG_APP_CONFIGURATION
+          - CONFIG_APP
+          - WORKSPACE
+          - CATALOG_LISTING
+          - ORCHESTRATION_INSTALLATION
+        id:
+          type: integer
+          format: int64
+        accessLevel:
+          type: string
+          enum:
+          - OWNER
+          - CAN_VIEW
+          - VIEW_AND_EXECUTE
+          - CAN_EDIT
+          - CAN_VIEW_AND_SHARE
+          - VIEW_AND_EXECUTE_AND_SHARE
+          - CAN_EDIT_AND_SHARE
+          - NONE
+    DataFlowShareRequest:
+      type: object
+      properties:
+        dataFlowPermissions:
+          type: array
+          items:
+            $ref: "#/components/schemas/DataFlowPermissionChangeEntity"
+        dataSetPermissions:
+          type: object
+          additionalProperties:
+            $ref: "#/components/schemas/DataSourceShareEntity"
+        message:
+          type: string
+        sendEmail:
+          type: boolean
+    DataSourcePermissionChangeEntity:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+          - USER
+          - GROUP
+          - CARD
+          - VIRTUAL_USER
+          - APPROVAL
+          - ENIGMA_FORM_INSTANCE
+          - DATA_APP
+          - DATA_APP_VIEW
+          - WORKFLOW
+          - REPORT_VIEW_PAGE
+        id:
+          type: string
+        accessLevel:
+          type: string
+          enum:
+          - OWNER
+          - CO_OWNER
+          - CAN_EDIT
+          - CAN_SHARE
+          - CAN_VIEW
+          - NONE
+          - FEDERATED
+    DataSourceShareEntity:
+      type: object
+      properties:
+        permissions:
+          type: array
+          items:
+            $ref: "#/components/schemas/DataSourcePermissionChangeEntity"
+        message:
+          type: string
+        sendEmail:
+          type: boolean
+  securitySchemes:
+    domo-developer-token:
+      type: apiKey
+      name: X-DOMO-Developer-Token
+      in: header

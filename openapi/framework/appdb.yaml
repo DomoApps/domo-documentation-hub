@@ -3051,7 +3051,7 @@ paths:
 
         When a collection is created inside an app's own datastore, the platform automatically grants the app instance `read`, `create_content`, `read_content`, `update_content`, and `delete_content`. Use this endpoint to grant additional permissions to any entity.
 
-        **This endpoint adds to existing permissions — it does not replace them.** To reduce or revoke an entity's access, first call [Delete Permissions](/api-reference/appdb-api/delete-permissions) to remove the current permission set, then re-grant only the permissions you want.
+        **By default, this endpoint adds to existing permissions — it does not replace them.** Pass `overwrite=true` to replace the entire permission set for that entity with the permissions you specify. To remove all permissions for an entity, use [Delete Permissions](/api-reference/appdb-api/delete-permissions).
 
         **Available permissions**
 
@@ -3092,29 +3092,53 @@ paths:
         - name: permissions
           in: query
           required: true
-          description: Comma-separated list of permissions
+          description: One or more permissions to apply. Pass as a comma-separated list.
+          style: form
+          explode: false
           schema:
-            type: string
+            type: array
+            items:
+              type: string
+              enum:
+                - admin
+                - write
+                - read
+                - share
+                - delete
+                - create_content
+                - update_content
+                - read_content
+                - delete_content
           example: "read,create_content,update_content,read_content"
+        - name: overwrite
+          in: query
+          required: false
+          description: |
+            Controls how the specified permissions are applied to the entity's existing permission set.
+
+            - `false` (default) — **additive**: merges the specified permissions with any permissions the entity already holds.
+            - `true` — **replace**: discards the entity's existing permissions and replaces them with exactly the permissions you specify.
+          schema:
+            type: boolean
+            default: false
       x-codeSamples:
         - lang: JavaScript
           label: domo.js
           source: |-
             const collectionName = 'YourCollection';
 
-            // Grant a user read/write access to the collection's documents
+            // Add permissions to a user's existing set (additive, default behavior)
             const userId = '540824222';
             domo.put(
               `/domo/datastores/v1/collections/${collectionName}/permission/USER/${userId}?permissions=read,create_content,read_content,update_content,delete_content`
             ).then(() => console.log('user permissions updated'));
 
-            // Grant the app instance read-only document access.
-            // To reduce permissions, call Delete Permissions first, then re-grant.
+            // Replace the app instance's permission set entirely (overwrite=true)
             // The instance UUID is the subdomain of the app's origin URL.
             const instanceId = window.location.hostname.split('.')[0];
             domo.put(
-              `/domo/datastores/v1/collections/${collectionName}/permission/RYUU_APP/${instanceId}?permissions=read,read_content`
-            ).then(() => console.log('app permissions updated'));
+              `/domo/datastores/v1/collections/${collectionName}/permission/RYUU_APP/${instanceId}?permissions=read,read_content&overwrite=true`
+            ).then(() => console.log('app permissions replaced'));
         - *stub_curl
         - *stub_python
         - *stub_php

@@ -1030,14 +1030,20 @@ paths:
           description: The ID of the datastore.
       requestBody:
         required: false
+        description: >-
+          Optional. A JSON array of collection UUIDs from other datastores to sync
+          alongside this datastore's own collections. Typically used for shared
+          collections declared with a fixed UUID in an app design's `collectionsMapping`.
+          Pass an empty array or omit the body entirely to sync only this datastore's
+          own collections.
         content:
           application/json:
             schema:
               type: array
               items:
                 type: string
-              description: Optional list of collection IDs from other datastores to sync alongside this datastore's own collections. Typically used for shared collections declared with a fixed UUID in an app design's `collectionsMapping`.
-            example: []
+                format: uuid
+            example: ["3f2504e0-4f89-11d3-9a0c-0305e82c3301"]
       responses:
         '200':
           description: Sync triggered successfully. No response body is returned.

@@ -2969,16 +2969,13 @@ paths:
       summary: Sync Collections
       description: |
         Manually trigger a sync of this card's collections to their linked Domo DataSets.
-        Only syncEnabled collections with pending changes are synced. By default, only
-        the collections in this card's own datastore are synced. Set
-        `includeRelatedCollections=true` to also sync any shared collections declared
-        in the app design's `collectionsMapping` with a fixed collection UUID — these are
-        collections that live outside this card's own datastore and are shared across
-        instances. Returns an empty body on success.
+        Only syncEnabled collections with pending changes are synced. Returns an empty body on success.
 
-        <Note>
-        **If `includeRelatedCollections=true` and the design has no shared collections configured, nothing is synced** — not even this card's own collections. Use `includeRelatedCollections=false` (the default) unless you know the design explicitly declares shared collections.
-        </Note>
+        By default, only the collections in this card's own datastore are synced. Set
+        `includeRelatedCollections=true` to also sync any additional collections listed
+        in the app design's `collectionsMapping` — this is useful for designs that declare
+        **shared collections** with a fixed UUID, which are the same collection reused
+        across all instances of the design.
 
         <Warning>
         **Collections won't sync if the collection owner lacks permissions on the target DataSet.** If that user is removed from Domo, syncing stops. The new owner must have both Collection ownership and Admin Permissions.
@@ -2989,12 +2986,11 @@ paths:
         - name: includeRelatedCollections
           in: query
           description: >-
-            When `true`, syncs this card's own datastore collections plus any shared
-            collections declared with a fixed UUID in the app design's `collectionsMapping`.
-            Shared collections live outside this card's datastore and are the same collection
-            across all instances of the design. If the design has no shared collections
-            configured, passing `true` skips the sync entirely.
-            When `false` (default), syncs only this card's own datastore collections.
+            When `false` (default), syncs only the collections in this card's own datastore.
+            When `true`, also syncs any additional collections listed in the app design's
+            `collectionsMapping` alongside this card's own collections. Primarily useful for
+            designs that declare shared collections with a fixed UUID — collections that are
+            the same across all instances of the design.
           schema:
             type: boolean
             default: false

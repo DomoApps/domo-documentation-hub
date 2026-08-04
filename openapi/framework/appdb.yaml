@@ -24,9 +24,19 @@ components:
     ErrorResponse:
       type: object
       properties:
-        message:
+        status:
+          type: integer
+          description: the HTTP error code
+        statusReason:
           type: string
           description: A human-readable error message
+        toe:
+          type: string
+          description: Thread of Execution; a unique identifier that Support can use to find more info about your problem
+      example:
+        status: 404
+        statusReason: "DA0088: Invalid collection name: Students"
+        toe: FTYRJMBLKD-5HB2Z-H6W8A        
 
     Document:
       type: object
@@ -1469,6 +1479,16 @@ paths:
                     - "Transfiguration"
                   enrolledOn: "1991-09-01"
                   lastDetention: "1994-06-08T20:00:00Z"
+        '404':
+          description: "Collection not found. Verify the collection name matches your manifest and that the collection has been created or correctly wired."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                status: 404
+                statusReason: "DA0088: Invalid collection name: Students"
+                toe: "FTYRJMBLKD-5HB2Z-H6W8A"
 
     get:
       summary: List Documents

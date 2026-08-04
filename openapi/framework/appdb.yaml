@@ -2418,6 +2418,17 @@ paths:
               schema:
                 type: integer
               example: 2
+        '400':
+          description: "Bad request. Maybe your JSON is malformed, or you've forgotten to include both `query` and `operation` in the body."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                message: "JSON parse error: Instantiation of [simple type, class com.domo.magnum.model.documents.DocumentUpdate] value failed for JSON property query due to missing (therefore NULL) value for creator parameter query which is a non-nullable type"
+                status: 400
+                statusReason: "Bad Request"
+                toe: "APS9BQQ3SQ-HJJ5D-9MRP6"
         '403':
           description: "Forbidden. The user does not have the UPDATE_CONTENT permission on this collection."
           content:
@@ -2531,6 +2542,15 @@ paths:
                 $ref: '#/components/schemas/BulkCreateResponse'
               example:
                 Created: 2
+        '403':
+          description: "Forbidden. The user does not have the CREATE_CONTENT permission on this collection."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                status: 403
+                toe: "OK7MYQR2W9-49AOV-77KCS"
 
     put:
       summary: Upsert Documents in Bulk
@@ -2687,17 +2707,38 @@ paths:
               example:
                 Updated: 2
                 Created: 1
-        '403':
-          description: "Forbidden. The user does not have the UPDATE_CONTENT permission on this collection."
+        '400':
+          description: "Bad request. One or more of the document IDs in the request do not exist in the collection."
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
               example:
-                message: "User does not have permission to update documents in this collection."
-                status: 403
-                statusReason: "Forbidden"
-                toe: "2Z8PMHEI9H-0OJ88-NV4Y1"
+                message: "The following document IDs do not exist: 18d29306-934f-4869-9c16-1843eaf9df42"
+                status: 400
+                statusReason: "Bad Request"
+                toe: "4LSUUFVGRL-4BDIB-2THSU"
+        '403':
+          description: "Forbidden. The user is missing a required permission — UPDATE_CONTENT when updating existing documents, or CREATE_CONTENT when inserting new ones."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                missingUpdatePermission:
+                  summary: Missing UPDATE_CONTENT permission
+                  value:
+                    message: "User does not have permission to update documents in this collection."
+                    status: 403
+                    statusReason: "Forbidden"
+                    toe: "2Z8PMHEI9H-0OJ88-NV4Y1"
+                missingCreatePermission:
+                  summary: Missing CREATE_CONTENT permission
+                  value:
+                    message: "User does not have permission to create documents in this collection."
+                    status: 403
+                    statusReason: "Forbidden"
+                    toe: "Y3CKVRLQVS-Z5JZT-PVA6W"
 
     delete:
       summary: Delete Documents in Bulk

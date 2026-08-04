@@ -3035,27 +3035,19 @@ paths:
       description: |
         Modify the permissions for a user, group, or app instance on a collection.
 
-        **Entity types**
+        ## Permission Inheritance
+        **Users and groups inherit** permissions from the app, so often the most convenient thing is to give the _app_ the permissions you want all people to have. Anyone who gets the app shared with them inherits its permissions on the collection and its documents. By **default**, apps are given the following permissions on their collections: `read`, `create_content`, `read_content`, `update_content`, and `delete_content`.
 
-        | `entity` path param | `entityId` value | Who this controls |
-        | ------------------- | ---------------- | ----------------- |
-        | `USER`              | Domo user ID | An individual user's access |
-        | `GROUP`             | Domo group ID | A Domo group's access |
-        | `RYUU_APP`          | App instance UUID | The running app's own server-side access |
+        You can set the app permissions with this API or using the **wiring screen** of an app card.
 
-        **USER vs RYUU_APP**
+        ## Direct Permissions
+        However, in situations where not everyone should be able to create, update or delete documents, you'll need a more nuanced permission model. You can give individual users and groups permissions using this API or [AppDB Admin](/s/article/9221297758615). 
+        
+        When you need control down to the document level, you can leverage [Document-level Security](/portal/API-Reference/app-framework-apis/AppDB-API#document-level-security).
 
-        `USER` and `GROUP` control what individual users and groups can do when they interact with the collection directly through the API or AppDB Admin.
+        <Info>**Adds by default.** This endpoint **adds to** existing permissions, unless you pass `overwrite=true`. Then it will **replace** the entire permission set for that entity with the permissions you specify. To remove all permissions for an entity, use [Delete Permissions](/api-reference/appdb-api/delete-permissions).</Info>
 
-        `RYUU_APP` controls access at the app level. Any user who has the app card shared with them inherits the app's permissions on the collection — they can do whatever the app is allowed to do, even if they have no direct `USER` or `GROUP` permission on the collection. If the app has no permissions, users fall back to their own direct permissions.
-
-        The `entityId` for `RYUU_APP` is the app instance UUID, which is the same as the datastore UUID and appears as the subdomain of the app's origin (e.g., `https://<instance-uuid>.domoapps.domo.com`).
-
-        When a collection is created inside an app's own datastore, the platform automatically grants the app instance `read`, `create_content`, `read_content`, `update_content`, and `delete_content`. Use this endpoint to grant additional permissions to any entity.
-
-        **By default, this endpoint adds to existing permissions — it does not replace them.** Pass `overwrite=true` to replace the entire permission set for that entity with the permissions you specify. To remove all permissions for an entity, use [Delete Permissions](/api-reference/appdb-api/delete-permissions).
-
-        **Available permissions**
+        ## Available Permissions
 
         | Permission       | Grants |
         | ---------------- | ------ |
@@ -3088,7 +3080,7 @@ paths:
         - name: entityId
           in: path
           required: true
-          description: ID of the user, group, or app instance
+          description: ID of the user, group, or app instance; for apps, the id is the same as the datastore UUID and also appears as the subdomain of the app's origin (e.g., `https://<instance-uuid>.domoapps.domo.com`).
           schema:
             type: string
         - name: permissions

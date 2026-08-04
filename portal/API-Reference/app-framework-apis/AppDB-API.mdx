@@ -86,7 +86,7 @@ Add an output container to `index.html`:
       integrity="sha384-YYsd9wQ+wDlUWhvpfGdptxmNYIqBC+52oJtWgPKJadbs3sSFTY/+ZotPbEHTTRWz"
       crossorigin="anonymous"
     ></script>
-    <script src="app.js"></script>
+    <script type="module" src="app.js"></script>
   </body>
 </html>
 ```
@@ -99,7 +99,7 @@ Add an output container to `index.html`:
   <body>
     <div id="output"></div>
     <script src="https://unpkg.com/ryuu.js/dist/domo.js"></script>
-    <script src="app.js"></script>
+    <script type="module" src="app.js"></script>
   </body>
 </html>
 ```
@@ -113,73 +113,31 @@ Documents in the same collection don't need the same shape. Electronics carry a 
 ```js domo.js
 const output = document.getElementById("output");
 
-domo
-  .post("/domo/datastores/v2/collections/Inventory/documents/bulk", [
-    {
-      content: {
-        name: "Laptop",
-        category: "electronics",
-        qty: 12,
-        tags: ["portable", "computing"],
-        warranty: "2 years",
-      },
-    },
-    {
-      content: {
-        name: "Mouse",
-        category: "electronics",
-        qty: 5,
-        tags: ["portable", "input"],
-        warranty: "1 year",
-      },
-    },
-    {
-      content: {
-        name: "Desk",
-        category: "furniture",
-        qty: 8,
-        tags: ["office"],
-        weight: "25kg",
-      },
-    },
-    {
-      content: {
-        name: "Chair",
-        category: "furniture",
-        qty: 3,
-        tags: ["office", "ergonomic"],
-        weight: "12kg",
-      },
-    },
-    {
-      content: {
-        name: "Notebook",
-        category: "stationery",
-        qty: 50,
-        tags: ["writing", "portable"],
-      },
-    },
-  ])
-  .then((result) => {
-    output.textContent = `Created ${result.Created} items.`;
-  });
+const result = await domo.post(
+  "/domo/datastores/v2/collections/Inventory/documents/bulk",
+  [
+    { content: { name: "Laptop", category: "electronics", qty: 12, tags: ["portable", "computing"], warranty: "2 years" } },
+    { content: { name: "Mouse", category: "electronics", qty: 5, tags: ["portable", "input"], warranty: "1 year" } },
+    { content: { name: "Desk", category: "furniture", qty: 8, tags: ["office"], weight: "25kg" } },
+    { content: { name: "Chair", category: "furniture", qty: 3, tags: ["office", "ergonomic"], weight: "12kg" } },
+    { content: { name: "Notebook", category: "stationery", qty: 50, tags: ["writing", "portable"] } },
+  ],
+);
+output.textContent = `Created ${result.Created} items.`;
 ```
 
 ```js domo.js v6
 const output = document.getElementById("output");
 
 // domo.appdb.bulkCreate automatically wraps each object in { content: ... }
-domo.appdb
-  .bulkCreate("Inventory", [
-    { name: "Laptop", category: "electronics", qty: 12, tags: ["portable", "computing"], warranty: "2 years" },
-    { name: "Mouse", category: "electronics", qty: 5, tags: ["portable", "input"], warranty: "1 year" },
-    { name: "Desk", category: "furniture", qty: 8, tags: ["office"], weight: "25kg" },
-    { name: "Chair", category: "furniture", qty: 3, tags: ["office", "ergonomic"], weight: "12kg" },
-    { name: "Notebook", category: "stationery", qty: 50, tags: ["writing", "portable"] },
-  ])
-  .then((result) => {
-    output.textContent = `Created ${result.Created} items.`;
-  });
+const result = await domo.appdb.bulkCreate("Inventory", [
+  { name: "Laptop", category: "electronics", qty: 12, tags: ["portable", "computing"], warranty: "2 years" },
+  { name: "Mouse", category: "electronics", qty: 5, tags: ["portable", "input"], warranty: "1 year" },
+  { name: "Desk", category: "furniture", qty: 8, tags: ["office"], weight: "25kg" },
+  { name: "Chair", category: "furniture", qty: 3, tags: ["office", "ergonomic"], weight: "12kg" },
+  { name: "Notebook", category: "stationery", qty: 50, tags: ["writing", "portable"] },
+]);
+output.textContent = `Created ${result.Created} items.`;
 ```
 </CodeGroup>
 
@@ -193,35 +151,22 @@ Save and verify the preview shows **Created 5 items.**
 ```js domo.js
 const output = document.getElementById("output");
 
-domo
-  .post("/domo/datastores/v2/collections/Inventory/documents/query", {
-    "content.qty": { $lt: 10 },
-  })
-  .then((docs) => {
-    output.innerHTML =
-      "<p>Low stock (under 10):</p>" +
-      docs
-        .map(
-          (doc) => `<p>${doc.content.name} — ${doc.content.qty} remaining</p>`,
-        )
-        .join("");
-  });
+const docs = await domo.post(
+  "/domo/datastores/v2/collections/Inventory/documents/query",
+  { "content.qty": { $lt: 10 } },
+);
+output.innerHTML =
+  "<p>Low stock (under 10):</p>" +
+  docs.map((doc) => `<p>${doc.content.name} — ${doc.content.qty} remaining</p>`).join("");
 ```
 
 ```js domo.js v6
 const output = document.getElementById("output");
 
-domo.appdb
-  .query("Inventory", { "content.qty": { $lt: 10 } })
-  .then((docs) => {
-    output.innerHTML =
-      "<p>Low stock (under 10):</p>" +
-      docs
-        .map(
-          (doc) => `<p>${doc.content.name} — ${doc.content.qty} remaining</p>`,
-        )
-        .join("");
-  });
+const docs = await domo.appdb.query("Inventory", { "content.qty": { $lt: 10 } });
+output.innerHTML =
+  "<p>Low stock (under 10):</p>" +
+  docs.map((doc) => `<p>${doc.content.name} — ${doc.content.qty} remaining</p>`).join("");
 ```
 </CodeGroup>
 
@@ -235,48 +180,33 @@ Save. The preview lists Desk (8), Chair (3), Mouse (5). See [Query Documents](/a
 ```js domo.js
 const output = document.getElementById("output");
 
-domo
-  .put("/domo/datastores/v2/collections/Inventory/documents/update", {
-    query: { "content.name": "Mouse" },
-    operation: { $inc: { "content.qty": 20 } },
-  })
-  .then(() =>
-    domo.post("/domo/datastores/v2/collections/Inventory/documents/query", {
-      "content.qty": { $lt: 10 },
-    }),
-  )
-  .then((docs) => {
-    output.innerHTML =
-      "<p>Low stock after restock:</p>" +
-      docs
-        .map(
-          (doc) => `<p>${doc.content.name} — ${doc.content.qty} remaining</p>`,
-        )
-        .join("");
-  });
+await domo.put("/domo/datastores/v2/collections/Inventory/documents/update", {
+  query: { "content.name": "Mouse" },
+  operation: { $inc: { "content.qty": 20 } },
+});
+
+const docs = await domo.post(
+  "/domo/datastores/v2/collections/Inventory/documents/query",
+  { "content.qty": { $lt: 10 } },
+);
+output.innerHTML =
+  "<p>Low stock after restock:</p>" +
+  docs.map((doc) => `<p>${doc.content.name} — ${doc.content.qty} remaining</p>`).join("");
 ```
 
 ```js domo.js v6
 const output = document.getElementById("output");
 
-domo.appdb
-  .partialUpdate(
-    "Inventory",
-    { "content.name": "Mouse" },
-    { $inc: { "content.qty": 20 } },
-  )
-  .then(() =>
-    domo.appdb.query("Inventory", { "content.qty": { $lt: 10 } }),
-  )
-  .then((docs) => {
-    output.innerHTML =
-      "<p>Low stock after restock:</p>" +
-      docs
-        .map(
-          (doc) => `<p>${doc.content.name} — ${doc.content.qty} remaining</p>`,
-        )
-        .join("");
-  });
+await domo.appdb.partialUpdate(
+  "Inventory",
+  { "content.name": "Mouse" },
+  { $inc: { "content.qty": 20 } },
+);
+
+const docs = await domo.appdb.query("Inventory", { "content.qty": { $lt: 10 } });
+output.innerHTML =
+  "<p>Low stock after restock:</p>" +
+  docs.map((doc) => `<p>${doc.content.name} — ${doc.content.qty} remaining</p>`).join("");
 ```
 </CodeGroup>
 
@@ -290,36 +220,30 @@ Aggregation runs server-side on live data — no DataSet refresh needed. Replace
 ```js domo.js
 const output = document.getElementById("output");
 
-domo
-  .post(
-    "/domo/datastores/v2/collections/Inventory/documents/query?groupby=content.category&sum=content.qty totalQty&orderby=totalQty descending",
-    {},
-  )
-  .then((groups) => {
-    output.innerHTML =
-      "<p>Total inventory by category:</p>" +
-      groups.map((g) => `<p>${g._id}: ${g.totalQty} units</p>`).join("");
-  });
+const groups = await domo.post(
+  "/domo/datastores/v2/collections/Inventory/documents/query?groupby=content.category&sum=content.qty totalQty&orderby=totalQty descending",
+  {},
+);
+output.innerHTML =
+  "<p>Total inventory by category:</p>" +
+  groups.map((g) => `<p>${g._id}: ${g.totalQty} units</p>`).join("");
 ```
 
 ```js domo.js v6
 const output = document.getElementById("output");
 
-domo.appdb
-  .query(
-    "Inventory",
-    {},
-    {
-      groupby: "content.category",
-      sum: "content.qty totalQty",
-      orderby: "totalQty descending",
-    },
-  )
-  .then((groups) => {
-    output.innerHTML =
-      "<p>Total inventory by category:</p>" +
-      groups.map((g) => `<p>${g._id}: ${g.totalQty} units</p>`).join("");
-  });
+const groups = await domo.appdb.query(
+  "Inventory",
+  {},
+  {
+    groupby: "content.category",
+    sum: "content.qty totalQty",
+    orderby: "totalQty descending",
+  },
+);
+output.innerHTML =
+  "<p>Total inventory by category:</p>" +
+  groups.map((g) => `<p>${g._id}: ${g.totalQty} units</p>`).join("");
 ```
 </CodeGroup>
 

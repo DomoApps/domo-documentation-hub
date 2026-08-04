@@ -998,9 +998,9 @@ paths:
 
   /api/datastores/v1/export/{datastoreId}:
     post:
-      summary: Export Datastore (v1, Deprecated)
+      summary: Sync Datastore (v1, Deprecated)
       deprecated: true
-      description: "**Deprecated.** Use the [v2 Export Datastore](#operation/exportDatastoreV2) endpoint instead. Triggers an async sync of all collections in the datastore to their linked Domo DataSets. Each collection must have `syncEnabled: true` to be exported. If a collection does not yet have a `datasourceId`, one is created automatically on first export."
+      description: "**Deprecated.** Use the [v2 Sync Datastore](#operation/exportDatastoreV2) endpoint instead. Triggers an async sync of all collections in the datastore to their linked Domo DataSets. Each collection must have `syncEnabled: true` to be synced. If a collection does not yet have a `datasourceId`, one is created automatically on first sync."
       tags:
         - App DB API (Product)
       parameters:
@@ -1012,13 +1012,13 @@ paths:
           description: The ID of the datastore.
       responses:
         '200':
-          description: Export triggered successfully. No response body is returned.
+          description: Sync triggered successfully. No response body is returned.
 
   /api/datastores/v2/export/{datastoreId}:
     post:
       operationId: exportDatastoreV2
-      summary: Export Datastore
-      description: "Triggers an async sync of all syncEnabled collections in the datastore to their linked Domo DataSets. Optionally pass a list of collection IDs from **other** datastores in the request body to include those collections in the same export operation. Each collection must have `syncEnabled: true` to be exported. If a collection does not yet have a `datasourceId`, one is created automatically on first export."
+      summary: Sync Datastore
+      description: "Triggers a sync of all syncEnabled collections in the datastore to their linked Domo DataSets. Optionally pass a list of collection IDs from **other** datastores in the request body to include those collections in the same sync operation. Each collection must have `syncEnabled: true` to be synced. If a collection does not yet have a `datasourceId`, one is created automatically on first sync."
       tags:
         - App DB API (Product)
       parameters:
@@ -1036,11 +1036,11 @@ paths:
               type: array
               items:
                 type: string
-              description: Optional list of collection IDs from other datastores to include in this export operation.
+              description: Optional list of collection IDs from other datastores to include in this sync operation.
             example: []
       responses:
         '200':
-          description: Export triggered successfully. No response body is returned.
+          description: Sync triggered successfully. No response body is returned.
 
   #========= Document Endpoints (v1, Deprecated) =========
   /api/datastores/v1/collections/{collectionId}/documents:

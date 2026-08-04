@@ -2966,13 +2966,13 @@ paths:
 
   /domo/datastores/v1/export:
     post:
-      summary: Manually Export Collections
+      summary: Sync Collections
       description: |
-        Manually trigger an asynchronous export (sync) of this card's collections to
+        Manually trigger a sync of this card's collections to
         their linked Domo DataSets. Only collections that have a linked DataSet and
         pending changes are synced. By default, only the collections in this card's own
-        datastore are exported. Set `includeRelatedCollections=true` to additionally
-        export the related collections this card instance is mapped to through the app's
+        datastore are synced. Set `includeRelatedCollections=true` to additionally
+        sync the related collections this card instance is mapped to through the app's
         design manifest (its `collectionsMapping`), such as collections shared from
         another instance. Returns an empty body on success.
 
@@ -2985,9 +2985,9 @@ paths:
         - name: includeRelatedCollections
           in: query
           description: >-
-            When `true`, exports this card's own datastore collections **plus** the related
+            When `true`, syncs this card's own datastore collections **plus** the related
             collections the card instance is mapped to through the app design. When `false`
-            (default), exports only the card's own datastore collections.
+            (default), syncs only the card's own datastore collections.
           schema:
             type: boolean
             default: false
@@ -3002,21 +3002,21 @@ paths:
         - lang: JavaScript
           label: domo.js
           source: |-
-            // Export this card's own collections
+            // Sync this card's own collections
             domo.post('/domo/datastores/v1/export')
-              .then(() => console.log('export started'));
+              .then(() => console.log('sync started'));
 
-            // Also export related collections (collectionsMapping)
+            // Also sync related collections (collectionsMapping)
             domo.post('/domo/datastores/v1/export?includeRelatedCollections=true')
-              .then(() => console.log('export started'));
+              .then(() => console.log('sync started'));
         - lang: JavaScript
           label: domo.js v6
           source: |-
             // domo.js v6
 
-            // Export this card's own collections
+            // Sync this card's own collections
             await domo.appdb.export();
-            console.log('export started');
+            console.log('sync started');
         - *stub_curl
         - *stub_python
         - *stub_php
@@ -3025,9 +3025,9 @@ paths:
         - *stub_ruby
       responses:
         '200':
-          description: Export accepted and running asynchronously. No response body is returned.
+          description: Sync accepted and running asynchronously. No response body is returned.
         '423':
-          description: Export already in progress (LOCKED). Retry once the current export completes.
+          description: Sync already in progress (LOCKED). Retry once the current sync completes.
 
   /domo/datastores/v1/collections/{collectionName}/permission/{entity}/{entityId}:
     put:

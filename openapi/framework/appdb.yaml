@@ -2966,7 +2966,25 @@ paths:
                 updatedOn: "2026-08-01T00:10:52.952Z"
                 updatedBy: 540824222
         '400':
-          description: "`syncEnabled: true` was passed without a `schema`."
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                missingName:
+                  summary: Required field `name` was not provided
+                  value:
+                    message: "JSON parse error: Instantiation of [simple type, class com.domo.magnum.model.collections.CollectionDefinition] value failed for JSON property name due to missing (therefore NULL) value for creator parameter name which is a non-nullable type"
+                    status: 400
+                    statusReason: "Bad Request"
+                    toe: "PTBS40L6BM-Y7P0M-4GA90"
+                syncEnabledWithoutSchema:
+                  summary: "`syncEnabled: true` was passed without a `schema`"
+                  value:
+                    status: 400
+                    statusReason: "status 400 reading CollectionsResourceClient#createCollection(UUID,String,CollectionDefinition); content:\n{\"message\":\"cannot enable sync when there is no schema template provided\",\"status\":400,\"statusReason\":\"Bad Request\",\"toe\":\"YI08S6SGHH-C1N9Z-XBPRW\"}"
+                    toe: "YI08S6SGHH-C1N9Z-XBPRW"
 
     get:
       summary: List Collections

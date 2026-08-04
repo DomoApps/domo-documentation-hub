@@ -24,19 +24,22 @@ components:
     ErrorResponse:
       type: object
       properties:
+        message:
+          type: string
+          description: A plain-English explanation of the error. Present on some errors but not all.
         status:
           type: integer
-          description: the HTTP error code
+          description: The HTTP error code
         statusReason:
           type: string
-          description: A human-readable error message
+          description: A human-readable error message, sometimes including nested error detail
         toe:
           type: string
           description: Thread of Execution; a unique identifier that Support can use to find more info about your problem
       example:
         status: 404
         statusReason: "DA0088: Invalid collection name: Students"
-        toe: FTYRJMBLKD-5HB2Z-H6W8A        
+        toe: FTYRJMBLKD-5HB2Z-H6W8A
 
     Document:
       type: object
@@ -1685,8 +1688,26 @@ paths:
                     - "Transfiguration"
                   enrolledOn: "1991-09-01"
                   lastDetention: "1994-06-08T20:00:00Z"
+        '403':
+          description: "Forbidden. The user does not have the READ_CONTENT permission on this collection."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                status: 403
+                statusReason: "status 403 reading DocumentsResourceClient#getDocument(UUID,UUID)"
+                toe: "PLA2ZUY5Z6-PHF58-7JGU6"
         '404':
-          description: Document not found
+          description: "Document not found. Verify the document ID is correct."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                status: 404
+                statusReason: "status 404 reading DocumentsResourceClient#getDocument(UUID,UUID); content:{\"message\":\"Document with id '0599350c-6fdc-41fc-a2ff-c56b78b1a0cf' not found\",\"status\":404,\"statusReason\":\"Not Found\"}"
+                toe: "HVJA1FVUF6-BCB2D-SYWOO"
 
     put:
       summary: Update Document
@@ -1797,6 +1818,26 @@ paths:
                   prefect: false
                   enrolledOn: "1991-09-01"
                   lastDetention: "1994-06-08T20:00:00Z"
+        '403':
+          description: "Forbidden. The user does not have the UPDATE_CONTENT permission on this collection."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                status: 403
+                statusReason: "status 403 reading DocumentsResourceClient#updateDocument(UUID,UUID,DocumentDefinition)"
+                toe: "BU22GXWMDI-ILY50-5YX28"
+        '404':
+          description: "Document not found. Verify the document ID is correct."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                status: 404
+                statusReason: "status 404 reading DocumentsResourceClient#getDocument(UUID,UUID); content:{\"message\":\"Document with id '0599350c-6fdc-41fc-a2ff-c56b78b1a0cf' not found\",\"status\":404,\"statusReason\":\"Not Found\"}"
+                toe: "HVJA1FVUF6-BCB2D-SYWOO"
 
     delete:
       summary: Delete Document
@@ -1843,7 +1884,15 @@ paths:
         '200':
           description: Document deleted successfully. No response body is returned.
         '404':
-          description: Document not found
+          description: "Document not found. The ID may be incorrect or the document may have already been deleted."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                status: 404
+                statusReason: "status 404 reading DocumentsResourceClient#deleteDocument(UUID,UUID); content:{\"message\":\"Document could not be found: 0599350c-5fdc-41fc-a2ff-c56b78b1a0cf\",\"status\":404,\"statusReason\":\"Not Found\"}"
+                toe: "R2VYD2M7Y0-0592G-L00S1"
 
   /domo/datastores/v2/collections/{collectionName}/documents/query:
     post:
@@ -2340,6 +2389,16 @@ paths:
               schema:
                 type: integer
               example: 2
+        '403':
+          description: "Forbidden. The user does not have the UPDATE_CONTENT permission on this collection."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                status: 403
+                statusReason: "status 403 reading DocumentsResourceClient#updateDocument(UUID,UUID,DocumentDefinition)"
+                toe: "BU22GXWMDI-ILY50-5YX28"
 
   /domo/datastores/v2/collections/{collectionName}/documents/bulk:
     post:
@@ -2599,6 +2658,17 @@ paths:
               example:
                 Updated: 2
                 Created: 1
+        '403':
+          description: "Forbidden. The user does not have the UPDATE_CONTENT permission on this collection."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                message: "User does not have permission to update documents in this collection."
+                status: 403
+                statusReason: "Forbidden"
+                toe: "2Z8PMHEI9H-0OJ88-NV4Y1"
 
     delete:
       summary: Delete Documents in Bulk

@@ -37,7 +37,9 @@ All navigation is defined in **`docs.json`** (large file, \~307KB). The schema i
 
 ## MDX Content Conventions
 
-All articles use YAML frontmatter with at minimum a `title` field.
+All articles require two YAML frontmatter fields: `title` and `excerpt` (a single sentence summarizing what the article covers, placed directly below `title`). Never use `description` in place of `excerpt`, because Mintlify renders `description` on the published page, which duplicates the Intro section, while `excerpt` stays invisible and serves as repo-level metadata for search and AI context. See `Domo-KB-Style-Guide.mdx` › **Excerpt**.
+
+Images and video clips must be committed to `images/kb/` on the same branch before an article references them.
 
 Key Mintlify components in use:
 
@@ -69,6 +71,77 @@ Domo releases monthly. Branches are named by the date the branch is cut. From br
 - Feature release (feature switches enabled, customers see new features) is \~1 week after code ships
 
 Internally, releases are always identified by the **branch cut date** (the branch name). Customers and client-facing teams only care about when features appear in their environments, so they talk in terms of the feature release date — PMs translate between the two. For tracking feature availability and mapping KB articles to releases, always use the **branch cut date** as the canonical identifier.
+
+This is the **product** release cadence. The KB publishes on its own weekly schedule (see **KB Publishing Cadence** below). The two only intersect for GA-tied documentation.
+
+## Contribution Workflow
+
+The authoritative source is the [KB Contribution App](https://domo.domo.com/app-studio/649552668/pages/1393071293) (access via Jared Peterson, the Knowledge Base Administrator). Agents can't reach it, so the conventions that affect repo work are recorded here.
+
+### Branch Naming
+
+Standard content work, such as a new article, an edit, or an image swap:
+
+```
+first.last/short-description
+```
+
+Example: `jared.peterson/pricing-update`
+
+Work tied to a **GA release** with a specific feature switch date:
+
+```
+first.last/article-title-ga-MM-DD-YYYY
+```
+
+Example: `jared.peterson/XTM-Connector-ga-05-20-2026`
+
+Use a zero-padded numeric `MM-DD-YYYY` date. The date is the **feature switch date** (when customers see the feature), not the product branch cut date.
+
+Never derive the feature switch date from the branch cut date. Ask the user, the PM, or the release checklist for it. The product cadence gives a rough interval, not a date you can compute reliably.
+
+### GA Release Workflow
+
+GA-tied documentation must go live in sync with the feature, never before. It does not go to `main` on the normal schedule:
+
+- A dedicated GA branch exists for each release date, using a **spelled-out month**: `release-ga/may-20-2026`, `release-ga/sept-23-2026`
+- GA PRs base onto that `release-ga/*` branch, not `main`
+- They are reviewed and approved normally, then held; the KB Administrator merges the GA branch into `main` on the feature switch date, outside the normal release schedule
+- This mirrors how release-notes branches work: changes queue in the GA branch, get validated together, and ship as one merge
+
+Before opening a GA PR, confirm the target branch exists:
+
+```bash
+git branch -r | grep release-ga
+```
+
+If the branch for that date doesn't exist yet, say so, since the KB Administrator creates it. Don't fall back to basing on `main`.
+
+Signal GA intent in **both** the branch name and the PR description so the PR gets routed to the right base branch.
+
+### Pull Requests
+
+- Base: `main`, or the appropriate `release-ga/*` branch for GA work
+- One topic per PR. Never mix unrelated updates; smaller PRs are approved faster
+- Clear title and description
+- Assign to the Knowledge Base Administrator (Jared Peterson) for review
+- If changes are requested, commit to the same branch, and the PR updates automatically
+
+Commit messages: present tense, short, describing the change and not the tool. `Add XTM-Connector article`, `Update pricing section`, `Clarify setup steps`.
+
+### KB Publishing Cadence
+
+Merging to `main` does not publish immediately. Content is held for the next scheduled release:
+
+| When | What happens |
+| -------------------- | ----------------------------------------------------------------------------- |
+| Thursday | Deadline to submit a PR for the following Monday's release |
+| Friday, early PM | The release is cut |
+| Monday morning | Enablement switches the release branch via an EC ticket, then Mintlify rebuilds and content goes live |
+
+Mid-week releases are possible for urgent fixes or specific customer asks, but the user must request one from the Knowledge Base Administrator.
+
+When telling a user their change is done, be accurate about this: merged is not live. If a deadline is relevant (e.g. it's Friday and they expect Monday publication), say so.
 
 ## Finding Existing Articles
 
@@ -154,7 +227,7 @@ This activates a `post-merge` hook that warns you when a `git pull` leaves track
 |add-to-nav|Adding a page to docs.json navigation or moving an existing page to a different location in docs.json|
 |update-kb-article|Any update to an existing KB article: renames, content edits, image swaps, content removal, file path updates, cross-file changes, step/process edits, navigation moves, merges, or splits|
 |mintlify-design|Mintlify component/page-design expert: choosing components, composing custom layouts, building rich pages, "is there a component for X" questions, or authoring reusable snippets in `/snippets/`|
-|fix-ja-formatting|Fixing structural formatting issues in queued Japanese articles: inline image placement, block vs. inline `<img>` mismatches, callout wrapping, and redundant blank lines|
+|fix-ja-formatting|Fix MDX syntax and structural formatting issues in Japanese articles WITHOUT touching translation: bold-label rendering (space after `**` when preceded by fullwidth punctuation or em-dash), HTML-escaped component tags, callouts containing list items, broken links, broken bold spans, English translation artifacts, and inline icon replacement. Run after any JA article edit to catch MDX mis-formatting before merge.|
 |update-pm-ownership|Regenerate `Article-PM-Ownership-Reference.mdx` after the squad CSV or article list changes|
 |csv-to-mdx|Review and audit an MDX article produced by the Salesforce-to-Domo programmatic conversion pipeline (`scripts/html_to_mdx.py`)|
 |migrate-html|Migrate a single HTML article to a repo-ready MDX file: convert with pandoc, apply Domo style rules, save to `s/article/`, and register in `docs.json`|
@@ -162,3 +235,4 @@ This activates a `post-merge` hook that warns you when a `git pull` leaves track
 |release-notes|Generate user-friendly internal release notes by diffing the latest git tag against the previous tag|
 |mintlify-preview-workflow|Working on `.github/workflows/mint-preview.yml` — the Mintlify preview deployment GitHub Action|
 |openapi-sync-workflow|Working on the OpenAPI sync GitHub Action (`sync-api-docs.yml`) — YAML detection, sync scripts, or `docs.json` nav-generation integration|
+|connector-review|Manage the connector PR/Jira review lifecycle: run the dashboard, post follow-ups on stale tickets, merge approved PRs, post release-date comments, close Jira tickets, and handle publish/migration requests from Arun|

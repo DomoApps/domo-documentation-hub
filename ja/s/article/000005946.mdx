@@ -1,0 +1,552 @@
+---
+title: "DataSetのフィールド"
+excerpt: "アクティビティログ、AIチャットセッション、その他のガバナンストラッキングソースを含む、DomoStatsレポートDataSetの各フィールドのリファレンス。"
+---
+
+このセクションでは、DomoStatsレポートDataSetの各フィールドについて説明します。
+
+## Activity Log DataSet
+
+| **フィールド** | **説明** |
+| --- | --- |
+| Object\_Name | アクションが実行されたオブジェクトの名前です。 |
+| User\_ID | アクションを実行したユーザーなどのIDです。 |
+| Source\_ID | タイプのIDです。簡単な例として、ユーザーがカードをページに追加したとします。イベントでは次の2つのアクションが発生し、両方ともDataSetで返されます。  - 「ユーザーがページを更新」。この場合、次のようにDataSetに返されます。  - UserId: user\_id   - Type: USER   - Source\_Id: userId   - action: updated   - object\_type: page   - object\_id: page\_id - 「カードをページに追加」。この場合、次のようにDataSetに返されます。  - UserId: user\_id   - Type: CARD   - Source\_Id: card\_id   - action: added\_to   - object\_type: page   - object\_id: page\_id |
+| Name | アクションを実行したオブジェクトの名前です。 |
+| Action | 発生したイベントです。次のアクションがここに記録されます。  |  |  | | --- | --- | | LOGGEDIN | パスワードを使用して、ログインページから正常にログインした場合に記録されます。モバイルログインは、Appからログアウトして、またAppにログインした時に記録されます。Appを開いたり閉じたりしても、ログインにはカウントされません。 | | LOGGEDIN\_SSO | SSOを使用して、ログインページから正常にログインした場合に記録されます。 | | LOGGEDIN\_TWO\_FACTOR | 2要素認証コードを使用して、正常にログインした場合に記録されます。 | | PAGE VIEW | ページが表示されるたびにカウントされます。 | | CARD VIEW | ユーザーがカードの詳細ビューをクリックした場合のみカウントされます。 | |
+| Object\_Type | オブジェクトが何かを特定します。 |
+| Object\_ID | オブジェクトのIDです。 |
+| Type | アクションを実行したユーザーなどのタイプです。 |
+| Event\_Time | イベントが発生した時刻です。監査エンドポイントは、協定世界時（UTC）で時刻を記録するか、返しますが、コネクターがユーザーのタイムゾーンに変換します。 |
+| Authentication\_Method | この列は履歴レコードのデータを含む場合がありますが、新しくログに記録されたアクティビティについてはNULL値です。 |
+| IP\_Address | — |
+| Device | — |
+| Browser\_Details | — |
+| \_BATCH\_ID\_ | — |
+| \_BATCH\_LAST\_RUN\_ | — |
+
+#### 
+
+## AI Chat Sessions DataSet
+
+| フィールド | 説明 |
+| --- | --- |
+| Session Id | チャットセッションの固有の識別子です。 |
+| Request Id | 特定のユーザーリクエストの固有の識別子です。 |
+| User Id | ユーザーがリクエストを実行するための固有の識別子です。 |
+| DataSource Ids | リクエストに関連するデータソースの識別子（存在する場合）です。 |
+| Ignorable DataSource Ids | 「`Focus`」にあるが、使用されていないデータソースの識別子です。 |
+| Card Ids | 応答の作成に使用されるUIコンポーネントの識別子です。 |
+| Page Ids | リクエストに関連するページ識別子です。 |
+| Filters | セッション中に適用されたフィルターです。 |
+| TOE | 実行の識別子です。Domoがトラブルシューティングに使用します。 |
+| Request | ユーザーのクエリのテキストです。 |
+| Request Timestamp | リクエストが行われた時点のタイムスタンプです。 |
+| Response | ユーザーリクエストに対するチャットの応答です。 |
+| Response Timestamp | 応答が生成された時点のタイムスタンプです。 |
+| Duration | 応答の生成にかかった時間（ミリ秒単位）です。 |
+| Error Message | エラーの説明です。 |
+| Error Code | エラーの分類です。 |
+| Response Status | 結果を表す数値コードです。 例： `200` |
+| Models | 応答の生成に使用されるモデルです。 |
+| BATCH\_ID | バッチ処理ID（内部トラッキングに使用）です。 |
+| BATCH\_LAST\_RUN | 最後に実行されたバッチ処理のタイムスタンプです。 |
+
+#### 
+
+## AI Model Endpoints DataSet
+
+| フィールド | 説明 |
+| --- | --- |
+| Model Id | モデルの数値識別子です。 |
+| Event Type | エンドポイントが実行される場所、またはモデルのソースがトリガーされる場所です。 値の例：  - AutoML - Jupyter |
+| Date | モデルが最後に更新された日付です。 |
+| Tier | モデルが使用する使用ティアです。 値の例：  - Tier 3 - Tier 4 |
+| Status | モデルの現在のステータスです。 値の例：  - Stopped - Created - Failed |
+| Failure Reason | モデルが失敗の状態の場合、モデルの失敗のステータスです。 値の例：  - Timed out initializing. - Request to service failed. |
+| User ID | モデル所有者のユーザーIDです。 |
+
+#### 
+
+## AI Models DataSet
+
+| フィールド | 説明 |
+| --- | --- |
+| Model Name | モデル名です。 |
+| Description | モデルの説明です。 |
+| Projects | モデルが追加されているプロジェクトの数です。 |
+| Created | モデルが作成された日付です。 |
+| Owner | モデル所有者のユーザーIDです。 |
+| Model ID | モデルの数値識別子です。 |
+| Provider | モデルプロバイダーです。 値の例：  - Open AI - Amazon Sagemaker |
+| Project IDs | モデルが追加されているプロジェクトのIDです。 |
+
+#### 
+
+## AI Projects DataSet
+
+| フィールド | 説明 |
+| --- | --- |
+| Project Id | プロジェクトの数値識別子です。 |
+| Project Name | プロジェクトの名前です。 |
+| Description | プロジェクトの説明です。 |
+| Created | プロジェクトが作成された日付です。 |
+| Updated | プロジェクトが最後に更新された日付です。 |
+| Owner | プロジェクト所有者のユーザーIDです。 |
+| Number of Models | プロジェクトが追加されているモデルの数です。 |
+
+## AI Readiness
+
+| フィールド | 説明 |
+| --- | --- |
+| Dataset Id | DataSetの一意の識別子。文字列で表されます。 |
+| Has Dictionary | ディクショナリがDataSetに関連付けられているかどうかを示します。 オプション：`Yes`または`No` |
+| Dictionary Id | DataSetに関連付けられているディクショナリの一意の識別子です。 |
+| Dictionary Name | DataSetに関連付けられているディクショナリの名前です。 |
+| Dataset Context | DataSetのコンテキストまたは目的です。 例：`business domain`、`usage scenario` |
+| Context Length | DataSetに関連付けられているコンテキストアイテムの数またはコンテキストデータの長さです。 |
+| Synonym Count | DataSetまたはそのディクショナリ内の用語に定義されている類義語の数です。 |
+| Beast Modes Enabled | DataSetで有効なカスタム計算フィールド（または「Beast Mode」）の数です。 |
+| Total Columns | DataSetに存在する列の合計数です。 |
+| Percentage Columns Enabled | 有効またはアクティブな列の割合。整数（0～100）で表されます。 |
+| Columns AI Enabled | AI関連機能が有効なDataSet列の数です。 |
+| Columns Not AI Enabled | AI機能が有効化されていないDataSet列の数です。 |
+
+## AI Readiness Details
+
+| フィールド | 説明 |
+| --- | --- |
+| Dictionary Id | 列メタデータが属するディクショナリの一意の識別子（文字列）です。 |
+| Column Name | ディクショナリエントリが関連付けられているDataSet内の列の名前です。 |
+| Context | 列の意味または使用コンテキストを示す説明または分類です。 |
+| Synonyms | 列を参照するために使用できる代替名または用語です。これは文字列として格納されます。 |
+| AI Enabled | この列でAI機能が有効になっているかどうかを示すブール値（trueまたはfalse）です。 |
+
+## AI Services DataSet
+
+| フィールド | 説明 |
+| --- | --- |
+| Provider | モデルサービスプロバイダーです。 値の例：  - Open AI - Amazon Sagemaker |
+| Service | モデルで使用されるAIサービスです。 値の例：  - Text to SQL - Text Generation |
+| Model Name | モデル名です。 |
+| Model Id | モデルの数値識別子です。 |
+| Description | モデルの説明です。 |
+| Default | このフィールドは、関連サービスでモデルがデフォルトで使用されているかどうかを表示します。 |
+| Domo Provided | このフィールドには、モデルがDomoと外部のどちらから提供されたものであるかが表示されます。 |
+
+#### 
+
+## App Studio App Pages DataSet
+
+| フィールド | 説明 |
+| --- | --- |
+| App ID | Appの数値識別子です。 |
+| App Page ID | App Studio Appのページの識別子です。 |
+| App Page Title | App Studio Appのページのタイトルまたは名前です。 |
+| Number of views | App Studio Appのページの閲覧数です。 |
+
+## App Studio Apps DataSet
+
+| フィールド | 説明 |
+| --- | --- |
+| App ID | Appの数値識別子です。 |
+| App Title | インスタンス内のAppのタイトルまたは名前です。 |
+| Owner ID | Appの所有者の数値識別子です。 |
+| Owner Type | Appの所有者のタイプです。  含まれるオプション：`USER`、`GROUP` |
+| Created | Appが作成された日時です。 |
+| Locked | Appがロックされているかどうかを示します。  `BOOLEAN` |
+| \_BATCH\_ID\_ | バッチの識別子です。 |
+| \_BATCH\_LAST\_RUN\_ | バッチが最後に実行された日時です。 |
+
+#### 
+
+## Beast Mode Datasource
+
+| フィールド | 説明 |
+| --- | --- |
+| BeastModeID | 計算フィールドの数値識別子です。 タイプ：整数 |
+| DatasourceID | DataSetの英数字識別子です。 |
+| Status | DataFlowのステータスです。含まれるオプション：  - **Valid —** データソースリンクが有効です。- **ILLEGAL\_REFERENCE —** 計算フィールドで無効な列が参照されています。- **ILLEGAL\_ FUNCTION —** 計算フィールドで無効なSQL関数が使用されています。- **ILLEGAL\_DEPTH —** 計算ファイルのネストが深すぎます（複数レベルの深さ）。- **INVALID\_LINK —** データソースに問題があることを示します。- **UNKNOWN —** データソースリンクの検証が意味をなさないという意味で、計算フィールドが保存時に構文的に無効でした。 |
+
+#### 
+
+## Beast Modes DataSet
+
+| フィールド | 説明 |
+| --- | --- |
+| ID | 計算の数値識別子です。 |
+| Name | 計算の名前です。 |
+| LinkedID | 計算の保存先となるカードまたはDataSetの識別子です。 |
+| LinkedType | 計算の保存先となる場所タイプのタイプです。  `DATA_SOURCE`、`CARD` |
+| LinkedName | 計算の保存先となるカードまたはDataSetの名前です。 |
+| ArchivedStatus | 計算のステータスです。  `Active`、`Archived` |
+| Validity | 計算の有効/無効ステータスです。  `Valid`、`Invalid` |
+
+#### 
+
+## Card Loads DataSet
+
+| フィールド | 説明 |
+| --- | --- |
+| cardId | カードの数値識別子です。 |
+| context | カードが読み込まれる場所です。 例： `page` |
+| date | カードが読み込まれた日付です。 例： `March 22, 2024` |
+| errorCode | カードの読み込みに関するステータスメッセージです。 含まれるオプション：`Success`、`Misconfigured card`、`Query timeout`、`Other` |
+| platform | カードが読み込まれるプラットフォームです。 含まれるオプション：`Web`および`Mobile` |
+| totalCount | この日付に行ったカードの読み込みで、これらの同じ詳細を持つものの数です。 |
+| totalDuration | この日付に行った結合されたカードの読み込みの合計時間です。 |
+| \_BATCH\_ID\_ | 浮動小数としてのバッチの数値識別子です。 例： `363.00` |
+| \_BATCH\_LAST\_RUN\_ | バッチが最後に実行された日時です。 |
+
+## Card Permissions DataSet
+
+| **フィールド** | **説明** |
+| --- | --- |
+| cardId | 権限をチェックするカードのIDです。 |
+| entity type | 権限が存在するエンティティ（ユーザーまたはグループ）です。 |
+| entityId | 権限が存在するエンティティのユーザーIDまたはグループIDです。 |
+| permission mask | ユーザーまたはグループに付与された権限のセットの数値表現です。 |
+| Permission | 権限マスクと、その後に続く、ユーザーまたはグループに付与された権限の視覚的な詳細です。 R=読み取り W=書き込み  D=削除 S=共有  A=管理者 |
+
+#### 
+
+## Connector Permissions DataSet
+
+|  |  |
+| --- | --- |
+| **フィールド** | **説明** |
+| State | ポリシーのタイプです。   |  |  | | --- | --- | | **状態** | **ポリシータイプ** | | DENY | 特定のコネクターを制限する | | ALLOW | 特定のコネクターを許可する | |
+| Connector Id | ポリシーが適用されるコネクターのID。アスタリスク（\*）はすべてのコネクターを表します。 |
+| Display Name | ポリシーが適用されるコネクターの名前です。 |
+| Created | ポリシーが作成された日付（エポック時間）です。 |
+| Modified | ポリシーが最後に変更された日付（エポック時間）です。 |
+| userGroups ID | ポリシーが適用されるエンティティのIDです。 |
+| userGroups\_notGroup | ポリシーがユーザーまたはグループのどちらに適用されるかを示します。値がtrueの場合はユーザーを示し、falseの場合はグループを示します。 |
+| userGroups\_group | ポリシーがユーザーまたはグループのどちらに適用されるかを示します。値がtrueの場合はグループを示し、falseの場合はユーザーを示します。 |
+| userGroups\_isGroup | ポリシーがユーザーまたはグループのどちらに適用されるかを示します。値がtrueの場合はグループを示し、falseの場合はユーザーを示します。 |
+
+## 認証済コンテンツの既知の制限事項
+
+Certified Content DomoStats DataSetとActivity Log DomoStats DataSetを結合する場合には、制限があります。
+
+## DataFlows DataSet
+
+| **フィールド** | **説明** |
+| --- | --- |
+| Current Version | DataFlowのバージョン番号を返します。 |
+| ID | DataFlowのID番号を返します。 |
+| Description | 指定されている場合は、DataFlowの説明を返します。 |
+| Type | DataFlowのタイプです。 |
+| Status | DataFlowのステータスです。ここには、次のステータスが表示されます。  |  |  | | --- | --- | | Success | DataFlowは正常に実行されました。 | | Not Runnable/Rejected | DataFlow定義に問題があります。DataFlow詳細を確認してください。 | | Canceled | DataFlowの実行をユーザーが手動でキャンセルしました。 | | Enabled | DataFlowは作成されていますが、まだ実行されていません。 | | Failed | DataFlow実行において内部の問題があります。 | | Running | DataFlowは現在実行されています。 | | Success | 正常に実行されました。 | |
+| Owner ID | DataFlow所有者のユーザーIDを返します。このIDは、DomoStats People DataSetのユーザーIDと同じものです。 |
+| Display Name | DataFlowの現在の名前を返します。 |
+| Last Executed Date | 最後に実行された時点のタイムスタンプを返します。 |
+| Last Updated Date | DataFlowが最後に更新された時点のタイムスタンプを返します。 |
+| Last Updated By | DataFlowを最後に編集したユーザーのユーザーIDを返します。 |
+
+## DataFlows History DataSet
+
+| **フィールド** | **説明** |
+| --- | --- |
+| ID | DataFlowの特定の実行におけるIDです。 |
+| DataFlow ID | DataFlowのID番号です。 |
+| Display Name | DataFlowの名前です。 |
+| Type | DataFlowタイプであるETL、MYSQL、REDSHIFTのいずれかを返します。 |
+| Status | DataFlow実行のステータスとして、CANCELLED、FAILED、REJECTED、SUCCESSのいずれかを返します。 |
+| Execution Type | 実行のタイプとして、DATA\_UPDATE、MANUAL、RETRY、SCHEDULEDのいずれかを返します。 |
+| Start Time | DataFlowの実行を開始した時点のタイムスタンプです。 |
+| End Time | DataFlowの実行が終了した時点のタイムスタンプです。 |
+
+#### 
+
+## DataSets DataSet
+
+| **フィールド** | **説明** |
+| --- | --- |
+| Status | DataSetのステータスです。ここには、次のステータスが表示されます。  |  |  | | --- | --- | | Error | インポート中にエラーが発生しました。 | | Idle | ストリームは作成されたものの、DataSetはまだ実行されていない状態です。 | | Success | インポートは正常に完了しました。 | | Active（または空白） | インポートが実行中です。 | | Invalid | ほかのタスクがまだ実行中で、前のタスクが完了するまで無効になっている状態です。 | |
+| ID | DataSetを識別する固有の値です。 |
+| Owner\_User\_ID | DataSetを所有するユーザーを識別する固有の値です。 DataSet所有者とは、DataSetを作成したユーザー、または管理者権限を割り当てられたユーザーです。 |
+| Created\_Date | DataSetが初めて実行された日付です。 |
+| Last\_Run\_Date | DataSetが最後に正常に実行完了した日付です。 |
+| Name | DataSetに付けられている現在の名前です。 |
+| Schedule | このDataSetに設定されているスケジュールオプションです。ここには、次のオプションが表示されます。  |  |  | | --- | --- | | Manual | スケジュールは、DataSetを手動で実行した場合のみ更新されるように設定されています。 | | Day | DataSetを1日に1回実行するよう設定されています。 | | Minute | DataSetを所定の分間隔で実行するよう設定されています。 | | Hour | DataSetを1時間に1回実行するよう設定されています。 | | Blank | DataSetは作成されたものの、スケジュールが設定されていません。 | |
+| Import\_Type | DataSetのソースです。Connector、DataFlow、APIなどがあります。 |
+| Source\_Type | 作成中 |
+
+## DataSets History DataSet
+
+| **フィールド** | **説明** |
+| --- | --- |
+| Stream ID | ストリームにマッピングするDomo固有のIDです。 |
+| Execution ID | DataSetの特定の実行におけるIDです。 |
+| Datasource ID | Domo固有のデータソースIDです。 |
+| Status | DataSet履歴アイテムのステータスです。ここには、次のステータスが表示されます。  |  |  | | --- | --- | | Success | データは正常にインポートされました。 | | Error | インポート中にエラーが発生しました。 | | Invalid | ほかのタスクがまだ実行中で、前のタスクが完了するまで無効になっている状態です。 | |
+| Execution Type | 実行のタイプです。ここには、次の実行タイプが表示されます。  |  |  | | --- | --- | | Manually | インポートは手動で実行されました。 | | Automated | インポートはスケジュールに沿って実行されました。 | | Retry | インポートが失敗し、Domoが自動的に再度実行を試みました。 | | Replay | 以前インポートされたDataSetが再度実行されました。 | | Batch | データはバッチでインポートされました。 | | Extended | データのインポートは次のスケジュールされた実行に引き継がれました。 | |
+| Start Time | DataSetが実行を開始した時間です。 |
+| End Time | DataSetが実行を終了した時間、エラー状態になった時間、または無効になった時間です。 |
+
+#### 
+
+## OKR Objectives DataSet
+
+このセクションのフィールドでは、「Objectives」と「Key Results」という名称が使用されています。目標の管理者設定によっては、これらは組織内で目標やメトリクスなどの別の名称で呼ばれている場合があります。DomoStatsコネクターと目標の使用方法の詳細については、「[目標データにアクセスする](/s/article/4577793742615)」を参照してください。 
+
+| **フィールド** | **説明** |
+| --- | --- |
+| ID | 目標の固有の識別子です。 |
+| Name | 目標の名前です。 |
+| Description | 目標の説明です。 |
+| State | 目標の現在の状態です。状態の例を次に示します。   OPEN：目標の期限が過ぎておらず、目標が完了になっていません。   EXPIRED：目標の期限が過ぎています。   CLOSED：目標が完了になりました。 |
+| Owner ID | 目標を所有する個人ユーザーまたはグループのIDです。複数の個人ユーザーまたはグループが1つの目標を所有している場合、最初の所有者のIDがこのフィールドに入力されます。 |
+| Owner Type | 目標の所有者が個人ユーザーかグループかを示します。タイプの例を次に示します。   USER：Domoユーザー    GROUP：Domoグループ |
+| Type | 目標のタイプです。値の例を次に示します。 PERSONAL  TEAM  COMPANY |
+| Team ID | 目標に割り当てられたDomoグループのIDです （チームタイプの目標の場合）。 |
+| Parent ID | 親目標のIDです（該当する場合）。 |
+| Parent IDs | 目標が複数の親を持つ場合の親目標のIDです（該当する場合）。 |
+| Multiple Parents | 目標に親が複数あるかどうかを示します。 |
+| Period ID | 目標がアクティブな期間のIDです（開始日と期限にもとづく）。 |
+| Period IDs | 目標が複数の期間でアクティブである*場合*の期間のIDです。 |
+| Company ID | 目標に割り当てられた組織のIDです （会社タイプの目標の場合）。 |
+| Company IDs | 複数の会社タイプの目標に関連付けられている*場合*の各会社タイプの目標のIDです。 |
+| Self Assessment | 目標が完了になったときに提出される自己評価です（オプション）。 |
+| Confidence | 目標のステータスにもとづく数値です。関連するステータスの値を次に示します。   1：進行中  0.5：注意が必要  0：リスクあり |
+| Likes | 目標が「いいね！」された回数です。 |
+| Dislikes | 目標が「よくないね！ ヤダネ！」された回数です。 |
+| Subscriptions | 目標をサブスクライブしたユーザーの数です。 |
+| Company Objective | 目標が会社タイプの目標かどうかを示します。 |
+| Start Date | 目標の開始日です。 |
+| Expire Date | 目標の終了日です。 |
+| Impact Start Date | *（廃止）*達成された目標の影響が出始めると予想される日付です。 |
+| Impact End Date | *（廃止）*達成された目標の影響が終息すると予想される日付です。 |
+| Tags | 目標に関連付けられたタグのリストです。このリストはカンマで区切ります。 |
+| Tag Categories | ［Tags］フィールドのアイテムに関連付けられているタグカテゴリーのリストです。このリストはカンマで区切ります。 |
+| Created Date | 目標が作成された日付です。 |
+| Creator ID | 目標を作成したユーザーのIDです。 |
+| Modified Date | 目標が最後に修正された日時です。目標が変更されていない場合は、その目標が最初に作成された日時になります。 |
+| Modifier ID | 目標を修正したユーザーのIDです。目標が変更されていない場合は、その目標を作成したユーザーのIDになります。 |
+| Owners | カンマで区切った、目標を所有しているユーザーまたはグループのIDおよびタイプのリストです。 例えば、ユーザーID 12345678が目標を所有している場合、このフィールドには12345678:USERという値が含まれます。 グループ54231564が目標を所有している場合、このフィールドには54231564:GROUPという値が含まれます。 |
+| Assigned Team IDs | カンマで区切った、目標が割り当てられたDomoグループIDのリストです。 |
+| \_BATCH\_ID\_ | 各DataSet更新を表すインクリメンタルなバッチ番号です。 |
+| \_BATCH\_LAST\_RUN\_ | DataSetが最後に実行された日時です。 |
+
+#### 
+
+## OKR Key Results DataSet
+
+このセクションのフィールドでは、「Objectives」と「Key Results」という名称が使用されています。目標の管理者設定によっては、これらは組織内で目標やメトリクスなどの別の名称で呼ばれている場合があります。DomoStatsコネクターと目標の使用方法の詳細については、「[目標データにアクセスする](/s/article/4577793742615)」を参照してください。 
+
+| **フィールド** | **説明** |
+| --- | --- |
+| ID | 主な結果の固有の識別子です。 |
+| Name | 主な結果の名前です。 |
+| Description | 主な結果の説明です。 |
+| State | 主な結果の現在の状態です。状態の例を次に示します。   OPEN：主な結果の期限が過ぎておらず、主な結果が完了になっていません。   EXPIRED：主な結果の期限が過ぎています。   CLOSED：主な結果が属している目標が完了になりました。 |
+| Owner ID | 主な結果を所有する個人ユーザーまたはグループのID。複数の個人ユーザーまたはグループが1つの主な結果を所有している場合、最初の所有者のIDがこのフィールドに入力されます。 |
+| Owner Type | 主な結果の所有者が個人ユーザーかグループかを示します。タイプの例を次に示します。   USER：Domoユーザー  GROUP：Domoグループ |
+| Objective ID | 主な結果が属する目標のIDです。 |
+| Card ID | 主な結果がリンクされているカードのID（自動の主な結果またはカードにもとづく主な結果）です。 |
+| Alert ID | カードにリンクされた主な結果ごとに生成された固有のIDです。 |
+| Completion | 実際の値と目標値の関係で測定される主な結果の進捗を示すパーセンテージです。   Completionは次の方法で計算されます。   Automatic, card-based key results：目標値に対するカード内の値にもとづいて進捗が算出されます。   Manual/percent completion-based key results：主な結果スライダーバーで指定された進捗率にもとづいて値が算出されます。   Manual/choose your own value key results：主な結果の実際の値を主な結果の目標値で割った値にもとづいて進捗が算出されます。   Projects and Tasks-based key results：プロジェクトとタスク機能で完了したプロジェクトとタスクの数によって進捗が算出されます。 |
+| Pacing | このフィールドを有効にすると、主な結果が進行中だった時間（開始日から終了日までの時間）の割合と比較して、主な結果の進捗率がパーセンテージで示されます。 |
+| Start Value | 主な結果の初期値です。 |
+| Current Value | 主な結果の現在の値です。 |
+| Target Value | 主な結果の目標値です。 |
+| Weight | （使用されていません） |
+| Fixed Weight | （使用されていません） |
+| Manual Type | 手動で管理される主な結果の場合、このフィールドは主な結果のタイプを示します。   値の例を次に示します。   VALUE：単一の値で測定された主な結果です。 SCALE：進捗率を使って測定された主な結果です。 PROJECT\_AND\_TASK：Domoプロジェクトに関連付けられた主な結果です。 |
+| Unit Type | 主な結果の値と目標のデータタイプです。値の例は次の通りです。   NUMERICAL  PERCENT |
+| Project ID | 主な結果にリンクされているプロジェクトのIDです（プロジェクトとタスクにもとづく主な結果にのみ適用されます）。 |
+| Likes | 主な結果が「いいね！」された回数です。 |
+| Dislikes | 主な結果が「よくないね！ ヤダネ！」された回数です。 |
+| Start Date | 主な結果の開始日です。 |
+| Expire Date | 主な結果の終了日です。 |
+| Cure Period | 主な結果の変更がいつ追跡されなくなるかを示します。 |
+| Tags | カンマで区切った、目標に関連付けられたタグのリストです。 |
+| Tag Categories | ［Tags］フィールドのアイテムに関連付けられているタグカテゴリーのリストです。 |
+| Created Date | 目標が作成された日付です。 |
+| Creator ID | 目標を作成したユーザーのIDです。 |
+| Modified Date | 目標が最後に修正された日時です。目標が変更されていない場合は、その目標が最初に作成された日時になります。 |
+| Modifier ID | 主な結果を修正したユーザーのIDです。目標が変更されていない場合は、その目標を作成したユーザーのIDになります。 |
+| Owners | カンマで区切った、主な結果を所有しているユーザーまたはグループのIDおよびタイプのリストです。 例えば、ユーザーID 12345678が目標を所有している場合、このフィールドには12345678:USERという値が含まれます。 グループ54231564が主な結果を所有している場合、このフィールドには54231564:GROUPという値が含まれます。 |
+| \_BATCH\_ID\_ | 各DataSet更新を表すインクリメンタルなバッチ番号です。 |
+| \_BATCH\_LAST\_RUN\_ | DataSetが最後に実行された日時です。 |
+
+#### 
+
+## People DataSet
+
+このDataSetの個人情報に関するフィールド（名前、メール、場所など）のいずれかが空白で返された場合は、ユーザーのプロフィールページ、または**［管理者］>［ユーザー］**ページで不足している情報を入力できます。詳細については、「[個人プロフィール情報を指定する](/s/article/360043439413)」を参照してください。
+
+| **フィールド** | **説明** |
+| --- | --- |
+| Department | 組織におけるユーザーの部署です。 |
+| Display Name | Domo内で使用されるユーザーを表す名前です。 |
+| Role | 組織におけるユーザーの権限です。 |
+| Title | 組織におけるユーザーの役職です。 |
+| Email | ユーザーのメールアドレスです。 |
+| Alternate Email | ユーザーの代替メールアドレスです。 |
+| Phone Number | ユーザーの個人の電話番号です。 |
+| Desk Phone Number | ユーザーのデスクの固定電話の番号です。 |
+| Employee Number | 組織におけるユーザーの社員番号です。 |
+| Location | ユーザーが勤務している会社の所在地です。 |
+| Locale | 作成中 |
+| Timezone | ユーザーのタイムゾーンです。 |
+| Role ID | 特定の権限に対してDomoが生成したIDです。 |
+| User ID | 各ユーザーに対してDomoが生成したIDです。 |
+| Last Login | このユーザーによる前回のログイン時のタイムスタンプです。通常ログイン、SSOログイン、モバイルログインが反映されます。モバイルからのログインとしてカウントされるには、ユーザーはインスタンスから実際にログアウトし、再度ログインする必要があります。Appを開いたり閉じたりしても、ログインとしてカウントされません。 |
+| Password Created | ユーザーによるパスワード作成時のタイムスタンプです。パスワードが更新されると、このフィールドも更新されます。 |
+| Account Locked | アカウントがロックされている場合は、「True」値を返します。 |
+| Profile Picture | ユーザーのプロフィールページか、**［管理者］>［ガバナンス］>［ユーザー］**のページに、プロフィール写真が追加されている場合は「True」値を返します。 |
+| Org Chart | ユーザーがプロフィールページの会社組織図にレポートとして追加されている場合は、「True」値を返します。 |
+| Two Factor Enabled | 会社が2要素認証を**［管理者］>［認証］>［認証］**にあるオプションで有効にしており、ユーザーが設定メニュー（プロフィール写真下の歯車メニューから利用可能）で2要素認証の有効を選択している場合は、「True」値を返します。 |
+| Created Date | ユーザーがシステムに追加された日のタイムスタンプです。 |
+| Last Updated Date | ユーザー情報が最後に更新された日のタイムスタンプです。 |
+
+#### 
+
+## Project Stages DataSet
+
+| **フィールド** | **説明** |
+| --- | --- |
+| Priority | リストまたはステージを表示する順番を決定します。小さい値から左に表示されます。 |
+| Project\_id | プロジェクトのID番号です。 |
+| Project\_name | プロジェクトの名前です。 |
+| List\_name | リストの名前です。 |
+| List\_type | リストのタイプです。 |
+| Project\_list\_id | リストのID番号です。 |
+| Created | プロジェクトを作成したユーザーです。 |
+| Updated | リストが最後に編集された（移動、名前の変更など）時間です。 |
+| Active | リストまたはステージがアーカイブされていない場合は、「True」を返します。 |
+
+## Projects DataSet
+
+| **フィールド** | **説明** |
+| --- | --- |
+| Created\_by\_user | プロジェクトを作成したユーザーです。 |
+| Project\_id | プロジェクトのID番号です。 |
+| Created | プロジェクトが作成された日時です。 |
+| DueDate | プロジェクトの期日です。 |
+| Created\_by | プロジェクトを作成したユーザーのユーザーIDです。 |
+| Project\_name | プロジェクトの名前です。 |
+| Description | 指定されている場合、プロジェクトの説明を返します。 |
+| Active | 現在プロジェクトを表示できる場合は「True」を返します。 |
+| Deleted | プロジェクトが削除されている場合は「True」を返します。 |
+
+#### 
+
+## Task Center DataSet
+
+|  |  |
+| --- | --- |
+| **フィールド** | **説明** |
+| Task ID | タスクの固有の数値識別子です。 |
+| Task identifier | タスクIDとして設定されたフィールド値です。タスク識別子については、[こちら](/s/article/000005171)を参照してください。 |
+| Form Name | タスクで使用されているフォームの名前です。 |
+| Form ID | フォームの固有の識別子です。 |
+| Task status | タスクの現在の状態です。 |
+| Queue | タスクがあるキューの名前です。 |
+| Queue ID | キューの固有の識別子です。 |
+| Created On | タスクが作成された日付です。 |
+| Completed On | タスクが完了した日付です。 |
+| Completed By | タスクを完了したユーザーの一意の識別子です。 |
+| Assignee | タスクに割り当てられたユーザー、またはグループの固有の識別子です。 |
+| Assignee Type | タスクに割り当てられた担当者のタイプです。 含まれているオプション：`User`または`Group` |
+| Source ID | タスクを生成したソースの固有の識別子です。 |
+| Source Entity | タスクを生成したソースのエンティティタイプです。 例： `Workflow` |
+| Updated On | タスクの最新の更新日です。 |
+
+#### 
+
+## Task Owners DataSet
+
+| **フィールド** | **説明** |
+| --- | --- |
+| ProjectTaskName | タスクの名前です。 |
+| ProjectName | タスクの親プロジェクトの名前です。 |
+| ProjectListId | タスクがあるリストのID番号です。 |
+| ProjectListName | タスクがあるリストの名前です。 |
+| ProjectListType | タスクがあるリストのタイプです。 |
+| ProjectTaskID | タスクのID番号です。 |
+| ProjectID | タスクの親プロジェクトのID番号です。 |
+| Created | タスクが作成された日時です。 |
+| AssignedBy | タスクを割り当てたユーザーのID番号です。 |
+| AssignedByName | タスクを割り当てたユーザーの名前です。 |
+| AssignedTo | タスクを割り当てられたユーザーのID番号です。 |
+| AssignedToName | タスクを割り当てられたユーザーの名前です。 |
+
+## Tasks DataSet
+
+| **フィールド** | **説明** |
+| --- | --- |
+| DueDate | タスクの期日です。 |
+| Project\_id | タスクの親プロジェクトのID番号です。 |
+| ProjectListId | タスクがあるリストのID番号です。 |
+| ProjectListName | タスクがあるリストの名前です。 |
+| ProjectListType | タスクがあるリストのタイプです。 |
+| ProjectTaskId | タスクのID番号です。 |
+| ProjectTaskName | タスクの名前です。 |
+| Created | タスクが作成された日時です。 |
+| Updated | タスクが最後に更新された日時です。 |
+| ProjectName | タスクの親プロジェクトの名前です。 |
+| CreatedBy | タスクを作成したユーザーのユーザーIDです。 |
+| CreatedByName | タスクを作成したユーザーの名前です。 |
+| Owner | タスク所有者のID番号です。タスク所有者は、デフォルトではタスクの作成者となっていますが、インスタンス内の誰にでも変更できます。 |
+| OwnerName | タスクを作成したユーザーの名前です。元の所有者が管理者権限を再度割り当てた場合には、新しい所有者の名前になります。 |
+| Priority | タスクボードに表示されるタスクの順番です。優先度の値が小さいものから上に表示されます。 |
+| Active | タスクがアーカイブされていない場合は、「True」を返します。 |
+| Description | 指定されている場合、タスクの説明を返します。 |
+| Contributors | タスク実行を割り当てられたユーザーです。 |
+
+#### 
+
+## ユーザーアクティビティ — AIサービス請求
+
+| **フィールド** | **説明** |
+| --- | --- |
+| Date | AIサービスイベントの日付です。 |
+| SKU | AIサービスのDomoコンサンプションSKUです。 |
+| Entity Type | Domoで行われたアクションです。 |
+| Entity ID | アクションの固有のIDです。 |
+| Usage Unit | アクションの測定単位です。 |
+| Usage Quantity | 記録されたアクションの数です。 |
+
+#### 
+
+## Workbench DataSet
+
+| **フィールド** | **説明** |
+| --- | --- |
+| Workbench Agent | Workbenchジョブを実行しているマシンの名前です。 |
+| Owner ID | ジョブの所有者のID番号です。 |
+| DataSet ID | DataSetの識別子である値です。 |
+| DataSet Name | DataSetの名前です。 |
+| Job Name | ジョブの名前です。 |
+| Job Status | ジョブのステータス（例：success、fail）です。 |
+| Created Date | ジョブが作成された日付です。 |
+| Last Run | ジョブが最後に実行された日付です。 |
+| Next Run | ジョブが次回実行される日付です。 |
+| Last Successful Run | 最後にジョブが正常に実行された日付です。 |
+| Update Method | DataSetで使用される更新方法です。（例：Append、Replace） |
+| Rows Updated | 更新された行の数です。 |
+| Schedule Type | スケジュールタイプ（例：manual、custom）を示します。 |
+
+#### 
+
+## Workflows DataSet
+
+| フィールド | 説明 |
+| --- | --- |
+| Workflow\_Name | ワークフローの名前です。 |
+| Workflow\_Version | ワークフローのバージョン番号です。 |
+| Execution\_ID | 特定の実行の識別子です。 |
+| Model\_ID | ワークフローモデルの識別子です。 |
+| Trigger\_Type | ワークフローの実行を開始したトリガーのタイプです。 |
+| Trigger\_ID | ワークフローの実行を開始したトリガーの識別子です。 |
+| Created\_By | ワークフローを作成したユーザーの名前です。 |
+| Started\_By | ワークフローの実行を開始したユーザーの名前です。 |
+| Deployed\_By | ワークフローのバージョンを展開したユーザーの名前です。 |
+| Workflow\_Status | ワークフローの実行のステータスです。 |
+| Start\_Time | ワークフローの実行が開始された時刻です。 |
+| End\_Time | ワークフローの実行が終了した時刻です。 |
+| Cycle\_Time | ワークフロー実行の開始時刻から現在の状態までの時間です。 |
+| Qualifying\_Tasks | 実行中にワークフローが蓄積した部分的なクレジットの数です（これらは実行された開始形状、自動関数、またはユーザータスク用です）。 |

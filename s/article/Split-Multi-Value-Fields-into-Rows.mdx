@@ -1,0 +1,81 @@
+---
+title: "Split a Delimited Field into Multiple Rows in Magic ETL"
+excerpt: "Turn a single column of delimited values into one row per value in Magic ETL using the Split Column and Dynamic Unpivot tiles."
+status: "active"
+---
+
+## Intro
+
+This article explains how to turn a single column of delimited values—such as "red, green, blue" in one cell—into one row per value in Magic ETL, using the Split Column and Dynamic Unpivot tiles together.
+
+---
+
+## Understand the Two-Step Approach
+
+Magic ETL has no single tile that explodes a delimited field into rows. You compose two tiles:
+
+1. **Split Column** breaks the delimited string into several columns, one per value.
+2. **Dynamic Unpivot** turns those columns into rows, giving you one row per value.
+
+## Step 1: Split the Field into Columns
+
+The Split Column tile splits a single string column into multiple columns by a delimiter.
+
+1. Add a **Split Column** tile and select the column to split.
+2. Choose the delimiter that separates the values (for example, a comma).
+3. Decide whether to keep extra splits in the last column.
+4. Add and name one output column per value you expect.
+
+<Frame>
+  <img
+    alt="The Split Column tile configuration, showing the source column, delimiter, and named output columns."
+    src="/images/kb/ka05w00000124U6-00N5w00000Ri7BU-0EM5w000005vNi0.png"
+  />
+</Frame>
+
+<Warning>**Important:** Split Column requires a fixed number of output columns. If a row has more values than the columns you created and you choose not to keep the extra splits, the extra values are not placed in any column. Create enough columns for the longest expected value list, or see *Handle Variable-Length Values* below.</Warning>
+
+## Step 2: Turn the Columns into Rows
+
+The Dynamic Unpivot tile normalizes data by transforming multiple columns in a single row into a single column with multiple rows. It is designed for a column count that can change—as columns are added, it unpivots them automatically.
+
+1. Add a **Dynamic Unpivot** tile after the Split Column tile.
+2. Select the column or columns **not** to pivot (for example, an ID). Their values repeat on each unpivoted row.
+3. Name the column that will hold the original column headings.
+4. Name the column that will hold the row values.
+
+<Frame>
+  <img
+    alt="The Dynamic Unpivot tile configuration, showing the non-pivoted column and the new heading and value columns."
+    src="/images/kb/ka0Vq0000001kYf-00N5w00000Ri7BU-0EM5w000005vNj0.png"
+  />
+</Frame>
+
+After the unpivot, filter out any rows with an empty value to drop the padding from rows that had fewer values than columns.
+
+## Handle Variable-Length Values
+
+When the number of values per cell varies widely and a fixed column count is impractical, use a Python or R scripting tile to split the field and emit one row per value in a single step. See [Magic ETL Tiles: Scripting](/s/article/8276764172951).
+
+To extract a single positional value rather than explode all of them, the `SPLIT_PART` string expression is available in Magic ETL formula and SQL contexts. See [Magic ETL SQL Expressions](/s/article/000005809).
+
+## FAQ
+
+<AccordionGroup>
+
+<Accordion title="Why do I get blank rows after unpivoting?">
+  Rows that had fewer values than the number of Split Column output columns produce empty cells, which become empty rows after the unpivot. Add a filter after the Dynamic Unpivot tile to remove rows where the value column is empty.
+</Accordion>
+
+<Accordion title="What if different rows have different numbers of values?">
+  Create enough Split Column output columns for the longest value list, then filter out the empty rows after unpivoting. If the count varies too widely to predict, use a Python or R scripting tile instead.
+</Accordion>
+
+</AccordionGroup>
+
+## Related Articles
+
+- [Magic ETL Tiles: Text](/s/article/360045402873)
+- [Magic ETL Tiles: Unpivot and Pivot](/s/article/360044951294)
+- [Magic ETL Tiles: Scripting](/s/article/8276764172951)
+- [Magic ETL SQL Expressions](/s/article/000005809)

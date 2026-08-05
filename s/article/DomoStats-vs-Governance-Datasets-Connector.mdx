@@ -1,0 +1,70 @@
+---
+title: "Compare the DomoStats and Domo Governance Datasets Connectors"
+excerpt: "Decide between the DomoStats connector and the Domo Governance Datasets connector by comparing how each is set up, what reports each provides, and which one answers a given governance question."
+status: "active"
+---
+
+## Intro
+
+This article explains how the DomoStats connector and the Domo Governance Datasets connector differ, how each is set up, and which one to choose for common governance and usage questions.
+
+---
+
+## Choose Between the Two Connectors
+
+Both connectors report on the metadata of your Domo instance—users, cards, dashboards, DataSets, DataFlows, and Beast Mode calculations—but they are set up differently, and each covers reports the other does not.
+
+| Use this connector       | When you need                                                                                                    |
+| ------------------------ | ---------------------------------------------------------------------------------------------------------------- |
+| DomoStats                | Run and refresh history (DataSets History, DataFlows History), App Studio inventory, and a prebuilt dashboard.   |
+| Domo Governance Datasets | PDP policy inventory, DataSet card counts and PDP-enabled flags, and detailed schema-level governance reporting. |
+
+## Set Up Each Connector
+
+The two connectors authenticate differently:
+
+- **DomoStats** requires the Admin default security role to create its DataSets. After the DataSets are created, you can share them with anyone in your organization.
+- **Domo Governance Datasets** requires connector credentials rather than a security role: an `APIKEY` (a Domo access token) and a `CUSTOMER` value (your instance subdomain).
+
+<Warning>**Important:** Because the Domo Governance Datasets connector reads every card and dashboard, the access token's owner appears in the Activity Log as having visited every card and dashboard every day. Use a dedicated service account as the token owner so this activity does not distort usage reporting for a real person.</Warning>
+
+## Compare the Reports
+
+The connectors name and structure their reports differently. The table below maps the areas where they diverge.
+
+| Reporting area          | DomoStats                                                                                                                                                           | Domo Governance Datasets                                                                                                      |
+| ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| People and users        | **People** report (Department, Display Name, Role, Title, Email, Last Login, Two Factor Enabled)                                                                    | **Users** report (User ID, Name, Title, Security Profile, Email, Phone Number, Employee Number, dates)                        |
+| Run and refresh history | **DataSets History** and **DataFlows History** reports with start and end times and status                                                                          | No history report; point-in-time "Last Execution" and "Last Run" fields on the Dataflows and Datasets reports                 |
+| App Studio inventory    | **App Studio Apps** and **App Studio App Pages** reports                                                                                                            | No App Studio report                                                                                                          |
+| Card-to-page mapping    | **Card Pages** report (dashboards where at least one card displays)                                                                                                 | **Pages and Cards** report (Page ID, Title, cards on page, Card ID, Card Title, Collection)                                   |
+| Beast Mode inventory    | **Beast Modes**, **Beast Modes used in Cards**, **Beast Modes used in Beast Modes**, **Columns used in Beast Modes**, and **Beast Mode Datasource** (with a Status) | **Beast Modes**, **Beast Modes with Fields**, and **Card Fields and Beast Modes**, each split into dataset-saved vs card-only |
+| PDP                     | No PDP-policy report                                                                                                                                                | **PDP** report (Policy ID and Name, Filter Field, User and Group), plus PDP Enabled and Card Count on the Datasets report     |
+
+## Match a Question to a Connector
+
+- "When did this DataSet or DataFlow last run, and did it succeed?" — use **DomoStats** (DataSets History and DataFlows History).
+- "Which App Studio apps and pages exist?" — use **DomoStats** (App Studio reports).
+- "Which DataSets have PDP enabled, and what are the policies?" — use **Domo Governance Datasets** (PDP report and Datasets report).
+- "How many cards use this DataSet?" — use **Domo Governance Datasets** (Datasets report Card Count).
+- "Who are my users, and when did they last log in?" — either connector reports users; DomoStats includes Last Login and Two Factor Enabled.
+
+## FAQ
+
+<AccordionGroup>
+
+<Accordion title="Can I use both connectors at the same time?">
+  Yes. They are separate connectors and can run side by side. Many instances use DomoStats for run history and the prebuilt dashboard, and the Domo Governance Datasets connector for PDP and schema-level governance reporting.
+</Accordion>
+
+<Accordion title="Why does one user show as viewing every card and dashboard daily?">
+  That is the owner of the Domo Governance Datasets connector's access token. The connector reads every card and dashboard, so the token owner is recorded in the Activity Log as viewing them. Use a dedicated service account as the token owner to keep this activity out of real users' usage metrics.
+</Accordion>
+
+</AccordionGroup>
+
+## Related Articles
+
+- [DomoStats Overview](/s/article/DomoStats-Overview)
+- [DomoStats Connector](/s/article/360043433813)
+- [Domo Governance Datasets Connector](/s/article/360056318074)

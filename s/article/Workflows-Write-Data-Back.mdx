@@ -1,0 +1,72 @@
+---
+title: "Write Data Back to a DataSet from Workflows"
+excerpt: "Choose between writing to a DataSet or AppDB from a workflow, append rows efficiently, and handle a dynamic number of rows."
+status: "active"
+---
+
+## Intro
+
+This article explains how to write data back to Domo from a workflow: choosing between a DataSet and AppDB as the destination, appending rows without overwriting existing data, batching rows for efficiency, and handling a variable number of rows.
+
+---
+
+## Prerequisites
+
+This article assumes you already have a workflow. To build one, see [Create a Workflow](/s/article/000005331). For the reference details on individual shapes and actions—including the Query Table action that reads data *from* a DataSet—see [Workflows | Reference](/s/article/000005797).
+
+## Choose a Write-Back Destination: DataSet or AppDB
+
+A workflow can write data to two kinds of destination. Choose based on how the data is used after it is written.
+
+| Destination | Best for                                                                                                         |
+| ----------- | ---------------------------------------------------------------------------------------------------------------- |
+| DataSet     | Data you want to analyze, visualize on cards, or join with other DataSets. Best for batch and reporting use.     |
+| AppDB       | Data an application reads and writes in real time. AppDB adds document-level security and tight app integration. |
+
+As a rule of thumb, write to a **DataSet** when the output feeds cards, dashboards, or DataFlows, and write to **AppDB** when a Domo app needs to read and update the records interactively.
+
+## Append or Replace DataSet Rows
+
+When you write to a DataSet, decide whether to add to the existing data or overwrite it:
+
+- **Append** adds new rows to the end of the DataSet and leaves existing rows in place. Use append when the DataSet is a running log or history.
+- **Replace** overwrites the entire DataSet with the rows you write. Use replace when each run should produce a complete, fresh snapshot.
+
+## Append Rows Efficiently
+
+How you append affects how many resources a workflow consumes. Rather than appending one row at a time inside a loop, collect the rows first and append them in a single write:
+
+- Build a list of the rows you want to add—one entry per row—as the workflow runs.
+- Append the whole list to the DataSet in one action after the list is complete.
+
+A single batched append is far more efficient than repeating a single-row append for every record, which multiplies the number of write operations.
+
+## Handle a Dynamic Number of Rows
+
+The number of rows you need to write is often not known in advance—for example, when the rows come from an uploaded file or the result of a query. Build the list of rows dynamically as the workflow processes the input, then append the completed list. The write action handles however many rows the list contains, so the same workflow works whether the input has three rows or three thousand.
+
+{/* [pm-input] Ryan Despain — confirm the exact action names and configuration steps for writing data back to a DataSet from Workflows (for example, the append and multiline-append actions), including how values and delimiters are entered, how a list of rows is mapped to the write action, and how to create a new DataSet as the write target. Add a step-by-step configuration section once the action details are confirmed. */}
+
+## FAQ
+
+<AccordionGroup>
+
+<Accordion title="Should I write to a DataSet or to AppDB?">
+  Write to a DataSet when the data feeds cards, dashboards, or DataFlows, or when you are appending to a history or log. Write to AppDB when a Domo app needs to read and update the records in real time and you want document-level security.
+</Accordion>
+
+<Accordion title="How do I add rows without deleting what's already there?">
+  Use an append rather than a replace. Append adds new rows and leaves existing rows in place; replace overwrites the entire DataSet.
+</Accordion>
+
+<Accordion title="My workflow appends one row at a time and feels slow. What can I do?">
+  Collect all the rows into a single list as the workflow runs, then append the whole list in one write action instead of appending each row individually. One batched write is much more efficient than many single-row writes.
+</Accordion>
+
+</AccordionGroup>
+
+## Related Articles
+
+- [Create a Workflow](/s/article/000005331)
+- [Workflows | Reference](/s/article/000005797)
+- [What Is a DataSet?](/s/article/What-is-a-DataSet)

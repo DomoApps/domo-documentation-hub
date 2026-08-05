@@ -1,0 +1,113 @@
+---
+title: "Compare Periods over Time in Beast Mode and DataFlows"
+excerpt: "Flag prior-period rows with Beast Mode date logic and build side-by-side period comparisons and rolling averages in a DataFlow."
+status: "active"
+---
+
+## Intro
+
+This article explains how to compare a metric across time periods in Domo: flagging prior-period rows with Beast Mode date logic, building a side-by-side period snapshot in a DataFlow, and calculating a rolling average.
+
+---
+
+## Choose an Approach
+
+There are two ways to compare periods, and the right one depends on where the comparison happens:
+
+- **Beast Mode** works well when you want to flag or filter rows that belong to a comparison period (for example, "same period last year") on a single card.
+- **A DataFlow** works well when you want each period's value side by side in the same row—yesterday next to today, last month next to this month—so a card can plot them together or compute the difference. It is also required for a rolling average, which Beast Mode can't produce because a calculation can't reference other rows.
+
+## Flag Prior-Period Rows with Beast Mode
+
+Use a `CASE` statement or a filter calculation to mark the rows that fall in the period you want to compare against.
+
+**Flag the same period in the prior year (last 12 months):**
+
+```
+CASE
+  WHEN YEAR(`MyDateColumn`) = YEAR(CURRENT_DATE()) - 1
+    AND MONTH(`MyDateColumn`) <= MONTH(CURRENT_DATE())
+  THEN 'Prior Year'
+  ELSE 'Current'
+END
+```
+
+**Filter to the prior year up to today's date:**
+
+```
+`MyDateColumn` >= STR_TO_DATE(CONCAT(YEAR(CURRENT_DATE()) - 1, MONTH(CURRENT_DATE()), DAY(CURRENT_DATE())), '%Y%m%d')
+AND `MyDateColumn` < CURRENT_DATE()
+```
+
+**Filter to the prior year through the first of the current month:**
+
+```
+`MyDateColumn` >= STR_TO_DATE(CONCAT(YEAR(CURRENT_DATE()) - 1, MONTH(CURRENT_DATE()), '01'), '%Y%m%d')
+AND `MyDateColumn` < DATE_FORMAT(CURRENT_DATE(), '%Y%m01')
+```
+
+A fiscal-calendar variation maps current-year and prior-year dates to the same adjusted date value so the periods align for comparison.
+
+## Build a Side-by-Side Snapshot in a DataFlow
+
+To place each prior period next to the current one in a single row, shift the date in a joined copy of the data. In a MySQL DataFlow, left-join the table to itself on a shifted date:
+
+```
+date_add(datevalue, INTERVAL 1 DAY)     -- align yesterday to today
+date_add(datevalue, INTERVAL 7 DAY)     -- align last week to this week
+date_add(datevalue, INTERVAL 1 MONTH)   -- align last month to this month
+```
+
+Join each shifted copy back on `today.date` so the current row also carries the day-before, week-before, and month-before values. A card can then read all periods from one row.
+
+<Frame>
+  <img
+    alt="A logic table showing the offset-join pattern that aligns prior-period values side by side with the current period."
+    src="/images/kb/ka05w00000123jq-00N5w00000Ri7BU-0EM5w000005vOxn.png"
+  />
+</Frame>
+
+Give each comparison its own transform, add indexing to the query for performance, and use a Group By action if you need to pull the correct columns forward.
+
+## Calculate a Rolling Average
+
+A rolling average needs values from other rows, so calculate it in a DataFlow with a correlated subquery. This example computes a three-month rolling average:
+
+```
+SELECT
+  `DateField`,
+  `ValueField`,
+  (SELECT SUM(`ValueField`) / COUNT(*)
+     FROM t2
+    WHERE t2.`DateField` > LAST_DAY(DATE_SUB(t1.`DateField`, INTERVAL 3 MONTH))
+      AND t2.`DateField` < LAST_DAY(t1.`DateField`)) AS `Rolling_Average`
+FROM t1
+```
+
+## Bucket by Week
+
+When comparing week over week, note two Beast Mode behaviors:
+
+- `WEEKDAY()` is not supported in Beast Mode and is replaced with `DAYOFWEEK()`. Set the week-start day with `SUBDATE(`Date`, DAYOFWEEK(`Date`) + X)`.
+- Converting a week number to a date-like label returns a character value, so a card using it locks to the weekly grain.
+
+## FAQ
+
+<AccordionGroup>
+
+<Accordion title="Why can't I just reference last month's value in a Beast Mode calculation?">
+  A Beast Mode calculation is evaluated on a single record or group of records and can't reference other rows, so it can't reach back to a prior period's value. To place periods side by side, build the comparison in a DataFlow, or use a [window function](/s/article/Beast-Mode-Window-Functions), which can operate across ordered rows.
+</Accordion>
+
+<Accordion title="Should I compare periods in Beast Mode or in a DataFlow?">
+  Use Beast Mode to flag or filter rows that belong to a comparison period on a single card. Use a DataFlow when you need each period's value in the same row—for a difference, a percent change, or a rolling average.
+</Accordion>
+
+</AccordionGroup>
+
+## Related Articles
+
+- [Sample Beast Mode Calculations: Date Transforms](/s/article/360042925494)
+- [Creating a Rolling Average Period-over-Period DataFlow](/s/article/360042923094)
+- [Use Window Functions in Beast Mode](/s/article/Beast-Mode-Window-Functions)
+- [Date Format Specifier Characters in Beast Mode](/s/article/360043430153)

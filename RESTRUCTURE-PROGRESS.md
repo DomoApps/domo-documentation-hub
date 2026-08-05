@@ -6,7 +6,7 @@ file at the start of any restructure work to orient themselves before doing anyt
 
 **Plan document:** `KB-RESTRUCTURE-PLAN.md`
 **Disposition log:** `RESTRUCTURE-MANIFEST.md` — running record of what happened to every article; updated throughout all phases; Phase 9 converts it to the final audit report
-**Last updated:** 2026-07-16 (Phase 3c Main Branch Sync added; five-state product lifecycle system; Phase 4.6 Lifecycle Status Application added; snippets + Style Guide updated)
+**Last updated:** 2026-08-04 (Phase 3a-Forum writing pass complete — 57 scored net-new gaps triaged: 14 written, 43 deferred to PM briefs)
 
 ---
 
@@ -16,7 +16,7 @@ file at the start of any restructure work to orient themselves before doing anyt
 **Blocked on:** 8 human decisions (see Phase 2 Decision Required table in `RESTRUCTURE-IA-SPEC.md`)
 **Phase 3a quality gates:** ✅ Complete 2026-07-15 — all 3 gates passed on all 31 articles; 15+ factual fixes, 30 screenshots added, see `RESTRUCTURE-MANIFEST.md`
 **Snowflake urgent fix:** ✅ Complete 2026-07-15 — 7 Snowflake connector articles updated (retirement language, `<Note>` → `<Warning>`, migration section rewritten); PM: Tasleema Lallmamode; see Phase 3b section in `RESTRUCTURE-MANIFEST.md`
-**Phase 3a-Forum:** 🔄 In progress (2026-07-15) — 1 of ~57 articles written (`Beast-Mode-Window-Functions.mdx`); PM: Phil Fuchs; 2 items flagged for Phil Fuchs PM brief (see PM Input section below)
+**Phase 3a-Forum:** ✅ Writing pass complete (2026-08-04) — all 57 scored net-new gaps triaged: **14 written**, **43 deferred** to PM briefs (undocumented mechanics; logged in `RESTRUCTURE-MANIFEST.md` › Deferred to PM Briefs, one row per gap with PM + what the PM must supply). Written: 5 Critical, 5 High (ranks 26, 32, 49, 50, 89), 4 Medium (ranks 117, 139, 152, 172). The 43 deferred become `[pm-input]` items in the Phase 4.5 PM briefs.
 
 **Standing rule — pending articles:** Any article that cannot be completed without PM or human context (missing feature details, unclear positioning, unconfirmed scope) is automatically added as a `[pm-input]` item in the relevant PM's Phase 4.5 meeting brief. It is never tracked as a blocker to the current phase. Write what can be written from existing KB content; note the gap in the PM brief.
 **Phase 1/2 re-run:** Complete 2026-07-14 on branch `update/fullRestructure`
@@ -32,7 +32,7 @@ file at the start of any restructure work to orient themselves before doing anyt
 | **2: IA Design** | ✅ Complete (re-run 2026-07-14) | 11 pillars in `docs.json` KB tab; 1,832 articles assigned; see Phase 2 outputs below |
 | **3a: Net-New Articles (~29)** | ✅ Complete (2026-07-14) | 29 articles written; all registered in docs.json; MCP group fixed |
 | **3a-PM: PM Input Articles (4)** | ➡️ Moved to Phase 4.5 PM briefs | [pm-input] items in per-PM meeting briefs; see PM Input section below |
-| **3a-Forum: Forum-Driven New Articles (~57)** | 🔄 In progress (2026-07-15) | 1 of ~57 written: `Beast-Mode-Window-Functions.mdx`; see Forum Gap Analysis section below |
+| **3a-Forum: Forum-Driven New Articles (~57)** | ✅ Writing pass complete (2026-08-04) | All 57 triaged: 14 written, 43 deferred to PM briefs (undocumented mechanics). See Forum Gap Analysis section + `RESTRUCTURE-MANIFEST.md` |
 | **3b: Article Upgrades (~200)** | 🔲 Not started | Bulk agent edit pass |
 | **3b-Forum: Forum-Driven Article Updates (Critical+High, ~68)** | 🔲 Not started | Priority targets for Phase 3b bulk agent pass |
 | **3c: Main Branch Content Sync** | 🔲 Not started | Runs after 3b/3b-Forum; cherry-pick new articles + factual updates from main; see Phase 3c section below |
@@ -424,6 +424,9 @@ In addition, the items below were flagged during article writing and need specif
 | `Beast-Mode-Window-Functions.mdx` | Confirm the supported workaround for filtering on window function results (options: materialize in Magic ETL, restructure logic to avoid post-aggregation filter, other?) — replace FAQ placeholder once confirmed | Phil Fuchs |
 | `Beast-Mode-Window-Functions.mdx` | Awareness: new article published covering RANK/DENSE_RANK, LAG/LEAD, running totals, Top N + Others — request review for accuracy and completeness | Phil Fuchs |
 | Getting Started articles (all 4 role variants) | Confirm correct eLearning course URLs per role — all 4 articles currently link to the same `data-consumer-training` URL which is likely wrong for Admins, App Builders, Developers | Education team / PM TBD |
+| `Workflows-Write-Data-Back.mdx` | Confirm exact write-back action names and configuration steps (append / multiline-append): how values + delimiters are entered, how a list of rows maps to the write action, how to create a new DataSet as the target — replace the `[pm-input]` block with a step-by-step section | Ryan Despain |
+| `Activity-Log-Event-Reference.mdx` | Provide the complete enumerated Activity Log event glossary with precise definitions (VIEWED vs EXPORTED vs DOWNLOADED, Shared/Added/Access Granted, FILE/FILE_REVISION/ACTIVITY_LOG_CSV object types); confirm canonical **View Activity Logs** grant wording | Dan Brinton |
+| `Restore-a-Deleted-Dashboard.mdx` | Confirm the backup retention window for deleted dashboards and the exact Support recovery path; confirm card-fate behavior when a dashboard is deleted | Dan Brinton |
 
 ---
 
@@ -481,10 +484,10 @@ Address Critical `rec=update` items during Phase 3b alongside or immediately aft
 | Rank | Suggested filename | Topic summary |
 |------|--------------------|---------------|
 | 1 | `Beast-Mode-Window-Functions.mdx` | ✅ **Done 2026-07-15** — RANK/DENSE_RANK, LAG/LEAD, SUM(SUM(x)) OVER running totals, Top N + Others; filter limitation noted; PM brief item logged for Phil Fuchs |
-| 6 | `Workflows-Write-Data-Back.mdx` | Append / Multiline Append / AppDB write from Workflows; dynamic row handling |
-| 7 | `Activity-Log-Event-Reference.mdx` | All Activity Log event types defined; VIEWED vs EXPORTED vs DOWNLOADED; DomoStats field mapping |
-| 9 | `Restore-a-Deleted-Dashboard.mdx` | No self-service restore; contact support path; prevention via snapshot/copy |
-| 11 | `Beast-Mode-for-Spreadsheet-Users.mdx` | IF→CASE, SUMIF→SUM(CASE), VLOOKUP→ETL join; no stacked IF, no volatile functions |
+| 6 | `Workflows-Write-Data-Back.mdx` | ✅ **Done 2026-08-04** — DataSet vs AppDB destination, append vs replace, credit-efficient batching, dynamic rows; `[pm-input]` Ryan Despain for exact action config |
+| 7 | `Activity-Log-Event-Reference.mdx` | ✅ **Done 2026-08-04** — entry structure, Type/Event/Object model, card-view semantics, analysis over time; `[pm-input]` Dan Brinton for full event glossary |
+| 9 | `Restore-a-Deleted-Dashboard.mdx` | ✅ **Done 2026-08-04** — no self-service restore, Support recovery path, parent-deletes-subpages, prevention; `[pm-input]` Dan Brinton for retention window |
+| 11 | `Beast-Mode-for-Spreadsheet-Users.mdx` | ✅ **Done 2026-08-04** — IF→CASE, SUMIF/COUNTIF→SUM(CASE), VLOOKUP→ETL join, no-stacking guidance |
 
 #### High new (37 articles)
 

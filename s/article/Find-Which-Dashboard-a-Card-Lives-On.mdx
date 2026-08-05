@@ -1,0 +1,56 @@
+---
+title: "Find Which Dashboard a Card Lives On"
+excerpt: "Use the Domo Governance Datasets connector's Cards and Pages reports to find which dashboards a card appears on across your instance."
+status: "active"
+---
+
+## Intro
+
+This article explains how to find which dashboards a card appears on, across your whole instance, using the Domo Governance Datasets connector.
+
+---
+
+## Set Up the Governance Connector
+
+Card-to-dashboard mapping comes from the Domo Governance Datasets connector, which reports on the users, groups, DataSets, DataFlows, pages, cards, Beast Modes, and PDP policies in your instance.
+
+Add its DataSets from the Data Center using the connector. It requires two credentials:
+
+- `APIKEY` — a Domo access token. See [Managing Access Tokens](/s/article/360042934494).
+- `CUSTOMER` — your instance subdomain (for example, `some-customer`).
+
+See [Adding a DataSet Using a Data Connector](/s/article/360042926274) for the general connector setup.
+
+<Warning>**Important:** The Governance connector reads every card and dashboard, so the access token's owner appears in the Activity Log as having visited every card and dashboard every day. Use a dedicated service account as the token owner so this activity does not distort usage reporting for a real person.</Warning>
+
+## Use the Cards Report
+
+The **Cards** report lists every card in your instance, who owns it, and the pages it resides on. Each row includes Card ID, Title, Card Type, Owner, **Page**, **Page ID**, Last Modified date, and Locked status.
+
+Because the page is on the same row as the card, finding a card's dashboard is a single filter—filter the Cards report by the Card ID or Title, and read the Page and Page ID columns. No join is required.
+
+## Use the Pages and Cards Report
+
+To go the other direction—starting from a dashboard and listing its cards—use the **Pages and Cards** report. It carries page information alongside the cards on each page: Page ID, Title, Owner, Number of Cards on Page, Parent Page ID, Parent Page Title, Number of Child Pages, Card ID, Card Title, and Collection. The parent-page fields let you trace a card up through a dashboard's hierarchy.
+
+{/* [pm-input] Tasleema Lallmamode — the Governance connector reports cover classic pages and dashboards. Confirm how to trace a card to an App Studio app/page (whether an App Studio pages dataset exists) and document why App Studio pages are not shown in a card's info panel or Move/Copy menu. Add an App Studio section once confirmed. */}
+
+## FAQ
+
+<AccordionGroup>
+
+<Accordion title="Is there a faster way than the Governance connector for a single card?">
+  For a single card you own or can open, the card's own menus show where it lives. The Governance connector is the way to answer the question in bulk—across every card and dashboard in the instance at once.
+</Accordion>
+
+<Accordion title="Can I find every dashboard a card appears on if it's on more than one?">
+  Yes. A card can appear on multiple pages, and the Cards report has one row per card-page placement, so filtering by the Card ID returns every page the card appears on.
+</Accordion>
+
+</AccordionGroup>
+
+## Related Articles
+
+- [Domo Governance Datasets Connector](/s/article/360056318074)
+- [Compare the DomoStats and Domo Governance Datasets Connectors](/s/article/DomoStats-vs-Governance-Datasets-Connector)
+- [Managing Access Tokens](/s/article/360042934494)

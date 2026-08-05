@@ -1,0 +1,82 @@
+---
+title: "Retrieve a Dataset's Source Query with the API"
+excerpt: "Use the Domo API to find the underlying connector stream and extraction query behind a dataset, following the metadata-to-stream chain."
+status: "active"
+---
+
+## Intro
+
+This article explains how to use the Domo API to find the connector stream behind a dataset and retrieve its source extraction query, following the chain from dataset metadata to the stream configuration. For full endpoint details, see the [DataSet API](/portal/API-Reference/Product-APIs/Datasets) reference in the Developer Portal.
+
+---
+
+## Prerequisites
+
+These calls use the Product APIs, which let you do anything you could do as your user in the Domo UI. They require an access token passed in the `X-DOMO-Developer-Token` header, are CORS-restricted, and must be called server-side. See the [API Reference overview](/portal/API-Reference/overview) for authentication details.
+
+<Note>**Note:** The extraction query lives on the connector stream, not on the dataset record. The scope-limited public (OAuth) DataSet API does not expose it, so use the Product APIs described here.</Note>
+
+## Step 1: Get the Dataset's Stream ID
+
+Call Get Metadata to read the dataset's properties:
+
+```
+GET /api/data/v3/datasources/:datasetId
+```
+
+The response includes a `streamId` (for example, `"streamId": 25222`) and a `transportType` (such as `CONNECTOR` or `WEBFORM`). The `streamId` links the dataset to its connector stream. A dataset with no connector stream—an uploaded or webform dataset—has no source query to retrieve.
+
+## Step 2: Get the Stream Configuration
+
+Call Stream (Connector) - Get with the `streamId` from step 1:
+
+```
+GET /api/data/v1/streams/{stream_id}
+```
+
+This retrieves the stream's configuration details, including:
+
+- `dataProvider` — identifies the connector type behind the dataset (for example, `dataProvider.key` of `com.domo.connector.snowflakeunloadv2`).
+- `transport`, `updateMethod`, and `dataSource` — describe how the stream runs.
+- `configuration` — an array of name/value pairs holding the connector settings.
+
+## Step 3: Read the Query from the Configuration
+
+For a connector-backed dataset, the extraction query is stored as an entry in the `configuration` array. It appears as a name/value pair like:
+
+```
+{ "name": "query", "value": "SELECT * FROM table", "type": "string", "category": "METADATA" }
+```
+
+Read the `value` of the `query` entry to get the source query. Because the query is a configuration value rather than a dedicated field, the same `configuration` array is what you set when creating a stream (`POST /api/data/v1/streams`) or updating one (`PUT /api/data/v1/streams/{stream_id}`).
+
+<Warning>**Important:** Not every connector stores its extraction logic under a `query` key—connectors that use report pickers or form-based configuration expose their settings as other `configuration` entries. Inspect the full `configuration` array to see what a given connector exposes.</Warning>
+
+## Query the Dataset's Data Instead
+
+If your goal is to run SQL against the dataset's data rather than to read the source extraction query, use Query with SQL instead:
+
+```
+POST /api/query/v1/execute/:datasetId
+```
+
+## FAQ
+
+<AccordionGroup>
+
+<Accordion title="Why isn't the source query on the dataset record?">
+  The query belongs to the connector stream that feeds the dataset, not to the dataset itself. Get the dataset's `streamId` from its metadata, then read the stream's `configuration` array to find the query.
+</Accordion>
+
+<Accordion title="My dataset has no streamId. Where's the query?">
+  A dataset with no `streamId`—an uploaded file or webform dataset—has no connector stream and therefore no source extraction query. Only connector-backed datasets have one.
+</Accordion>
+
+</AccordionGroup>
+
+## Related Articles
+
+- [DataSet API](/portal/API-Reference/Product-APIs/Datasets)
+- [Get Dataset Schema](/portal/API-Reference/Product-APIs/Get-Dataset-Schema)
+- [Managing Dataset History](/portal/API-Reference/Product-APIs/Managing-Dataset-History)
+- [API Reference Overview](/portal/API-Reference/overview)

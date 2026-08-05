@@ -1,0 +1,108 @@
+---
+title: "Write Data from an App to an AppDB Collection"
+excerpt: "Define an AppDB collection in your app manifest, write and append documents to it from a pro-code app, grant non-owners write access, and sync the collection to a DataSet."
+status: "active"
+---
+
+## Intro
+
+This article explains how to write data from a pro-code Domo app to an AppDB collection: defining the collection in the manifest, writing and appending documents, granting non-owners write access, and syncing the collection to a DataSet. For the full endpoint reference, see the [AppDB API](/portal/API-Reference/app-framework-apis/AppDB-API) in the Developer Portal.
+
+---
+
+## Required Grants
+
+To retain access to a collection after entity-level permissions are removed, the following grant must be enabled for your role:
+
+- **Manage AppDB —** Access any AppDB collection in the instance, including collections whose entity-level permissions have been removed.
+
+Learn more about [grants](/s/article/360043438973).
+
+## Define the Collection in the Manifest
+
+Declare each collection your app writes to in `manifest.json` under a `collections` array. Each collection object takes:
+
+- `name` — the collection name (required).
+- `schema` — required only if you sync the collection to a DataSet; omit it if you don't need sync.
+- `syncEnabled` — whether the collection exports to a Domo DataSet.
+
+Because AppDB is a proxied resource, also set a `proxyId` in the manifest. During local development, the `proxyId` is the UUID taken from the app iframe URL, between `//` and `.domoapps`. See [The Manifest File](/portal/Apps/App-Framework/Guides/manifest).
+
+## Use Supported Schema Column Types
+
+When you provide a `schema` for sync, each column type must be one of:
+
+`STRING`, `LONG`, `DECIMAL`, `DOUBLE`, `DATE`, `DATETIME`
+
+Invalid types such as `NUMBER` or `INTEGER` prevent the DataSet from being created. If the synced DataSet does not appear after about 15 minutes, an invalid schema is the likely cause.
+
+## Write Documents to the Collection
+
+Write a single document by wrapping the record in a `content` object:
+
+```
+domo.post('/domo/datastores/v1/collections/{collectionName}/documents/', { content: { /* fields */ } });
+```
+
+Append many documents at once with the bulk endpoint, which returns the count created:
+
+```
+POST /domo/datastores/v1/collections/{collectionName}/documents/bulk
+```
+
+To create or update in one call (upsert), use `PUT` on the bulk endpoint. Objects that include an `id` are updated; objects with no `id`, or an unknown `id`, are created:
+
+```
+PUT /domo/datastores/v1/collections/{collectionName}/documents/bulk
+```
+
+## Let Non-Owners Write to the Collection
+
+By default, every user who owns the collection has all permissions. To let other users, groups, or app instances write, set permissions per entity:
+
+```
+PUT /domo/datastores/v1/collections/{collectionName}/permission/{entity}/{entityId}?permissions=create_content,update_content
+```
+
+- `{entity}` is `USER`, `GROUP`, or `RYUU_APP` (an app instance ID).
+- `create_content` allows creating documents; `update_content` allows updating them. Broader `write` and `admin` permissions are also available.
+
+<Warning>**Important:** If you remove all entity permissions from a collection, only users with the **Manage AppDB** grant retain access to it. Confirm that the right entities keep `create_content` and `update_content` before narrowing permissions.</Warning>
+
+## Sync the Collection to a DataSet
+
+A collection with `syncEnabled` set exports to its Domo DataSet every 15 minutes. To force an export sooner:
+
+```
+POST /domo/datastores/v1/export
+```
+
+If an export is already running, the endpoint returns `423 LOCKED`—wait for the current export to finish and try again.
+
+## Apply Manifest Changes to an Installed App
+
+Changing the `collections` definition in the manifest does not update an already-installed app on its own. After you re-publish the app design, edit the installed app and save it again so the collection changes take effect on the installed card.
+
+## FAQ
+
+<AccordionGroup>
+
+<Accordion title="Do I need a schema for every collection?">
+  Only for collections you sync to a DataSet. If a collection is app-only storage and you don't set `syncEnabled`, you can omit the schema and store documents freely.
+</Accordion>
+
+<Accordion title="How do I append many rows at once instead of one at a time?">
+  Use the bulk endpoint—`POST .../documents/bulk`—to create many documents in a single call, or `PUT .../documents/bulk` to create or update in bulk. This is more efficient than posting documents one at a time.
+</Accordion>
+
+<Accordion title="Why doesn't my synced DataSet appear?">
+  A synced DataSet that does not appear after about 15 minutes usually means the schema contains an unsupported column type. Use only `STRING`, `LONG`, `DECIMAL`, `DOUBLE`, `DATE`, or `DATETIME`.
+</Accordion>
+
+</AccordionGroup>
+
+## Related Articles
+
+- [AppDB API](/portal/API-Reference/app-framework-apis/AppDB-API)
+- [The Manifest File](/portal/Apps/App-Framework/Guides/manifest)
+- [Clearing a Collection](/portal/Apps/App-Framework/Guides/clearing-out-collections)

@@ -1,0 +1,125 @@
+---
+title: "Activity Log Event Reference"
+excerpt: "Understand how Activity Log entries are structured, how the Type, Event, and Object filters relate, what counts as a card view, and how to analyze activity over time."
+status: "active"
+---
+
+## Intro
+
+This article explains how to read an Activity Log entry, how the Type, Event, and Object filters relate to one another, what does and does not count as a card view, and how to analyze Activity Log data over time for audit and usage reporting.
+
+---
+
+## Required Grants
+
+To view the Activity Log, the following grant must be enabled for your role:
+
+- **View Activity Logs —** View the Activity Log for your Domo instance.
+
+An Admin system role has this access by default. Learn more about [grants](/s/article/360043438973).
+
+{/* [pm-input] Dan Brinton — confirm the canonical description wording for the View Activity Logs grant; the description above was authored for this article because no existing article defines it in the standard grant format. */}
+
+## Access the Activity Log
+
+Open the Activity Log from the Admin Settings (**More** > **Admin**). Under **Governance**, select **Activity log**.
+
+<Frame>
+  <img
+    alt="The Activity Log page in the Admin Settings, showing the event list and the Time, Person, Type, Event, and Object filters."
+    src="/images/kb/ka0Vq0000008Oht-00N5w00000Ri7BU-0EMVq000005cyxy.jpg"
+  />
+</Frame>
+
+The Activity Log is updated in near real-time and contains events from a rolling one-year window. When you first load it, the data is filtered to a rolling 24-hour window. For the full interface—including CSV export and webhook delivery—see [Activity Log](/s/article/360042934574).
+
+## Read an Activity Log Entry
+
+Each entry records a single action: who did it, what they did, and which object it affected. An entry includes the following fields:
+
+| Field       | Description                                                                                               |
+| ----------- | --------------------------------------------------------------------------------------------------------- |
+| Person      | The user who performed the action.                                                                        |
+| Event       | The action that occurred, such as a view, a creation, or an export. Domo records this as the action type. |
+| Object      | The specific item the action affected, such as a card, dashboard, DataSet, or account.                    |
+| Object type | The category of the affected object (for example, `PAGE`, `CARD`, or `DATASET`).                          |
+| Description | A human-readable summary of the event—for example, "Leonard Euler viewed page Intro to Domo."             |
+| Time        | The date and time the action occurred.                                                                    |
+| Device      | The device type used, such as desktop or mobile.                                                          |
+| IP address  | The IP address the action originated from.                                                                |
+
+## Understand the Type, Event, and Object Model
+
+The Activity Log organizes every action along three related dimensions, and the filters depend on one another in order:
+
+1. **Type** is the category of object involved, such as card, dashboard, or account.
+2. **Event** is the action taken on that type of object, such as created, viewed, or exported.
+3. **Object** is the specific item affected, such as a single named dashboard or a specific PDP policy.
+
+To filter on a specific Event or Object, first apply a Type filter—the available Event and Object values are limited by the Type you select. For example, selecting the **Access token** type and then the **Created** event returns only access-token creation events.
+
+## Common Events by Type
+
+The table below lists representative events grouped by type to illustrate the model. It is not an exhaustive list—the events available in your instance depend on the features you use. To see every event available to filter on, apply a Type filter in the Activity Log and open the Event filter.
+
+| Type         | Representative events                            |
+| ------------ | ------------------------------------------------ |
+| Users        | Logged in, failed login, password reset, invited |
+| Card         | Viewed, created, edited, exported                |
+| Dashboard    | Viewed, created, edited                          |
+| DataSet      | Created, edited                                  |
+| DataFlow     | Created, edited                                  |
+| Access token | Created                                          |
+| Group        | Created                                          |
+| App          | Deployed                                         |
+| PDP policy   | Created, edited                                  |
+
+{/* [pm-input] Dan Brinton — provide the complete enumerated list of Activity Log event types with a precise one-line definition of each, including the semantic distinctions users ask about: VIEWED vs. EXPORTED vs. DOWNLOADED, the Shared / Added / Access Granted distinctions, and the FILE / FILE_REVISION / ACTIVITY_LOG_CSV object types. Replace the representative table above with the confirmed glossary. */}
+
+## Know What Counts as a Card View
+
+Card-view events are the most common source of confusion, so it helps to know exactly what triggers one:
+
+- Opening the Details view of a card is recorded as a card view.
+- Filtering a card in the Details view is also recorded as a card view.
+- If a Dashboard Filter is in place when you open a card's Details view, two card-view events are recorded—one for the view and one for the filtering.
+
+The following interactions are **not** recorded as card-view events:
+
+- Opening a card in full-screen mode from the dashboard.
+- Filtering or interacting with a card in full-screen mode.
+- Using filter-in-place at the dashboard level.
+
+## Analyze Activity Log Data over Time
+
+The in-product Activity Log holds a rolling one-year window and is best for spot checks and short-term audits. For longer history and reporting, use one of the following:
+
+- **DomoStats Activity Log report.** Install the [DomoStats Activity Log App](/s/article/360042934594) to build a long-running history. The report loads a rolling 30-day window the first time it runs, then appends only the activities logged since its last run—letting you accumulate history well beyond one year.
+- **CSV export.** Export the currently filtered log to a CSV file from the Activity Log page. The export reflects the filters set at the time of export.
+- **Webhook delivery.** Send selected event types to a third-party system to consolidate auditing across your enterprise.
+
+See [Activity Log](/s/article/360042934574) for the export and webhook procedures.
+
+## FAQ
+
+<AccordionGroup>
+
+<Accordion title="How far back does the Activity Log go?">
+  The in-product Activity Log contains events from a rolling one-year window. To keep a longer history, install the DomoStats Activity Log report, which appends new activity on each run and accumulates history over time.
+</Accordion>
+
+<Accordion title="Why don't full-screen card interactions appear in the log?">
+  Card-view events are captured when you open or filter a card's Details view. Opening a card in full-screen mode from the dashboard, interacting with it in full-screen mode, and using filter-in-place at the dashboard level are not captured as card-view events.
+</Accordion>
+
+<Accordion title="Why can't I select an Event or Object in the filter?">
+  The Event and Object filters are limited by the Type filter. Apply a Type filter first—then the Event and Object filters populate with the values available for that type.
+</Accordion>
+
+</AccordionGroup>
+
+## Related Articles
+
+- [Activity Log](/s/article/360042934574)
+- [DomoStats - Activity Log App](/s/article/360042934594)
+- [Administer and Govern Overview](/s/article/Administer-and-Govern-Overview)

@@ -1,0 +1,165 @@
+---
+title: "Translate Spreadsheet Formulas to Beast Mode"
+excerpt: "Recreate common spreadsheet formulas—IF, SUMIF, COUNTIF, nested IF, and VLOOKUP—as Beast Mode calculations, and learn why intermediate calculations are nested or moved to Magic ETL rather than stacked."
+status: "active"
+---
+
+## Intro
+
+This article explains how to recreate the spreadsheet formulas you already know—IF, SUMIF, COUNTIF, nested IF, and VLOOKUP—as Beast Mode calculations, and how to handle multi-step logic that a spreadsheet would build across several cells.
+
+---
+
+## Required Grants
+
+To create and edit Beast Mode calculations, the following grant must be enabled for your role:
+
+- **Edit Cards —** Build and modify cards in Analyzer, including Beast Mode calculations.
+
+Learn more about [grants](/s/article/360043438973).
+
+## Understand How Beast Mode Differs from a Spreadsheet
+
+Before translating a formula, it helps to understand three ways Beast Mode behaves differently from a spreadsheet:
+
+- **There are no cell references.** A spreadsheet formula points at individual cells, such as `A2` or `B2:B50`. A Beast Mode calculation references columns by name, wrapped in backticks—`` `Revenue` ``—and applies to every row in the DataSet.
+- **Calculations run in the context of a card's aggregation.** A Beast Mode calculation is evaluated against the rows or groups a card displays. Because of this, filters in Analyzer are row-level and are applied *before* aggregation, so you can't filter a card on an aggregated result the way a spreadsheet filters on a computed column.
+- **You can't stack calculations.** A spreadsheet often builds a result across several helper cells, each referencing the one before it. Beast Mode calculations can't reference one another by name. To build multi-step logic, either nest the expressions into a single calculation or create the intermediate columns in [Magic ETL](/s/article/What-is-Magic-ETL) or a DataSet View.
+
+Use the table below as a quick map from a spreadsheet function to its Beast Mode equivalent. Each pattern is explained in the sections that follow.
+
+| Spreadsheet function | Beast Mode equivalent                                                                |
+| -------------------- | ------------------------------------------------------------------------------------ |
+| `IF`                 | `CASE WHEN ... THEN ... ELSE ... END`                                                |
+| Nested `IF`          | `CASE` with multiple `WHEN` branches                                                 |
+| `SUMIF`              | `SUM(CASE WHEN condition THEN` `` `value` `` `ELSE 0 END)`                           |
+| `COUNTIF`            | `SUM(CASE WHEN condition THEN 1 ELSE 0 END)`                                         |
+| `VLOOKUP`            | A join in [Magic ETL](/s/article/What-is-Magic-ETL) or a DataSet View                |
+| Helper-cell chains   | A single nested `CASE`, or intermediate columns built in Magic ETL or a DataSet View |
+
+## Translate IF to CASE WHEN
+
+A spreadsheet `IF` maps directly to a `CASE` statement. Every `CASE` needs a `WHEN`, a `THEN`, and an `END`; the `ELSE` clause is optional, and a row that matches no branch returns `NULL`.
+
+**Spreadsheet:** `IF(Revenue > 1000, "High", "Low")`
+
+**Beast Mode:**
+
+```
+CASE
+  WHEN `Revenue` > 1000 THEN 'High'
+  ELSE 'Low'
+END
+```
+
+You enter every calculation in the Beast Mode editor, referencing columns from the DataSet panel:
+
+<Frame>
+  <img
+    alt="The Beast Mode editor open in the DataSet panel in Analyzer, showing the formula input field and column name field."
+    src="/images/kb/ka0Vq0000005Tm9-00N5w00000Ri7BU-0EMVq000005fQOf.jpg"
+  />
+</Frame>
+
+Wrap column names in backticks and string values in single quotes. Using single quotes around a column name—or forgetting the `END`—is the most common cause of an "Invalid Query" error.
+
+## Recreate SUMIF and COUNTIF
+
+A spreadsheet `SUMIF` adds up the values that meet a condition. In Beast Mode, place a `CASE` statement inside a `SUM` so the aggregation runs across the whole column rather than within a single row:
+
+**Spreadsheet:** `SUMIF(Status, "Won", Revenue)`
+
+**Beast Mode:**
+
+```
+SUM(CASE WHEN `Status` = 'Won' THEN `Revenue` ELSE 0 END)
+```
+
+`COUNTIF` follows the same pattern—return `1` for each matching row and sum the result:
+
+**Spreadsheet:** `COUNTIF(Status, "Won")`
+
+**Beast Mode:**
+
+```
+SUM(CASE WHEN `Status` = 'Won' THEN 1 ELSE 0 END)
+```
+
+<Warning>**Important:** Wrap the entire `CASE` statement in the aggregation—`SUM(CASE WHEN ... END)`—rather than placing `SUM` inside the `THEN` clause. A `SUM` inside `THEN` aggregates within each row instead of across the column and returns values you don't expect.</Warning>
+
+## Recreate Nested IF
+
+A stack of nested `IF` functions becomes a single `CASE` with one `WHEN` branch per condition. Beast Mode evaluates the branches in order and returns the first one that is true.
+
+**Spreadsheet:** `IF(Score>=90,"A", IF(Score>=80,"B", IF(Score>=70,"C","F")))`
+
+**Beast Mode:**
+
+```
+CASE
+  WHEN `Score` >= 90 THEN 'A'
+  WHEN `Score` >= 80 THEN 'B'
+  WHEN `Score` >= 70 THEN 'C'
+  ELSE 'F'
+END
+```
+
+You can combine conditions in a single branch with `AND` and `OR`:
+
+```
+CASE
+  WHEN `Region` = 'West' AND `Revenue` > 1000 THEN 'Key Account'
+  ELSE 'Standard'
+END
+```
+
+## Replace VLOOKUP with a Join
+
+Spreadsheet users reach for `VLOOKUP` to pull a value from another table. Beast Mode operates on a single DataSet and can't look values up in a second one, so there is no direct equivalent. Instead, combine the two sources before analysis:
+
+- Join the two DataSets in [Magic ETL](/s/article/What-is-Magic-ETL) so the looked-up column becomes a column in the output DataSet.
+- Or create a DataSet View that joins the tables.
+
+After the join, the value you would have looked up is a regular column you can reference in Beast Mode like any other.
+
+## Build Multi-Step Calculations Without Stacking
+
+In a spreadsheet you might compute an intermediate value in one cell and reference it in the next. Beast Mode calculations can't reference each other, so you have two options:
+
+- **Nest the logic into one calculation.** Fold each step into a single expression. For example, instead of a "Margin" helper column feeding a "Margin %" column, write the full expression at once:
+
+  ```
+  (SUM(`Revenue`) - SUM(`Cost`)) / SUM(`Revenue`)
+  ```
+
+- **Materialize the intermediate columns upstream.** When the logic is too complex to nest readably, create the intermediate columns in [Magic ETL](/s/article/What-is-Magic-ETL) or a DataSet View. Each step becomes a real column that later steps—and Beast Mode—can reference directly.
+
+## FAQ
+
+<AccordionGroup>
+
+<Accordion title="Why can't I use a Beast Mode calculation as a filter on my card?">
+  Filters in Analyzer are applied at the row level on the DataSet, before aggregation, so they can't filter on an aggregated result such as a `SUM` or `COUNT`. To filter on an aggregated value, group and aggregate the data first in [Magic ETL](/s/article/What-is-Magic-ETL) or a SQL DataFlow, then build the card and filter on the resulting column.
+</Accordion>
+
+<Accordion title="How do I calculate a percent of total?">
+  Beast Mode doesn't calculate a percent of total directly, because each row's calculation can't see the total across all rows. Instead, add a data label to the chart: open **Chart Properties**, and in **Data Label Settings**, enter `%_PERCENT_OF_TOTAL` in the **Text** field.
+</Accordion>
+
+<Accordion title="Can I create a rolling or moving average in Beast Mode?">
+  No. A Beast Mode calculation is evaluated on a single record or group of records and can't reference other rows, so it can't look back across previous periods. To build a rolling average, calculate it in a [Magic ETL](/s/article/What-is-Magic-ETL) or SQL DataFlow, or use a [window function](/s/article/Beast-Mode-Window-Functions), which can operate across ordered rows.
+</Accordion>
+
+<Accordion title="Why does my calculation return NULL for some rows?">
+  A `CASE` statement without an `ELSE` clause returns `NULL` for any row that matches none of its `WHEN` branches. Add an `ELSE` clause to supply a default value, and use `IFNULL(` `` `column` `` `, 0)` when summing a column that contains NULLs so they count as zero rather than dropping out.
+</Accordion>
+
+</AccordionGroup>
+
+## Related Articles
+
+- [What Is Beast Mode?](/s/article/What-is-Beast-Mode)
+- [Create a Beast Mode Calculation](/s/article/360043429913)
+- [Sample Beast Mode Calculations: Basic Transforms](/s/article/360043430073)
+- [Use Window Functions in Beast Mode](/s/article/Beast-Mode-Window-Functions)
+- [Beast Mode Functions Reference Guide](/s/article/360043429933)

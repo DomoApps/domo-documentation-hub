@@ -18,6 +18,7 @@ domo.js (published as `ryuu.js`) is the official JavaScript SDK for building Cus
 
 | Feature | Description |
 | --- | --- |
+| `domo.broadcast()` | Topic-based cross-app communication with sticky replay and source identity |
 | `domo.intercept()` | Register request middleware — logging, retries, custom headers |
 | Structured errors | `DomoHttpError`, `DomoAuthError`, `DomoConnectionError`, `DomoValidationError`, `DomoTimeoutError` |
 | `RequestOptions.schema` | Runtime response validation with a custom parse function |
@@ -57,6 +58,7 @@ domo.onFiltersUpdated((filters) => {
 - **AI Services** — Text generation and text-to-SQL via Domo's AI Service Layer
 - **HTTP API Access** — Authenticated requests to Domo datasets, datastores, and APIs
 - **Real-time Events** — Listen for dataset updates, filter changes, and variable updates
+- **App Broadcasting** — Topic-based pub/sub between apps on the same page with sticky replay and source identity
 - **Filter Management** — Get and set page-level filters programmatically
 - **Variable Management** — Access and update page variables
 - **Custom App Data** — Send custom data between apps on the same page
@@ -703,6 +705,97 @@ domo.onAppDataUpdated((data) => {
 
 **Use Case:** Enable communication between multiple Custom Apps on the same Domo page.
 
+<Note>
+**Note:** For new apps, prefer [App Broadcasting](#broadcasting) over `onAppDataUpdated`. Broadcasting provides topic-based routing, sticky replay, source identity, and manifest-declared channels.
+</Note>
+
+---
+
+#### Broadcasting
+
+The broadcasting methods provide a topic-based pub/sub system for cross-app communication. Apps publish named messages and subscribe to topics — the host routes messages between apps on the same page.
+
+<Note>
+**Note:** App Broadcasting requires the `app-broadcasting` feature switch. When disabled, all methods are safe no-ops with a one-time `console.warn`.
+</Note>
+
+See the [App Broadcasting Guide](/portal/Apps/App-Framework/Guides/broadcasting) for conceptual overview, architecture, and security model.
+
+---
+
+#### `domo.onBroadcast(topic, handler)`
+
+Subscribe to messages on a topic. If the topic is sticky and a value has already been published, the handler fires immediately with the last value.
+
+**Parameters:**
+
+- `topic` (string, required) — Topic name to subscribe to. Cannot start with `domo:`.
+- `handler` — `(msg: BroadcastMessage) => void`
+
+**Returns:** `function` — Unsubscribe function. Call it to stop listening.
+
+**BroadcastMessage shape:**
+
+```typescript
+interface BroadcastMessage {
+  topic: string;       // Topic the message was published to
+  payload: unknown;    // Data sent by the publisher
+  sourceAppId: string; // Host-stamped app instance ID (trustworthy)
+  timestamp: number;   // Host-assigned timestamp (ms since epoch)
+}
+```
+
+```javascript
+const unsubscribe = domo.onBroadcast('selection:changed', (msg) => {
+  console.log(`App ${msg.sourceAppId} selected:`, msg.payload);
+  renderDetail(msg.payload);
+});
+
+// Stop listening
+unsubscribe();
+```
+
+---
+
+#### `domo.onBroadcastOnce(topic, handler)`
+
+Subscribe to a topic and automatically unsubscribe after the first message is received.
+
+**Parameters:**
+
+- `topic` (string, required) — Topic name
+- `handler` — `(msg: BroadcastMessage) => void`
+
+**Returns:** `function` — Unsubscribe function (can cancel before first delivery)
+
+```javascript
+domo.onBroadcastOnce('init:ready', (msg) => {
+  console.log('Coordinator is ready, starting work');
+  beginProcessing(msg.payload.config);
+});
+```
+
+---
+
+#### `domo.onBroadcastFrom(topic, sourceAppId, handler)`
+
+Subscribe to a topic but only receive messages from a specific app instance.
+
+**Parameters:**
+
+- `topic` (string, required) — Topic name
+- `sourceAppId` (string, required) — Only deliver messages from this app instance
+- `handler` — `(msg: BroadcastMessage) => void`
+
+**Returns:** `function` — Unsubscribe function
+
+```javascript
+// Only listen to selection events from the main data table
+domo.onBroadcastFrom('selection:changed', 'abc-123-def', (msg) => {
+  updateChart(msg.payload);
+});
+```
+
 ---
 
 ### Emitters
@@ -765,6 +858,57 @@ domo.requestAppDataUpdate({
   action: 'highlight',
   rowId: 123
 });
+```
+
+<Note>
+**Note:** For new apps, prefer [`domo.broadcast()`](#domo-broadcast-topic-payload-opts) over `requestAppDataUpdate`. Broadcasting provides topic routing, sticky state, and source identity.
+</Note>
+
+---
+
+#### `domo.broadcast(topic, payload, opts?)`
+
+Publish a message to all apps subscribed to the given topic on the same page.
+
+**Parameters:**
+
+- `topic` (string, required) — Topic name. Cannot start with `domo:`.
+- `payload` (unknown, required) — Any serializable data. Must be under 64 KB when serialized.
+- `opts` (object, optional):
+  - `sticky` (boolean) — If `true`, the bus retains this value and replays it to future subscribers. Defaults to `false`.
+
+**Returns:** `void`
+
+**Throws:**
+
+- `Error('Reserved namespace')` — Topic starts with `domo:`
+- `Error('Payload too large')` — Serialized payload exceeds 64 KB
+
+```javascript
+// Fire-and-forget event
+domo.broadcast('chart:hover', { seriesId: 'revenue', index: 3 });
+
+// Sticky state (retained for late subscribers)
+domo.broadcast('selection:changed', { id: 42, name: 'Acme Corp' }, { sticky: true });
+```
+
+---
+
+#### `domo.broadcastState(topic, payload)`
+
+Shorthand for `domo.broadcast(topic, payload, { sticky: true })`. Use this when publishing state that late-mounting apps should receive immediately.
+
+**Parameters:**
+
+- `topic` (string, required) — Topic name
+- `payload` (unknown, required) — State value to broadcast and retain
+
+**Returns:** `void`
+
+```javascript
+// These are equivalent:
+domo.broadcastState('config:theme', { mode: 'dark' });
+domo.broadcast('config:theme', { mode: 'dark' }, { sticky: true });
 ```
 
 ---

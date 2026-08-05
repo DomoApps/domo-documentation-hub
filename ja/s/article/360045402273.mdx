@@ -1,6 +1,6 @@
 ---
 title: "Magic ETLのタイル：DataSet"
-excerpt: "Magic ETL の［DataSet］タブにある入力 DataSet、出力 DataSet、ライトバックの 3 種類のタイルを設定して、DataFlow の入出力を定義します。"
+excerpt: "Magic ETL DataFlowで入力DataSet、出力DataSet、Writeback、クエリDataSetタイルを設定し、データの取得と保持を行います。"
 ---
 
 ## はじめに
@@ -11,15 +11,27 @@ Magic ETLインターフェースの［DataSet］タブには、3種類のタイ
 - 出力DataSet
 - ライトバック
 
-（実際のDataSetを表す）［入力DataSet］タイルと［出力DataSet］タイルは、すべてのMagic ETL DataFlowに必要です。少なくとも1つの入力DataSetが必要ですが、必要な数を含めることができます。DataFlowの最後には1つの出力DataSetが必要です。これはDomoカードとAppを起動するために使用できるDataSetです。
+<Frame>![Screenshot 2024-07-29 at 11.45.57 AM.png](/images/kb/0EMVq000001yOV7.jpg)</Frame>
 
-Magic ETL DataFlowを作成する方法については、[こちら](/s/article/360055259234)を参照してください。
+[Domo on Databricks](/s/article/000005289)でのみ利用可能な追加のタイルがあります。
 
-<Frame>![Screenshot 2024-07-29 at 11.45.57 AM.png](/images/kb/ja/0EMVq000001yOV7.jpg)</Frame>
+- クエリDataSet
 
-## DataFlowとPersonalized Data Permission（PDP）
+すべてのMagic ETL DataFlowでは、1つ以上の入力タイルと1つの出力DataSetタイルが必要です。これらのタイルは、実際のDataSetを表します。
 
-<Warning>**重要：**DataFlowの入力DataSetは、PDPポリシーで制限することはできません。利用可能なすべての行がDataFlowを経由する*必要があります*。つまり、PDPポリシーは、入力DataSetではなく、DataFlowの出力DataSetに適用する必要があります。</Warning>
+**入力タイル —** 入力DataSetタイルを常に最初の位置で使用するのではなく、カスタムのSELECTステートメントを記述できる [［SQL］タイル](/s/article/360044876874)を代わりに使用することができます。また、［クエリDataSet］タイルを使用して、クエリ結果セットを小さな読み込み数に分割するというさらに高度な機能を活用することもできます。
+
+**［出力DataSet］タイル —** DomoカードとAppを起動するため、DataFlowの最後に出力DataSetタイルが必要です。
+
+この資料では、[入力DataSet](#add-an-input-dataset-to-a-dataflow)、[出力DataSet](#output-dataset-tile)、[ライトバック](#writeback-タイル)、[クエリDataSet](#query-dataset-tile)タイルの設定方法について説明します。［SQL］タイルの詳細については、[こちら](/s/article/360055259234?language=ja)を参照してください。
+
+<Tip>**ヒント：** Magic ETL DataFlowを作成する方法については、[こちら](/s/article/360055259234?language=ja)を参照してください。</Tip>
+
+---
+
+### DataFlowとPersonalized Data Permission（PDP）
+
+<Warning>**重要：** DataFlowの入力DataSetは、PDPポリシーで制限することはできません。利用可能なすべての行がDataFlowを経由する必要があります。つまり、PDPポリシーは、入力DataSetではなく、DataFlowの出力DataSetに適用する必要があります。</Warning>
 
 PDPポリシーが有効な状態で入力DataSetを使ってDataFlowを作成する場合は、以下の条件が少なくとも1つ満たされていないとDataFlowに不具合が発生します。
 
@@ -27,41 +39,42 @@ PDPポリシーが有効な状態で入力DataSetを使ってDataFlowを作成�
 - そのDataSetの所有者である。
 - DataSetの「全ての行」ポリシーに自分のユーザーアカウントが追加されている。これにより、DataSetのすべての行にアクセスできます。
 
-DataFlowでPDPを使用する方法については、「[PDPとDataFlow/DataFusion](/ja/s/article/360042934614#pdpポリシーが複数ある場合のandorロジック)」を参照してください。
-
----
+DataFlowでPDPを使用する方法については、[「PDPとDataFlow/DataFusion」](/s/article/360042934614)を参照してください。
 
 ## DataFlowに入力DataSetを追加する
 
-<Frame>![Input_DataSet_Tile.png](/images/kb/ja/0EM5w000005vNiz.png)</Frame>
+<Frame>![Output_DataSet_Tile.png](/images/kb/0EM5w000005vNih.png)</Frame>
 
 DataFlowには少なくとも1つの入力DataSetが必要です。仮想DataSetはフェデレーテッドDataSetとは異なり、Magic ETLでも異なる方法で処理されます。Magic ETLへの入力として仮想DataSetを使用することはできますが、フェデレーテッドDataSetを使用することはできません。以下の手順に従います。
 
 1. Magic ETLを開きます。
-2. 左側レールの**［DataSet］**から［入力DataSet］タイルをキャンバスにドラッグします。キャンバスの下にタイルエディターが開きます。   
+2. 左側レールの**［DataSet］から［入力DataSet］タイルをキャンバス**にドラッグします。キャンバスの下にタイルエディターが開きます。   
      
 
-   <Frame>![Screenshot](/images/kb/ja/0EMVq0000060rKD.jpg)</Frame>
-3. タイルエディターで**［DataSetを選択］**を選択して、DataFlowの入力DataSetを選択します。
+   <Frame>![Screenshot](/images/kb/0EMVq0000060rKD.jpg)</Frame>
+3. タイルエディターで［**DataSetを選択］を選択**して、DataFlowの入力DataSetを選択します。
 
-<Note>   **注記：**Magic ETLで使用できる最大列数は1,500です。</Note>
+   
+<Note>**注記：** Magic ETLで使用できる最大列数は1,500です。</Note>
 
      
      
 
-   <Frame>![Screenshot](/images/kb/ja/0EMVq0000060ld0.jpg)</Frame>
-4. **［DataSetを選択］**モーダルで、DataSetを探して選択します。複数の［入力DataSet］を追加するには、［入力DataSet］ごとに手順2～4を繰り返す必要があります。  
+   <Frame>![Screenshot](/images/kb/0EMVq0000060ld0.jpg)</Frame>
+4. **［DataSetを選択］** モーダルで、DataSetを探して選択します。複数の［入力DataSet］を追加するには、［入力DataSet］ごとに手順2～4を繰り返す必要があります。  
      
 
-   <Frame>![choose dataset.jpg](/images/kb/ja/0EMVq000001yQru.jpg)</Frame>
-5. （オプション）タイルエディターで**［データ］**タブに進み、入力データのプレビューを表示します。  
+   <Frame>![choose dataset.jpg](/images/kb/0EMVq000001yQru.jpg)</Frame>
+5. （オプション）タイルエディターで［データ］タブに進み、入力**データ**のプレビューを表示します。  
      
 
-   <Frame>![Screenshot](/images/kb/ja/0EMVq0000060rLq.jpg)</Frame>
+   <Frame>![Screenshot](/images/kb/0EMVq0000060rLq.jpg)</Frame>
 
-## ［入力DataSet］タイルを設定する
+### ［入力DataSet］タイルを設定する
 
-**DataSetの詳細を表示する：**タイルエディターの**［詳細］**タブには、DataSetの名前、所有者、更新日、列名とタイプなどの情報が含まれます。
+<Note>
+**DataSetの詳細を表示する：** タイルエディターの**［詳細］**タブには、DataSetの名前、所有者、更新日、列名とタイプなどの情報が含まれます。
+</Note>
 
 ［入力DataSet］タイルを設定するには、以下の手順に従います。
 
@@ -69,94 +82,300 @@ DataFlowには少なくとも1つの入力DataSetが必要です。仮想DataSet
 2. タイルエディターで**［DataSetを選択］**を選択します。表示されるモーダルで、既存のDataSetを選択するか、**［新規作成］**を選択して新しいDataSetを使用します。  
      
 
-   <Frame>![choose dataset.jpg](/images/kb/ja/0EMVq00000231OD.jpg)</Frame>
-3. タイルエディターの**［設定］**タブの**［データ選択］**ドロップダウンで、以下のいずれかを選択します。  
-     
+   <Frame>![choose dataset.jpg](/images/kb/0EMVq00000231OD.jpg)</Frame>
+3. タイルエディターの**［設定］**タブの**［データ選択］**ドロップダウンで、以下のいずれかを選択します。     
 
-   <Frame>![data selection dropdown.jpg](/images/kb/ja/0EMVq0000020HCb.jpg)</Frame>
+   <Frame>![data selection dropdown.jpg](/images/kb/0EMVq0000020HCb.jpg)</Frame>
 
    - **［全て］**（デフォルト） **—** DataSetからすべての行を読み込みます。
-   - **［新規］ —** 最後に正常に実行された後にDataSetに追加された新しい行を読み込みます。  
-<Note>
+   - **［新規］ —**  最後に正常に実行された後にDataSetに追加された新しい行を読み込みます。   
+     
+<Note>**注記：** このオプションを選択した場合は、データ更新方法を［置き換え］ではなく［追加］に設定する必要があります。</Note>
 
-**注記：**このオプションを選択した場合は、データ更新方法を［置き換え］ではなく［追加］に設定する必要があります。
-   - **［バッチでフィルター］ —** 作成日または名前（パーティションの場合）にもとづいて読み込むバッチを選択できます。  
-     このオプションを選択すると、**［バッチでフィルター］**エリアが表示されます。
-
-</Note>
+- **［バッチでフィルター］ —** 作成日または名前（パーティションの場合）にもとづいて読み込むバッチを選択できます。  
+     このオプションを選択すると、 **［バッチでフィルター］**エリアが表示されます。  
        
-     データが処理された時期とカスタマイズされた数式のどちらにもとづいてバッチにフィルターをかけるかを指定し、日付パラメーターを選択します。例：*過去7日間*の*処理済みデータ*。  
-       
+     データが処理された時期とカスタマイズされた数式のどちらにもとづいてバッチにフィルターをかけるかを指定し、日付パラメーターを選択します。例：*処理済みデータ（過去7日間）。*
 
-     <Frame>![Screenshot 2024-08-01 at 7.18.28 PM.png](/images/kb/ja/0EMVq000002327N.jpg)</Frame>
+     <Frame>![Screenshot 2024-08-01 at 7.18.28 PM.png](/images/kb/0EMVq000002327N.jpg)</Frame>
 4. （オプション）入力DataSetがパーティション分割されている場合は、**［パーティション列名］**フィールドを使用してパーティション名を公開できます。
 5. **［データ処理］**エリアで列データタイプを変更します。これにより、入力データに発生する可能性のあるスキーマの変更によってDataFlowが破損するのを防ぐことができます。  
      
 
-   <Frame>![change data type.jpg](/images/kb/ja/0EMVq00000232H3.jpg)</Frame>
-6. <img alt="settings.png" src="/images/kb/ja/0EMVq00000232FR.jpg" style={{width: 22, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/>
-
-   **［設定を変換］**を使用して、列内の**［不正な値］**や**［NULL値］**などについて、各列の特別な処理を設定します。  
+   <Frame>![change data type.jpg](/images/kb/0EMVq00000232H3.jpg)</Frame>
+6. 右側の <i className="icon-gear sm" aria-hidden="true" /> **［設定を変換］**を使用して、列内の**［不正な値］**や**［NULL値］**などについて、各列の特別な処理を設定します。  
      
 
-   <Frame>![bad values.jpg](/images/kb/ja/0EMVq00000231ck.jpg)</Frame>
+   <Frame>![bad values.jpg](/images/kb/0EMVq00000231ck.jpg)</Frame>
 
-   <Frame>![data settings.jpg](/images/kb/ja/0EMVq00000231BK.jpg)</Frame>
+     
 
-Advanced DataFlow TriggeringでDataFlowの実行を自動化する方法については、[こちら](/s/article/000005216)を参照してください。
+   <Frame>![data settings.jpg](/images/kb/0EMVq00000231BK.jpg)</Frame>
+
+[Advanced DataFlow Triggering](/s/article/000005216)でDataFlowの実行を自動化する方法については、こちらを参照してください。
 
 ## ［出力DataSet］タイル
 
-<Frame>![Output_DataSet_Tile.png](/images/kb/ja/0EM5w000005vNih.png)</Frame>
+<Frame>![Output_DataSet_Tile.png](/images/kb/0EM5w000005vNih.png)</Frame>
 
 DataFlowには出力DataSetが必要です。出力DataSetを使用して、カード（またはほかのDataFlow）に情報を追加します。
 
-## ［出力DataSet］タイルを設定する
+### ［出力DataSet］タイルを設定する
 
 ［出力DataSet］タイルを設定するには、以下の手順に従います。
 
 1. DataFlowのすべてのタイルが接続され、設定されていることを確認します。
-2. 左側パネルの**［DataSet］**の**［出力DataSet］**タイルをキャンバスにドラッグして、接続します。
+2. 左側パネルの**［DataSet］**の**［出力DataSet］**タイルをキャンバスにドラッグして、接続します。 
 3. タイルエディターでタイルの名前を変更します。これは、Data Centerに表示される出力DataSetの名前です。
-4. **［更新方法］**ドロップダウンを使用して、更新されるデータの処理方法を選択します。Domoでの更新方法については、[こちら](/s/article/360043430733)を参照してください。
+4. **［更新方法］**ドロップダウンを使用して、更新されるデータの処理方法を選択します。Domoでの更新方法については、[こちら](/s/article/360043430733)を参照してください。 
 
-<Tip>**ヒント：**出力DataSetにあるデータをプレビューするには、プレビューを実行し、［出力DataSet］タイルを選択してから**［プレビュー］**タブを選択します。</Tip>
+   
+<Tip>**ヒント：** 出力DataSetにあるデータをプレビューするには、プレビューを実行し、［出力DataSet］タイルを選択してから**［プレビュー］**タブを選択します。</Tip>
 
-<Frame>![preview output .jpg](/images/kb/ja/0EMVq00000232nJ.jpg)</Frame>
+   <Frame>![preview output .jpg](/images/kb/0EMVq00000232nJ.jpg)</Frame>
 
-**DataSetの詳細を表示する：**DataFlowが少なくとも1回実行された後は、タイルエディターの**［詳細］**タブに、出力DataSetに関するすべての情報が含まれます。
+   <Note>**DataSetの詳細を表示する：** DataFlowが少なくとも1回実行された後は、タイルエディターの**［詳細］**タブに、出力DataSetに関するすべての情報が含まれます。</Note>
 
-5. **［DataSetをクラウドに追加］**ドロップダウンを使用して、データを書き込む場所を選択します。
-6. クラウドでデータを保存する**データベース**の名前を入力します。
+5. **［DataSetをクラウドに追加］** ドロップダウンを使用して、データを書き込む場所を選択します。
+6. クラウドでデータを保存する**データベース** の名前を入力します。
 7. データベースでデータを保存する**スキーマ**の名前を入力します。
-8. スキーマ内で使用する**表**の名前を入力します。
+8. スキーマ内で使用する**表** の名前を入力します。
 
 <Note>
 **注記：**
 
-- **［DataSetをクラウドに追加］**するオプションは、Cloud Integrationsを使用していて、ライトバック用に設定された統合がある場合にのみ利用可能です。
-- **データベース、** **スキーマ**、**表**フィールドは、Cloud Integrationsがクラウド（現在はSnowflakeのみ利用可能ですが、ほかのエンジンもまもなく利用可能になる予定です）内の位置パラメーターをサポートしている場合に利用できます。
+- **［DataSetをクラウドに追加］**するオプションは、クラウド統合を使用していて、ライトバック用に設定された統合がある場合にのみ利用可能です。 
+- **［データベース］、** **［スキーマ］、****［表］**フィールドは、Cloud Amplifier統合がクラウド（現在はSnowflakeのみ利用可能ですが、ほかのエンジンもまもなく利用可能になる予定です）内の位置パラメーターをサポートしている場合に利用できます。
 </Note>
+
+## ［クエリDataSet］タイル
+
+<Warning>**重要：** 現在、このタイルは[DomoのDatabricks](/s/article/000005289)でのみ使用できます。</Warning>
+
+［クエリDataSet］タイルを使用すると、入力設定プロセスの一環としてDataSetに対してクエリを記述できます。クラウド統合を介してアクセスされる大きな表の読み込みは、基盤となるクラウドデータウェアハウス（CDW）のリソース制限によって遅延する場合がありますが、［クエリDataSet］タイルを使用することで効率性が向上します。このタイルを適切に使用すると、次のようなエラーメッセージが解決されることがあります。
+
+```
+socket timeout?????????
+```
+
+```
+exceeding maximum heap size of 16 GB???????
+```
+
+［クエリDataSet］タイルは様々なデータソースで使用できますが、Databricksで使用することが強く推奨されます。
+
+カスタムのSELECTステートメントとは別に、ユーザーは次の2つの追加フィールドの値を指定できます。
+
+- クエリのパーティションキー
+- # 読み込み
+
+### ［クエリDataSet］タイルを設定する
+
+［クエリDataSet］タイルを設定するには、以下の手順に従います。
+
+1. Magic ETLで、左側のサイドバーの**［DataSet］**セクションを展開し、［クエリDataSet］タイルをキャンバスにドラッグします。
+
+   <Note>**注：** これは、DomoのDatabricksユーザーのみ利用できます。</Note>
+
+2. キャンバスの下のタイル構成パネルで、**［DataSetを選択］** ドロップダウンからDatabricks DataSetを選択します。
+3. Magic ETL DataFlowに取り込みたいデータを識別するクエリを記述します。
+
+   
+<Note>**注：** このクエリはSELECTクエリのみである必要があり、CTE（common table expressions）は使用できません。</Note>
+4. 設定 `Query Partition Key` Databricksテーブルでこの値を決定するための推奨プロセスが[下に](#choose-the-partition-key-recommended-process-for-databricks)表示されます。
+
+   
+<Warning>**警告：**  `「パーティションキー」`列にNULL値を含めることはできません。NULL値は無視されます。パーティションキーには、NULL以外の値のみを含む列だけを選択してください。</Warning>
+5. **［# of Loads］** セクションを設定しますか？
+
+### パーティションキーを選択する（Databricksの推奨プロセス）
+
+パーティションキーを選択する場合、列の値ごとに行数がより均等に分散されているほうが望ましいです。Databricksでは、パーティションキーを選択し、最大のバッチが4GB以下になるように読み込みの数を定義することを推奨します。これを行うには、次の手順に従います。
+
+1. Databricks UI内で、または次のようにクエリを実行して、表の全体的なサイズを確認します。  
+     
+   `DESCRIBE DETAIL <catalog>.<schema>.<table>`
+2. sizeInBytesを2^30=1024^3で割ってGBに変換します。
+3. 次のように、推奨される4 GBで除算して、必要な分割数の暫定値を取得します。  
+     
+   `divisions = ( sizeInBytes / 2^30 ) / 4`  
+     
+       
+<Note>**注：** これは中間的な計算であり、必要な読み込み数として解釈されるべきではありません。</Note>
+
+4. 表の合計行数を見つけます。
+5. 次の式を使用して、最大バッチの上限である4GBを占める表の行数を推定します。  
+     
+   `max_rows = row_count / divisions`
+6. これで、どの列をパーティションキーとして使用するかについて評価を開始できます。列にNULL値を含めることはできない点に注意してください。  
+     
+   次の式を使用して、候補となる列に存在する個別の値の数を検索します。  
+     
+   `SELECT COUNT( DISTINCT <column> ) AS distinct_count`  
+    `FROM <table>;`  
+     
+   `distinct_count`の値は後の計算で使用します。
+7. 候補となる列でパーティション分割した場合のデータの偏りを、次の式を使って最大行数を確認して評価します。  
+     
+   `SELECT <column>, COUNT(*) AS row_count`  
+    `FROM <table>`  
+    `GROUP BY <column>`  
+    `ORDER BY row_count DESC;`  
+     
+   バッチは、N個のパーティションキー値に関連付けられたすべての行で構成されます。最悪の場合、最大のバッチは、N個の最大行数を持つパーティションキー値で構成されることになります。累積合計は、次のクエリで表されます。
+
+   `WITH grouped_counts AS (`  
+    `SELECT <column> , COUNT(*) AS row_count`
+
+   `FROM <table>`  
+    `GROUP BY <column>`
+
+   `)`
+
+   `SELECT <column> , row_count, SUM( row_count )`  
+   `OVER (`
+
+   `ORDER BY row_count DESC`  
+    `ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW`  
+    `) AS cumulative_row_count`  
+   `FROM grouped_counts`  
+   `ORDER BY row_count DESC;`
+
+   例えば、日付\<column\>がパーティションキー候補として評価されているとします。  
+     
+
+   |            |            |                        |
+   | ---------- | ---------- | ---------------------- |
+   | \<column\> | row\_count | cumulative\_row\_count |
+   | 2024-10-13 | 100        | 100                    |
+   | 2024-02-21 | 80         | 180                    |
+   | 2024-05-17 | 60         | 240                    |
+   | 2024-08-19 | 50         | 290                    |
+   | 2024-03-06 | 30         | 320                    |
+   | 2024-02-10 | 20         | 340                    |
+   | 2024-11-30 | 10         | 350                    |
+
+     
+   さらに一歩進みます。先ほど計算した最大行数（4GBにもとづく）の制限を満たしつつ、バッチに含めることができるこの \<column\> の固有の値はいくつですか？必要なクエリは次のとおりです。   
+     
+
+   `WITH grouped_counts AS (`  
+    `SELECT <column> , COUNT(*) AS row_count`
+
+   `FROM <table>`  
+    `GROUP BY <column>`
+
+   `) ,`
+
+   `ranked_counts AS (`
+
+   `SELECT <column> , row_count , SUM( row_count )`  
+    `OVER (`
+
+   `ORDER BY row_count DESC`  
+    `ROWS BETWEEN UNBOUNDED PRECEDING`
+
+   `AND CURRENT ROW`  
+    `) AS cumulative_row_count`  
+   `FROM grouped_counts`
+
+   `)`  
+    `SELECT COUNT(*) AS max_column_values`  
+    `FROM ranked_counts`  
+    `WHERE cumulative_row_count < max_rows;`
+
+手順4で計算した値と   `max_rows`を置き換えます。次に、上記のクエリを実行して整数の結果`max_column_values`を取得します。
+8. この候補となる列をパーティションキーとして使用する場合は、手順6および手順7の結果を用いて、最大読み込み数が確実に4GB未満になるよう、以下のように端数を切り上げて必要な読み込みの最小値を計算します。  
+     
+   `“# loads” >= distinct_count / max_column_values`  
+     
+   4GB未満にするために必要な読み込み数は、選択したパーティションキーの列によって異なります。読み込み数を少なくするには、値が表全体に均一に分散される列を選択します。
 
 ## ［ライトバック］タイル
 
-<Frame>![Writeback_Tile.png](/images/kb/ja/0EM5w000005vNii.png)</Frame>
+<Frame>![Writeback_Tile.png](/images/kb/0EM5w000005vNii.png)</Frame>
 
 ［ライトバック］タイルを使用して、変換されたデータをDataSetとして出力し、データを別のシステムに送ることができます。
 
-## ［ライトバック］タイルを設定する
+### ［ライトバック］タイルを設定する
 
 ［ライトバック］タイルを設定するには、以下の手順に従います。
 
 1. ［入力DataSet］タイルの代わりに、［ライトバック］タイルをキャンバスにドラッグします。
-2. ［ライトバック］タイルの名前を変更し、<img alt="" src="/images/kb/ja/0EMVq0000060jJS.jpg" style={{width: 23, height: 23, display: 'inline', verticalAlign: 'start', margin: '0'}}/>
-
-   **［編集］**を選択して名前と説明を入力することで、出力するDataSetの名前を指定します。
-3. （オプション）**［追加オプション］**メニューを選択し、**［更新方法］**を選択して、データを置き換えるか（デフォルト）、追加します。
-4. **［ライトバックを設定］**を選択して、使用するWritebackコネクターを選択します。
+2. ［ライトバック］タイルの名前を変更し、 <img alt="" src="/images/kb/0EMVq0000060jJS.jpg" style={{width: 23, height: 23, display: 'inline', verticalAlign: 'start', margin: '0'}}/> **［編集］** を選択して出力するDataSetの名前と説明を指定します。
+3. （オプション） **［追加オプション］** メニューを選択し、 **［更新方法］**を選択して、データを置き換えるか（デフォルト）、追加します。
+4.  **［ライトバックを設定］**を選択して、使用するWritebackコネクターを選択します。
 5. ほかのタイルを［ライトバック］タイルに接続してDataFlowを完了し、［出力DataSet］タイルで終了します。
 
-**［ライトバック］タイルの詳細を表示する：**DataFlowが少なくとも1回実行された後は、タイルエディターの**［詳細］**タブに、ライトバック出力DataSetに関するすべての情報が含まれます。
+**［ライトバック］タイルの詳細を表示する：** DataFlowが少なくとも1回実行された後は、タイルエディターの**［詳細］** タブに、ライトバック出力DataSetに関するすべての情報が含まれます。
+
+## ［固定入力］タイル
+
+このタイルを使用して、変換、プロトタイプロジックの検証、意味のあるプレースホルダデータによる出力の実証、入力DataSetが利用できない場合のDataFlowの作成を行うことができます。
+
+Magic ETLのオーサリングキャンバスの左パネルにあるDataSetで、［固定入力］タイルを見つけます。
+
+<Frame>![Screenshot](/images/kb/0EMVq00000BKvLa.jpg)</Frame>
+
+<Note>**注：** ［固定入力］タイルでAI機能を使用するには、インスタンスでAIサービスを有効にする必要があります。AIサービスが有効になっていない場合でも、データを手動で入力したり、値を貼り付けたり、ファイルをアップロードしたりすることはできます。</Note>
+
+### ［固定入力］タイルに手動でデータを入力する
+
+データを手動で入力するには、次の手順に従います。
+
+1. 固定入力タイルを［DataSet］セクションからキャンバスにドラッグします。
+2. ［新しい列のヘッダー］フィールドに列名を入力します。
+3. 各列名の左側で小さなテキストを選択して、データタイプを設定します。
+4. 表にデータを直接入力します。
+5. *（オプション）* 別のソースのデータをコピーして、行と列に貼り付けます。
+
+<Frame>![Screenshot](/images/kb/0EMVq00000BKw6M.jpg)</Frame>
+
+### ［固定入力］タイルにファイルをアップロードする
+
+ファイルをアップロードするには、次の手順に従います。
+
+1. ［固定入力］タイルを［DataSet］からキャンバスにドラッグします。
+2. 右下の**［データの生成/アップロード ］** ボタンをクリックします。  
+
+   <Frame>![コンピューターのスクリーンショット。AIで生成されたコンテンツは、実際とは異なる可能性があります。](/images/kb/0EMVq00000BKxbt.jpg)</Frame>
+3. モーダルで、**［ファイルをアップロード］**タブをクリックします。  
+
+   <Frame>![コンピューターのスクリーンショット。AIで生成されたコンテンツは、実際とは異なる可能性があります。](/images/kb/0EMVq00000BKxaH.jpg)</Frame>
+4. ファイルをドラッグアンドドロップするか、 **［ファイルをアップロード］** ボタンを選択します。
+5. ファイルにヘッダー行を含めるかどうかを指定し、［インポート］ボタンを選択します。  
+   データが設定パネルに表示されます。列の追加や値の編集を行うことも、そのまま使用することもできます。
+
+<Frame>![Screenshot](/images/kb/0EMVq00000BKxjx.jpg)</Frame>
+
+<Warning>**重要：** ファイルごとに最大10,000行と1,000列をアップロードできます。.csvや.xlsxの形式がサポートされています。</Warning>
+
+### AIを使用して、［固定入力］タイルのサンプルデータを生成する
+
+AIを使用してサンプルデータを生成するには、次の手順に従います。
+
+また、単一の列のAIデータを生成する場合は、**スパークルアイコン**を <img alt="AIで生成された3つのクロスと紫色の星のコンテンツは、実際とは異なる可能性があります。" src="/images/kb/0EMVq00000BKxvF.jpg" style={{width: 14, height: 14, display: 'inline', verticalAlign: 'start', margin: '0'}}/> その列のヘッダーで選択します。値の簡単な説明と行数を入力します。この方法はDataSet全体を生成するよりも迅速ですが、数秒かかる場合があります。
+
+1. ［固定入力］タイルをキャンバスにドラッグします。
+2. **［データの生成/アップロード ］** ボタンを選択します。
+3. ［データの生成］タブで、データを説明する短いプロンプトを入力します（例えば、「名前、日付、および金額を含む50件の顧客のトランザクション」）。
+4. 生成する行数を選択します（50を推奨）。  
+
+   <Frame>![A screenshot of a data generatorAI-generated content may be incorrect.](/images/kb/0EMVq00000BKwJG.jpg)</Frame>
+5. **［データを生成］**を選択します。
+6. 表が表示されるまでしばらく待ちます。
+
+<Frame>![Screenshot](/images/kb/0EMVq00000BKxjx.jpg)</Frame>
+
+### ［固定入力］タイルのデータを保存して使用する
+
+固定入力データの準備が完了したら、それをDataFlowの任意のダウンストリーム変換タイルに接続します。
+
+データは、スタンドアロンのDataSetとしてではなく、DataFlow定義に保存されます。
+
+別のDataSetを作成するには、タイルを［出力DataSet］タイルに接続します。DataFlowが実行されると、Domoはその出力から新しいDataSetを作成します。
+
+[［出力DataSet］タイル](/s/article/360045402273)の設定方法を確認してください。
 
 ## よくある質問
 
@@ -164,6 +383,14 @@ DataFlowには出力DataSetが必要です。出力DataSetを使用して、カ�
 
 <Accordion title="少数の列が小数点以下5桁まで切り捨てられるのはなぜですか？">
 Domoでは、固定小数に（19,5）の精度/スケールを使用します。そのため、小数点の右側に5桁のみ表示されます。DataSetをより高い精度/スケールを使用する設定にするようリクエストできます。
+</Accordion>
+
+<Accordion title="［固定入力］タイルで作成できるデータ量に制限はありますか？">
+アップロードできるファイルは、10,000行および1,000列に制限されています。手動で入力または貼り付けしたデータには制限が定義されていませんが、今後制限が適用される可能性はあります。
+</Accordion>
+
+<Accordion title="［固定入力］タイルでは、個別のDataSetが作成されますか？">
+いいえ。データはDataFlow定義に保存されます。スタンドアロンのDataSetを作成するには、［固定入力］タイルを出力タイルに接続します。
 </Accordion>
 
 </AccordionGroup>

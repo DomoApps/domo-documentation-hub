@@ -160,7 +160,50 @@ After saving the internal file, produce a sanitized copy for external audiences 
 
 ### 8. Confirm
 
-Tell the user both file paths and offer to adjust tone, detail, or framing for either version.
+Tell the user both file paths and offer to adjust tone, detail, or framing for either version. Wait for explicit approval before proceeding to step 9.
+
+### 9. Open a branch, commit, and open a PR
+
+Once the user approves the generated notes, publish them without further prompting:
+
+1. **Derive the branch name** from `git config user.name` — lowercase it and convert spaces to dots to get `firstname.lastname`, then append the version:
+   ```bash
+   git config user.name
+   # "Jared Peterson" → jared.peterson/release-notes-v<X.Y.Z>
+   ```
+
+2. **Create and switch to the branch:**
+   ```bash
+   git checkout -b jared.peterson/release-notes-v<X.Y.Z>
+   ```
+
+3. **Stage and commit both files:**
+   ```bash
+   git add releaseNotes/v<X.Y.Z>.mdx releaseNotesExternal/v<X.Y.Z>.mdx
+   git commit -m "docs: add v<X.Y.Z> release notes (internal + external)
+
+   Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>"
+   ```
+
+4. **Push and open a PR immediately after the commit:**
+   ```bash
+   git push -u origin jared.peterson/release-notes-v<X.Y.Z>
+   gh pr create \
+     --title "docs: add v<X.Y.Z> release notes" \
+     --body "$(cat <<'EOF'
+   ## Summary
+   - Adds internal release notes to `releaseNotes/v<X.Y.Z>.mdx`
+   - Adds sanitized external release notes to `releaseNotesExternal/v<X.Y.Z>.mdx`
+
+   ## Test plan
+   - [ ] Verify both files render correctly on the Mintlify preview
+
+   🤖 Generated with [Claude Code](https://claude.com/claude-code)
+   EOF
+   )"
+   ```
+
+5. Return the PR URL to the user so they can approve it through GitHub.
 
 ## Notes
 

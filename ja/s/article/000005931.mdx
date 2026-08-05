@@ -1,0 +1,93 @@
+---
+title: "Salesforce Rest Writebackコネクター"
+excerpt: "DomoのSalesforce Rest Writebackコネクターを設定すると、DomoクライアントIDを使ってREST API経由でDataSetの行をSalesforceにエクスポートできます。"
+---
+
+## はじめに
+
+Salesforceは、クラウドベースのカスタマーリレーションシップ管理（CRM）プラットフォームです。DomoのSalesforce Rest Writebackコネクターを使用すると、Domo DataSetからSalesforceアカウントにREST API経由でデータをエクスポートできます。
+
+Salesforce REST Writebackアカウントには、Data Centerから接続できます。このトピックでは、Salesforce Rest Writebackコネクターのユーザーインターフェースに固有のフィールドとメニューについて説明します。DataSetの追加、更新スケジュールの設定、およびDataSet情報の編集方法については、「[コネクターを使用してDataSetを追加する](/s/article/360042926274)」を参照してください。
+
+## 必要条件
+
+Salesforce REST Writebackコネクターを設定してDomo DataSetを作成するには、以下を提供する必要があります。
+
+- DomoクライアントID
+- Domoクライアントシークレット
+- Salesforce環境の選択
+
+### DomoクライアントIDとクライアントシークレットを生成する
+
+DomoクライアントIDとクライアントシークレットは、Domoインスタンス内で生成できます。
+
+DomoクライアントIDとシークレットを生成するには、次の手順に従います。
+
+1. ナビゲーションヘッダーで、**［その他］** &gt; <img alt="" src="/images/kb/0EMVq00000EYlkP.jpg" style={{width: 18, height: 18, display: 'inline', verticalAlign: 'start', margin: '0'}}/> **［管理者］**を選択します。  
+
+   <Frame>![スクリーンショット](/images/kb/0EMVq00000EYmBp.jpg)</Frame>
+2. 管理者設定の**［認証］**セクションで、**［APIクライアント］**ページをクリックします。  
+
+   <Frame>![スクリーンショット](/images/kb/0EMVq00000EYma1.jpg)</Frame>
+3. 右上隅にある**［作成］**をクリックします。  
+
+   <Frame>![スクリーンショット](/images/kb/0EMVq00000EYmer.jpg)</Frame>
+
+     
+   **［APIクライアントの作成］**ウィンドウが開きます。
+4. アプリケーション名と説明を入力します。
+5. **［スコープ］**で**［データ］**と**［ユーザー］**のチェックボックスをオンにし、**［作成］**をクリックします。  
+
+   <Frame>![スクリーンショット](/images/kb/0EMVq00000EYmoX.jpg)</Frame>
+6. 生成したクライアントIDとクライアントシークレットをコピーして保存します。
+
+## Salesforce REST Writebackアカウントに接続する
+
+このセクションでは、Salesforce Rest Writebackコネクターページの**［認証情報］**ペインおよび**［詳細］**ペインのオプションについて説明します。このページのほかのペインの項目である**［スケジュール設定］**や**［DataSetに名前を付け、説明を入力］**に関しては、ほとんどのタイプのコネクターで共通しています。詳細については、「[コネクターを使用してDataSetを追加する](/s/article/360042926274)」を参照してください。
+
+## ［認証情報］ペイン
+
+このペインには、Salesforce REST Writebackアカウントに接続する認証情報の入力フィールドが含まれています。以下の表では、各フィールドに必要な内容を説明しています。  
+
+| フィールド | 説明 |
+| --- | --- |
+| Salesforce Environment | 認証するSalesforce環境（login.salesforce.comまたはtest.salesforce.com）を選択します。 認証するSalesforce環境を選択します  *（オプション：login.salesforce.comまたはtest.salesforce.com）。* |
+| Domo Client ID | DomoクライアントIDを入力します。 |
+| Domo Client Secret | Domoクライアントシークレットを入力します。 |
+
+有効なSalesforce REST Writeback認証情報を一度入力しておくと、いつでも同じアカウントを使用して新しいSalesforce REST Writeback DataSetを作成できます。コネクターアカウントは、Data Centerの**［アカウント］**タブで管理することができます。このタブの詳細については、「[コネクター/アダプターアカウントを管理する](/s/article/360042926054)」を参照してください。
+
+## ［詳細］ペイン
+
+このペインは4つのセクションで構成され、Salesforceへの送信データの選択と設定を行います。
+
+#### Writeback Type
+
+このセクションでは、Domo DataSetのデータを既存のSalesforceテーブルに挿入するか、更新するか、または挿入と更新の両方を行うかを選択できます。Salesforceのオブジェクトは、**［詳細］**ペインにある**［Salesforce Setup］**セクションに自動入力されます。また、データのプッシュ先を選択することができます。
+
+#### Domo DataSet
+
+SalesforceにコピーするDataSetのDataSet ID（GUID）を入力します。Data CenterでDataSetの詳細ビューを開き、URLのdatasources/に続く部分を見ると、IDを見つけることができます。例えば、URLが「[https://mycompany.domo.com/datasources/845305d8-da3d-4107-a9d6-13ef3f86d4a4/details/overview](https://mycompany.domo.com/datasources/845305d8-da3d-4107-a9d6-13ef3f86d4a4/details/overview)」であれば、DataSet IDは「845305d8-da3d-4107-a9d6-13ef3f86d4a4」になります。
+
+<Note>
+
+**注記：** - レコードを挿入すると、Salesforceの内部IDまたは外部IDがDataSetにGUIDとして保存されます。
+- Salesforce Writebackコネクターは、「*\_BATCH\_ID\_*」列を検索します。この列が入力DataSetの中に存在する場合、コネクターはソースDataSetの最高の*\_BATCH\_ID\_*を追跡して、Salesforceに既に書き込まれているデータを追跡します。次の実行では、コネクターは前の実行で記録された行よりも*\_BATCH\_ID\_*が高い行のみを書き込みます。これは、Salesforceに重複データを書き込まないようにするためです。「*\_BATCH\_ID\_*」列がソースDataSetに存在しない場合、コネクターが実行されるたびにすべてのデータがSalesforceに書き込まれます。
+
+</Note>
+
+#### Salesforce Setup
+
+**［Writeback Type］**セクションで、**［Insert Data in Existing Table］**を選択した場合、この項目にSalesforceオブジェクトが自動表示されます。また、データのプッシュ先を選択することができます。
+
+#### Configuration Mapping
+
+このセクションでは、Domo DataSetにある列を任意のSalesforceフィールドとマッチさせます。
+
+Salesforceの必須フィールドで、正しいDataSet列を選択します。
+
+オプションのフィールドの場合は、任意のSalesforceフィールドと、DataSet列をマッチさせます。
+
+## その他のペイン
+
+スケジュール設定、再試行、更新に関するオプションなど、コネクターインターフェースのその他のペインに表示されるオプションについては、「[コネクターを使用してDataSetを追加する](/s/article/360042926274?language=ja)」を参照してください。

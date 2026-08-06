@@ -7,20 +7,26 @@ description: Build two coordinated apps that communicate via App Broadcasting �
 
 ---
 
-This tutorial builds two Custom Apps that communicate in real time using [App Broadcasting](/portal/Apps/App-Framework/Guides/broadcasting). You'll create:
+This tutorial builds two Custom Apps that talk to each other in real time using [App Broadcasting](/portal/Apps/App-Framework/Guides/broadcasting). You'll create:
 
-1. **Selector App** — A data table that publishes a `selection:changed` event whenever a user clicks a row
-2. **Detail App** — A panel that subscribes to `selection:changed` and displays details for the selected record
+1. **Selector App** — a data table that publishes a `selection:changed` message whenever a user clicks a row
+2. **Detail App** — a panel that subscribes to `selection:changed` and shows details for the selected record
 
-Along the way you'll learn:
+Along the way you'll learn how to:
 
-- How to declare broadcast channels in `manifest.json`
-- How to use `{ sticky: true }` for state that survives late mounts
-- How to filter messages by source using `domo.onBroadcastFrom()`
-- Best practices for channel naming and payload design
+- Declare broadcast channels in `manifest.json`
+- Publish and subscribe with `domo.broadcast()` and `domo.onBroadcast()`
+- Sync current state when an app mounts late (the bus keeps no history)
+- Filter messages by source with `domo.onBroadcastFrom()`
+
+```mermaid
+flowchart LR
+    S["Selector App<br/>publishes selection:changed"] -- selection:changed --> H{{Domo page}}
+    H -- selection:changed --> D["Detail App<br/>subscribes selection:changed"]
+```
 
 <Note>
-**Prerequisites:** Complete the [Setup and Installation](/portal/Apps/App-Framework/Quickstart/Setup-and-Installation) guide. You'll need two app designs published to the same Domo page.
+**Prerequisites:** Complete the [Setup and Installation](/portal/Apps/App-Framework/Quickstart/Setup-and-Installation) guide. You'll place both apps on the same Domo page, and the `app-broadcasting` feature switch must be enabled on your instance.
 </Note>
 
 ### Step 1: Scaffold both apps
@@ -63,18 +69,14 @@ Open `selector-app/manifest.json` and add the `channels` and `datasetsMapping` p
     "publishes": [
       {
         "name": "selection:changed",
-        "description": "Fires when the user clicks a customer row",
-        "sticky": true
+        "description": "Fires when the user clicks a customer row"
       }
     ]
   }
 }
 ```
 
-Key decisions:
-
-- **`sticky: true`** — The Detail App might mount after the user has already clicked a row. Sticky ensures it receives the last selection immediately.
-- **Channel naming** — `selection:changed` uses the `namespace:event` convention. The namespace groups related channels; the event describes what happened.
+The channel name `selection:changed` uses the `namespace:event` convention: the namespace groups related channels; the event describes what happened.
 
 ### Step 3: Build the Selector App component
 
@@ -98,19 +100,18 @@ export default function App() {
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
   useEffect(() => {
-    domo.data.query('customers').then(setCustomers);
+    domo.get('/data/v1/customers').then(setCustomers);
   }, []);
 
   function handleRowClick(customer: Customer) {
     setSelectedId(customer.id);
 
-    // Publish sticky state — late-mounting subscribers get this immediately
     domo.broadcast('selection:changed', {
       id: customer.id,
       name: customer.name,
       region: customer.region,
       revenue: customer.revenue,
-    }, { sticky: true });
+    });
   }
 
   return (
@@ -165,7 +166,11 @@ Open `detail-app/manifest.json`:
 }
 ```
 
-The Detail App has no datasets of its own — it gets all its data from the Selector App's broadcast messages.
+The Detail App has no datasets of its own — it gets all its data from the Selector App's messages.
+
+<Note>
+**Note:** In production, an app receives a channel only if that channel is listed under `subscribes`. Declaring `selection:changed` here is what wires the Detail App up to receive it.
+</Note>
 
 ### Step 5: Build the Detail App component
 
@@ -218,7 +223,7 @@ export default function App() {
 }
 ```
 
-Because the Selector App publishes with `sticky: true`, if the Detail App mounts after a selection has been made, it immediately receives the last value — no waiting for the user to click again.
+`onBroadcast` returns an unsubscribe function — call it in the effect cleanup so the subscription is removed when the component unmounts.
 
 ### Step 6: Publish and test
 
@@ -231,13 +236,57 @@ cd selector-app && domo publish
 cd ../detail-app && domo publish
 ```
 
-In Domo, create a new App Studio page and add both apps as cards. Broadcasting happens automatically — you don't need to configure anything in the Wiring Screen for message routing, though the Wiring Screen will display the channel declarations from your manifests for visibility. Click a row in the Selector App — the Detail App updates instantly.
+In Domo, create a new App Studio page and add both apps as cards. Broadcasting happens automatically once both apps are on the same page — you don't configure any routing. Click a row in the Selector App, and the Detail App updates instantly.
+
+### Pattern: Sync current state on mount
+
+---
+
+The bus keeps no history, so if the Detail App mounts *after* a row was already selected, it starts empty until the next click. To catch up, have the Detail App **request** the current selection when it mounts, and have the Selector App **answer** by republishing.
+
+Add a request channel to both manifests — `subscribes` in the Selector, `publishes` in the Detail:
+
+```json
+// selector-app/manifest.json → channels
+"publishes":  [{ "name": "selection:changed", "description": "Row selection" }],
+"subscribes": [{ "name": "selection:request", "description": "Replay the current selection" }]
+```
+
+```json
+// detail-app/manifest.json → channels
+"subscribes": [{ "name": "selection:changed", "description": "Selected customer" }],
+"publishes":  [{ "name": "selection:request", "description": "Ask for the current selection" }]
+```
+
+In the Selector App, answer requests by republishing the last selection:
+
+```tsx
+const [selection, setSelection] = useState<CustomerPayload | null>(null);
+
+useEffect(() => {
+  return domo.onBroadcast('selection:request', () => {
+    if (selection) domo.broadcast('selection:changed', selection);
+  });
+}, [selection]);
+```
+
+In the Detail App, ask for the current selection right after subscribing:
+
+```tsx
+useEffect(() => {
+  const unsubscribe = domo.onBroadcast('selection:changed', (msg) =>
+    setCustomer(msg.payload as CustomerPayload),
+  );
+  domo.broadcast('selection:request', {}); // catch up on mount
+  return () => unsubscribe();
+}, []);
+```
 
 ### Pattern: Filtering by source
 
 ---
 
-If your page has multiple Selector Apps and you only want to listen to one, use `domo.onBroadcastFrom()`:
+If a page has multiple Selector Apps and you only want to listen to one, use `domo.onBroadcastFrom()`:
 
 ```javascript
 // Only react to messages from a specific app instance
@@ -246,40 +295,38 @@ domo.onBroadcastFrom('selection:changed', 'target-app-instance-id', (msg) => {
 });
 ```
 
-You can find an app's instance ID in the `sourceAppId` field of any message it sends, or in the App Broadcasting DevTools inspector.
+The instance ID is the `sourceAppId` on any message that app sends — it identifies a specific *card instance* on the page, so two copies of the same app have different IDs. Like `onBroadcast`, this returns an unsubscribe function.
+
+<Note>
+**Note:** A visual broadcasting inspector for viewing live channel traffic and instance IDs is on the roadmap. Until then, log `sourceAppId` during development to find an instance's ID.
+</Note>
 
 ### Pattern: Multi-channel coordination
 
 ---
 
-Real apps often use multiple channels. Here's a Selector App that publishes both selection state and hover events:
+Real apps often use several channels. Here's a Selector App that publishes both selection and hover events:
 
 ```json
 {
   "channels": {
     "publishes": [
-      { "name": "selection:changed", "description": "Row click", "sticky": true },
-      { "name": "chart:hover", "description": "Mouse hover on data point", "sticky": false }
+      { "name": "selection:changed", "description": "Row click" },
+      { "name": "chart:hover", "description": "Mouse hover on data point" }
     ]
   }
 }
 ```
 
 ```javascript
-// Selection is sticky — persists for late subscribers
-domo.broadcast('selection:changed', { id: row.id, name: row.name }, { sticky: true });
-
-// Hover is ephemeral — only relevant right now
+domo.broadcast('selection:changed', { id: row.id, name: row.name });
 domo.broadcast('chart:hover', { seriesId: 'revenue', index: 3 });
 ```
 
 The subscriber decides which channels it cares about:
 
 ```javascript
-// Subscribe to selection (sticky — gets last value immediately)
 domo.onBroadcast('selection:changed', (msg) => updateDetail(msg.payload));
-
-// Subscribe to hover (ephemeral — only fires in real time)
 domo.onBroadcast('chart:hover', (msg) => highlightPoint(msg.payload));
 ```
 
@@ -287,7 +334,7 @@ domo.onBroadcast('chart:hover', (msg) => highlightPoint(msg.payload));
 
 ---
 
-Use `domo.onBroadcastOnce()` when an app only needs to receive a message once (e.g., initial configuration from a coordinator app):
+Use `domo.onBroadcastOnce()` when an app only needs a message once — for example, an initial configuration from a coordinator app. It unsubscribes automatically after the first delivery:
 
 ```javascript
 domo.onBroadcastOnce('config:init', (msg) => {
@@ -300,41 +347,29 @@ domo.onBroadcastOnce('config:init', (msg) => {
 
 ---
 
-The SDK throws synchronous errors for invalid usage:
+`domo.broadcast()` returns immediately and **never throws**. If the host rejects a message — a reserved `domo:` channel, a payload over 64 KB, more than 100 messages per second, or the feature switch being off — it notifies only the sending app, and the SDK writes a warning to the browser console:
 
-```javascript
-try {
-  // Reserved namespace — throws immediately
-  domo.broadcast('domo:system', { data: 'test' });
-} catch (e) {
-  console.error(e.message); // "Reserved namespace"
-}
-
-try {
-  // Payload too large — throws immediately
-  domo.broadcast('data:export', hugeObject);
-} catch (e) {
-  console.error(e.message); // "Payload too large"
-}
+```
+[domo.broadcast] RATE_LIMIT_EXCEEDED — Rate limit of 100 messages/second exceeded (channel: chart:hover)
 ```
 
-Rate-limit errors from the host arrive asynchronously. The SDK logs a warning when messages are being throttled.
+Because there's no thrown error to catch, watch the console during development, and design publishers to stay within the limits (for example, throttle high-frequency events like hover before broadcasting).
 
 ### Summary
 
 ---
 
-| Concept | What you learned |
-| --- | --- |
-| `channels` in manifest | Declare what your app publishes and subscribes to |
-| `domo.broadcast()` | Publish a message; pass `{ sticky: true }` to retain it for late subscribers |
-| `domo.onBroadcast()` | Subscribe to a channel and react to messages |
-| `domo.onBroadcastFrom()` | Filter messages by source app |
-| `domo.onBroadcastOnce()` | Auto-unsubscribe after first delivery |
-| Sticky vs. ephemeral | Use sticky for state, ephemeral for events |
+| Concept                  | What you learned                                                                                |
+| ------------------------ | ----------------------------------------------------------------------------------------------- |
+| `channels` in manifest   | Declare what your app publishes and subscribes to; `subscribes` is what wires you up to receive |
+| `domo.broadcast()`       | Publish a message to a channel; returns `void`, never throws                                    |
+| `domo.onBroadcast()`     | Subscribe to a channel; returns an unsubscribe function                                         |
+| `domo.onBroadcastFrom()` | Only receive messages from a specific app instance                                              |
+| `domo.onBroadcastOnce()` | Auto-unsubscribe after the first message                                                        |
+| Sync on mount            | The bus keeps no history — request current state instead of relying on replay                   |
 
 ### Next steps
 
-- [App Broadcasting Guide](/portal/Apps/App-Framework/Guides/broadcasting) — Architecture, security model, and lifecycle details
+- [App Broadcasting Guide](/portal/Apps/App-Framework/Guides/broadcasting) — Architecture, limits, and lifecycle
 - [The Manifest File](/portal/Apps/App-Framework/Guides/manifest#channels) — Full channel declaration reference
 - [domo.js SDK Reference](/portal/Apps/App-Framework/Tools/domo-js#broadcasting) — Complete API documentation

@@ -340,6 +340,17 @@ Tell the user:
 
 ---
 
+## Step 12: Offer localization
+
+After delivering the output above, ask the user:
+
+> "Would you like to localize this article into Spanish, French, and German? (Note: Japanese localization is handled on a separate pipeline — no action needed there.)"
+
+- **If yes:** invoke the `localize` skill, passing the new article's file path as the argument.
+- **If no:** the skill ends here.
+
+---
+
 ## Reference: Good prior examples
 
 When in doubt about voice, length, or cluster organization, read one of these as a model:

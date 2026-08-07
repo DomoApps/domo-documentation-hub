@@ -33,10 +33,11 @@ If the feature is brand-new and not yet in the reference, find the closest match
 
 ## Step 3: Gather release information
 
-After the Article Intake Summary is confirmed, ask the following two questions before writing:
+After the Article Intake Summary is confirmed, ask the following questions before writing:
 
 1. **Release status:** What is the release status of the feature(s) covered in this article? For each distinct feature or section, is it GA (generally available) or beta? If mixed, which parts are beta?
 2. **Planned branch cut date:** What is the planned **branch cut date** for this release? This is the internal branch name (NOT the feature release date).
+3. **Feature switch date:** (Ask only if the article is tied to a GA release.) On what date do customers see the feature? This determines the branch name and the base branch (see **Step 8**). Do not try to derive it from the branch cut date; if the user doesn't know it, tell them the article can't be routed to a GA branch until they get it from the PM or release checklist.
 
 ---
 
@@ -124,3 +125,38 @@ python3 -c "import json; json.load(open('docs.json')); print('docs.json is valid
 1. Tell the user the file path of the new MDX article (`s/article/Article-Title-Here.mdx`).
 2. Confirm the article was added to `docs.json` navigation and state where it was placed.
 3. Note any sections left as placeholders (screenshots, specific grant names, etc.) that the user will need to fill in.
+4. State the branch name and PR base branch the article should use, per **Step 8**.
+
+---
+
+## Step 8: Branch and PR routing
+
+Tell the user which branch and base branch this article belongs on. Do not create the branch or open the PR unless they ask.
+
+**If the article is not tied to a GA release:** branch `first.last/short-description`, base `main`. It publishes on the normal weekly KB schedule (PR in by Thursday for the following Monday).
+
+**If the article is tied to a GA release:** use the feature switch date collected in Step 3:
+
+- Branch: `first.last/Article-Title-ga-MM-DD-YYYY` (zero-padded numeric date)
+- Base: the GA branch for that date, named with a spelled-out month, such as `release-ga/may-20-2026`
+
+Confirm the GA branch exists before telling the user to target it:
+
+```bash
+git branch -r | grep release-ga
+```
+
+If it doesn't exist, tell the user the Knowledge Base Administrator needs to create it. Do not tell them to base on `main` instead, because that would publish the article before the feature ships.
+
+See `CLAUDE.md` › **Contribution Workflow** for the full convention.
+
+---
+
+## Step 9: Offer localization
+
+After delivering the output above, ask the user:
+
+> "Would you like to localize this article into Spanish, French, and German? (Note: Japanese localization is handled on a separate pipeline — no action needed there.)"
+
+- **If yes:** invoke the `localize` skill, passing the new article's file path as the argument.
+- **If no:** the skill ends here.

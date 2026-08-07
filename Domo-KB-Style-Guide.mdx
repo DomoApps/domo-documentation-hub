@@ -3,6 +3,8 @@ title: "Domo KB Style Guide"
 excerpt: "Standards and conventions for writing clear, consistent Domo Knowledge Base documentation."
 ---
 
+import { DomoEmbed } from "/snippets/DomoEmbed.mdx";
+
 ## Intro
 
 This style guide provides guidelines for producing Domo Knowledge Base documentation that is clear and consistent. When a specific instance is not addressed within this guide, refer to the following third-party references:
@@ -132,6 +134,19 @@ The frontmatter `title` field renders as H1. This means:
 - Subsections should be H3, H4, and so on
 
 The table of contents renders through H4. If you find yourself going three or more levels deep, consider reorganizing your content.
+
+### Versioned Articles
+
+When two or more versions of a feature are documented simultaneously — both remaining available to users — append a version label to the article title using the format `Feature Name v[number]`. The `v` is always lowercase; do not capitalize it, do not spell it out as "Version," and do not add a space between `v` and the number.
+
+- **Correct:** "AI Chat v2", "AI Chat v1"
+- **Incorrect:** "AI Chat V2", "AI Chat Version 2", "AI Chat v 2"
+
+Apply the label consistently to **all** coexisting articles for the same feature, including the older one. Never leave one version unlabeled when another exists — this makes it ambiguous which article is which.
+
+The same format applies to filenames and `docs.json` paths: `AI-Chat-v2.mdx`, `"s/article/AI-Chat-v2"`. Do not append `(Beta)` or `(Legacy)` to distinguish versions; use the version label instead.
+
+In body copy, spell out "version" in lowercase when referring to a version by number: "AI Chat version 2 supports cross-DataSet queries."
 
 ## Process Instructions
 
@@ -389,6 +404,12 @@ Three props are available:
 
 <Note>**Note:** The Domo instance that hosts the embed must allow your documentation domain in its embed allowlist. If the iframe appears blank, check the source instance's CSP / embed allowlist settings.</Note>
 
+### Live Example
+
+<DomoEmbed src="https://embed.domo.com/cards/G8mM0" width="600" initialHeight="600" />
+
+Source card: [modocorp.domo.com/kpis/details/1429774452](https://modocorp.domo.com/kpis/details/1429774452)
+
 ## Callouts
 
 Use React callout elements for notes, warnings, and tips — not plain text or HTML. Always bold the label and its colon, for example `**Note:**`.
@@ -430,6 +451,32 @@ For a Note that introduces a **group** of beta features rather than one specific
 ```
 
 The snippet renders a Note about enabling beta features, with links to enable beta features, to join the Beta Program, and an address for beta questions or feedback (and, unless `generic` is set, a leading "This feature is in beta." sentence). To see or change the exact text, open `/snippets/BetaNote.mdx` — remember that a change there updates every article that imports it.
+
+### Localized Beta Notes
+
+For articles in Spanish, French, German, or Japanese, import and use the language-specific named export from the same snippet file. Both `<LangBetaNote />` (feature-level) and `<LangBetaNote generic />` (release-notes roundup) work identically to their English equivalents.
+
+| Language | Import name | Component usage |
+| -------- | ----------- | --------------- |
+| English  | `BetaNote`    | `<BetaNote />` / `<BetaNote generic />` |
+| Spanish  | `BetaNoteEs`  | `<BetaNoteEs />` / `<BetaNoteEs generic />` |
+| French   | `BetaNoteFr`  | `<BetaNoteFr />` / `<BetaNoteFr generic />` |
+| German   | `BetaNoteDe`  | `<BetaNoteDe />` / `<BetaNoteDe generic />` |
+| Japanese | `BetaNoteJa`  | `<BetaNoteJa />` / `<BetaNoteJa generic />` |
+
+Example import for a Spanish article:
+
+```mdx
+import { BetaNoteEs } from '/snippets/BetaNote.mdx';
+```
+
+Example usage (Spanish, release-notes roundup above a list of beta features):
+
+```mdx
+<BetaNoteEs generic />
+```
+
+Do not use the English `<BetaNote />` in a localized article. Do not paste raw beta text inline — always use the snippet so that wording, links, and the email address stay consistent and can be updated in one place.
 
 ### Whole-Article Beta Features
 

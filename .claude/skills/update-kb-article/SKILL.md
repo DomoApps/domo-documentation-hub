@@ -284,3 +284,40 @@ Tell the user:
 - What was changed, created, or deleted
 - Any follow-up actions they need to handle manually (e.g., uploading new image assets, updating absolute links on the live Salesforce support site)
 - Any files that were intentionally left unchanged and why
+- The branch and PR base branch the change belongs on, per **Step 8**
+
+---
+
+## Step 8: Branch and PR routing
+
+If the user is already on a working branch, verify it matches the convention and that its base is correct. Otherwise, tell them what to use. Do not create the branch or open the PR unless they ask.
+
+**Routine updates:** branch `first.last/short-description`, base `main`. Publishes on the normal weekly KB schedule (PR in by Thursday for the following Monday).
+
+**Updates documenting a change that ships with a GA release:** the article must not go live before the feature. If the change is tied to a release and you don't already know the **feature switch date** (the date customers see the feature), ask for it. Never derive it from the product branch cut date.
+
+- Branch: `first.last/short-description-ga-MM-DD-YYYY` (zero-padded numeric date)
+- Base: the GA branch for that date, named with a spelled-out month, such as `release-ga/may-20-2026`
+
+Confirm the GA branch exists before telling the user to target it:
+
+```bash
+git branch -r | grep release-ga
+```
+
+If it doesn't exist, tell the user the Knowledge Base Administrator needs to create it. Do not fall back to `main`.
+
+If the user is on a branch whose name contains `-ga-<date>` but whose PR bases onto `main`, flag it: the change would publish ahead of the feature.
+
+See `CLAUDE.md` › **Contribution Workflow** for the full convention.
+
+---
+
+## Step 9: Offer localization
+
+After delivering the output above, ask the user:
+
+> "Would you like to localize this article (or your changes to it) into Spanish, French, and German? (Note: Japanese localization is handled on a separate pipeline — no action needed there.)"
+
+- **If yes:** invoke the `localize` skill, passing the updated article's file path as the argument.
+- **If no:** the skill ends here.

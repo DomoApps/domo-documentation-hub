@@ -16,14 +16,15 @@ domo.js (published as `ryuu.js`) is the official JavaScript SDK for building Cus
 
 ## What's New in v6
 
-| Feature | Description |
-| --- | --- |
-| `domo.intercept()` | Register request middleware — logging, retries, custom headers |
-| Structured errors | `DomoHttpError`, `DomoAuthError`, `DomoConnectionError`, `DomoValidationError`, `DomoTimeoutError` |
-| `RequestOptions.schema` | Runtime response validation with a custom parse function |
-| `domo.debug` | Category-based debug logging, persisted via `localStorage` |
-| Service namespaces | `domo.data`, `domo.appdb`, `domo.ai`, `domo.workflow`, `domo.codeEngine` |
-| Optimized bundle | Reduced bundle size, zero runtime dependencies |
+| Feature                 | Description                                                                                        |
+| ----------------------- | -------------------------------------------------------------------------------------------------- |
+| `domo.broadcast()`      | Channel-based cross-app communication with source identity                                         |
+| `domo.intercept()`      | Register request middleware — logging, retries, custom headers                                     |
+| Structured errors       | `DomoHttpError`, `DomoAuthError`, `DomoConnectionError`, `DomoValidationError`, `DomoTimeoutError` |
+| `RequestOptions.schema` | Runtime response validation with a custom parse function                                           |
+| `domo.debug`            | Category-based debug logging, persisted via `localStorage`                                         |
+| Service namespaces      | `domo.data`, `domo.appdb`, `domo.ai`, `domo.workflow`, `domo.codeEngine`                           |
+| Optimized bundle        | Reduced bundle size, zero runtime dependencies                                                     |
 
 For a full list of breaking changes, see [Migration from v5](#migration-from-v5).
 
@@ -57,6 +58,7 @@ domo.onFiltersUpdated((filters) => {
 - **AI Services** — Text generation and text-to-SQL via Domo's AI Service Layer
 - **HTTP API Access** — Authenticated requests to Domo datasets, datastores, and APIs
 - **Real-time Events** — Listen for dataset updates, filter changes, and variable updates
+- **App Broadcasting** — Channel-based pub/sub between apps on the same page with source identity
 - **Filter Management** — Get and set page-level filters programmatically
 - **Variable Management** — Access and update page variables
 - **Custom App Data** — Send custom data between apps on the same page
@@ -208,13 +210,13 @@ import {
 } from 'ryuu.js';
 ```
 
-| Class | Thrown When | Key Properties |
-| --- | --- | --- |
-| `DomoHttpError` | Non-2xx HTTP response | `status`, `statusText`, `body`, `headers` |
-| `DomoAuthError` | 401 or 403 response | Extends `DomoHttpError` |
-| `DomoConnectionError` | Network failure (fetch rejects) | — |
-| `DomoValidationError` | Invalid input or schema parse failure | `errors[]` |
-| `DomoTimeoutError` | Request or message timeout | `url` |
+| Class                 | Thrown When                           | Key Properties                            |
+| --------------------- | ------------------------------------- | ----------------------------------------- |
+| `DomoHttpError`       | Non-2xx HTTP response                 | `status`, `statusText`, `body`, `headers` |
+| `DomoAuthError`       | 401 or 403 response                   | Extends `DomoHttpError`                   |
+| `DomoConnectionError` | Network failure (fetch rejects)       | —                                         |
+| `DomoValidationError` | Invalid input or schema parse failure | `errors[]`                                |
+| `DomoTimeoutError`    | Request or message timeout            | `url`                                     |
 
 <Note>
 Always check `DomoAuthError` before `DomoHttpError` in your catch block — `DomoAuthError` extends `DomoHttpError`, so an `instanceof DomoHttpError` check will also match auth errors.
@@ -703,6 +705,97 @@ domo.onAppDataUpdated((data) => {
 
 **Use Case:** Enable communication between multiple Custom Apps on the same Domo page.
 
+<Note>
+**Note:** For new apps, prefer [App Broadcasting](#broadcasting) over `onAppDataUpdated`. Broadcasting provides channel-based routing, source identity, and manifest-declared channels.
+</Note>
+
+---
+
+#### Broadcasting
+
+The broadcasting methods provide a channel-based pub/sub system for cross-app communication. Apps publish named messages and subscribe to channels — the host routes messages between apps on the same page.
+
+<Note>
+**Note:** App Broadcasting requires the `app-broadcasting` feature switch. While it is disabled, publishing is safe but has no effect — the host rejects each message with a `FEATURE_DISABLED` notice that the SDK logs to the console, and no messages are delivered.
+</Note>
+
+See the [App Broadcasting Guide](/portal/Apps/App-Framework/Guides/broadcasting) for conceptual overview, architecture, and security model.
+
+---
+
+#### `domo.onBroadcast(channel, handler)`
+
+Subscribe to messages on a channel. The handler fires each time a message is published to the channel *after* you subscribe. The bus keeps no history, so a new subscriber does not receive earlier messages.
+
+**Parameters:**
+
+- `channel` (string, required) — Channel name to subscribe to. Cannot start with `domo:`.
+- `handler` — `(msg: BroadcastMessage) => void`
+
+**Returns:** `function` — Unsubscribe function. Call it to stop listening.
+
+**BroadcastMessage shape:**
+
+```typescript
+interface BroadcastMessage {
+  channel: string;     // Channel the message was published to
+  payload: unknown;    // Data sent by the publisher
+  sourceAppId: string; // Publishing card instance ID, host-stamped (trustworthy)
+  timestamp: number;   // Host-assigned delivery time (ms since epoch)
+}
+```
+
+```javascript
+const unsubscribe = domo.onBroadcast('selection:changed', (msg) => {
+  console.log(`App ${msg.sourceAppId} selected:`, msg.payload);
+  renderDetail(msg.payload);
+});
+
+// Stop listening
+unsubscribe();
+```
+
+---
+
+#### `domo.onBroadcastOnce(channel, handler)`
+
+Subscribe to a channel and automatically unsubscribe after the first message is received.
+
+**Parameters:**
+
+- `channel` (string, required) — Channel name
+- `handler` — `(msg: BroadcastMessage) => void`
+
+**Returns:** `function` — Unsubscribe function (can cancel before first delivery)
+
+```javascript
+domo.onBroadcastOnce('init:ready', (msg) => {
+  console.log('Coordinator is ready, starting work');
+  beginProcessing(msg.payload.config);
+});
+```
+
+---
+
+#### `domo.onBroadcastFrom(channel, sourceAppId, handler)`
+
+Subscribe to a channel but only receive messages from a specific app instance.
+
+**Parameters:**
+
+- `channel` (string, required) — Channel name
+- `sourceAppId` (string, required) — Only deliver messages from this app instance
+- `handler` — `(msg: BroadcastMessage) => void`
+
+**Returns:** `function` — Unsubscribe function
+
+```javascript
+// Only listen to selection events from the main data table
+domo.onBroadcastFrom('selection:changed', 'abc-123-def', (msg) => {
+  updateChart(msg.payload);
+});
+```
+
 ---
 
 ### Emitters
@@ -765,6 +858,32 @@ domo.requestAppDataUpdate({
   action: 'highlight',
   rowId: 123
 });
+```
+
+<Note>
+**Note:** For new apps, prefer [`domo.broadcast()`](#domo-broadcast-channel-payload) over `requestAppDataUpdate`. Broadcasting provides channel routing and source identity.
+</Note>
+
+---
+
+#### `domo.broadcast(channel, payload)`
+
+Publish a message to all apps subscribed to the given channel on the same page.
+
+**Parameters:**
+
+- `channel` (string, required) — Channel name. Cannot start with `domo:`.
+- `payload` (unknown, required) — Any serializable data. Must be under 64 KB when serialized.
+
+**Returns:** `void` — Returns immediately and never throws.
+
+If the host rejects a message, it notifies only the sending app and the SDK logs a `console.warn` in the form `[domo.broadcast] <CODE> — <message>`. It does not throw or reject a promise. Rejection codes: `RESERVED_NAMESPACE`, `PAYLOAD_TOO_LARGE`, `PAYLOAD_NOT_SERIALIZABLE`, `RATE_LIMIT_EXCEEDED`, `FEATURE_DISABLED`.
+
+```javascript
+// Fire-and-forget event
+domo.broadcast('chart:hover', { seriesId: 'revenue', index: 3 });
+
+domo.broadcast('selection:changed', { id: 42, name: 'Acme Corp' });
 ```
 
 ---
@@ -1126,10 +1245,10 @@ const rows = (await domo.data.query('sales')) as SalesRecord[];
 
 domo.js detects the platform and routes messages through the appropriate bridge automatically. No configuration needed.
 
-| Platform | Bridge used |
-| --- | --- |
-| Desktop / Web | MessageChannel + `window.parent.postMessage` |
-| iOS | `webkit.messageHandlers` (`domofilter`, `domovariable`) |
+| Platform          | Bridge used                                                 |
+| ----------------- | ----------------------------------------------------------- |
+| Desktop / Web     | MessageChannel + `window.parent.postMessage`                |
+| iOS               | `webkit.messageHandlers` (`domofilter`, `domovariable`)     |
 | Android / Flutter | Global objects (`window.domofilter`, `window.domovariable`) |
 
 **Platform detection:**
@@ -1178,13 +1297,13 @@ localStorage.__domo_debug__ = '["all"]';
 
 **Debug categories:**
 
-| Category | What it logs |
-| --- | --- |
-| `http` | Every request: method, URL, headers, response status and body |
-| `messages` | All MessageChannel and postMessage traffic (inbound and outbound) |
-| `filters` | Filter update events and subscriptions |
-| `variables` | Variable update events and subscriptions |
-| `all` | Everything above |
+| Category    | What it logs                                                      |
+| ----------- | ----------------------------------------------------------------- |
+| `http`      | Every request: method, URL, headers, response status and body     |
+| `messages`  | All MessageChannel and postMessage traffic (inbound and outbound) |
+| `filters`   | Filter update events and subscriptions                            |
+| `variables` | Variable update events and subscriptions                          |
+| `all`       | Everything above                                                  |
 
 **Example output:**
 
@@ -1278,10 +1397,10 @@ domo.onDataUpdated((alias) => {
 
 The filter event name on the wire is `"filter"` (not `"filtersUpdated"`). Desktop and mobile use different field names which domo.js normalizes for you:
 
-| Field | Desktop | Mobile |
-| --- | --- | --- |
-| Column | `columnName` | `column` |
-| Operator | `operator` | `operand` |
+| Field    | Desktop      | Mobile    |
+| -------- | ------------ | --------- |
+| Column   | `columnName` | `column`  |
+| Operator | `operator`   | `operand` |
 
 ---
 

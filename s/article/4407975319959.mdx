@@ -1,0 +1,90 @@
+---
+title: "Google BigQuery Rakuten Custom Unload Connector"
+excerpt: "Configure Domo's Google BigQuery Rakuten Custom Unload Connector to unload large BigQuery query results into Domo through the Google Cloud Storage service."
+---
+
+## Intro
+
+Google BigQuery is a serverless, highly scalable, and cost-effective cloud data warehouse designed to create, manage, share, and query data. It's a cloud-based big data analytics web service for processing very large read-only data sets. With this connector you can unload larger results from BigQuery through the assistance of the Google Cloud Storage service. Google BigQuery queries are written using a variation of the standard SQL SELECT statement. To learn more about the BigQuery API, go to [https://cloud.google.com/bigquery/docs/reference/v2/](https://cloud.google.com/bigquery/docs/reference/v2/).
+
+The Google BigQuery Rakuten Custom Unload Connector is a "Cloud App" connector, meaning it retrieves data stored in the cloud. In the Data Center, you can access the connector page for this and other Cloud App connectors by selecting **Cloud App** in the toolbar at the top of the window.
+
+This article covers the fields and menus specific to the Google BigQuery Rakuten Custom Unload Connector interface. For general information about adding DataSets, setting update schedules, and editing DataSet information, see [Adding a DataSet Using a Connector](/s/article/360042926274).
+
+---
+
+## Prerequisites
+
+To connect to BigQuery and create a DataSet, you must have the following:
+
+- A Google BigQuery service account JSON key
+- A Google Cloud Storage service account JSON key
+
+To generate a Google BigQuery service account JSON key, do the following:
+
+1. In the [Google Cloud Platform Console](https://console.cloud.google.com/), open the **IAM & Admin** page.
+
+2. Select **Service accounts** in the left-hand navigation pane.
+
+3. Select your project and select **Open**.
+
+4. Select **Create Service Account**.
+
+5. In the Create service account pane, enter a name and description for the service account, and select **Create and continue**.
+
+6. In the **Grant this service account access to the project** section, select **Project** > **Owner** from the **Select a role** dropdown.
+
+7. Select **Done**.
+
+   <Note>**Note:** You may need the "BigQuery Admin" role in the service account permissions dialog. Consult with your Google administrator for additional guidance.</Note>
+
+8. To create a new JSON key, in the **Service accounts** pane, open the three-dot expansion menu and select **Manage keys**.
+
+9. In the **Keys** section, select **Add Key** > **Create new key**.
+
+10. Select **JSON** as the key type and select **Create**.
+
+11. Select **Create**.
+
+    A private key is saved to your computer.
+
+## Connect to BigQuery
+
+This section enumerates the options in the Credentials and Details panes on the Google BigQuery Rakuten Custom Unload Connector page. The components of the other panes on this page, **Scheduling** and **Name & Describe Your DataSet**, are universal across most connector types and are discussed in greater length in [Adding a DataSet Using a Connector](/s/article/360042926274).
+
+### Credentials Pane
+
+This pane contains fields for entering credentials to connect to your BigQuery account. The following table describes what is needed for each field:
+
+| Field                                         | Description                                                        |
+| --------------------------------------------- | ------------------------------------------------------------------ |
+| Service Account Key JSON BigQuery             | Copy and paste the JSON for your BigQuery service account key.     |
+| Service Account Key JSON Google Cloud Storage | Copy and paste the JSON for your Google Cloud Storage account key. |
+
+Once you have entered valid keys, you can use the same account any time you go to create a new Google BigQuery Rakuten Custom Unload DataSet. You can manage connector accounts in the **Accounts** tab in the Data Center. For more information about this tab, see [Manage Connector/Adapter Accounts](/s/article/360042926054).
+
+### Details Pane
+
+This pane contains a number of fields and menus you can use to configure your report.
+
+| Menu                                             | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| ------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| How would you like to import data into Domo?     | <table><thead><tr><th>Import Type</th><th>Description</th></tr></thead><tbody><tr><td>Standard Update</td><td>To use standard update, select the Replace or Append mode in the scheduling section.</td></tr><tr><td>Use Partitions</td><td>To use partition update, select the Append mode in the scheduling section.</td></tr><tr><td>Use Upsert</td><td>To use upsert update, select the Merge mode in the scheduling section.</td></tr></tbody></table> |
+| Project ID                                       | Select the Google project ID obtained from the service key.                                                                                                                                                                                                                                                                                                                                                                                                |
+| Google BigQuery Dataset ID                       | Select the BigQuery dataset ID for your data. For more information about BigQuery datasets, see [Introduction to DataSets](https://cloud.google.com/bigquery/docs/datasets-intro).                                                                                                                                                                                                                                                                         |
+| Google Cloud Storage Bucket Name                 | Select the Google Cloud Storage bucket name that is used for temporary storage as we transfer your data into Domo.                                                                                                                                                                                                                                                                                                                                         |
+| Query                                            | Enter a query to execute. Only Standard SQL queries are supported.                                                                                                                                                                                                                                                                                                                                                                                         |
+| How would you like to perform your partition?    | Select whether you want to perform partition by date or by meta query.                                                                                                                                                                                                                                                                                                                                                                                     |
+| Partition Meta Query to determine partition tags | Enter partition query to determine the distinct partition tags.                                                                                                                                                                                                                                                                                                                                                                                            |
+| Partition Column Name                            | Enter partition column name.                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| Days Back                                        | The number of days back that you would like to get data. Specify 7 to get data for the last 7 days.                                                                                                                                                                                                                                                                                                                                                        |
+| Upsert Key Column(s)                             | Enter upsert key column name or a comma-separated list of upsert key column names. **This is required only when the Update method is Merge.**                                                                                                                                                                                                                                                                                                              |
+
+### Other Panes
+
+For information about the remaining sections of the connector interface, including how to configure scheduling, retry, and update options, see [Adding a DataSet Using a Connector](/s/article/360042926274).
+
+## Troubleshoot
+
+- Ensure that the credentials have the proper access to query the tables needed.
+- Make sure the queries are correct and calling the correctly named data sources.

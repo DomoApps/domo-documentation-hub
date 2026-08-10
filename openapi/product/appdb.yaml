@@ -311,6 +311,41 @@ components:
         updatedOn: "2024-01-15T18:42:30.115Z"
         updatedBy: 870010733
 
+  responses:
+    CollectionNotFound:
+      description: Not Found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            message: "Cannot find permission from source [USER:870010733] to target [MAGNUM_COLLECTION:a3f7d891-bc24-4e56-9a12-c7e3b0f845d2]. Permission Service reports that one or both does not exist"
+            status: 404
+            statusReason: "Not Found"
+            toe: "RG3808D5LS-DHKE4-TG5EB"
+    CollectionNotFoundDirect:
+      description: Not Found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            message: "No collection with id a3f7d891-bc24-4e56-9a12-c7e3b0f845d2 found"
+            status: 404
+            statusReason: "Not Found"
+            toe: "UO3SB982DA-RL9G8-GO8DF"
+    DatastoreNotFound:
+      description: Not Found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            message: "Datastore not found"
+            status: 404
+            statusReason: "Not Found"
+            toe: "368PTXPNSC-XVC0X-TBNYZ"
+
 security:
   - developerToken: []
 
@@ -447,7 +482,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Collection'
         '400':
-          description: "`syncEnabled: true` was passed without a `schema`."
+          description: "Bad Request. Common causes: `syncEnabled: true` was passed without a `schema`; or the required `name` field was missing."
 
   /api/datastores/v1/collections/query:
     post:
@@ -600,6 +635,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Collection'
+        '404':
+          $ref: '#/components/responses/CollectionNotFound'
     put:
       summary: Update Collection
       description: "Update one or more fields on a collection. All request body fields are optional — only the fields you include are changed."
@@ -650,6 +687,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Collection'
+        '404':
+          $ref: '#/components/responses/CollectionNotFoundDirect'
     delete:
       summary: Delete Collection
       description: Permanently delete a collection and all of its documents.
@@ -664,11 +703,38 @@ paths:
       responses:
         '204':
           description: Collection deleted. No response body is returned.
+        '404':
+          $ref: '#/components/responses/CollectionNotFound'
 
   /api/datastores/v1/collections/{collectionId}/permission/RYUU_APP/{proxyId}:
     put:
-      summary: Update App Permissions
-      description: "Grant or replace permissions for a Custom App (proxy) on a collection. By default, the specified permissions are merged with any permissions the app already holds. Pass `overwrite=true` to replace the app's permission set entirely. To grant permissions to a user or group instead, use the USER or GROUP variants of this endpoint."
+      summary: Update Permissions
+      description: |
+        Grant or replace permissions for a Custom App (proxy) on a collection. To update permissions for a user or group instead, use the USER or GROUP path variants of this endpoint.
+
+        ## Permission Inheritance
+
+        Users and groups inherit permissions from the app, so often the most convenient approach is to give the app the permissions you want all users to have. Anyone who has the app card shared with them inherits its permissions on the collection and its documents. By default, apps receive `read`, `create_content`, `read_content`, `update_content`, and `delete_content` on their collections.
+
+        For finer-grained control — when not everyone should be able to create, update, or delete documents — grant permissions directly to individual users or groups instead.
+
+        ## Available Permissions
+
+        | Permission       | Grants |
+        | ---------------- | ------ |
+        | `admin`          | All permissions to the collection and its documents |
+        | `write`          | Update the collection's properties |
+        | `read`           | Read the collection's properties |
+        | `share`          | Add or remove permissions this entity already holds |
+        | `delete`         | Delete the collection |
+        | `create_content` | Create documents in the collection |
+        | `update_content` | Update documents in the collection |
+        | `read_content`   | Read documents in the collection |
+        | `delete_content` | Delete documents from the collection |
+
+        `READ` is always included in the resulting permission set, even if you do not specify it.
+
+        Removing all entity permissions leaves only users with the **Manage AppDB** grant with access.
       tags:
         - App DB API (Product)
       parameters:
@@ -706,13 +772,30 @@ paths:
         - name: overwrite
           in: query
           required: false
-          description: "When `false` (default), merges the specified permissions with the app's existing permissions. When `true`, replaces the app's entire permission set with exactly the permissions specified."
+          description: |
+            Controls how the specified permissions are applied to the entity's existing permission set.
+
+            - `false` (default) — **additive**: merges the specified permissions with any permissions the entity already holds.
+            - `true` — **replace**: discards the entity's existing permissions and replaces them with exactly the permissions you specify. `READ` is still always included in the resulting set.
           schema:
             type: boolean
             default: false
       responses:
         '204':
-          description: No Content
+          description: Permissions updated successfully. No response body is returned.
+        '403':
+          description: "Forbidden. The collection does not exist or the caller does not have permission to manage its permissions."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                message: "The item you're looking for can not be found"
+                status: 403
+                statusReason: "Forbidden"
+                toe: "GP0ITH3EYK-UTED0-8ZCS2"
+        '404':
+          $ref: '#/components/responses/CollectionNotFoundDirect'
 
   /api/datastores/v1/collections/{collectionId}/permission/USER/{userId}:
     put:
@@ -762,6 +845,8 @@ paths:
       responses:
         '204':
           description: No Content
+        '404':
+          $ref: '#/components/responses/CollectionNotFoundDirect'
 
   /api/datastores/v1/collections/{collectionId}/permission/GROUP/{groupId}:
     put:
@@ -811,6 +896,8 @@ paths:
       responses:
         '204':
           description: No Content
+        '404':
+          $ref: '#/components/responses/CollectionNotFoundDirect'
 
   /api/datastores/v1/collections/{collectionId}/permission:
     get:
@@ -870,6 +957,17 @@ paths:
                 RYUU_APP:
                   - id: "a1b2c3d4-1234-5678-abcd-ef0123456789"
                     permissions: ["READ", "CREATE_CONTENT", "READ_CONTENT", "UPDATE_CONTENT", "DELETE_CONTENT"]
+        '403':
+          description: "Forbidden. The collection does not exist or the user does not have permission to view its permission list."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                message: "The item you're looking for can not be found"
+                status: 403
+                statusReason: "Forbidden"
+                toe: "S3L5DHUFAT-79LXK-PWJG5"
 
   /api/datastores/v1/collections/{collectionId}/permission/user:
     get:
@@ -995,6 +1093,8 @@ paths:
       responses:
         '204':
           description: Datastore deleted successfully. No response body is returned.
+        '404':
+          $ref: '#/components/responses/DatastoreNotFound'
 
   /api/datastores/v1/export/{datastoreId}:
     post:
@@ -1016,7 +1116,6 @@ paths:
 
   /api/datastores/v2/export/{datastoreId}:
     post:
-      operationId: exportDatastoreV2
       summary: Sync Datastore
       description: "Triggers a sync of all syncEnabled collections in the datastore to their linked Domo DataSets. Each collection must have `syncEnabled: true` to be synced. If a collection does not yet have a `datasourceId`, one is created automatically on first sync. Optionally pass a list of collection IDs from **other** datastores in the request body to sync those collections in the same operation — these are typically shared collections declared with a fixed UUID in an app design's `collectionsMapping`, which live outside the primary datastore and are shared across app instances."
       tags:
@@ -1282,7 +1381,7 @@ paths:
                     example: 2
   /api/datastores/v2/collections/{collectionId}/documents/query:
     post:
-      summary: Query Document
+      summary: Query Documents
       description: |
         Retrieve documents from a collection via MongoDB query (v2 endpoint).
 
@@ -1509,11 +1608,12 @@ paths:
                     campaignName: "Red Campaign"
                     region: "West"
                     status: "Inactive"
+        '404':
+          $ref: '#/components/responses/CollectionNotFound'
 
   #========= Document Endpoints (v2) =========
   /api/datastores/v2/collections/{collectionId}/documents:
     get:
-      operationId: listDocumentsV2
       summary: List Documents
       description: Retrieve documents from a specified collection. There is an upper limit of 10,000 documents per request. Use `limit` and `offset` to paginate through large collections.
       tags:
@@ -1556,6 +1656,8 @@ paths:
                     region: "West"
                     status: "Active"
 
+        '404':
+          $ref: '#/components/responses/CollectionNotFound'
     post:
       summary: Create Document
       description: Add a new document to a specified collection.
@@ -1602,9 +1704,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/Document'
 
+        '404':
+          $ref: '#/components/responses/CollectionNotFound'
+
   /api/datastores/v2/collections/{collectionId}/documents/{documentId}:
     get:
-      operationId: getDocumentV2
       summary: Get Document
       description: Retrieve a specific document from a collection.
       tags:
@@ -1783,6 +1887,8 @@ paths:
               example:
                 Created: 2
 
+        '404':
+          $ref: '#/components/responses/CollectionNotFound'
     put:
       summary: Bulk Upsert Documents
       description: "Insert or update multiple documents in a single request. Documents with a matching `id` are updated; documents without a matching `id` are created. Each document is limited to 2 MB."
@@ -1832,6 +1938,8 @@ paths:
                 Updated: 1
                 Created: 1
 
+        '404':
+          $ref: '#/components/responses/CollectionNotFound'
     delete:
       summary: Bulk Delete Documents
       description: "Remove multiple documents from a collection in a single request. IDs are passed as a comma-separated `ids` query parameter. For large batches, keep requests under approximately 800 UUIDs (~30 KB URL) to avoid URL length errors; split larger deletes across multiple requests."
@@ -1863,6 +1971,8 @@ paths:
                     description: Number of documents deleted.
               example:
                 Deleted: 2
+        '404':
+          $ref: '#/components/responses/CollectionNotFound'
 
   /api/datastores/v2/collections/{collectionId}/documents/update:
     put:
@@ -1927,6 +2037,19 @@ paths:
               schema:
                 type: integer
                 example: 1
+        '400':
+          description: "Bad Request. The request body is missing a required field (`query` or `operation`)."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                message: "query is required"
+                status: 400
+                statusReason: "Bad Request"
+                toe: "8PJRQYWMHF-NXB3Z-KTZUA"
+        '404':
+          $ref: '#/components/responses/CollectionNotFound'
 
   /api/datastores/v2/collections/{collectionId}/download:
     get:

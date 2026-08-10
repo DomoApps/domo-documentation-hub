@@ -58,7 +58,10 @@ mintlify dev
 
 ## Deployment
 
-- **`main`** — merges auto-deploy to production via the Mintlify GitHub App.
+Merging does not publish. Once your changes are approved and merged into `main`, they are held until the next scheduled release, at which point Mintlify rebuilds the site and the updated content goes live.
+
+- **Release schedule:** to be included in the following Monday's release, submit your PR by Thursday. The release is cut Friday early afternoon. Monday morning, the Enablement team switches over the release branch via an EC ticket; after that changeover completes, Mintlify rebuilds and the content is live.
+- **Mid-week releases:** in certain circumstances, such as a specific customer ask or a highly visible fix, a release can be cut mid-week. Contact the Knowledge Base Administrator to request one.
 - **`release/**`** — pushes to release branches create a Mintlify preview via `.github/workflows/mint-preview.yml`. Preview URL is posted to any open PR whose head is the release branch.
 - **Any PR** — Mintlify's GitHub App posts a preview link in the PR's Checks tab.
 

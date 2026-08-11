@@ -324,11 +324,13 @@ Save. The preview lists Desk (8), Chair (3), and Mouse (5) — the three items u
 
 ---
 
-## Update a Document Atomically
+## Update a Document
 
-AppDB supports atomic field-level operators, so you can increment, set, or push to a field without reading the document first. The [`$inc`](https://www.mongodb.com/docs/manual/reference/operator/update/inc/) operator below adds 20 to `content.qty` on the Mouse document only — the rest of the document is unchanged.
+There are three ways to update documents: the [single document replace](/api-reference/appdb-api/update-document), the [bulk upsert](/api-reference/appdb-api/upsert-documents-in-bulk), or the [multi-document partial update](/api-reference/appdb-api/partially-update-documents).
 
-This differs from a full-document replace in an important way: with `$inc`, concurrent updates from multiple users don't overwrite each other.
+The partial update allows you to update only certain fields and each document is updated atomically — meaning updates are forced to take turns on a document, instead of trying to update the same value at the same time. That matters most when writes could collide.
+
+To see it in action, simulate a burst of orders: fire ten sales of the same item at the same instant. Each `$inc` decrements `content.qty` by one, and because each runs atomically, none overwrite the others.
 
 Replace `app.js`:
 
@@ -336,45 +338,51 @@ Replace `app.js`:
 ```js domo.js v6
 const output = document.getElementById("output");
 
-await domo.appdb.partialUpdate(
-  "Inventory",
-  { "content.name": "Mouse" },
-  { $inc: { "content.qty": 20 } },
+// Ten orders for the same item arrive at the same instant.
+// Each $inc is applied atomically on the server, so none overwrite each other.
+await Promise.all(
+  Array.from({ length: 10 }, () =>
+    domo.appdb.partialUpdate(
+      "Inventory",
+      { "content.name": "Notebook" },
+      { $inc: { "content.qty": -1 } },
+    ),
+  ),
 );
 
-const docs = await domo.appdb.query("Inventory", {
-  "content.qty": { $lt: 10 },
+const [notebook] = await domo.appdb.query("Inventory", {
+  "content.name": "Notebook",
 });
-output.innerHTML =
-  "<p>Low stock after restock:</p>" +
-  docs
-    .map((doc) => `<p>${doc.content.name} — ${doc.content.qty} remaining</p>`)
-    .join("");
+output.textContent = `Notebook remaining: ${notebook.content.qty}`;
 
 ````
 
 ```js domo.js v4
 const output = document.getElementById("output");
 
-await domo.put("/domo/datastores/v2/collections/Inventory/documents/update", {
-  query: { "content.name": "Mouse" },
-  operation: { $inc: { "content.qty": 20 } },
-});
-
-const docs = await domo.post(
-  "/domo/datastores/v2/collections/Inventory/documents/query",
-  { "content.qty": { $lt: 10 } },
+// Ten orders for the same item arrive at the same instant.
+// Each $inc is applied atomically on the server, so none overwrite each other.
+await Promise.all(
+  Array.from({ length: 10 }, () =>
+    domo.put("/domo/datastores/v2/collections/Inventory/documents/update", {
+      query: { "content.name": "Notebook" },
+      operation: { $inc: { "content.qty": -1 } },
+    }),
+  ),
 );
-output.innerHTML =
-  "<p>Low stock after restock:</p>" +
-  docs
-    .map((doc) => `<p>${doc.content.name} — ${doc.content.qty} remaining</p>`)
-    .join("");
+
+const [notebook] = await domo.post(
+  "/domo/datastores/v2/collections/Inventory/documents/query",
+  { "content.name": "Notebook" },
+);
+output.textContent = `Notebook remaining: ${notebook.content.qty}`;
 ````
 
 </CodeGroup>
 
-Save. Mouse is gone from the low-stock list — only Desk (8) and Chair (3) remain. See [Partially Update Documents](/api-reference/appdb-api/partially-update-documents) for all supported operators.
+Save. The preview shows **Notebook remaining: 40** — ten operations, ten decrements, nothing lost. Had you instead read `qty` into JavaScript, subtracted one, and written the whole document back, all ten reads would have seen the same starting value and overwritten each other, losing almost every sale. Atomic operators eliminate that race. (Re-running the block sells ten more.)
+
+See [Partially Update Documents](/api-reference/appdb-api/partially-update-documents) for all supported operators.
 
 ---
 

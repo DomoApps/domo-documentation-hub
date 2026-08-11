@@ -1,9 +1,9 @@
 ---
 title: Build an Inventory Tracker with AppDB
-description: Build a working inventory tracker to learn how AppDB stores flexible documents, queries them, updates fields atomically, aggregates server-side, and syncs to a DataSet for cards — no connector required.
+description: Build a working inventory tracker to learn how AppDB stores flexible documents, queries them, updates fields atomically, and aggregates server-side — no connector required.
 ---
 
-This guide builds a working inventory tracker to teach the essentials of **AppDB**, Domo's built-in document store for app data. You'll define a collection, write and query documents, update them atomically, aggregate on the server, and sync the results to a DataSet you can build cards on — all without a connector or refresh cycle.
+This guide builds a working inventory tracker to teach the essentials of **AppDB**, Domo's built-in document store for app data. You'll define a collection, write and query documents, update them atomically, and aggregate on the server — all without a connector or refresh cycle.
 
 ---
 
@@ -15,8 +15,6 @@ Reach for AppDB when your app owns its data:
 
 - **Use AppDB** for state a user creates or edits inside the app — inventory, annotations, saved settings, form entries.
 - **Use a Domo DataSet** when data arrives from a connector, Workbench, or ETL, or exists mainly to power cards and dashboards.
-
-You don't have to choose permanently: any collection can **sync to a DataSet** when you're ready to report on it — the [last step](#sync-your-collection-to-a-dataset) does exactly that.
 
 <Note>
   **Before you start:** You need access to a **Domo instance** where you can
@@ -100,8 +98,7 @@ Collections are the primary unit of data organization in AppDB. In the **Resourc
   **Note:** The manifest controls the collection, not the API. If you later
   update this collection through the API, the platform will overwrite your
   changes the next time the card is saved. To change a manifest-defined
-  collection — add a field to its schema, enable sync to a DataSet — edit the
-  manifest instead. See [Working with the
+  collection, edit the manifest instead. See [Working with the
   Manifest](/portal/API-Reference/app-framework-apis/AppDB-API#working-with-the-manifest).
 </Note>
 
@@ -417,65 +414,6 @@ Save. The preview shows totals per category, sorted highest first. See [Query Do
 
 ---
 
-## Sync Your Collection to a DataSet
-
-Your inventory data now lives inside the app. To chart it — a low-stock alert card, a units-by-category bar chart, a dashboard for the whole warehouse — the data needs to be a Domo **DataSet**. Turn on **sync**, and AppDB copies the collection's documents into a DataSet you can build cards on like any other.
-
-Sync is a property of the collection, so set it in the manifest (the source of truth). Enabling sync requires a `schema` — the columns you list become the DataSet's columns, and only those top-level `content` fields are synced.
-
-Update the `Inventory` entry in `manifest.json` by using the Resources pane or editing the file directly:
-
-```json
-{
-  "collectionsMapping": [
-    {
-      "name": "Inventory",
-      "schema": {
-        "columns": [
-          { "name": "name", "type": "STRING" },
-          { "name": "category", "type": "STRING" },
-          { "name": "qty", "type": "LONG" }
-        ]
-      },
-      "syncEnabled": true
-    }
-  ]
-}
-```
-
-We chose to have the heterogeneous fields from earlier — `warranty`, `weight`, `tags` — not appear as columns in the DataSet, but you could include them. 
-
-Domo syncs `syncEnabled` collections to their DataSets **every 15 minutes**. During development, trigger a sync on demand instead of waiting:
-
-<CodeGroup>
-```js domo.js v6
-// domo.js v6
-await domo.appdb.export(true); // `true` includes related collections as well, which includes any Collections in the manifest with a fixed UUID
-console.log("sync started");
-```
-
-```js domo.js
-domo.post("/domo/datastores/v1/export?includeRelatedCollections=true").then(() => console.log("sync started"));
-// `true` includes related collections as well, which includes any Collections in the manifest with a fixed UUID
-```
-
-</CodeGroup>
-
-After the sync runs, find the new DataSet under **Data** and build cards on it like any other DataSet.
-
-<Warning>
-**Watch these sync rules:**
-
-- Only **top-level** keys in `content` sync. A nested object syncs as its JSON string, not as separate columns.
-- Use only these column types: `STRING` · `LONG` · `DECIMAL` · `DOUBLE` · `DATE` · `DATETIME` — if it doesn't appear after 15 minutes, check your types first.
-- Format `DATE` and `DATETIME` values as `YYYY-MM-DD` or `YYYY-MM-DDTHH:MM:SSZ`.
-
-</Warning>
-
-See [Sync Collections](/api-reference/appdb-api/sync-collections) for the full sync endpoint and [Working with the Manifest](/portal/API-Reference/app-framework-apis/AppDB-API#working-with-the-manifest) for schema details.
-
----
-
 ## Inspect Your Data
 
 To view, query, and edit your collection's documents outside your app, open [AppDB Admin](/s/article/9221297758615). The **Data Explorer** lets you run queries and modify documents interactively — useful for checking what your app wrote during development, or for debugging an unexpected query result.
@@ -484,8 +422,8 @@ To view, query, and edit your collection's documents outside your app, open [App
 
 ## Where to Go Next
 
-This walkthrough covered the core read/write operations — bulk create, query with operators, atomic update, server-side aggregation, and sync to a DataSet. A few more AppDB capabilities are worth exploring:
+This walkthrough covered the core read/write operations — bulk create, query with operators, atomic update, and server-side aggregation. A few more AppDB capabilities are worth exploring:
 
 - **Document-level security** — Enforce server-side filter rules on a collection so users see only the documents they're permitted to access, such as records matching their user ID or group. See [Document-Level Security](/portal/API-Reference/app-framework-apis/AppDB-API#document-level-security).
 - **Collection permissions** — Grant specific users, groups, or the app instance itself read, write, or manage access to a collection. See [Collection-Level Security](/portal/API-Reference/app-framework-apis/AppDB-API#collection-level-security).
-- **Full endpoint reference** — Every endpoint for documents, collections, sync, and permissions is listed on the [AppDB API Overview](/portal/API-Reference/app-framework-apis/AppDB-API).
+- **Full endpoint reference** — Every AppDB endpoint is listed on the [AppDB API Overview](/portal/API-Reference/app-framework-apis/AppDB-API).

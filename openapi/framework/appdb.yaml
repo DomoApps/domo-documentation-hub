@@ -122,24 +122,23 @@ components:
 
     DocumentCreate:
       type: object
+      required:
+        - content
       properties:
         content:
           type: object
           additionalProperties: true
-          description: >-
-            The document content. If omitted, the top-level fields of the request body are
-            automatically wrapped as the content (e.g. `{"name":"Harry"}` is stored as
-            `{"content":{"name":"Harry"}}`). Both forms are accepted.
+          description: The document content matching collection schema
 
     DocumentUpdate:
       type: object
+      required:
+        - content
       properties:
         content:
           type: object
           additionalProperties: true
-          description: >-
-            The replacement document content. If omitted, the top-level fields of the request body are
-            automatically wrapped as the content. Both forms are accepted.
+          description: Updated document content
 
     Collection:
       type: object
@@ -1343,7 +1342,7 @@ paths:
   /domo/datastores/v2/collections/{collectionName}/documents:
     post:
       summary: Create Document
-      description: "Creates a single document in a collection. The request body accepts either the wrapped form `{\"content\": {...}}` or a flat object — flat payloads are automatically stored under the `content` key."
+      description: "Creates a single document in a collection."
       tags:
       - AppDB API
       parameters:
@@ -1660,7 +1659,7 @@ paths:
 
     put:
       summary: Replace Document
-      description: "Replaces an existing document in a collection — the entire `content` object is overwritten with whatever you send. The request body accepts either the wrapped form `{\"content\": {...}}` or a flat object — flat payloads are automatically stored under the `content` key. To update individual fields without replacing the whole document, use Partially Update Documents instead."
+      description: "Replaces an existing document in a collection — the entire `content` object is overwritten with whatever you send. To update individual fields without replacing the whole document, use Partially Update Documents instead."
       tags:
       - AppDB API
       parameters:

@@ -1,0 +1,274 @@
+---
+title: Build an Inventory Tracker with AppDB
+description: A step-by-step walkthrough that builds a live inventory tracker to illustrate how AppDB stores flexible documents, runs MongoDB-style queries, applies atomic updates, and aggregates data server-side — all without a connector or refresh cycle.
+---
+
+This guide builds a working inventory tracker to illustrate the most important parts of AppDB: defining a collection, writing heterogeneous documents, filtering with query operators, updating fields atomically, and aggregating on the server. You'll finish with a small app that reads and writes live data directly — no connector required.
+
+---
+
+## Understand How AppDB is Organized
+
+Before writing any code, it helps to understand the three-layer structure AppDB uses to organize data.
+
+| Layer          | Analogy  | Notes                                                             |
+| -------------- | -------- | ----------------------------------------------------------------- |
+| **Datastore**  | Database | One per app; created automatically when the card is installed.    |
+| **Collection** | Table    | Define in the manifest or create programmatically at runtime.     |
+| **Document**   | Row      | A free-form JSON object stored inside a system-provided envelope. |
+
+Every document has a `content` field that holds your data. When you write a document, you put your data inside `content`. When you read one back, you'll find it there.
+
+Unlike a Domo DataSet, AppDB doesn't require a fixed column schema. Documents in the same collection can have completely different shapes — which is what makes it useful for app-owned state.
+
+---
+
+## Create the App
+
+Go to **Asset Library** (`your-instance.domo.com/assetlibrary`) and select **Pro Code Editor** in the top-right corner. Select the **Hello World** template to create a new app.
+
+---
+
+## Define a Collection
+
+Collections are the primary unit of data organization in AppDB. The standard way to define them is in your app's `manifest.json` — the manifest is the source of truth for your app's data model.
+
+In the **Resources** pane (bottom-left of the Pro Code Editor), expand **Collections** and create a new collection named `Inventory`. Saving updates your `manifest.json` to include the collection:
+
+```json
+{
+  "id": "d9e480f1-0625-42e7-aedf-2f19eabb81e2",
+  "name": "Hello World",
+  "version": "0.0.1",
+  "datasetsMapping": [],
+  "size": { "width": 1, "height": 1 },
+  "collectionsMapping": [
+    {
+      "id": "89c6a829-479a-4533-8e1b-6746df0de4ad",
+      "name": "Inventory",
+      "syncEnabled": false
+    }
+  ]
+}
+```
+
+<Note>
+**Note:** The manifest controls the collection, not the API. If you later update this collection through the API, the platform will overwrite your changes the next time the card is saved. To change a manifest-defined collection — add a field to its schema, enable sync to a DataSet — edit the manifest instead. See [Working with the Manifest](/portal/API-Reference/app-framework-apis/AppDB-API#working-with-the-manifest).
+</Note>
+
+---
+
+## Prepare the HTML
+
+Add an output container to `index.html` and load `domo.js`. Subsequent steps will replace `app.js` to demonstrate each operation.
+
+<CodeGroup>
+```html domo.js
+<html>
+  <head>
+    <link rel="stylesheet" href="app.css" />
+  </head>
+  <body>
+    <div id="output"></div>
+    <script
+      src="https://unpkg.com/ryuu.js@4.6.0/dist/domo.js"
+      integrity="sha384-YYsd9wQ+wDlUWhvpfGdptxmNYIqBC+52oJtWgPKJadbs3sSFTY/+ZotPbEHTTRWz"
+      crossorigin="anonymous"
+    ></script>
+    <script type="module" src="app.js"></script>
+  </body>
+</html>
+```
+
+```html domo.js v6
+<html>
+  <head>
+    <link rel="stylesheet" href="app.css" />
+  </head>
+  <body>
+    <div id="output"></div>
+    <script src="https://unpkg.com/ryuu.js/dist/domo.js"></script>
+    <script type="module" src="app.js"></script>
+  </body>
+</html>
+```
+</CodeGroup>
+
+---
+
+## Create Documents
+
+AppDB documents don't require a fixed schema. Documents in the same collection can carry completely different fields — electronics carry `warranty`, furniture carries `weight`, and the notebook has neither. All live in the same `Inventory` collection with no schema change required.
+
+Replace `app.js` with the following:
+
+<CodeGroup>
+```js domo.js
+const output = document.getElementById("output");
+
+const result = await domo.post(
+  "/domo/datastores/v2/collections/Inventory/documents/bulk",
+  [
+    { content: { name: "Laptop",   category: "electronics", qty: 12, tags: ["portable", "computing"], warranty: "2 years" } },
+    { content: { name: "Mouse",    category: "electronics", qty: 5,  tags: ["portable", "input"],     warranty: "1 year"  } },
+    { content: { name: "Desk",     category: "furniture",   qty: 8,  tags: ["office"],                weight: "25kg"      } },
+    { content: { name: "Chair",    category: "furniture",   qty: 3,  tags: ["office", "ergonomic"],   weight: "12kg"      } },
+    { content: { name: "Notebook", category: "stationery",  qty: 50, tags: ["writing", "portable"]                       } },
+  ],
+);
+output.textContent = `Created ${result.Created} items.`;
+```
+
+```js domo.js v6
+const output = document.getElementById("output");
+
+// domo.appdb.bulkCreate automatically wraps each object in { content: ... }
+const result = await domo.appdb.bulkCreate("Inventory", [
+  { name: "Laptop",   category: "electronics", qty: 12, tags: ["portable", "computing"], warranty: "2 years" },
+  { name: "Mouse",    category: "electronics", qty: 5,  tags: ["portable", "input"],     warranty: "1 year"  },
+  { name: "Desk",     category: "furniture",   qty: 8,  tags: ["office"],                weight: "25kg"      },
+  { name: "Chair",    category: "furniture",   qty: 3,  tags: ["office", "ergonomic"],   weight: "12kg"      },
+  { name: "Notebook", category: "stationery",  qty: 50, tags: ["writing", "portable"]                        },
+]);
+output.textContent = `Created ${result.Created} items.`;
+```
+</CodeGroup>
+
+Save and verify the preview shows **Created 5 items.**
+
+---
+
+## Query Documents
+
+AppDB uses [MongoDB query operators](https://www.mongodb.com/docs/manual/reference/mql/query-predicates/) on any field, with no index setup required. The following query finds items where `content.qty` is less than 10 using the `$lt` operator.
+
+Replace `app.js`:
+
+<CodeGroup>
+```js domo.js
+const output = document.getElementById("output");
+
+const docs = await domo.post(
+  "/domo/datastores/v2/collections/Inventory/documents/query",
+  { "content.qty": { $lt: 10 } },
+);
+output.innerHTML =
+  "<p>Low stock (under 10):</p>" +
+  docs.map((doc) => `<p>${doc.content.name} — ${doc.content.qty} remaining</p>`).join("");
+```
+
+```js domo.js v6
+const output = document.getElementById("output");
+
+const docs = await domo.appdb.query("Inventory", { "content.qty": { $lt: 10 } });
+output.innerHTML =
+  "<p>Low stock (under 10):</p>" +
+  docs.map((doc) => `<p>${doc.content.name} — ${doc.content.qty} remaining</p>`).join("");
+```
+</CodeGroup>
+
+Save. The preview lists Desk (8), Chair (3), and Mouse (5) — the three items under the threshold. See [Query Documents](/api-reference/appdb-api/query-documents) for the full filter syntax.
+
+---
+
+## Update a Document Atomically
+
+AppDB supports atomic field-level operators, which means you can increment, set, or push to a field without reading the document first. The [`$inc`](https://www.mongodb.com/docs/manual/reference/operator/update/inc/) operator below adds 20 to `content.qty` on the Mouse document only — the rest of the document is unchanged.
+
+This is meaningfully different from a full-document replace: with `$inc`, concurrent updates from multiple users don't overwrite each other.
+
+Replace `app.js`:
+
+<CodeGroup>
+```js domo.js
+const output = document.getElementById("output");
+
+await domo.put("/domo/datastores/v2/collections/Inventory/documents/update", {
+  query:     { "content.name": "Mouse" },
+  operation: { $inc: { "content.qty": 20 } },
+});
+
+const docs = await domo.post(
+  "/domo/datastores/v2/collections/Inventory/documents/query",
+  { "content.qty": { $lt: 10 } },
+);
+output.innerHTML =
+  "<p>Low stock after restock:</p>" +
+  docs.map((doc) => `<p>${doc.content.name} — ${doc.content.qty} remaining</p>`).join("");
+```
+
+```js domo.js v6
+const output = document.getElementById("output");
+
+await domo.appdb.partialUpdate(
+  "Inventory",
+  { "content.name": "Mouse" },
+  { $inc: { "content.qty": 20 } },
+);
+
+const docs = await domo.appdb.query("Inventory", { "content.qty": { $lt: 10 } });
+output.innerHTML =
+  "<p>Low stock after restock:</p>" +
+  docs.map((doc) => `<p>${doc.content.name} — ${doc.content.qty} remaining</p>`).join("");
+```
+</CodeGroup>
+
+Save. Mouse is gone from the low-stock list — only Desk (8) and Chair (3) remain. See [Partially Update Documents](/api-reference/appdb-api/partially-update-documents) for all supported operators.
+
+---
+
+## Aggregate Server-Side
+
+AppDB can group, sum, and sort your data on the server before the response is sent — no DataSet refresh required, no client-side sorting. This is the same `query` endpoint used above, extended with aggregation parameters.
+
+Replace `app.js`:
+
+<CodeGroup>
+```js domo.js
+const output = document.getElementById("output");
+
+const groups = await domo.post(
+  "/domo/datastores/v2/collections/Inventory/documents/query?groupby=content.category&sum=content.qty totalQty&orderby=totalQty descending",
+  {},
+);
+output.innerHTML =
+  "<p>Total inventory by category:</p>" +
+  groups.map((g) => `<p>${g._id}: ${g.totalQty} units</p>`).join("");
+```
+
+```js domo.js v6
+const output = document.getElementById("output");
+
+const groups = await domo.appdb.query(
+  "Inventory",
+  {},
+  {
+    groupby: "content.category",
+    sum:     "content.qty totalQty",
+    orderby: "totalQty descending",
+  },
+);
+output.innerHTML =
+  "<p>Total inventory by category:</p>" +
+  groups.map((g) => `<p>${g._id}: ${g.totalQty} units</p>`).join("");
+```
+</CodeGroup>
+
+Save. The preview shows totals per category, sorted highest first. See [Query Documents](/api-reference/appdb-api/query-documents) for all aggregation parameters including `groupby`, `sum`, `avg`, and `orderby`.
+
+---
+
+## Inspect Your Data
+
+To view, query, and edit your collection's documents outside your app, open [AppDB Admin](/s/article/9221297758615). The **Data Explorer** lets you run queries and modify documents interactively — useful for checking what your app wrote during development, or for debugging an unexpected query result.
+
+---
+
+## Where to Go Next
+
+This walkthrough covered the core read/write operations — bulk create, query with operators, atomic update, and server-side aggregation. A few important AppDB capabilities weren't covered here:
+
+- **Collection sync to a DataSet** — Collections can optionally sync their documents to a Domo DataSet, making your app's data available for reporting and dashboards. Configure this with `syncEnabled: true` in the manifest schema. See [Working with the Manifest](/portal/API-Reference/app-framework-apis/AppDB-API#working-with-the-manifest).
+- **Document-level security** — You can enforce server-side filter rules on a collection so that users only see documents they're permitted to access — for example, records matching their user ID or group. See [Document-Level Security](/portal/API-Reference/app-framework-apis/AppDB-API#document-level-security).
+- **Collection permissions** — Grant specific users, groups, or the app instance itself read, write, or manage access to a collection. See [Collection-Level Security](/portal/API-Reference/app-framework-apis/AppDB-API#collection-level-security).
+- **Full endpoint reference** — Every available endpoint for documents, collections, sync, and permissions is listed on the [AppDB API Overview](/portal/API-Reference/app-framework-apis/AppDB-API).

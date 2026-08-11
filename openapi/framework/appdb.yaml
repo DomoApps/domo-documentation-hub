@@ -145,23 +145,26 @@ components:
 
     DocumentCreate:
       type: object
-      required:
-        - content
       properties:
         content:
           type: object
           additionalProperties: true
-          description: The document content matching collection schema
+          description: >-
+            The document content. If the request body has no `content` key, its
+            top-level fields are wrapped as the content automatically. For
+            example, `{"name": "Harry"}` is stored as `{"content": {"name":
+            "Harry"}}`.
 
     DocumentUpdate:
       type: object
-      required:
-        - content
       properties:
         content:
           type: object
           additionalProperties: true
-          description: Updated document content
+          description: >-
+            The replacement document content. If the request body has no
+            `content` key, its top-level fields are wrapped as the content
+            automatically.
 
     Collection:
       type: object
@@ -332,7 +335,10 @@ paths:
     post:
       x-excluded: true
       summary: Create Document (v1)
-      description: Creates a single document in a collection.
+      description: |-
+        Creates a single document in a collection.
+
+        The request body accepts either the wrapped form `{"content": {...}}` or a flat object. A flat payload is stored under the `content` key automatically.
       tags:
       - AppDB API
       parameters:
@@ -585,7 +591,10 @@ paths:
     put:
       x-excluded: true
       summary: Update Document (v1)
-      description: Updates an existing document in a collection.
+      description: |-
+        Updates an existing document in a collection.
+
+        The request body accepts either the wrapped form `{"content": {...}}` or a flat object. A flat payload is stored under the `content` key automatically.
       tags:
       - AppDB API
       parameters:
@@ -1126,7 +1135,10 @@ paths:
     post:
       x-excluded: true
       summary: Create Documents in Bulk (v1)
-      description: Create multiple documents in a given collection in a single HTTP request. Each document is limited to 2 MB.
+      description: |-
+        Create multiple documents in a given collection in a single HTTP request. Each document is limited to 2 MB.
+
+        Each entry accepts either the wrapped form `{"content": {...}}` or a flat object. A flat entry is stored under the `content` key automatically.
       tags:
       - AppDB API
       parameters:
@@ -1202,7 +1214,10 @@ paths:
     put:
       x-excluded: true
       summary: Upsert Documents in Bulk (v1)
-      description: "Update existing documents or create new ones in bulk. Documents with a matching `id` are updated; documents without a matching `id` are created. Each document is limited to 2 MB."
+      description: |-
+        Update existing documents or create new ones in bulk. Documents with a matching `id` are updated; documents without a matching `id` are created. Each document is limited to 2 MB.
+
+        To update an existing document, send its `id` alongside a `content` object. An entry with no `content` key is always treated as a new document: its top-level fields are wrapped under the `content` key automatically, and a top-level `id` is wrapped in with them rather than used to match an existing document. Use the wrapped `{"id": "...", "content": {...}}` form whenever you intend to update.
       tags:
       - AppDB API
       parameters:
@@ -1365,7 +1380,10 @@ paths:
   /domo/datastores/v2/collections/{collectionName}/documents:
     post:
       summary: Create Document
-      description: "Creates a single document in a collection."
+      description: |-
+        Creates a single document in a collection.
+
+        The request body accepts either the wrapped form `{"content": {...}}` or a flat object. A flat payload is stored under the `content` key automatically.
       tags:
       - AppDB API
       parameters:
@@ -1682,7 +1700,10 @@ paths:
 
     put:
       summary: Replace Document
-      description: "Replaces an existing document in a collection — the entire `content` object is overwritten with whatever you send. To update individual fields without replacing the whole document, use Partially Update Documents instead."
+      description: |-
+        Replaces an existing document in a collection — the entire `content` object is overwritten with whatever you send. To update individual fields without replacing the whole document, use Partially Update Documents instead.
+
+        The request body accepts either the wrapped form `{"content": {...}}` or a flat object. A flat payload is stored under the `content` key automatically.
       tags:
       - AppDB API
       parameters:
@@ -2397,7 +2418,10 @@ paths:
   /domo/datastores/v2/collections/{collectionName}/documents/bulk:
     post:
       summary: Create Documents in Bulk
-      description: "Create multiple documents in a given collection in a single HTTP request. Each document is limited to 2 MB."
+      description: |-
+        Create multiple documents in a given collection in a single HTTP request. Each document is limited to 2 MB.
+
+        Each entry accepts either the wrapped form `{"content": {...}}` or a flat object. A flat entry is stored under the `content` key automatically.
       tags:
       - AppDB API
       parameters:
@@ -2513,7 +2537,10 @@ paths:
 
     put:
       summary: Upsert Documents in Bulk
-      description: "Update existing documents or create new ones in bulk. Documents with a matching `id` are updated; documents without a matching `id` are created. Each document is limited to 2 MB."
+      description: |-
+        Update existing documents or create new ones in bulk. Documents with a matching `id` are updated; documents without a matching `id` are created. Each document is limited to 2 MB.
+
+        To update an existing document, send its `id` alongside a `content` object. An entry with no `content` key is always treated as a new document: its top-level fields are wrapped under the `content` key automatically, and a top-level `id` is wrapped in with them rather than used to match an existing document. Use the wrapped `{"id": "...", "content": {...}}` form whenever you intend to update.
       tags:
       - AppDB API
       parameters:

@@ -50,21 +50,6 @@ If you've used a relational database, the analogy is direct:
 
 Unlike a DataSet, AppDB doesn't require a fixed column schema — documents in the same collection can have completely different shapes. That flexibility is what makes it useful for app-owned state.
 
-### Know the `content` Envelope
-
-Every document stores your data inside a `content` field. AppDB wraps that data in a system envelope with its own metadata (`id`, `createdBy`, timestamps), so you always write to, read from, and filter on `content`.
-
-```mermaid
-flowchart LR
-    W["You write\n{ name: 'Mouse', qty: 5 }"] --> S["AppDB wraps it\n{ id, createdBy, createdDate,\n  content: { name: 'Mouse', qty: 5 } }"]
-    S --> R["You read and query it\ndoc.content.name\n{ 'content.qty': { $lt: 10 } }"]
-
-    classDef env fill:#f5f5f5,stroke:#ccc
-    class S env
-```
-
-The takeaway before you write any code: your fields live under `content`, and queries address them as `content.fieldName`.
-
 ---
 
 ## Create the App
@@ -158,7 +143,7 @@ Collections are the primary unit of data organization in AppDB. In the **Resourc
 
 Because AppDB has no fixed schema, documents in the same collection can carry completely different fields — electronics carry `warranty`, furniture carries `weight`, and the notebook has neither. All live in the same `Inventory` collection with no schema change.
 
-Replace `app.js` with the following. The v6 helper wraps each object in `content` for you; the raw call shows the envelope explicitly.
+Replace `app.js` with the following.
 
 <CodeGroup>
 ```js domo.js v6
@@ -266,6 +251,32 @@ output.textContent = `Created ${result.Created} items.`;
 Save and verify the preview shows **Created 5 items.**
 
 You can **preview** the contents of your collections at any time. In the Pro-Code Editor, under "Resources", click your collection. Or, once deployed, you can preview your collections in [AppDB Admin](/s/article/9221297758615).
+
+#### Know the `content` Envelope
+
+Every document stores its data inside a `content` "envelope". You write only the `content` object; AppDB adds system metadata around it — an `id`, ownership, and timestamps — and returns the full document. In the diff below, the `+` lines are what AppDB adds; everything else is the `content` you wrote:
+
+```diff
++ {
++   "id": "f4d232ce-75b8-4264-85dc-9f79092dba10",
++   "datastoreId": "4b863af2-0b40-45c6-8595-540469753a43",
++   "collectionId": "208f029e-ca07-4739-a1d8-0f88c04d5cb2",
++   "syncRequired": true,
++   "owner": 782899327,
++   "createdOn": "2026-08-11T20:28:41.953726154Z",
++   "updatedOn": "2026-08-11T20:28:41.953726154Z",
++   "updatedBy": 782899327,
+    "content": {
+      "name": "Mouse",
+      "category": "electronics",
+      "qty": 5,
+      "tags": ["portable", "input"],
+      "warranty": "1 year"
+    }
++ }
+```
+
+Your fields live under `content`, and queries address them as `content.fieldName`.
 
 ---
 

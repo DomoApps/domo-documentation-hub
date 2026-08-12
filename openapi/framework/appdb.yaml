@@ -3,9 +3,9 @@ info:
   title: Domo AppDB API
   version: v1
   description: |
-    AppDB API for storing arbitrary JSON documents similar to a NoSQL database. This enables storing state within your DomoApp 
+    AppDB API for storing arbitrary JSON documents similar to a NoSQL database. This enables storing state within your DomoApp
     with optional syncing to Domo DataSets.
-    
+
     Three layers provide data storage:
     - **Datastores**: Analogous to a database. A CustomApp has a single datastore created automatically.
     - **Collections**: Analogous to a collection in NoSQL or table in relational databases.
@@ -20,13 +20,65 @@ servers:
         description: Your Domo instance name
 
 components:
+  parameters:
+    CollectionName:
+      name: collectionName
+      in: path
+      required: true
+      description: The name given to the collection in the manifest. Case-sensitive.
+      schema:
+        type: string
+    DocumentId:
+      name: documentId
+      in: path
+      required: true
+      description: The UUID of the document.
+      schema:
+        type: string
+        format: uuid
+    EntityType:
+      name: entity
+      in: path
+      required: true
+      description: The type of entity the permissions apply to.
+      schema:
+        type: string
+        enum: [USER, GROUP, RYUU_APP]
+    EntityId:
+      name: entityId
+      in: path
+      required: true
+      description: >-
+        The ID of the entity the permissions apply to. For a **USER** or **GROUP**, this is the numeric ID (for example, `870010733`). For a **RYUU_APP**, this is the app instance's UUID — the same value as the app's datastore UUID, which also appears as the subdomain of the app's origin (e.g., `https://<instance-uuid>.domoapps.domo.com`).
+      schema:
+        type: string
+      examples:
+        userOrGroup:
+          summary: User or group (numeric ID)
+          value: "870010733"
+        app:
+          summary: App instance (UUID)
+          value: "fcd8baba-9524-4fb5-b94b-b3d3b588e740"
   schemas:
     ErrorResponse:
       type: object
       properties:
         message:
           type: string
-          description: A human-readable error message
+          description: A plain-English explanation of the error. Present on some errors but not all.
+        status:
+          type: integer
+          description: The HTTP error code
+        statusReason:
+          type: string
+          description: A human-readable error message, sometimes including nested error detail
+        toe:
+          type: string
+          description: Thread of Execution; a unique identifier that Support can use to find more info about your problem
+      example:
+        status: 404
+        statusReason: "DA0088: Invalid collection name: Students"
+        toe: FTYRJMBLKD-5HB2Z-H6W8A
 
     Document:
       type: object
@@ -34,33 +86,62 @@ components:
         id:
           type: string
           format: uuid
-          description: Unique identifier for the document
-        customer:
-          type: string
-        owner:
-          type: integer
-          format: int64
+          description: Unique identifier for the Document
         datastoreId:
           type: string
           format: uuid
+          description: "Unique identifier of the Datastore that this Document's Collection belongs to."
         collectionId:
           type: string
           format: uuid
+          description: "Unique identifier of the Collection this Document belongs to."
+        syncRequired:
+          type: boolean
+          description: Whether or not this Document needs to be synced by Domo to the associated DataSet; only applies if the `syncEnabled` option is on for the Collection.
+        owner:
+          type: string
+          description: "User ID of the Document owner."
+        createdBy:
+          type: string
+          description: "User ID of the user who created the Document."
         createdOn:
           type: string
           format: date-time
+          description: "The ISO-8601 timestamp showing when this Document was created."
         updatedOn:
           type: string
           format: date-time
+          description: "The ISO-8601 timestamp showing when this Document was last updated."
         updatedBy:
-          type: integer
-          format: int64
+          type: string
+          description: "User ID of the user who last updated the Document."
         content:
           type: object
           additionalProperties: true
-          description: The actual document content
-        syncRequired:
-          type: boolean
+          description: The actual Document content
+      example:
+        id: "c023b254-647e-4839-b74b-b050d4c17447"
+        datastoreId: "5565fecc-a852-4799-83bf-f9423c0f7687"
+        collectionId: "a3aaeeed-5210-4048-9ff0-d88fa0de4eda"
+        syncRequired: true
+        owner: "870010733"
+        createdBy: "870010733"
+        createdOn: "2026-06-25T01:33:56.332Z"
+        updatedOn: "2026-06-25T01:33:56.332Z"
+        updatedBy: "870010733"
+        content:
+          name: "Harry Potter"
+          house: "Gryffindor"
+          wand:
+            wood: "holly"
+            core: "phoenix feather"
+            length: 11
+          courses:
+            - "Defense Against the Dark Arts"
+            - "Potions"
+            - "Transfiguration"
+          enrolledOn: "1991-09-01"
+          lastDetention: "1994-06-08T20:00:00Z"
 
     DocumentCreate:
       type: object
@@ -88,43 +169,81 @@ components:
         id:
           type: string
           format: uuid
-        customer:
-          type: string
+          description: Unique identifier for the collection.
         owner:
           type: integer
           format: int64
+          description: User ID of the collection owner.
         datastoreId:
           type: string
           format: uuid
+          description: ID of the datastore this collection belongs to.
         name:
           type: string
+          description: Name of the collection.
         datasourceId:
           type: string
           format: uuid
-        schemaJson:
-          type: string
+          nullable: true
+          description: ID of the linked Domo DataSet, or null if not yet linked.
+        defaultPermissions:
+          nullable: true
+          description: "Comma-separated default permission set for new app grants on this collection, or null if not set."
+        requiredAuthorities:
+          nullable: true
+          description: "Maps CollectionOperation names to required authority strings, or null if not set."
+        filters:
+          nullable: true
+          description: "Array of document-level filter predicates applied to read operations, or null if not set."
+        schema:
+          $ref: '#/components/schemas/Schema'
+        syncEnabled:
+          type: boolean
+          description: Whether documents are periodically synced to the linked DataSet.
         syncRequired:
           type: boolean
+          description: Whether a sync is pending.
+        cdcEnabled:
+          type: boolean
+          description: Whether change data capture is enabled for this collection.
         fullReplaceRequired:
           type: boolean
         lastSync:
           type: string
           format: date-time
-        updatedBy:
-          type: integer
-          format: int64
-        schema:
-          $ref: '#/components/schemas/Schema'
+          nullable: true
         createdOn:
           type: string
           format: date-time
         updatedOn:
           type: string
           format: date-time
-        exportable:
-          type: boolean
-        syncEnabled:
-          type: boolean
+        updatedBy:
+          type: integer
+          format: int64
+      example:
+        id: "a3aaeeed-5210-4048-9ff0-d88fa0de4eda"
+        datastoreId: "5565fecc-a852-4799-83bf-f9423c0f7687"
+        defaultPermissions: null
+        requiredAuthorities: null
+        owner: 870010733
+        name: "Students"
+        datasourceId: null
+        schema:
+          columns:
+            - type: "STRING"
+              name: "name"
+            - type: "STRING"
+              name: "house"
+        filters: null
+        syncEnabled: false
+        syncRequired: false
+        cdcEnabled: false
+        fullReplaceRequired: false
+        lastSync: null
+        createdOn: "2026-06-25T01:26:34.744Z"
+        updatedOn: "2026-06-25T01:26:34.744Z"
+        updatedBy: 870010733
 
     CollectionCreate:
       type: object
@@ -139,6 +258,10 @@ components:
         syncEnabled:
           type: boolean
           default: false
+          description: >-
+            Turning this property on causes the documents in your collection to be converted into rows in a DataSet every 15 minutes.
+            Only the properties defined in the schema are synced.
+            Requires `schema` to be provided — returns a 400 if `syncEnabled: true` is passed without a schema.
 
     Schema:
       type: object
@@ -153,20 +276,14 @@ components:
               type:
                 type: string
                 enum: [STRING, LONG, DECIMAL, DOUBLE, DATE, DATETIME]
-              visible:
-                type: boolean
-                default: true
+                description: The type of value. Dates must be formatted as `YYYY-MM-DD`. DateTimes must be formatted as `YYYY-MM-DDTHH:MM:SSZ`.
 
     MongoQuery:
       type: object
       additionalProperties: true
       description: MongoDB query object
       example:
-        $or:
-          - content.comments:
-              $regex: "happy"
-          - content.username:
-              $ne: "Eeyore"
+        content.wand.core: "phoenix feather"
 
     PartialUpdateRequest:
       type: object
@@ -188,6 +305,8 @@ components:
       properties:
         Created:
           type: integer
+      example:
+        Created: 2
 
     BulkUpsertResponse:
       type: object
@@ -196,27 +315,28 @@ components:
           type: integer
         Created:
           type: integer
+      example:
+        Updated: 1
+        Created: 1
 
     BulkDeleteResponse:
       type: object
       properties:
         Deleted:
           type: integer
+      example:
+        Deleted: 3
 
 paths:
   /domo/datastores/v1/collections/{collectionName}/documents:
     post:
-      summary: Create Document
-      description: Creates a single document in a collection
+      x-excluded: true
+      summary: Create Document (v1)
+      description: Creates a single document in a collection.
       tags:
       - AppDB API
       parameters:
-        - name: collectionName
-          in: path
-          required: true
-          description: The name given to the collection in the manifest
-          schema:
-            type: string
+        - $ref: '#/components/parameters/CollectionName'
       requestBody:
         required: true
         content:
@@ -225,7 +345,68 @@ paths:
               $ref: '#/components/schemas/DocumentCreate'
             example:
               content:
-                username: "Bill S. Preston, Esquire"
+                name: "Harry Potter"
+                house: "Gryffindor"
+                wand:
+                  wood: "holly"
+                  core: "phoenix feather"
+                  length: 11
+                courses:
+                  - "Defense Against the Dark Arts"
+                  - "Potions"
+                  - "Transfiguration"
+      x-codeSamples:
+        - lang: JavaScript
+          label: domo.js
+          source: |-
+            const collectionName = 'Students';
+
+            domo.post(`/domo/datastores/v1/collections/${collectionName}/documents`, {
+              content: {
+                name: 'Harry Potter',
+                house: 'Gryffindor',
+                wand: { wood: 'holly', core: 'phoenix feather', length: 11 },
+                courses: ['Defense Against the Dark Arts', 'Potions', 'Transfiguration'],
+                enrolledOn: '1991-09-01',
+                lastDetention: '1992-05-26T20:00:00Z'
+              }
+            }).then(doc => console.log(doc));
+        - &stub_curl
+          lang: cURL
+          label: cURL
+          source: |-
+            # This API is only available inside a Domo app.
+            # Use the JavaScript (domo.js) tab for the correct usage.
+        - &stub_python
+          lang: Python
+          label: Python
+          source: |-
+            # This API is only available inside a Domo app.
+            # Use the JavaScript (domo.js) tab for the correct usage.
+        - &stub_php
+          lang: PHP
+          label: PHP
+          source: |-
+            // This API is only available inside a Domo app.
+            // Use the JavaScript (domo.js) tab for the correct usage.
+        - &stub_go
+          lang: Go
+          label: Go
+          source: |-
+            // This API is only available inside a Domo app.
+            // Use the JavaScript (domo.js) tab for the correct usage.
+        - &stub_java
+          lang: Java
+          label: Java
+          source: |-
+            // This API is only available inside a Domo app.
+            // Use the JavaScript (domo.js) tab for the correct usage.
+        - &stub_ruby
+          lang: Ruby
+          label: Ruby
+          source: |-
+            # This API is only available inside a Domo app.
+            # Use the JavaScript (domo.js) tab for the correct usage.
       responses:
         '200':
           description: Document created successfully
@@ -233,25 +414,63 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Document'
-        '400':
-          description: Bad request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                id: "402778f6-bc8d-4aa5-a581-e08e3fc98c05"
+                datastoreId: "daee775a-3be4-410d-ba20-bb0d94ce51cb"
+                collectionId: "2148c830-14c2-478f-bb14-5c3019de46b4"
+                syncRequired: true
+                owner: 540824222
+                createdOn: "2026-07-31T23:09:34.542Z"
+                updatedOn: "2026-07-31T23:09:34.542Z"
+                updatedBy: 540824222
+                content:
+                  name: "Harry Potter"
+                  house: "Gryffindor"
+                  wand:
+                    wood: "holly"
+                    core: "phoenix feather"
+                    length: 11
+                  courses:
+                    - "Defense Against the Dark Arts"
+                    - "Potions"
+                    - "Transfiguration"
+                  enrolledOn: "1991-09-01"
+                  lastDetention: "1994-06-08T20:00:00Z"
 
     get:
-      summary: List Documents
-      description: Lists all documents from a given collection
+      x-excluded: true
+      summary: List Documents (v1)
+      description: Lists all documents from a given collection. There is an upper limit of 10,000 documents per request.
       tags:
       - AppDB API
       parameters:
-        - name: collectionName
-          in: path
-          required: true
-          description: The name given to the collection in the manifest
+        - $ref: '#/components/parameters/CollectionName'
+        - name: limit
+          in: query
+          description: Maximum number of documents to return
           schema:
-            type: string
+            type: integer
+            default: 10000
+        - name: offset
+          in: query
+          description: Number of documents to skip
+          schema:
+            type: integer
+            default: 0
+      x-codeSamples:
+        - lang: JavaScript
+          label: domo.js
+          source: |-
+            const collectionName = 'YourCollection';
+
+            domo.get(`/domo/datastores/v1/collections/${collectionName}/documents`)
+              .then(docs => console.log(docs));
+        - *stub_curl
+        - *stub_python
+        - *stub_php
+        - *stub_go
+        - *stub_java
+        - *stub_ruby
       responses:
         '200':
           description: Array of documents
@@ -261,26 +480,76 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Document'
+              example:
+                - id: "402778f6-bc8d-4aa5-a581-e08e3fc98c05"
+                  datastoreId: "daee775a-3be4-410d-ba20-bb0d94ce51cb"
+                  collectionId: "2148c830-14c2-478f-bb14-5c3019de46b4"
+                  syncRequired: true
+                  owner: 540824222
+                  createdOn: "2026-07-31T23:09:34.542Z"
+                  updatedOn: "2026-07-31T23:09:34.542Z"
+                  updatedBy: 540824222
+                  content:
+                    name: "Harry Potter"
+                    house: "Gryffindor"
+                    wand:
+                      wood: "holly"
+                      core: "phoenix feather"
+                      length: 11
+                    courses:
+                      - "Defense Against the Dark Arts"
+                      - "Potions"
+                      - "Transfiguration"
+                    enrolledOn: "1991-09-01"
+                    lastDetention: "1994-06-08T20:00:00Z"
+                - id: "dd363c89-60d2-4f70-89cb-c3c175be625b"
+                  datastoreId: "daee775a-3be4-410d-ba20-bb0d94ce51cb"
+                  collectionId: "2148c830-14c2-478f-bb14-5c3019de46b4"
+                  syncRequired: true
+                  owner: 540824222
+                  createdOn: "2026-07-31T23:11:11.564Z"
+                  updatedOn: "2026-07-31T23:11:11.564Z"
+                  updatedBy: 540824222
+                  content:
+                    name: "Hermione Granger"
+                    house: "Gryffindor"
+                    wand:
+                      wood: "vine"
+                      core: "dragon heartstring"
+                      length: 10.75
+                    courses:
+                      - "Potions"
+                      - "Transfiguration"
+                      - "Arithmancy"
+                      - "Care of Magical Creatures"
+                    enrolledOn: "1991-09-01"
+                    lastDetention: "1995-10-15T15:30:00Z"
 
   /domo/datastores/v1/collections/{collectionName}/documents/{documentId}:
     get:
-      summary: Get Document
-      description: Retrieves a single document from a collection
+      x-excluded: true
+      summary: Get Document (v1)
+      description: Retrieves a single document from a collection.
       tags:
       - AppDB API
       parameters:
-        - name: collectionName
-          in: path
-          required: true
-          schema:
-            type: string
-        - name: documentId
-          in: path
-          required: true
-          description: The UUID of the document
-          schema:
-            type: string
-            format: uuid
+        - $ref: '#/components/parameters/CollectionName'
+        - $ref: '#/components/parameters/DocumentId'
+      x-codeSamples:
+        - lang: JavaScript
+          label: domo.js
+          source: |-
+            const collectionName = 'YourCollection';
+            const documentId = 'your-document-id';
+
+            domo.get(`/domo/datastores/v1/collections/${collectionName}/documents/${documentId}`)
+              .then(doc => console.log(doc));
+        - *stub_curl
+        - *stub_python
+        - *stub_php
+        - *stub_go
+        - *stub_java
+        - *stub_ruby
       responses:
         '200':
           description: Document retrieved successfully
@@ -288,26 +557,40 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Document'
+              example:
+                id: "402778f6-bc8d-4aa5-a581-e08e3fc98c05"
+                datastoreId: "daee775a-3be4-410d-ba20-bb0d94ce51cb"
+                collectionId: "2148c830-14c2-478f-bb14-5c3019de46b4"
+                syncRequired: true
+                owner: 540824222
+                createdOn: "2026-07-31T23:09:34.542Z"
+                updatedOn: "2026-07-31T23:09:34.542Z"
+                updatedBy: 540824222
+                content:
+                  name: "Harry Potter"
+                  house: "Gryffindor"
+                  wand:
+                    wood: "holly"
+                    core: "phoenix feather"
+                    length: 11
+                  courses:
+                    - "Defense Against the Dark Arts"
+                    - "Potions"
+                    - "Transfiguration"
+                  enrolledOn: "1991-09-01"
+                  lastDetention: "1994-06-08T20:00:00Z"
         '404':
           description: Document not found
 
     put:
-      summary: Update Document
-      description: Updates an existing document in a collection
+      x-excluded: true
+      summary: Update Document (v1)
+      description: Updates an existing document in a collection.
       tags:
       - AppDB API
       parameters:
-        - name: collectionName
-          in: path
-          required: true
-          schema:
-            type: string
-        - name: documentId
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
+        - $ref: '#/components/parameters/CollectionName'
+        - $ref: '#/components/parameters/DocumentId'
       requestBody:
         required: true
         content:
@@ -316,50 +599,294 @@ paths:
               $ref: '#/components/schemas/DocumentUpdate'
             example:
               content:
-                username: "Bill S. Preston, Esquire"
-                Band: "Wyld Stallyns"
+                name: "Harry Potter"
+                house: "Gryffindor"
+                wand:
+                  wood: "holly"
+                  core: "phoenix feather"
+                  length: 11
+                courses:
+                  - "Defense Against the Dark Arts"
+                  - "Potions"
+                  - "Transfiguration"
+                prefect: false
+      x-codeSamples:
+        - lang: JavaScript
+          label: domo.js
+          source: |-
+            const collectionName = 'Students';
+            const documentId = '402778f6-bc8d-4aa5-a581-e08e3fc98c05';
+
+            // PUT replaces the entire document — include all fields, not just the ones changing.
+            // Harry was notably never made a prefect (that honor went to Ron in book 5).
+            domo.put(`/domo/datastores/v1/collections/${collectionName}/documents/${documentId}`, {
+              content: {
+                name: 'Harry Potter',
+                house: 'Gryffindor',
+                wand: { wood: 'holly', core: 'phoenix feather', length: 11 },
+                courses: ['Defense Against the Dark Arts', 'Potions', 'Transfiguration'],
+                prefect: false
+              }
+            }).then(doc => console.log(doc));
+        - *stub_curl
+        - *stub_python
+        - *stub_php
+        - *stub_go
+        - *stub_java
+        - *stub_ruby
       responses:
         '200':
-          description: Document updated successfully
+          description: Document updated successfully. Returns the full updated document.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Document'
+              example:
+                id: "402778f6-bc8d-4aa5-a581-e08e3fc98c05"
+                datastoreId: "daee775a-3be4-410d-ba20-bb0d94ce51cb"
+                collectionId: "2148c830-14c2-478f-bb14-5c3019de46b4"
+                syncRequired: true
+                owner: 540824222
+                createdOn: "2026-07-31T23:09:34.542Z"
+                updatedOn: "2026-07-31T23:14:23.209Z"
+                updatedBy: 540824222
+                content:
+                  name: "Harry Potter"
+                  house: "Gryffindor"
+                  wand:
+                    wood: "holly"
+                    core: "phoenix feather"
+                    length: 11
+                  courses:
+                    - "Defense Against the Dark Arts"
+                    - "Potions"
+                    - "Transfiguration"
+                  prefect: false
+                  enrolledOn: "1991-09-01"
+                  lastDetention: "1994-06-08T20:00:00Z"
 
     delete:
-      summary: Delete Document
-      description: Permanently deletes a document from the collection
+      x-excluded: true
+      summary: Delete Document (v1)
+      description: Permanently deletes a document from the collection. Returns an empty response body on success.
       tags:
       - AppDB API
       parameters:
-        - name: collectionName
-          in: path
-          required: true
-          schema:
-            type: string
-        - name: documentId
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
+        - $ref: '#/components/parameters/CollectionName'
+        - $ref: '#/components/parameters/DocumentId'
+      x-codeSamples:
+        - lang: JavaScript
+          label: domo.js
+          source: |-
+            const collectionName = 'YourCollection';
+            const documentId = 'your-document-id';
+
+            domo.delete(`/domo/datastores/v1/collections/${collectionName}/documents/${documentId}`)
+              .then(() => console.log('deleted'));
+        - *stub_curl
+        - *stub_python
+        - *stub_php
+        - *stub_go
+        - *stub_java
+        - *stub_ruby
       responses:
         '200':
-          description: Document deleted successfully
+          description: Document deleted successfully. No response body is returned.
+        '404':
+          description: Document not found
 
   /domo/datastores/v1/collections/{collectionName}/documents/query:
     post:
-      summary: Query Documents
-      description: Query documents using MongoDB query syntax
+      x-excluded: true
+      summary: Query Documents (v1)
+      description: |
+        Query documents using MongoDB query syntax.
+
+        **Supported operators**
+
+        All MongoDB query predicates supported in a `find()` call are available, including comparison, logical, array, data type, bitwise, `$expr`, `$jsonSchema`, `$regex`, `$geoWithin`, and `$geoIntersects`. See the [MongoDB query predicate documentation](https://www.mongodb.com/docs/manual/reference/mql/query-predicates/) for the full operator list.
+
+        <Warning>
+          **Unsupported operators**
+
+          - `$where` — JavaScript evaluation is disabled server-side.
+          - `$near` and `$nearSphere` — geospatial proximity searches require an index that AppDB collections do not have.
+        </Warning>
+
+        **Examples**
+
+        The following examples use this sample Students collection:
+        ```json
+        [
+          {
+            "content": {
+              "name": "Harry Potter", "house": "Gryffindor",
+              "wand": { "wood": "holly", "core": "phoenix feather", "length": 11 },
+              "courses": ["Defense Against the Dark Arts", "Potions", "Transfiguration"],
+              "prefect": false,
+              "enrolledOn": "1991-09-01",
+              "lastDetention": "1994-06-08T20:00:00Z"
+            }
+          },
+          {
+            "content": {
+              "name": "Hermione Granger", "house": "Gryffindor",
+              "wand": { "wood": "vine", "core": "dragon heartstring", "length": 10.75 },
+              "courses": ["Potions", "Transfiguration", "Arithmancy", "Care of Magical Creatures"],
+              "prefect": true,
+              "enrolledOn": "1991-09-01",
+              "lastDetention": "1995-10-15T15:30:00Z"
+            }
+          },
+          {
+            "content": {
+              "name": "Ron Weasley", "house": "Gryffindor",
+              "wand": { "wood": "willow", "core": "unicorn hair", "length": 14 },
+              "courses": ["Defense Against the Dark Arts", "Potions", "Divination"],
+              "prefect": true,
+              "enrolledOn": "1991-09-01",
+              "lastDetention": "1994-06-08T20:00:00Z"
+            }
+          },
+          {
+            "content": {
+              "name": "Draco Malfoy", "house": "Slytherin",
+              "wand": { "wood": "hawthorn", "core": "unicorn hair", "length": 10 },
+              "courses": ["Potions", "Transfiguration", "Defense Against the Dark Arts"],
+              "prefect": true,
+              "enrolledOn": "1991-09-01",
+              "lastDetention": "1996-03-12T19:00:00Z"
+            }
+          },
+          {
+            "content": {
+              "name": "Luna Lovegood", "house": "Ravenclaw",
+              "courses": ["Charms", "Defense Against the Dark Arts", "Care of Magical Creatures"],
+              "enrolledOn": "1992-09-01"
+            }
+          }
+        ]
+        ```
+
+        **Querying nested fields**
+
+        AppDB stores documents as arbitrary JSON, so nested objects like `wand` are queryable directly using dot notation — no joins or schema changes needed. To find all students whose wand core is phoenix feather:
+        ```js
+        domo.post(`/domo/datastores/v1/collections/Students/documents/query`, 
+            {
+              'content.wand.core': 'phoenix feather',
+            }
+          )
+          .then((docs) => console.log(docs));
+        ```
+
+        **Querying by date**
+
+        AppDB has two categories of date fields that require different query approaches. Using the wrong approach for a field type fails silently — no error, just incorrect results.
+
+        **System date fields** (`createdOn`, `updatedOn`) are stored as BSON DateTime by AppDB. Query them using [MongoDB Extended JSON v2](https://www.mongodb.com/docs/manual/reference/mongodb-extended-json/#mongodb-bsontype-Date) `$date` syntax:
+        ```json
+        {"createdOn": {"$gt": {"$date": "2026-01-01"}}}
+        ```
+
+        **Content date fields** are stored as whatever JSON primitive you write. An ISO 8601 string like `"2026-09-01T18:30:00Z"` is stored as a BSON String. Two approaches work:
+
+        **String comparison** — ISO 8601 strings sort lexicographically in date order, so standard comparison operators work directly for both date-only (`YYYY-MM-DD`) and datetime (`YYYY-MM-DDTHH:MM:SSZ`) strings. To find students who enrolled after the original 1991 cohort:
+        ```json
+        {"content.enrolledOn": {"$gt": "1991-09-01"}}
+        ```
+
+        To find students with a detention after a specific datetime:
+        ```json
+        {"content.lastDetention": {"$gt": "1995-01-01T00:00:00Z"}}
+        ```
+
+        **`$expr` + `$toDate`** — converts the string to a date at query time, enabling `$date` comparisons and handling mixed-precision strings correctly. Works for both date-only and datetime strings:
+        ```json
+        {
+          "$expr": {
+            "$gt": [
+              {"$toDate": "$content.enrolledOn"},
+              {"$date": "1992-08-30"}
+            ]
+          }
+        }
+        ```
+        ```json
+        {
+          "$expr": {
+            "$gt": [
+              {"$toDate": "$content.lastDetention"},
+              {"$date": "1995-01-01T00:00:00Z"}
+            ]
+          }
+        }
+        ```
+
+        <Warning>
+          **Mixing up these approaches produces wrong results without an error.**
+
+          Using `$date` against a content string field always returns empty — BSON DateTime never matches BSON String. Using plain string comparison against a system field like `createdOn` also always returns empty — BSON String never compares against BSON DateTime regardless of the operator used.
+
+          To confirm the stored type of any field, use the `$type` operator. If `{"someField": {"$type": "date"}}` returns documents, use `$date` syntax. If `{"someField": {"$type": "string"}}` returns documents, use string comparison or `$expr` + `$toDate`.
+        </Warning>
+
+        **Students per house**
+        ```
+        ?groupby=content.house&count=count
+        ```
+        Body: `{}`
+        ```json
+        [
+          {"_id": "Slytherin",  "count": 1},
+          {"_id": "Gryffindor", "count": 3},
+          {"_id": "Ravenclaw",  "count": 1}
+        ]
+        ```
+        <Info>
+        **Aggregation query parameters**
+
+        Field names use dot notation; fields inside `content` must be prefixed with `content.` (e.g., `content.house`). Nested fields like `content.wand.length` also work. Top-level fields like `owner` and `createdOn` can be referenced directly.
+        </Info>
+
+        **Average wand length per house**
+
+        Because `wand` is a nested object, `content.wand.length` works as an aggregation target directly — no joins or flattening needed.
+        ```
+        ?groupby=content.house&avg=content.wand.length avgWandLength&orderby=avgWandLength descending
+        ```
+        Body: `{}`
+        ```json
+        [
+          {"_id": "Gryffindor", "avgWandLength": 11.916666666666666},
+          {"_id": "Slytherin",  "avgWandLength": 10}
+        ]
+        ```
+
+        **Course enrollment frequency**
+
+        `unwind` produces one document per course value before grouping, so a student enrolled in `["Potions", "Transfiguration"]` counts once toward each group.
+        ```
+        ?unwind=content.courses&groupby=content.courses&count=count&orderby=count descending
+        ```
+        Body: `{}`
+        ```json
+        [
+          {"_id": "Potions",                       "count": 4},
+          {"_id": "Defense Against the Dark Arts", "count": 4},
+          {"_id": "Transfiguration",               "count": 3},
+          {"_id": "Care of Magical Creatures",     "count": 2},
+          {"_id": "Divination",                    "count": 1},
+          {"_id": "Arithmancy",                    "count": 1},
+          {"_id": "Charms",                        "count": 1}
+        ]
+        ```
+
+        To group by multiple fields, pass a comma-separated list: `groupby=content.house,content.prefect`. The `_id` in each result becomes an object — `{"_id": {"house": "Gryffindor", "prefect": false}, "count": 1}` — instead of a scalar. Aggregation values remain top-level keys using their configured aliases.
       tags:
       - AppDB API
       parameters:
-        - name: collectionName
-          in: path
-          required: true
-          schema:
-            type: string
-            description: The name given to the collection in the manifest
+        - $ref: '#/components/parameters/CollectionName'
         - name: groupby
           in: query
           description: Comma-separated list of properties to group by
@@ -373,33 +900,36 @@ paths:
             type: string
         - name: avg
           in: query
-          description: Comma-separated list of properties for average aggregation
+          description: "`property alias` pairs, comma-separated — computes the average of each property. Alias is used as the key in the response."
           schema:
             type: string
           example: "content.clicks avgClicks,content.impressions avgImps"
         - name: min
           in: query
-          description: Comma-separated list of properties for minimum aggregation
+          description: "`property alias` pairs, comma-separated — computes the minimum of each property."
           schema:
             type: string
+          example: "content.clicks minClicks,content.impressions minImps"
         - name: max
           in: query
-          description: Comma-separated list of properties for maximum aggregation
+          description: "`property alias` pairs, comma-separated — computes the maximum of each property."
           schema:
             type: string
+          example: "content.clicks maxClicks,content.impressions maxImps"
         - name: sum
           in: query
-          description: Comma-separated list of properties for sum aggregation
+          description: "`property alias` pairs, comma-separated — computes the sum of each property."
           schema:
             type: string
+          example: "content.clicks sumClicks,content.impressions sumImps"
         - name: unwind
           in: query
-          description: Comma-separated list of properties to unwind (flatten nested arrays)
+          description: "Comma-separated list of properties to unwind (deconstructs an array field, producing one document per element). Must be combined with at least one of `count`, `groupby`, `avg`, `min`, `max`, or `sum`."
           schema:
             type: string
         - name: orderby
           in: query
-          description: Alias of aggregation to order by (ascending or descending)
+          description: "Field name or aggregation alias to sort by, followed by `ascending` or `descending`. Without aggregation, accepts field names in dot notation; with aggregation, accepts aliases defined by other parameters."
           schema:
             type: string
           example: "sumClicks descending"
@@ -422,20 +952,45 @@ paths:
             schema:
               $ref: '#/components/schemas/MongoQuery'
             examples:
-              simpleQuery:
-                summary: Simple query example
+              nestedFieldQuery:
+                summary: Query by nested field
                 value:
-                  $or:
-                    - content.comments:
-                        $regex: "happy"
-                    - content.username:
-                        $ne: "Eeyore"
+                  content.wand.core: "phoenix feather"
               dateQuery:
-                summary: Query with date filter
+                summary: Query by content date field
                 value:
-                  createdOn:
-                    $lte:
-                      $date: "2020-05-12T00:00:00.000Z"
+                  content.enrolledOn:
+                    $gt: "1991-09-01"
+              datetimeQuery:
+                summary: Query by content datetime field
+                value:
+                  content.lastDetention:
+                    $gt: "1995-01-01T00:00:00Z"
+      x-codeSamples:
+        - lang: JavaScript
+          label: domo.js
+          source: |-
+            const collectionName = 'Students';
+
+            // Query by nested field — no joins needed
+            domo.post(`/domo/datastores/v1/collections/${collectionName}/documents/query`,
+                {
+                  'content.wand.core': 'phoenix feather',
+                }
+              )
+              .then((docs) => console.log(docs));
+
+            // Count students per house (aggregation)
+            domo.post(
+              `/domo/datastores/v1/collections/${collectionName}/documents/query?groupby=content.house&count=count`,
+              {}
+            ).then(results => console.log(results));
+        - *stub_curl
+        - *stub_python
+        - *stub_php
+        - *stub_go
+        - *stub_java
+        - *stub_ruby
       responses:
         '200':
           description: Array of matching documents
@@ -445,19 +1000,54 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Document'
+              example:
+                - id: "402778f6-bc8d-4aa5-a581-e08e3fc98c05"
+                  datastoreId: "daee775a-3be4-410d-ba20-bb0d94ce51cb"
+                  collectionId: "2148c830-14c2-478f-bb14-5c3019de46b4"
+                  syncRequired: true
+                  owner: 540824222
+                  createdOn: "2026-07-31T23:09:34.542Z"
+                  updatedOn: "2026-07-31T23:16:41.776Z"
+                  updatedBy: 540824222
+                  content:
+                    name: "Harry Potter"
+                    house: "Gryffindor"
+                    wand:
+                      wood: "holly"
+                      core: "phoenix feather"
+                      length: 11
+                    courses:
+                      - "Defense Against the Dark Arts"
+                      - "Potions"
+                      - "Transfiguration"
+                    prefect: false
+                    enrolledOn: "1991-09-01"
+                    lastDetention: "1994-06-08T20:00:00Z"
 
   /domo/datastores/v1/collections/{collectionName}/documents/update:
     put:
-      summary: Partially Update Documents
-      description: Update documents using MongoDB query and update operations
+      x-excluded: true
+      summary: Partially Update Documents (v1)
+      description: |
+        Partially updates documents matching a query using MongoDB update operators.
+
+        **Supported operators**
+
+        `$currentDate` · `$inc` · `$min` · `$max` · `$mul` · `$rename` · `$set` · `$unset` · `$addToSet` · `$pop` · `$pull` · `$pullAll` · `$push`
+
+        **Supported modifiers**
+
+        `$each` · `$position` · `$slice` · `$sort`
+
+        <Note>
+          `$setOnInsert` has no effect — partial updates do not perform upserts.
+        </Note>
+
+        See the [MongoDB update operator documentation](https://www.mongodb.com/docs/manual/reference/mql/update/) for full semantics.
       tags:
       - AppDB API
       parameters:
-        - name: collectionName
-          in: path
-          required: true
-          schema:
-            type: string
+        - $ref: '#/components/parameters/CollectionName'
       requestBody:
         required: true
         content:
@@ -466,31 +1056,81 @@ paths:
               $ref: '#/components/schemas/PartialUpdateRequest'
             example:
               query:
-                content.username: "Bill S. Preston, Esquire"
+                content.name:
+                  $in:
+                    - "Hermione Granger"
+                    - "Ron Weasley"
               operation:
                 $set:
-                  content.comment: "Excellent!"
+                  content.prefect: true
+      x-codeSamples:
+        - lang: JavaScript
+          label: domo.js
+          source: |-
+            const collectionName = 'Students';
+            const url = `/domo/datastores/v1/collections/${collectionName}/documents/update`;
+
+            // $set — appoint Hermione and Ron as prefects
+            domo.put(url, {
+              query: { 'content.name': { $in: ['Hermione Granger', 'Ron Weasley'] } },
+              operation: { $set: { 'content.prefect': true } }
+            }).then(count => console.log(count + ' document(s) updated'));
+
+            // $addToSet — add a course only if Harry isn't already enrolled
+            domo.put(url, {
+              query: { 'content.name': 'Harry Potter' },
+              operation: { $addToSet: { 'content.courses': 'Care of Magical Creatures' } }
+            }).then(count => console.log(count + ' document(s) updated'));
+
+            // $push + $each + $sort — enroll Harry in two electives and keep the list alphabetical
+            domo.put(url, {
+              query: { 'content.name': 'Harry Potter' },
+              operation: { $push: { 'content.courses': { $each: ['Divination', 'Astronomy'], $sort: 1 } } }
+            }).then(count => console.log(count + ' document(s) updated'));
+
+            // $currentDate — stamp the moment Harry was caught out after curfew.
+            // Note: $currentDate stores a BSON Date, not a string. Query it with
+            // {"content.caughtAfterCurfewAt": {"$lt": {"$date": "..."}}} not plain string comparison.
+            domo.put(url, {
+              query: { 'content.name': 'Harry Potter' },
+              operation: { $currentDate: { 'content.caughtAfterCurfewAt': true } }
+            }).then(count => console.log(count + ' document(s) updated'));
+
+            // $pull — Draco drops Defense Against the Dark Arts
+            domo.put(url, {
+              query: { 'content.name': 'Draco Malfoy' },
+              operation: { $pull: { 'content.courses': 'Defense Against the Dark Arts' } }
+            }).then(count => console.log(count + ' document(s) updated'));
+
+            // $unset — clear detention records for all Gryffindors at year end
+            domo.put(url, {
+              query: { 'content.house': 'Gryffindor' },
+              operation: { $unset: { 'content.lastDetention': '' } }
+            }).then(count => console.log(count + ' document(s) updated'));
+        - *stub_curl
+        - *stub_python
+        - *stub_php
+        - *stub_go
+        - *stub_java
+        - *stub_ruby
       responses:
         '200':
-          description: Number of updated objects
+          description: Number of documents updated
           content:
             application/json:
               schema:
                 type: integer
+              example: 2
 
   /domo/datastores/v1/collections/{collectionName}/documents/bulk:
     post:
-      summary: Create Documents in Bulk
-      description: Create multiple documents in a given collection in a single HTTP request.
+      x-excluded: true
+      summary: Create Documents in Bulk (v1)
+      description: Create multiple documents in a given collection in a single HTTP request. Each document is limited to 2 MB.
       tags:
       - AppDB API
       parameters:
-        - name: collectionName
-          in: path
-          required: true
-          schema:
-            type: string
-            description: The name given to the collection in the manifest
+        - $ref: '#/components/parameters/CollectionName'
       requestBody:
         required: true
         content:
@@ -501,9 +1141,54 @@ paths:
                 $ref: '#/components/schemas/DocumentCreate'
             example:
               - content:
-                  username: "Bill S. Preston, Esquire"
+                  name: "Draco Malfoy"
+                  house: "Slytherin"
+                  wand:
+                    wood: "hawthorn"
+                    core: "unicorn hair"
+                    length: 10
+                  courses:
+                    - "Potions"
+                    - "Transfiguration"
+                    - "Defense Against the Dark Arts"
+                  prefect: true
               - content:
-                  username: "Ted Theodore Logan"
+                  name: "Luna Lovegood"
+                  house: "Ravenclaw"
+                  courses:
+                    - "Charms"
+                    - "Defense Against the Dark Arts"
+                    - "Care of Magical Creatures"
+      x-codeSamples:
+        - lang: JavaScript
+          label: domo.js
+          source: |-
+            const collectionName = 'Students';
+
+            domo.post(`/domo/datastores/v1/collections/${collectionName}/documents/bulk`, [
+              {
+                content: {
+                  name: 'Draco Malfoy',
+                  house: 'Slytherin',
+                  wand: { wood: 'hawthorn', core: 'unicorn hair', length: 10 },
+                  courses: ['Potions', 'Transfiguration', 'Defense Against the Dark Arts'],
+                  prefect: true
+                }
+              },
+              {
+                content: {
+                  name: 'Luna Lovegood',
+                  house: 'Ravenclaw',
+                  courses: ['Charms', 'Defense Against the Dark Arts', 'Care of Magical Creatures']
+                }
+              }
+            ]).then(result => console.log(result));
+        - *stub_curl
+        - *stub_python
+        - *stub_php
+        - *stub_go
+        - *stub_java
+        - *stub_ruby
       responses:
         '200':
           description: Bulk creation result
@@ -511,19 +1196,17 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/BulkCreateResponse'
+              example:
+                Created: 2
 
     put:
-      summary: Upsert Documents in Bulk
-      description: Update existing documents or create new ones in bulk.
+      x-excluded: true
+      summary: Upsert Documents in Bulk (v1)
+      description: "Update existing documents or create new ones in bulk. Documents with a matching `id` are updated; documents without a matching `id` are created. Each document is limited to 2 MB."
       tags:
       - AppDB API
       parameters:
-        - name: collectionName
-          in: path
-          required: true
-          schema:
-            type: string
-            description: The name given to the collection in the manifest
+        - $ref: '#/components/parameters/CollectionName'
       requestBody:
         required: true
         content:
@@ -540,16 +1223,90 @@ paths:
                     type: object
                     additionalProperties: true
             example:
-              - id: "b3ea3d2d-86c5-44e6-a2f4-985136bbbce1"
+              - id: "402778f6-bc8d-4aa5-a581-e08e3fc98c05"
                 content:
-                  username: "Bill S. Preston, Esquire"
-                  Band: "Wyld Stallyns"
-              - id: "1e61d99d-9885-419a-a33e-3be3941ee720"
+                  name: "Harry Potter"
+                  house: "Gryffindor"
+                  wand:
+                    wood: "holly"
+                    core: "phoenix feather"
+                    length: 11
+                  courses:
+                    - "Defense Against the Dark Arts"
+                    - "Potions"
+                    - "Transfiguration"
+                  prefect: false
+                  enrolledOn: "1991-09-01"
+                  lastDetention: "1994-06-08T20:00:00Z"
+              - id: "dd363c89-60d2-4f70-89cb-c3c175be625b"
                 content:
-                  username: "Ted Theodore Logan"
-                  Band: "Wyld Stallyns"
+                  name: "Hermione Granger"
+                  house: "Gryffindor"
+                  wand:
+                    wood: "vine"
+                    core: "dragon heartstring"
+                    length: 10.75
+                  courses:
+                    - "Potions"
+                    - "Transfiguration"
+                    - "Arithmancy"
+                    - "Care of Magical Creatures"
+                  prefect: true
+                  enrolledOn: "1991-09-01"
+                  lastDetention: "1995-10-15T15:30:00Z"
               - content:
-                  username: "Rufus"
+                  name: "Ron Weasley"
+                  house: "Gryffindor"
+                  wand:
+                    wood: "willow"
+                    core: "unicorn hair"
+                    length: 14
+                  courses:
+                    - "Defense Against the Dark Arts"
+                    - "Potions"
+                    - "Divination"
+      x-codeSamples:
+        - lang: JavaScript
+          label: domo.js
+          source: |-
+            const collectionName = 'Students';
+
+            domo.put(`/domo/datastores/v1/collections/${collectionName}/documents/bulk`, [
+              {
+                id: '402778f6-bc8d-4aa5-a581-e08e3fc98c05',
+                content: {
+                  name: 'Harry Potter',
+                  house: 'Gryffindor',
+                  wand: { wood: 'holly', core: 'phoenix feather', length: 11 },
+                  courses: ['Defense Against the Dark Arts', 'Potions', 'Transfiguration'],
+                  prefect: false
+                }
+              },
+              {
+                id: 'dd363c89-60d2-4f70-89cb-c3c175be625b',
+                content: {
+                  name: 'Hermione Granger',
+                  house: 'Gryffindor',
+                  wand: { wood: 'vine', core: 'dragon heartstring', length: 10.75 },
+                  courses: ['Potions', 'Transfiguration', 'Arithmancy', 'Care of Magical Creatures'],
+                  prefect: true
+                }
+              },
+              {
+                content: {
+                  name: 'Ron Weasley',
+                  house: 'Gryffindor',
+                  wand: { wood: 'willow', core: 'unicorn hair', length: 14 },
+                  courses: ['Defense Against the Dark Arts', 'Potions', 'Divination']
+                }
+              }
+            ]).then(result => console.log(result));
+        - *stub_curl
+        - *stub_python
+        - *stub_php
+        - *stub_go
+        - *stub_java
+        - *stub_ruby
       responses:
         '200':
           description: Bulk upsert result
@@ -557,19 +1314,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/BulkUpsertResponse'
+              example:
+                Updated: 2
+                Created: 1
 
     delete:
-      summary: Delete Documents in Bulk
-      description: "\n\n<Danger>\n**Warning**\n\n This is destructive and cannot be reversed. Deleting documents in an AppDB collection may have performance implications with regard to syncing to its corresponding DataSet in Domo if the syncEnabled property is set to true for the Collection.\n</Danger>"
+      x-excluded: true
+      summary: Delete Documents in Bulk (v1)
+      description: "Remove multiple documents from a collection in a single request. IDs are passed as a comma-separated `ids` query parameter. Keep requests under approximately 700 UUIDs (~26 KB URL) to avoid HTTP 414 URI Too Long errors from the framework proxy; split larger deletes across multiple requests.\n\n<Danger>\n**Warning**\n\n This is destructive and cannot be reversed. Deleting documents in an AppDB collection may have performance implications with regard to syncing to its corresponding DataSet in Domo if the syncEnabled property is set to true for the Collection.\n</Danger>"
       tags:
       - AppDB API
       parameters:
-        - name: collectionName
-          in: path
-          required: true
-          schema:
-            type: string
-            description: The name given to the collection in the manifest
+        - $ref: '#/components/parameters/CollectionName'
         - name: ids
           in: query
           required: true
@@ -577,6 +1333,21 @@ paths:
           schema:
             type: string
           example: "2bdd6370-85af-4e06-aadb-380839e4de8c,c78ba737-5f84-49c9-8ac9-58615a0f8aa8"
+      x-codeSamples:
+        - lang: JavaScript
+          label: domo.js
+          source: |-
+            const collectionName = 'YourCollection';
+            const ids = 'id-one,id-two';
+
+            domo.delete(`/domo/datastores/v1/collections/${collectionName}/documents/bulk?ids=${ids}`)
+              .then(result => console.log(result));
+        - *stub_curl
+        - *stub_python
+        - *stub_php
+        - *stub_go
+        - *stub_java
+        - *stub_ruby
       responses:
         '200':
           description: Bulk deletion result
@@ -584,11 +1355,1447 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/BulkDeleteResponse'
+              example:
+                Deleted: 3
+
+  # ========= Document Endpoints (v2) =========
+  # Largely the same as v1, but the ids that were integers in v1 (`owner` and `updatedBy`) are now integer strings. 
+  # v2 also includes a string integer `createdBy` user id.
+
+  /domo/datastores/v2/collections/{collectionName}/documents:
+    post:
+      summary: Create Document
+      description: "Creates a single document in a collection."
+      tags:
+      - AppDB API
+      parameters:
+        - $ref: '#/components/parameters/CollectionName'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DocumentCreate'
+            example:
+              content:
+                name: "Harry Potter"
+                house: "Gryffindor"
+                wand:
+                  wood: "holly"
+                  core: "phoenix feather"
+                  length: 11
+                courses:
+                  - "Defense Against the Dark Arts"
+                  - "Potions"
+                  - "Transfiguration"
+                enrolledOn: "1991-09-01"
+                lastDetention: "1994-06-08T20:00:00Z"
+      x-codeSamples:
+        - lang: JavaScript
+          label: domo.js
+          source: |-
+            const collectionName = 'Students';
+
+            domo.post(`/domo/datastores/v2/collections/${collectionName}/documents`, {
+              content: {
+                name: 'Harry Potter',
+                house: 'Gryffindor',
+                wand: { wood: 'holly', core: 'phoenix feather', length: 11 },
+                courses: ['Defense Against the Dark Arts', 'Potions', 'Transfiguration'],
+                enrolledOn: '1991-09-01',
+                lastDetention: '1994-06-08T20:00:00Z'
+              }
+            }).then(doc => console.log(doc));
+        - lang: JavaScript
+          label: domo.js v6
+          source: |-
+            // domo.js v6
+            const collectionName = 'Students';
+
+            // create auto-wraps content — pass content fields directly.
+            const doc = await domo.appdb.create(collectionName, {
+              name: 'Harry Potter',
+              house: 'Gryffindor',
+              wand: { wood: 'holly', core: 'phoenix feather', length: 11 },
+              courses: ['Defense Against the Dark Arts', 'Potions', 'Transfiguration'],
+              enrolledOn: '1991-09-01',
+              lastDetention: '1994-06-08T20:00:00Z'
+            });
+            console.log(doc);
+        - *stub_curl
+        - *stub_python
+        - *stub_php
+        - *stub_go
+        - *stub_java
+        - *stub_ruby
+      responses:
+        '200':
+          description: Document created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Document'
+              example:
+                id: "402778f6-bc8d-4aa5-a581-e08e3fc98c05"
+                datastoreId: "daee775a-3be4-410d-ba20-bb0d94ce51cb"
+                collectionId: "2148c830-14c2-478f-bb14-5c3019de46b4"
+                syncRequired: true
+                owner: "540824222"
+                createdBy: "540824222"
+                createdOn: "2026-07-31T23:09:34.542Z"
+                updatedOn: "2026-07-31T23:09:34.542Z"
+                updatedBy: "540824222"
+                content:
+                  name: "Harry Potter"
+                  house: "Gryffindor"
+                  wand:
+                    wood: "holly"
+                    core: "phoenix feather"
+                    length: 11
+                  courses:
+                    - "Defense Against the Dark Arts"
+                    - "Potions"
+                    - "Transfiguration"
+                  enrolledOn: "1991-09-01"
+                  lastDetention: "1994-06-08T20:00:00Z"
+        '403':
+          description: "Forbidden. The user does not have permission to create documents on this collection — either directly or inherited through app permissions."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                status: 403
+                statusReason: "status 403 reading DocumentsResourceClient#createDocument(UUID,DocumentDefinition)"
+                toe: "72B1APM37J-KOMYZ-3JLGX"
+        '404':
+          description: "Collection not found. Verify the collection name is correct (it is case-sensitive) and that the collection has been created or correctly wired in this app's datastore."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                status: 404
+                statusReason: "DA0088: Invalid collection name: Students"
+                toe: "FTYRJMBLKD-5HB2Z-H6W8A"
+
+    get:
+      summary: List Documents
+      description: "Lists all documents from a given collection. There is an upper limit of 10,000 documents per request."
+      tags:
+      - AppDB API
+      parameters:
+        - $ref: '#/components/parameters/CollectionName'
+        - name: limit
+          in: query
+          description: Maximum number of documents to return
+          schema:
+            type: integer
+            default: 10000
+        - name: offset
+          in: query
+          description: Number of documents to skip
+          schema:
+            type: integer
+            default: 0
+      x-codeSamples:
+        - lang: JavaScript
+          label: domo.js
+          source: |-
+            const collectionName = 'Students';
+
+            domo.get(`/domo/datastores/v2/collections/${collectionName}/documents`)
+              .then(docs => console.log(docs));
+        - lang: JavaScript
+          label: domo.js v6
+          source: |-
+            // domo.js v6
+            const collectionName = 'Students';
+
+            const docs = await domo.appdb.list(collectionName);
+            console.log(docs);
+        - *stub_curl
+        - *stub_python
+        - *stub_php
+        - *stub_go
+        - *stub_java
+        - *stub_ruby
+      responses:
+        '200':
+          description: Array of documents
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Document'
+              example:
+                - id: "402778f6-bc8d-4aa5-a581-e08e3fc98c05"
+                  datastoreId: "daee775a-3be4-410d-ba20-bb0d94ce51cb"
+                  collectionId: "2148c830-14c2-478f-bb14-5c3019de46b4"
+                  syncRequired: true
+                  owner: "540824222"
+                  createdBy: "540824222"
+                  createdOn: "2026-07-31T23:09:34.542Z"
+                  updatedOn: "2026-07-31T23:09:34.542Z"
+                  updatedBy: "540824222"
+                  content:
+                    name: "Harry Potter"
+                    house: "Gryffindor"
+                    wand:
+                      wood: "holly"
+                      core: "phoenix feather"
+                      length: 11
+                    courses:
+                      - "Defense Against the Dark Arts"
+                      - "Potions"
+                      - "Transfiguration"
+                    enrolledOn: "1991-09-01"
+                    lastDetention: "1994-06-08T20:00:00Z"
+                - id: "dd363c89-60d2-4f70-89cb-c3c175be625b"
+                  datastoreId: "daee775a-3be4-410d-ba20-bb0d94ce51cb"
+                  collectionId: "2148c830-14c2-478f-bb14-5c3019de46b4"
+                  syncRequired: true
+                  owner: "540824222"
+                  createdBy: "540824222"
+                  createdOn: "2026-07-31T23:11:11.564Z"
+                  updatedOn: "2026-07-31T23:11:11.564Z"
+                  updatedBy: "540824222"
+                  content:
+                    name: "Hermione Granger"
+                    house: "Gryffindor"
+                    wand:
+                      wood: "vine"
+                      core: "dragon heartstring"
+                      length: 10.75
+                    courses:
+                      - "Potions"
+                      - "Transfiguration"
+                      - "Arithmancy"
+                      - "Care of Magical Creatures"
+                    enrolledOn: "1991-09-01"
+                    lastDetention: "1995-10-15T15:30:00Z"
+        '403':
+          description: "Forbidden. The user does not have the READ_CONTENT permission on this collection."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                status: 403
+                statusReason: "status 403 reading DocumentsResourceClient#listDocuments(UUID,Integer,Integer)"
+                toe: "VRHSOYJ0UQ-F8PE7-0B7YA"
+        '404':
+          description: "Collection not found. Verify the collection name is correct (it is case-sensitive) and that the collection has been created or correctly wired in this app's datastore."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                status: 404
+                statusReason: "DA0088: Invalid collection name: students"
+                toe: "HADQGFG933-6MCDF-73C2N"
+
+  /domo/datastores/v2/collections/{collectionName}/documents/{documentId}:
+    get:
+      summary: Get Document
+      description: "Retrieves a single document from a collection."
+      tags:
+      - AppDB API
+      parameters:
+        - $ref: '#/components/parameters/CollectionName'
+        - $ref: '#/components/parameters/DocumentId'
+      x-codeSamples:
+        - lang: JavaScript
+          label: domo.js
+          source: |-
+            const collectionName = 'Students';
+            const documentId = '402778f6-bc8d-4aa5-a581-e08e3fc98c05';
+
+            domo.get(`/domo/datastores/v2/collections/${collectionName}/documents/${documentId}`)
+              .then(doc => console.log(doc));
+        - lang: JavaScript
+          label: domo.js v6
+          source: |-
+            // domo.js v6
+            const collectionName = 'Students';
+            const documentId = '402778f6-bc8d-4aa5-a581-e08e3fc98c05';
+
+            const doc = await domo.appdb.get(collectionName, documentId);
+            console.log(doc);
+        - *stub_curl
+        - *stub_python
+        - *stub_php
+        - *stub_go
+        - *stub_java
+        - *stub_ruby
+      responses:
+        '200':
+          description: Document retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Document'
+              example:
+                id: "402778f6-bc8d-4aa5-a581-e08e3fc98c05"
+                datastoreId: "daee775a-3be4-410d-ba20-bb0d94ce51cb"
+                collectionId: "2148c830-14c2-478f-bb14-5c3019de46b4"
+                syncRequired: true
+                owner: "540824222"
+                createdBy: "540824222"
+                createdOn: "2026-07-31T23:09:34.542Z"
+                updatedOn: "2026-07-31T23:09:34.542Z"
+                updatedBy: "540824222"
+                content:
+                  name: "Harry Potter"
+                  house: "Gryffindor"
+                  wand:
+                    wood: "holly"
+                    core: "phoenix feather"
+                    length: 11
+                  courses:
+                    - "Defense Against the Dark Arts"
+                    - "Potions"
+                    - "Transfiguration"
+                  enrolledOn: "1991-09-01"
+                  lastDetention: "1994-06-08T20:00:00Z"
+        '403':
+          description: "Forbidden. The user does not have the READ_CONTENT permission on this collection."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                status: 403
+                statusReason: "status 403 reading DocumentsResourceClient#getDocument(UUID,UUID)"
+                toe: "PLA2ZUY5Z6-PHF58-7JGU6"
+        '404':
+          description: "Document not found. Verify the document ID is correct."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                status: 404
+                statusReason: "status 404 reading DocumentsResourceClient#getDocument(UUID,UUID); content:{\"message\":\"Document with id '0599350c-6fdc-41fc-a2ff-c56b78b1a0cf' not found\",\"status\":404,\"statusReason\":\"Not Found\"}"
+                toe: "HVJA1FVUF6-BCB2D-SYWOO"
+
+    put:
+      summary: Replace Document
+      description: "Replaces an existing document in a collection — the entire `content` object is overwritten with whatever you send. To update individual fields without replacing the whole document, use Partially Update Documents instead."
+      tags:
+      - AppDB API
+      parameters:
+        - $ref: '#/components/parameters/CollectionName'
+        - $ref: '#/components/parameters/DocumentId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DocumentUpdate'
+            example:
+              content:
+                name: "Harry Potter"
+                house: "Gryffindor"
+                wand:
+                  wood: "holly"
+                  core: "phoenix feather"
+                  length: 11
+                courses:
+                  - "Defense Against the Dark Arts"
+                  - "Potions"
+                  - "Transfiguration"
+                prefect: false
+                enrolledOn: "1991-09-01"
+                lastDetention: "1994-06-08T20:00:00Z"
+      x-codeSamples:
+        - lang: JavaScript
+          label: domo.js
+          source: |-
+            const collectionName = 'Students';
+            const documentId = '402778f6-bc8d-4aa5-a581-e08e3fc98c05';
+
+            // PUT replaces the entire document — include all fields, not just the ones changing.
+            domo.put(`/domo/datastores/v2/collections/${collectionName}/documents/${documentId}`, {
+              content: {
+                name: 'Harry Potter',
+                house: 'Gryffindor',
+                wand: { wood: 'holly', core: 'phoenix feather', length: 11 },
+                courses: ['Defense Against the Dark Arts', 'Potions', 'Transfiguration'],
+                prefect: false
+              }
+            }).then(doc => console.log(doc));
+        - lang: JavaScript
+          label: domo.js v6
+          source: |-
+            // domo.js v6
+            const collectionName = 'Students';
+            const documentId = '402778f6-bc8d-4aa5-a581-e08e3fc98c05';
+
+            // update auto-wraps content — pass content fields directly.
+            // this replaces the entire document — include all fields, not just the ones changing.
+            const doc = await domo.appdb.update(collectionName, documentId, {
+              name: 'Harry Potter',
+              house: 'Gryffindor',
+              wand: { wood: 'holly', core: 'phoenix feather', length: 11 },
+              courses: ['Defense Against the Dark Arts', 'Potions', 'Transfiguration'],
+              prefect: false
+            });
+            console.log(doc);
+        - *stub_curl
+        - *stub_python
+        - *stub_php
+        - *stub_go
+        - *stub_java
+        - *stub_ruby
+      responses:
+        '200':
+          description: Document updated successfully. Returns the full updated document.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Document'
+              example:
+                id: "402778f6-bc8d-4aa5-a581-e08e3fc98c05"
+                datastoreId: "daee775a-3be4-410d-ba20-bb0d94ce51cb"
+                collectionId: "2148c830-14c2-478f-bb14-5c3019de46b4"
+                syncRequired: true
+                owner: "540824222"
+                createdBy: "540824222"
+                createdOn: "2026-07-31T23:09:34.542Z"
+                updatedOn: "2026-08-01T09:14:23.209Z"
+                updatedBy: "540824222"
+                content:
+                  name: "Harry Potter"
+                  house: "Gryffindor"
+                  wand:
+                    wood: "holly"
+                    core: "phoenix feather"
+                    length: 11
+                  courses:
+                    - "Defense Against the Dark Arts"
+                    - "Potions"
+                    - "Transfiguration"
+                  prefect: false
+                  enrolledOn: "1991-09-01"
+                  lastDetention: "1994-06-08T20:00:00Z"
+        '403':
+          description: "Forbidden. The user does not have the UPDATE_CONTENT permission on this collection."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                status: 403
+                statusReason: "status 403 reading DocumentsResourceClient#updateDocument(UUID,UUID,DocumentDefinition)"
+                toe: "BU22GXWMDI-ILY50-5YX28"
+        '404':
+          description: "Document not found. Verify the document ID is correct."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                status: 404
+                statusReason: "status 404 reading DocumentsResourceClient#getDocument(UUID,UUID); content:{\"message\":\"Document with id '0599350c-6fdc-41fc-a2ff-c56b78b1a0cf' not found\",\"status\":404,\"statusReason\":\"Not Found\"}"
+                toe: "HVJA1FVUF6-BCB2D-SYWOO"
+
+    delete:
+      summary: Delete Document
+      description: Permanently deletes a document from the collection. Returns an empty response body on success.
+      tags:
+      - AppDB API
+      parameters:
+        - $ref: '#/components/parameters/CollectionName'
+        - $ref: '#/components/parameters/DocumentId'
+      x-codeSamples:
+        - lang: JavaScript
+          label: domo.js
+          source: |-
+            const collectionName = 'Students';
+            const documentId = '402778f6-bc8d-4aa5-a581-e08e3fc98c05';
+
+            domo.delete(`/domo/datastores/v2/collections/${collectionName}/documents/${documentId}`)
+              .then(() => console.log('deleted'));
+        - lang: JavaScript
+          label: domo.js v6
+          source: |-
+            // domo.js v6
+            const collectionName = 'Students';
+            const documentId = '402778f6-bc8d-4aa5-a581-e08e3fc98c05';
+
+            await domo.appdb.remove(collectionName, documentId);
+            console.log('deleted');
+        - *stub_curl
+        - *stub_python
+        - *stub_php
+        - *stub_go
+        - *stub_java
+        - *stub_ruby
+      responses:
+        '200':
+          description: Document deleted successfully. No response body is returned.
+        '403':
+          description: "Forbidden. The user does not have the DELETE_CONTENT permission on this collection."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                status: 403
+                statusReason: "status 403 reading DocumentsResourceClient#deleteDocument(UUID,UUID)"
+                toe: "2CN1RLP9LG-P8AB7-RJ4I5"
+        '404':
+          description: "Document not found. The ID may be incorrect or the document may have already been deleted."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                status: 404
+                statusReason: "status 404 reading DocumentsResourceClient#deleteDocument(UUID,UUID); content:{\"message\":\"Document could not be found: 0599350c-5fdc-41fc-a2ff-c56b78b1a0cf\",\"status\":404,\"statusReason\":\"Not Found\"}"
+                toe: "R2VYD2M7Y0-0592G-L00S1"
+
+  /domo/datastores/v2/collections/{collectionName}/documents/query:
+    post:
+      summary: Query Documents
+      description: |
+        Query documents using MongoDB query syntax.
+
+        **Supported operators**
+
+        All MongoDB query predicates supported in a `find()` call are available, including comparison, logical, array, data type, bitwise, `$expr`, `$jsonSchema`, `$regex`, `$geoWithin`, and `$geoIntersects`. See the [MongoDB query predicate documentation](https://www.mongodb.com/docs/manual/reference/mql/query-predicates/) for the full operator list.
+
+        <Warning>
+          **Unsupported operators**
+
+          - `$where` — JavaScript evaluation is disabled server-side.
+          - `$near` and `$nearSphere` — geospatial proximity searches require an index that AppDB collections do not have.
+        </Warning>
+
+        **Examples**
+
+        The following examples use this sample Students collection:
+        ```json
+        [
+          {
+            "content": {
+              "name": "Harry Potter", "house": "Gryffindor",
+              "wand": { "wood": "holly", "core": "phoenix feather", "length": 11 },
+              "courses": ["Defense Against the Dark Arts", "Potions", "Transfiguration"],
+              "prefect": false,
+              "enrolledOn": "1991-09-01",
+              "lastDetention": "1994-06-08T20:00:00Z"
+            }
+          },
+          {
+            "content": {
+              "name": "Hermione Granger", "house": "Gryffindor",
+              "wand": { "wood": "vine", "core": "dragon heartstring", "length": 10.75 },
+              "courses": ["Potions", "Transfiguration", "Arithmancy", "Care of Magical Creatures"],
+              "prefect": true,
+              "enrolledOn": "1991-09-01",
+              "lastDetention": "1995-10-15T15:30:00Z"
+            }
+          },
+          {
+            "content": {
+              "name": "Ron Weasley", "house": "Gryffindor",
+              "wand": { "wood": "willow", "core": "unicorn hair", "length": 14 },
+              "courses": ["Defense Against the Dark Arts", "Potions", "Divination"],
+              "prefect": true,
+              "enrolledOn": "1991-09-01",
+              "lastDetention": "1994-06-08T20:00:00Z"
+            }
+          },
+          {
+            "content": {
+              "name": "Draco Malfoy", "house": "Slytherin",
+              "wand": { "wood": "hawthorn", "core": "unicorn hair", "length": 10 },
+              "courses": ["Potions", "Transfiguration", "Defense Against the Dark Arts"],
+              "prefect": true,
+              "enrolledOn": "1991-09-01",
+              "lastDetention": "1996-03-12T19:00:00Z"
+            }
+          },
+          {
+            "content": {
+              "name": "Luna Lovegood", "house": "Ravenclaw",
+              "courses": ["Charms", "Defense Against the Dark Arts", "Care of Magical Creatures"],
+              "enrolledOn": "1992-09-01"
+            }
+          }
+        ]
+        ```
+
+        **Querying nested fields**
+
+        AppDB stores documents as arbitrary JSON, so nested objects like `wand` are queryable directly using dot notation — no joins or schema changes needed. To find all students whose wand core is phoenix feather:
+        ```js
+        domo.post(`/domo/datastores/v2/collections/Students/documents/query`,
+            {
+              'content.wand.core': 'phoenix feather',
+            }
+          )
+          .then((docs) => console.log(docs));
+        ```
+
+        **Querying by date**
+
+        AppDB has two categories of date fields that require different query approaches. Using the wrong approach for a field type fails silently — no error, just incorrect results.
+
+        **System date fields** (`createdOn`, `updatedOn`) are stored as BSON DateTime by AppDB. Query them using [MongoDB Extended JSON v2](https://www.mongodb.com/docs/manual/reference/mongodb-extended-json/#mongodb-bsontype-Date) `$date` syntax:
+        ```json
+        {"createdOn": {"$gt": {"$date": "2026-01-01"}}}
+        ```
+
+        **Content date fields** are stored as whatever JSON primitive you write. An ISO 8601 string like `"2026-09-01T18:30:00Z"` is stored as a BSON String. Two approaches work:
+
+        **String comparison** — ISO 8601 strings sort lexicographically in date order, so standard comparison operators work directly for both date-only (`YYYY-MM-DD`) and datetime (`YYYY-MM-DDTHH:MM:SSZ`) strings. To find students who enrolled after the original 1991 cohort:
+        ```json
+        {"content.enrolledOn": {"$gt": "1991-09-01"}}
+        ```
+
+        To find students with a detention after a specific datetime:
+        ```json
+        {"content.lastDetention": {"$gt": "1995-01-01T00:00:00Z"}}
+        ```
+
+        **`$expr` + `$toDate`** — converts the string to a date at query time, enabling `$date` comparisons and handling mixed-precision strings correctly. Works for both date-only and datetime strings:
+        ```json
+        {
+          "$expr": {
+            "$gt": [
+              {"$toDate": "$content.enrolledOn"},
+              {"$date": "1992-08-30"}
+            ]
+          }
+        }
+        ```
+        ```json
+        {
+          "$expr": {
+            "$gt": [
+              {"$toDate": "$content.lastDetention"},
+              {"$date": "1995-01-01T00:00:00Z"}
+            ]
+          }
+        }
+        ```
+
+        <Warning>
+          **Mixing up these approaches produces wrong results without an error.**
+
+          Using `$date` against a content string field always returns empty — BSON DateTime never matches BSON String. Using plain string comparison against a system field like `createdOn` also always returns empty — BSON String never compares against BSON DateTime regardless of the operator used.
+
+          To confirm the stored type of any field, use the `$type` operator. If `{"someField": {"$type": "date"}}` returns documents, use `$date` syntax. If `{"someField": {"$type": "string"}}` returns documents, use string comparison or `$expr` + `$toDate`.
+        </Warning>
+
+        **Students per house**
+        ```
+        ?groupby=content.house&count=count
+        ```
+        Body: `{}`
+        ```json
+        [
+          {"_id": "Slytherin",  "count": 1},
+          {"_id": "Gryffindor", "count": 3},
+          {"_id": "Ravenclaw",  "count": 1}
+        ]
+        ```
+        <Info>
+        **Aggregation query parameters**
+
+        Field names use dot notation; fields inside `content` must be prefixed with `content.` (e.g., `content.house`). Nested fields like `content.wand.length` also work. Top-level fields like `owner` and `createdOn` can be referenced directly.
+        </Info>
+
+        **Average wand length per house**
+
+        Because `wand` is a nested object, `content.wand.length` works as an aggregation target directly — no joins or flattening needed.
+        ```
+        ?groupby=content.house&avg=content.wand.length avgWandLength&orderby=avgWandLength descending
+        ```
+        Body: `{}`
+        ```json
+        [
+          {"_id": "Gryffindor", "avgWandLength": 11.916666666666666},
+          {"_id": "Slytherin",  "avgWandLength": 10}
+        ]
+        ```
+
+        **Course enrollment frequency**
+
+        `unwind` produces one document per course value before grouping, so a student enrolled in `["Potions", "Transfiguration"]` counts once toward each group.
+        ```
+        ?unwind=content.courses&groupby=content.courses&count=count&orderby=count descending
+        ```
+        Body: `{}`
+        ```json
+        [
+          {"_id": "Potions",                       "count": 4},
+          {"_id": "Defense Against the Dark Arts", "count": 4},
+          {"_id": "Transfiguration",               "count": 3},
+          {"_id": "Care of Magical Creatures",     "count": 2},
+          {"_id": "Divination",                    "count": 1},
+          {"_id": "Arithmancy",                    "count": 1},
+          {"_id": "Charms",                        "count": 1}
+        ]
+        ```
+
+        To group by multiple fields, pass a comma-separated list: `groupby=content.house,content.prefect`. The `_id` in each result becomes an object — `{"_id": {"house": "Gryffindor", "prefect": false}, "count": 1}` — instead of a scalar. Aggregation values remain top-level keys using their configured aliases.
+      tags:
+      - AppDB API
+      parameters:
+        - $ref: '#/components/parameters/CollectionName'
+        - name: groupby
+          in: query
+          description: Comma-separated list of properties to group by
+          schema:
+            type: string
+          example: "content.campaignName,content.month"
+        - name: count
+          in: query
+          description: Alias for count aggregation
+          schema:
+            type: string
+        - name: avg
+          in: query
+          description: "`property alias` pairs, comma-separated — computes the average of each property. Alias is used as the key in the response."
+          schema:
+            type: string
+          example: "content.clicks avgClicks,content.impressions avgImps"
+        - name: min
+          in: query
+          description: "`property alias` pairs, comma-separated — computes the minimum of each property."
+          schema:
+            type: string
+          example: "content.clicks minClicks,content.impressions minImps"
+        - name: max
+          in: query
+          description: "`property alias` pairs, comma-separated — computes the maximum of each property."
+          schema:
+            type: string
+          example: "content.clicks maxClicks,content.impressions maxImps"
+        - name: sum
+          in: query
+          description: "`property alias` pairs, comma-separated — computes the sum of each property."
+          schema:
+            type: string
+          example: "content.clicks sumClicks,content.impressions sumImps"
+        - name: unwind
+          in: query
+          description: "Comma-separated list of properties to unwind (deconstructs an array field, producing one document per element). Must be combined with at least one of `count`, `groupby`, `avg`, `min`, `max`, or `sum`."
+          schema:
+            type: string
+        - name: orderby
+          in: query
+          description: "Field name or aggregation alias to sort by, followed by `ascending` or `descending`. Without aggregation, accepts field names in dot notation; with aggregation, accepts aliases defined by other parameters."
+          schema:
+            type: string
+          example: "sumClicks descending"
+        - name: limit
+          in: query
+          description: Maximum number of documents to return
+          schema:
+            type: integer
+            default: 10000
+        - name: offset
+          in: query
+          description: Number of documents to skip
+          schema:
+            type: integer
+            default: 0
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MongoQuery'
+            examples:
+              nestedFieldQuery:
+                summary: Query by nested field
+                value:
+                  content.wand.core: "phoenix feather"
+              dateQuery:
+                summary: Query by content date field
+                value:
+                  content.enrolledOn:
+                    $gt: "1991-09-01"
+              datetimeQuery:
+                summary: Query by content datetime field
+                value:
+                  content.lastDetention:
+                    $gt: "1995-01-01T00:00:00Z"
+      x-codeSamples:
+        - lang: JavaScript
+          label: domo.js
+          source: |-
+            const collectionName = 'Students';
+
+            // Query by nested field — no joins needed
+            domo.post(`/domo/datastores/v2/collections/${collectionName}/documents/query`,
+                {
+                  'content.wand.core': 'phoenix feather',
+                }
+              )
+              .then((docs) => console.log(docs));
+
+            // Count students per house (aggregation)
+            domo.post(
+              `/domo/datastores/v2/collections/${collectionName}/documents/query?groupby=content.house&count=count`,
+              {}
+            ).then(results => console.log(results));
+        - lang: JavaScript
+          label: domo.js v6
+          source: |-
+            // domo.js v6
+            const collectionName = 'Students';
+
+            // Query by nested field — no joins needed
+            const docs = await domo.appdb.query(collectionName, {
+              'content.wand.core': 'phoenix feather'
+            });
+            console.log(docs);
+
+            // Count students per house (aggregation)
+            const results = await domo.appdb.query(collectionName, {}, {
+              groupby: 'content.house',
+              count: 'count'
+            });
+            console.log(results);
+        - *stub_curl
+        - *stub_python
+        - *stub_php
+        - *stub_go
+        - *stub_java
+        - *stub_ruby
+      responses:
+        '200':
+          description: Array of matching documents
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Document'
+              example:
+                - id: "402778f6-bc8d-4aa5-a581-e08e3fc98c05"
+                  datastoreId: "daee775a-3be4-410d-ba20-bb0d94ce51cb"
+                  collectionId: "2148c830-14c2-478f-bb14-5c3019de46b4"
+                  syncRequired: true
+                  owner: "540824222"
+                  createdBy: "540824222"
+                  createdOn: "2026-07-31T23:09:34.542Z"
+                  updatedOn: "2026-07-31T23:16:41.776Z"
+                  updatedBy: "540824222"
+                  content:
+                    name: "Harry Potter"
+                    house: "Gryffindor"
+                    wand:
+                      wood: "holly"
+                      core: "phoenix feather"
+                      length: 11
+                    courses:
+                      - "Defense Against the Dark Arts"
+                      - "Potions"
+                      - "Transfiguration"
+                    prefect: false
+                    enrolledOn: "1991-09-01"
+                    lastDetention: "1994-06-08T20:00:00Z"
+        '403':
+          description: "Forbidden. The user does not have the READ_CONTENT permission on this collection."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                status: 403
+                toe: "2DCMTO3OOK-UZCA0-J004P"
+        '404':
+          description: "Collection not found. Verify the collection name is correct (it is case-sensitive) and that the collection has been created or correctly wired in this app's datastore."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                status: 404
+                statusReason: "DA0088: Invalid collection name: tudents"
+                toe: "7AOCDSM8OQ-P1AQ1-UHD0F"
+
+  /domo/datastores/v2/collections/{collectionName}/documents/update:
+    put:
+      summary: Partially Update Documents
+      description: |
+        Partially updates documents matching a query using MongoDB update operators.
+
+        **Supported operators**
+
+        `$currentDate` · `$inc` · `$min` · `$max` · `$mul` · `$rename` · `$set` · `$unset` · `$addToSet` · `$pop` · `$pull` · `$pullAll` · `$push`
+
+        **Supported modifiers**
+
+        `$each` · `$position` · `$slice` · `$sort`
+
+        <Note>
+          `$setOnInsert` has no effect — partial updates do not perform upserts.
+        </Note>
+
+        See the [MongoDB update operator documentation](https://www.mongodb.com/docs/manual/reference/mql/update/) for full semantics.
+      tags:
+      - AppDB API
+      parameters:
+        - $ref: '#/components/parameters/CollectionName'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PartialUpdateRequest'
+            example:
+              query:
+                "content.name":
+                  $in:
+                    - "Hermione Granger"
+                    - "Ron Weasley"
+              operation:
+                $set:
+                  "content.prefect": true
+      x-codeSamples:
+        - lang: JavaScript
+          label: domo.js
+          source: |-
+            const collectionName = 'Students';
+            const url = `/domo/datastores/v2/collections/${collectionName}/documents/update`;
+
+            // $set — appoint Hermione and Ron as prefects
+            domo.put(url, {
+              query: { 'content.name': { $in: ['Hermione Granger', 'Ron Weasley'] } },
+              operation: { $set: { 'content.prefect': true } }
+            }).then(count => console.log(count + ' document(s) updated'));
+
+            // $addToSet — add a course only if Harry isn't already enrolled
+            domo.put(url, {
+              query: { 'content.name': 'Harry Potter' },
+              operation: { $addToSet: { 'content.courses': 'Remedial Potions' } }
+            }).then(count => console.log(count + ' document(s) updated'));
+
+            // $push + $each + $sort — enroll Harry in two electives and keep the list alphabetical
+            domo.put(url, {
+              query: { 'content.name': 'Harry Potter' },
+              operation: { $push: { 'content.courses': { $each: ['Divination', 'Astronomy'], $sort: 1 } } }
+            }).then(count => console.log(count + ' document(s) updated'));
+
+            // $currentDate — stamp the moment Harry was caught out after curfew.
+            // Note: $currentDate stores a BSON Date, not a string. Query it with
+            // {"content.caughtAfterCurfewAt": {"$lt": {"$date": "..."}}} not plain string comparison.
+            domo.put(url, {
+              query: { 'content.name': 'Harry Potter' },
+              operation: { $currentDate: { 'content.caughtAfterCurfewAt': true } }
+            }).then(count => console.log(count + ' document(s) updated'));
+
+            // $pull — Draco drops Defense Against the Dark Arts
+            domo.put(url, {
+              query: { 'content.name': 'Draco Malfoy' },
+              operation: { $pull: { 'content.courses': 'Defense Against the Dark Arts' } }
+            }).then(count => console.log(count + ' document(s) updated'));
+
+            // $unset — clear detention records for all Gryffindors at year end
+            domo.put(url, {
+              query: { 'content.house': 'Gryffindor' },
+              operation: { $unset: { 'content.lastDetention': '' } }
+            }).then(count => console.log(count + ' document(s) updated'));
+        - lang: JavaScript
+          label: domo.js v6
+          source: |-
+            // domo.js v6
+            const collectionName = 'Students';
+
+            // $set — appoint Hermione and Ron as prefects
+            await domo.appdb.partialUpdate(collectionName,
+              { 'content.name': { $in: ['Hermione Granger', 'Ron Weasley'] } },
+              { $set: { 'content.prefect': true } }
+            ).then(count => console.log(count + ' document(s) updated'));
+
+            // $addToSet — add a course only if Harry isn't already enrolled
+            await domo.appdb.partialUpdate(collectionName,
+              { 'content.name': 'Harry Potter' },
+              { $addToSet: { 'content.courses': 'Remedial Potions' } }
+            ).then(count => console.log(count + ' document(s) updated'));
+
+            // $push + $each + $sort — enroll Harry in two electives and keep the list alphabetical
+            await domo.appdb.partialUpdate(collectionName,
+              { 'content.name': 'Harry Potter' },
+              { $push: { 'content.courses': { $each: ['Divination', 'Astronomy'], $sort: 1 } } }
+            ).then(count => console.log(count + ' document(s) updated'));
+
+            // $currentDate — stamp the moment Harry was caught out after curfew.
+            // Note: $currentDate stores a BSON Date, not a string. Query it with
+            // {"content.caughtAfterCurfewAt": {"$lt": {"$date": "..."}}} not plain string comparison.
+            await domo.appdb.partialUpdate(collectionName,
+              { 'content.name': 'Harry Potter' },
+              { $currentDate: { 'content.caughtAfterCurfewAt': true } }
+            ).then(count => console.log(count + ' document(s) updated'));
+
+            // $pull — Draco drops Defense Against the Dark Arts
+            await domo.appdb.partialUpdate(collectionName,
+              { 'content.name': 'Draco Malfoy' },
+              { $pull: { 'content.courses': 'Defense Against the Dark Arts' } }
+            ).then(count => console.log(count + ' document(s) updated'));
+
+            // $unset — clear detention records for all Gryffindors at year end
+            await domo.appdb.partialUpdate(collectionName,
+              { 'content.house': 'Gryffindor' },
+              { $unset: { 'content.lastDetention': '' } }
+            ).then(count => console.log(count + ' document(s) updated'));
+        - *stub_curl
+        - *stub_python
+        - *stub_php
+        - *stub_go
+        - *stub_java
+        - *stub_ruby
+      responses:
+        '200':
+          description: Number of documents updated
+          content:
+            application/json:
+              schema:
+                type: integer
+              example: 2
+        '400':
+          description: "Bad request. Maybe your JSON is malformed, or you've forgotten to include both `query` and `operation` in the body."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                message: "JSON parse error: Instantiation of [simple type, class com.domo.magnum.model.documents.DocumentUpdate] value failed for JSON property query due to missing (therefore NULL) value for creator parameter query which is a non-nullable type"
+                status: 400
+                statusReason: "Bad Request"
+                toe: "APS9BQQ3SQ-HJJ5D-9MRP6"
+        '403':
+          description: "Forbidden. The user does not have the UPDATE_CONTENT permission on this collection."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                status: 403
+                statusReason: "status 403 reading DocumentsResourceClient#updateDocument(UUID,UUID,DocumentDefinition)"
+                toe: "BU22GXWMDI-ILY50-5YX28"
+        '404':
+          description: "Collection not found. Verify the collection name is correct (it is case-sensitive) and that the collection has been created or correctly wired in this app's datastore."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                status: 404
+                statusReason: "DA0088: Invalid collection name: students"
+                toe: "C7Z7W7ILTW-D2P1Y-9QKHK"
+
+  /domo/datastores/v2/collections/{collectionName}/documents/bulk:
+    post:
+      summary: Create Documents in Bulk
+      description: "Create multiple documents in a given collection in a single HTTP request. Each document is limited to 2 MB."
+      tags:
+      - AppDB API
+      parameters:
+        - $ref: '#/components/parameters/CollectionName'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/DocumentCreate'
+            example:
+              - content:
+                  name: "Draco Malfoy"
+                  house: "Slytherin"
+                  wand:
+                    wood: "hawthorn"
+                    core: "unicorn hair"
+                    length: 10
+                  courses:
+                    - "Potions"
+                    - "Transfiguration"
+                    - "Defense Against the Dark Arts"
+                  prefect: true
+              - content:
+                  name: "Luna Lovegood"
+                  house: "Ravenclaw"
+                  courses:
+                    - "Charms"
+                    - "Defense Against the Dark Arts"
+                    - "Care of Magical Creatures"
+      x-codeSamples:
+        - lang: JavaScript
+          label: domo.js
+          source: |-
+            const collectionName = 'Students';
+
+            domo.post(`/domo/datastores/v2/collections/${collectionName}/documents/bulk`, [
+              {
+                content: {
+                  name: 'Draco Malfoy',
+                  house: 'Slytherin',
+                  wand: { wood: 'hawthorn', core: 'unicorn hair', length: 10 },
+                  courses: ['Potions', 'Transfiguration', 'Defense Against the Dark Arts'],
+                  prefect: true
+                }
+              },
+              {
+                content: {
+                  name: 'Luna Lovegood',
+                  house: 'Ravenclaw',
+                  courses: ['Charms', 'Defense Against the Dark Arts', 'Care of Magical Creatures']
+                }
+              }
+            ]).then(result => console.log(result));
+        - lang: JavaScript
+          label: domo.js v6
+          source: |-
+            // domo.js v6
+            const collectionName = 'Students';
+
+            // bulkCreate auto-wraps content — pass content fields directly.
+            const result = await domo.appdb.bulkCreate(collectionName, [
+              {
+                name: 'Draco Malfoy',
+                house: 'Slytherin',
+                wand: { wood: 'hawthorn', core: 'unicorn hair', length: 10 },
+                courses: ['Potions', 'Transfiguration', 'Defense Against the Dark Arts'],
+                prefect: true
+              },
+              {
+                name: 'Luna Lovegood',
+                house: 'Ravenclaw',
+                courses: ['Charms', 'Defense Against the Dark Arts', 'Care of Magical Creatures']
+              }
+            ]);
+            console.log(result);
+        - *stub_curl
+        - *stub_python
+        - *stub_php
+        - *stub_go
+        - *stub_java
+        - *stub_ruby
+      responses:
+        '200':
+          description: Bulk creation result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BulkCreateResponse'
+              example:
+                Created: 2
+        '403':
+          description: "Forbidden. The user does not have the CREATE_CONTENT permission on this collection."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                status: 403
+                toe: "OK7MYQR2W9-49AOV-77KCS"
+        '404':
+          description: "Collection not found. Verify the collection name is correct (it is case-sensitive) and that the collection has been created or correctly wired in this app's datastore."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                status: 404
+                statusReason: "DA0088: Invalid collection name: students"
+                toe: "182LQAYFQ7-WJY65-XJLCA"
+
+    put:
+      summary: Upsert Documents in Bulk
+      description: "Update existing documents or create new ones in bulk. Documents with a matching `id` are updated; documents without a matching `id` are created. Each document is limited to 2 MB."
+      tags:
+      - AppDB API
+      parameters:
+        - $ref: '#/components/parameters/CollectionName'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: uuid
+                  content:
+                    type: object
+                    additionalProperties: true
+            example:
+              - id: "402778f6-bc8d-4aa5-a581-e08e3fc98c05"
+                content:
+                  name: "Harry Potter"
+                  house: "Gryffindor"
+                  wand:
+                    wood: "holly"
+                    core: "phoenix feather"
+                    length: 11
+                  courses:
+                    - "Defense Against the Dark Arts"
+                    - "Potions"
+                    - "Transfiguration"
+                  prefect: false
+                  enrolledOn: "1991-09-01"
+                  lastDetention: "1994-06-08T20:00:00Z"
+              - id: "dd363c89-60d2-4f70-89cb-c3c175be625b"
+                content:
+                  name: "Hermione Granger"
+                  house: "Gryffindor"
+                  wand:
+                    wood: "vine"
+                    core: "dragon heartstring"
+                    length: 10.75
+                  courses:
+                    - "Potions"
+                    - "Transfiguration"
+                    - "Arithmancy"
+                    - "Care of Magical Creatures"
+                  prefect: true
+                  enrolledOn: "1991-09-01"
+                  lastDetention: "1995-10-15T15:30:00Z"
+              - content:
+                  name: "Ron Weasley"
+                  house: "Gryffindor"
+                  wand:
+                    wood: "willow"
+                    core: "unicorn hair"
+                    length: 14
+                  courses:
+                    - "Defense Against the Dark Arts"
+                    - "Potions"
+                    - "Divination"
+      x-codeSamples:
+        - lang: JavaScript
+          label: domo.js
+          source: |-
+            const collectionName = 'Students';
+
+            domo.put(`/domo/datastores/v2/collections/${collectionName}/documents/bulk`, [
+              {
+                id: '402778f6-bc8d-4aa5-a581-e08e3fc98c05',
+                content: {
+                  name: 'Harry Potter',
+                  house: 'Gryffindor',
+                  wand: { wood: 'holly', core: 'phoenix feather', length: 11 },
+                  courses: ['Defense Against the Dark Arts', 'Potions', 'Transfiguration'],
+                  prefect: false
+                }
+              },
+              {
+                id: 'dd363c89-60d2-4f70-89cb-c3c175be625b',
+                content: {
+                  name: 'Hermione Granger',
+                  house: 'Gryffindor',
+                  wand: { wood: 'vine', core: 'dragon heartstring', length: 10.75 },
+                  courses: ['Potions', 'Transfiguration', 'Arithmancy', 'Care of Magical Creatures'],
+                  prefect: true
+                }
+              },
+              {
+                content: {
+                  name: 'Ron Weasley',
+                  house: 'Gryffindor',
+                  wand: { wood: 'willow', core: 'unicorn hair', length: 14 },
+                  courses: ['Defense Against the Dark Arts', 'Potions', 'Divination']
+                }
+              }
+            ]).then(result => console.log(result));
+        - lang: JavaScript
+          label: domo.js v6
+          source: |-
+            // domo.js v6
+            const collectionName = 'Students';
+
+            // bulkUpsert auto-wraps content — pass content fields directly.
+            // Documents with a matching id are updated; those without are created.
+            const result = await domo.appdb.bulkUpsert(collectionName, [
+              {
+                id: '402778f6-bc8d-4aa5-a581-e08e3fc98c05',
+                name: 'Harry Potter',
+                house: 'Gryffindor',
+                wand: { wood: 'holly', core: 'phoenix feather', length: 11 },
+                courses: ['Defense Against the Dark Arts', 'Potions', 'Transfiguration'],
+                prefect: false
+              },
+              {
+                id: 'dd363c89-60d2-4f70-89cb-c3c175be625b',
+                name: 'Hermione Granger',
+                house: 'Gryffindor',
+                wand: { wood: 'vine', core: 'dragon heartstring', length: 10.75 },
+                courses: ['Potions', 'Transfiguration', 'Arithmancy', 'Care of Magical Creatures'],
+                prefect: true
+              },
+              {
+                name: 'Ron Weasley',
+                house: 'Gryffindor',
+                wand: { wood: 'willow', core: 'unicorn hair', length: 14 },
+                courses: ['Defense Against the Dark Arts', 'Potions', 'Divination']
+              }
+            ]);
+            console.log(result);
+        - *stub_curl
+        - *stub_python
+        - *stub_php
+        - *stub_go
+        - *stub_java
+        - *stub_ruby
+      responses:
+        '200':
+          description: Bulk upsert result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BulkUpsertResponse'
+              example:
+                Updated: 2
+                Created: 1
+        '400':
+          description: "Bad request. One or more of the document IDs in the request do not exist in the collection."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                message: "The following document IDs do not exist: 18d29306-934f-4869-9c16-1843eaf9df42"
+                status: 400
+                statusReason: "Bad Request"
+                toe: "4LSUUFVGRL-4BDIB-2THSU"
+        '403':
+          description: "Forbidden. The user is missing a required permission — UPDATE_CONTENT when updating existing documents, or CREATE_CONTENT when inserting new ones."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                missingUpdatePermission:
+                  summary: Missing UPDATE_CONTENT permission
+                  value:
+                    message: "User does not have permission to update documents in this collection."
+                    status: 403
+                    statusReason: "Forbidden"
+                    toe: "2Z8PMHEI9H-0OJ88-NV4Y1"
+                missingCreatePermission:
+                  summary: Missing CREATE_CONTENT permission
+                  value:
+                    message: "User does not have permission to create documents in this collection."
+                    status: 403
+                    statusReason: "Forbidden"
+                    toe: "Y3CKVRLQVS-Z5JZT-PVA6W"
+        '404':
+          description: "Collection not found. Verify the collection name is correct (it is case-sensitive) and that the collection has been created or correctly wired in this app's datastore."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                status: 404
+                statusReason: "DA0088: Collection 'students' was not found in datastore 875557bc-679d-40a0-ac7e-9e8251dc3fde - it may not exist on this instance or may not be accessible"
+                toe: "DJGTVPTJZL-6MOPE-AD42K"
+
+    delete:
+      summary: Delete Documents in Bulk
+      description: "Remove multiple documents from a collection in a single request. IDs are passed as a comma-separated `ids` query parameter. Keep requests under approximately 700 UUIDs (~26 KB URL) to avoid HTTP 414 URI Too Long errors from the framework proxy; split larger deletes across multiple requests.\n\n<Danger>\n**Warning**\n\n This is destructive and cannot be reversed. Deleting documents in an AppDB collection may have performance implications with regard to syncing to its corresponding DataSet in Domo if the syncEnabled property is set to true for the Collection.\n</Danger>"
+      tags:
+      - AppDB API
+      parameters:
+        - $ref: '#/components/parameters/CollectionName'
+        - name: ids
+          in: query
+          required: true
+          description: Comma-separated list of document IDs to delete
+          schema:
+            type: string
+          example: "2bdd6370-85af-4e06-aadb-380839e4de8c,c78ba737-5f84-49c9-8ac9-58615a0f8aa8"
+      x-codeSamples:
+        - lang: JavaScript
+          label: domo.js
+          source: |-
+            const collectionName = 'Students';
+            const ids = 'id-one,id-two';
+
+            domo.delete(`/domo/datastores/v2/collections/${collectionName}/documents/bulk?ids=${ids}`)
+              .then(result => console.log(result));
+        - lang: JavaScript
+          label: domo.js v6
+          source: |-
+            // domo.js v6
+            const collectionName = 'Students';
+            const ids = ['id-one', 'id-two'];
+
+            await domo.appdb.bulkDelete(collectionName, ids);
+        - *stub_curl
+        - *stub_python
+        - *stub_php
+        - *stub_go
+        - *stub_java
+        - *stub_ruby
+      responses:
+        '200':
+          description: Bulk deletion result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BulkDeleteResponse'
+              example:
+                Deleted: 3
+        '403':
+          description: "Forbidden. The user does not have the DELETE_CONTENT permission on this collection."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                status: 403
+                statusReason: "status 403 reading DocumentsResourceClient#bulkDeleteDocuments(UUID,List)"
+                toe: "NSR9V0OFF0-N49OB-9PZHP"
+        '404':
+          description: "Collection not found. Verify the collection name is correct (it is case-sensitive) and that the collection has been created or correctly wired in this app's datastore."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                status: 404
+                statusReason: "DA0088: Collection 'students' was not found in datastore 875557bc-679d-40a0-ac7e-9e8251dc3fde - it may not exist on this instance or may not be accessible"
+                toe: "RTZEY0D56C-HXTOO-KP1IC"
+
+  # ========= Collection Endpoints =========
 
   /domo/datastores/v1/collections:
     post:
       summary: Create Collection
-      description: To create a Collection programmatically, send a POST request to the below endpoint and provide as the body of the request the same JSON value that you would have provided in your manifest for a Collection. Once created, the Collection can be retrieved by the name you provided as usual.
+      description: |
+        To create a Collection programmatically, provide as the body of the request the same JSON value that you would have provided in your manifest for a Collection when creating a custom app. Once created, the Collection can be retrieved by the name you provided as usual.
+
+        Setting `syncEnabled: true` causes the Collection's documents to be converted into rows in a Domo DataSet every 15 minutes. The `schema` you define controls which fields appear as DataSet columns — only the listed properties are synced. If you plan to use sync, note the following:
+
+        <Note>
+        **Date formatting:** Documents containing `DATE` or `DATETIME` data must use the format `YYYY-MM-DD` or `YYYY-MM-DDTHH:MM:SSZ` to sync correctly.
+        </Note>
+
+        <Warning>
+        **Only top-level fields can be synced.** Column names must be **top-level keys** in the document's `content` object; dot notation does not traverse nested objects during sync. To include a nested object, use the top-level key name (e.g., `wand`) — the synced value will be the JSON string representation of that object (e.g., `{"wood":"holly","core":"phoenix feather","length":11}`).
+        </Warning>
+
+        <Warning>
+        **Incorrect schema types prevent DataSet creation.** The accepted column types are `STRING` · `LONG` · `DECIMAL` · `DOUBLE` · `DATE` · `DATETIME`. If your AppDB DataSet doesn't appear after 15 minutes, verify your schema uses only these values — common mistakes include `NUMBER` or `INTEGER`.
+        </Warning>
+
+        <Warning>
+        **Collections won't sync if the collection owner lacks permissions on the target DataSet.** If that user is removed from Domo, syncing stops. The new owner must have both Collection ownership and Admin Permissions.
+        </Warning>
       tags:
       - AppDB API
       requestBody:
@@ -598,14 +2805,57 @@ paths:
             schema:
               $ref: '#/components/schemas/CollectionCreate'
             example:
-              name: "Users"
+              name: "Students"
               schema:
                 columns:
-                  - name: "username"
+                  - name: "name"
                     type: "STRING"
-                  - name: "band"
+                  - name: "house"
                     type: "STRING"
+                  - name: "enrolledOn"
+                    type: "DATE"
+                  - name: "lastDetention"
+                    type: "DATETIME"
               syncEnabled: true
+      x-codeSamples:
+        - lang: JavaScript
+          label: domo.js
+          source: |-
+            domo.post('/domo/datastores/v1/collections', {
+              name: 'Students',
+              schema: {
+                columns: [
+                  { name: 'name', type: 'STRING' },
+                  { name: 'house', type: 'STRING' },
+                  { name: 'enrolledOn', type: 'DATE' },
+                  { name: 'lastDetention', type: 'DATETIME' }
+                ]
+              },
+              syncEnabled: true
+            }).then(collection => console.log(collection));
+        - lang: JavaScript
+          label: domo.js v6
+          source: |-
+            // domo.js v6
+            const collection = await domo.appdb.createCollection({
+              name: 'Students',
+              schema: {
+                columns: [
+                  { name: 'name', type: 'STRING' },
+                  { name: 'house', type: 'STRING' },
+                  { name: 'enrolledOn', type: 'DATE' },
+                  { name: 'lastDetention', type: 'DATETIME' }
+                ]
+              },
+              syncEnabled: true
+            });
+            console.log(collection);
+        - *stub_curl
+        - *stub_python
+        - *stub_php
+        - *stub_go
+        - *stub_java
+        - *stub_ruby
       responses:
         '200':
           description: Collection created successfully
@@ -613,12 +2863,77 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Collection'
+              example:
+                id: "757a1a2a-8d97-4c7e-875d-1bb5909df783"
+                datastoreId: "a7363c9d-77ad-4ffa-8926-8295c8464f51"
+                defaultPermissions: null
+                requiredAuthorities: null
+                owner: 540824222
+                name: "Students"
+                datasourceId: null
+                schema:
+                  columns:
+                    - type: "STRING"
+                      name: "name"
+                    - type: "STRING"
+                      name: "house"
+                    - type: "DATE"
+                      name: "enrolledOn"
+                    - type: "DATETIME"
+                      name: "lastDetention"
+                filters: null
+                syncEnabled: true
+                syncRequired: true
+                cdcEnabled: false
+                fullReplaceRequired: false
+                lastSync: null
+                createdOn: "2026-08-01T00:10:52.952Z"
+                updatedOn: "2026-08-01T00:10:52.952Z"
+                updatedBy: 540824222
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                missingName:
+                  summary: Required field `name` was not provided
+                  value:
+                    message: "JSON parse error: Instantiation of [simple type, class com.domo.magnum.model.collections.CollectionDefinition] value failed for JSON property name due to missing (therefore NULL) value for creator parameter name which is a non-nullable type"
+                    status: 400
+                    statusReason: "Bad Request"
+                    toe: "PTBS40L6BM-Y7P0M-4GA90"
+                syncEnabledWithoutSchema:
+                  summary: "`syncEnabled: true` was passed without a `schema`"
+                  value:
+                    status: 400
+                    statusReason: "status 400 reading CollectionsResourceClient#createCollection(UUID,String,CollectionDefinition); content:\n{\"message\":\"cannot enable sync when there is no schema template provided\",\"status\":400,\"statusReason\":\"Bad Request\",\"toe\":\"YI08S6SGHH-C1N9Z-XBPRW\"}"
+                    toe: "YI08S6SGHH-C1N9Z-XBPRW"
 
     get:
       summary: List Collections
       description: Retrieves a list of the existing Collections for your application.
       tags:
       - AppDB API
+      x-codeSamples:
+        - lang: JavaScript
+          label: domo.js
+          source: |-
+            domo.get('/domo/datastores/v1/collections')
+              .then(collections => console.log(collections));
+        - lang: JavaScript
+          label: domo.js v6
+          source: |-
+            // domo.js v6
+            const collections = await domo.appdb.listCollections();
+            console.log(collections);
+        - *stub_curl
+        - *stub_python
+        - *stub_php
+        - *stub_go
+        - *stub_java
+        - *stub_ruby
       responses:
         '200':
           description: Array of collections
@@ -628,19 +2943,87 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Collection'
+              example:
+                - id: "bea2bb1b-d4bb-4414-89fa-4d69dd8743db"
+                  datastoreId: "fcd8baba-9524-4fb5-b94b-b3d3b588e740"
+                  defaultPermissions: null
+                  requiredAuthorities: null
+                  owner: 330281426
+                  name: "Students"
+                  datasourceId: null
+                  schema:
+                    columns:
+                      - type: "STRING"
+                        name: "name"
+                      - type: "STRING"
+                        name: "house"
+                  filters: null
+                  syncEnabled: false
+                  syncRequired: false
+                  cdcEnabled: false
+                  fullReplaceRequired: false
+                  lastSync: null
+                  createdOn: "2026-08-04T18:58:58.661Z"
+                  updatedOn: "2026-08-04T18:58:58.661Z"
+                  updatedBy: 330281426
+                - id: "277f0d9f-355d-4905-8fb8-0dc87e496159"
+                  datastoreId: "fcd8baba-9524-4fb5-b94b-b3d3b588e740"
+                  defaultPermissions: null
+                  requiredAuthorities: null
+                  owner: 330281426
+                  name: "Teachers"
+                  datasourceId: null
+                  schema:
+                    columns:
+                      - type: "STRING"
+                        name: "name"
+                      - type: "STRING"
+                        name: "house"
+                      - type: "STRING"
+                        name: "subjects"
+                  filters: null
+                  syncEnabled: false
+                  syncRequired: false
+                  cdcEnabled: false
+                  fullReplaceRequired: false
+                  lastSync: null
+                  createdOn: "2026-08-04T19:14:26.862Z"
+                  updatedOn: "2026-08-04T19:14:26.862Z"
+                  updatedBy: 330281426
 
   /domo/datastores/v1/collections/{collectionName}:
     put:
       summary: Update Collection
-      description: "\n\n<Danger>\n**Warning**\n\n If you manually override the properties of a Collection that exists in your manifest, then any time an app Card is saved, the Card will revert back to the manifest definition of that Collection. It is best practice to only update Collections that you have created manually. Otherwise, to update a Collection, simply update the manifest.\n</Danger>"
+      description: |
+        You can update the schema and other properties of a collection. To see their current value, use the List Collections endpoint.
+        
+        <Danger>
+        **Update Manifest Instead Of Collection**
+
+        If you manually override the properties of a Collection that exists in your manifest, then any time an app Card is saved, the Card will revert back to the manifest definition of that Collection. It is best practice to only update Collections that you have created manually. Otherwise, to update a Collection, simply update the manifest.
+        </Danger>
+
+        <Note>
+        After updating the manifest and re-publishing your app design, you must **edit the installed app and re-save it** for manifest changes to take effect.
+        </Note>
+
+        If the collection has `syncEnabled`, updating the `schema` changes which fields are synced to the linked Domo DataSet. Note the following when modifying a synced collection's schema:
+
+        <Note>
+        **Date formatting:** Documents containing `DATE` or `DATETIME` data must use the format `YYYY-MM-DD` or `YYYY-MM-DDTHH:MM:SSZ` to sync correctly.
+        </Note>
+
+        <Warning>
+        **Only top-level fields can be synced.** Column names must be **top-level keys** in the document's `content` object; dot notation does not traverse nested objects during sync. To include a nested object, use the top-level key name (e.g., `wand`) — the synced value will be the JSON string representation of that object (e.g., `{"wood":"holly","core":"phoenix feather","length":11}`).
+        </Warning>
+
+        <Warning>
+        **Incorrect schema types prevent DataSet creation.** The accepted column types are `STRING` · `LONG` · `DECIMAL` · `DOUBLE` · `DATE` · `DATETIME`. If your AppDB DataSet doesn't appear after 15 minutes, verify your schema uses only these values — common mistakes include `NUMBER` or `INTEGER`.
+        </Warning>
       tags:
       - AppDB API
       parameters:
-        - name: collectionName
-          in: path
-          required: true
-          schema:
-            type: string
+        - $ref: '#/components/parameters/CollectionName'
       requestBody:
         required: true
         content:
@@ -648,136 +3031,421 @@ paths:
             schema:
               type: object
               properties:
-                id:
+                name:
                   type: string
-                  format: uuid
+                  description: "Rename the collection. Note: renaming only changes the stored name — your app's `collectionsMapping` still routes calls using the original name from the manifest. The app will continue to work, but the name shown in AppDB Admin and returned by List Collections will reflect the new name."
                 schema:
                   $ref: '#/components/schemas/Schema'
                 syncEnabled:
                   type: boolean
             example:
-              id: "6de8034e-0aa3-4fd9-ac1d-9a1ffeccb759"
               schema:
                 columns:
                   - type: "STRING"
-                    name: "username"
-                    visible: true
+                    name: "name"
                   - type: "STRING"
-                    name: "band"
-                    visible: true
-                  - type: "STRING"
-                    name: "favorite color"
-                    visible: true
+                    name: "house"
+                  - type: "DATE"
+                    name: "enrolledOn"
+                  - type: "DATETIME"
+                    name: "lastDetention"
               syncEnabled: true
+      x-codeSamples:
+        - lang: JavaScript
+          label: domo.js
+          source: |-
+            const collectionName = 'YourCollection';
+
+            domo.put(`/domo/datastores/v1/collections/${collectionName}`, {
+              schema: {
+                columns: [
+                  { name: 'name', type: 'STRING' },
+                  { name: 'house', type: 'STRING' },
+                  { name: 'enrolledOn', type: 'DATE' },
+                  { name: 'lastDetention', type: 'DATETIME' }
+                ]
+              },
+              syncEnabled: true
+            }).then(collection => console.log(collection));
+        - lang: JavaScript
+          label: domo.js v6
+          source: |-
+            // domo.js v6
+            const collectionName = 'Students';
+
+            const collection = await domo.appdb.updateCollection(collectionName, {
+              schema: {
+                columns: [
+                  { name: 'name', type: 'STRING' },
+                  { name: 'house', type: 'STRING' },
+                  { name: 'enrolledOn', type: 'DATE' },
+                  { name: 'lastDetention', type: 'DATETIME' }
+                ]
+              },
+              syncEnabled: true
+            });
+            console.log(collection);
+        - *stub_curl
+        - *stub_python
+        - *stub_php
+        - *stub_go
+        - *stub_java
+        - *stub_ruby
       responses:
         '200':
-          description: Collection updated successfully
+          description: Collection updated successfully. Returns the full updated collection.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Collection'
+              example:
+                id: "277f0d9f-355d-4905-8fb8-0dc87e496159"
+                datastoreId: "fcd8baba-9524-4fb5-b94b-b3d3b588e740"
+                defaultPermissions: null
+                requiredAuthorities: null
+                owner: 330281426
+                name: "Teachers"
+                datasourceId: null
+                schema:
+                  columns:
+                    - type: "STRING"
+                      name: "name"
+                    - type: "STRING"
+                      name: "house"
+                    - type: "STRING"
+                      name: "subjects"
+                filters: null
+                syncEnabled: false
+                syncRequired: true
+                cdcEnabled: false
+                fullReplaceRequired: false
+                lastSync: null
+                createdOn: "2026-08-04T19:14:26.862Z"
+                updatedOn: "2026-08-04T19:33:49.586128905Z"
+                updatedBy: 330281426
+        '403':
+          description: You are not the collection owner and do not have the Admin permission on this app. Only the collection owner or a user with Admin permission can update a collection.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                status: 403
+                statusReason: "status 403 reading CollectionsResourceClient#updateCollection(UUID,Map,Boolean); content:\n{\"message\":\"User does not have permission to update the collection.\",\"status\":403,\"statusReason\":\"Forbidden\",\"toe\":\"SPRKYZVRC6-P1HPE-ZQPOD\"}"
+                toe: "SPRKYZVRC6-P1HPE-ZQPOD"
+        '404':
+          description: "Collection not found. Verify the collection name is correct (it is case-sensitive) and that the collection has been created or correctly wired in this app's datastore."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                status: 404
+                statusReason: "DA0088: Collection 'students' was not found in datastore fcd8baba-9524-4fb5-b94b-b3d3b588e740 - it may not exist on this instance or may not be accessible"
+                toe: "SPRBHMOV31-SSMDK-4TTZJ"
 
     delete:
       summary: Delete Collection
       description: "Programmatically deletes a Collection.\n\n<Danger>\n**Warning**\n\nThis is destructive and cannot be reversed.\n</Danger>"
-
       tags:
       - AppDB API
       parameters:
-        - name: collectionName
-          in: path
-          required: true
-          schema:
-            type: string
-            description: The name of the collection provided when the collection was created
+        - $ref: '#/components/parameters/CollectionName'
+      x-codeSamples:
+        - lang: JavaScript
+          label: domo.js
+          source: |-
+            const collectionName = 'YourCollection';
+
+            domo.delete(`/domo/datastores/v1/collections/${collectionName}`)
+              .then(() => console.log('collection deleted'));
+        - lang: JavaScript
+          label: domo.js v6
+          source: |-
+            // domo.js v6
+            const collectionName = 'Students';
+
+            await domo.appdb.deleteCollection(collectionName);
+            console.log('collection deleted');
+        - *stub_curl
+        - *stub_python
+        - *stub_php
+        - *stub_go
+        - *stub_java
+        - *stub_ruby
       responses:
         '200':
-          description: Collection deleted successfully
+          description: Collection deleted successfully. No response body is returned.
+        '403':
+          description: You do not have the DELETE permission on this collection.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                status: 403
+                statusReason: "status 403 reading CollectionsResourceClient#deleteCollection(UUID); content:\n{\"status\":403,\"toe\":\"AIFZ3S4ZR9-CVL5Q-1FOQC\"}"
+                toe: "AIFZ3S4ZR9-CVL5Q-1FOQC"
+        '404':
+          description: "Collection not found. Verify the collection name is correct (it is case-sensitive) and that the collection has been created or correctly wired in this app's datastore."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                status: 404
+                statusReason: "status 404 reading CollectionsResourceClient#deleteCollection(UUID); content:\n{\"message\":\"No collection with id 1b9eebac-e9b0-4e98-b218-34d4d751d15b found\",\"status\":404,\"statusReason\":\"Not Found\",\"toe\":\"CUDX3VBUXC-8BF1P-DXONT\"}"
+                toe: "CUDX3VBUXC-8BF1P-DXONT"
 
   /domo/datastores/v1/export:
     post:
-      summary: Manually Export Collections
-      description: Manually trigger export of collections to Domo instance
+      summary: Sync Collections
+      description: |
+        Manually trigger a sync of this card's collections to their linked Domo DataSets.
+        Only syncEnabled collections with pending changes are synced. Returns an empty body on success.
+
+        By default, only the collections in this card's own datastore are synced. Set
+        `includeRelatedCollections=true` to also sync any additional collections listed
+        in the app design's `collectionsMapping` — this is useful for designs that declare
+        **shared collections** with a fixed UUID, which are the same collection reused
+        across all instances of the design.
+
+        <Warning>
+        **Collections won't sync if the collection owner lacks permissions on the target DataSet.** If that user is removed from Domo, syncing stops. The new owner must have both Collection ownership and Admin Permissions.
+        </Warning>
       tags:
       - AppDB API
       parameters:
         - name: includeRelatedCollections
           in: query
-          description: Export all collections wired to app instance
+          description: >-
+            When `false` (default), syncs only the collections in this card's own datastore.
+            When `true`, also syncs any additional collections listed in the app design's
+            `collectionsMapping` alongside this card's own collections. Primarily useful for
+            designs that declare shared collections with a fixed UUID — collections that are
+            the same across all instances of the design.
           schema:
             type: boolean
             default: false
       requestBody:
-        required: true
+        required: false
         content:
           application/json:
             schema:
               type: object
             example: {}
+      x-codeSamples:
+        - lang: JavaScript
+          label: domo.js
+          source: |-
+            // Sync this card's own collections
+            domo.post('/domo/datastores/v1/export')
+              .then(() => console.log('sync started'));
+
+            // Also sync related collections (collectionsMapping)
+            domo.post('/domo/datastores/v1/export?includeRelatedCollections=true')
+              .then(() => console.log('sync started'));
+        - lang: JavaScript
+          label: domo.js v6
+          source: |-
+            // domo.js v6
+
+            // Sync this card's own collections
+            await domo.appdb.export();
+            console.log('sync started');
+        - *stub_curl
+        - *stub_python
+        - *stub_php
+        - *stub_go
+        - *stub_java
+        - *stub_ruby
       responses:
         '200':
-          description: Export request received successfully
+          description: Sync accepted and running asynchronously. No response body is returned.
         '423':
-          description: Export already in progress (LOCKED)
+          description: Sync already in progress (LOCKED). Retry once the current sync completes.
 
   /domo/datastores/v1/collections/{collectionName}/permission/{entity}/{entityId}:
     put:
       summary: Modify Collection Permissions
-      description: Assuming you already have permission to modify the Collection, you can change the permissions of a Collection by hitting the following endpoint
+      description: |
+        Modify the permissions for a user, group, or app instance on a collection.
+
+        ## Permission Inheritance
+        **Users and groups inherit** permissions from the app, so often the most convenient thing is to give the _app_ the permissions you want all people to have. Anyone who gets the app shared with them inherits its permissions on the collection and its documents. By **default**, apps are given the following permissions on their collections: `read`, `create_content`, `read_content`, `update_content`, and `delete_content`.
+
+        You can set the app permissions with this API or using the **wiring screen** of an app card.
+
+        ## Direct Permissions
+        However, in situations where not everyone should be able to create, update or delete documents, you'll need a more nuanced permission model. You can give individual users and groups permissions using this API or [AppDB Admin](/s/article/9221297758615). 
+        
+        When you need control down to the document level, you can leverage [Document-level Security](/portal/API-Reference/app-framework-apis/AppDB-API#document-level-security).
+
+        <Info>**Adds by default.** This endpoint **adds to** existing permissions, unless you pass `overwrite=true`. Then it will **replace** the entire permission set for that entity with the permissions you specify. To remove all permissions for an entity, use [Delete Permissions](/api-reference/appdb-api/delete-permissions).</Info>
+
+        ## Available Permissions
+
+        | Permission       | Grants |
+        | ---------------- | ------ |
+        | `admin`          | All permissions to the collection and its documents |
+        | `write`          | Update the collection's properties |
+        | `read`           | Read the collection's properties |
+        | `share`          | Add or remove permissions this entity already holds |
+        | `delete`         | Delete the collection |
+        | `create_content` | Create documents in the collection |
+        | `update_content` | Update documents in the collection |
+        | `read_content`   | Read documents in the collection |
+        | `delete_content` | Delete documents from the collection |
+
+        Removing all entity permissions leaves only users with the **Manage AppDB** grant with access.
       tags:
       - AppDB API
       parameters:
-        - name: collectionName
-          in: path
-          required: true
-          schema:
-            type: string
-        - name: entity
-          in: path
-          required: true
-          description: Type of entity
-          schema:
-            type: string
-            enum: [USER, GROUP, RYUU_APP]
-        - name: entityId
-          in: path
-          required: true
-          description: ID of the user, group, or app instance
-          schema:
-            type: string
+        - $ref: '#/components/parameters/CollectionName'
+        - $ref: '#/components/parameters/EntityType'
+        - $ref: '#/components/parameters/EntityId'
         - name: permissions
           in: query
           required: true
-          description: Comma-separated list of permissions
+          description: One or more permissions to apply. Pass as a comma-separated list.
+          style: form
+          explode: false
           schema:
-            type: string
+            type: array
+            items:
+              type: string
+              enum:
+                - admin
+                - write
+                - read
+                - share
+                - delete
+                - create_content
+                - update_content
+                - read_content
+                - delete_content
           example: "read,create_content,update_content,read_content"
+        - name: overwrite
+          in: query
+          required: false
+          description: |
+            Controls how the specified permissions are applied to the entity's existing permission set.
+
+            - `false` (default) — **additive**: merges the specified permissions with any permissions the entity already holds.
+            - `true` — **replace**: discards the entity's existing permissions and replaces them with exactly the permissions you specify.
+          schema:
+            type: boolean
+            default: false
+      x-codeSamples:
+        - lang: JavaScript
+          label: domo.js
+          source: |-
+            const collectionName = 'YourCollection';
+
+            // Add permissions to a user's existing set (additive, default behavior)
+            const userId = '540824222';
+            domo.put(
+              `/domo/datastores/v1/collections/${collectionName}/permission/USER/${userId}?permissions=read,create_content,read_content,update_content,delete_content`
+            ).then(() => console.log('user permissions updated'));
+
+            // Replace the app instance's permission set entirely (overwrite=true)
+            // The instance UUID is the subdomain of the app's origin URL.
+            const instanceId = window.location.hostname.split('.')[0];
+            domo.put(
+              `/domo/datastores/v1/collections/${collectionName}/permission/RYUU_APP/${instanceId}?permissions=read,read_content&overwrite=true`
+            ).then(() => console.log('app permissions replaced'));
+        - *stub_curl
+        - *stub_python
+        - *stub_php
+        - *stub_go
+        - *stub_java
+        - *stub_ruby
       responses:
         '200':
-          description: Permissions updated successfully
+          description: Permissions updated successfully. No response body is returned.
+        '400':
+          description: >-
+            The request could not be validated — for example, the `entityId` does not resolve to an existing entity.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                status: 400
+                statusReason: "status 400 reading CollectionsResourceClient#setCollectionPermissions(UUID,String,String,Set,Boolean); content:\n{\"message\":\"Unable to verify user with id 1\",\"status\":400,\"statusReason\":\"Bad Request\",\"toe\":\"4TZK5F0MHP-VLK9M-YVHFY\"}"
+                toe: "4TZK5F0MHP-VLK9M-YVHFY"
+        '403':
+          description: You do not have the SHARE permission on this collection.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                status: 403
+                statusReason: "status 403 reading CollectionsResourceClient#setCollectionPermissions(UUID,String,String,Set,Boolean); content:\n{\"message\":\"The item you're looking for can not be found\",\"status\":403,\"statusReason\":\"Forbidden\",\"toe\":\"6CPYAXAZXA-8DYRE-V4TQC\"}"
+                toe: "6CPYAXAZXA-8DYRE-V4TQC"
+        '404':
+          description: "Collection not found. Verify the collection name is correct (it is case-sensitive) and that the collection has been created or correctly wired in this app's datastore."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                status: 404
+                statusReason: "DA0088: Collection 'T' was not found in datastore fcd8baba-9524-4fb5-b94b-b3d3b588e740 - it may not exist on this instance or may not be accessible"
+                toe: "DSKD0CWR0C-NTWA3-UNZVI"
 
     delete:
       summary: Delete Permissions
-      description: You can remove all permissions for an entity using the endpoint below. If all entities’ permissions are removed, then only users with the Manage AppDB grant will still have access.
+      description: |-
+        Remove all permissions for an entity. 
+        
+        <Note>
+        If all entities' permissions are removed, then only users with the **Manage AppDB** grant will still have access.
+        </Note>
       tags:
       - AppDB API
       parameters:
-        - name: collectionName
-          in: path
-          required: true
-          schema:
-            type: string
-        - name: entity
-          in: path
-          required: true
-          schema:
-            type: string
-            enum: [USER, GROUP, RYUU_APP]
-        - name: entityId
-          in: path
-          required: true
-          schema:
-            type: string
+        - $ref: '#/components/parameters/CollectionName'
+        - $ref: '#/components/parameters/EntityType'
+        - $ref: '#/components/parameters/EntityId'
+      x-codeSamples:
+        - lang: JavaScript
+          label: domo.js
+          source: |-
+            const collectionName = 'YourCollection';
+            const entity = 'RYUU_APP'; // USER, GROUP, or RYUU_APP
+            const entityId = 'your-entity-id';
+
+            domo.delete(
+              `/domo/datastores/v1/collections/${collectionName}/permission/${entity}/${entityId}`
+            ).then(() => console.log('permissions removed'));
+        - *stub_curl
+        - *stub_python
+        - *stub_php
+        - *stub_go
+        - *stub_java
+        - *stub_ruby
       responses:
         '200':
-          description: Permissions removed successfully
+          description: Permissions removed successfully. No response body is returned.
+        '403':
+          description: You do not have the SHARE permission on this collection.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                status: 403
+                statusReason: "status 403 reading CollectionsResourceClient#revokeCollectionPermission(UUID,String,String); content:\n{\"status\":403,\"toe\":\"66W18AJRO2-2RSJP-MO2J4\"}"
+                toe: "66W18AJRO2-2RSJP-MO2J4"
+        '404':
+          description: "Collection not found. Verify the collection name is correct (it is case-sensitive) and that the collection has been created or correctly wired in this app's datastore."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                status: 404
+                statusReason: "DA0088: Collection 'students' was not found in datastore fcd8baba-9524-4fb5-b94b-b3d3b588e740 - it may not exist on this instance or may not be accessible"
+                toe: "IZDKUBLU52-EBW2Z-BFOY2"

@@ -19,6 +19,8 @@ tags:
     description: Manage individual documents in an AppDB collection.
   - name: Collections
     description: Manage AppDB collections (schema, permissions).
+  - name: App DB API (Product)
+    description: Manage documents and collections in AppDB.
 components:
   securitySchemes:
     developerToken:
@@ -26,6 +28,30 @@ components:
       in: header
       name: X-DOMO-Developer-Token
       description: Domo Developer Token for authentication.
+  parameters:
+    EntityType:
+      name: entity
+      in: path
+      required: true
+      description: The type of entity the permissions apply to.
+      schema:
+        type: string
+        enum: [USER, GROUP, RYUU_APP]
+    EntityId:
+      name: entityId
+      in: path
+      required: true
+      description: >-
+        The ID of the entity the permissions apply to. For a **USER** or **GROUP**, this is the numeric ID (for example, `870010733`). For a **RYUU_APP**, this is the app instance's UUID — the same value as the app's datastore UUID, which also appears as the subdomain of the app's origin (e.g., `https://<instance-uuid>.domoapps.domo.com`).
+      schema:
+        type: string
+      examples:
+        userOrGroup:
+          summary: User or group (numeric ID)
+          value: "870010733"
+        app:
+          summary: App instance (UUID)
+          value: "fcd8baba-9524-4fb5-b94b-b3d3b588e740"
   schemas:
     #========= SHARED SCHEMAS =========
     ErrorResponse:
@@ -34,26 +60,81 @@ components:
         message:
           type: string
           description: A human-readable error message.
+        status:
+          type: integer
+          description: HTTP status code.
+        statusReason:
+          type: string
+          description: HTTP status reason phrase.
+        toe:
+          type: string
+          description: Trace identifier for support; stands for Thread of Execution.
           
     #========= REQUEST BODY SCHEMAS =========
     DocumentContent:
       type: object
-      required: [content]
       properties:
         content:
           type: object
           additionalProperties: true
-          description: "Arbitrary JSON content of the document."
+          description: "Arbitrary JSON content of the document. If omitted, the document is created with an empty content object."
+
+    #========= RESPONSE SCHEMAS =========
+    Document:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier for the document.
+        datastoreId:
+          type: string
+          description: ID of the datastore the document belongs to.
+        collectionId:
+          type: string
+          description: ID of the collection the document belongs to.
+        syncRequired:
+          type: boolean
+          description: Whether the document is pending a sync to the underlying dataset.
+        owner:
+          type: string
+          description: "User ID of the document owner. v2 endpoints return this as a string; v1 endpoints (List, Get, Query, Update) return it as a numeric integer. This differs from Collection and Datastore owner fields, which are always integers."
+        createdBy:
+          type: string
+          description: "User ID of the user who created the document. v2 endpoints always return this field. v1 endpoints return it only from Create Document; all other v1 endpoints (List, Get, Query, Update) omit it."
+        createdOn:
+          type: string
+          format: date-time
+          description: ISO 8601 timestamp when the document was created.
+        updatedOn:
+          type: string
+          format: date-time
+          description: ISO 8601 timestamp when the document was last updated.
+        updatedBy:
+          type: string
+          description: "User ID of the user who last updated the document. v2 endpoints return this as a string; v1 endpoints return it as a numeric integer."
+        content:
+          type: object
+          additionalProperties: true
+          description: Arbitrary JSON content of the document.
       example:
-        content: { "username": "Bill", "band": "Wyld Stallyns" }
+        id: "a8428d64-a01d-49b2-9144-ddeec001acf8"
+        datastoreId: "39b88a97-8247-4c0d-ba1d-8ed78d1a6680"
+        collectionId: "232e6d6c-46e9-49b6-a137-8933f0f05999"
+        syncRequired: true
+        owner: "870010733"
+        createdBy: "870010733"
+        createdOn: "2026-06-23T20:58:06.567Z"
+        updatedOn: "2026-06-23T23:36:13.177Z"
+        updatedBy: "870010733"
+        content:
+          campaignName: "Q2 Campaign"
+          region: "West"
+          status: "Active"
 
     QueryRequest:
       type: object
-      additionalProperties:
-        type: object
+      additionalProperties: true
       description: A MongoDB-style query object.
-      example:
-        "content.userId": { "$eq": "123456789" }
 
     CollectionColumn:
       type: object
@@ -63,14 +144,46 @@ components:
           enum: [STRING, LONG, DECIMAL, DOUBLE, DATE, DATETIME]
         name:
           type: string
-        visible:
-          type: boolean
-          
-    CollectionSchemaRequest:
+
+    CollectionSummary:
       type: object
+      description: Simplified collection object returned by Query Collections.
       properties:
+        id:
+          type: string
+          format: uuid
+        owner:
+          type: integer
+          description: "Numeric user ID of the collection owner. Note: Collection and Datastore owner fields are always integers; Document owner fields differ by endpoint version (see Document schema)."
+        name:
+          type: string
+        syncEnabled:
+          type: boolean
+        createdOn:
+          type: string
+          format: date-time
+        updatedOn:
+          type: string
+          format: date-time
+        documentCount:
+          type: integer
+          description: Number of documents in the collection.
+        datastoreId:
+          type: string
+          format: uuid
+        datastoreName:
+          type: string
+
+    CollectionUpdateRequest:
+      type: object
+      description: "All fields are optional. Only the fields you include are updated; omitted fields are left unchanged."
+      properties:
+        name:
+          type: string
+          description: New name for the collection.
         schema:
           type: object
+          description: "Updated column schema for this collection. Required before enabling DataSet sync. Requires admin privilege. Valid column types: `STRING`, `LONG`, `DECIMAL`, `DOUBLE`, `DATE`, `DATETIME`. The legacy field name `schemaJson` is also accepted."
           properties:
             columns:
               type: array
@@ -78,17 +191,480 @@ components:
                 $ref: '#/components/schemas/CollectionColumn'
         syncEnabled:
           type: boolean
-          
+          description: "Whether to enable periodic syncing of documents to a linked Domo DataSet. Returns a 400 if set to `true` and the collection has no schema — set `schema` first."
+        fullReplaceRequired:
+          type: boolean
+          description: Whether the next DataSet sync should fully replace existing rows rather than upsert.
+        defaultPermissions:
+          type: string
+          nullable: true
+          description: "Comma-separated default permission set for new app grants on this collection. `READ` is always appended even if omitted. When `null` or blank, defaults to `READ,CREATE_CONTENT,READ_CONTENT,UPDATE_CONTENT,DELETE_CONTENT`. Valid values: `ADMIN`, `SHARE`, `DELETE`, `WRITE`, `READ`, `CREATE_CONTENT`, `READ_CONTENT`, `UPDATE_CONTENT`, `DELETE_CONTENT`. Requires admin privilege."
+        owner:
+          type: integer
+          description: "Numeric user ID to set as the collection owner. Requires admin privilege to change."
+        requiredAuthorities:
+          type: object
+          nullable: true
+          description: "Maps `CollectionOperation` names to arrays of authority strings. When set, only users with matching authorities may perform the corresponding operation. Requires admin privilege."
+        filters:
+          type: array
+          nullable: true
+          description: "Array of document-level filter predicates applied to read operations on this collection. Requires WRITE permission on the collection."
+          items:
+            type: object
+
+    Datastore:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the datastore.
+        name:
+          type: string
+          description: Name of the datastore.
+        customer:
+          type: string
+          description: The Domo instance name this datastore belongs to.
+        owner:
+          type: integer
+          description: User ID of the datastore owner.
+        createdOn:
+          type: string
+          format: date-time
+        updatedOn:
+          type: string
+          format: date-time
+        updatedBy:
+          type: integer
+          description: User ID of the user who last updated the datastore.
+        datastore_id:
+          type: integer
+          description: "Internal numeric ID for the datastore. Present in Get and List responses; absent in the Create response."
+        temporary:
+          type: boolean
+          description: Whether the datastore is temporary.
+      example:
+        id: "39b88a97-8247-4c0d-ba1d-8ed78d1a6680"
+        name: "My App Datastore"
+        customer: "mycompany"
+        owner: 870010733
+        createdOn: "2024-01-15T18:42:17.293Z"
+        updatedOn: "2024-01-15T18:42:17.293Z"
+        updatedBy: 870010733
+        datastore_id: 125691
+        temporary: false
+
+    Collection:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the collection.
+        datastoreId:
+          type: string
+          format: uuid
+          description: ID of the datastore this collection belongs to.
+        defaultPermissions:
+          nullable: true
+          description: "Comma-separated default permission set for new app grants on this collection, or null if not set."
+        requiredAuthorities:
+          nullable: true
+          description: "Maps CollectionOperation names to required authority strings, or null if not set."
+        owner:
+          type: integer
+          description: User ID of the collection owner.
+        name:
+          type: string
+          description: Name of the collection.
+        datasourceId:
+          type: string
+          nullable: true
+          description: ID of the linked Domo DataSet, or null if not yet linked.
+        schema:
+          type: object
+          properties:
+            columns:
+              type: array
+              items:
+                $ref: '#/components/schemas/CollectionColumn'
+        filters:
+          nullable: true
+          description: "Array of document-level filter predicates applied to read operations, or null if not set."
+        syncEnabled:
+          type: boolean
+          description: Whether documents are periodically synced to the linked DataSet.
+        syncRequired:
+          type: boolean
+          description: Whether a sync is pending.
+        fullReplaceRequired:
+          type: boolean
+        lastSync:
+          type: string
+          format: date-time
+          nullable: true
+        createdOn:
+          type: string
+          format: date-time
+        updatedOn:
+          type: string
+          format: date-time
+        updatedBy:
+          type: integer
+      example:
+        id: "232e6d6c-46e9-49b6-a137-8933f0f05999"
+        datastoreId: "39b88a97-8247-4c0d-ba1d-8ed78d1a6680"
+        defaultPermissions: null
+        requiredAuthorities: null
+        owner: 870010733
+        name: "users"
+        datasourceId: null
+        schema:
+          columns:
+            - type: "STRING"
+              name: "username"
+            - type: "STRING"
+              name: "email"
+        filters: null
+        syncEnabled: true
+        syncRequired: false
+        fullReplaceRequired: false
+        lastSync: null
+        createdOn: "2024-01-15T18:42:30.115Z"
+        updatedOn: "2024-01-15T18:42:30.115Z"
+        updatedBy: 870010733
+
+  responses:
+    CollectionNotFound:
+      description: Not Found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            message: "Cannot find permission from source [USER:870010733] to target [MAGNUM_COLLECTION:a3f7d891-bc24-4e56-9a12-c7e3b0f845d2]. Permission Service reports that one or both does not exist"
+            status: 404
+            statusReason: "Not Found"
+            toe: "RG3808D5LS-DHKE4-TG5EB"
+    CollectionNotFoundDirect:
+      description: Not Found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            message: "No collection with id a3f7d891-bc24-4e56-9a12-c7e3b0f845d2 found"
+            status: 404
+            statusReason: "Not Found"
+            toe: "UO3SB982DA-RL9G8-GO8DF"
+    DatastoreNotFound:
+      description: Not Found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            message: "Datastore not found"
+            status: 404
+            statusReason: "Not Found"
+            toe: "368PTXPNSC-XVC0X-TBNYZ"
+
 security:
   - developerToken: []
 
 paths:
   #========= Collection Endpoints =========
+  /api/datastores/v1/collections:
+    get:
+      summary: List Collections
+      description: Get all collections visible to the current user. Use `datastoreId` to filter by datastore.
+      tags:
+        - App DB API (Product)
+      parameters:
+        - name: datastoreId
+          in: query
+          required: false
+          schema: { type: string }
+          description: Filter collections by datastore ID.
+        - name: shareable
+          in: query
+          required: false
+          schema: { type: boolean, default: false }
+          description: When true, returns only collections the current user can share.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Collection'
+              example:
+                - id: "cf97ef6f-4c7c-4739-9af5-5cc0bd782ddb"
+                  datastoreId: "78a89993-3d3a-4b57-a325-1b3886fe1e1b"
+                  defaultPermissions: "READ,CREATE_CONTENT,READ_CONTENT,UPDATE_CONTENT,DELETE_CONTENT"
+                  requiredAuthorities: null
+                  owner: 870010733
+                  name: "groups"
+                  datasourceId: null
+                  schema: null
+                  filters: null
+                  syncEnabled: false
+                  syncRequired: false
+                  fullReplaceRequired: false
+                  lastSync: null
+                  createdOn: "2026-06-24T20:09:12.502Z"
+                  updatedOn: "2026-06-24T20:09:12.502Z"
+                  updatedBy: 870010733
+                - id: "8050a95f-7865-4ed9-bbeb-a82eaf1d1c41"
+                  datastoreId: "f812ea02-0e52-478b-90f0-00aad7e05029"
+                  defaultPermissions: null
+                  requiredAuthorities: null
+                  owner: 870010733
+                  name: "users"
+                  datasourceId: "de683ed7-eb83-4799-a9c7-876da6b5b008"
+                  schema:
+                    columns:
+                      - type: "STRING"
+                        name: "username"
+                      - type: "DATETIME"
+                        name: "joined"
+                  filters: null
+                  syncEnabled: true
+                  syncRequired: false
+                  fullReplaceRequired: false
+                  lastSync: "2026-06-24T21:42:28Z"
+                  createdOn: "2026-06-24T21:35:39.593Z"
+                  updatedOn: "2026-06-24T21:42:28.493Z"
+                  updatedBy: 870010733
+    post:
+      summary: Create Collection
+      description: |
+        Create a new collection in a datastore. Pass `datastoreId` as a query parameter.
+
+        If you plan to use sync, note the following:
+
+        <Note>
+        **Date formatting:** Documents containing `DATE` or `DATETIME` data must use the format `YYYY-MM-DD` or `YYYY-MM-DDTHH:MM:SSZ` to sync correctly.
+        </Note>
+
+        <Warning>
+        **Only top-level fields can be synced.** Column names must be **top-level keys** in the document's `content` object; dot notation does not traverse nested objects during sync. To include a nested object, use the top-level key name (e.g., `wand`) — the synced value will be the JSON string representation of that object (e.g., `{"wood":"holly","core":"phoenix feather","length":11}`).
+        </Warning>
+
+        <Warning>
+        **Incorrect schema types prevent DataSet creation.** The accepted column types are `STRING` · `LONG` · `DECIMAL` · `DOUBLE` · `DATE` · `DATETIME`. If your AppDB DataSet doesn't appear after 15 minutes, verify your schema uses only these values — common mistakes include `NUMBER` or `INTEGER`.
+        </Warning>
+
+        <Warning>
+        **Collections won't sync if the collection owner lacks permissions on the target DataSet.** If that user is removed from Domo, syncing stops. The new owner must have both Collection ownership and Admin Permissions.
+        </Warning>
+      tags:
+        - App DB API (Product)
+      parameters:
+        - name: datastoreId
+          in: query
+          required: true
+          schema: { type: string }
+          description: The ID of the datastore to create the collection in.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: Name for the collection.
+                syncEnabled:
+                  type: boolean
+                  description: "Whether to enable periodic syncing to a linked Domo DataSet. Requires `schema` to be provided; the API returns a 400 if `syncEnabled: true` is passed without a schema."
+                schema:
+                  type: object
+                  properties:
+                    columns:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/CollectionColumn'
+            example:
+              name: "users"
+              syncEnabled: true
+              schema:
+                columns:
+                  - name: "username"
+                    type: "STRING"
+                  - name: "email"
+                    type: "STRING"
+      responses:
+        '201':
+          description: Collection created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Collection'
+        '400':
+          description: "Bad Request. Common causes: `syncEnabled: true` was passed without a `schema`; or the required `name` field was missing."
+
+  /api/datastores/v1/collections/query:
+    post:
+      summary: Query Collections
+      description: Filter and sort collections using field-level predicates with pagination.
+      tags:
+        - App DB API (Product)
+      parameters:
+        - name: ownedBy
+          in: query
+          required: false
+          schema: { type: boolean, default: true }
+          description: Include a summary of collections grouped by owner in the response.
+        - name: createdOn
+          in: query
+          required: false
+          schema: { type: boolean, default: true }
+          description: Include a summary of collections grouped by creation date in the response.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                collectionFilteringList:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      filterType:
+                        type: string
+                        enum: [datastorename, ownedby, createddate, nameof]
+                        description: "`datastorename` — filter by the app/card name. `ownedby` — filter by owner user ID. `createddate` — filter by creation date. `nameof` — filter by collection name."
+                      not:
+                        type: boolean
+                        nullable: true
+                        description: When true, inverts the filter (supported for `ownedby`, `createddate` with `on`, and `nameof`).
+                      comparingCriteria:
+                        type: string
+                        nullable: true
+                        description: "Required for `createddate`. One of: `after`, `before`, `on`."
+                      typedValue:
+                        type: string
+                        description: "The value to filter on: a user ID for `ownedby`, an ISO date for `createddate`, or a name string for `nameof` and `datastorename`."
+                sortBy:
+                  type: string
+                  description: "Field to sort by. One of: `documentCount`, `createdOn`, `updatedOn`, `name`, `datastoreName`."
+                direction:
+                  type: string
+                  enum: [ASC, DESC]
+                pageSize:
+                  type: integer
+                  default: -1
+                  description: "Number of results per page. Pass `-1` to return all results."
+                pageNumber:
+                  type: integer
+                  default: -1
+                  description: "1-indexed page number. Pass `-1` to return all results."
+            example:
+              collectionFilteringList:
+                - filterType: "nameof"
+                  typedValue: "users"
+              sortBy: "createdOn"
+              direction: "DESC"
+              pageSize: 25
+              pageNumber: 1
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  totalCollectionCount:
+                    type: integer
+                  pageSize:
+                    type: integer
+                  pageNumber:
+                    type: integer
+                  pageCount:
+                    type: integer
+                  collections:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/CollectionSummary'
+                  ownedBy:
+                    type: array
+                    description: Aggregate of collections grouped by owner. Present when the `ownedBy` query parameter is true (default).
+                    items:
+                      type: object
+                      properties:
+                        ownerId:
+                          type: string
+                        ownerName:
+                          type: string
+                        collectionCount:
+                          type: integer
+                  createdOn:
+                    type: object
+                    description: Aggregate of collections grouped by creation date. Present when the `createdOn` query parameter is true (default).
+                    properties:
+                      sevenDaysAgo:
+                        type: integer
+                      fifteenDaysAgo:
+                        type: integer
+                      thirtyDaysAgo:
+                        type: integer
+              example:
+                totalCollectionCount: 1
+                pageSize: 1
+                pageNumber: 1
+                pageCount: 1
+                collections:
+                  - id: "232e6d6c-46e9-49b6-a137-8933f0f05999"
+                    owner: 870010733
+                    name: "users"
+                    syncEnabled: true
+                    createdOn: "2024-01-15T18:42:30.115Z"
+                    updatedOn: "2024-01-15T18:42:30.115Z"
+                    documentCount: 42
+                    datastoreId: "39b88a97-8247-4c0d-ba1d-8ed78d1a6680"
+                    datastoreName: "My App Datastore"
+                ownedBy:
+                  - ownerId: "870010733"
+                    ownerName: "Jane Smith"
+                    collectionCount: 1
+                createdOn:
+                  sevenDaysAgo: 0
+                  fifteenDaysAgo: 1
+                  thirtyDaysAgo: 1
+
   /api/datastores/v1/collections/{collectionId}:
+    get:
+      summary: Get Collection
+      description: Get a collection by ID.
+      tags:
+        - App DB API (Product)
+      parameters:
+        - name: collectionId
+          in: path
+          required: true
+          schema: { type: string }
+          description: The ID of the collection.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Collection'
+        '404':
+          $ref: '#/components/responses/CollectionNotFound'
     put:
-      summary: Update Collection Schema
-      description: Update the schema of a collection.
-      tags: 
+      summary: Update Collection
+      description: "Update one or more fields on a collection. All request body fields are optional — only the fields you include are changed."
+      tags:
         - App DB API (Product)
       parameters:
         - name: collectionId
@@ -101,16 +677,89 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CollectionSchemaRequest'
+              $ref: '#/components/schemas/CollectionUpdateRequest'
+            examples:
+              rename:
+                summary: Rename a collection
+                value:
+                  name: "My new name"
+              update-schema:
+                summary: Update schema
+                value:
+                  schema:
+                    columns:
+                      - type: STRING
+                        name: theme
+                      - type: STRING
+                        name: defaultView
+                  syncEnabled: true
+              rename-and-update-schema:
+                summary: Rename and update schema
+                value:
+                  name: "preferences"
+                  schema:
+                    columns:
+                      - type: STRING
+                        name: theme
+                      - type: STRING
+                        name: defaultView
+                  syncEnabled: false
       responses:
         '200':
           description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Collection'
+        '404':
+          $ref: '#/components/responses/CollectionNotFoundDirect'
+    delete:
+      summary: Delete Collection
+      description: Permanently delete a collection and all of its documents.
+      tags:
+        - App DB API (Product)
+      parameters:
+        - name: collectionId
+          in: path
+          required: true
+          schema: { type: string }
+          description: The ID of the collection to delete.
+      responses:
+        '204':
+          description: Collection deleted. No response body is returned.
+        '404':
+          $ref: '#/components/responses/CollectionNotFound'
 
-  /api/datastores/v1/collections/{collectionId}/permission/RYUU_APP/{proxyId}:
+  /api/datastores/v1/collections/{collectionId}/permission/{entity}/{entityId}:
     put:
-      summary: Update Collection Permissions
-      description: Update permissions for a collection as it relates to a specific Custom App.
-      tags: 
+      summary: Update Permissions
+      description: |
+        Grant or replace permissions for a user, group, or app instance on a collection.
+
+        ## Permission Inheritance
+
+        Users and groups inherit permissions from the app, so often the most convenient approach is to give the app the permissions you want all users to have. Anyone who has the app card shared with them inherits its permissions on the collection and its documents. By default, apps receive `read`, `create_content`, `read_content`, `update_content`, and `delete_content` on their collections.
+
+        For finer-grained control — when not everyone should be able to create, update, or delete documents — grant permissions directly to individual users or groups instead.
+
+        ## Available Permissions
+
+        | Permission       | Grants |
+        | ---------------- | ------ |
+        | `admin`          | All permissions to the collection and its documents |
+        | `write`          | Update the collection's properties |
+        | `read`           | Read the collection's properties |
+        | `share`          | Add or remove permissions this entity already holds |
+        | `delete`         | Delete the collection |
+        | `create_content` | Create documents in the collection |
+        | `update_content` | Update documents in the collection |
+        | `read_content`   | Read documents in the collection |
+        | `delete_content` | Delete documents from the collection |
+
+        `READ` is always included in the resulting permission set, even if you do not specify it.
+
+        Removing all entity permissions leaves only users with the **Manage AppDB** grant with access.
+      tags:
         - App DB API (Product)
       parameters:
         - name: collectionId
@@ -118,28 +767,179 @@ paths:
           required: true
           schema: { type: string }
           description: The ID of the collection.
-        - name: proxyId
-          in: path
-          required: true
-          schema: { type: string }
-          description: Proxy ID available in the Asset Library.
+        - $ref: '#/components/parameters/EntityType'
+        - $ref: '#/components/parameters/EntityId'
         - name: permissions
           in: query
           required: true
-          description: "Comma-separated list of permissions (e.g., read,create_content)."
+          description: One or more permissions to apply. Pass as a comma-separated list.
+          style: form
+          explode: false
           schema:
-            type: string
-            example: "read,create_content,read_content"
+            type: array
+            items:
+              type: string
+              enum:
+                - admin
+                - write
+                - read
+                - share
+                - delete
+                - create_content
+                - update_content
+                - read_content
+                - delete_content
+          example: "read,create_content,read_content,update_content,delete_content"
+        - name: overwrite
+          in: query
+          required: false
+          description: |
+            Controls how the specified permissions are applied to the entity's existing permission set.
+
+            - `false` (default) — **additive**: merges the specified permissions with any permissions the entity already holds.
+            - `true` — **replace**: discards the entity's existing permissions and replaces them with exactly the permissions you specify. `READ` is still always included in the resulting set.
+          schema:
+            type: boolean
+            default: false
       responses:
         '204':
-          description: No Content
+          description: Permissions updated successfully. No response body is returned.
+        '400':
+          description: >-
+            The request could not be validated — for example, the `entityId` does not resolve to an existing entity.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                message: "Unable to verify user with id 1"
+                status: 400
+                statusReason: "Bad Request"
+                toe: "X1EIQPAW9O-YR1AP-0WM59"
+        '403':
+          description: "Forbidden. The collection does not exist or the caller does not have the `share` permission on it."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                message: "The item you're looking for can not be found"
+                status: 403
+                statusReason: "Forbidden"
+                toe: "GP0ITH3EYK-UTED0-8ZCS2"
+        '404':
+          $ref: '#/components/responses/CollectionNotFoundDirect'
+    delete:
+      summary: Delete Permissions
+      description: |
+        Remove all permissions for a user, group, or app instance on a collection.
 
-  #========= Document Endpoints (v1) =========
-  /api/datastores/v1/collections/{collectionId}/documents:
+        This operation is idempotent: removing permissions for an entity that currently has none still returns `204`.
+
+        <Note>
+        If all entities' permissions are removed, then only users with the **Manage AppDB** grant will still have access.
+        </Note>
+      tags:
+        - App DB API (Product)
+      parameters:
+        - name: collectionId
+          in: path
+          required: true
+          schema: { type: string }
+          description: The ID of the collection.
+        - $ref: '#/components/parameters/EntityType'
+        - $ref: '#/components/parameters/EntityId'
+      responses:
+        '204':
+          description: Permissions removed successfully. No response body is returned.
+        '403':
+          description: "Forbidden. The caller does not have the `share` permission on this collection."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                status: 403
+                toe: "4BTZ5Z37R0-WR4VI-YS9Y4"
+        '404':
+          $ref: '#/components/responses/CollectionNotFoundDirect'
+
+  /api/datastores/v1/collections/{collectionId}/permission:
     get:
-      summary: List Documents
-      description: Retrieve all documents from a specified collection (limit 10,000).
-      tags: 
+      summary: List Collection Permissions
+      description: List all entities that have permissions on a collection, optionally filtered by entity type or ID.
+      tags:
+        - App DB API (Product)
+      parameters:
+        - name: collectionId
+          in: path
+          required: true
+          schema: { type: string }
+          description: The ID of the collection.
+        - name: sourceType
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [USER, GROUP, RYUU_APP]
+          description: Filter by entity type.
+        - name: sourceIds
+          in: query
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+          description: >-
+            Filter by specific entity IDs. User and group IDs are numeric (for example, `870010733`); app (`RYUU_APP`) IDs are UUIDs (for example, `fcd8baba-9524-4fb5-b94b-b3d3b588e740`).
+      responses:
+        '200':
+          description: OK. Returns a map of entity type to list of permission entries.
+          content:
+            application/json:
+              schema:
+                type: object
+                description: "Keys are entity types (`USER`, `GROUP`, `RYUU_APP`). Values are arrays of permission entries."
+                additionalProperties:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        description: The entity ID (user ID, group ID, or proxy ID).
+                      permissions:
+                        type: array
+                        items:
+                          type: string
+                        description: "List of permissions granted. Values are uppercase: `ADMIN`, `READ`, `WRITE`, `SHARE`, `DELETE`, `CREATE_CONTENT`, `READ_CONTENT`, `UPDATE_CONTENT`, `DELETE_CONTENT`."
+                      name:
+                        type: string
+                        description: Display name of the entity, if available.
+              example:
+                USER:
+                  - id: "870010733"
+                    permissions: ["ADMIN", "SHARE", "DELETE", "WRITE", "READ"]
+                RYUU_APP:
+                  - id: "a1b2c3d4-1234-5678-abcd-ef0123456789"
+                    permissions: ["READ", "CREATE_CONTENT", "READ_CONTENT", "UPDATE_CONTENT", "DELETE_CONTENT"]
+        '403':
+          description: "Forbidden. The collection does not exist or the user does not have permission to view its permission list."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                message: "The item you're looking for can not be found"
+                status: 403
+                statusReason: "Forbidden"
+                toe: "S3L5DHUFAT-79LXK-PWJG5"
+
+  /api/datastores/v1/collections/{collectionId}/permission/user:
+    get:
+      summary: Check User Permission
+      description: Returns `true` if the current user has permission to edit permissions on the collection, `false` otherwise.
+      tags:
         - App DB API (Product)
       parameters:
         - name: collectionId
@@ -149,12 +949,220 @@ paths:
           description: The ID of the collection.
       responses:
         '200':
-          description: OK (Response body is not documented)
-          
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: boolean
+
+  #========= Datastore Endpoints =========
+  /api/datastores/v1:
+    get:
+      summary: List Datastores
+      description: Get all datastores owned by the current user.
+      tags:
+        - App DB API (Product)
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Datastore'
     post:
-      summary: Create Document
-      description: Add a new document to a specified collection.
-      tags: 
+      summary: Create Datastore
+      description: Create a new datastore.
+      tags:
+        - App DB API (Product)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: Name for the new datastore.
+            example:
+              name: "My App Datastore"
+      responses:
+        '201':
+          description: Datastore created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Datastore'
+              example:
+                id: "98572030-591b-4b6e-94dd-817a30ec5e2f"
+                name: "My App Datastore"
+                customer: "mycompany"
+                owner: 870010733
+                createdOn: "2026-06-24T21:17:18.767Z"
+                updatedOn: "2026-06-24T21:17:18.767Z"
+                updatedBy: 870010733
+                temporary: false
+
+  /api/datastores/v1/{datastoreId}:
+    get:
+      summary: Get Datastore
+      description: Get a datastore by ID.
+      tags:
+        - App DB API (Product)
+      parameters:
+        - name: datastoreId
+          in: path
+          required: true
+          schema: { type: string }
+          description: "The UUID of the datastore. Use the `id` field from the datastore object — **not** the numeric `datastore_id` field. For example, `98572030-591b-4b6e-94dd-817a30ec5e2f` is valid; `157944` is not."
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Datastore'
+              example:
+                id: "98572030-591b-4b6e-94dd-817a30ec5e2f"
+                name: "My App Datastore"
+                customer: "mycompany"
+                owner: 870010733
+                createdOn: "2026-06-24T21:17:18.767Z"
+                updatedOn: "2026-06-24T21:17:18.767Z"
+                updatedBy: 870010733
+                datastore_id: 157944
+                temporary: false
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                message: "No static resource api/datastores/v1/157944 for request '/api/datastores/v1/157944'."
+                status: 404
+                statusReason: "Not Found"
+                toe: "6NHUOBZXHJ-7JQU0-BAPQM"
+    delete:
+      summary: Delete Datastore
+      description: "Permanently delete a datastore and all of its collections and documents. **This action cannot be undone.**"
+      tags:
+        - App DB API (Product)
+      parameters:
+        - name: datastoreId
+          in: path
+          required: true
+          schema: { type: string }
+          description: The ID of the datastore to delete.
+      responses:
+        '204':
+          description: Datastore deleted successfully. No response body is returned.
+        '404':
+          $ref: '#/components/responses/DatastoreNotFound'
+
+  /api/datastores/v1/export/{datastoreId}:
+    post:
+      summary: Sync Datastore (v1, Deprecated)
+      deprecated: true
+      description: "**Deprecated.** Use the [v2 Sync Datastore](#operation/exportDatastoreV2) endpoint instead. Triggers an async sync of all collections in the datastore to their linked Domo DataSets. Each collection must have `syncEnabled: true` to be synced. If a collection does not yet have a `datasourceId`, one is created automatically on first sync."
+      tags:
+        - App DB API (Product)
+      parameters:
+        - name: datastoreId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The ID of the datastore.
+      responses:
+        '200':
+          description: Sync triggered successfully. No response body is returned.
+
+  /api/datastores/v2/export/{datastoreId}:
+    post:
+      summary: Sync Datastore
+      description: "Triggers a sync of all syncEnabled collections in the datastore to their linked Domo DataSets. Each collection must have `syncEnabled: true` to be synced. If a collection does not yet have a `datasourceId`, one is created automatically on first sync. Optionally pass a list of collection IDs from **other** datastores in the request body to sync those collections in the same operation — these are typically shared collections declared with a fixed UUID in an app design's `collectionsMapping`, which live outside the primary datastore and are shared across app instances."
+      tags:
+        - App DB API (Product)
+      parameters:
+        - name: datastoreId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The ID of the datastore.
+      requestBody:
+        required: false
+        description: >-
+          Optional. A JSON array of collection UUIDs from other datastores to sync
+          alongside this datastore's own collections. Typically used for shared
+          collections declared with a fixed UUID in an app design's `collectionsMapping`.
+          Pass an empty array or omit the body entirely to sync only this datastore's
+          own collections.
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: string
+                format: uuid
+            example: ["3f2504e0-4f89-11d3-9a0c-0305e82c3301"]
+      responses:
+        '200':
+          description: Sync triggered successfully. No response body is returned.
+
+  #========= Document Endpoints (v1, Deprecated) =========
+  /api/datastores/v1/collections/{collectionId}/documents:
+    get:
+      summary: List Documents (v1, Deprecated)
+      deprecated: true
+      description: "**Deprecated.** Use the [v2 List Documents](#operation/listDocumentsV2) endpoint instead. This v1 endpoint returns a stripped-down document object that omits `createdBy` and returns numeric user IDs instead of strings."
+      tags:
+        - App DB API (Product)
+      parameters:
+        - name: collectionId
+          in: path
+          required: true
+          schema: { type: string }
+          description: The ID of the collection.
+        - name: limit
+          in: query
+          schema: { type: integer }
+          description: Maximum number of documents to return.
+        - name: offset
+          in: query
+          schema: { type: integer }
+          description: Number of documents to skip before returning. Default is 0.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Document'
+              example:
+                - id: "a8428d64-a01d-49b2-9144-ddeec001acf8"
+                  datastoreId: "39b88a97-8247-4c0d-ba1d-8ed78d1a6680"
+                  collectionId: "232e6d6c-46e9-49b6-a137-8933f0f05999"
+                  syncRequired: true
+                  owner: 870010733
+                  createdOn: "2026-06-23T20:58:06.567Z"
+                  updatedOn: "2026-06-23T23:36:13.177Z"
+                  updatedBy: 870010733
+                  content:
+                    campaignName: "Q2 Campaign"
+                    region: "West"
+                    status: "Active"
+
+    post:
+      summary: Create Document (v1, Deprecated)
+      deprecated: true
+      description: "**Deprecated.** Use the v2 Create Document endpoint instead. Add a new document to a specified collection."
+      tags:
         - App DB API (Product)
       parameters:
         - name: collectionId
@@ -168,15 +1176,22 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/DocumentContent'
+            example:
+              content: { "campaignName": "Q2 Campaign", "region": "West", "status": "Active" }
       responses:
         '200':
-          description: OK (Response body is not documented)
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Document'
 
   /api/datastores/v1/collections/{collectionId}/documents/{documentId}:
     get:
-      summary: Get Document
-      description: Retrieve a specific document from a collection.
-      tags: 
+      summary: Get Document (v1, Deprecated)
+      deprecated: true
+      description: "**Deprecated.** Use the [v2 Get Document](#operation/getDocumentV2) endpoint instead. This v1 endpoint returns a stripped-down document object that omits `createdBy` and returns numeric user IDs instead of strings."
+      tags:
         - App DB API (Product)
       parameters:
         - name: collectionId
@@ -191,18 +1206,28 @@ paths:
           description: The ID of the document.
       responses:
         '200':
-          description: OK (Response body is not documented)
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Document'
         '404':
           description: Not Found
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-                
+              example:
+                message: "Document with id 'b1e2f3a4-c5d6-7890-abcd-ef1234567890' not found"
+                status: 404
+                statusReason: "Not Found"
+                toe: "1Y7SXEXLME-YM859-UOWZK"
+
     put:
-      summary: Update Document
-      description: Modify an existing document in a collection.
-      tags: 
+      summary: Update Document (v1, Deprecated)
+      deprecated: true
+      description: "**Deprecated.** Use the v2 Update Document endpoint instead. Modify an existing document in a collection."
+      tags:
         - App DB API (Product)
       parameters:
         - name: collectionId
@@ -221,20 +1246,45 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/DocumentContent'
+            example:
+              content: { "campaignName": "Q2 Campaign", "region": "West", "status": "Inactive" }
       responses:
         '200':
-          description: OK (Response body is not documented)
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Document'
+              example:
+                id: "a8428d64-a01d-49b2-9144-ddeec001acf8"
+                datastoreId: "39b88a97-8247-4c0d-ba1d-8ed78d1a6680"
+                collectionId: "232e6d6c-46e9-49b6-a137-8933f0f05999"
+                syncRequired: true
+                owner: 870010733
+                createdOn: "2026-06-23T20:58:06.567Z"
+                updatedOn: "2026-06-24T14:22:11.403Z"
+                updatedBy: 870010733
+                content:
+                  campaignName: "Q2 Campaign"
+                  region: "West"
+                  status: "Inactive"
         '404':
           description: Not Found
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-                
+              example:
+                message: "Could not find document with id 'b1e2f3a4-c5d6-7890-abcd-ef1234567890' to update"
+                status: 404
+                statusReason: "Not Found"
+                toe: "HKUMCHOWVY-GRVTS-RU3ZG"
+
     delete:
-      summary: Delete Document
-      description: Remove a document from a collection.
-      tags: 
+      summary: Delete Document (v1, Deprecated)
+      deprecated: true
+      description: "**Deprecated.** Use the v2 Delete Document endpoint instead. Remove a document from a collection."
+      tags:
         - App DB API (Product)
       parameters:
         - name: collectionId
@@ -249,18 +1299,26 @@ paths:
           description: The ID of the document.
       responses:
         '204':
-          description: No Content
+          description: The document was successfully deleted. No response body is returned.
+          
+
         '404':
           description: Not Found
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+              example:
+                message: "Document could not be found: b1e2f3a4-c5d6-7890-abcd-ef1234567890"
+                status: 404
+                statusReason: "Not Found"
+                toe: "BH3HHD53Y3-BZGE0-DQSG3"
 
   /api/datastores/v1/collections/{collectionId}/documents/bulk:
     delete:
-      summary: Bulk Delete Documents
-      description: Remove multiple documents from a collection in a single request.
+      summary: Bulk Delete Documents (v1, Deprecated)
+      deprecated: true
+      description: "**Deprecated.** Use the v2 Bulk Delete Documents endpoint instead. Remove multiple documents from a collection in a single request."
       tags: 
         - App DB API (Product)
       parameters:
@@ -277,13 +1335,299 @@ paths:
             type: string
           example: "id1,id2,id3"
       responses:
-        '200':
-          description: OK (Response body is not documented)
+        '202':
+          description: Accepted — returns the count of deleted documents.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  Deleted:
+                    type: integer
+                    example: 2
   /api/datastores/v2/collections/{collectionId}/documents/query:
     post:
-      summary: Query Document
-      description: Retrieve documents from a collection via query (using v2 endpoint).
-      tags: 
+      summary: Query Documents
+      description: |
+        Retrieve documents from a collection via MongoDB query (v2 endpoint).
+
+        AppDB supports the full range of MongoDB query predicates. The following operators are **not** supported:
+        - `$where` — JavaScript expression evaluation is disabled server-side.
+        - `$near` and `$nearSphere` — proximity searches require a geospatial index, which AppDB collections do not have.
+
+        All other operators in the [official MongoDB query predicate documentation](https://www.mongodb.com/docs/manual/reference/mql/query-predicates/) are supported, including comparison, logical, array, data type, bitwise, `$expr`, `$jsonSchema`, and `$regex` operators. The geospatial shape operators `$geoWithin` and `$geoIntersects` are also supported when your documents contain GeoJSON data.
+
+        **Querying by date**
+
+        AppDB has two categories of date fields that require different query approaches. Using the wrong approach for a field type fails silently — no error, just incorrect results.
+
+        **System date fields** (`createdOn`, `updatedOn`) are stored as BSON DateTime by AppDB. Query them using [MongoDB Extended JSON v2](https://www.mongodb.com/docs/manual/reference/mongodb-extended-json/#mongodb-bsontype-Date) `$date` syntax:
+        ```json
+        {"createdOn": {"$gt": {"$date": "2026-01-01"}}}
+        ```
+
+        **Content date fields** are stored as whatever JSON primitive you write. An ISO 8601 string like `"2026-09-01T18:30:00Z"` is stored as a BSON String. Two approaches work:
+
+        **String comparison** — ISO 8601 strings sort lexicographically in date order, so standard comparison operators work directly for both date-only (`YYYY-MM-DD`) and datetime (`YYYY-MM-DDTHH:MM:SSZ`) strings:
+        ```json
+        {"content.startDate": {"$gt": "2026-01-01"}}
+        ```
+
+        **`$expr` + `$toDate`** — converts the string to a date at query time, enabling `$date` comparisons and handling mixed-precision strings correctly:
+        ```json
+        {
+          "$expr": {
+            "$gt": [
+              {"$toDate": "$content.startDate"},
+              {"$date": "2026-01-01"}
+            ]
+          }
+        }
+        ```
+
+        <Warning>
+          **Mixing up these approaches produces wrong results without an error.**
+
+          Using `$date` against a content string field always returns empty — BSON DateTime never matches BSON String. Using plain string comparison against a system field like `createdOn` also always returns empty — BSON String never compares against BSON DateTime regardless of the operator used.
+
+          To confirm the stored type of any field, use the `$type` operator. If `{"someField": {"$type": "date"}}` returns documents, use `$date` syntax. If `{"someField": {"$type": "string"}}` returns documents, use string comparison or `$expr` + `$toDate`.
+        </Warning>
+
+        **Aggregation examples**
+
+        The following examples use this sample movie collection:
+        ```json
+        [
+          {
+            "content": {
+              "title": "Inception", "genre": "sci-fi",
+              "year": 2010, "rating": 8.8,
+              "tags": ["mind-bending", "action"]
+            }
+          },
+          {
+            "content": {
+              "title": "Interstellar", "genre": "sci-fi",
+              "year": 2014, "rating": 8.6,
+              "tags": ["mind-bending", "emotional"]
+            }
+          },
+          {
+            "content": {
+              "title": "The Notebook", "genre": "romance",
+              "year": 2004, "rating": 7.9,
+              "tags": ["romantic", "drama"]
+            }
+          },
+          {
+            "content": {
+              "title": "Titanic", "genre": "romance",
+              "year": 1997, "rating": 7.8,
+              "tags": ["romantic", "drama", "action"]
+            }
+          },
+          {
+            "content": {
+              "title": "The Avengers", "genre": "action",
+              "year": 2012, "rating": 8.0,
+              "tags": ["action", "superhero"]
+            }
+          }
+        ]
+        ```
+
+        **Average rating per genre for movies released since 2010**
+        ```
+        ?groupby=content.genre&avg=content.rating avgRating&orderby=avgRating descending
+        ```
+        Body:
+        ```json
+        {"content.year": {"$gte": 2010}}
+        ```
+        Response:
+        ```json
+        [
+          {"_id": "sci-fi", "avgRating": 8.7},
+          {"_id": "action", "avgRating": 8.0}
+        ]
+        ```
+
+        **Movie count per genre**
+        ```
+        ?groupby=content.genre&count=count
+        ```
+        Body: `{}`
+        ```json
+        [
+          {"_id": "sci-fi",  "count": 2},
+          {"_id": "romance", "count": 2},
+          {"_id": "action",  "count": 1}
+        ]
+        ```
+
+        **Tag frequency across all movies**
+
+        `unwind` produces one document per tag value before grouping, so a movie with `["action", "romantic"]` counts once toward each group.
+        ```
+        ?unwind=content.tags&groupby=content.tags&count=count&orderby=count descending
+        ```
+        Body: `{}`
+        ```json
+        [
+          {"_id": "action",       "count": 3},
+          {"_id": "romantic",     "count": 2},
+          {"_id": "drama",        "count": 2},
+          {"_id": "mind-bending", "count": 2},
+          {"_id": "superhero",    "count": 1},
+          {"_id": "emotional",    "count": 1}
+        ]
+        ```
+      tags:
+        - App DB API (Product)
+      parameters:
+        - name: collectionId
+          in: path
+          required: true
+          schema: { type: string }
+          description: The ID of the collection.
+        - name: groupby
+          in: query
+          schema: { type: string }
+          description: "Comma-separated list of properties to group by. Use dot notation for nested fields (e.g., `content.campaignName`). Top-level fields can be referenced directly."
+        - name: count
+          in: query
+          schema: { type: string }
+          description: Alias for a count aggregation.
+        - name: avg
+          in: query
+          schema: { type: string }
+          description: "Comma-separated list of properties with aliases to average (e.g., `content.clicks myAlias`). Use dot notation for nested fields."
+        - name: min
+          in: query
+          schema: { type: string }
+          description: "Comma-separated list of properties with aliases to find the minimum. Use dot notation for nested fields."
+        - name: max
+          in: query
+          schema: { type: string }
+          description: "Comma-separated list of properties with aliases to find the maximum. Use dot notation for nested fields."
+        - name: sum
+          in: query
+          schema: { type: string }
+          description: "Comma-separated list of properties with aliases to sum. Use dot notation for nested fields."
+        - name: unwind
+          in: query
+          schema: { type: string }
+          description: "Comma-separated list of array properties to unwind (deconstructs an array field, producing one document per element). Use dot notation for nested fields. Must be combined with at least one of `count`, `groupby`, `avg`, `min`, `max`, or `sum`."
+        - name: orderby
+          in: query
+          schema: { type: string }
+          description: "Field or alias to order by, followed by `ascending` or `descending` (e.g., `totalClicks descending`). Accepts either an aggregation alias or a field name using dot notation."
+        - name: limit
+          in: query
+          schema: { type: integer }
+          description: Maximum number of results to return. Default is 10,000.
+        - name: offset
+          in: query
+          schema: { type: integer }
+          description: Number of results to skip before returning. Default is 0.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/QueryRequest'
+            example:
+              "content.region": { "$eq": "West" }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Document'
+              example:
+                - id: "a8428d64-a01d-49b2-9144-ddeec001acf8"
+                  datastoreId: "39b88a97-8247-4c0d-ba1d-8ed78d1a6680"
+                  collectionId: "232e6d6c-46e9-49b6-a137-8933f0f05999"
+                  syncRequired: true
+                  owner: "870010733"
+                  createdBy: "870010733"
+                  createdOn: "2026-06-23T20:58:06.567Z"
+                  updatedOn: "2026-06-23T23:36:13.177Z"
+                  updatedBy: "870010733"
+                  content:
+                    campaignName: "Q2 Campaign"
+                    region: "West"
+                    status: "Active"
+                - id: "fc28d0cb-92a5-40fd-8a7c-84547d63953a"
+                  datastoreId: "39b88a97-8247-4c0d-ba1d-8ed78d1a6680"
+                  collectionId: "232e6d6c-46e9-49b6-a137-8933f0f05999"
+                  syncRequired: true
+                  owner: "870010733"
+                  createdBy: "870010733"
+                  createdOn: "2026-06-23T20:58:35.097Z"
+                  updatedOn: "2026-06-23T21:03:40.861Z"
+                  updatedBy: "870010733"
+                  content:
+                    campaignName: "Red Campaign"
+                    region: "West"
+                    status: "Inactive"
+        '404':
+          $ref: '#/components/responses/CollectionNotFound'
+
+  #========= Document Endpoints (v2) =========
+  /api/datastores/v2/collections/{collectionId}/documents:
+    get:
+      summary: List Documents
+      description: Retrieve documents from a specified collection. There is an upper limit of 10,000 documents per request. Use `limit` and `offset` to paginate through large collections.
+      tags:
+        - App DB API (Product)
+      parameters:
+        - name: collectionId
+          in: path
+          required: true
+          schema: { type: string }
+          description: The ID of the collection.
+        - name: limit
+          in: query
+          schema: { type: integer }
+          description: Maximum number of documents to return.
+        - name: offset
+          in: query
+          schema: { type: integer }
+          description: Number of documents to skip before returning. Default is 0.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Document'
+              example:
+                - id: "a8428d64-a01d-49b2-9144-ddeec001acf8"
+                  datastoreId: "39b88a97-8247-4c0d-ba1d-8ed78d1a6680"
+                  collectionId: "232e6d6c-46e9-49b6-a137-8933f0f05999"
+                  syncRequired: true
+                  owner: "870010733"
+                  createdBy: "870010733"
+                  createdOn: "2026-06-23T20:58:06.567Z"
+                  updatedOn: "2026-06-23T23:36:13.177Z"
+                  updatedBy: "870010733"
+                  content:
+                    campaignName: "Q2 Campaign"
+                    region: "West"
+                    status: "Active"
+
+        '404':
+          $ref: '#/components/responses/CollectionNotFound'
+    post:
+      summary: Create Document
+      description: Add a new document to a specified collection.
+      tags:
         - App DB API (Product)
       parameters:
         - name: collectionId
@@ -296,7 +1640,528 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/QueryRequest'
+              $ref: '#/components/schemas/DocumentContent'
+            examples:
+              campaign:
+                summary: Campaign document
+                value:
+                  content: { "campaignName": "Q2 Campaign", "region": "West", "status": "Active" }
+              allTypes:
+                summary: One of each supported field type
+                value:
+                  content:
+                    name: "Example Record"
+                    count: 42
+                    unitPriceDecimal: 9.99
+                    conversionRateDouble: 0.3333333333333333
+                    startDate: "2026-06-24"
+                    createdAt: "2026-06-24T17:42:06.949Z"
+                    isActive: true
+                    deletedAt: null
+                    address:
+                      street: "123 Main St"
+                      city: "Austin"
+                    tags: ["featured", "new", "sale"]
       responses:
         '200':
-          description: OK (Response body is not documented)
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Document'
+
+        '404':
+          $ref: '#/components/responses/CollectionNotFound'
+
+  /api/datastores/v2/collections/{collectionId}/documents/{documentId}:
+    get:
+      summary: Get Document
+      description: Retrieve a specific document from a collection.
+      tags:
+        - App DB API (Product)
+      parameters:
+        - name: collectionId
+          in: path
+          required: true
+          schema: { type: string }
+          description: The ID of the collection.
+        - name: documentId
+          in: path
+          required: true
+          schema: { type: string }
+          description: The ID of the document.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Document'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                message: "Document with id 'b1e2f3a4-c5d6-7890-abcd-ef1234567890' not found"
+                status: 404
+                statusReason: "Not Found"
+                toe: "1Y7SXEXLME-YM859-UOWZK"
+
+    put:
+      summary: Replace Document
+      description: "Replaces an existing document in a collection — the entire `content` object is overwritten with whatever you send. To update individual fields without replacing the whole document, use the Partially Update Documents endpoint instead."
+      tags:
+        - App DB API (Product)
+      parameters:
+        - name: collectionId
+          in: path
+          required: true
+          schema: { type: string }
+          description: The ID of the collection.
+        - name: documentId
+          in: path
+          required: true
+          schema: { type: string }
+          description: The ID of the document.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DocumentContent'
+            examples:
+              campaign:
+                summary: Campaign document
+                value:
+                  content: { "campaignName": "Q2 Campaign", "region": "West", "status": "Inactive" }
+              allTypes:
+                summary: One of each supported field type
+                value:
+                  content:
+                    name: "Example Record"
+                    count: 42
+                    unitPriceDecimal: 9.99
+                    conversionRateDouble: 0.3333333333333333
+                    startDate: "2026-06-24"
+                    createdAt: "2026-06-24T17:42:06.949Z"
+                    isActive: true
+                    deletedAt: null
+                    address:
+                      street: "123 Main St"
+                      city: "Austin"
+                    tags: ["featured", "new", "sale"]
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Document'
+              example:
+                id: "a8428d64-a01d-49b2-9144-ddeec001acf8"
+                datastoreId: "39b88a97-8247-4c0d-ba1d-8ed78d1a6680"
+                collectionId: "232e6d6c-46e9-49b6-a137-8933f0f05999"
+                syncRequired: true
+                owner: "870010733"
+                createdBy: "870010733"
+                createdOn: "2026-06-23T20:58:06.567Z"
+                updatedOn: "2026-06-24T14:22:11.403Z"
+                updatedBy: "870010733"
+                content:
+                  campaignName: "Q2 Campaign"
+                  region: "West"
+                  status: "Inactive"
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                message: "Could not find document with id 'b1e2f3a4-c5d6-7890-abcd-ef1234567890' to update"
+                status: 404
+                statusReason: "Not Found"
+                toe: "HKUMCHOWVY-GRVTS-RU3ZG"
+
+    delete:
+      summary: Delete Document
+      description: Remove a document from a collection.
+      tags:
+        - App DB API (Product)
+      parameters:
+        - name: collectionId
+          in: path
+          required: true
+          schema: { type: string }
+          description: The ID of the collection.
+        - name: documentId
+          in: path
+          required: true
+          schema: { type: string }
+          description: The ID of the document.
+      responses:
+        '204':
+          description: The document was successfully deleted. No response body is returned.
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                message: "Document could not be found: b1e2f3a4-c5d6-7890-abcd-ef1234567890"
+                status: 404
+                statusReason: "Not Found"
+                toe: "BH3HHD53Y3-BZGE0-DQSG3"
+
+  /api/datastores/v2/collections/{collectionId}/documents/bulk:
+    post:
+      summary: Bulk Create Documents
+      description: "Add multiple documents to a collection in a single request. Each document is limited to 2 MB."
+      tags:
+        - App DB API (Product)
+      parameters:
+        - name: collectionId
+          in: path
+          required: true
+          schema: { type: string }
+          description: The ID of the collection.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/DocumentContent'
+            example:
+              - content: { "campaignName": "Q2 Campaign", "region": "West", "status": "Active" }
+              - content: { "campaignName": "Red Campaign", "region": "East", "status": "Inactive" }
+      responses:
+        '200':
+          description: Returns the number of created documents.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  Created:
+                    type: integer
+                    description: Number of documents created.
+              example:
+                Created: 2
+
+        '404':
+          $ref: '#/components/responses/CollectionNotFound'
+    put:
+      summary: Bulk Upsert Documents
+      description: "Insert or update multiple documents in a single request. Documents with a matching `id` are updated; documents without a matching `id` are created. Each document is limited to 2 MB."
+      tags:
+        - App DB API (Product)
+      parameters:
+        - name: collectionId
+          in: path
+          required: true
+          schema: { type: string }
+          description: The ID of the collection.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    description: Document ID to update. Omit to create a new document.
+                  content:
+                    type: object
+                    additionalProperties: true
+                    description: Arbitrary JSON content of the document.
+            example:
+              - id: "a8428d64-a01d-49b2-9144-ddeec001acf8"
+                content: { "campaignName": "Q2 Campaign", "region": "West", "status": "Inactive" }
+              - content: { "campaignName": "New Campaign", "region": "North", "status": "Active" }
+      responses:
+        '200':
+          description: Returns the number of updated and created documents.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  Updated:
+                    type: integer
+                    description: Number of documents updated.
+                  Created:
+                    type: integer
+                    description: Number of documents created.
+              example:
+                Updated: 1
+                Created: 1
+
+        '404':
+          $ref: '#/components/responses/CollectionNotFound'
+    delete:
+      summary: Bulk Delete Documents
+      description: "Remove multiple documents from a collection in a single request. IDs are passed as a comma-separated `ids` query parameter. For large batches, keep requests under approximately 800 UUIDs (~30 KB URL) to avoid URL length errors; split larger deletes across multiple requests."
+      tags:
+        - App DB API (Product)
+      parameters:
+        - name: collectionId
+          in: path
+          required: true
+          schema: { type: string }
+          description: The ID of the collection.
+        - name: ids
+          in: query
+          required: true
+          description: A comma-separated list of document IDs.
+          schema:
+            type: string
+          example: "id1,id2,id3"
+      responses:
+        '202':
+          description: Accepted — returns the count of deleted documents.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  Deleted:
+                    type: integer
+                    description: Number of documents deleted.
+              example:
+                Deleted: 2
+        '404':
+          $ref: '#/components/responses/CollectionNotFound'
+
+  /api/datastores/v2/collections/{collectionId}/documents/update:
+    put:
+      summary: Partially Update Documents
+      description: |
+        Perform partial updates on documents using MongoDB query and update operations.
+        Returns the number of documents updated. Returns `0` if no documents matched — this is a successful response, not an error.
+        `$setOnInsert` has no effect because AppDB partial updates do not perform upserts.
+
+        **Supported update operators:** `currentDate`, `inc`, `min`, `max`, `mul`, `rename`, `set`, `unset`, `addToSet`, `pop`, `pull`, `pullAll`, `push`
+
+        **Supported modifiers:** `each`, `position`, `slice`, `sort`
+
+        See the [MongoDB Update Operators documentation](https://www.mongodb.com/docs/manual/reference/mql/update/) for details.
+      tags:
+        - App DB API (Product)
+      parameters:
+        - name: collectionId
+          in: path
+          required: true
+          schema: { type: string }
+          description: The ID of the collection.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [query, operation]
+              properties:
+                query:
+                  type: object
+                  additionalProperties: true
+                  description: MongoDB query that identifies the documents to update.
+                operation:
+                  type: object
+                  additionalProperties: true
+                  description: MongoDB update operation to apply.
+            examples:
+              set-field:
+                summary: Set a field on matching documents
+                value:
+                  query:
+                    content.status: "Draft"
+                  operation:
+                    $set:
+                      content.status: "Active"
+              increment-field:
+                summary: Increment a numeric field
+                value:
+                  query:
+                    content.views:
+                      $exists: true
+                  operation:
+                    $inc:
+                      content.views: 1
+      responses:
+        '200':
+          description: Returns the number of updated documents or properties.
+          content:
+            application/json:
+              schema:
+                type: integer
+                example: 1
+        '400':
+          description: "Bad Request. The request body is missing a required field (`query` or `operation`)."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                message: "query is required"
+                status: 400
+                statusReason: "Bad Request"
+                toe: "8PJRQYWMHF-NXB3Z-KTZUA"
+        '404':
+          $ref: '#/components/responses/CollectionNotFound'
+
+  /api/datastores/v2/collections/{collectionId}/download:
+    get:
+      summary: Download Documents
+      description: >-
+        Download documents in a collection as a JSON file (served with a
+        `Content-Disposition: attachment` header). Each entry is a complete document object
+        in the same shape accepted by Import Documents.
+
+        **Hard limit: returns at most 100 documents.** If the collection has more than 100 documents,
+        only the first 100 are returned with no error or warning. Use the List Documents endpoint with
+        `limit`/`offset` pagination to retrieve larger collections.
+      tags:
+        - App DB API (Product)
+      parameters:
+        - name: collectionId
+          in: path
+          required: true
+          schema: { type: string }
+          description: The ID of the collection.
+      responses:
+        '200':
+          description: JSON array of the documents in the collection.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Document'
+
+  /api/datastores/v2/collections/{collectionId}/documents/import:
+    put:
+      summary: Import Documents
+      description: >-
+        Bulk-import complete document objects into a collection — the counterpart to Download
+        Documents. Each item must be a full document (including its `id`); documents are
+        **upserted by `id`**, so the original `id`, `createdOn`, and `owner` are preserved.
+        This is the format produced by Download Documents, which makes the two endpoints a
+        copy/restore pair. To add brand-new documents from raw content instead, use Create
+        Document. Existing documents not present in the payload are left untouched.
+      tags:
+        - App DB API (Product)
+      parameters:
+        - name: collectionId
+          in: path
+          required: true
+          schema: { type: string }
+          description: The ID of the collection.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/Document'
+            example:
+              - id: "a8428d64-a01d-49b2-9144-ddeec001acf8"
+                datastoreId: "39b88a97-8247-4c0d-ba1d-8ed78d1a6680"
+                collectionId: "232e6d6c-46e9-49b6-a137-8933f0f05999"
+                syncRequired: true
+                owner: "870010733"
+                createdBy: "870010733"
+                createdOn: "2026-06-23T20:58:06.567Z"
+                updatedOn: "2026-06-23T23:36:13.177Z"
+                updatedBy: "870010733"
+                content:
+                  username: "bill"
+                  email: "bill@example.com"
+      responses:
+        '200':
+          description: >-
+            Import completed. Returns counts of the operations performed.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  Updated:
+                    type: integer
+                    description: Number of existing documents that were updated.
+                  Created:
+                    type: integer
+                    description: Number of documents created.
+                  Upserted:
+                    type: integer
+                    description: Number of documents inserted via upsert (matched no existing document).
+              example:
+                Updated: 0
+                Created: 0
+                Upserted: 1
+
+  /api/datastores/v1/collections/{collectionId}/documents/update:
+    put:
+      summary: Partially Update Documents (v1, Deprecated)
+      deprecated: true
+      description: |
+        **Deprecated.** Use the v2 Partially Update Documents endpoint instead.
+
+        Perform partial updates on documents using MongoDB query and update operations.
+        Returns the number of documents updated. Returns `0` if no documents matched — this is a successful response, not an error.
+        `$setOnInsert` has no effect because AppDB partial updates do not perform upserts.
+
+        **Supported update operators:** `currentDate`, `inc`, `min`, `max`, `mul`, `rename`, `set`, `unset`, `addToSet`, `pop`, `pull`, `pullAll`, `push`
+
+        **Supported modifiers:** `each`, `position`, `slice`, `sort`
+
+        See the [MongoDB Update Operators documentation](https://www.mongodb.com/docs/manual/reference/mql/update/) for details.
+      tags:
+        - App DB API (Product)
+      parameters:
+        - name: collectionId
+          in: path
+          required: true
+          schema: { type: string }
+          description: The ID of the collection.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [query, operation]
+              properties:
+                query:
+                  type: object
+                  additionalProperties: true
+                  description: MongoDB query that identifies the documents to update.
+                operation:
+                  type: object
+                  additionalProperties: true
+                  description: MongoDB update operation to apply.
+            examples:
+              set-field:
+                summary: Set a field on matching documents
+                value:
+                  query:
+                    content.status: "Draft"
+                  operation:
+                    $set:
+                      content.status: "Active"
+      responses:
+        '200':
+          description: Returns the number of updated documents or properties.
+          content:
+            application/json:
+              schema:
+                type: integer
+                example: 1

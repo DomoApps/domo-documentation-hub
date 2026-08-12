@@ -28,6 +28,30 @@ components:
       in: header
       name: X-DOMO-Developer-Token
       description: Domo Developer Token for authentication.
+  parameters:
+    EntityType:
+      name: entity
+      in: path
+      required: true
+      description: The type of entity the permissions apply to.
+      schema:
+        type: string
+        enum: [USER, GROUP, RYUU_APP]
+    EntityId:
+      name: entityId
+      in: path
+      required: true
+      description: >-
+        The ID of the entity the permissions apply to. For a **USER** or **GROUP**, this is the numeric ID (for example, `870010733`). For a **RYUU_APP**, this is the app instance's UUID — the same value as the app's datastore UUID, which also appears as the subdomain of the app's origin (e.g., `https://<instance-uuid>.domoapps.domo.com`).
+      schema:
+        type: string
+      examples:
+        userOrGroup:
+          summary: User or group (numeric ID)
+          value: "870010733"
+        app:
+          summary: App instance (UUID)
+          value: "fcd8baba-9524-4fb5-b94b-b3d3b588e740"
   schemas:
     #========= SHARED SCHEMAS =========
     ErrorResponse:
@@ -706,11 +730,11 @@ paths:
         '404':
           $ref: '#/components/responses/CollectionNotFound'
 
-  /api/datastores/v1/collections/{collectionId}/permission/RYUU_APP/{proxyId}:
+  /api/datastores/v1/collections/{collectionId}/permission/{entity}/{entityId}:
     put:
       summary: Update Permissions
       description: |
-        Grant or replace permissions for a Custom App (proxy) on a collection. To update permissions for a user or group instead, use the USER or GROUP path variants of this endpoint.
+        Grant or replace permissions for a user, group, or app instance on a collection.
 
         ## Permission Inheritance
 
@@ -743,11 +767,8 @@ paths:
           required: true
           schema: { type: string }
           description: The ID of the collection.
-        - name: proxyId
-          in: path
-          required: true
-          schema: { type: string }
-          description: App instance UUID. This is the subdomain prefix of the app's origin URL (e.g., `https://<instance-uuid>.domoapps.domo.com`), and is the same value as the app's datastore UUID.
+        - $ref: '#/components/parameters/EntityType'
+        - $ref: '#/components/parameters/EntityId'
         - name: permissions
           in: query
           required: true
@@ -784,7 +805,7 @@ paths:
         '204':
           description: Permissions updated successfully. No response body is returned.
         '403':
-          description: "Forbidden. The collection does not exist or the caller does not have permission to manage its permissions."
+          description: "Forbidden. The collection does not exist or the caller does not have the `share` permission on it."
           content:
             application/json:
               schema:
@@ -796,11 +817,16 @@ paths:
                 toe: "GP0ITH3EYK-UTED0-8ZCS2"
         '404':
           $ref: '#/components/responses/CollectionNotFoundDirect'
+    delete:
+      summary: Delete Permissions
+      description: |
+        Remove all permissions for a user, group, or app instance on a collection.
 
-  /api/datastores/v1/collections/{collectionId}/permission/USER/{userId}:
-    put:
-      summary: Update User Permissions
-      description: "Grant or replace permissions for a specific user on a collection. By default, the specified permissions are merged with any permissions the user already holds. Pass `overwrite=true` to replace the user's permission set entirely."
+        This operation is idempotent: removing permissions for an entity that currently has none still returns `204`.
+
+        <Note>
+        If all entities' permissions are removed, then only users with the **Manage AppDB** grant will still have access.
+        </Note>
       tags:
         - App DB API (Product)
       parameters:
@@ -809,93 +835,20 @@ paths:
           required: true
           schema: { type: string }
           description: The ID of the collection.
-        - name: userId
-          in: path
-          required: true
-          schema: { type: string }
-          description: Numeric user ID.
-        - name: permissions
-          in: query
-          required: true
-          description: One or more permissions to apply. Pass as a comma-separated list.
-          style: form
-          explode: false
-          schema:
-            type: array
-            items:
-              type: string
-              enum:
-                - admin
-                - write
-                - read
-                - share
-                - delete
-                - create_content
-                - update_content
-                - read_content
-                - delete_content
-          example: "read,write"
-        - name: overwrite
-          in: query
-          required: false
-          description: "When `false` (default), merges the specified permissions with the user's existing permissions. When `true`, replaces the user's entire permission set with exactly the permissions specified."
-          schema:
-            type: boolean
-            default: false
+        - $ref: '#/components/parameters/EntityType'
+        - $ref: '#/components/parameters/EntityId'
       responses:
         '204':
-          description: No Content
-        '404':
-          $ref: '#/components/responses/CollectionNotFoundDirect'
-
-  /api/datastores/v1/collections/{collectionId}/permission/GROUP/{groupId}:
-    put:
-      summary: Update Group Permissions
-      description: "Grant or replace permissions for a group on a collection. By default, the specified permissions are merged with any permissions the group already holds. Pass `overwrite=true` to replace the group's permission set entirely."
-      tags:
-        - App DB API (Product)
-      parameters:
-        - name: collectionId
-          in: path
-          required: true
-          schema: { type: string }
-          description: The ID of the collection.
-        - name: groupId
-          in: path
-          required: true
-          schema: { type: string }
-          description: Numeric group ID.
-        - name: permissions
-          in: query
-          required: true
-          description: One or more permissions to apply. Pass as a comma-separated list.
-          style: form
-          explode: false
-          schema:
-            type: array
-            items:
-              type: string
-              enum:
-                - admin
-                - write
-                - read
-                - share
-                - delete
-                - create_content
-                - update_content
-                - read_content
-                - delete_content
-          example: "read,read_content"
-        - name: overwrite
-          in: query
-          required: false
-          description: "When `false` (default), merges the specified permissions with the group's existing permissions. When `true`, replaces the group's entire permission set with exactly the permissions specified."
-          schema:
-            type: boolean
-            default: false
-      responses:
-        '204':
-          description: No Content
+          description: Permissions removed successfully. No response body is returned.
+        '403':
+          description: "Forbidden. The caller does not have the `share` permission on this collection."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                status: 403
+                toe: "4BTZ5Z37R0-WR4VI-YS9Y4"
         '404':
           $ref: '#/components/responses/CollectionNotFoundDirect'
 
@@ -925,7 +878,8 @@ paths:
             type: array
             items:
               type: string
-          description: Filter by specific entity IDs.
+          description: >-
+            Filter by specific entity IDs. User and group IDs are numeric (for example, `870010733`); app (`RYUU_APP`) IDs are UUIDs (for example, `fcd8baba-9524-4fb5-b94b-b3d3b588e740`).
       responses:
         '200':
           description: OK. Returns a map of entity type to list of permission entries.

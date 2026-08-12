@@ -36,6 +36,29 @@ components:
       schema:
         type: string
         format: uuid
+    EntityType:
+      name: entity
+      in: path
+      required: true
+      description: The type of entity the permissions apply to.
+      schema:
+        type: string
+        enum: [USER, GROUP, RYUU_APP]
+    EntityId:
+      name: entityId
+      in: path
+      required: true
+      description: >-
+        The ID of the entity the permissions apply to. For a **USER** or **GROUP**, this is the numeric ID (for example, `870010733`). For a **RYUU_APP**, this is the app instance's UUID — the same value as the app's datastore UUID, which also appears as the subdomain of the app's origin (e.g., `https://<instance-uuid>.domoapps.domo.com`).
+      schema:
+        type: string
+      examples:
+        userOrGroup:
+          summary: User or group (numeric ID)
+          value: "870010733"
+        app:
+          summary: App instance (UUID)
+          value: "fcd8baba-9524-4fb5-b94b-b3d3b588e740"
   schemas:
     ErrorResponse:
       type: object
@@ -3279,19 +3302,8 @@ paths:
       - AppDB API
       parameters:
         - $ref: '#/components/parameters/CollectionName'
-        - name: entity
-          in: path
-          required: true
-          description: Type of entity
-          schema:
-            type: string
-            enum: [USER, GROUP, RYUU_APP]
-        - name: entityId
-          in: path
-          required: true
-          description: ID of the user, group, or app instance; for apps, the id is the same as the datastore UUID and also appears as the subdomain of the app's origin (e.g., `https://<instance-uuid>.domoapps.domo.com`).
-          schema:
-            type: string
+        - $ref: '#/components/parameters/EntityType'
+        - $ref: '#/components/parameters/EntityId'
         - name: permissions
           in: query
           required: true
@@ -3384,17 +3396,8 @@ paths:
       - AppDB API
       parameters:
         - $ref: '#/components/parameters/CollectionName'
-        - name: entity
-          in: path
-          required: true
-          schema:
-            type: string
-            enum: [USER, GROUP, RYUU_APP]
-        - name: entityId
-          in: path
-          required: true
-          schema:
-            type: string
+        - $ref: '#/components/parameters/EntityType'
+        - $ref: '#/components/parameters/EntityId'
       x-codeSamples:
         - lang: JavaScript
           label: domo.js

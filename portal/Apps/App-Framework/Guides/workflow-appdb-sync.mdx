@@ -113,9 +113,11 @@ async function syncCollection(collectionId) {
 async function forceSyncWithRetry(datastoreId) {
   for (let attempt = 1; attempt <= MAX_SYNC_ATTEMPTS; attempt++) {
     try {
+      // Code Engine requires a body on POST requests, so send an empty object.
       await codeengine.sendRequest(
         "post",
         `/api/datastores/v1/export/${datastoreId}`,
+        {},
       );
       return;
     } catch (error) {

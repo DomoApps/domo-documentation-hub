@@ -3,53 +3,110 @@ title: 'Sync AppDB Only Once a Day'
 permalink: 34d8713d17282-sync-app-db-only-once-a-day
 ---
 
-Since Domo doesn't currently allow you to specify sync intervals, AppDB can **only** be set to either 1) not sync at all or 2) sync every 15 minutes. If you would like to **conserve credits** on syncs, you can create a Workflow to **sync on your schedule**.
+This article explains how to sync an AppDB collection to its Domo DataSet on a custom schedule, using a scheduled Workflow and a Code Engine function to force a sync on demand instead of on AppDB's fixed 15-minute cadence.
 
-This guide leverages Workflows and Code Engine. Please make sure you are familiar with Workflows and Code Engine first.
+---
 
-<Note>
-**Links to documentation**
-- [Workflow Documentation](/s/article/000005108?language=en_US)
-- [Code Engine Documentation](/s/article/000005173?language=en_US)
-</Note>
+When sync is enabled, an AppDB collection syncs to its Domo DataSet every 15 minutes, and Domo doesn't currently expose a configurable interval — the only choices are "every 15 minutes" or "not at all." Because each sync consumes credits (a 15-minute cadence runs up to 96 times a day), you can drive the sync yourself: schedule a [Workflow](/portal/Automate-Actions/Workflows/overview) that calls a [Code Engine](/portal/Automate-Actions/Code-Engine/overview) function which turns the collection's sync on, forces one export, then turns it back off. The collection then syncs exactly when your Workflow runs, and never on the background cycle.
 
-1. [Create a Workflow](/s/article/000005331?language=en_US) that runs at the time you want to sync the collection
-2. Specify which collection you want to sync
-   - You can [specify it as a variable](/s/article/000005331?language=en_US#add_a_variable) in the Workflow
-3. [Create a Code Engine function](/s/article/000005173?language=en_US#create_custom_package) to execute a sync, which could be written like this:
+For how AppDB collections map to DataSets, see the [App DB API overview](/portal/API-Reference/Product-APIs/App-DB).
+
+## Prerequisites
+
+This guide assumes you're comfortable with [Workflows](/s/article/000005108) and [Code Engine](/s/article/000005173), and that you can create both.
+
+You'll also need the target collection's **ID** — a UUID. Find it in the [AppDB Admin User Interface](/s/article/9221297758615), in your app's `manifest.json` under `collectionsMapping[].id`, or with a [List Collections](/api-reference/app-db-api-product/list-collections) call. This is the Product API's collection ID, not the collection name used by the App Framework proxy.
+
+## Sync a collection on a schedule
+
+Begin in Domo Workflows.
+
+1. [Create a Workflow](/s/article/000005331) with a scheduled (timer) trigger set to the time you want the collection to sync — for example, once a day.
+2. Add the collection's ID as a [Workflow variable](/s/article/000005331#add-a-variable) so the same function works for any collection.
+3. [Create a custom Code Engine package](/portal/Automate-Actions/Code-Engine/creating-packages) containing a function like the one below. It uses [`codeengine.sendRequest`](/portal/Automate-Actions/Code-Engine/javascript-libraries#sendrequest) to call the [App DB API](/portal/API-Reference/Product-APIs/App-DB) — reading the collection to find its datastore, enabling sync, forcing an export, then disabling sync:
 
 ```js
 const codeengine = require('codeengine');
 
+// Seconds to wait between retries when the collection is locked.
+const RETRY_DELAY_SECONDS = 10;
+// A collection is locked while a sync is in progress. If it's still locked
+// after this many attempts, treat it as a permanent lock.
+const MAX_SYNC_ATTEMPTS = 5;
+
+const wait = (seconds) =>
+  new Promise((resolve) => setTimeout(resolve, seconds * 1000));
+
+// A 423 response means the collection is locked (a sync is already running).
+// Check the common places an HTTP status can appear on the thrown error.
+function isCollectionLocked(error) {
+  if (!error) return false;
+  const status =
+    error.status || (error.response && error.response.status) || error.statusCode;
+  const message = error.message || '';
+  return status === 423 || /\b423\b/.test(message);
+}
+
 async function syncCollection(collectionId) {
-  // gets the collection
-  const collection = await codeengine.sendRequest(
-    'get',
-    `/api/datastores/v1/collections/${collectionId}`,
-  );
+  try {
+    // Get the collection so we can look up its datastore
+    const collection = await codeengine.sendRequest(
+      'get',
+      `/api/datastores/v1/collections/${collectionId}`,
+    );
 
-  // enables collection sync
-  const putBody = { id: collectionId, syncEnabled: true };
-  await codeengine.sendRequest(
-    'put',
-    `/api/datastores/v1/collections/${collectionId}`,
-    JSON.stringify(putBody),
-  );
+    // Enable sync on the collection
+    await codeengine.sendRequest(
+      'put',
+      `/api/datastores/v1/collections/${collectionId}`,
+      { id: collectionId, syncEnabled: true },
+    );
 
-  // forces collection sync
-  await codeengine.sendRequest(
-    'post',
-    `/api/datastores/v1/export/${collection.datastoreId}`,
-    '',
-  );
+    // Force a sync now, retrying while the collection is locked
+    await forceSyncWithRetry(collection.datastoreId);
 
-  // turns off collection sync
-  await codeengine.sendRequest(
-    'put',
-    `/api/datastores/v1/collections/${collectionId}`,
-    JSON.stringify({ ...putBody, syncEnabled: false }),
-  );
+    // Disable sync so it won't run again on the default 15-minute interval
+    await codeengine.sendRequest(
+      'put',
+      `/api/datastores/v1/collections/${collectionId}`,
+      { id: collectionId, syncEnabled: false },
+    );
+  } catch (error) {
+    console.error(`Failed to sync collection ${collectionId}:`, error);
+    throw error;
+  }
+}
+
+// A newly enabled collection can be locked if a sync is already running.
+// Retry the export until it succeeds or the lock proves permanent.
+async function forceSyncWithRetry(datastoreId) {
+  for (let attempt = 1; attempt <= MAX_SYNC_ATTEMPTS; attempt++) {
+    try {
+      await codeengine.sendRequest(
+        'post',
+        `/api/datastores/v1/export/${datastoreId}`,
+      );
+      return;
+    } catch (error) {
+      if (!isCollectionLocked(error)) throw error;
+
+      if (attempt === MAX_SYNC_ATTEMPTS) {
+        throw new Error(
+          `Collection is still locked after ${MAX_SYNC_ATTEMPTS} attempts. ` +
+            `This is likely a permanent lock — please open a Domo support ticket.`,
+        );
+      }
+
+      console.log(
+        `Collection locked (423). Attempt ${attempt} of ${MAX_SYNC_ATTEMPTS} failed; ` +
+          `retrying in ${RETRY_DELAY_SECONDS}s...`,
+      );
+      await wait(RETRY_DELAY_SECONDS);
+    }
+  }
 }
 ```
 
-4. Call the new Code Engine function in the Workflow with the collection id
+<Note>**Note:** A collection returns `423 Locked` while a sync is already running, so the function retries the export every `RETRY_DELAY_SECONDS` (10 seconds by default), up to `MAX_SYNC_ATTEMPTS` (5) times. If it's still locked after the final attempt, the lock is likely permanent — contact your Domo account team to open a support ticket. Keep `RETRY_DELAY_SECONDS` × `MAX_SYNC_ATTEMPTS` comfortably under Code Engine's [5-minute runtime limit](/portal/Automate-Actions/Code-Engine/limitations-and-troubleshooting).</Note>
+
+4. Call the function from the Workflow, mapping your collection-ID variable to the function's `collectionId` parameter. If the sync can't complete, the function throws — which surfaces as a failed Workflow step, so the error (including the permanent-lock message) appears in the run history.

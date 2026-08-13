@@ -1,55 +1,273 @@
 # Sync OpenAPI Specifications and Update Navigation
 #
-# Detects changed OpenAPI YAMLs in the source repo, then fans out
-# a matrix job per changed file. Each matrix job syncs its one YAML,
-# regenerates the nav entry in docs.json, and opens a dedicated PR.
+# TRIGGER (normal path): Jenkins pushes a changed public YAML to the
+# openapi-sync-incoming branch via a write deploy key. This workflow
+# detects the change, merges main, regenerates nav, and opens/updates
+# one rolling PR to main using the DomoApps App token (GITHUB_TOKEN
+# would suppress the mint-preview pull_request event).
+#
+# TRIGGER (manual fallback): workflow_dispatch with optional force_sync.
+# Uses the existing mirror-clone approach (domoinc/internal-domo-apis)
+# when Jenkins is unavailable.
+#
+# See: ~/dev/domo-docs-research/docs/openapi_sync_pipeline_plan.md
 
 name: Sync OpenAPI Specs
 
-# ============================================================================
-# CONFIGURATION - Update these values for your setup
-# ============================================================================
-env:
-  # Source repository (where OpenAPI YAMLs live)
-  SOURCE_OWNER: domoinc
-  SOURCE_REPO: internal-domo-apis
-  SOURCE_YAML_PATH: api-docs/public
-
-  # Destination paths (in this repo)
-  DEST_YAML_PATH: openapi/product
-  DOCS_JSON_PATH: ./docs.json
-  OPENAPI_BASE_PATH: openapi/product
-
-  # Git settings
-  BASE_BRANCH: main
-# ============================================================================
-
 on:
-  # Triggered by the upstream notifier workflow in domoinc/internal-domo-apis
-  # (.github/workflows/notify-docs-hub.yml) whenever a YAML under
-  # api-docs/public/ changes on master.
-  repository_dispatch:
-    types: [openapi-updated]
+  push:
+    branches:
+      - openapi-sync-incoming  # exact — avoids matching stale openapi-sync-* branches
+    paths:
+      - "openapi/product/**"   # docs.json-only nav commits don't re-trigger this
 
-  # Manual escape hatch. Supports force_sync for re-syncing unchanged files.
   workflow_dispatch:
     inputs:
       force_sync:
-        description: "Force sync all YAML files"
+        description: "Force sync all YAML files (ignores content hash)"
         required: false
         type: boolean
         default: false
 
+concurrency:
+  group: openapi-sync
+  cancel-in-progress: true  # rapid pushes collapse; latest state wins
+
+env:
+  DEST_YAML_PATH: openapi/product
+  DOCS_JSON_PATH: ./docs.json
+  OPENAPI_BASE_PATH: openapi/product
+  BASE_BRANCH: main
+  SYNC_BRANCH: openapi-sync-incoming
+  # For workflow_dispatch mirror-clone fallback only:
+  SOURCE_OWNER: domoinc
+  SOURCE_REPO: internal-domo-apis
+  SOURCE_YAML_PATH: api-docs/public
+
+# =============================================================================
+# Push path — Jenkins pushed a changed YAML to openapi-sync-incoming
+# =============================================================================
 jobs:
-  detect:
+  sync-on-push:
+    name: Sync (push trigger)
+    if: github.event_name == 'push'
     runs-on: ubuntu-latest
     permissions:
-      contents: read
-    outputs:
-      has_changes: ${{ steps.check.outputs.has_changes }}
-      files: ${{ steps.detect.outputs.files_json }}
+      contents: write
+      pull-requests: write
+
     steps:
-      - name: Generate Source Repo Token
+      - name: Generate App token
+        uses: actions/create-github-app-token@v1
+        id: app-token
+        with:
+          app-id: ${{ secrets.APP_ID }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY }}
+
+      # Verify this push only touched openapi/product/*.yaml — defense-in-depth
+      # against a buggy or mis-wired Jenkins job writing outside its lane.
+      # Zero SHA means a new branch was created; no before-SHA to compare, skip.
+      - name: Content guard
+        id: guard
+        env:
+          BEFORE: ${{ github.event.before }}
+          AFTER: ${{ github.event.after }}
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+        run: |
+          set -euo pipefail
+          if [ "$BEFORE" = "0000000000000000000000000000000000000000" ]; then
+            echo "First push to branch — skipping content guard."
+            echo "changed_yamls=" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          CHANGED=$(gh api \
+            "repos/${{ github.repository }}/compare/${BEFORE}...${AFTER}" \
+            --jq '.files[].filename')
+
+          echo "Changed files in this push:"
+          echo "$CHANGED"
+
+          NON_OPENAPI=$(echo "$CHANGED" | grep -v '^openapi/product/' || true)
+          if [ -n "$NON_OPENAPI" ]; then
+            echo "::error::Push contains files outside openapi/product/ — aborting sync."
+            echo "$NON_OPENAPI"
+            exit 1
+          fi
+
+          # Build comma-separated list of changed YAMLs for changed-only nav regen.
+          # Changed-only keeps the action idempotent and avoids re-ordering unrelated entries.
+          YAMLS=$(echo "$CHANGED" | grep -E '\.ya?ml$' | tr '\n' ',' | sed 's/,$//')
+          echo "changed_yamls=$YAMLS" >> "$GITHUB_OUTPUT"
+
+      - name: Checkout sync branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ env.SYNC_BRANCH }}
+          token: ${{ steps.app-token.outputs.token }}  # git push uses this token
+          fetch-depth: 0
+
+      - name: Configure git identity
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      # Merge main so KB nav edits that landed after the sync branch was cut
+      # are preserved. Take main's docs.json on conflict — regen reapplies the
+      # OpenAPI nav entries on top. Any conflict outside docs.json is unexpected
+      # (Jenkins only writes openapi/product/; main writes .mdx + docs.json) and
+      # fails loudly so the engineer can investigate.
+      - name: Merge main into sync branch
+        run: |
+          set -euo pipefail
+          git fetch origin main
+          if git merge origin/main --no-edit; then
+            echo "Merged main cleanly."
+          else
+            CONFLICTS=$(git diff --name-only --diff-filter=U)
+            NON_DOCSJSON=$(echo "$CONFLICTS" | grep -v '^docs\.json$' || true)
+            if [ -n "$NON_DOCSJSON" ]; then
+              echo "::error::Unexpected merge conflicts outside docs.json:"
+              echo "$NON_DOCSJSON"
+              git merge --abort
+              exit 1
+            fi
+            echo "Resolving docs.json conflict — taking main's version (regen reapplies OpenAPI nav)."
+            git checkout --theirs -- docs.json
+            git add docs.json
+            git -c core.editor=true merge --continue
+          fi
+
+      # If a YAML was renamed with a case change (e.g. Filesets.yaml → filesets.yaml),
+      # remove the old-case file so case-collision-check.yml passes on the rolling PR.
+      - name: Remove case-variant YAML duplicates
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import os, collections, subprocess
+          dest = os.environ.get("DEST_YAML_PATH", "openapi/product")
+          if not os.path.isdir(dest):
+              raise SystemExit(0)
+          files = [f for f in os.listdir(dest) if f.lower().endswith((".yaml", ".yml"))]
+          by_lower = collections.defaultdict(list)
+          for f in files:
+              by_lower[f.lower()].append(f)
+          removed = []
+          for group in by_lower.values():
+              if len(group) > 1:
+                  keep = sorted(group)[0]
+                  for f in sorted(group)[1:]:
+                      path = os.path.join(dest, f)
+                      print(f"Removing case-variant: {path} (keeping {keep})")
+                      os.remove(path)
+                      removed.append(path)
+          if removed:
+              subprocess.run(["git", "add", dest], check=True)
+              subprocess.run(
+                  ["git", "commit", "-m", "chore: remove case-variant YAML duplicates"],
+                  check=True,
+              )
+          else:
+              print("No case-variant duplicates found.")
+          PY
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+
+      # Run nav regen for the files that changed in this push (changed-only keeps
+      # the action from reordering unrelated entries and ensures the diff guard
+      # below sees a clean "no changes" on a re-run against identical content).
+      # Zero-SHA pushes (new branch) pass changed_yamls="" → process all.
+      - name: Regenerate OpenAPI nav
+        uses: DomoApps/documentation-generator-action@main
+        with:
+          yaml_input_path: "./${{ env.DEST_YAML_PATH }}"
+          docs_json_path: "${{ env.DOCS_JSON_PATH }}"
+          openapi_base_path: "${{ env.OPENAPI_BASE_PATH }}"
+          process_changed_only: "${{ steps.guard.outputs.changed_yamls != '' }}"
+          changed_files: ${{ steps.guard.outputs.changed_yamls }}
+
+      - name: Prune stale OpenAPI nav entries
+        run: |
+          python .github/scripts/prune_stale_nav.py \
+            --docs-json "${{ env.DOCS_JSON_PATH }}" \
+            --repo-root .
+
+      # Push with the App token (not GITHUB_TOKEN) so GitHub fires
+      # pull_request:synchronize on the open rolling PR, which lets
+      # mint-preview.yml build a preview of the updated nav.
+      # docs.json-only commit misses the openapi/product/** path filter
+      # on this workflow, so no self-trigger loop.
+      - name: Commit and push nav changes
+        run: |
+          set -euo pipefail
+          git add "${{ env.DOCS_JSON_PATH }}"
+          if git diff --cached --exit-code; then
+            echo "docs.json unchanged — nothing to commit."
+          else
+            git commit -m "docs: regenerate OpenAPI nav"
+            git push origin "${{ env.SYNC_BRANCH }}"
+          fi
+
+      - name: Open or update rolling PR
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+        run: |
+          set -euo pipefail
+          PR_NUMBER=$(gh pr list \
+            --base "${{ env.BASE_BRANCH }}" \
+            --head "${{ env.SYNC_BRANCH }}" \
+            --state open \
+            --json number \
+            --jq '.[0].number // empty')
+
+          if [ -z "$PR_NUMBER" ]; then
+            gh pr create \
+              --base "${{ env.BASE_BRANCH }}" \
+              --head "${{ env.SYNC_BRANCH }}" \
+              --title "docs: Sync OpenAPI specifications" \
+              --body "$(cat <<'EOF'
+          ## OpenAPI Specification Sync
+
+          Updated by the Jenkins-direct pipeline. Each push from Jenkins updates this PR in place.
+
+          ### Changes
+          - Synced public YAML file(s) from api-registry via Jenkins
+          - Regenerated \`docs.json\` navigation
+          - Pruned any stale nav entries
+
+          ---
+          *One rolling PR — review on the weekly KB cadence and merge when ready.*
+          EOF
+          )"
+            echo "Rolling PR created."
+          else
+            echo "Rolling PR #${PR_NUMBER} already open — branch updated. mint-preview will fire."
+          fi
+
+      - name: Step summary
+        if: always()
+        run: |
+          echo "## OpenAPI Sync (push)" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Trigger: push to \`${{ env.SYNC_BRANCH }}\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Changed YAMLs: \`${{ steps.guard.outputs.changed_yamls || '(all — new branch)' }}\`" >> "$GITHUB_STEP_SUMMARY"
+
+# =============================================================================
+# Manual fallback — clones the source mirror and drives a full sync
+# =============================================================================
+  sync-on-dispatch:
+    name: Sync (manual fallback — mirror clone)
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - name: Generate source repo token
         uses: actions/create-github-app-token@v1
         id: source-token
         with:
@@ -58,10 +276,56 @@ jobs:
           owner: ${{ env.SOURCE_OWNER }}
           repositories: ${{ env.SOURCE_REPO }}
 
-      - name: Checkout Destination Repo
-        uses: actions/checkout@v4
+      - name: Generate App token (docs repo)
+        uses: actions/create-github-app-token@v1
+        id: app-token
+        with:
+          app-id: ${{ secrets.APP_ID }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY }}
 
-      - name: Clone Source Repo
+      # Checkout main so we have a valid worktree; then switch to / create the sync branch.
+      - name: Checkout docs repo (main)
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ env.BASE_BRANCH }}
+          token: ${{ steps.app-token.outputs.token }}
+          fetch-depth: 0
+
+      - name: Configure git identity
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Switch to / create sync branch
+        run: |
+          set -euo pipefail
+          git fetch origin
+          if git ls-remote --exit-code --heads origin "${{ env.SYNC_BRANCH }}" > /dev/null; then
+            git checkout -b "${{ env.SYNC_BRANCH }}" "origin/${{ env.SYNC_BRANCH }}"
+            echo "Switched to existing sync branch."
+            # Merge main — same targeted conflict resolution as the push path
+            if git merge origin/main --no-edit; then
+              echo "Merged main cleanly."
+            else
+              CONFLICTS=$(git diff --name-only --diff-filter=U)
+              NON_DOCSJSON=$(echo "$CONFLICTS" | grep -v '^docs\.json$' || true)
+              if [ -n "$NON_DOCSJSON" ]; then
+                echo "::error::Unexpected merge conflicts outside docs.json:"
+                echo "$NON_DOCSJSON"
+                git merge --abort
+                exit 1
+              fi
+              git checkout --theirs -- docs.json
+              git add docs.json
+              git -c core.editor=true merge --continue
+              echo "Resolved docs.json conflict (took main's version)."
+            fi
+          else
+            git checkout -b "${{ env.SYNC_BRANCH }}"
+            echo "Created sync branch from main."
+          fi
+
+      - name: Clone source (mirror) repo
         uses: actions/checkout@v4
         with:
           repository: ${{ env.SOURCE_OWNER }}/${{ env.SOURCE_REPO }}
@@ -73,170 +337,107 @@ jobs:
         with:
           python-version: "3.10"
 
-      - name: Detect Changed YAML Files
+      - name: Detect changed YAMLs and copy to sync branch
         id: detect
         run: |
+          set -euo pipefail
           python .github/scripts/detect_yaml_changes.py \
             --source "source-repo/${{ env.SOURCE_YAML_PATH }}" \
             --dest "${{ env.DEST_YAML_PATH }}" \
-            --force ${{ github.event.inputs.force_sync || 'false' }}
+            --force "${{ github.event.inputs.force_sync || 'false' }}"
 
-          # Emit the changed file list as a JSON array so the matrix can fan out
           if [ -f changed_files.txt ] && [ -s changed_files.txt ]; then
-            FILES_JSON=$(jq -R -s -c 'split("\n") | map(select(length > 0))' changed_files.txt)
-          else
-            FILES_JSON="[]"
-          fi
-          echo "files_json=$FILES_JSON" >> $GITHUB_OUTPUT
-
-      - name: Check for Changes
-        id: check
-        run: |
-          if [ -f changed_files.txt ] && [ -s changed_files.txt ]; then
-            echo "has_changes=true" >> $GITHUB_OUTPUT
-            echo "Changed files:"
+            echo "has_changes=true" >> "$GITHUB_OUTPUT"
+            echo "Changed files to sync:"
             cat changed_files.txt
+
+            mkdir -p "${{ env.DEST_YAML_PATH }}"
+            while IFS= read -r src; do
+              BASENAME=$(basename "$src")
+              # Remove case-variants before copying
+              find "${{ env.DEST_YAML_PATH }}" -maxdepth 1 -type f \
+                -iname "$BASENAME" ! -name "$BASENAME" -delete || true
+              cp "$src" "${{ env.DEST_YAML_PATH }}/$BASENAME"
+              echo "Copied: $BASENAME"
+            done < changed_files.txt
+
+            YAMLS=$(cat changed_files.txt | xargs -I{} basename {} | tr '\n' ',' | sed 's/,$//')
+            echo "changed_yamls=$YAMLS" >> "$GITHUB_OUTPUT"
           else
-            echo "has_changes=false" >> $GITHUB_OUTPUT
-            echo "No changes detected"
+            echo "has_changes=false" >> "$GITHUB_OUTPUT"
+            echo "No changes detected."
           fi
 
-  sync-file:
-    needs: detect
-    if: needs.detect.outputs.has_changes == 'true'
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-      pull-requests: write
-    strategy:
-      fail-fast: false
-      # Cap parallelism to reduce the chance of docs.json merge conflicts
-      # between concurrent PRs. Sequential merges by the reviewer still
-      # require rebases if docs.json regions overlap.
-      max-parallel: 3
-      matrix:
-        file: ${{ fromJSON(needs.detect.outputs.files) }}
-    steps:
-      - name: Generate Source Repo Token
-        uses: actions/create-github-app-token@v1
-        id: source-token
-        with:
-          app-id: ${{ secrets.APP_ID }}
-          private-key: ${{ secrets.APP_PRIVATE_KEY }}
-          owner: ${{ env.SOURCE_OWNER }}
-          repositories: ${{ env.SOURCE_REPO }}
-
-      - name: Generate Destination Repo Token
-        uses: actions/create-github-app-token@v1
-        id: dest-token
-        with:
-          app-id: ${{ secrets.APP_ID }}
-          private-key: ${{ secrets.APP_PRIVATE_KEY }}
-
-      - name: Checkout Destination Repo
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Clone Source Repo
-        uses: actions/checkout@v4
-        with:
-          repository: ${{ env.SOURCE_OWNER }}/${{ env.SOURCE_REPO }}
-          token: ${{ steps.source-token.outputs.token }}
-          path: source-repo
-
-      - name: Copy file to destination
-        id: copy
-        run: |
-          set -euo pipefail
-          SRC="${{ matrix.file }}"
-          BASENAME=$(basename "$SRC")
-          DEST_DIR="${{ env.DEST_YAML_PATH }}"
-          DEST="$DEST_DIR/$BASENAME"
-
-          mkdir -p "$DEST_DIR"
-
-          # If a case-variant of this filename exists in dest, remove it so the
-          # new casing wins. `find -iname` is case-insensitive.
-          find "$DEST_DIR" -maxdepth 1 -type f -iname "$BASENAME" ! -name "$BASENAME" -print -delete || true
-
-          cp "$SRC" "$DEST"
-          echo "Copied $SRC -> $DEST"
-
-          STEM="${BASENAME%.*}"
-          # Slugify the stem for use in branch/ref names
-          SLUG=$(echo "$STEM" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9]/-/g' | sed 's/--*/-/g' | sed 's/^-//; s/-$//')
-
-          echo "basename=$BASENAME" >> $GITHUB_OUTPUT
-          echo "dest=$DEST" >> $GITHUB_OUTPUT
-          echo "stem=$STEM" >> $GITHUB_OUTPUT
-          echo "slug=$SLUG" >> $GITHUB_OUTPUT
-
-      - name: Update API Navigation
+      - name: Regenerate OpenAPI nav
+        if: steps.detect.outputs.has_changes == 'true'
         uses: DomoApps/documentation-generator-action@main
         with:
           yaml_input_path: "./${{ env.DEST_YAML_PATH }}"
           docs_json_path: "${{ env.DOCS_JSON_PATH }}"
           openapi_base_path: "${{ env.OPENAPI_BASE_PATH }}"
           process_changed_only: "true"
-          changed_files: ${{ steps.copy.outputs.dest }}
+          changed_files: ${{ steps.detect.outputs.changed_yamls }}
 
-      # Remove any OpenAPI nav entries in docs.json that reference YAMLs no
-      # longer on disk (e.g. from upstream deletes or case-only renames like
-      # Filesets.yaml -> filesets.yaml). Without this, preview deploys fail
-      # because Mintlify tries to resolve a missing spec.
       - name: Prune stale OpenAPI nav entries
+        if: steps.detect.outputs.has_changes == 'true'
         run: |
           python .github/scripts/prune_stale_nav.py \
             --docs-json "${{ env.DOCS_JSON_PATH }}" \
             --repo-root .
 
-      - name: Create Pull Request
-        uses: peter-evans/create-pull-request@v5
-        with:
-          token: ${{ steps.dest-token.outputs.token }}
-          base: ${{ env.BASE_BRANCH }}
-          commit-message: "docs: Update OpenAPI spec ${{ steps.copy.outputs.basename }}"
-          title: "docs: Update OpenAPI spec ${{ steps.copy.outputs.basename }}"
-          body: |
-            ## OpenAPI Specification Update
-
-            Synced from `${{ env.SOURCE_OWNER }}/${{ env.SOURCE_REPO }}` and regenerated navigation.
-
-            ### File
-            - `${{ steps.copy.outputs.basename }}`
-
-            ### Changes
-            - Updated `${{ steps.copy.outputs.dest }}`
-            - Updated `docs.json` navigation entry for this spec
-
-            ---
-            *This PR was created automatically by the OpenAPI sync workflow.*
-          branch: openapi-sync/${{ steps.copy.outputs.slug }}
-          delete-branch: true
-          # Include the whole dest dir (not just the new file) so that
-          # deletions of case-variant duplicates are staged in the PR.
-          # Nothing else in this job touches openapi/product/, so this is safe.
-          add-paths: |
-            ${{ env.DEST_YAML_PATH }}
-            ${{ env.DOCS_JSON_PATH }}
-
-  summary:
-    needs: [detect, sync-file]
-    if: always()
-    runs-on: ubuntu-latest
-    steps:
-      - name: Summary
+      - name: Commit and push all changes
+        if: steps.detect.outputs.has_changes == 'true'
         run: |
-          echo "## OpenAPI Sync Summary" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          if [ "${{ needs.detect.outputs.has_changes }}" == "true" ]; then
-            echo "Fanned out one PR per changed file." >> $GITHUB_STEP_SUMMARY
-            echo "" >> $GITHUB_STEP_SUMMARY
-            echo "Files:" >> $GITHUB_STEP_SUMMARY
-            echo '```json' >> $GITHUB_STEP_SUMMARY
-            echo '${{ needs.detect.outputs.files }}' >> $GITHUB_STEP_SUMMARY
-            echo '```' >> $GITHUB_STEP_SUMMARY
+          set -euo pipefail
+          git add "${{ env.DEST_YAML_PATH }}" "${{ env.DOCS_JSON_PATH }}"
+          if git diff --cached --exit-code; then
+            echo "Nothing to commit."
           else
-            echo "No changes detected - YAML files are up to date" >> $GITHUB_STEP_SUMMARY
+            git commit -m "docs: sync OpenAPI specs from mirror (manual)"
+            git push origin "${{ env.SYNC_BRANCH }}"
           fi
+
+      - name: Open or update rolling PR
+        if: steps.detect.outputs.has_changes == 'true'
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+        run: |
+          set -euo pipefail
+          PR_NUMBER=$(gh pr list \
+            --base "${{ env.BASE_BRANCH }}" \
+            --head "${{ env.SYNC_BRANCH }}" \
+            --state open \
+            --json number \
+            --jq '.[0].number // empty')
+
+          if [ -z "$PR_NUMBER" ]; then
+            gh pr create \
+              --base "${{ env.BASE_BRANCH }}" \
+              --head "${{ env.SYNC_BRANCH }}" \
+              --title "docs: Sync OpenAPI specifications" \
+              --body "$(cat <<'EOF'
+          ## OpenAPI Specification Sync
+
+          Manually synced from \`${{ env.SOURCE_OWNER }}/${{ env.SOURCE_REPO }}\`.
+
+          ### Changes
+          - Synced YAML file(s) from mirror
+          - Regenerated \`docs.json\` navigation
+          - Pruned any stale nav entries
+
+          ---
+          *One rolling PR — review on the weekly KB cadence and merge when ready.*
+          EOF
+          )"
+            echo "Rolling PR created."
+          else
+            echo "Rolling PR #${PR_NUMBER} updated."
+          fi
+
+      - name: Step summary
+        if: always()
+        run: |
+          echo "## OpenAPI Sync (manual dispatch)" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Force sync: ${{ github.event.inputs.force_sync }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Changes found: ${{ steps.detect.outputs.has_changes }}" >> "$GITHUB_STEP_SUMMARY"

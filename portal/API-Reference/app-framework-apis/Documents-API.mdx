@@ -1,0 +1,999 @@
+---
+title: "Documents API"
+permalink: 7e8654dedb1c8-file-set-api
+---
+
+This API reference documents the endpoints for managing Document Collections and Files in Domo from within a Domo app.
+
+<Note>
+  **Note:** All code examples below are tested and match the working Domo app
+  UI. Use `domo.*` methods for all API calls except File upload/download, which
+  require `fetch` for binary or FormData support.
+</Note>
+
+---
+
+## Get File by Path
+
+**Method:** `GET`  
+**Endpoint:** `/domo/files/v1/filesets/{documentCollectionId}/path?path={filePath}`
+
+**Path Parameters:**
+
+| Parameter | Type   | Required | Description                             |
+| --------- | ------ | -------- | --------------------------------------- |
+| documentCollectionId | String | Yes      | The ID of the Document Collection                   |
+| path      | String | Yes      | The path to the File within the Document Collection |
+
+<Tabs>
+<Tab title="Javascript (domo.get)">
+
+```js
+domo
+  .get(
+    `/domo/files/v1/filesets/${documentCollectionId}/path?path=${encodeURIComponent(
+      filePath,
+    )}`,
+  )
+  .then((result) => console.log(result))
+  .catch((error) => console.error(`Error: ${error}`));
+```
+
+</Tab>
+<Tab title="Javascript (fetch)">
+
+```js
+fetch(
+  `/domo/files/v1/filesets/${documentCollectionId}/path?path=${encodeURIComponent(
+    filePath,
+  )}`,
+)
+  .then((response) => response.json())
+  .then((result) => console.log(result))
+  .catch((error) => console.error(`Error: ${error}`));
+```
+
+</Tab>
+</Tabs>
+
+**Response:**
+
+```json
+{
+  "id": "00000000-0000-0000-0000-000000000001",
+  "path": "rules.txt",
+  "name": "rules.txt",
+  "fileType": "TEXT",
+  "contentType": "text/plain",
+  "size": 12345,
+  "hash": "fakehash00000000000000000000000000000000000000000000000000000000000001",
+  "hashAlgorithm": "SHA_256_HEX",
+  "downloadUrl": null,
+  "created": "2025-01-01T00:00:00.000Z",
+  "createdBy": 111111111,
+  "connectorKey": null,
+  "indexStatus": null,
+  "indexReason": null
+}
+```
+
+---
+
+## Get File by Id
+
+**Method:** `GET`  
+**Endpoint:** `/domo/files/v1/filesets/{documentCollectionId}/files/{fileId}`
+
+**Path Parameters:**
+
+| Parameter | Type   | Required | Description           |
+| --------- | ------ | -------- | --------------------- |
+| documentCollectionId | String | Yes      | The ID of the Document Collection |
+| fileId    | String | Yes      | The ID of the File    |
+
+<Tabs>
+<Tab title="Javascript (domo.get)">
+
+```js
+domo
+  .get(`/domo/files/v1/filesets/${documentCollectionId}/files/${fileId}`)
+  .then((result) => console.log(result))
+  .catch((error) => console.error(`Error: ${error}`));
+```
+
+</Tab>
+<Tab title="Javascript (fetch)">
+
+```js
+fetch(`/domo/files/v1/filesets/${documentCollectionId}/files/${fileId}`)
+  .then((response) => response.json())
+  .then((result) => console.log(result))
+  .catch((error) => console.error(`Error: ${error}`));
+```
+
+</Tab>
+</Tabs>
+
+**Response:**
+
+```json
+{
+  "id": "00000000-0000-0000-0000-000000000002",
+  "path": "rules.txt",
+  "name": "rules.txt",
+  "fileType": "TEXT",
+  "contentType": "text/plain",
+  "size": 12345,
+  "hash": "fakehash00000000000000000000000000000000000000000000000000000000000002",
+  "hashAlgorithm": "SHA_256_HEX",
+  "downloadUrl": "/domo/files/v1/filesets/00000000-0000-0000-0000-000000000010/files/00000000-0000-0000-0000-000000000002/download",
+  "created": "2025-01-01T00:00:00.000Z",
+  "createdBy": 111111111,
+  "connectorKey": null,
+  "indexStatus": null,
+  "indexReason": null
+}
+```
+
+---
+
+## Download File by Id
+
+**Method:** `GET`  
+**Endpoint:** `/domo/files/v1/filesets/{documentCollectionId}/files/{fileId}/download`
+
+**Path Parameters:**
+
+| Parameter | Type   | Required | Description           |
+| --------- | ------ | -------- | --------------------- |
+| documentCollectionId | String | Yes      | The ID of the Document Collection |
+| fileId    | String | Yes      | The ID of the File    |
+
+> **Note:** Use `fetch` for File downloads. `domo.get` does not support binary downloads.
+
+<Tabs>
+<Tab title="Javascript (fetch)">
+
+```js
+fetch(`/domo/files/v1/filesets/${documentCollectionId}/files/${fileId}/download`)
+  .then((response) => response.blob())
+  .then((blob) => {
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "downloaded-file"; // Set your filename
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    window.URL.revokeObjectURL(url);
+  })
+  .catch((error) => console.error(`Error: ${error}`));
+```
+
+</Tab>
+</Tabs>
+
+**Response:**
+
+- Returns the File contents as a download (binary/text stream).
+
+---
+
+## Query Files
+
+**Method:** `POST`  
+**Endpoint:** `/domo/files/v1/filesets/{documentCollectionId}/query`
+
+**Path Parameters:**
+
+| Parameter | Type   | Required | Description           |
+| --------- | ------ | -------- | --------------------- |
+| documentCollectionId | String | Yes      | The ID of the Document Collection |
+
+**Request Body Parameters:**
+
+| Parameter     | Type    | Required | Description                          |
+| ------------- | ------- | -------- | ------------------------------------ |
+| query         | String  | Yes      | Text to search for in Files          |
+| directoryPath | String  | No       | Limit search to a specific directory |
+| topK          | Integer | No       | Maximum number of results to return  |
+
+<Tabs>
+<Tab title="Javascript (domo.post)">
+
+```js
+domo
+  .post(`/domo/files/v1/filesets/${documentCollectionId}/query`, {
+    query: "search for text in documents", // Required: Text to search for in files
+    directoryPath: "reports/quarterly", // Optional: Limit search to specific directory
+    topK: 5, // Optional: Maximum number of results to return
+  })
+  .then((result) => console.log(result))
+  .catch((error) => console.error(`Error: ${error}`));
+```
+
+</Tab>
+<Tab title="Javascript (fetch)">
+
+```js
+fetch(`/domo/files/v1/filesets/${documentCollectionId}/query`, {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({
+    query: "search for text in documents", // Required: Text to search for in files
+    directoryPath: "reports/quarterly", // Optional: Limit search to specific directory
+    topK: 5, // Optional: Maximum number of results to return
+  }),
+})
+  .then((response) => response.json())
+  .then((result) => console.log(result))
+  .catch((error) => console.error(`Error: ${error}`));
+```
+
+</Tab>
+</Tabs>
+
+**Response:**
+
+```json
+[
+  {
+    "id": "00000000-0000-0000-0000-000000000003",
+    "path": "rules.txt",
+    "name": "rules.txt",
+    "fileType": "TEXT",
+    "contentType": "text/plain",
+    "size": 12345,
+    "created": "2025-01-01T00:00:00.000Z",
+    "createdBy": 111111111
+  }
+]
+```
+
+---
+
+## Upload File
+
+**Method:** `POST`  
+**Endpoint:** `/domo/files/v1/filesets/{documentCollectionId}/files`
+
+**Path Parameters:**
+
+| Parameter | Type   | Required | Description           |
+| --------- | ------ | -------- | --------------------- |
+| documentCollectionId | String | Yes      | The ID of the Document Collection |
+
+> **Note:** Use `fetch` for file uploads. Always set the file content type to `text/plain` for text files, as in the app code.
+
+<Tabs>
+<Tab title="Javascript (fetch)">
+
+```js
+const file = fileInput.files[0];
+const formdata = new FormData();
+formdata.append(
+  "file",
+  new File([file], file.name, { type: "text/plain" }),
+  file.name,
+);
+formdata.append("createFileRequest", JSON.stringify({ directoryPath: "" }));
+
+fetch(`/domo/files/v1/filesets/${documentCollectionId}/files`, {
+  method: "POST",
+  body: formdata,
+})
+  .then((response) => response.json())
+  .then((result) => console.log(result))
+  .catch((error) => console.error(`Error: ${error}`));
+```
+
+</Tab>
+</Tabs>
+
+**Response:**
+
+```json
+{
+  "id": "00000000-0000-0000-0000-000000000004",
+  "path": "rules.txt",
+  "name": "rules.txt",
+  "fileType": "TEXT",
+  "contentType": "text/plain",
+  "size": 12345,
+  "created": "2025-01-01T00:00:00.000Z",
+  "createdBy": 111111111
+}
+```
+
+---
+
+## Search Files in Document Collection
+
+**Method:** `POST`  
+**Endpoint:** `/domo/files/v1/filesets/{documentCollectionId}/files/search`
+
+**Path Parameters:**
+
+| Parameter | Type   | Required | Description           |
+| --------- | ------ | -------- | --------------------- |
+| documentCollectionId | String | Yes      | The ID of the Document Collection |
+
+**Query Parameters:**
+
+| Parameter         | Type    | Required | Description                                                            |
+| ----------------- | ------- | -------- | ---------------------------------------------------------------------- |
+| directoryPath     | String  | No       | Filter Files by specific directory path                                |
+| immediateChildren | Boolean | No       | If true, returns only immediate children of directory (default: false) |
+| limit             | Integer | No       | Maximum number of results (default: 100)                               |
+| next              | String  | No       | Pagination token for fetching next set of results                      |
+
+**Request Body Parameters:**
+
+| Parameter   | Type  | Required | Description                                              |
+| ----------- | ----- | -------- | -------------------------------------------------------- |
+| fieldSort   | Array | No       | Sort options for results. Array of FieldSort Objects.    |
+| filters     | Array | No       | Filter criteria for the search. Array of Filter Objects. |
+| dateFilters | Array | No       | Date-based filter criteria. Array of DateFilter Objects. |
+
+**Filter Object Properties:**
+
+| Property | Type    | Description                                                               |
+| -------- | ------- | ------------------------------------------------------------------------- |
+| field    | String  | Field name to filter on (e.g., 'name', 'description')                     |
+| value    | Array   | Values to match against                                                   |
+| not      | Boolean | If true, inverts the filter match                                         |
+| operator | String  | Operation type: 'EQUALS', 'GREATER_THAN', 'LESS_THAN', 'IN', 'LIKE', etc. |
+
+**FieldSort Object Properties:**
+
+| Property | Type   | Description                     |
+| -------- | ------ | ------------------------------- |
+| field    | String | Field name to sort by           |
+| order    | String | Sort direction: 'ASC' or 'DESC' |
+
+**DateFilter Object Properties:**
+
+| Property | Type    | Description                                  |
+| -------- | ------- | -------------------------------------------- |
+| field    | String  | Field name for date filter (e.g., 'created') |
+| start    | String  | Start timestamp as ISO string                |
+| end      | String  | End timestamp as ISO string                  |
+| not      | Boolean | If true, inverts the date filter match       |
+
+<Tabs>
+<Tab title="Javascript (domo.post)">
+
+```js
+// Example 1: List all files
+domo
+  .post(`/domo/files/v1/filesets/${documentCollectionId}/files/search`, {})
+  .then((result) => console.log(result.files))
+  .catch((error) => console.error(`Error: ${error}`));
+
+// Example 2: Advanced search with directory path and filters
+domo
+  .post(
+    `/domo/files/v1/filesets/${documentCollectionId}/files/search?directoryPath=reports&limit=20`,
+    {
+      // Sort by file name in ascending order
+      fieldSort: [
+        {
+          field: "name",
+          order: "ASC",
+        },
+      ],
+      // Filter files by name
+      filters: [
+        {
+          field: "name",
+          value: [".pdf"],
+          operator: "LIKE",
+        },
+      ],
+      // Filter files created in past 30 days
+      dateFilters: [
+        {
+          field: "created",
+          start: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(), // 30 days ago as ISO string
+          end: new Date().toISOString(), // Current time as ISO string
+        },
+      ],
+    },
+  )
+  .then((result) => console.log(result.files))
+  .catch((error) => console.error(`Error: ${error}`));
+```
+
+</Tab>
+<Tab title="Javascript (fetch)">
+
+```js
+// Example 1: List all files
+fetch(`/domo/files/v1/filesets/${documentCollectionId}/files/search`, {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({}),
+})
+  .then((response) => response.json())
+  .then((result) => console.log(result.files))
+  .catch((error) => console.error(`Error: ${error}`));
+
+// Example 2: Advanced search with directory path and filters
+fetch(
+  `/domo/files/v1/filesets/${documentCollectionId}/files/search?directoryPath=reports&immediateChildren=true&limit=20`,
+  {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      // Sort by file name in ascending order
+      fieldSort: [
+        {
+          field: "name",
+          order: "ASC",
+        },
+      ],
+      // Filter files by name
+      filters: [
+        {
+          field: "name",
+          value: [".pdf"],
+          operator: "LIKE",
+        },
+      ],
+      // Filter files created in past 30 days
+      dateFilters: [
+        {
+          field: "created",
+          start: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(), // 30 days ago as ISO string
+          end: new Date().toISOString(), // Current time as ISO string
+        },
+      ],
+    }),
+  },
+)
+  .then((response) => response.json())
+  .then((result) => console.log(result.files))
+  .catch((error) => console.error(`Error: ${error}`));
+```
+
+</Tab>
+</Tabs>
+
+**Response:**
+
+```json
+{
+  "files": [
+    {
+      "id": "00000000-0000-0000-0000-000000000005",
+      "path": "reports/quarterly-report.pdf",
+      "name": "quarterly-report.pdf",
+      "fileType": "FILE",
+      "contentType": "application/pdf",
+      "size": 234567,
+      "created": "2025-06-15T00:00:00.000Z",
+      "createdBy": 111111111
+    }
+  ],
+  "pageContext": {
+    "next": "eyJpZCI6IjEyMzQ1Njc4OTAifQ=="
+  }
+}
+```
+
+---
+
+## Delete Files by Path
+
+**Method:** `DELETE`  
+**Endpoint:** `/domo/files/v1/filesets/{documentCollectionId}/path?path={filePath}`
+
+**Path Parameters:**
+
+| Parameter | Type   | Required | Description                             |
+| --------- | ------ | -------- | --------------------------------------- |
+| documentCollectionId | String | Yes      | The ID of the Document Collection                   |
+| filePath  | String | Yes      | The path to the File within the Document Collection |
+
+<Tabs>
+<Tab title="Javascript (domo.delete)">
+
+```js
+domo
+  .delete(
+    `/domo/files/v1/filesets/${documentCollectionId}/path?path=${encodeURIComponent(
+      filePath,
+    )}`,
+  )
+  .then((result) => {
+    if (result === 1 || (result && result.status === "success")) {
+      console.log("File deleted successfully.");
+    } else {
+      console.log(result);
+    }
+  })
+  .catch((error) => console.error(`Error: ${error}`));
+```
+
+</Tab>
+<Tab title="Javascript (fetch)">
+
+```js
+fetch(
+  `/domo/files/v1/filesets/${documentCollectionId}/path?path=${encodeURIComponent(
+    filePath,
+  )}`,
+  {
+    method: "DELETE",
+  },
+)
+  .then((response) => response.json())
+  .then((result) => {
+    if (result === 1 || (result && result.status === "success")) {
+      console.log("File deleted successfully.");
+    } else {
+      console.log(result);
+    }
+  })
+  .catch((error) => console.error(`Error: ${error}`));
+```
+
+</Tab>
+</Tabs>
+
+**Response:**
+
+```json
+{
+  "status": "success",
+  "message": "File deleted successfully."
+}
+```
+
+---
+
+## Delete File by Id
+
+**Method:** `DELETE`  
+**Endpoint:** `/domo/files/v1/filesets/{documentCollectionId}/files/{fileId}`
+
+**Path Parameters:**
+
+| Parameter | Type   | Required | Description           |
+| --------- | ------ | -------- | --------------------- |
+| documentCollectionId | String | Yes      | The ID of the Document Collection |
+| fileId    | String | Yes      | The ID of the File    |
+
+<Tabs>
+<Tab title="Javascript (domo.delete)">
+
+```js
+domo
+  .delete(`/domo/files/v1/filesets/${documentCollectionId}/files/${fileId}`)
+  .then((result) => {
+    if (result === 1 || (result && result.status === "success")) {
+      console.log("File deleted successfully.");
+    } else {
+      console.log(result);
+    }
+  })
+  .catch((error) => console.error(`Error: ${error}`));
+```
+
+</Tab>
+<Tab title="Javascript (fetch)">
+
+```js
+fetch(`/domo/files/v1/filesets/${documentCollectionId}/files/${fileId}`, {
+  method: "DELETE",
+})
+  .then((response) => response.json())
+  .then((result) => {
+    if (result === 1 || (result && result.status === "success")) {
+      console.log("File deleted successfully.");
+    } else {
+      console.log(result);
+    }
+  })
+  .catch((error) => console.error(`Error: ${error}`));
+```
+
+</Tab>
+</Tabs>
+
+**Response:**
+
+```json
+{
+  "status": "success",
+  "message": "File deleted successfully."
+}
+```
+
+---
+
+## Search Document Collections
+
+**Method:** `POST`  
+**Endpoint:** `/domo/files/v1/filesets/search`
+
+**Query Parameters:**
+
+| Parameter | Type    | Required | Description                              |
+| --------- | ------- | -------- | ---------------------------------------- |
+| limit     | Integer | No       | Maximum number of results (default: 100) |
+| offset    | Integer | No       | Pagination offset (default: 0)           |
+
+> **Note:** To list all Document Collections, send an empty object as the body. To filter, provide filter parameters in the body.
+
+**Request Body Parameters:**
+
+| Parameter   | Type  | Required | Description                                              |
+| ----------- | ----- | -------- | -------------------------------------------------------- |
+| fieldSort   | Array | No       | Sort options for results. Array of FieldSort Objects.    |
+| filters     | Array | No       | Filter criteria for the search. Array of Filter Objects. |
+| dateFilters | Array | No       | Date-based filter criteria. Array of DateFilter Objects. |
+
+**Filter Object Properties:**
+
+| Property | Type    | Description                                                               |
+| -------- | ------- | ------------------------------------------------------------------------- |
+| field    | String  | Field name to filter on (e.g., 'name', 'description')                     |
+| value    | Array   | Values to match against                                                   |
+| not      | Boolean | If true, inverts the filter match                                         |
+| operator | String  | Operation type: 'EQUALS', 'GREATER_THAN', 'LESS_THAN', 'IN', 'LIKE', etc. |
+
+**FieldSort Object Properties:**
+
+| Property | Type   | Description                     |
+| -------- | ------ | ------------------------------- |
+| field    | String | Field name to sort by           |
+| order    | String | Sort direction: 'ASC' or 'DESC' |
+
+**DateFilter Object Properties:**
+
+| Property | Type    | Description                                  |
+| -------- | ------- | -------------------------------------------- |
+| field    | String  | Field name for date filter (e.g., 'created') |
+| start    | String  | Start timestamp as ISO string                |
+| end      | String  | End timestamp as ISO string                  |
+| not      | Boolean | If true, inverts the date filter match       |
+
+<Tabs>
+<Tab title="Javascript (domo.post)">
+
+```js
+// Example 1: List all Document Collections (empty search)
+domo
+  .post("/domo/files/v1/filesets/search", {})
+  .then((result) => console.log(result.fileSets))
+  .catch((error) => console.error(`Error: ${error}`));
+
+// Example 2: Advanced search with filters and sorting
+domo
+  .post("/domo/files/v1/filesets/search", {
+    // Sort by name in ascending order
+    fieldSort: [
+      {
+        field: "name",
+        order: "ASC",
+      },
+    ],
+    // Filter Document Collection by name containing "Marketing"
+    filters: [
+      {
+        field: "name",
+        value: ["Marketing"],
+        operator: "LIKE",
+      },
+    ],
+    // Filter Document Collection created between two dates
+    dateFilters: [
+      {
+        field: "created",
+        start: "2025-06-01T19:23:55.156Z", // June 1, 2024
+        end: "2025-06-30T19:23:55.156Z", // June 30, 2024
+      },
+    ],
+  })
+  .then((result) => console.log(result.fileSets))
+  .catch((error) => console.error(`Error: ${error}`));
+```
+
+</Tab>
+<Tab title="Javascript (fetch)">
+
+```js
+// Example 1: List all Document Collections (empty search)
+fetch("/domo/files/v1/filesets/search", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({}),
+})
+  .then((response) => response.json())
+  .then((result) => console.log(result.fileSets))
+  .catch((error) => console.error(`Error: ${error}`));
+
+// Example 2: Advanced search with filters and sorting
+fetch("/domo/files/v1/filesets/search?limit=50&offset=0", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({
+    // Sort by name in ascending order
+    fieldSort: [
+      {
+        field: "name",
+        order: "ASC",
+      },
+    ],
+    // Filter Document Collection by name containing "Marketing"
+    filters: [
+      {
+        field: "name",
+        value: ["Marketing"],
+        operator: "LIKE",
+      },
+    ],
+    // Filter Document Collection created between two dates
+    dateFilters: [
+      {
+        field: "created",
+        start: "2025-06-01T19:23:55.156Z", // June 1, 2024
+        end: "2025-06-30T19:23:55.156Z", // June 30, 2024
+      },
+    ],
+  }),
+})
+  .then((response) => response.json())
+  .then((result) => console.log(result.fileSets))
+  .catch((error) => console.error(`Error: ${error}`));
+```
+
+</Tab>
+</Tabs>
+
+**Response:**
+
+```json
+{
+  "fileSets": [
+    {
+      "id": "00000000-0000-0000-0000-000000000010",
+      "name": "Sample Document Collection",
+      "description": "A sample Document Collection for demonstration purposes.",
+      "created": "2025-01-01T00:00:00.000Z",
+      "createdBy": 111111111
+    }
+  ]
+}
+```
+
+---
+
+## Create Document Collection
+
+**Method:** `POST`  
+**Endpoint:** `/domo/files/v1/filesets`
+
+**Request Body Parameters:**
+
+| Parameter        | Type    | Required | Description                                                            |
+| ---------------- | ------- | -------- | ---------------------------------------------------------------------- |
+| name             | String  | Yes      | The name of the Document Collection                                                |
+| accountId        | Integer | No       | The account ID to associate (nullable)                                 |
+| connectorContext | Object  | No       | Connector context for the Document Collection (nullable). ConnectorContext Object. |
+| description      | String  | No       | Description for the Document Collection                                            |
+
+**ConnectorContext Object Properties:**
+
+| Property     | Type   | Required | Description                                |
+| ------------ | ------ | -------- | ------------------------------------------ |
+| connector    | String | Yes      | The connector key                          |
+| relativePath | String | No       | Relative path for the connector (nullable) |
+
+<Tabs>
+<Tab title="Javascript (domo.post)">
+
+```js
+domo
+  .post("/domo/files/v1/filesets", {
+    name: "Sample Document Collection",
+    description: "A sample Document Collection for demonstration purposes.",
+    // accountId: 12345, // Optional
+    // connectorContext: { connector: 'S3', relativePath: 'bucket/path' }, // Optional
+  })
+  .then((result) => console.log(result))
+  .catch((error) => console.error(`Error: ${error}`));
+```
+
+</Tab>
+<Tab title="Javascript (fetch)">
+
+```js
+fetch("/domo/files/v1/filesets", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({
+    name: "Sample Document Collection",
+    description: "A sample Document Collection for demonstration purposes.",
+    // accountId: 12345, // Optional
+    // connectorContext: { connector: 'S3', relativePath: 'bucket/path' }, // Optional
+  }),
+})
+  .then((response) => response.json())
+  .then((result) => console.log(result))
+  .catch((error) => console.error(`Error: ${error}`));
+```
+
+</Tab>
+</Tabs>
+
+**Response:**
+
+```json
+{
+  "id": "00000000-0000-0000-0000-000000000012",
+  "name": "Sample Document Collection",
+  "description": "A sample Document Collection for demonstration purposes.",
+  "created": "2025-01-01T00:00:00.000Z",
+  "createdBy": 111111111
+}
+```
+
+---
+
+## Get Document Collection by Id
+
+**Method:** `GET`
+**Endpoint:** `/domo/files/v1/filesets/{documentCollectionId}`
+
+**Path Parameters:**
+
+| Parameter | Type   | Required | Description           |
+| --------- | ------ | -------- | --------------------- |
+| documentCollectionId | String | Yes      | The ID of the Document Collection |
+
+<Tabs>
+<Tab title="Javascript (domo.get)">
+
+```js
+domo
+  .get(`/domo/files/v1/filesets/${documentCollectionId}`)
+  .then((result) => console.log(result))
+  .catch((error) => console.error(`Error: ${error}`));
+```
+
+</Tab>
+<Tab title="Javascript (fetch)">
+
+```js
+fetch(`/domo/files/v1/filesets/${documentCollectionId}`)
+  .then((response) => response.json())
+  .then((result) => console.log(result))
+  .catch((error) => console.error(`Error: ${error}`));
+```
+
+</Tab>
+</Tabs>
+
+**Response:**
+
+```json
+{
+  "id": "00000000-0000-0000-0000-000000000013",
+  "name": "Sample Document Collection",
+  "description": "A sample Document Collection for demonstration purposes.",
+  "created": "2025-01-01T00:00:00.000Z",
+  "createdBy": 111111111
+}
+```
+
+## Update Document Collection by Id
+
+**Method:** `POST`  
+**Endpoint:** `/domo/files/v1/filesets/{documentCollectionId}`
+
+**Path Parameters:**
+
+| Parameter | Type   | Required | Description           |
+| --------- | ------ | -------- | --------------------- |
+| documentCollectionId | String | Yes      | The ID of the Document Collection |
+
+**Request Body Parameters:**
+
+| Parameter   | Type   | Required | Description                         |
+| ----------- | ------ | -------- | ----------------------------------- |
+| name        | String | No       | The new name for the Document Collection        |
+| description | String | No       | The new description for the Document Collection |
+
+<Tabs>
+<Tab title="Javascript (domo.post)">
+
+```js
+domo
+  .post(`/domo/files/v1/filesets/${documentCollectionId}`, {
+    name: "Updated Document Collection Name", // Optional: New name for the Document Collection
+    description: "Updated description.", // Optional: New description
+  })
+  .then((result) => console.log(result))
+  .catch((error) => console.error(`Error: ${error}`));
+```
+
+</Tab>
+<Tab title="Javascript (fetch)">
+
+```js
+fetch(`/domo/files/v1/filesets/${documentCollectionId}`, {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({
+    name: "Updated Document Collection Name", // Optional: New name for the Document Collection
+    description: "Updated description.", // Optional: New description
+  }),
+})
+  .then((response) => response.json())
+  .then((result) => console.log(result))
+  .catch((error) => console.error(`Error: ${error}`));
+```
+
+</Tab>
+</Tabs>
+
+**Response:**
+
+```json
+{
+  "id": "00000000-0000-0000-0000-000000000014",
+  "name": "Sample Document Collection",
+  "description": "A sample Document Collection for demonstration purposes.",
+  "created": "2025-01-01T00:00:00.000Z",
+  "createdBy": 111111111
+}
+```
+
+---
+
+## Delete Document Collection by Id
+
+**Method:** `DELETE`  
+**Endpoint:** `/domo/files/v1/filesets/{documentCollectionId}`
+
+**Path Parameters:**
+
+| Parameter | Type   | Required | Description           |
+| --------- | ------ | -------- | --------------------- |
+| documentCollectionId | String | Yes      | The ID of the Document Collection |
+
+<Tabs>
+<Tab title="Javascript (domo.delete)">
+
+```js
+domo
+  .delete(`/domo/files/v1/filesets/${documentCollectionId}`)
+  .then((result) => console.log(result))
+  .catch((error) => console.error(`Error: ${error}`));
+```
+
+</Tab>
+<Tab title="Javascript (fetch)">
+
+```js
+fetch(`/domo/files/v1/filesets/${documentCollectionId}`, {
+  method: "DELETE",
+})
+  .then((response) => response.json())
+  .then((result) => console.log(result))
+  .catch((error) => console.error(`Error: ${error}`));
+```
+
+</Tab>
+</Tabs>
+
+**Response:**
+
+```json
+{
+  "status": "success",
+  "message": "Document Collection deleted successfully."
+}
+```

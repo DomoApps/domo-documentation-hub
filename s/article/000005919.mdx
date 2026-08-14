@@ -1,49 +1,50 @@
 ---
 title: "Magic ETL Tiles: Split Join and Split Filter"
+excerpt: "Use the Magic ETL Split Join and Split Filter tiles to output matched and unmatched records or branch rows by filter conditions."
 ---
 
-### Intro
+## Intro
 
 This article explains how to use two tiles under Actions in Magic ETL:
 
 * **Split Join**
 * **Split Filter**
 
-<Frame><img src="/images/kb/ka0Vq000000Qeg9-00N5w00000Ri7BU-0EMVq00000CsNGr.jpg" style={{width: 640, height: 365}}/></Frame>
+<Frame><img src="/images/kb/ka0Vq000000Qeg9-00N5w00000Ri7BU-0EMVq00000CsNGr.jpg"/></Frame>
 
 ---
 
-### Configure the Split Join Tile
+## Configure the Split Join Tile
 
 To join two input tables and output both matched and unmatched records (such as Inner join, Left anti-join, or Right anti-join), configure the **Split Join** tile as shown in the following steps:
 
 1. Drag the **Split Join** tile from **Combine Data** into the canvas. The tile is larger than a standard Join tile and expands as you enable more outputs.
 
-   <Frame><img alt="A screenshot of a phoneAI-generated content may be incorrect." src="/images/kb/ka0Vq000000Qeg9-00N5w00000Ri7BU-0EMVq00000CsNS9.jpg" style={{width: 188, height: 428}}/></Frame>
+   <Frame><img alt="A screenshot of a phoneAI-generated content may be incorrect." src="/images/kb/ka0Vq000000Qeg9-00N5w00000Ri7BU-0EMVq00000CsNS9.jpg"/></Frame>
 1. Choose the left table and right table, either by dragging the arrows from the inputs to the tile, or by selecting the table names from the dropdowns in the configuration menu.
 2. Configure your join and column handling the same way you would in the regular join tile.
 
-   <Frame><img alt="A screenshot of a computerAI-generated content may be incorrect." src="/images/kb/ka0Vq000000Qeg9-00N5w00000Ri7BU-0EMVq00000CsNVN.jpg" style={{width: 760, height: 408}}/></Frame>
+   <Frame><img alt="A screenshot of a computerAI-generated content may be incorrect." src="/images/kb/ka0Vq000000Qeg9-00N5w00000Ri7BU-0EMVq00000CsNVN.jpg"/></Frame>
 3. Under **Output names**, check the boxes next to which outputs you would like.
 
    You can rename them.
 
-   <Frame><img alt="A screenshot of a computerAI-generated content may be incorrect." src="/images/kb/ka0Vq000000Qeg9-00N5w00000Ri7BU-0EMVq00000CsNTl.jpg" style={{width: 764, height: 326}}/></Frame>
+   <Frame><img alt="A screenshot of a computerAI-generated content may be incorrect." src="/images/kb/ka0Vq000000Qeg9-00N5w00000Ri7BU-0EMVq00000CsNTl.jpg"/></Frame>
    The result on the canvas is multiple nodes representing the outputs selected. You can build your downstream DataFlow from any of those outputs.
 
-   <Frame><img alt="A screenshot of a computer screenAI-generated content may be incorrect." src="/images/kb/ka0Vq000000Qeg9-00N5w00000Ri7BU-0EMVq00000CsNQX.jpg" style={{width: 390, height: 274}}/></Frame>
+   <Frame><img alt="A screenshot of a computer screenAI-generated content may be incorrect." src="/images/kb/ka0Vq000000Qeg9-00N5w00000Ri7BU-0EMVq00000CsNQX.jpg"/></Frame>
    <Tip>
      **Tip:** The tile expands horizontally as you add outputs. Rearrange the canvas for readability. You can hide unused outputs in the configuration panel.
 
    </Tip>
 
-### Configure the Split Filter Tile
+## Configure the Split Filter Tile
 
 To filter a DataSet into multiple named outputs based on formula conditions, and optionally capture all other rows in an *Else* output, use the **Split Filter** tile as outlined in the following steps:
 
 1. Drag the **Split Filter** tile from **Filter** into the canvas. The tile expands as you add more outputs.
 
-   <Frame><img alt="A screenshot of a phoneAI-generated content may be incorrect." src="/images/kb/ka0Vq000000Qeg9-00N5w00000Ri7BU-0EMVq00000CsNgf.jpg" style={{width: 174, height: 404}}/></Frame>
+   <Frame><img alt="A screenshot of a phoneAI-generated content may be incorrect." src="/images/kb/ka0Vq000000Qeg9-00N5w00000Ri7BU-0EMVq00000CsNgf.jpg"/></Frame>
 2. Configure the Formula filters. Each formula represents a different stream that will be output from the tile.
 
 <Note>
@@ -53,23 +54,23 @@ To filter a DataSet into multiple named outputs based on formula conditions, and
 
 1. Choose whether to output all unfiltered rows as an *Else* .
 
-   <Frame><img alt="A screenshot of a computerAI-generated content may be incorrect." src="/images/kb/ka0Vq000000Qeg9-00N5w00000Ri7BU-0EMVq00000CsNiH.jpg" style={{width: 399, height: 178}}/></Frame>
+   <Frame><img alt="A screenshot of a computerAI-generated content may be incorrect." src="/images/kb/ka0Vq000000Qeg9-00N5w00000Ri7BU-0EMVq00000CsNiH.jpg"/></Frame>
 2. You can name any of the filter outputs, as well as the *Else* output.
 
    The result on the canvas will be multiple nodes representing the outputs selected. You can build your downstream DataFlow from any of those outputs.
 
-   <Frame><img alt="A screenshot of a computerAI-generated content may be incorrect." src="/images/kb/ka0Vq000000Qeg9-00N5w00000Ri7BU-0EMVq00000CsNf3.jpg" style={{width: 281, height: 318}}/></Frame>
+   <Frame><img alt="A screenshot of a computerAI-generated content may be incorrect." src="/images/kb/ka0Vq000000Qeg9-00N5w00000Ri7BU-0EMVq00000CsNf3.jpg"/></Frame>
    <Tip>
      **Tip:** For complex, rule-based filtering, you can still use standard Filter tiles in combination. Split Filter is optimized for formula-driven, multi-stream splits.
 
    </Tip>
 
-### Example Use Cases
+## Example Use Cases
 
 * **Join auditing:** Use Split Join to join *Customer A* (left) to *Customer B* (right). Output *Matched* rows for normal processing, *Left Only* rows to an error or reconciliation DataFlow, and *Right Only* rows for data quality review—all from one join step.
 * **Multi-region sales processing:** Use the Split Filter to create one output per region (e.g., `Region = 'West'` , `Region = 'East'` , and so on). Process each region independently downstream, and use *Else* to capture rows with no region value.
 
-### FAQ
+## FAQ
 
 <Accordion title="Do I have to use every output I configure?">
   No. You can use only the outputs you need. You can also hide unused outputs in the configuration panel.
@@ -82,6 +83,6 @@ To filter a DataSet into multiple named outputs based on formula conditions, and
 </Accordion>
 
 <Accordion title="I see a new join type called “Anti-join.” What is it?">
-  An *Anti-join* (left or right) returns rows from one table that don’t have a corresponding match in the other table. It’s useful for finding missing or unmatched records. You can achieve the same result using Split Join outputs (*Left Only* or *Right Only* ) or with dedicated anti-join logic.
+  An *Anti-join* (left or right) returns rows from one table that don't have a corresponding match in the other table. It's useful for finding missing or unmatched records. You can achieve the same result using Split Join outputs (*Left Only* or *Right Only* ) or with dedicated anti-join logic.
 
 </Accordion>

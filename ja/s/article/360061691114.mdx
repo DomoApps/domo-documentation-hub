@@ -1,97 +1,111 @@
 ---
 title: "Snowflake High Bandwidth With Advanced Partitionsコネクター"
+excerpt: "Snowflake High Bandwidth With Advanced Partitions コネクターを設定し、日付以外の列によるパーティション分割で Snowflake から大規模データを社内 S3 経由で Domo に取り込みます。"
 ---
 
-<Note>
-**注記：** Snowflakeは2025年11月以降、ユーザー名とパスワードによる認証メカニズムのサポートを終了します。そのため、このConnectorの提供を段階的に終了します。代わりに、以下のいずれかの接続方法の利用をご検討ください。
+<Note>**注記：**Snowflakeは2025年11月以降、ユーザー名とパスワードによる認証メカニズムのサポートを終了します。そのため、このConnectorの提供を段階的に終了します。代わりに、以下のいずれかの接続方法の利用をご検討ください。</Note>
 
-* [Cloud Amplifier](/ja/s/article/4402322966807 "Cloud Amplifier")
-* [Snowflake Key Pair High Bandwidth With Advanced Partitions](/ja/s/article/000005832 "Snowflake Key Pair High Bandwidth With Advanced Partitions")
-* [Snowflake OAuth High Bandwidth With Advanced Partitions](/ja/s/article/4402638182935 "Snowflake OAuth High Bandwidth With Advanced Partitions")
-
-</Note>
+- [Cloud Amplifier](/ja/s/article/4402322966807)
+- [Snowflake Key Pair High Bandwidth With Advanced Partitions](/s/article/000005832)
+- [Snowflake OAuth High Bandwidth With Advanced Partitions](/s/article/4402638182935)
 
 ## はじめに
 
-Snowflakeは、クラウドベースのアナリティクスデータウェアハウスシステムです。DomoのSnowflake High Bandwidth With Advanced Partitionsコネクターを使用すると、Snowflakeデータベースから社内のAmazon S3にデータをアンロードできます。その後、ファイルは社内のS3からDomoにダウンロードされます。非常に大きなクエリを実行している場合は、ほかのSnowflakeコネクターよりもこのコネクターのほうが適しています。このコネクターでは、データをパーティション分割するかどうかを選択できます。ほかのパーティションコネクターとは異なり、日付以外の列でパーティション分割を使用できます。Snowflake APIの詳細については、Snowflakeのウェブサイト（ [https://docs.snowflake.com/ja](https://docs.snowflake.com/ja "https://docs.snowflake.com/ja") ）を参照してください。
+Snowflakeは、クラウドベースのアナリティクスデータウェアハウスシステムです。DomoのSnowflake High Bandwidth With Advanced Partitionsコネクターを使用すると、Snowflakeデータベースから社内のAmazon S3にデータをアンロードできます。その後、ファイルは社内のS3からDomoにダウンロードされます。非常に大きなクエリを実行している場合は、ほかのSnowflakeコネクターよりもこのコネクターのほうが適しています。このコネクターでは、データをパーティション分割するかどうかを選択できます。ほかのパーティションコネクターとは異なり、日付以外の列でパーティション分割を使用できます。Snowflake APIの詳細については、Snowflakeのウェブサイト（[https://docs.snowflake.com/ja](https://docs.snowflake.com/ja)）を参照してください。
 
-Snowflakeアカウントには、Data Centerから接続します。このトピックでは、Snowflake High Bandwidth With Advanced Partitionsコネクターのユーザインターフェースに固有のフィールドとメニューについて説明します。DataSetの追加、更新スケジュールの設定、DataSet情報の編集に関する一般的な情報については、「 [コネクターを使用してDataSetを追加する](/ja/s/article/360042926274 "コネクターを使用してDataSetを追加する") 」を参照してください。
+Snowflakeアカウントには、Data Centerから接続します。このトピックでは、Snowflake High Bandwidth With Advanced Partitionsコネクターのユーザインターフェースに固有のフィールドとメニューについて説明します。DataSetの追加、更新スケジュールの設定、DataSet情報の編集に関する一般的な情報については、「[コネクターを使用してDataSetを追加する](/ja/s/article/360042926274)」を参照してください。
 
-**注記：** パーティションにより、このコネクターはAPPENDモードのみをサポートします。
+<Note>**注記：**パーティションにより、このコネクターはAPPENDモードのみをサポートします。</Note>
 
 ## 必要条件
 
 Snowflakeアカウントに接続してDataSetを作成するには、以下が必要です。
 
-* アカウントのフルネーム（Snowflakeが提供）。米国西部地域は **account\_name** 、その他の地域は **account\_name.region\_id** です。これは、Snowflake URLの https://の 直後に続く部分です。
+- アカウントのフルネーム（Snowflakeが提供）。米国西部地域は**account\_name**、その他の地域は**account\_name.region\_id**です。これは、Snowflake URLのhttps://の直後に続く部分です。  
     
   アカウントのフルネームには、アカウントがホストされる地域とクラウドプラットフォームを識別する追加のセグメントが含まれる場合があることに注意してください。以下の表に、クラウドプラットフォームまたは地域別のアカウント名の例を示します。各行では、アカウント名が「xy12345」であると仮定しています。
-* Snowflakeホストへの接続に使用するユーザー名とパスワード。
+- Snowflakeホストへの接続に使用するユーザー名とパスワード。
 
-## Snowflake アカウントに接続する
+## Snowflakeアカウントに接続する
 
-このセクションでは、 Snowflake High Bandwidth With Advanced Partitions コネクター ページの［認証情報］ペインと［詳細］ペインのオプションについて説明します。このページのほかのペインの項目である **［スケジュール設定］** や **［DataSetに名前を付け、説明を入力］** に関しては、ほとんどのタイプのコネクターで共通しています。詳細については、「 [コネクターを使用してDataSetを追加する](/ja/s/article/360042926274 "コネクターを使用してDataSetを追加する") 」を参照してください。
+このセクションでは、Snowflake High Bandwidth With Advanced Partitionsコネクター ページの［認証情報］ペインと［詳細］ペインのオプションについて説明します。このページのほかのペインの項目である**［スケジュール設定］**や**［DataSetに名前を付け、説明を入力］**に関しては、ほとんどのタイプのコネクターで共通しています。詳細については、「[コネクターを使用してDataSetを追加する](/ja/s/article/360042926274)」を参照してください。
 
 ## ［認証情報］ペイン
 
-このペインには、 Snowflake アカウントに接続するための認証情報を入力するフィールドがあります。以下の表は、各フィールドに必要な内容を説明しています。
+このペインには、Snowflakeアカウントに接続するための認証情報を入力するフィールドがあります。以下の表は、各フィールドに必要な内容を説明しています。
 
-<table border="1" cellpadding="1" cellspacing="1" data-aura-rendered-by="33:195;a"><thead><tr><th colspan="1" rowspan="1"><p> フィールド </p></th><th colspan="1" rowspan="1"><p> 説明 </p></th></tr></thead><tbody><tr><td colspan="1" rowspan="1"> Account Name </td><td colspan="1" rowspan="1"> Snowflakeのアカウント名を入力します。詳細は、「必要条件」を参照してください。 </td></tr><tr><td colspan="1" rowspan="1"> Username </td><td colspan="1" rowspan="1"> Snowflakeホストへの接続に使用するユーザー名を入力します。 </td></tr><tr><td colspan="1" rowspan="1"> Password </td><td colspan="1" rowspan="1"> Snowflakeホストへの接続に使用するパスワードを入力します。 </td></tr><tr><td colspan="1" rowspan="1"> Role </td><td colspan="1" rowspan="1"> 権限を入力します。 </td></tr></tbody></table>
+| フィールド        | 説明                                          |
+| ------------ | ------------------------------------------- |
+| Account Name | Snowflakeのアカウント名を入力します。詳細は、「必要条件」を参照してください。 |
+| Username     | Snowflakeホストへの接続に使用するユーザー名を入力します。           |
+| Password     | Snowflakeホストへの接続に使用するパスワードを入力します。           |
+| Role         | 権限を入力します。                                   |
 
-**注記：** コネクターのセットアップに使用するすべての権限で、 **READ** 、 **WRITE** 、 **CREATE STAGE** 、 **SELECT** の権限をオンにする必要があります。各権限の詳細については、 [https://docs.snowflake.com/ja/user-guide/security-access-control-privileges](https://docs.snowflake.com/ja/user-guide/security-access-control-privileges#table-privileges "https://docs.snowflake.com/ja/user-guide/security-access-control-privileges") を参照してください。
+<Note>**注記：**コネクターのセットアップに使用するすべての権限で、**READ**、**WRITE**、**CREATE STAGE**、**SELECT**の権限をオンにする必要があります。各権限の詳細については、[https://docs.snowflake.com/ja/user-guide/security-access-control-privileges](https://docs.snowflake.com/ja/user-guide/security-access-control-privileges#table-privileges)を参照してください。</Note>
 
-有効なSnowflakeの認証情報を一度入力しておくと、随時同じアカウントを使用して新しい Snowflake High Bandwidth With Advanced Partitions DataSetを作成することができます。 コネクターアカウントは、Data Centerの **［アカウント］** タブで管理できます。このタブの詳細については、「 [コネクター/アダプターアカウントを管理する](/ja/s/article/360042926054 "コネクター/アダプターアカウントを管理する") 」を参照してください。
+有効なSnowflakeの認証情報を一度入力しておくと、随時同じアカウントを使用して新しいSnowflake High Bandwidth With Advanced Partitions DataSetを作成することができます。コネクターアカウントは、Data Centerの**［アカウント］**タブで管理できます。このタブの詳細については、「[コネクター/アダプターアカウントを管理する](/ja/s/article/360042926054)」を参照してください。
 
 ## ［詳細］ペイン
 
-このペインには、メインの **［Reports］** メニューのほか、選択したレポートタイプに応じて表示/非表示になるその他様々なメニューがあります。
+このペインには、メインの**［Reports］**メニューのほか、選択したレポートタイプに応じて表示/非表示になるその他様々なメニューがあります。
 
-<table border="1" cellpadding="1" cellspacing="1" data-aura-rendered-by="33:195;a"><thead><tr><th colspan="1" rowspan="1"><p> メニュー </p></th><th colspan="1" rowspan="1"><p> 説明 </p></th></tr></thead><tbody><tr><td colspan="1" rowspan="1"><p> Report </p></td><td colspan="1" rowspan="1"><p><span> クエリタイプを選択します。以下のクエリタイプを利用できます。 </span></p><table border="1" cellpadding="1" cellspacing="1"><tbody><tr><td colspan="1" rowspan="1"> Custom Query </td><td colspan="1" rowspan="1"> 実行するSQLクエリを入力します。 </td></tr><tr><td colspan="1" rowspan="1"> Query Builder </td><td colspan="1" rowspan="1"> クエリを自動生成するテーブルとフィールドを選択します。 </td></tr></tbody></table></td></tr><tr><td colspan="1" rowspan="1"> Warehouses </td><td colspan="1" rowspan="1"> 取得したいデータが格納されているウェアハウスを選択します。このリストには、認証情報にもとづいてアクセス権のあるすべてのウェアハウスが表示されます。 </td></tr><tr><td colspan="1" rowspan="1"> Databases </td><td colspan="1" rowspan="1"> 取得したいデータが格納されているデータベースを選択します。このリストには、認証情報にもとづいてアクセス権のあるすべてのデータベースが表示されます。 </td></tr><tr><td colspan="1" rowspan="1"> Schemas </td><td colspan="1" rowspan="1"> 取得したいデータが格納されているデータベーススキーマを選択します。このリストには、認証情報にもとづいてアクセス権のあるすべてのスキーマが表示されます。 </td></tr><tr><td colspan="1" rowspan="1"> Database Objects </td><td colspan="1" rowspan="1"> データベースオブジェクトを選択します。 </td></tr><tr><td colspan="1" rowspan="1"> Tables </td><td colspan="1" rowspan="1"> 取得するデータベーステーブルを選択します。このリストには、認証情報にもとづいてアクセス権のあるすべてのテーブルが表示されます。データベーステーブルを選択しない場合は、コネクターはデータベーススキーマ全体を取得します。 </td></tr><tr><td colspan="1" rowspan="1"> Table Columns </td><td colspan="1" rowspan="1"> 取得するテーブルの列を選択します。このリストには、認証情報にもとづいてアクセス権のあるすべての列が表示されます。テーブルの列を選択しない場合は、コネクターは選択したデータベーステーブル全体を取得します。 </td></tr><tr><td colspan="1" rowspan="1"> Table Query Helper </td><td colspan="1" rowspan="1"> このフィールドには、選択したフィールドにもとづいて生成されたクエリが表示されます。 </td></tr><tr><td colspan="1" rowspan="1"> Views </td><td colspan="1" rowspan="1"> ビューを選択します。 </td></tr><tr><td colspan="1" rowspan="1"> View Columns </td><td colspan="1" rowspan="1"> レポートに含める表示列を選択します。 </td></tr><tr><td colspan="1" rowspan="1"> View Query Helper </td><td colspan="1" rowspan="1"> このフィールドには、選択したフィールドにもとづいて生成されたクエリが表示されます。 </td></tr><tr><td colspan="1" rowspan="1"> Query </td><td colspan="1" rowspan="1"><p> データを取得するために使用するSQLクエリを入力します。 <b><b><b><b> ［Query Helper］ </b></b></b></b> パラメーターを使用して、使用可能なSQLクエリを記述できます。 <b><b><b><b> ［Query Helper］ </b></b></b></b> を使用するには、以下を行います。 </p><ol><li><p> 各メニューで、目的のウェアハウス、データベース、データベーススキーマ、データベーステーブル、テーブルの列を選択します。 </p></li><li><p><b><b><b><b> ［Query Helper］ </b></b></b></b> フィールドに表示されるSQLステートメントをコピーします。 </p></li><li><p> コピーしたSQLステートメントを <b><b><b><b> ［Query］ </b></b></b></b> フィールドに貼り付けます。 </p></li></ol></td></tr><tr><td colspan="1" rowspan="1"> Partition Support </td><td colspan="1" rowspan="1"> データをパーティション分割するかどうかを選択します。 </td></tr><tr><td colspan="1" rowspan="1"> Partition Criteria </td><td colspan="1" rowspan="1"> 日付のキー、日付以外のキー、またはメタクエリを使用してデータをパーティション分割するかどうかを選択します。 </td></tr><tr><td colspan="1" rowspan="1"> Partition Query to determine partition tags </td><td colspan="1" rowspan="1"><p> パーティションタグ（キー）を特定するために、パーティションメタクエリを入力します。 <span></span><b> ［Date］ <span></span></b> データを含む列が、パーティション列です。 </p><p> 例：SELECT DISTINCT(DATE_COLUMN_NAME) FROM TABLENAME </p></td></tr><tr><td colspan="1" rowspan="1"> Partition Support Format </td><td colspan="1" rowspan="1"> パーティションサポートの形式を選択します。 </td></tr><tr><td colspan="1" rowspan="1"> Partition Column Name </td><td colspan="1" rowspan="1"> パーティション列の名前を選択します。 </td></tr><tr><td colspan="1" rowspan="1"> Past Year </td><td colspan="1" rowspan="1"> データを取得する過去の年数を入力します。値はXとすることができ、 この場合Xは正の整数です。例：5。 </td></tr><tr><td colspan="1" rowspan="1"> Future Years </td><td colspan="1" rowspan="1"> データを取得する未来の年数を入力します。値はXとすることができ、 この場合Xは正の整数です。例：5。 </td></tr><tr><td colspan="1" rowspan="1"> Past Months </td><td colspan="1" rowspan="1"> データを取得する過去の月数を入力します。値はXとすることができ、 この場合Xは正の整数です。例：5。 </td></tr><tr><td colspan="1" rowspan="1"> Future Months </td><td colspan="1" rowspan="1"> データを取得する未来の月数を入力します。値はXとすることができ、 この場合Xは正の整数です。例：5。 </td></tr><tr><td colspan="1" rowspan="1"> Past Days </td><td colspan="1" rowspan="1"> データを取得する過去の日数を入力します。値はXとすることができ、この場合Xは正の整数です。例：30。 </td></tr><tr><td colspan="1" rowspan="1"> Date Format </td><td colspan="1" rowspan="1"> 必要な日付形式を選択します。デフォルトでは、 <b><b> yyyy-MM-dd </b></b> が使用されます。 </td></tr><tr><td colspan="1" rowspan="1"> Custom Date Format </td><td colspan="1" rowspan="1"> カスタマイズされた日付形式を入力します。 </td></tr><tr><td colspan="1" rowspan="1"> Partition Non Date Key Column Name </td><td colspan="1" rowspan="1"> パーティション列の名前を選択します。 </td></tr></tbody></table>
+| メニュー | 説明  |
+| ---- | --- |
+| Report | クエリタイプを選択します。以下のクエリタイプを利用できます。<table><tbody><tr><td>Custom Query</td><td>実行するSQLクエリを入力します。</td></tr><tr><td>Query Builder</td><td>クエリを自動生成するテーブルとフィールドを選択します。</td></tr></tbody></table> |
+| Warehouses | 取得したいデータが格納されているウェアハウスを選択します。このリストには、認証情報にもとづいてアクセス権のあるすべてのウェアハウスが表示されます。 |
+| Databases | 取得したいデータが格納されているデータベースを選択します。このリストには、認証情報にもとづいてアクセス権のあるすべてのデータベースが表示されます。 |
+| Schemas | 取得したいデータが格納されているデータベーススキーマを選択します。このリストには、認証情報にもとづいてアクセス権のあるすべてのスキーマが表示されます。 |
+| Database Objects | データベースオブジェクトを選択します。 |
+| Tables | 取得するデータベーステーブルを選択します。このリストには、認証情報にもとづいてアクセス権のあるすべてのテーブルが表示されます。データベーステーブルを選択しない場合は、コネクターはデータベーススキーマ全体を取得します。 |
+| Table Columns | 取得するテーブルの列を選択します。このリストには、認証情報にもとづいてアクセス権のあるすべての列が表示されます。テーブルの列を選択しない場合は、コネクターは選択したデータベーステーブル全体を取得します。 |
+| Table Query Helper | このフィールドには、選択したフィールドにもとづいて生成されたクエリが表示されます。 |
+| Views | ビューを選択します。 |
+| View Columns | レポートに含める表示列を選択します。 |
+| View Query Helper | このフィールドには、選択したフィールドにもとづいて生成されたクエリが表示されます。 |
+| Query | データを取得するために使用するSQLクエリを入力します。********［Query Helper］********パラメーターを使用して、使用可能なSQLクエリを記述できます。********［Query Helper］********を使用するには、以下を行います。   1. 各メニューで、目的のウェアハウス、データベース、データベーススキーマ、データベーステーブル、テーブルの列を選択します。 2. ********［Query Helper］********フィールドに表示されるSQLステートメントをコピーします。 3. コピーしたSQLステートメントを********［Query］********フィールドに貼り付けます。 |
+| Partition Support | データをパーティション分割するかどうかを選択します。 |
+| Partition Criteria | 日付のキー、日付以外のキー、またはメタクエリを使用してデータをパーティション分割するかどうかを選択します。 |
+| Partition Query to determine partition tags | パーティションタグ（キー）を特定するために、パーティションメタクエリを入力します。**［Date］**データを含む列が、パーティション列です。  例：SELECT DISTINCT(DATE\_COLUMN\_NAME) FROM TABLENAME |
+| Partition Support Format | パーティションサポートの形式を選択します。 |
+| Partition Column Name | パーティション列の名前を選択します。 |
+| Past Year | データを取得する過去の年数を入力します。値はXとすることができ、 この場合Xは正の整数です。例：5。 |
+| Future Years | データを取得する未来の年数を入力します。値はXとすることができ、 この場合Xは正の整数です。例：5。 |
+| Past Months | データを取得する過去の月数を入力します。値はXとすることができ、 この場合Xは正の整数です。例：5。 |
+| Future Months | データを取得する未来の月数を入力します。値はXとすることができ、 この場合Xは正の整数です。例：5。 |
+| Past Days | データを取得する過去の日数を入力します。値はXとすることができ、この場合Xは正の整数です。例：30。 |
+| Date Format | 必要な日付形式を選択します。デフォルトでは、****yyyy-MM-dd****が使用されます。 |
+| Custom Date Format | カスタマイズされた日付形式を入力します。 |
+| Partition Non Date Key Column Name | パーティション列の名前を選択します。 |
 
 ## その他のペイン
 
-スケジュール設定、再試行、更新に関するオプションなど、コネクターインターフェースのその他のペインに表示されるオプションについては、「 [コネクターを使用してDataSetを追加する](/ja/s/article/360042926274 "コネクターを使用してDataSetを追加する") 」を参照してください。
+スケジュール設定、再試行、更新に関するオプションなど、コネクターインターフェースのその他のペインに表示されるオプションについては、「[コネクターを使用してDataSetを追加する](/ja/s/article/360042926274)」を参照してください。
 
 ## よくある質問
 
 <AccordionGroup>
+
 <Accordion title="このコネクターを起動するにはどのような認証情報が必要ですか？">
-
-
 自分のSnowflakeアカウントのフルネームと、Snowflakeホストに関連付けられたユーザー名およびパスワードが必要です。自分の権限を入力することもできます。
-
-
 </Accordion>
+
 <Accordion title="注意すべきAPI制限はありますか？">
-
-
 制限は使用するサーバー構成によって異なります。
-
-
 </Accordion>
+
 <Accordion title="データ更新の頻度はどのくらいですか？">
-
-
 DataSetは15分間隔で実行できます。ただし、クエリの実行時間によっては、DataSetの実行頻度を低くする必要があります。
-
-
 </Accordion>
+
 <Accordion title="クエリの記述の際に注意すべき点はありますか？">
-
-
 すべての単語、テーブル名、フィールド名が正しく記述されていることを確認してください。クエリのヘルプについては、［Query Helper］フィールドを参照してください。
-
-
 </Accordion>
+
 <Accordion title="Snowflakeデータベースに接続できない理由は何ですか？IPアドレスをホワイトリストに登録する必要がありますか？">
-
-
-Snowflakeデータベースに接続する前に、接続するポート上のデータベースサーバーにあるいくつかのIPアドレスをホワイトリストに登録する必要があります。IPアドレスの詳細なリストは、「 [ネットワーク接続にDomoのIPアドレスを許可する](/ja/s/article/360043630093 "ネットワーク接続にDomoのIPアドレスを許可する") 」を参照してください。
-
-
+Snowflakeデータベースに接続する前に、接続するポート上のデータベースサーバーにあるいくつかのIPアドレスをホワイトリストに登録する必要があります。IPアドレスの詳細なリストは、「[ネットワーク接続にDomoのIPアドレスを許可する](/s/article/360043630093)」を参照してください。
 </Accordion>
-<Accordion title="Snowflake High Bandwidth With Advanced PartitionsコネクターとSnowflake Managed Unloadコネクターは、何が違うのですか？">
 
+<Accordion title="Snowflake High Bandwidth With Advanced PartitionsコネクターとSnowflake Managed Unloadコネクターは、何が違うのですか？">
 
 どちらのコネクターもパーティション分割に対応していますが、Snowflake High Bandwidth With Advanced Partitionsコネクターの場合はデータにパーティション分割を使用するかどうかの選択ができます。また、Snowflake High Bandwidth With Advanced Partitionsコネクターでは、ほかのパーティションコネクターとは異なり、日付以外の列でパーティション分割ができます。
 
@@ -101,8 +115,6 @@ Snowflakeデータベースに接続する前に、接続するポート上の�
 * 設定を見直し、すべての必須項目が選択されていることを確認してください。
 * コネクターの履歴にエラーメッセージが記録されていないか確認してください。
 * まれに、リクエストした情報が多すぎた結果、API制限またはタイムアウトに達する場合があります。記録されている場合は、コネクターの履歴でエラーメッセージと実行時間を確認することができます。また、取得するアカウント数やレポートのメトリクス数を減らしたり、取得するタイムフレームを短縮したりすることができます。
-
-
 
 </Accordion>
 </AccordionGroup>

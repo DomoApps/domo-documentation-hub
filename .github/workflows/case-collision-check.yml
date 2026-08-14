@@ -1,0 +1,47 @@
+name: Case-collision check
+
+# Fails if two or more tracked paths differ only by upper/lowercase.
+# Such paths collapse to a single file on case-insensitive filesystems
+# (macOS APFS, Windows NTFS), so contributors on those systems see
+# phantom "modified" files and articles silently render the wrong image.
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Detect case-colliding paths
+        run: |
+          python3 - <<'PY'
+          import subprocess, collections, sys
+          paths = subprocess.check_output(['git', 'ls-files']).decode().splitlines()
+          by_lower = collections.defaultdict(list)
+          for p in paths:
+              by_lower[p.lower()].append(p)
+          colliders = {k: v for k, v in by_lower.items() if len(v) > 1}
+          if not colliders:
+              print(f"OK: no case-colliding paths across {len(paths)} tracked files.")
+              sys.exit(0)
+          print("ERROR: tracked paths that differ only by case:")
+          print("(These collapse to one file on macOS/Windows and break contributors on those platforms.)")
+          print()
+          for key in sorted(colliders):
+              print(f"  {key}:")
+              for p in sorted(colliders[key]):
+                  print(f"    {p}")
+          print()
+          print(f"Total colliding groups: {len(colliders)}")
+          print("Fix: rename one member of each group (e.g. append '-2' before the extension)")
+          print("and update all references in MDX/JSON files.")
+          sys.exit(1)
+          PY

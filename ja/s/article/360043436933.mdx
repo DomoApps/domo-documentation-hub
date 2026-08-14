@@ -1,20 +1,22 @@
 ---
-title: "Google BigQuery Writeback Connector"
+title: "Google BigQuery Writebackコネクター"
+excerpt: "Google BigQuery Writeback コネクターを設定し、Domo クライアント認証情報と Google Service Token を使用して DataSet を BigQuery にエクスポートします。"
 ---
 
-# はじめに
+## はじめに
 
-Google BigQueryは、大量の読み取り専用DataSetを処理するクラウドベースのビッグデータ解析ウェブサービスです。このコネクターを使用すると、Domo DataSetからBigQueryテーブルにデータをエクスポートできます。BigQuery APIの詳細については、こちらを参照してください：
-https://cloud.google.com/bigquery/docs/reference/v2/
+Google BigQueryは、大量の読み取り専用DataSetを処理するクラウドベースのビッグデータ解析ウェブサービスです。このコネクターを使用すると、Domo DataSetからBigQueryテーブルにデータをエクスポートできます。BigQuery APIの詳細については、ウェブサイト（[https://cloud.google.com/bigquery/docs/reference/v2/](https://cloud.google.com/bigquery/docs/reference/v2/)）を参照してください。
 
-BigQueryへのデータのエクスポートはData Centerで行います。このトピックでは、BigQuery Writebackコネクターユーザーインターフェースに固有のフィールドとメニューについて説明します。DataSetの追加や更新スケジュールの設定、DataSet情報の編集に関する一般的な情報は「データコネクターを使ってDataSetを追加する」で説明しています。
+BigQueryへのデータのエクスポートはData Centerで行います。このトピックでは、BigQuery Writebackコネクターユーザーインターフェースに固有のフィールドとメニューについて説明します。DataSetの追加や更新スケジュールの設定、DataSet情報の編集に関する一般的な情報は、「[コネクターを使用してDataSetを追加する](/ja/s/article/360042926274)」を参照してください。
+
+<Note>**注記：**Writeback DataSetの所有者は、入力DataSetの所有者または共同所有者である必要があります。</Note>
 
 ## 必要条件
 
 このコネクターを設定するには、次の情報が必要です。
 
-* DomoクライアントIDとクライアントシークレット。
-* Google Service Token JSONファイル。
+- DomoクライアントIDとクライアントシークレット。
+- Google Service Token JSONファイル。
 
 次のサブセクションでは、上述の認証情報を取得する方法について詳しく説明します。
 
@@ -22,71 +24,58 @@ BigQueryへのデータのエクスポートはData Centerで行います。こ�
 
 DomoクライアントIDとクライアントシークレットを作成するには、次の手順を実行します。
 
-1. [https://developer.domo.com](https://developer.domo.com "https://developer.domo.com") に移動してログインします。
-2. **[新規クライアント]** をクリックします（右上の [マイアカウント]）。
-3. **[データ]** と **[ユーザー]** のアプリケーションの範囲を持つ新しいクライアントを作成します。
+1. [https://developer.domo.com](https://developer.domo.com)に移動してログインします。
+2. **［New Client］** をクリックします（右上の［My Account］から）。
+3. **［Data］**と**［User］**のアプリケーション範囲を持つ新しいクライアントを作成します。
+
+<Frame>![](/images/kb/ja/0EM5w000005vOA3.png)</Frame>
+
      
-   <Frame><img alt="googledrive_writeback_6.png" src="/images/kb/ka05w00000123QW-00N5w00000Ri7BU-0EM5w000005vOA8.png"/></Frame>
-
-   **[作成]** をクリックすると、クライアントIDとクライアントシークレットにリダイレクトされます。
-4. すぐに必要になるため、クライアントIDとクライアントシークレットをコピーします。
-
-### Service Token JSON Fileを取得する
-
-To obtain a Google Service Token JSONファイルを取得するには、次の手順を実行します。
-
-1. Google Developers Consoleで、**[認証情報]** タブを開きます。
-2. **[認証情報を作成]** をクリックし、 **[サービス アカウント キー]** を選択します。
      
-   <Frame><img alt="googlesheets_writeback_5.png" src="/images/kb/ka05w00000123QW-00N5w00000Ri7BU-0EM5w000005vOAJ.png"/></Frame>
+   **［Create］**をクリックすると、クライアントIDとクライアントシークレットにリダイレクトされます。
+4. 後ほど使用するため、クライアントIDとクライアントシークレットをコピーします。
 
-3. **[新しいサービス アカウント]** を選択します。
+### Service Token JSONファイルを取得する
+
+Google Service Token JSONファイルを取得するには、次の手順を実行します。
+
+1. Google Developers Consoleで、**［Credentials］** タブを開きます。
+2. **［Create credentials］**をクリックし、**［Service account key］**を選択します。<img alt="googlesheets_writeback_5.png" src="/images/kb/ja/0EM5w000005vOAF.png" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/>
+3. **［New service account］**を選択します。
 4. 新しいサービスアカウントに名前を付けます。
-5. **[役割]** ドロップダウンで、 **[Project] > [オーナー]** を選択します。
-6. **[キーのタイプ]** で、 **[JSON]** を選択します。
-     
-   <Frame><img alt="googledrive_writeback_2.png" src="/images/kb/ka05w00000123QW-00N5w00000Ri7BU-0EM5w000005vOAH.png"/></Frame>
-
-7. **[作成]**、 **[保存]** の順にクリックします。
-8. すぐに必要になるため、ファイルの保存には安全な場所を選択します。
-9. ファイルを作成したら、右端にある **[サービス アカウントの管理]** をクリックします。
-     
-   <Frame><img alt="googledrive_writeback_3.png" src="/images/kb/ka05w00000123QW-00N5w00000Ri7BU-0EM5w000005vOA2.png"/></Frame>
-
-10. 作成したプロジェクトのメールアドレスをコピーします。
-      
-    <Frame><img alt="googledrive_writeback_4.png" src="/images/kb/ka05w00000123QW-00N5w00000Ri7BU-0EM5w000005vOAG.png"/></Frame>
-
-11. ファイルの保存先となるGoogleドライブアカウント（[https://www.google.com/drive](https://www.google.com/drive "https://www.google.com/drive") ）にログインします。
-12. 新しいGoogleドライブフォルダを作成します。
-      
-    <Frame><img alt="googledrive_writeback_5.png" src="/images/kb/ka05w00000123QW-00N5w00000Ri7BU-0EM5w000005vOAD.png"/></Frame>
-
-13. 新しいフォルダに移動し、ステップ10でコピーしたメールアドレスで共有します。
-14. 後で参照する必要があるため、URLをフォルダにコピーします。URLは次のようになります。
-      
-    https://drive.google.com/drive/folders/1TOdpy2kki8-pealAGXWwCYF8EyiwxWMW
+5. **［Role］** ドロップダウンで、**［Project］> ［Owner］**の順で選択します。
+6. **［Key type］** で、**［JSON］**を選択します。<img alt="googledrive_writeback_2.png" src="/images/kb/ja/0EM5w000005vOA7.png" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/>
+7. **［Create］**、**［Save］**の順にクリックします。
+8. 後ほど使用するため、安全な場所にファイルを保存します。
 
 ## 接続を設定する
 
-このセクションでは、[Google BigQuery Writebackコネクター] ページの **[認証情報]** ペインと **[詳細]** ペインのオプションについて説明します。このページの他のペインの項目である **[スケジュール設定]** や **[DataSetの名前と説明]** に関しては、ほとんどのタイプのコネクターで共通しています。詳細については「 [データコネクターを使ってDataSetを追加する](/ja/s/article/360042926274 "データコネクターを使ってDataSetを追加する") 」を参照してください。
+このセクションでは、Google BigQuery Writebackコネクターページの **［認証情報］** ペインと **［詳細］** ペインのオプションについて説明します。このページのほかのペインの項目である**［スケジュール設定］**や**［DataSetに名前を付け、説明を入力］**に関しては、ほとんどのタイプのコネクターで共通しています。詳細については、「[コネクターを使用してDataSetを追加する](/ja/s/article/360042926274)」を参照してください。
 
-### [認証情報] ペイン
+### ［認証情報］ペイン
 
-このペインには、Domo開発者アカウントとBigQueryの接続先テーブルに接続するための認証情報の入力フィールドがあります。下表では、各フィールドに必要な内容を説明しています。
+このペインには、DomoデベロッパーアカウントとBigQueryの接続先テーブルに接続するための認証情報の入力フィールドがあります。下表では、各フィールドに必要な内容を説明しています。
 
-<table border="1" cellpadding="1" cellspacing="1" data-aura-rendered-by="33:195;a"><thead><tr><th colspan="1" rowspan="1"><p><span class="s1"> フィールド </span></p></th><th colspan="1" rowspan="1"><p><span class="s1"> 説明 </span></p></th></tr></thead><tbody><tr><td colspan="1" rowspan="1"><p> DomoクライアントID </p></td><td colspan="1" rowspan="1"><p> 上述の「必要条件」セクションの「 <a target="_blank" title="GoogleドライブWritebackコネクター"> ステップ4：DomoクライアントIDとクライアントシークレットを作成する </a> 」でコピーしたDomoクライアントIDを貼り付けます。 </p></td></tr><tr><td colspan="1" rowspan="1"><p> Domoクライアントシークレット </p></td><td colspan="1" rowspan="1"> 上述の「必要条件」セクションの「 <a target="_blank" title="GoogleドライブWritebackコネクター"> ステップ4：DomoクライアントIDとクライアントシークレットを作成する </a> 」でコピーしたDomoクライアントシークレットを貼り付けます。 </td></tr><tr><td colspan="1" rowspan="1"><p> Service Token JSON </p></td><td colspan="1" rowspan="1"><p> 上述の「必要条件」セクションの「 <a target="_blank" title="GoogleドライブWritebackコネクター"> ステップ3：サービスアカウントを作成する </a> 」で生成したJSON Service Tokenを貼り付けます。 </p></td></tr></tbody></table>
+| フィールド              | 説明                                                                                  |
+| ------------------ | ----------------------------------------------------------------------------------- |
+| Domo Client ID     | 上述の「必要条件」セクションの「ステップ4：DomoクライアントIDとクライアントシークレットを作成する」でコピーしたDomoクライアントIDを貼り付けます。     |
+| Domo Client Secret | 上述の「必要条件」セクションの「ステップ4：DomoクライアントIDとクライアントシークレットを作成する」でコピーしたDomoクライアントシークレットを貼り付けます。 |
+| Service Token JSON | 上述の「必要条件」セクションの「ステップ3：サービスアカウントを作成する」で生成したJSON Service Tokenを貼り付けます。                |
 
-有効な認証情報を一度入力しておくと、随時同じアカウントを使用して新しいDomo-Googleドライブ接続を設定できます。コネクターアカウントは、Data Centerの **[アカウント]** タブで管理できます。このタブの詳細については「 [コネクターのユーザーアカウントを管理する](/ja/s/article/360042926054 "コネクターのユーザーアカウントを管理する") 」を参照してください。
+有効な認証情報を一度入力しておくと、いつでも同じアカウントを使用して新しいDomo-Google BigQuery接続を設定できます。コネクターアカウントは、Data Centerの**［アカウント］**タブで管理できます。このタブの詳細については、「[コネクター/アダプターアカウントを管理する](/ja/s/article/360042926054)」を参照してください。
 
-### [詳細] ペイン
+### ［詳細］ペイン
 
 このペインには、データを指定してデータの送信先を示すための多数のフィールドがあります。
 
-<table border="1" cellpadding="1" cellspacing="1" data-aura-rendered-by="33:195;a"><thead><tr><th colspan="1" rowspan="1"><p> メニュー </p></th><th colspan="1" rowspan="1"><p> 説明 </p></th></tr></thead><tbody><tr><td colspan="1" rowspan="1"><p> 入力BigQueryテーブルの名前 </p></td><td colspan="1" rowspan="1"><p> Domoデータの送信先となるBigQueryテーブルの名前を入力します。指定したテーブルは実行ごとに削除され、再作成されます。 </p></td></tr><tr><td colspan="1" rowspan="1"><p> 入力BigQuery DataSetの名前 </p></td><td colspan="1" rowspan="1"><p> テーブルがあるBigQuery DataSetの名前を入力します。 </p></td></tr><tr><td colspan="1" rowspan="1"><p> 入力Domo DataSet ID </p></td><td colspan="1" rowspan="1"><p> BigQueryテーブルにコピーするDataSetのDataSet ID（GUID）を入力します。Data CenterでDataSetの詳細ビューを開き、 <span class="mt-font-courier-new"> datasources/ </span> に続くURLの部分を見ると、IDを見つけることができます。たとえば、URLが <span class="mt-font-courier-new"><span class="nowiki"><a href="https://mycompany.domo.com/datasources/845305d8-da3d-4107-a9d6-13ef3f86d4a4/details/overview" rel="noopener" target="_blank"> https://mycompany.domo.com/datasources/845305d8-da3d-4107-a9d6-13ef3f86d4a4/details/overview </a></span></span> であれば、DataSet IDは <span class="mt-font-courier-new"> 845305d8-da3d-4107-a9d6-13ef3f86d4a4 </span> になります。 </p></td></tr></tbody></table>
+| メニュー                                         | 説明                                                                                                                                                                                                                                                                                        |
+| -------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Input BigQuery Table Name                    | Domoデータの送信先となるBigQueryテーブルの名前を入力します。指定したテーブルは実行ごとに削除され、再作成されます。                                                                                                                                                                                                                           |
+| Input BigQuery DataSet Name                  | テーブルがあるBigQuery DataSetの名前を入力します。                                                                                                                                                                                                                                                         |
+| Input Domo DataSet ID                        | BigQueryテーブルにコピーするDataSetのDataSet ID（GUID）を入力します。Data CenterでDataSetの詳細ビューを開き、datasources/に続くURLの部分を見ると、IDを見つけることができます。例えば、URLが「https://mycompany.domo.com/datasources/845305d8-da3d-4107-a9d6-13ef3f86d4a4/details/overview」であれば、DataSet IDは「845305d8-da3d-4107-a9d6-13ef3f86d4a4」になります。 |
+| Use BigDecimal（チェックボックス）                     | すべての数値にBigDecimalを使用する場合は、このチェックボックスを選択します。このオプションは、桁数の多い数値を扱う際に精度を保つのに役立ちます。小数点以下9桁を超える数値がデータに含まれている場合は、このオプションを選択します。                                                                                                                                                                   |
+| Keep Special Characters in Headers（チェックボックス） | ヘッダー内の特殊文字をそのまま残すには、このチェックボックスを選択します。このオプションが選択されていない場合、列のヘッダーに特殊文字が含まれていると、それらは生成されるBigQueryテーブル内でアンダースコアに置き換えられます。                                                                                                                                                                      |
 
 ### その他のペイン
 
-スケジュール設定、再試行、オプションの更新など、残りのコネクターインターフェースのセクションの詳細については、「 [データコネクターを使ってDataSetを追加する](/ja/s/article/360042926274 "データコネクターを使ってDataSetを追加する") 」を参照してください。
-
-
+スケジュール設定、再試行、更新オプションなど、その他のコネクターインターフェースのセクションの詳細については、「[コネクターを使用してDataSetを追加する](/ja/s/article/360042926274)」を参照してください。

@@ -1,91 +1,86 @@
 ---
 title: "DataFusionを使用してDataSetを結合する（廃止）"
+excerpt: "廃止された DataFusion で［列を追加］または［行を追加］を使用して DataSet を結合する従来の手順を参照します（現在は Magic ETL を推奨）。"
 ---
 
-import {InlineImage} from "/snippets/InlineImage.mdx";
+<Warning>**重要：**DataFusionを使用したデータの結合は廃止されました。データはMagic ETLを使用して結合することを推奨します。Magic ETL DataFlowを作成する方法については、[こちら](/s/article/360055259234)を参照してください。</Warning>
 
-<Warning>
-  **重要：** DataFusionを使用したデータの結合は廃止されました。データはMagic ETLを使用して結合することを推奨します。Magic ETL DataFlowを作成する方法については、 [こちら](/s/article/360055259234) を参照してください。
-
-</Warning>
-
-### はじめに
+## はじめに
 
 DataFusionを使用してデータを結合する場合は、［列を追加］オプションによる結合と［行を追加］オプションによる結合という2つの方法があります。［列を追加］は、同様の列を一致させ、2つ以上のDataSetを結合します。この方法では、一致する列のみ、同じヘッダーまたはデータタイプがある必要があります。［行を追加］では、DataSetの結合はDataSetの行を結合することで行います。この方法では、すべての列が同じヘッダーを持っていなくてはなりません。
 
-<Note>
-  **注記：** DataFusionにあるDataSetの中に期限切れのものがある場合、DataFusion自体が期限切れと表示されます。PDPポリシーが有効になっているDataSetをDataFusionの入力（親）DataSetとして使用する場合、そのポリシーは出力DataSetにも組み込まれます。ポリシーは、DataFusionから出力DataSetに適用させることはできません。従って、入力（親）DataSetに適用する必要があります。詳細は「 PDPとDataFusion/DataFlow 」を参照してください 。
+<Note>**注記：**DataFusionにあるDataSetの中に期限切れのものがある場合、DataFusion自体が期限切れと表示されます。PDPポリシーが有効になっているDataSetをDataFusionの入力（親）DataSetとして使用する場合、そのポリシーは出力DataSetにも組み込まれます。ポリシーは、DataFusionから出力DataSetに適用させることはできません。従って、入力（親）DataSetに適用する必要があります。詳細は「PDPとDataFusion/DataFlow」を参照してください。</Note>
 
-</Note>
-
-### ［列を結合］の方法を使用してDataSetを結合する
+## ［列を結合］の方法を使用してDataSetを結合する
 
 この方法では、2つ以上のDataSetを選択します。それぞれのDataSetが、もう1つのDataSetにある列またはデータタイプに一致する列を最低1つ含んでいなければなりません。そして、同様の列を一致させ、すべてのDataSetを1つのDataSetに結合します。この方法は、SQLでJOINを使用するのと同じです。
 
 以下の例では、この方法でユーザーが2つのDataSetをアップロードし、結合しています。「注文#」と「注文番号」の列を一致させました。2つ目のDataSetは1つ目の右に表示されています。
 
-<Frame><img alt="" src="/images/kb/ka0Vq000000GlXd-00N5w00000Ri7BU-0EM5w000005vOsr.png" style={{width: 719, height: 584}}/></Frame>
+<Frame>![Screenshot](/images/kb/ja/0EM5w000005vOsr.png)</Frame>
+
 ここでさらに一歩進んで、会社情報を提供するための3つ目のDataSetを追加することもできます。
 
-<Frame><img alt="" src="/images/kb/ka0Vq000000GlXd-00N5w00000Ri7BU-0EM5w000005vOsY.png" style={{width: 748, height: 600}}/></Frame>
+<Frame>![Screenshot](/images/kb/ja/0EM5w000005vOsY.png)</Frame>
+
 そして、重複している「注文番号」と「会社」の列を削除します。最終的に結合したDataSetは以下のように表示されます。
 
-<Frame><img alt="" src="/images/kb/ka0Vq000000GlXd-00N5w00000Ri7BU-0EM5w000005vOsm.png" style={{width: 714, height: 296}}/></Frame>
+<Frame>![Screenshot](/images/kb/ja/0EM5w000005vOsm.png)</Frame>
+
 **［列を追加］の方法を使用してDataSetを結合するには：**
 
-1. Domoで、画面上部のツールバーの ****［データ］**** をクリックします。
-2. ウィンドウ上部ツールバーの **［MAGIC変換］** で **［BLEND］** をクリックします。
+1. Domoで、画面上部のツールバーの****［データ］****をクリックします。
+2. ウィンドウ上部ツールバーの**［MAGIC変換］**で**［BLEND］**をクリックします。
 
-   <Tip>
-     **ヒント：** DataFusionエディターは、DomoのどこからでもAppツールバーの <InlineImage src="/images/kb/ja/ka0Vq000000GlcW-00N5w00000Ri7BU-0EM5w000005vOsp.png" /> を選択し、 **［データ］>［Blend］** を選択することで表示させることができます。
+<Tip>   **ヒント：**DataFusionエディターは、DomoのどこからでもAppツールバーの</Tip>
 
-   </Tip>
+   <Frame>![Screenshot](/images/kb/ja/0EM5w000005vOsp.png)</Frame>
 
-3. （オプション）DataSetのデフォルトのタイトルを変更します。
-     
+   を選択し、**［データ］>［Blend］**を選択することで表示させることができます。
+3. （オプション）DataSetのデフォルトのタイトルを変更します。  
    タイトルは、カードを作成するときにDataSetを検索したり選択するのに使用します。
 4. 1番目の（マスター）DataSetを以下に従って追加します。
 
-   1. **［DATASETを選択］** をクリックします。
-   2. リストからDataSetを選択します。
-        
-      **すべてのタイプ** メニューでDataSetを選択したり、 **検索** フィールドでDataSetの名前を入力すると、リストに表示されるDataSetにフィルターをかけることができます。
-        
+   1. **［DATASETを選択］**をクリックします。
+   2. リストからDataSetを選択します。  
+      **すべてのタイプ**メニューでDataSetを選択したり、**検索**フィールドでDataSetの名前を入力すると、リストに表示されるDataSetにフィルターをかけることができます。  
       DataSetの列の名前のリストが表示されます。
 5. 2番目のDataSetを以下に従って追加します。
 
-   1. **［DATASETを選択］** をクリックします。
-   2. リストからDataSetを選択します。
-        
-      リストに表示されるDataSetには、フィルターをかけることができます。 **すべてのタイプ** メニューでDataSetを選択するか、 **すべてのユーザー** メニューで所有者を選択する、または **検索** フィールドでDataSetの名前を入力します。
-        
+   1. **［DATASETを選択］**をクリックします。
+   2. リストからDataSetを選択します。  
+      リストに表示されるDataSetには、フィルターをかけることができます。**すべてのタイプ**メニューでDataSetを選択するか、**すべてのユーザー**メニューで所有者を選択する、または**検索**フィールドでDataSetの名前を入力します。  
       DataSetの列の名前のリストが表示されます。
 6. （オプション）結合する別のDataSetを追加します。
-7. （オプション） **X** アイコンをクリックして、選択したDataSetを削除します。
+7. （オプション）**X**アイコンをクリックして、選択したDataSetを削除します。
 8. DataSetを結合する設定を指定します。
 
-   1. DataSetからどの列が同じ値およびデータタイプを含んでいるかを判断します。
-        
+   1. DataSetからどの列が同じ値およびデータタイプを含んでいるかを判断します。  
       ヘルプが必要なら、各DataSetの列名のリストを参照することができます。
    2. 使用したいDataSetの各組み合わせに対し、一致させたい列を選択します。
 
-      1. 最初の **［フィールドを選択］** メニューをクリックして、マスターのDataSetを選択してから、列を選択します。
-      2. 2つ目の **［フィールドを選択］** メニューをクリックして、2つ目のDataSetを選択してから、選択した最初の列のものと一致する数値またはデータタイプのある列を選択します。
-      3. <InlineImage src="/images/kb/ja/ka0Vq000000GlcW-00N5w00000Ri7BU-0EM5w000005vOst.png" /> メニューから希望するインクルードオプションを選択します。
+      1. 最初の**［フィールドを選択］**メニューをクリックして、マスターのDataSetを選択してから、列を選択します。
+      2. 2つ目の**［フィールドを選択］**メニューをクリックして、2つ目のDataSetを選択してから、選択した最初の列のものと一致する数値またはデータタイプのある列を選択します。
+      3. <Frame>![Screenshot](/images/kb/ja/0EM5w000005vOst.png)</Frame>
 
-         <table border="1" cellpadding="1" cellspacing="1"><thead><tr><th colspan="1" rowspan="1"><p> オプション </p></th><th colspan="1" rowspan="1"><p> 説明 </p></th></tr></thead><tbody><tr><td colspan="1" rowspan="1"><p><InlineImage src="/images/kb/ja/ka0Vq000000GlcW-00N5w00000Ri7BU-0EM5w000005vOsi.png" /><br/> 左の外側の結合部 </p></td><td colspan="1" rowspan="1"><p> 1つ目に選択されたDataSetのすべての行を含め、2つ目に選択されたDataSetで指定の一致する値のフィールドがある行を追加します。 </p></td></tr><tr><td colspan="1" rowspan="1"><p><InlineImage src="/images/kb/ja/ka0Vq000000GlcW-00N5w00000Ri7BU-0EM5w000005vOse.png" /><br/> INNER JOIN </p></td><td colspan="1" rowspan="1"><p> 両方のDataSetから、指定された一致する値のフィールドがある行を含めます。 </p></td></tr></tbody></table>
+         メニューから希望するインクルードオプションを選択します。
 
-   3. （条件付き）複数のDataSetを追加した場合は、表示される **［フィールドを選択］** メニューのペアそれぞれに対して、一致する列の手順を繰り返します。
-9. **［クリックして、プレビューを読み込みます］** をクリックして、DataSetをプレビューします。
-     
+         | オプション | 説明 |
+         | --- | --- |
+         | <Frame>![Screenshot](/images/kb/ja/0EM5w000005vOsi.png)</Frame>   左の外側の結合部 | 1つ目に選択されたDataSetのすべての行を含め、2つ目に選択されたDataSetで指定の一致する値のフィールドがある行を追加します。 |
+         | <Frame>![Screenshot](/images/kb/ja/0EM5w000005vOse.png)</Frame>   INNER JOIN | 両方のDataSetから、指定された一致する値のフィールドがある行を含めます。 |
+   3. （条件付き）複数のDataSetを追加した場合は、表示される**［フィールドを選択］**メニューのペアそれぞれに対して、一致する列の手順を繰り返します。
+9. **［クリックして、プレビューを読み込みます］**をクリックして、DataSetをプレビューします。  
    一致する列が選択されたDataSetすべてに正確に選択されると、このオプションが利用できます。
 10. （オプション）プレビューにある列の右側にある矢印をクリックして、列にオプションを設定します。
 
-    <table border="1" cellpadding="1" cellspacing="1"><thead><tr><th colspan="1" rowspan="1"><p> オプション </p></th><th colspan="1" rowspan="1"><p> 説明 </p></th></tr></thead><tbody><tr><td colspan="1" rowspan="1"><p> 列名を変更 </p></td><td colspan="1" rowspan="1"><p> この列の名前が変更できます。列の名前の変更は、DataFusionを保存する前にのみ行うことができます。保存した後はこのオプションは利用できなくなります。 </p></td></tr><tr><td colspan="1" rowspan="1"><p> 列を無視する </p></td><td colspan="1" rowspan="1"><p> この列を結合したDataSetから除外します。 </p></td></tr></tbody></table>
+    | オプション | 説明 |
+    | --- | --- |
+    | 列名を変更 | この列の名前が変更できます。列の名前の変更は、DataFusionを保存する前にのみ行うことができます。保存した後はこのオプションは利用できなくなります。 |
+    | 列を無視する | この列を結合したDataSetから除外します。 |
+11. **［保存］**をクリックして、結合したDataSetを保存します。
 
-11. **［保存］** をクリックして、結合したDataSetを保存します。
-
-Data Centerの **［DataSet］** タブに新しいDataSetが追加されます。このタブについて詳しくは、「 [Data Centerのレイアウト](/ja/s/article/360047553253) 」を参照してください。
+Data Centerの**［DataSet］**タブに新しいDataSetが追加されます。このタブについて詳しくは、「[Data Centerのレイアウト](/ja/s/article/360047553253)」を参照してください。
 
 ## ［行を追加］の方法を使用してDataSetを結合する
 
@@ -93,57 +88,47 @@ Data Centerの **［DataSet］** タブに新しいDataSetが追加されます�
 
 以下の例では、この方法でユーザーが2つのDataSetをアップロードし、結合しています。2つ目のDataSetは、1つ目の真下に追加されます。
 
-<Frame><img alt="" src="/images/kb/ka0Vq000000GlXd-00N5w00000Ri7BU-0EM5w000005vOsk.png" style={{width: 748, height: 739}}/></Frame>
-<Warning>
-  **重要：** この方法で結合するDataSetは、すべて同じ列ヘッダーおよび順番になっている *必要があります* 。また、データタイプが一致する列の間で一致しなくてはいけません。例えば、1つのDataSetからの列が `DATE` としてフォーマットされている場合、ほかのすべてのDataSetの同じ列も `DATE` としてフォーマットされている必要があります。可能なデータタイプは以下のとおりです。
+<Frame>![Screenshot](/images/kb/ja/0EM5w000005vOsk.png)</Frame>
 
-  * LONGは、小数、分数、整数を含め、数字を数値として保存します。
-  * DOUBLEは、倍精度浮動小数点数値を保存します。
-  * STRINGは、英数字をテキストとして保存します。
-  * DATETIMEは、年、月、日、時、分、秒の値を保存します。
-  * DATEは、年、月、日の値を保存します。
-  * TIMEは、時、分、秒の値を保存します。
+<Warning>**重要：**この方法で結合するDataSetは、すべて同じ列ヘッダーおよび順番になっている*必要があります*。また、データタイプが一致する列の間で一致しなくてはいけません。例えば、1つのDataSetからの列がDATEとしてフォーマットされている場合、ほかのすべてのDataSetの同じ列もDATEとしてフォーマットされている必要があります。可能なデータタイプは以下のとおりです。</Warning>
 
-</Warning>
+- LONGは、小数、分数、整数を含め、数字を数値として保存します。
+- DOUBLEは、倍精度浮動小数点数値を保存します。
+- STRINGは、英数字をテキストとして保存します。
+- DATETIMEは、年、月、日、時、分、秒の値を保存します。
+- DATEは、年、月、日の値を保存します。
+- TIMEは、時、分、秒の値を保存します。
 
 **［行を結合］の方法を使用してDataSetを結合するには：**
 
-1. <InlineImage src="/images/kb/ja/ka0Vq000000GlcW-00N5w00000Ri7BU-0EM5w000005vOsb.png" /> **>［Data Center］** をクリックします。
+1. <Frame>![Screenshot](/images/kb/ja/0EM5w000005vOsb.png)</Frame>
 
-2. ウィンドウ上部ツールバーの **［MAGIC変換］** で **［BLEND］** をクリックします。
-3. （オプション）DataSetのデフォルトのタイトルを変更します。
-     
+   **>［Data Center］**をクリックします。
+2. ウィンドウ上部ツールバーの**［MAGIC変換］**で**［BLEND］**をクリックします。
+3. （オプション）DataSetのデフォルトのタイトルを変更します。  
    タイトルは、カードを作成するときにDataSetを検索したり選択するのに使用します。
 4. 1番目のDataSetを以下に従って追加します。
 
-   1. **［DATASETを選択］** をクリックします。
-   2. リストからDataSetを選択します。
-        
-      リストに表示されるDataSetには、フィルターをかけることができます。 **すべてのタイプ** メニューでDataSetを選択するか、 **すべてのユーザー** メニューで所有者を選択する、または **検索** フィールドでDataSetの名前を入力します。
-        
+   1. **［DATASETを選択］**をクリックします。
+   2. リストからDataSetを選択します。  
+      リストに表示されるDataSetには、フィルターをかけることができます。**すべてのタイプ**メニューでDataSetを選択するか、**すべてのユーザー**メニューで所有者を選択する、または**検索**フィールドでDataSetの名前を入力します。  
       DataSetの列の名前のリストが表示されます。
-5. **［DATASETを選択］** をクリックし、リストからDataSetを選択し、2つ目のDataSetを追加します。
+5. **［DATASETを選択］**をクリックし、リストからDataSetを選択し、2つ目のDataSetを追加します。
 
-   <Note>
-     **注記：** この方法で追加するすべてのDataSetは、同じ列ヘッダーになっている *必要があります* 。そうでない場合、結合をプレビューして保存することができません。
-
-   </Note>
-
+<Note>   **注記：**この方法で追加するすべてのDataSetは、同じ列ヘッダーになっている*必要があります*。そうでない場合、結合をプレビューして保存することができません。
 6. （オプション）結合する別のDataSetを追加します。
-7. **［行を追加］** をクリックします。
-     
-   同じ列のヘッディングがある二つのDataSetを選択すると、 **クリックしてプレビューを読み込む** というリンクが下に表示されます。
-8. **［クリックして、プレビューを読み込みます］** をクリックして、DataSetをプレビューします。
-9. （オプション）プレビューにある列の右側にある矢印をクリックして、列にオプションを設定します。
+7. **［行を追加］**をクリックします。  
+   同じ列のヘッディングがある二つのDataSetを選択すると、**クリックしてプレビューを読み込む**というリンクが下に表示されます。
+8. **［クリックして、プレビューを読み込みます］**をクリックして、DataSetをプレビューします。
+9. （オプション）プレビューにある列の右側にある矢印をクリックして、列にオプションを設定します。</Note>
 
-   <table border="1" cellpadding="1" cellspacing="1"><tbody><tr><th colspan="1" rowspan="1"><p> オプション </p></th><th colspan="1" rowspan="1"><p> 説明 </p></th></tr><tr><td colspan="1" rowspan="1"><p> 列を除外する </p></td><td colspan="1" rowspan="1"><p> この列を結合したDataSetから除外します。 </p></td></tr></tbody></table>
+   | オプション | 説明 |
+   | --- | --- |
+   | 列を除外する | この列を結合したDataSetから除外します。 |
+10. **［保存］**をクリックして、結合したDataSetを保存します。
 
-10. **［保存］** をクリックして、結合したDataSetを保存します。
-
-Data Centerの **［DataSet］** タブに新しいDataSetが追加されます。このタブについて詳しくは、「 [Data Centerのレイアウト](/ja/s/article/360047553253) 」を参照してください。
+Data Centerの**［DataSet］**タブに新しいDataSetが追加されます。このタブについて詳しくは、「[Data Centerのレイアウト](/ja/s/article/360047553253)」を参照してください。
 
 **動画 - DataFusionを使用してDataSetを結合する**
 
 <iframe allowfullscreen="allowfullscreen" frameborder="1" height="315" src="//www.youtube-nocookie.com/embed/Lic6oRbosQo" width="560"></iframe>
-
-日本語

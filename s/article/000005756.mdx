@@ -1,72 +1,93 @@
 ---
-title: "> Domo on PostgreSQL (RECOMMENDED)"
+title: "Domo on PostgreSQL"
+excerpt: "Connect Domo's Cloud Integrations to PostgreSQL to query and visualize PostgreSQL data without moving or duplicating it."
 ---
 
-import {InlineImage} from "/snippets/InlineImage.mdx";
+## Intro
 
-### Intro
-
-PostgreSQL users can now connect their data to Domo through Cloud Amplifier integrations. Integrating PostgreSQL with Domo is now as simple as providing connection parameters and selecting tables that you want to see as Domo DataSets.
+This article explains how to connect Domo's Cloud Integrations to PostgreSQL, allowing you to query and visualize PostgreSQL data directly in Domo without moving or duplicating data.
 
 ---
 
-### Create a PostgreSQL Integration
+## Prerequisites
 
-1. In Domo, go to the
-   <InlineImage src="/images/kb/ka0Vq000000BENp-00N5w00000Ri7BU-0EMVq000004mhMv.jpg" /> **Data Warehouse** and select <InlineImage src="/images/kb/ka0Vq000000BCNd-00N5w00000Ri7BU-0EMVq000000uSeO.jpg" /> **Add New Cloud Account** to open the connection modal.
-2. Under
-   **Native integration**, choose **See More**
-   >
-   **PostgreSQL**.
-3. Select
-   **Add New Integration**. (If there are existing integrations, this option displays at the bottom of the list.)
-4. Enter the information listed in the table below and select
-   **Next**.
+You must have an account with access to PostgreSQL to move forward.
+
+## Create or Manage Your PostgreSQL Integrations
+
+To access the integration management interface, follow these steps:
+
+1. Navigate to **Data Warehouse**.
+2. Select **Connect Data**.
+3. From the list of Cloud Integrations, choose **PostgreSQL**.  
+   The **Domo on PostgreSQL** page appears.
+4. Select **Connect PostgreSQL** to start creating a new integration (see the [integration setup instructions](#create-a-postgresql-integration-in-domo)).
+5. Select **Manage Integrations** to modify existing integrations.  
+   A list of available integrations displays.
+6. Select the wrench icon next to an integration to view available options.  
+   The options shown depend on your access level.
+
+<Frame>![Screenshot](/images/kb/0EMVu00000T95PZ.jpg)</Frame>
+
+## Create a PostgreSQL Integration in Domo
+
+Every PostgreSQL integration in Domo requires an authenticated service account. Once created, a single service account can be reused across multiple integrations.
+
+Follow these steps to create a PostgreSQL Integration in Domo.
+
+1. Provide a name for the integration. This is simply a label to help you identify the integration within Domo. It does not need to match any names in PostgreSQL and can be changed later if needed.  
+
    
-   <table cellspacing="1" cellpadding="1" border="1"><thead><tr><th rowspan="1" colspan="1">
-   <p>Parameter</p>
-   </th><th rowspan="1" colspan="1">
-   <p>Description</p>
-   </th></tr></thead><tbody><tr><td rowspan="1" colspan="1">
-   <p>Integration name</p>
-   </td><td rowspan="1" colspan="1">
-   <p>This is how you can find your integration in the PostgreSQL integrations list for future updates.</p>
-   </td></tr><tr><td rowspan="1" colspan="1">
-   <p>(Optional) Description</p>
-   </td><td rowspan="1" colspan="1">
-   <p>Enter any additional information about the integration.</p>
-   </td></tr><tr><td rowspan="1" colspan="1">
-   <p>PostgreSQL connection URL</p>
-   </td><td rowspan="1" colspan="1">
-   <p>Enter the host and port that represents the PostgreSQL instance you want to connect to.&nbsp;<em>Example:</em> &lt;&lt;<em><a rel="noopener" target="_blank" href="http://myhost.com">myhost.com</a></em>&gt;&gt;</p>
-   </td></tr><tr><td rowspan="1" colspan="1">
-   <p>PostgreSQL connection port</p>
-   </td><td rowspan="1" colspan="1">
-   <p>Enter the port where your PostgreSQL instance is running.&nbsp;<em>Example:&nbsp;</em>&lt;&lt;<em>5432</em>&gt;&gt;</p>
-   </td></tr><tr ><td rowspan="1" colspan="1">
-   <p>PostgreSQL database name</p>
-   </td><td rowspan="1" colspan="1">
-   <p>Enter the name of the database you want to connect to.&nbsp;<em>Example:&nbsp;</em>&lt;&lt;<em>defaultdb</em>&gt;&gt;</p>
-   </td></tr><tr ><td rowspan="1" colspan="1">
-   <p>PostgreSQL username</p>
-   </td><td rowspan="1" colspan="1">
-   <p>Enter the name of your PostgreSQL username.</p>
-   </td></tr><tr ><td rowspan="1" colspan="1">
-   <p>PostgreSQL password</p>
-   </td><td rowspan="1" colspan="1">
-   <p>Enter the password for the user in the previous field.</p>
-   </td></tr></tbody></table>
-5. Configure the caching options and select
-   **Next**. Learn about Cloud Amplifier's [caching rules](https://domo-support.domo.com/s/article/4412849158167?language=en_US#caching_rules).
-     
-   A success message displays.
-     
-   <Frame><img alt="Screenshot 2024-12-19 at 8.50.24 PM.png" src="/images/kb/ka0Vq000000G1sz-00N5w00000Ri7BU-0EMVq000004SdXC.jpg" style={{width: 899, height: 419}}/></Frame>
+<Tip>**Tip:** Multiple PostgreSQL integrations can exist in the same Domo instance, created by you or your colleagues. Clear naming helps users select the correct integration later. For example, separate integrations might be created to connect different tables or manage access levels.
+2. Add a description to explain the purpose of this integration and who created it. Most users will only see the integration name in menus and lists. The description is visible only when viewing integration details.
+3. Select an existing PostgreSQL service account from the drop-down menu or select **Add account** to create a new one.  
+   You can change the service account later, but switching accounts may require remapping DataSets and ETLs if the new account lacks access to previously used tables. User access may also be affected unless privileges are identical.
+4. Enter the name of the Database that contains your PostgreSQL tables.</Tip>
 
-6. Use the table picker to choose the PostgreSQL schemas and tables to connect to Domo.
-7. Select
-   **Create DataSets** to open the sharing modal. You have the option to share the data with individuals and groups in Domo and choose their access level.
+**Understand the Architecture**
 
-You can now access your PostgreSQL DataSets in the Domo **DataSets** feature.
+There are three levels in this setup:
 
-<Frame><img alt="postgresql last.jpg" src="/images/kb/ka0Vq000000G1sz-00N5w00000Ri7BU-0EMVq000004mhRm.jpg" style={{width: 900, height: 336}}/></Frame>
+- PostgreSQL instance – Exists independently of Domo.
+- PostgreSQL service account – Defined in Domo and connects to the PostgreSQL instance.
+- PostgreSQL integration – Uses the service account and adds settings such as connected tables and caching behavior.
+
+<Note>**Note:** Multiple service accounts can connect to the same PostgreSQL instance. Multiple integrations can share a single service account.</Note>
+
+**Access and Sharing**
+
+- Initially, only the owner of the service account has access.
+- The owner can share access with individuals or groups.
+- If multiple integrations use the same service account, they inherit the same user privileges.
+- Changes to privileges affect all integrations tied to that account.
+
+To review access settings, go to the Accounts Page and select Account sharing next to the relevant PostgreSQL service account.
+
+<Tip>**Tip:** You can create multiple service accounts for the same PostgreSQL instance.  
+Reasons for doing this include:   
+Example A: Managing user access separately for different integrations.   
+Example B: Applying different caching TTL settings while sharing user access.</Tip>
+
+<Frame>![Screenshot](/images/kb/0EMVu00000T960f.jpg)</Frame>
+
+## Create a PostgreSQL Service Account in Domo
+
+Every PostgreSQL integration in Domo relies on an authenticated PostgreSQL service account. Once created, this account can be reused across multiple PostgreSQL integrations.
+
+Domo provides a dedicated Accounts Page where you can create and manage service accounts for various external services, including PostgreSQL. After creation, your PostgreSQL service account will appear on this page.
+
+<Warning>**Important:** Creating a PostgreSQL service account in Domo allows you, other account owners, Domo admins, and anyone with whom the account is shared, to use its credentials to access PostgreSQL and create connected DataSets in Domo. Users will not have access to sensitive values such as passwords, tokens, or keys used by the service account to connect to PostgreSQL.</Warning>
+
+Follow these steps to create a PostgreSQL service account in Domo.
+
+1. Choose a name to identify this PostgreSQL service account within Domo.
+
+   - The name can be changed later
+   - Use clear, distinctive names to avoid confusion between PostgreSQL accounts and integrations
+   - You can create multiple service accounts, even if they all point to the same PostgreSQL instance
+2. Enter the name of your server or its IP address.
+3. Enter the port that your PostgreSQL instance is using for incoming connections.
+4. Enter your PostgreSQL Username.
+5. Enter your PostgreSQL Password.
+
+<Frame>![Screenshot](/images/kb/0EMVu00000T96Ld.jpg)</Frame>

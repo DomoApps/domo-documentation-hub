@@ -1,198 +1,170 @@
 ---
 title: "ADP Connector"
+excerpt: "Use Domo's ADP connector to import ADP Workforce Now HR reports into a DataSet."
 ---
-
 
 ## Intro
 
- ADP Workforce Now is a web-based human resources (HR) application designed especially for midsize businesses.  Use Domo's ADP connector to import reports from ADP Workforce Now. To learn more about the ADP API, visit their page at
- https://developers.adp.com/.
- 
- You connect to your ADP account in the Data Center. This topic discusses the fields and menus that are specific to the ADP connector user interface. General information for adding DataSets, setting update schedules, and editing DataSet information is discussed in [Adding a DataSet Using a Data Connector](/s/article/360042926274 "Adding a DataSet Using a Data Connector")  .
- 
- <Warning>
-   **Important** 
+ADP Workforce Now is a web-based human resources (HR) application designed especially for midsize businesses.  Use Domo's ADP connector to import reports from ADP Workforce Now. To learn more about the ADP API, visit their page at [https://developers.adp.com/](https://developers.adp.com/).
 
-   Certain Connectors require an API usage fee charged to you by the company, not Domo, depending on your accounts with that company. Use of this Connector may require an API usage fee.
+You connect to your ADP account in the Data Center. This topic discusses the fields and menus that are specific to the ADP connector user interface. General information for adding DataSets, setting update schedules, and editing DataSet information is discussed in [Adding a DataSet Using a Data Connector](/s/article/360042926274).
 
- </Warning>
+<Warning> **Important****:** Certain Connectors require an API usage fee charged to you by the company, not Domo, depending on your accounts with that company. Use of this Connector may require an API usage fee.</Warning>
 
 ## Prerequisites
 
- To connect to your ADP account and create a DataSet, you must have the following:
- 
-* The network username and password for your ADP account
-* The PKCS12-formatted Mutual Authentication Certificate store generated for your ADP account (must be encoded in Base 64)
-* The password needed to open your Mutual Authentication Certificate
+To connect to your ADP account and create a DataSet, you must have the following:
 
-**A Set up guide and instructions to get started:** 
+- The network username and password for your ADP account
+- The PKCS12-formatted Mutual Authentication Certificate store generated for your ADP account (must be encoded in Base 64)
+- The password needed to open your Mutual Authentication Certificate
 
-* [Introduction to ADP](https://developers.adp.com/articles/general/introduction-to-adp-api-open-data-protocol-odata)
-* [Getting started](https://developers.adp.com/articles/guides/adp-marketplace---getting-started)
+**A Set up guide and instructions to get started:**
 
-
+- [Introduction to ADP](https://developers.adp.com/articles/general/introduction-to-adp-api-open-data-protocol-odata)
+- [Getting started](https://developers.adp.com/articles/guides/adp-marketplace---getting-started)
 
 ## Connecting to Your ADP Account
 
- This section enumerates the options in the **Credentials**  and **Details**  panes in the ADP Connector page. The components of the other panes in this page, **Scheduling**  and **Name & Describe Your DataSet**  , are universal across most connector types and are discussed in greater length in [Adding a DataSet Using a Data Connector](/s/article/360042926274 "Adding a DataSet Using a Data Connector")  .
-
+This section enumerates the options in the **Credentials** and **Details** panes in the ADP Connector page. The components of the other panes in this page, **Scheduling** and **Name & Describe Your DataSet**, are universal across most connector types and are discussed in greater length in [Adding a DataSet Using a Data Connector](/s/article/360042926274).
 
 ### Credentials Pane
 
- This pane contains fields for entering credentials to connect to your ADP account. The following table describes what is needed for each field:
+This pane contains fields for entering credentials to connect to your ADP account. The following table describes what is needed for each field:  
 
-<table border="1" cellpadding="1" cellspacing="1" data-aura-rendered-by="33:205;a"><thead><tr><th colspan="1" rowspan="1"><p><span class="s1"> Field </span></p></th><th colspan="1" rowspan="1"><p><span class="s1"> Description </span></p></th></tr></thead><tbody><tr><td colspan="1" rowspan="1"><p> Network Username </p></td><td colspan="1" rowspan="1"><p> Enter the network username for your ADP account. </p></td></tr><tr><td colspan="1" rowspan="1"><p> Network Password </p></td><td colspan="1" rowspan="1"><p> Enter the network password for your ADP account. </p></td></tr><tr><td colspan="1" rowspan="1"><p> Mutual Authentication Certificate </p></td><td colspan="1" rowspan="1"><p> Paste the Base 64-encoded PKCS12-formatted certificate store that was generated for your account. The certificate <em> must </em> be encoded in Base 64. </p></td></tr><tr><td colspan="1" rowspan="1"><p> Certificate Password </p></td><td colspan="1" rowspan="1"><p> Enter the password needed to open your Mutual Authentication Certificate. </p></td></tr></tbody></table>
+| Field | Description |
+| --- | --- |
+| Network Username | Enter the network username for your ADP account. |
+| Network Password | Enter the network password for your ADP account. |
+| Mutual Authentication Certificate | Paste the Base 64-encoded PKCS12-formatted certificate store that was generated for your account. The certificate *must* be encoded in Base 64. |
+| Certificate Password | Enter the password needed to open your Mutual Authentication Certificate. |
 
- Once you have entered valid ADP credentials, you can use the same account any time you go to create a new ADP DataSet. You can manage connector accounts in the **Accounts**  tab in the Data Center. For more information about this tab, see [Managing User Accounts for Connectors](/s/article/360042926054 "Managing User Accounts for Connectors")  .
+Once you have entered valid ADP credentials, you can use the same account any time you go to create a new ADP DataSet. You can manage connector accounts in the **Accounts** tab in the Data Center. For more information about this tab, see [Managing User Accounts for Connectors](/s/article/360042926054).
 
-
- 
 ### Creating a Mutual Authentication Certificate
 
- A Certificate Signing Request (CSR) is required for accessing ADP Application Programming Interfaces (APIs) and authenticating users with single sign-on (SSO). A private key and matching Web Services (WS) Certificate is required to access ADP web services. The WS Certificate provides client information to ADP and the matching private key confirms the authenticity of the client.
- 
- To generate the WS Certificate, a CSR needs to be generated by the client. During the CSR generation, the private key and matching public key are created. The CSR is submitted to the ADP Web Services Certificate Authority (currently run by Sectigo/Comodo) and they return the WS Certificate. Many software tools store the private key and the WS Certificate in one Personal Information Exchange Format (PFX), also known as a P12 file.
- 
- Open Secure Sockets Layer (OpenSSL) is an open-source tool. Although ADP has tested the commands based on the OS, configuration settings, and other environmental factors, the commands and configuration may have to be adjusted. Clients will need to check and support the OpenSSL tool from their own IT department.
- 
- Clients need to ensure that every time new private and public keys are created, they are managed properly. If they are generated more than once, each key pair must be stored (possibly in different directories) so there is no confusion. In addition, the returned Web Services Certificate (which also contains the public key) must be managed properly (stored in the directory that has the matching private key). For more information, see
- https://developers.adp.com/articles/general/generate-a-certificate-signing-request.
- 
-**To complete a Certificate Signing Request, do the following:** 
+A Certificate Signing Request (CSR) is required for accessing ADP Application Programming Interfaces (APIs) and authenticating users with single sign-on (SSO). A private key and matching Web Services (WS) Certificate is required to access ADP web services. The WS Certificate provides client information to ADP and the matching private key confirms the authenticity of the client.
 
-1. Download OpenSSL Light for Windows at:
- http://slproweb.com/products/Win32OpenSSL.html
- . Mac users can open Terminal and jump to the OpenSSL commands in step 5.
+To generate the WS Certificate, a CSR needs to be generated by the client. During the CSR generation, the private key and matching public key are created. The CSR is submitted to the ADP Web Services Certificate Authority (currently run by Sectigo/Comodo) and they return the WS Certificate. Many software tools store the private key and the WS Certificate in one Personal Information Exchange Format (PFX), also known as a P12 file.
+
+Open Secure Sockets Layer (OpenSSL) is an open-source tool. Although ADP has tested the commands based on the OS, configuration settings, and other environmental factors, the commands and configuration may have to be adjusted. Clients will need to check and support the OpenSSL tool from their own IT department.
+
+Clients need to ensure that every time new private and public keys are created, they are managed properly. If they are generated more than once, each key pair must be stored (possibly in different directories) so there is no confusion. In addition, the returned Web Services Certificate (which also contains the public key) must be managed properly (stored in the directory that has the matching private key). For more information, see [https://developers.adp.com/articles/general/generate-a-certificate-signing-request](https://developers.adp.com/articles/general/generate-a-certificate-signing-request).
+
+**To complete a Certificate Signing Request, do the following:**
+
+1. Download OpenSSL Light for Windows at: [http://slproweb.com/products/Win32OpenSSL.html](http://slproweb.com/products/Win32OpenSSL.html). Mac users can open Terminal and jump to the OpenSSL commands in step 5.
 2. To install OpenSSL, follow the instructions in the Install Wizard.
-3. Open
- **cmd.exe**.
-4. Go to the location where you installed OpenSSL and at the command line, type
- **cd C:\Program Files (x86)\OpenSSL-Win32\bin (or C:\Program Files\OpenSSL-Win64\bin for 64-bit)**.
+3. Open **cmd.exe**.
+4. Go to the location where you installed OpenSSL and at the command line, type **cd C:\Program Files (x86)\OpenSSL-Win32\bin (or C:\Program Files\OpenSSL-Win64\bin for 64-bit)**.
 5. Generate the CSR:
-	1. **openssl genrsa -out companyname\_auth.key 2048**
-	2. **openssl req -new -key companyname\_auth.key -out companyname\_auth.csr** 
-	  
-	<Note>
-	  **Note:** 
-	  Your CSR must not request S/MIME capabilities.
+   1. **openssl genrsa -out companyname\_auth.key 2048**
+   2. **openssl req -new -key companyname\_auth.key -out companyname\_auth.csr**  
 
-	</Note>
-
+      
+<Note>**Note:** Your CSR must not request S/MIME capabilities.</Note>
 6. Enter the following information into your CSR. Leave the challenge password blank.
-	1. Country Name.
-	2. State or Province Name.
-	3. Locality Name.
-	4. Organization Name (must be the same string used by your organization when registered with ADP.)
-	5. Common Name (use something meaningful, such as CompanyName Corp Mutual SSL or whatever best describes the usage and identifies this as the Mutual SSL Authentication certificate.)
-	6. Challenge password (leave this field blank.)
-7. After you have created your CSR, you have two options for submitting it to ADP for signing. If you’re currently in the process of implementing ADP APIs, you can email your CSR to your assigned ADP implementation representative for signing. Otherwise, follow these steps to submit your request directly to ADP Security Services:
-	1. Open the [ADP Certificate Signing Tool](https://cert-manager.com/customer/adp/device/adpwebservices)  (no login is required.)
-	2. Choose	**Authentication and transaction signing**  for the certificate type.
-	3. Enter your technical contact’s email.
-	4. Enter your company name and ADP client ID.
-	   
-	<Note>
-	  **Note:** 
-	  If you are an ADP Workforce Now client, your ADP client ID is all the characters to the right of the @ symbol in your ADP Workforce Now login name. If you don't know your ADP client ID, contact your ADP representative.
+   1. Country Name.
+   2. State or Province Name.
+   3. Locality Name.
+   4. Organization Name (must be the same string used by your organization when registered with ADP.)
+   5. Common Name (use something meaningful, such as CompanyName Corp Mutual SSL or whatever best describes the usage and identifies this as the Mutual SSL Authentication certificate.)
+   6. Challenge password (leave this field blank.)
+7. After you have created your CSR, you have two options for submitting it to ADP for signing. If you're currently in the process of implementing ADP APIs, you can email your CSR to your assigned ADP implementation representative for signing. Otherwise, follow these steps to submit your request directly to ADP Security Services:
+   1. Open the [ADP Certificate Signing Tool](https://cert-manager.com/customer/adp/device/adpwebservices) (no login is required.)
+   2. Choose **Authentication and transaction signing** for the certificate type.
+   3. Enter your technical contact's email.
+   4. Enter your company name and ADP client ID.
 
-	</Note>
+      
+<Note>**Note:** If you are an ADP Workforce Now client, your ADP client ID is all the characters to the right of the @ symbol in your ADP Workforce Now login name. If you don't know your ADP client ID, contact your ADP representative.</Note>
+   5. Enter your technical contact's first and last name and a group distribution list to be automatically notified when the generated certificate is reaching its two-year expiration date.
+   6. Paste the complete contents (including **BEGIN CERTIFICATE REQUEST** and **END CERTIFICATE REQUEST**) of your CSR into the CSR text box.
+   7. Click **Submit**.
 
-	5. Enter your technical contact’s first and last name and a group distribution list to be automatically notified when the generated certificate is reaching its two-year expiration date.
-	6. Paste the complete contents (including **BEGIN CERTIFICATE REQUEST**  and **END CERTIFICATE REQUEST**  ) of your CSR into the CSR text box.
-	7. Click **Submit**.
-	   
-	 <Note>
-	   **Note:** 
-	   It might take up to a week to sign the CSR.
-
-	 </Note>
-
-8. Save the signed certificate from ADP into a file named
- **companyname\_auth.pem**  in the same location that you initially created the CSR ( **C:\Program Files (x86)\OpenSSL-Win32\bin**  ).
-9. If you are using Windows/IIS, use the following command to get the key and certificate in
- **PKCS12 format:
-   
- openssl pkcs12 -export -out companyname\_auth.pfx -name “Company Name Mutual SSL” -inkey companyname\_auth.key -in companyname\_auth.pem**
+      
+<Note>**Note:** It might take up to a week to sign the CSR.</Note>
+8. Save the signed certificate from ADP into a file named **companyname\_auth.pem** in the same location that you initially created the CSR (**C:\Program Files (x86)\OpenSSL-Win32\bin**).
+9. If you are using Windows/IIS, use the following command to get the key and certificate in **PKCS12 format:  
+   openssl pkcs12 -export -out companyname\_auth.pfx -name “Company Name Mutual SSL” -inkey companyname\_auth.key -in companyname\_auth.pem**
 10. Enter the **Export Password**.
 
- The resulting certificate and key should be in the file **companyname\_auth.pfx**  that you'll reference for Mutual SSL authentication.
- 
-**To convert the .pfx file to base64 encoded string do the following:** 
+The resulting certificate and key should be in the file **companyname\_auth.pfx** that you'll reference for Mutual SSL authentication.
 
-**Windows (Use PowerShell):** 
+**To convert the .pfx file to base64 encoded string do the following:**
 
-```json
+**Windows (Use PowerShell):**
+
+```
 [convert]::ToBase64String((Get-Content -path "your_pfx_file_path" -Encoding byte)) > "output_file_name.txt"
 ```
 
-**Linux:** 
+**Linux:**
 
 ```
 base64 "your_pfx_file_path" > "output_file_name.text"
 ```
 
-<Note>
-  **Note:** 
-  Make sure you safeguard the .key, .pfx, and .jks files. Anyone that possesses these confidential files has access to the web service.
-
-</Note>
+<Note>**Note:** Make sure you safeguard the .key, .pfx, and .jks files. Anyone that possesses these confidential files has access to the web service.</Note>
 
 ### Details Pane
 
- This pane contains a primary **Reports** menu from which you select an ADP Workforce Now report to import, along with several other configuration options.
- 
-<table border="1" cellpadding="1" cellspacing="1" data-aura-rendered-by="33:205;a"><thead><tr><th colspan="1" rowspan="1"><p> Menu </p></th><th colspan="1" rowspan="1"><p> Description </p></th></tr></thead><tbody><tr><td colspan="1" rowspan="1"><p> Report </p></td><td colspan="1" rowspan="1"><p> Select the ADP Workforce Now report you want to import into Domo. </p></td></tr><tr><td colspan="1" rowspan="1"><p> Filter Query (Optional) </p></td><td colspan="1" rowspan="1"><p> Enter a <code> \$filter </code> query to filter the fields in your report. Please include only the specific query, not the <code> \$filter= </code> portion of the parameter string. For more information about building queries, see ADP's developer documentation at <a href="https://developers.adp.com/" target="_blank" title="https://developers.adp.com/"> https://developers.adp.com/ </a> . </p></td></tr><tr><td colspan="1" rowspan="1"><p> Select Query (Optional) </p></td><td colspan="1" rowspan="1"><p> Enter a <code> \$select </code> query for your report. Please include only the specific query, not the <code> \$select= </code> portion of the parameter string. For more information about building queries, see ADP's developer documentation at <a href="https://developers.adp.com/" target="_blank" title="https://developers.adp.com/"> https://developers.adp.com/ </a> . </p></td></tr><tr><td colspan="1" rowspan="1"><p> Unmask Data (Optional) </p></td><td colspan="1" rowspan="1"><p> When this box is checked, returned data will not be masked, so long as specified account has access to view all the data. </p></td></tr></tbody></table>
+This pane contains a primary **Reports** menu from which you select an ADP Workforce Now report to import, along with several other configuration options.
+
+| Menu | Description |
+| --- | --- |
+| Report | Select the ADP Workforce Now report you want to import into Domo. |
+| Filter Query (Optional) | Enter a $filter query to filter the fields in your report. Please include only the specific query, not the $filter= portion of the parameter string. For more information about building queries, see ADP's developer documentation at [https://developers.adp.com/](https://developers.adp.com/). |
+| Select Query (Optional) | Enter a $select query for your report. Please include only the specific query, not the $select= portion of the parameter string. For more information about building queries, see ADP's developer documentation at [https://developers.adp.com/](https://developers.adp.com/). |
+| Unmask Data (Optional) | When this box is checked, returned data will not be masked, so long as specified account has access to view all the data. |
 
 ### Other Panes
 
- For information about the remaining sections of the connector interface, including how to configure scheduling, retry, and update options, see [Adding a DataSet Using a Data Connector](/s/article/360042926274 "Adding a DataSet Using a Data Connector")  .
+For information about the remaining sections of the connector interface, including how to configure scheduling, retry, and update options, see [Adding a DataSet Using a Data Connector](/s/article/360042926274).
 
-
- 
 ## Using SFTP Export
 
- One of the easiest ways to get your ADP data into Domo is by using ADP's SFTP export capability. To do this, you will first need to request SFTP Export from the ADP Reporting module, then set up an SFTP server for use in pulling reports. You will only need to go through this setup process once. There is a small one-time fee (around \$200-\$300). Once the server is set up, you can pull any number of reports with no additional fee.
- 
- To pull reports, you build them in ADP, specify that they be sent via SFTP, and finally pull them into Domo using the CSV Advanced or SFTP connectors.
+One of the easiest ways to get your ADP data into Domo is by using ADP's SFTP export capability. To do this, you will first need to request SFTP Export from the ADP Reporting module, then set up an SFTP server for use in pulling reports. You will only need to go through this setup process once. There is a small one-time fee (around $200-$300). Once the server is set up, you can pull any number of reports with no additional fee.
 
+To pull reports, you build them in ADP, specify that they be sent via SFTP, and finally pull them into Domo using the CSV Advanced or SFTP connectors.
 
- 
 ### Setting up SFTP
 
-**To set up an SFTP server for use in pulling ADP reports,** 
+**To set up an SFTP server for use in pulling ADP reports,**
 
-1. Work with your ADP representative to request SFTP Export from the ADP Reporting module.
-   
- Your ADP representative will send you a Statement of Work (SOW) to fill out. The following PDF shows an example of this:
-   
-<Columns>
-  <Frame><img alt="Requesting_SFTP_Account_Page1.jpg" src="/images/kb/ka0Vq000000TPO1-00N5w00000Ri7BU-0EM5w000005vO24.jpg"/></Frame>
-  <Frame><img alt="Requesting_an_SFTP_Account_Page2.jpg" src="/images/kb/ka0Vq000000TPO1-00N5w00000Ri7BU-0EM5w000005vO23.jpg"/></Frame>
-</Columns>
-2. Enter the details for your SFTP server.
-   
-<Note>
-  **Note:** 
-  If you like, Domo can host your SFTP server. If you are interested, please reach out to your CSM for more information.
+1. Work with your ADP representative to request SFTP Export from the ADP Reporting module.  
+     
+   Your ADP representative will send you a Statement of Work (SOW) to fill out. The following PDF shows an example of this:  
 
-</Note>
+   <Frame>![Requesting_SFTP_Account_Page1.jpg](/images/kb/0EM5w000005vO24.jpg)</Frame>
 
-3. When requested, send ADP a report to use in testing the setup. (Any ADP report should work.)
+     
+
+   <Frame>![Requesting_an_SFTP_Account_Page2.jpg](/images/kb/0EM5w000005vO23.jpg)</Frame>
+2. Enter the details for your SFTP server.   
+
    
- ADP will then send a test and ask you to confirm receipt.
+<Note>**Note:** If you like, Domo can host your SFTP server. If you are interested, please reach out to your CSM for more information.</Note>
+3. When requested, send ADP a report to use in testing the setup. (Any ADP report should work.)  
+     
+   ADP will then send a test and ask you to confirm receipt.
 4. Confirm receipt of the test you have been sent.
 
- Once you confirm receipt, the server is live and you can begin using it to pull reports into Domo.
+Once you confirm receipt, the server is live and you can begin using it to pull reports into Domo.
 
-
- 
 ### Pulling Data into Domo Using SFTP
 
-**To pull a report into Domo using the SFTP server you have set up,** 
+**To pull a report into Domo using the SFTP server you have set up,**
 
 1. Build a report in ADP's reporting tool.
 2. Schedule the report in step 7 in the ADP report builder.
 3. In the
  **Distribution**  settings, specify that the report be sent via SFTP.
 4. Use Domo's
- [Microsoft Excel SFTP Push](/s/article/360043436733 "CSV Advanced Connector") to pull the report into Domo.
+ [Microsoft Excel SFTP Push](/s/article/360043436733 "CSV Advanced Connector") to pull the report into Domo.
+3. In the **Distribution** settings, specify that the report be sent via SFTP.
+4. Use Domo's [Microsoft Excel SFTP Push](/s/article/360043436733) to pull the report into Domo.
+
+### SFTP Server Setup Instructions (for CSMs)
+
+For information about creating an SFTP account for a client, go to [Requesting an SFTP Account](/s/article/360043441633).

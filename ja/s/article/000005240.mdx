@@ -1,96 +1,81 @@
 ---
 title: "APIクライアントの管理"
+excerpt: "管理者設定で API クライアントを作成、表示、取り消す方法を説明し、関連する許可とインスタンス全体での管理機能を解説します。"
 ---
 
-import { InlineImage } from "/snippets/InlineImage.mdx";
-
-### はじめに
+## はじめに
 
 管理者設定のAPIクライアント機能を使用すると、独自のAPIクライアントを作成および管理でき、管理者ユーザーはインスタンスのすべてのAPIクライアントを管理できます。APIクライアントでは、クライアントとそのスコープのリストが表示され、不要になったクライアントを取り消すことができます。
 
 ---
 
-* [必要な許可](#required_grants)
-* [APIクライアントにアクセスする](#access_api_clients)
-* [APIクライアントを作成する](#create_api_clients)
-* [APIクライアントを閲覧および管理する](#view_manage_clients)
-  + [クライアントを削除する](#delete_client)
-
----
-
-### 必要な許可
+## 必要な許可
 
 APIクライアント機能にアクセスするには、次のいずれかの許可が必要です。
 
-* **API OAuthクライアントを作成 —** 独自のAPIクライアントを閲覧および取り消しできます。APIクライアントを作成するには、この許可が必要です。
-* **（管理者のみ）全てのアクセストークンとAPIクライアントを管理 —** 管理者がDomoインスタンス内のすべてのAPIクライアントを閲覧および取り消しできます。
+- **API OAuthクライアントを作成 —** 独自のAPIクライアントを閲覧および取り消しできます。APIクライアントを作成するには、この許可が必要です。
+- **（管理者のみ）全てのアクセストークンとAPIクライアントを管理 —** 管理者がDomoインスタンス内のすべてのAPIクライアントを閲覧および取り消しできます。
 
 以下の表に、許可ごとの違いを示します。
 
-<table border="1" cellpadding="1" cellspacing="1" data-aura-rendered-by="33:206;a"><thead><tr><th colspan="1" rowspan="1"><p> アクセス </p></th><th colspan="1" rowspan="1"><p> API OAuth <br/> クライアントを作成 </p></th><th colspan="1" rowspan="1"><p> 全てのアクセストークンと <br/> APIクライアントを管理 </p></th></tr></thead><tbody><tr><td colspan="1" rowspan="1"><p> クライアントの作成 </p></td><td colspan="1" rowspan="1"><p><InlineImage src="/images/kb/ja/ka0Vq000000KNbc-00N5w00000Ri7BU-0EMVq000004rbAP.jpg" /></p></td><td colspan="1" rowspan="1"><p><InlineImage src="/images/kb/ja/ka0Vq000000KNbc-00N5w00000Ri7BU-0EMVq000004rbIT.jpg" /></p></td></tr><tr><td colspan="1" rowspan="1"><p> 自分が所有しているクライアントの閲覧 </p></td><td colspan="1" rowspan="1"><p><InlineImage src="/images/kb/ja/ka0Vq000000KNbc-00N5w00000Ri7BU-0EMVq000004rbAP-1.jpg" /></p></td><td colspan="1" rowspan="1"><p><InlineImage src="/images/kb/ja/ka0Vq000000KNbc-00N5w00000Ri7BU-0EMVq000004rbAP-2.jpg" /></p></td></tr><tr><td colspan="1" rowspan="1"><p> インスタンス内のすべてのクライアントの閲覧 </p></td><td colspan="1" rowspan="1"><p><InlineImage src="/images/kb/ja/ka0Vq000000KNbc-00N5w00000Ri7BU-0EMVq000004rbIT-1.jpg" /></p></td><td colspan="1" rowspan="1"><p><InlineImage src="/images/kb/ja/ka0Vq000000KNbc-00N5w00000Ri7BU-0EMVq000004rbAP-3.jpg" /></p></td></tr><tr><td colspan="1" rowspan="1"><p> 作成したクライアントの削除/取り消し <a id="access_api_clients" target="_blank"></a></p></td><td colspan="1" rowspan="1"><p><InlineImage src="/images/kb/ja/ka0Vq000000KNbc-00N5w00000Ri7BU-0EMVq000004rbAP-4.jpg" /></p></td><td colspan="1" rowspan="1"><p><InlineImage src="/images/kb/ja/ka0Vq000000KNbc-00N5w00000Ri7BU-0EMVq000004rbAP-5.jpg" /></p></td></tr><tr><td colspan="1" rowspan="1"><p> インスタンス内のすべてのクライアントのアクセス権の取り消し </p></td><td colspan="1" rowspan="1"><p><InlineImage src="/images/kb/ja/ka0Vq000000KNbc-00N5w00000Ri7BU-0EMVq000004rbIT-2.jpg" /></p></td><td colspan="1" rowspan="1"><p><InlineImage src="/images/kb/ja/ka0Vq000000KNbc-00N5w00000Ri7BU-0EMVq000004rbAP-6.jpg" /></p></td></tr></tbody></table>
+| アクセス                          | API OAuth クライアントを作成                                                                                                                                         | 全てのアクセストークンと APIクライアントを管理                                                                                                                                   |
+| ----------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| クライアントの作成                     | <img alt="checkmark.jpeg" src="/images/kb/ja/0EMVq000004rbAP.jpg" style={{width: 35, height: 36, display: 'inline', verticalAlign: 'start', margin: '0'}}/> | <img alt="red x.jpeg" src="/images/kb/ja/0EMVq000004rbIT.jpg" style={{width: 32, height: 29, display: 'inline', verticalAlign: 'start', margin: '0'}}/>     |
+| 自分が所有しているクライアントの閲覧            | <img alt="checkmark.jpeg" src="/images/kb/ja/0EMVq000004rbAP.jpg" style={{width: 35, height: 36, display: 'inline', verticalAlign: 'start', margin: '0'}}/> | <img alt="checkmark.jpeg" src="/images/kb/ja/0EMVq000004rbAP.jpg" style={{width: 35, height: 36, display: 'inline', verticalAlign: 'start', margin: '0'}}/> |
+| インスタンス内のすべてのクライアントの閲覧         | <img alt="red x.jpeg" src="/images/kb/ja/0EMVq000004rbIT.jpg" style={{width: 32, height: 29, display: 'inline', verticalAlign: 'start', margin: '0'}}/>     | <img alt="checkmark.jpeg" src="/images/kb/ja/0EMVq000004rbAP.jpg" style={{width: 35, height: 36, display: 'inline', verticalAlign: 'start', margin: '0'}}/> |
+| 作成したクライアントの削除/取り消し            | <img alt="checkmark.jpeg" src="/images/kb/ja/0EMVq000004rbAP.jpg" style={{width: 35, height: 36, display: 'inline', verticalAlign: 'start', margin: '0'}}/> | <img alt="checkmark.jpeg" src="/images/kb/ja/0EMVq000004rbAP.jpg" style={{width: 35, height: 36, display: 'inline', verticalAlign: 'start', margin: '0'}}/> |
+| インスタンス内のすべてのクライアントのアクセス権の取り消し | <img alt="red x.jpeg" src="/images/kb/ja/0EMVq000004rbIT.jpg" style={{width: 32, height: 29, display: 'inline', verticalAlign: 'start', margin: '0'}}/>     | <img alt="checkmark.jpeg" src="/images/kb/ja/0EMVq000004rbAP.jpg" style={{width: 35, height: 36, display: 'inline', verticalAlign: 'start', margin: '0'}}/> |
 
-### APIクライアントにアクセスする
+## APIクライアントにアクセスする
 
-**［管理者］** > **［認証］** > **［APIクライアント］** に移動します。
+**［管理者］**>**［認証］**>**［APIクライアント］**に移動します。
 
-<Frame><img alt="" src="/images/kb/ka0Vq000000G1wD-00N5w00000Ri7BU-0EMVq000007Rbp4.jpg" style={{width: 748, height: 190}}/></Frame>
-[このページのトップへ](#intro)
+<Frame>![Screenshot](/images/kb/ja/0EMVq000007Rbp4.jpg)</Frame>
 
-### APIクライアントを作成する
+## APIクライアントを作成する
 
-<Note>
-  **注記：** 現在はAPIクライアントを [Domoデベロッパーポータル](https://developer.domo.com) <InlineImage src="/images/kb/ja/ka0Vq000000KNbc-00N5w00000Ri7BU-0EMVq000004oUwf.jpg" /> でも作成できますが、この機能は今後削除される予定です。
+<Note>**注記：**現在はAPIクライアントを[Domoデベロッパーポータル](https://developer.domo.com) </Note><img alt="external link icon.png" src="/images/kb/ja/0EMVq000004oUwf.jpg" style={{width: 17, height: 17, display: 'inline', verticalAlign: 'start', margin: '0'}}/>
 
-</Note>
+でも作成できますが、この機能は今後削除される予定です。
 
-［API OAuthクライアントを作成］の [許可](#required_grants) を持つユーザーは、次の手順を実行してクライアントを作成できます。
+［API OAuthクライアントを作成］の許可を持つユーザーは、次の手順を実行してクライアントを作成できます。
 
-1. APIクライアント機能に
-   [アクセス](#access_api_clients) し、 **［作成］** を選択して作成モーダルを開きます。
-2. モーダルで、クライアントの一意の名前と説明を入力します。適切なクライアントガバナンスを促進するためにも、APIクライアントの計画的な運用法が反映された名前と説明を選択します。
+1. APIクライアント機能に[アクセス](#apiクライアントにアクセスする)し、**［作成］**を選択して作成モーダルを開きます。
+2. モーダルで、クライアントの一意の名前と説明を入力します。適切なクライアントガバナンスを促進するためにも、APIクライアントの計画的な運用法が反映された名前と説明を選択します。   
+     
 
-   <Frame><img alt="Screenshot 2025-01-17 at 11.55.54 AM.png" src="/images/kb/ka0Vq000000G1wD-00N5w00000Ri7BU-0EMVq000004sne9.jpg" style={{width: 399, height: 234}}/></Frame>
+   <Frame>![Screenshot 2025-01-17 at 11.55.54 AM.png](/images/kb/ja/0EMVq000004sne9.jpg)</Frame>
 3. クライアントに付与するスコープを選択します。
 
-<Note>
-  **注記：** Domoでは、最小権限の原則に従い、ユースケースで必要なスコープのみをクライアントに付与することを推奨しています。
+<Note>   **注記：**Domoでは、最小権限の原則に従い、ユースケースで必要なスコープのみをクライアントに付与することを推奨しています。</Note>
 
-</Note>
+   <Frame>![Screenshot 2025-01-17 at 11.56.03 AM.png](/images/kb/ja/0EMVq000004smoY.jpg)</Frame>
+<Warning>**重要：** 4. **［作成］**を選択します。確認後、新しいクライアントのIDとシークレットが表示されます。**重要：**クライアントシークレットが表示されるのはこのタイミングだけです。</Warning>
 
-   <Frame><img alt="Screenshot 2025-01-17 at 11.56.03 AM.png" src="/images/kb/ka0Vq000000G1wD-00N5w00000Ri7BU-0EMVq000004smoY.jpg" style={{width: 398, height: 494}}/></Frame>
-4. **［作成］** を選択します。確認後、新しいクライアントのIDとシークレットが表示されます。 **重要：** クライアントシークレットが表示されるのはこのタイミングだけです。
+<Warning>   **警告：**クライアントIDとクライアントシークレットは、Domoインスタンスへのアクセスを付与するため、非常に機密性が高い情報です。これらの資格情報は、組織のセキュリティポリシーに従って取り扱ってください。</Warning>
 
-   <Warning>
-     **警告：** クライアントIDとクライアントシークレットは、Domoインスタンスへのアクセスを付与するため、非常に機密性が高い情報です。これらの資格情報は、組織のセキュリティポリシーに従って取り扱ってください。
+   <Frame>![Screenshot 2025-01-13 at 8.47.30 AM.png](/images/kb/ja/0EMVq000004m6vF.jpg)</Frame>
 
-   </Warning>
+## APIクライアントを閲覧および管理する
 
-   <Frame><img alt="Screenshot 2025-01-13 at 8.47.30 AM.png" src="/images/kb/ka0Vq000000G1wD-00N5w00000Ri7BU-0EMVq000004m6vF.jpg" style={{width: 400, height: 463}}/></Frame>
-[このページのトップへ](#intro)
-
-### APIクライアントを閲覧および管理する
-
-APIクライアントページには、自身の [許可](#required_grants) に応じて、Domoインスタンス内のアクティブなAPIクライアントがリスト表示されます。
+APIクライアントページには、自身の許可に応じて、Domoインスタンス内のアクティブなAPIクライアントがリスト表示されます。
 
 セキュリティを確保するために、リストにはクライアントIDの一部のみが表示され、クライアントシークレットは表示されません。クライアントのスコープと所有者も併せて表示されます。
 
-<Frame><img alt="" src="/images/kb/ka0Vq000000G1wD-00N5w00000Ri7BU-0EMVq000007RZk2.jpg" style={{width: 848, height: 328}}/></Frame>
-# クライアントを削除する
+<Frame>![Screenshot](/images/kb/ja/0EMVq000007RZk2.jpg)</Frame>
 
-APIクライアントは編集できませんが、自身の [許可](#required_grants) に応じてクライアントを削除できます。クライアントを削除するには、次の手順を実行します。
+## クライアントを削除する
 
-1. 削除するクライアントの行で、
-   <InlineImage src="/images/kb/ja/ka0Vq000000KNbc-00N5w00000Ri7BU-0EMVq000007Rchu.jpg" /> **詳細** （縦の三点リーダー）> **［削除］** を選択します。
+APIクライアントは編集できませんが、自身の許可に応じてクライアントを削除できます。クライアントを削除するには、次の手順を実行します。
 
-   <Frame><img alt="" src="/images/kb/ka0Vq000000G1wD-00N5w00000Ri7BU-0EMVq000007ReII.jpg" style={{width: 700, height: 281}}/></Frame>
-2. 確認ダイアログで、 **［取り消す］** を選択します。
+1. 削除するクライアントの行で、<img alt="" src="/images/kb/ja/0EMVq000007Rchu.jpg" style={{width: 24, height: 23, display: 'inline', verticalAlign: 'start', margin: '0'}}/>
 
-   <Frame><img alt="Screenshot 2025-01-13 at 9.49.28 AM.png" src="/images/kb/ka0Vq000000G1wD-00N5w00000Ri7BU-0EMVq000004mE1Z.jpg" style={{width: 318, height: 261}}/></Frame>
-   <Warning>
-     **重要：** **［取り消す］** を選択すると、警告ダイアログは表示されないまま、クライアントが取り消されます。この操作は元に戻せないため、正しいクライアントを取り消していることを確認してください。既存のセッションは、有効期限が切れるまで引き続き有効であることにご注意ください。
+   **詳細**（縦の三点リーダー）>**［削除］**を選択します。
 
-   </Warning>
+   <Frame>![Screenshot](/images/kb/ja/0EMVq000007ReII.jpg)</Frame>
+2. 確認ダイアログで、**［取り消す］**を選択します。
 
-[このページのトップへ](#intro)
+   <Frame>![Screenshot 2025-01-13 at 9.49.28 AM.png](/images/kb/ja/0EMVq000004mE1Z.jpg)</Frame>
 
-日本語
+<Warning>**重要：****［取り消す］**を選択すると、警告ダイアログは表示されないまま、クライアントが取り消されます。この操作は元に戻せないため、正しいクライアントを取り消していることを確認してください。既存のセッションは、有効期限が切れるまで引き続き有効であることにご注意ください。</Warning>
+

@@ -1,246 +1,226 @@
 ---
 title: "Magic ETL DataFlowを作成する"
+excerpt: "Magic ETL のドラッグ＆ドロップキャンバスで入力 DataSet とタイルを使用して DataFlow を作成し、PDP の取り扱いやキャンバスツールを活用します。"
 ---
 
-import {InlineImage} from "/snippets/InlineImage.mdx";
+## はじめに
 
-### はじめに
+Magic ETL DataFlowの作成は、直感的なドラッグ＆ドロップインターフェースで簡単に行えます。入力DataSetをキャンバスにドラッグし、DataSetのJoinと変換の方法を指定するタイルを追加します。タイルを使用することで、[集計](/s/article/360044876094)、[データの結合](/s/article/360044876194)、[データサイエンス](/s/article/360045259294)操作の実行、[DataSet](/s/article/360045402273)の操作、[日付と数値](/s/article/360045402313)の操作、[フィルター](/s/article/360044876614)、[列のパフォーマンス](/s/article/4405156517527)の設定、[ピボット](/s/article/360044951294)、[スクリプティング](/s/article/360045485833)、[テキスト](/s/article/360045402873)の変換、さまざまな[ユーティリティータスク](/s/article/360044876874)（[定数の追加](/ja/s/article/360044876874)や[列の複製](/ja/s/article/360044876874)など）の実行を行えます。
 
-Magic ETL DataFlowの作成は、直感的なドラッグ＆ドロップインターフェースで簡単に行えます。入力DataSetをキャンバスにドラッグし、DataSetのJoinと変換の方法を指定するタイルを追加します。タイルを使用することで、 [集計](/s/article/360044876094) 、 [データの結合](/s/article/360044876194) 、 [データサイエンス](/s/article/360045259294) 操作の実行、 [DataSet](/s/article/360045402273) の操作、 [日付と数値](/s/article/360045402313) の操作、 [フィルター](/s/article/360044876614) 、 [列のパフォーマンス](/s/article/4405156517527) の設定、 [ピボット](/s/article/360044951294) 、 [スクリプティング](/s/article/360045485833) 、 [テキスト](/s/article/360045402873) の変換、さまざまな [ユーティリティータスク](/s/article/360044876874) （ [定数の追加](/ja/s/article/360044876874#add_constants) や [列の複製](/ja/s/article/360044876874#duplicate_column) など）の実行を行えます。
+<Frame>![Screenshot](/images/kb/ja/0EMVq000005pDuo.jpg)</Frame>
 
-<Frame><img alt="" src="/images/kb/ka0Vq000000QN93-00N5w00000Ri7BU-0EMVq000005pDuo.jpg" style={{width: 898, height: 410}}/></Frame>
 この記事では、Personalized Data Permissions（PDP）の操作方法やベストプラクティスなど、Magic ETLでDataFlowを作成するための基本的な手順について説明します。
 
 ---
 
-* [Magic ETL DataFlowとPDP](#magic_etl_dataflows_and_pdp)
-* [Magic ETLキャンバスツール](#canvas_tools)
-  + [粗いグリッド](#coarser_grid)
-  + [ミニマップ](#mini_map)
-  + [タイルのグループ化](#tile_grouping)
-  + [タイルに関するサポート](#tile_support)
-  + [取り消し/やり直し](#undo_redo)
-  + [セクションを使用する](#use_sections)
-  + [付箋を使用する](#use_sticky_notes)
-  + [列の検索機能を使用する](#use_column_search)
-* [Magic ETL DataFlowを作成する](#create_a_magic_etl_dataflow)
-* [Magic ETL DataFlowのベストプラクティス](#best_practices)
+## Magic ETL DataFlowとPDP
 
----
+<Warning>**重要：**DataFlowの入力DataSetは、PDPポリシーで制限することはできません。利用可能なすべての行はDataFlowを経由する*必要があります*。このため、PDPポリシーは、DataFlowが生成する出力DataSetに適用する必要があります。</Warning>
 
-### Magic ETL DataFlowとPDP
+PDPポリシーが有効な状態で入力DataSetを使ってDataFlowを作成する場合は、以下の条件が少なくとも1つ満たされていないとDataFlowに不具合が発生します。
 
-<Warning>
-  **重要：** DataFlowの入力DataSetは、PDPポリシーで制限することはできません。利用可能なすべての行はDataFlowを経由する *必要があります* 。このため、PDPポリシーは、DataFlowが生成する出力DataSetに適用する必要があります。
+- 自分がDataSetの所有者である。
+- 自分が「管理者」のシステム権限を持っているか、「DataFlowを管理」の許可が有効なカスタマイズされた権限を持っている。「[カスタマイズされた権限を管理する](/s/article/360043438973)」を参照してください。
+- DataSetの「全ての行」ポリシーに自分のユーザーアカウントが追加されている。詳細については、「[PDPとDataFlow](/s/article/360042934614#pdp-and-dataflowsdatafusion)」を参照してください。
 
-  PDPポリシーが有効な状態で入力DataSetを使ってDataFlowを作成する場合は、以下の条件が少なくとも1つ満たされていないとDataFlowに不具合が発生します。
-
-  * 自分がDataSetの所有者である。
-  * 自分が「管理者」のシステム権限を持っているか、「DataFlowを管理」の許可が有効なカスタマイズされた権限を持っている。「
-  [カスタマイズされた権限を管理する](/s/article/360043438973) 」を参照してください。
-  * DataSetの「全ての行」ポリシーに自分のユーザーアカウントが追加されている。詳細については、「
-  [PDPとDataFlow](/s/article/360042934614?language=ja#pdp_and_dataflows "http://knowledge.domo.com?cid=pdpdatafusions") 」を参照してください。
-
-</Warning>
-
-[このページのトップへ](#intro)
-
-### Magic ETLキャンバスツール
+## Magic ETLキャンバスツール
 
 Magic ETLキャンバスには、DataFlowをすばやく作成するのに役立つ様々なツールが用意されています。
 
-##### 粗いグリッド
+### 粗いグリッド
 
 デフォルトでは、Magic ETLキャンバスには12ピクセル単位で細かく分割されたグリッドにスナップする機能があります。これを変更して、32ピクセル単位（Magic ETLタイルのサイズの半分）の粗いグリッドにスナップする機能を選択できます。
 
-粗いグリッドを有効にするには、キャンバスのツールバーで <InlineImage src="/images/kb/ja/ka0Vq000000QNAf-00N5w00000Ri7BU-0EMVq000005NiqH.jpg" /> **［設定］** を選択して **［DataFlow設定］** モーダルを開きます。 **注記：** DataFlow設定の変更は、このDataFlowにのみ適用され、ほかのDataFlowには適用されません。
+粗いグリッドを有効にするには、キャンバスのツールバーで<img alt="Screenshot 2025-02-13 at 6.35.39 PM.png" src="/images/kb/ja/0EMVq000005NiqH.jpg" style={{width: 25, height: 25, display: 'inline', verticalAlign: 'start', margin: '0'}}/>
 
-<Frame><img alt="select settings.jpg" src="/images/kb/ka0Vq000000QN93-00N5w00000Ri7BU-0EMVq000005Nirt.jpg" style={{width: 502, height: 102}}/></Frame>
-モーダルの **［キャンバス設定］** タブに移動し、 **［大きなグリッド］** のチェックボックスをオンにします。ドロップダウンからグリッド線のスタイルを選択します。
+<Note>**［設定］**を選択して**［DataFlow設定］** モーダルを開きます。**注記：**DataFlow設定の変更は、このDataFlowにのみ適用され、ほかのDataFlowには適用されません。</Note>
 
-<Frame><img alt="Screenshot 2025-02-13 at 6.39.31 PM.png" src="/images/kb/ka0Vq000000QN93-00N5w00000Ri7BU-0EMVq000005Nd11.jpg" style={{width: 652, height: 266}}/></Frame>
-##### ミニマップ
+<Frame>![select settings.jpg](/images/kb/ja/0EMVq000005Nirt.jpg)</Frame>
+
+モーダルの**［キャンバス設定］**タブに移動し、**［大きなグリッド］**のチェックボックスをオンにします。ドロップダウンからグリッド線のスタイルを選択します。
+
+<Frame>![Screenshot 2025-02-13 at 6.39.31 PM.png](/images/kb/ja/0EMVq000005Nd11.jpg)</Frame>
+
+#### ミニマップ
 
 画面の隅にミニマップが表示され、レイアウトを確認したり、複雑で入り組んだDataFlowをナビゲートしたりするのに役立ちます。ミニマップの白い四角をクリックしてドラッグすると、キャンバス上のDataFlowの特定のビューに移動します。
 
-<Frame><img alt="" src="/images/kb/ka0Vq000000QN93-00N5w00000Ri7BU-0EMVq000005pF8c.jpg" style={{width: 543, height: 408}}/></Frame>
+<Frame>![Screenshot](/images/kb/ja/0EMVq000005pF8c.jpg)</Frame>
+
 ミニマップを閉じた場合は、表示されていた同じ隅にあるマップポインターアイコンを選択すると、再び開きます。
 
-<Frame><img alt="Screenshot 2024-08-23 at 11.06.40 AM.png" src="/images/kb/ka0Vq000000QN93-00N5w00000Ri7BU-0EMVq000002Mv89.jpg" style={{width: 149, height: 111}}/></Frame>
-[このページのトップへ](#intro)
+<Frame>![Screenshot 2024-08-23 at 11.06.40 AM.png](/images/kb/ja/0EMVq000002Mv89.jpg)</Frame>
 
-##### タイルのグループ化
+#### タイルのグループ化
 
-キャンバスをクリックし、カーソルをタイルの上にドラッグすることで、複数のタイルを一度に選択することもできます。複数のタイルを選択したら、それをまとめて好きな場所へドラッグできます。また、左側パネルにある **［削除］** を選択することで、選択したタイルを削除することもできます。
+キャンバスをクリックし、カーソルをタイルの上にドラッグすることで、複数のタイルを一度に選択することもできます。複数のタイルを選択したら、それをまとめて好きな場所へドラッグできます。また、左側パネルにある**［削除］**を選択することで、選択したタイルを削除することもできます。
 
-##### タイルに関するサポート
+#### タイルに関するサポート
 
-キャンバスでタイルを設定する際に、タイルを選択してから <InlineImage src="/images/kb/ja/ka0Vq000000QNAf-00N5w00000Ri7BU-0EMVq000005pGvt.jpg" /> **［ヘルプ］** （疑問符アイコン）を選択すると、ヘルプを確認できます。
+キャンバスでタイルを設定する際に、タイルを選択してから<img alt="" src="/images/kb/ja/0EMVq000005pGvt.jpg" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/>
 
-<Frame><img alt="" src="/images/kb/ka0Vq000000QN93-00N5w00000Ri7BU-0EMVq000005pPJF.jpg" style={{width: 300, height: 314}}/></Frame>
-##### 取り消し/やり直し
+**［ヘルプ］**（疑問符アイコン）を選択すると、ヘルプを確認できます。
 
-Magic ETL DataFlowの作成中に実行された操作は、取り消す/やり直すことができます。 <InlineImage src="/images/kb/ja/ka0Vq000000QNAf-00N5w00000Ri7BU-0EMVq000005pPWA.jpg" /> コントロール（矢印アイコン）がキャンバス上部のツールバーにあります。
+<Frame>![Screenshot](/images/kb/ja/0EMVq000005pPJF.jpg)</Frame>
+
+#### 取り消し/やり直し
+
+Magic ETL DataFlowの作成中に実行された操作は、取り消す/やり直すことができます。<img alt="" src="/images/kb/ja/0EMVq000005pPWA.jpg" style={{width: 59, height: 31, display: 'inline', verticalAlign: 'start', margin: '0'}}/>
+
+コントロール（矢印アイコン）がキャンバス上部のツールバーにあります。
 
 ドロップダウンを使用して、特定の編集セッション中に実行されたすべてのアクションのアクションの履歴リストを確認できます。このリストを使用することで、時間を前後にジャンプしながらその状態のDataFlowを確認できます。
 
-<Frame><img alt="" src="/images/kb/ka0Vq000000QN93-00N5w00000Ri7BU-0EMVq000005pRBN.jpg" style={{width: 551, height: 412}}/></Frame>
-<Warning>
-  **警告：** 過去の編集セッションのアクション履歴や、別のユーザーのアクション履歴は利用できません。
+<Frame>![Screenshot](/images/kb/ja/0EMVq000005pRBN.jpg)</Frame>
 
-</Warning>
+<Warning>**警告：**過去の編集セッションのアクション履歴や、別のユーザーのアクション履歴は利用できません。</Warning>
 
-[このページのトップへ](#intro)
-
-# セクションを使用する
+## セクションを使用する
 
 セクションは、タイルを論理的かつ視覚的にグループ化してまとめ、キャンバスを整理するのに役立ちます。
 
 以下の手順を実行して、1つまたは複数のセクションをキャンバスに追加します。
 
 1. セクションに含めるタイルをハイライト表示し、右クリックしてセクションオプションを表示します。
-2. **［セクション作成］** を選択します。
+2. **［セクション作成］**を選択します。  
      
-   <Frame><img alt="" src="/images/kb/ka0Vq000000QN93-00N5w00000Ri7BU-0EMVq000005orPe.jpg" style={{width: 499, height: 375}}/></Frame>
-3. セクションを作成したら、色ピッカーを使用して背景色を選択できます。
-     
-   <Frame><img alt="" src="/images/kb/ka0Vq000000QN93-00N5w00000Ri7BU-0EMVq000005ozQP.jpg" style={{width: 451, height: 325}}/></Frame>
-4. （オプション）セクションの名前を変更するには、
-   <InlineImage src="/images/kb/ja/ka0Vq000000QNAf-00N5w00000Ri7BU-0EMVq000005ombH.jpg" /> **［詳細］** （縦の三点リーダー）> **［セクション名を変更］** を選択します。
-     
-   <Frame><img alt="" src="/images/kb/ka0Vq000000QN93-00N5w00000Ri7BU-0EMVq000005ozVG.jpg" style={{width: 500, height: 330}}/></Frame>
-5. （オプション）セクションのサイズを変更するには、セクションの端または隅をクリックしてドラッグします。
-     
-   **注記：** サイズ変更時に、セクションと重なっているタイルと付箋がセクションに含まれます。
-6. （オプション）
-   [付箋](#use_sticky_notes) をグループ化してセクションに含めるには、セクションに付箋をドロップするか、セクションの端をドラッグして付箋の上に重なるようにします。
 
-[このページのトップへ](#intro)
+   <Frame>![Screenshot](/images/kb/ja/0EMVq000005orPe.jpg)</Frame>
+3. セクションを作成したら、色ピッカーを使用して背景色を選択できます。  
+     
 
-# 付箋を使用する
+   <Frame>![Screenshot](/images/kb/ja/0EMVq000005ozQP.jpg)</Frame>
+4. （オプション）セクションの名前を変更するには、<img alt="" src="/images/kb/ja/0EMVq000005ombH.jpg" style={{width: 24, height: 23, display: 'inline', verticalAlign: 'start', margin: '0'}}/>
+
+   **［詳細］**（縦の三点リーダー）>**［セクション名を変更］**を選択します。  
+     
+
+   <Frame>![Screenshot](/images/kb/ja/0EMVq000005ozVG.jpg)</Frame>
+5. （オプション）セクションのサイズを変更するには、セクションの端または隅をクリックしてドラッグします。  
+<Note>
+
+**注記：**サイズ変更時に、セクションと重なっているタイルと付箋がセクションに含まれます。
+6. （オプション）付箋をグループ化してセクションに含めるには、セクションに付箋をドロップするか、セクションの端をドラッグして付箋の上に重なるようにします。
+
+</Note>
+
+## 付箋を使用する
 
 付箋は記録を残したり注釈を付けたりするのに役立ちます。付箋を使用することで、DataFlowを閲覧する人に、DataFlowの現在のステータスや、履歴、必要な作業について伝えることができます。
 
-1. Magic ETLキャンバスの任意の場所を右クリックし、 **［コメントを追加］** を選択します。
+1. Magic ETLキャンバスの任意の場所を右クリックし、**［コメントを追加］**を選択します。  
      
-   <Frame><img alt="" src="/images/kb/ka0Vq000000QN93-00N5w00000Ri7BU-0EMVq000005p1f7.jpg" style={{width: 351, height: 177}}/></Frame>
+
+   <Frame>![Screenshot](/images/kb/ja/0EMVq000005p1f7.jpg)</Frame>
+
+     
+     
    付箋が表示され、上部に編集バーが表示されます。
-2. 編集バーを使用して、付箋の色や、ハイパーリンクなどその他のリッチテキストオプションを選択します。
+2. 編集バーを使用して、付箋の色や、ハイパーリンクなどその他のリッチテキストオプションを選択します。  
      
-   <Frame><img alt="" src="/images/kb/ka0Vq000000QN93-00N5w00000Ri7BU-0EMVq000005p40H.jpg" style={{width: 700, height: 251}}/></Frame>
-   <Tip>
-     **ヒント：** ユーザーが作成者を判別できるように、付箋に署名をスタンプできます。
 
-     <Frame><img alt="" src="/images/kb/ka0Vq000000QN93-00N5w00000Ri7BU-0EMVq000005p4t7.jpg" style={{width: 529, height: 286}}/></Frame>
-   </Tip>
+   <Frame>![Screenshot](/images/kb/ja/0EMVq000005p40H.jpg)</Frame>
 
-3. （オプション）付箋をドラッグしてその半分以上がセクションに重なるようにすると、付箋をグループ化してセクションに含めることができます。
+<Tip>   **ヒント：**ユーザーが作成者を判別できるように、付箋に署名をスタンプできます。</Tip>
+
+   <Frame>![Screenshot](/images/kb/ja/0EMVq000005p4t7.jpg)</Frame>
+3. （オプション）付箋をドラッグしてその半分以上がセクションに重なるようにすると、付箋をグループ化してセクションに含めることができます。  
      
-   <Frame><img alt="" src="/images/kb/ka0Vq000000QN93-00N5w00000Ri7BU-0EMVq000005p5pB.jpg" style={{width: 852, height: 450}}/></Frame>
-[このページのトップへ](#intro)
 
-# 列の検索機能を使用する
+   <Frame>![Screenshot](/images/kb/ja/0EMVq000005p5pB.jpg)</Frame>
+
+## 列の検索機能を使用する
 
 Magic ETLでの列の検索機能によって、DataFlowのタイルのうち、特定の列を含むタイルをすべて表示できます。列の検索機能を使用するには、以下を行います。
 
-1. DataFlowの作成中に、キャンバス上部にあるユーティリティーバーで虫眼鏡を選択し、検索フィールドを展開します。
+1. DataFlowの作成中に、キャンバス上部にあるユーティリティーバーで虫眼鏡を選択し、検索フィールドを展開します。   
      
-<InlineImage src="/images/kb/ja/ka0Vq000000QNAf-00N5w00000Ri7BU-0EMVq000004sxaH.jpg" /> 2. 検索フィールドに列名の一部または全部を入力します。入力されたすべての文字が検索に含まれます。
-     
-<InlineImage src="/images/kb/ja/ka0Vq000000QNAf-00N5w00000Ri7BU-0EMVq000004svWu.jpg" /> 3. オレンジ色でハイライト表示されたタイル（および関連するパス）をキャンバス上で確認します。ハイライト表示された各タイルには、検索語と一致する列が含まれています。
-     
-<Tip>
-  **ヒント：** 検索時にタイルを選択した場合は、そのタイルは選択解除されるまでオレンジ色にハイライト表示されません。ただし、接続パスはハイライト表示されます。
 
-</Tip>
+   <Frame>![select magnifying glass.jpg](/images/kb/ja/0EMVq000004sxaH.jpg)</Frame>
+2. 検索フィールドに列名の一部または全部を入力します。入力されたすべての文字が検索に含まれます。   
+     
 
-<Frame><img alt="Screenshot 2025-01-17 at 1.08.12 PM.png" src="/images/kb/ka0Vq000000QN93-00N5w00000Ri7BU-0EMVq000004svVG.jpg" style={{width: 801, height: 388}}/></Frame>
+   <Frame>![partial name.jpg](/images/kb/ja/0EMVq000004svWu.jpg)</Frame>
+3. オレンジ色でハイライト表示されたタイル（および関連するパス）をキャンバス上で確認します。ハイライト表示された各タイルには、検索語と一致する列が含まれています。  
+     
+
+<Tip>   **ヒント：**検索時にタイルを選択した場合は、そのタイルは選択解除されるまでオレンジ色にハイライト表示されません。ただし、接続パスはハイライト表示されます。</Tip>
+
+   <Frame>![Screenshot 2025-01-17 at 1.08.12 PM.png](/images/kb/ja/0EMVq000004svVG.jpg)</Frame>
+
 <Note>
-  **この機能では、列名テキストのスクリプトフィールドも検索されますか？** いいえ。検索されるのは、そのタイルで使用可能なデータスキーマのみです（スクリプトフィールドの検索は、今後の機能強化で追加される可能性があります）。
-
+**この機能では、列名テキストのスクリプトフィールドも検索されますか？**いいえ。検索されるのは、そのタイルで使用可能なデータスキーマのみです（スクリプトフィールドの検索は、今後の機能強化で追加される可能性があります）。
 </Note>
 
-[このページのトップへ](#intro)
-
-### Magic ETL DataFlowを作成する
+## Magic ETL DataFlowを作成する
 
 Magic ETL DataFlowを作成するには、以下の手順を実行します。
 
-1. Domo Data Centerに移動します（ **［その他］** > **［データ］** ）。
-2. Data Warehouseページが表示されない場合は、左サイドバーを使用して
-   <InlineImage src="/images/kb/ja/ka0Vq000000QNAf-00N5w00000Ri7BU-0EMVq000005Nj9d.jpg" /> **［Data Warehouse］** に移動します。
-3. Data Centerの上部にあるリボンで、 **［データを変換］** > **［Magic ETL］** を選択してMagic ETLキャンバスを開きます。
+1. Domo Data Centerに移動します（**［その他］**>**［データ］**）。
+2. Data Warehouseページが表示されない場合は、左サイドバーを使用して<img alt="data warehouse.jpg" src="/images/kb/ja/0EMVq000005Nj9d.jpg" style={{width: 22, height: 24, display: 'inline', verticalAlign: 'start', margin: '0'}}/>
+
+   **［Data Warehouse］**に移動します。
+3. Data Centerの上部にあるリボンで、**［データを変換］** >**［Magic ETL］**を選択してMagic ETLキャンバスを開きます。  
      
-   <Frame><img alt="magic etl.jpg" src="/images/kb/ka0Vq000000QN93-00N5w00000Ri7BU-0EMVq000005NjHh.jpg" style={{width: 649, height: 211}}/></Frame>
-4. 左側パネルで **［DATASET］** を展開し、 **［入力DataSet］** タイルをキャンバスにドラッグします。
+
+   <Frame>![magic etl.jpg](/images/kb/ja/0EMVq000005NjHh.jpg)</Frame>
+4. 左側パネルで**［DATASET］**を展開し、**［入力DataSet］**タイルをキャンバスにドラッグします。  
      
-   <Frame><img alt="drag an input dataset.jpg" src="/images/kb/ka0Vq000000QN93-00N5w00000Ri7BU-0EMVq000002JV3l.jpg" style={{width: 701, height: 573}}/></Frame>
-   タイルエディターがキャンバスの下に展開されます。
+
+   <Frame>![drag an input dataset.jpg](/images/kb/ja/0EMVq000002JV3l.jpg)</Frame>
+
+   タイルエディターがキャンバスの下に展開されます。  
      
-   <Frame><img alt="tile editor.jpg" src="/images/kb/ka0Vq000000QN93-00N5w00000Ri7BU-0EMVq000002JV8b.jpg" style={{width: 700, height: 516}}/></Frame>
-5. タイルエディターで **［DataSetを選択］** を選択し、変換するDataSetを選択します。
+
+   <Frame>![tile editor.jpg](/images/kb/ja/0EMVq000002JV8b.jpg)</Frame>
+5. タイルエディターで**［DataSetを選択］**を選択し、変換するDataSetを選択します。
 6. どの変換を行いたいかに応じてほかのタイルをキャンバスにドラッグし、各タイルの横にあるノードを次のタイルのノードにドラッグして、タイルがすべて接続されていることを確認します。
 
-<Note>
-  **注記：** 以下のタイルは、設定を行う前に、エディターで各タイルを設定する必要があります。タイルが設定されていない場合、次のタイルへの接続線は破線で表示されます。
+<Note>   **注記：**以下のタイルは、設定を行う前に、エディターで各タイルを設定する必要があります。タイルが設定されていない場合、次のタイルへの接続線は破線で表示されます。</Note>
 
-  <Frame><img alt="Screenshot 2024-08-20 at 5.58.25 PM.png" src="/images/kb/ka0Vq000000QN93-00N5w00000Ri7BU-0EMVq000002JSCM.jpg" style={{width: 399, height: 225}}/></Frame>
-</Note>
+   <Frame>![Screenshot 2024-08-20 at 5.58.25 PM.png](/images/kb/ja/0EMVq000002JSCM.jpg)</Frame>
 
-<Tip>
-  **ヒント：** 左側パネルの検索ツールを使用して、必要なタイルを検索できます。
+<Tip>   **ヒント：**左側パネルの検索ツールを使用して、必要なタイルを検索できます。</Tip>
 
-  <Frame><img alt="" src="/images/kb/ka0Vq000000QN93-00N5w00000Ri7BU-0EMVq0000060KZZ.jpg" style={{width: 300, height: 233}}/></Frame>
-</Tip>
+   <Frame>![Screenshot](/images/kb/ja/0EMVq0000060KZZ.jpg)</Frame>
+7. ほかのすべてのタイルを設定したら、**［DATASET］**タイルから**［出力DataSet］**タイルをキャンバスにドラッグし、最後に設定したタイルに接続して、出力DataSetを追加します。
+8. **［出力DataSet］**タイルを設定するには、以下の手順を実行します。
 
-7. ほかのすべてのタイルを設定したら、 **［DATASET］** タイルから **［出力DataSet］** タイルをキャンバスにドラッグし、最後に設定したタイルに接続して、出力DataSetを追加します。
-8. **［出力DataSet］** タイルを設定するには、以下の手順を実行します。
-
-   1. タイルを **［出力DataSet］** タイルに接続します。
-   2. **［出力DataSet］** タイルを選択して、新しい出力DataSetの名前を入力します。
-9. （オプション）DataFlowをスケジュールします。デフォルトでは、DataFlowを手動で実行する必要があります。トリガーが有効になったときにDataFlowが実行されるようにスケジュールすることもできます。詳細については、「
-   [Advanced DataFlow Triggering](/s/article/000005216) 」を参照してください。
+   1. タイルを**［出力DataSet］**タイルに接続します。
+   2. **［出力DataSet］**タイルを選択して、新しい出力DataSetの名前を入力します。
+9. （オプション）DataFlowをスケジュールします。デフォルトでは、DataFlowを手動で実行する必要があります。トリガーが有効になったときにDataFlowが実行されるようにスケジュールすることもできます。詳細については、「[Advanced DataFlow Triggering](/s/article/000005216)」を参照してください。
 10. DataFlowの名前と詳細を入力します。
-11. **［保存］** を選択して変更を保持し、オプションのバージョンの説明を追加してから、再度保存します。
-      
-    DataFlowを保存すると、このバージョンのエントリーがDataFlowの詳細ビュー内の **［バージョン］** タブに追加されます。バージョンの説明を追加すると、バージョンエントリーに表示されます。「 [DataFlowのバージョン履歴を閲覧する](/s/article/360042923074 "DataFlowのバージョン履歴を閲覧する") 」を参照してください。
+11. **［保存］**を選択して変更を保持し、オプションのバージョンの説明を追加してから、再度保存します。  
+    DataFlowを保存すると、このバージョンのエントリーがDataFlowの詳細ビュー内の**［バージョン］**タブに追加されます。バージョンの説明を追加すると、バージョンエントリーに表示されます。「[DataFlowのバージョン履歴を閲覧する](/s/article/360042923074)」を参照してください。
 
-    * （条件付き） **［保存して実行］** を選択する場合、DataFlowのバージョンやトリガーに関する説明を追加してから、再び **［保存して実行］** を選択できます。
+    - （条件付き）**［保存して実行］**を選択する場合、DataFlowのバージョンやトリガーに関する説明を追加してから、再び**［保存して実行］**を選択できます。  
+      DataFlowの詳細の**［履歴］**タブが開き、実行に関する統計などの情報が表示されます。  
         
-      DataFlowの詳細の **［履歴］** タブが開き、実行に関する統計などの情報が表示されます。
-        
-      <Frame><img alt="" src="/images/kb/ka0Vq000000QN93-00N5w00000Ri7BU-0EMVq0000060MZl.jpg" style={{width: 900, height: 362}}/></Frame>
-      <Note>
-        **DataFlowが正常に完了したときに、出力DataSetに** 更新済み **のマークが付いていないのはなぜですか？**
 
-        これは一般的には、データが実際には変更されていないためです。つまり更新が発生していません。DataFlowの実行が成功したときにデータが変更された場合、DataSetには更新済みのマークが表示されます。
+      <Frame>![Screenshot](/images/kb/ja/0EMVq0000060MZl.jpg)</Frame>
 
-      </Note>
+**DataFlowが正常に完了したときに、出力DataSetに**更新済み**のマークが付いていないのはなぜですか？**
 
-[このページのトップへ](#intro)
+これは一般的には、データが実際には変更されていないためです。つまり更新が発生していません。DataFlowの実行が成功したときにデータが変更された場合、DataSetには更新済みのマークが表示されます。
 
-### Magic ETL DataFlowのベストプラクティス
+## Magic ETL DataFlowのベストプラクティス
 
 DataFlowには以下を推奨します。
 
-* 出力DataSetを作成するのに必要なDataSetのみを含めます。
-* DataFlowの 開始時に不要な行をフィルターで除外します。タイルのフィルターについては、 [こちら](/s/article/360044876614) を参照してください。
-* 列の数を減らして必要なものだけにします。
-* DataFlowの各タイルには内容が分かる名前を使用します。
-* DataFlowの説明に以下を含めます。
-  + 変換される入力DataSetとその所有者の名前。
-  + 作成される出力DataSet。
-* DataFlowに出力DataSetと同じ名前を付けます。これは、DataFlowの出力がData CenterでDataFlow独自のDataSetになるためです。これにより、どのDataFlowがどの出力DataSetに影響を与えるかをより簡単に特定できるようになります。
-* 以下のタイルは、ほかのタイルよりも実行に時間がかかることに注意してください。
-    
-  + [グループ化](/ja/s/article/360044876094#group_by_tile)
-  + [ランクとウィンドウ](/ja/s/article/360044876094#rank_and_window_tile)
-  + [データを結合](/ja/s/article/360044876194#join_data_tile)
-  + [重複を削除](/ja/s/article/360044876614#remove_duplicates)
-  + [ピボット](/ja/s/article/360044951294#pivot_tile)
-  + [［スクリプティング］タイル](/s/article/360045485833)
-  + [［データサイエンス］タイル](/s/article/360045259294)
+- 出力DataSetを作成するのに必要なDataSetのみを含めます。
+- DataFlowの開始時に不要な行をフィルターで除外します。タイルのフィルターについては、[こちら](/s/article/360044876614)を参照してください。
+- 列の数を減らして必要なものだけにします。
+- DataFlowの各タイルには内容が分かる名前を使用します。
+- DataFlowの説明に以下を含めます。
+  - 変換される入力DataSetとその所有者の名前。
+  - 作成される出力DataSet。
+- DataFlowに出力DataSetと同じ名前を付けます。これは、DataFlowの出力がData CenterでDataFlow独自のDataSetになるためです。これにより、どのDataFlowがどの出力DataSetに影響を与えるかをより簡単に特定できるようになります。
+- 以下のタイルは、ほかのタイルよりも実行に時間がかかることに注意してください。  
+  - [グループ化](/ja/s/article/360044876094)
+  - [ランクとウィンドウ](/ja/s/article/360044876094)
+  - [データを結合](/ja/s/article/360044876194)
+  - [重複を削除](/ja/s/article/360044876614)
+  - [ピボット](/ja/s/article/360044951294)
+  - [［スクリプティング］タイル](/s/article/360045485833)
+  - [［データサイエンス］タイル](/s/article/360045259294)
 
-[このページのトップへ](#intro)
-
-日本語

@@ -1,101 +1,75 @@
 ---
-title: "DremioをCloud Amplifierに登録する"
+title: "DremioをCloud Integrationsに登録する"
+excerpt: "Dremio Cloud と Dremio Software を Cloud Integrations に登録する手順を説明し、必要なサービスアカウントと設定を解説します。"
 ---
 
-import { InlineImage } from "/snippets/InlineImage.mdx";
+## はじめに
 
-### はじめに
-
-Cloud Amplifierでは、Dremioを使用してDomoインスタンスを稼働させることができます。DremioクラウドとDremioソフトウェアの両方をDomoに登録できます。このプロセスについては以下で説明します。Cloud Amplifierの詳細については、 [概要](/ja/s/article/4412849158167) を参照してください。
-
----
-
-この記事では、読者がDremioに精通していると仮定し、DremioをCloud Amplifierに登録する方法について以下のトピックで説明します。
-
-* [構造的な概要](#architectural_overview)
-* [必要条件](#pre-reqs)
-* [設定](#setup)
-* [Dremioクラウドの登録](#cloud_registration)
-* [Dremioソフトウェアの登録](#software_registration)
+Cloud Integrationsでは、Dremioを使用してDomoインスタンスを稼働させることができます。DremioクラウドとDremioソフトウェアの両方をDomoに登録できます。このプロセスについては以下で説明します。Cloud Integrationsの詳細については、[概要](/ja/s/article/4412849158167)を参照してください。
 
 ---
 
-### 構造的な概要
+この記事では、読者がDremioに精通していると仮定し、DremioをCloud Integrationsに登録する方法について以下のトピックで説明します。
 
-<Frame><img alt="Dremio architecture diagram.png" src="/images/kb/ka0Vq000000BCVh-00N5w00000Ri7BU-0EMVq000003DgsX.jpg"/></Frame>
+---
 
-### 必要条件
+## 構造的な概要
+
+<Frame><img alt="Dremio architecture diagram.png" src="/images/kb/ja/0EMVq000003DgsX.jpg"/></Frame>
+
+## 必要条件
 
 Dremio接続を設定する前に、以下の手順を完了することを強く推奨します。
 
-* **（推奨）Dremioサービスアカウントを作成 —** この統合専用の新しいDremioアカウントを作成することを推奨します。Dremioでは、読み取り
+- **（推奨）Dremioサービスアカウントを作成 —** この統合専用の新しいDremioアカウントを作成することを推奨します。Dremioでは、読み取りアクセス権を持つ任意のアカウントを使用できますが、サービスアカウントを使用するのがベストプラクティスです。DomoでDremio仮想表を作成するには、このアカウントにデフォルトのDremio環境への読み取りアクセス権が必要です。
+- **（推奨）Domoサービスアカウントを作成 —** この統合専用の新しいDomoアカウントを作成することを推奨します。アカウント権限では、「クラウドアカウントを管理」および「DataSetを管理」の許可が有効になっている必要があります。
 
-  アクセス権を持つ任意のアカウントを使用できますが、
+権限と許可の詳細については、「[カスタマイズされた権限を管理する](/ja/s/article/360043438973)」を参照してください。
 
-  サービスアカウントを使用するのがベストプラクティスです。DomoでDremio仮想表を作成するには、このアカウントにデフォルトのDremio環境への読み取りアクセス権が必要です。
-* **（推奨）Domoサービスアカウントを作成 —** この統合専用の新しいDomoアカウントを作成することを推奨します。アカウント権限では、「クラウドアカウントを管理」および「DataSetを管理」の許可が有効になっている必要があります。
+## 設定
 
-権限と許可の詳細については、「 [カスタマイズされた権限を管理する](/ja/s/article/360043438973) 」を参照してください。
+DremioクラウドまたはDremioソフトウェアの登録プロセスは、以下で説明される同じステップから始まります。プロセスが分岐した後の各製品のステップは、それぞれの見出し（「Dremioクラウドの登録」および「Dremioソフトウェアの登録」）の下に表示されます。
 
-[このページのトップへ](#intro)
+**はじめに：**Domoのサービスアカウントにログインし、Data Centerに移動します（**［その他］**>**［データ］**）。
 
-### 設定
-
-DremioクラウドまたはDremioソフトウェアの登録プロセスは、以下で説明される同じステップから始まります。プロセスが分岐した後の各製品のステップは、それぞれの見出し（「 [Dremioクラウドの登録](#cloud_registration) 」および「 [Dremioソフトウェアの登録](#software_registration) 」）の下に表示されます。
-
-**はじめに：** Domoのサービスアカウントにログインし、Data Centerに移動します（ **［その他］** > **［データ］** ）。
-
-1. Data Warehouseページが表示されない場合は、左サイドバーの <InlineImage src="/images/kb/ka0Vq000000A23l-00N5w00000Ri7BU-0EMVq000005xN0v.jpg" /> **［Data Warehouse］** に進みます。
-2. **<InlineImage src="/images/kb/ka0Vq000000BCKP-00N5w00000Ri7BU-0EM5w000005vNtv.png" />** **［新しいクラウドを追加］** を選択します。
-
+1. Data Warehouseページが表示されない場合は、左サイドバーの
+   <img src="/images/kb/ja/0EMVq000005GWnR.jpg" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/> **［Data Warehouse］**に進みます。
+2. **<img src="/images/kb/ja/0EM5w000005vNtv.png" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/>** **［新しいクラウドを追加］**を選択します。  
    ［新しい統合］モーダルが表示されます。
-3. モーダルの **［ネイティブ統合］** で **［Dremio］** を選択します（Dremioが表示されない場合は、 **［詳細を見る］** を選択して、利用可能なすべての統合を表示します）。
+3. モーダルの**［ネイティブ統合］**で**［Dremio］**を選択します（Dremioが表示されない場合は、**［詳細を見る］**を選択して、利用可能なすべての統合を表示します）。   
 
-   <Frame><img alt="select dremio.jpg" src="/images/kb/ka0Vq000000BCVh-00N5w00000Ri7BU-0EMVq000005GYaj.jpg" style={{width: 649, height: 442}}/></Frame>
+   <Frame><img alt="select dremio.jpg" src="/images/kb/ja/0EMVq000005GYaj.jpg"/></Frame>
+4. **［+****新しい統合を追加］**を選択します。モーダルの  
+   ［Dremioクラウドの統合を接続］ページの**［アカウント情報を入力］**タブが表示されます。
+5. **［統合名］**および**［統合の説明］**フィールドに名前とオプションの説明を入力します。
+6. 適切なDremio製品のラジオボタン（**［Dremioクラウド］**または**［Dremioソフトウェア］**）を選択します。
 
-4. **［+ 新しい統合を追加］** を選択します。モーダルの
+設定のこの時点で、ステップは選択した製品によって異なります。お使いの製品に適したプロセス（「Dremioクラウドの登録」または「Dremioソフトウェアの登録」）に移動します。
 
-   ［Dremioクラウドの統合を接続］ページの **［アカウント情報を入力］** タブが表示されます。
-5. **［統合名］** および **［統合の説明］** フィールドに名前とオプションの説明を入力します。
-6. 適切なDremio製品のラジオボタン（**［Dremioクラウド］** または **［Dremioソフトウェア］** ）を選択します。
+## Dremioクラウドの登録
 
-設定のこの時点で、ステップは選択した製品によって異なります。お使いの製品に適したプロセス（「 [Dremioクラウドの登録](#cloud_registration) 」または「 [Dremioソフトウェアの登録](#software_registration) 」）に移動します。
+1. **［Dremioクラウド］**のラジオボタンを選択した後、**［次へ］**を選択します。
 
-[このページのトップへ](#intro)
-
-### Dremioクラウドの登録
-
-1. **［Dremioクラウド］** のラジオボタンを選択した後、 **［次へ］** を選択します。
-
-   <Frame><img alt="dremio cloud reg.png" src="/images/kb/ka0Vq000000BCVh-00N5w00000Ri7BU-0EM5w000006u1Gv.jpg" style={{width: 801, height: 559}}/></Frame>
-
-2. **［Dremio接続URL］** フィールドにURLを入力します。このURLは、Dremioクラウドアカウントの設定にあります。
+   <Frame><img alt="dremio cloud reg.png" src="/images/kb/ja/0EM5w000006u1Gv.jpg"/></Frame>
+2. **［Dremio接続URL］**フィールドにURLを入力します。このURLは、Dremioクラウドアカウントの設定にあります。
 3. Dremioクラウドアカウントで個人用アクセストークンを作成します。ページを離れた後ではトークンを回復できないため、レコードのトークンをコピーします。
-4. Domoの設定モーダルの **［個人用アクセストークン］** フィールドにトークンをペーストします。
-5. **［次へ］** を選択します。
+4. Domoの設定モーダルの**［個人用アクセストークン］**フィールドにトークンをペーストします。
+5. **［次へ］**を選択します。
 6. DomoでDataSetを作成するのに使用するスキーマと表を参照して選択します。
 
-   <Frame><img alt="Dremio Select Tables[51].jpg" src="/images/kb/ka0Vq000000BCVh-00N5w00000Ri7BU-0EM5w000006u1IN.jpg" style={{width: 856, height: 662}}/></Frame>
-
-7. **［DataSetを作成］** を選択します。
+   <Frame><img alt="Dremio Select Tables[51].jpg" src="/images/kb/ja/0EM5w000006u1IN.jpg"/></Frame>
+7. **［DataSetを作成］**を選択します。
 
 Dremioクラウドが正常に登録されました。
 
-[このページのトップへ](#intro)
+## Dremioソフトウェアの登録
 
-### Dremioソフトウェアの登録
+1. **［Dremioソフトウェア］**のラジオボタンを選択した後、**［次へ］**を選択します。
 
-1. **［Dremioソフトウェア］** のラジオボタンを選択した後、 **［次へ］** を選択します。
-
-   <Frame><img alt="dremio software reg.png" src="/images/kb/ka0Vq000000BCVh-00N5w00000Ri7BU-0EM5w000006u1H0.jpg" style={{width: 861, height: 601}}/></Frame>
-
-2. **［Dremio接続URL］**
-
-   フィールドにURLを入力します。
-3. **［ユーザー名］** および **［パスワード］** にDremioソフトウェアの認証情報を入力します。
-4. **［次へ］** を選択します。
+   <Frame><img alt="dremio software reg.png" src="/images/kb/ja/0EM5w000006u1H0.jpg"/></Frame>
+2. **［Dremio接続URL］**フィールドにURLを入力します。
+3. **［ユーザー名］**および**［パスワード］**にDremioソフトウェアの認証情報を入力します。
+4. **［次へ］**を選択します。
 5. DomoでDataSetを作成するのに使用するスキーマと表を参照して選択します。
 
 Dremioソフトウェアが正常に登録されました。
-
-[このページのトップへ](#intro)

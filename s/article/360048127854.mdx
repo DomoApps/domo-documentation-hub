@@ -1,14 +1,13 @@
 ---
 title: "Train and Deploy Models with AutoML (Automated Machine Learning)"
+excerpt: "Train AutoML models on Domo DataSets with Amazon SageMaker Autopilot and deploy them using the AutoML Interface tile in Magic ETL."
 ---
 
-import {InlineImage} from "/snippets/InlineImage.mdx";
+## Intro
 
-### Intro
+Machine learning is within everyone's grasp with the Domo automated machine learning (AutoML) tool. In partnership with Amazon SageMaker Autopilot, AutoML trains machine learning models based on data you provide and launches hundreds of training jobs on any Domo DataSet to find the best model for your task. Then, [deploy the model](#generate-predictions-with-the-automl-tile-in-magic-etl) on your Domo DataSets with the  AutoML Interface tile in Magic ETL.
 
-Machine learning is within everyone’s grasp with the Domo automated machine learning (AutoML) tool. In partnership with Amazon SageMaker Autopilot, AutoML trains machine learning models based on data you provide and launches hundreds of training jobs on any Domo DataSet to find the best model for your task. Then, [deploy the model](#generate_predictions) on your Domo DataSets with the  AutoML Interface tile in Magic ETL.
-
-Check out [this video](https://www.domo.com/learn/video/automatic-insights-with-automl) <InlineImage src="/images/kb/ka0Vq000000EBhx-00N5w00000Ri7BU-0EMVq000002rC3W.jpg" /> to see AutoML in action.
+Check out [this video](https://www.domo.com/learn/video/automatic-insights-with-automl) <img src="/images/kb/ka0Vq000000EBhx-00N5w00000Ri7BU-0EMVq000002rC3W.jpg" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/> to see AutoML in action.
 
 <Warning>
   **AutoML is an AWS feature (built on Sagemaker Autopilot).**
@@ -17,23 +16,20 @@ Check out [this video](https://www.domo.com/learn/video/automatic-insights-with-
 </Warning>
 
 <Columns>
-  <Frame><img alt="Screenshot 2024-09-23 at 1.44.52 PM.png" src="/images/kb/ka0Vq000000EBhx-00N5w00000Ri7BU-0EMVq000002rGof.jpg" style={{width: 600, height: 319}}/></Frame>
-  <Frame><img alt="Screenshot 2024-09-23 at 2.26.56 PM.png" src="/images/kb/ka0Vq000000EBhx-00N5w00000Ri7BU-0EMVq000002rL1x.jpg" style={{width: 900, height: 435}}/></Frame>
+  <Frame><img alt="Screenshot 2024-09-23 at 1.44.52 PM.png" src="/images/kb/ka0Vq000000EBhx-00N5w00000Ri7BU-0EMVq000002rGof.jpg"/></Frame>
+  <Frame><img alt="Screenshot 2024-09-23 at 2.26.56 PM.png" src="/images/kb/ka0Vq000000EBhx-00N5w00000Ri7BU-0EMVq000002rL1x.jpg"/></Frame>
 </Columns>
-
 
 ---
 
-### Required Grants
+## Required Grants
 
 To access AutoML, you need the following grant enabled for your system or custom role:
 
 * **Enable AutoML —**
   Allows the grant holder to t rain AutoML models and run DataFlows containing AutoML Inference actions.
 
-
-
-### Enable and Access the AutoML Tool
+## Enable and Access the AutoML Tool
 
 To access the AutoML tool, you must first enable it.
 
@@ -41,19 +37,17 @@ AutoML is available by default for users on a consumption agreement. For non-con
 
 After enabling AutoML, you can access it from any DataSet in the Data Center by navigating to the DataSet's Details view and then to the **AutoML** tab.
 
-<Frame><img alt="auto_ml.jpg" src="/images/kb/ka0Vq000000EBhx-00N5w00000Ri7BU-0EMVq000002rJTC.jpg" style={{width: 898, height: 171}}/></Frame>
-### Prepare Data for AutoML
+<Frame><img alt="auto_ml.jpg" src="/images/kb/ka0Vq000000EBhx-00N5w00000Ri7BU-0EMVq000002rJTC.jpg"/></Frame>
+## Prepare Data for AutoML
 
 Use the checklist below to help clean and prepare your data for the AutoML tool. Following these principles will improve your chances of training an effective model with AutoML.
-
-
 
 ##### Part I: Data Structure
 
 Complete these items to structure your DataSet:
 
 + **Singular DataSet —**
-  Gather your data together into one DataSet. Your DataSet should include both your output variable (the variable you want to predict) and your input variables (variables you will use to predict and that you expect to have an effect/influence on your output variable). Input variables are commonly referred to as “features” by machine learning practitioners.
+  Gather your data together into one DataSet. Your DataSet should include both your output variable (the variable you want to predict) and your input variables (variables you will use to predict and that you expect to have an effect/influence on your output variable). Input variables are commonly referred to as “features” by machine learning practitioners.
 
 + **Identify the outcome —**
   Only include one output column for your DataSet.
@@ -62,8 +56,6 @@ Complete these items to structure your DataSet:
   Each row should represent one record in your business problem.
     
   For example, if you want to predict which sales opportunity will close, each row should detail one distinct sales opportunity from start to finish, with the output column listing the result of the sales opportunity (won or lost.)
-
-
 
 ##### Part II: Data Preparation
 
@@ -88,9 +80,7 @@ After structuring your DataSet, complete these items before processing it:
 + **Outliers/Leverage points —**
   Remove known outliers. You can determine outliers either from statistical tests or known experience.
     
-  For example, if sales were artificially high one week due to a known anomaly, it may be best to remove this sample from your DataSet. Learn more about identifying and handling outliers [here](https://github.com/domoinc/domo-data-science-resources/blob/main/webinars/Handling_ExtremeValues_Outliers.pdf) <InlineImage src="/images/kb/ka0Vq000000EBhx-00N5w00000Ri7BU-0EMVq000003AAXR.jpg" />.
-
-
+  For example, if sales were artificially high one week due to a known anomaly, it may be best to remove this sample from your DataSet. Learn more about identifying and handling outliers [here](https://github.com/domoinc/domo-data-science-resources/blob/main/webinars/Handling_ExtremeValues_Outliers.pdf) <img src="/images/kb/ka0Vq000000EBhx-00N5w00000Ri7BU-0EMVq000003AAXR.jpg" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/>.
 
 ##### Part III: Feature Engineering
 
@@ -111,37 +101,36 @@ This allows us to focus more on the prior knowledge you have about your problem.
 + **Data Reductions —**
   A good model will have the fewest features that explain the data. Wherever possible, you should seek to remove redundant or unimportant columns. Meaningless features create noise for your model.
 
+## Use AutoML
 
-### Use AutoML
+After AutoML is [enabled](#enable-and-access-the-automl-tool) for your instance, there are two phases to using it—launching an AutoML training job and deploying your model.
 
-After AutoML is [enabled](#enable_and_access_automl) for your instance, there are two phases to using it—launching an AutoML training job and deploying your model.
-
-* [Launch](#launch_an_automl_job)
+* [Launch](#launch-an-automl-training-job)
   an AutoML training job to generate multiple machine learning models specific to your data. Choose one.
-* [Deploy](#generate_predictions)
+* [Deploy](#generate-predictions-with-the-automl-tile-in-magic-etl)
   your chosen model on a Domo DataSet to generate predictions using the AutoML Inference tile in a Magic ETL DataFlow.
 
   <Note>
     **Note:**
     Find a sample DataSet for trying out AutoML at
-    [this link](https://domosoftware.sharepoint.com/:x:/s/CS-Edu-PublicFiles/EYsFcCdV10tLsAN_fjxjhyIBKgqxNniCy19EBcK5KauwXQ?e=j8IA96) <InlineImage src="/images/kb/ka0Vq000000EBhx-00N5w00000Ri7BU-0EMVq000003A84F.jpg" />.
+    [this link](https://domosoftware.sharepoint.com/:x:/s/CS-Edu-PublicFiles/EYsFcCdV10tLsAN_fjxjhyIBKgqxNniCy19EBcK5KauwXQ?e=j8IA96) <img src="/images/kb/ka0Vq000000EBhx-00N5w00000Ri7BU-0EMVq000003A84F.jpg" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/>.
 
     The sample DataSet includes data on customer churn at a phone company. Download the DataSet to your computer and then upload it to your Domo instance as a new DataSet.
 
   </Note>
 
-# Launch an AutoML Training Job
+### Launch an AutoML Training Job
 
 Follow these instructions to launch an AutoML training job. The job will generate multiple machine learning models specific to your data for you to choose from.
 
 1. In the Data Center, go to the Details view for the DataSet you want to train on, then go to the
    **AutoML** tab.
      
-   <Frame><img alt="churn automl callout.jpg" src="/images/kb/ka0Vq000000EBhx-00N5w00000Ri7BU-0EMVq000003IuI9.jpg" style={{width: 900, height: 408}}/></Frame>
+   <Frame><img alt="churn automl callout.jpg" src="/images/kb/ka0Vq000000EBhx-00N5w00000Ri7BU-0EMVq000003IuI9.jpg"/></Frame>
 2. Select
    **Get Started**.
      
-   <Frame><img alt="get started.jpg" src="/images/kb/ka0Vq000000EBhx-00N5w00000Ri7BU-0EMVq000003It7a.jpg" style={{width: 900, height: 588}}/></Frame>
+   <Frame><img alt="get started.jpg" src="/images/kb/ka0Vq000000EBhx-00N5w00000Ri7BU-0EMVq000003It7a.jpg"/></Frame>
 3. In the modal that displays, use the
    **Column to predict** dropdown to select an output column on which the machine learning models will be trained to predict.
      
@@ -151,7 +140,7 @@ Follow these instructions to launch an AutoML training job. The job will generat
 5. When you're ready to process, select
    **Start Training**.
      
-   <Frame><img alt="Screenshot 2024-10-17 at 6.37.58 PM.png" src="/images/kb/ka0Vq000000EBhx-00N5w00000Ri7BU-0EMVq000003IuA6.jpg" style={{width: 600, height: 434}}/></Frame>
+   <Frame><img alt="Screenshot 2024-10-17 at 6.37.58 PM.png" src="/images/kb/ka0Vq000000EBhx-00N5w00000Ri7BU-0EMVq000003IuA6.jpg"/></Frame>
    A screen with a **Total training time** counter displays while AutoML trains and tests machine learning models using your data. AutoML specifically runs through the following three stages:
      
    * Data analysis
@@ -160,7 +149,7 @@ Follow these instructions to launch an AutoML training job. The job will generat
 
    The stage AutoML is currently in is highlighted in blue.
      
-   <Frame><img alt="Screenshot 2024-10-17 at 6.42.30 PM.png" src="/images/kb/ka0Vq000000EBhx-00N5w00000Ri7BU-0EMVq000003IqWI.jpg" style={{width: 600, height: 447}}/></Frame>
+   <Frame><img alt="Screenshot 2024-10-17 at 6.42.30 PM.png" src="/images/kb/ka0Vq000000EBhx-00N5w00000Ri7BU-0EMVq000003IqWI.jpg"/></Frame>
    <Warning>
      **Total training time can range from a few minutes to multiple hours depending on various factors**
      , including the number of rows in your DataSet, the number of columns in your DataSet, the amount of feature engineering conducted by AutoML, task type, and the number of candidate models trained and tested.
@@ -183,13 +172,13 @@ When AutoML is finished, a **Model Overview** page displays. On this page, you c
 
 </Tip>
 
-<Frame><img alt="top performing model.jpg" src="/images/kb/ka0Vq000000EBhx-00N5w00000Ri7BU-0EMVq000003IvCb.jpg" style={{width: 900, height: 453}}/></Frame>
-### Generate Predictions with the AutoML Tile in Magic ETL
+<Frame><img alt="top performing model.jpg" src="/images/kb/ka0Vq000000EBhx-00N5w00000Ri7BU-0EMVq000003IvCb.jpg"/></Frame>
+## Generate Predictions with the AutoML Tile in Magic ETL
 
 <Warning>
   **Important:**
   Before generating predictions with the AutoML Inference tile, you must have previously
-  [launched an AutoML training job](#launch_an_automl_job)
+  [launched an AutoML training job](#launch-an-automl-training-job)
   . This generates multiple machine learning models specific to your data that you can then choose to deploy using the AutoML Inference tile.
 
 </Warning>
@@ -203,11 +192,11 @@ Follow the instructions below to deploy your chosen AutoML model on a Domo DataS
      
    In this example, Model 25 has been selected.
      
-   <Frame><img alt="model 25.jpg" src="/images/kb/ka0Vq000000EBhx-00N5w00000Ri7BU-0EMVq000003IvhF.jpg" style={{width: 900, height: 439}}/></Frame>
+   <Frame><img alt="model 25.jpg" src="/images/kb/ka0Vq000000EBhx-00N5w00000Ri7BU-0EMVq000003IvhF.jpg"/></Frame>
 3. Select
    **Deploy to ETL** to deploy the selected model and open the Magic ETL interface.
      
-   <Frame><img alt="deploy to etl callout.jpg" src="/images/kb/ka0Vq000000EBhx-00N5w00000Ri7BU-0EMVq000003Ivm5.jpg" style={{width: 900, height: 452}}/></Frame>
+   <Frame><img alt="deploy to etl callout.jpg" src="/images/kb/ka0Vq000000EBhx-00N5w00000Ri7BU-0EMVq000003Ivm5.jpg"/></Frame>
    <Note>
      **Note:**
      You can also deploy an AutoML model by opening a new Magic ETL DataFlow and dragging an AutoML Inference tile onto the canvas, and then configuring the tile. However, when you deploy a model in this way, you can only use the model that is deemed the "Best Candidate" by the system. This model is listed first under
@@ -221,7 +210,7 @@ Follow the instructions below to deploy your chosen AutoML model on a Domo DataS
 4. In the Magic ETL interface, an Input DataSet tile and the AutoML Interface tile are pre-populated in the DataFlow. Connect the DataSet you want to use to generate predictions by selecting
    **Input DataSet tile** > **Change DataSet**.
      
-   <Frame><img alt="change dataset.jpg" src="/images/kb/ka0Vq000000EBhx-00N5w00000Ri7BU-0EMVq000003Iw8f.jpg" style={{width: 899, height: 405}}/></Frame>
+   <Frame><img alt="change dataset.jpg" src="/images/kb/ka0Vq000000EBhx-00N5w00000Ri7BU-0EMVq000003Iw8f.jpg"/></Frame>
    <Warning>
      **Important:**
      The Input DataSet that you use to generate predictions must have the same schema (columns with the same names and data types) as the DataSet you used to train the AutoML model.For example, if your training DataSet had columns named `education\_level,` `hourly\_pay\_rate,` and `tenure` that were used to predict your `Outcome` column, then the Input DataSet you choose should also have these three columns.
@@ -235,11 +224,11 @@ Follow the instructions below to deploy your chosen AutoML model on a Domo DataS
 5. (Optional) When you configure the AutoML Inference tile, you'll see that the
    **Name the prediction column** has been pre-populated. You can choose another name for this column.
      
-   <Frame><img alt="name prediction column.jpg" src="/images/kb/ka0Vq000000EBhx-00N5w00000Ri7BU-0EMVq000003IwDV.jpg" style={{width: 899, height: 426}}/></Frame>
+   <Frame><img alt="name prediction column.jpg" src="/images/kb/ka0Vq000000EBhx-00N5w00000Ri7BU-0EMVq000003IwDV.jpg"/></Frame>
 6. Connect and name an Output DataSet.
 7. Name your DataFlow and select
    **Expand** (down arrow icon) > **Save and Run**.
      
-   The resulting output DataSet will include all the columns from the Input DataSet plus a column (that you named in [step 5](#name_column) above) containing the predictions.
+   The resulting output DataSet will include all the columns from the Input DataSet plus a column (that you named in step 5 above) containing the predictions.
      
-   <Frame><img alt="save and run.jpg" src="/images/kb/ka0Vq000000EBhx-00N5w00000Ri7BU-0EMVq000003IwJx.jpg" style={{width: 898, height: 210}}/></Frame>
+   <Frame><img alt="save and run.jpg" src="/images/kb/ka0Vq000000EBhx-00N5w00000Ri7BU-0EMVq000003IwJx.jpg"/></Frame>

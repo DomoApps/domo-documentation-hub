@@ -1,56 +1,51 @@
 ---
 title: "DCM via Google Cloud Storageコネクター"
+excerpt: "DCM via Google Cloud Storage コネクターを設定し、Google Cloud Storage 経由で DoubleClick Campaign Manager のレポートデータを Domo の DataSet に取り込みます。"
 ---
 
 <Warning>
-**重要：** DomoコネクターでOAuth認証を使用する機能にGoogleによって変更が加えられたことにより、新しいデータ接続を作成する際に、すべてのユーザーがサービスアカウントキー認証を使用しなければならなくなりました。既存のDataSetはすべてこれまで通り正常に実行されます。Google OAuth認証に依存している現在のコネクターは、新しいDataSetを作成できなくなります。該当するコネクターは以下の通りです。
 
-* Google BigQuery
-* Google Adwords via Google BigQuery
-* [DCM via Google Cloud Storage（DTV2）](/ja/s/article/360042926694 "DCM via Google Cloud Storage（DTV2）コネクター")
-* [Google Cloud Storage](/ja/s/article/360043433313 "Google Cloud Storage")
-* [Google Contacts](/ja/s/article/360043435173 "Google Contacts")
-* Google Drive
-* [Google Gmail](/ja/s/article/360042930594 "Google Gmail")
-* [Google Admin SDK Reports](/ja/s/article/360042928714 "Google Admin SDK Reports")
+**重要：**DomoコネクターでOAuth認証を使用する機能にGoogleによって変更が加えられたことにより、新しいデータ接続を作成する際に、すべてのユーザーがサービスアカウントキー認証を使用しなければならなくなりました。既存のDataSetはすべてこれまで通り正常に実行されます。Google OAuth認証に依存している現在のコネクターは、新しいDataSetを作成できなくなります。該当するコネクターは以下の通りです。
+
+- [Google BigQuery](/s/article/360042928734)
+- [Google Adwords via Google BigQuery](/s/article/360043431293)
+- [DCM via Google Cloud Storage（DTV2）](/s/article/360042926694)
+- [Google Cloud Storage](/s/article/360043433313)
+- [Google Contacts](/s/article/360043435173)
+- [Google Drive](/s/article/360043436613)
+- [Google Gmail](/s/article/360042930594)
+- [Google Admin SDK Reports](/s/article/360042928714)
 
 既存のGoogle OAuth DataSetを変更する必要がある場合は、対応するサービスアカウントコネクターを使用してください。現在、以下のサービスアカウントコネクターが利用可能です。
 
-* [Google BigQuery Service](/ja/s/article/360043436593 "Google BigQuery Service")
-* [Google Ads（旧AdWords）via Google BigQuery Service](/ja/s/article/360043431253 "Google Ads（旧AdWords）via Google BigQuery Service")
-* [Google Drive Service](/ja/s/article/360042932014 "Google Drive Service")
-* [Google Cloud Storage Service](/ja/s/article/360042928774 "Google Cloud Storage Service")
-* [Google Contacts Service](/ja/s/article/360042930574 "Google Contacts Service")
-* [Google Gmail Service](/ja/s/article/360043435193 "Google Gmail Service")
-* [Google Admin SDK Reports Service](/ja/s/article/360043433273 "Google Admin SDK Reports Service")
+- [Google BigQuery Service](/s/article/360043436593)
+- [Google Ads（旧AdWords）via Google BigQuery Service](/s/article/360043431253)
+- [Google Drive Service](/s/article/360042932014)
+- [Google Cloud Storage Service](/s/article/360042928774)
+- [Google Contacts Service](/s/article/360042930574)
+- [Google Gmail Service](/s/article/360043435193)
+- [Google Admin SDK Reports Service](/s/article/360043433273)
 
-ほかのすべてのGoogleサービスアカウント対応コネクターは現在開発中です。これらのコネクターが利用可能になれば、Domoと通信できるようになります。Data CenterまたはAppstoreでサービスアカウント対応コネクターを探し、そのコネクターを使用してデータを取得する必要があります。
-  
+ほかのすべてのGoogleサービスアカウント対応コネクターは現在開発中です。これらのコネクターが利用可能になれば、Domoと通信できるようになります。Data CenterまたはAppstoreでサービスアカウント対応コネクターを探し、そのコネクターを使用してデータを取得する必要があります。  
   
 Domoでは、コネクターが使用可能になったときに新しいサービスアカウントキーコネクターを利用して新しいDataSetを作成し、前もって既存のGoogle接続を再度有効にしておくことを推奨します。移行に関してほかの変更が発生した場合は、Domoから通知いたします。
-
 </Warning>
 
 ## はじめに
 
-Google Cloud Storageは、Googleのクラウド内にデータを保管するためのインターネットサービスです。DomoのDCM via Google Cloud Storageコネクターを使用すると、DoubleClick Campaign ManagerとDoubleClick Bid Managerのデータを取得することができます。コネクターはインプレッションレベルのデータを取得し、自動的にデータをJoinできます。DoubleClick Campaign Manager APIの詳細については、ウェブサイト（ [https://developers.google.com/double...k-advertisers/](https://developers.google.com/doubleclick-advertisers/ "https://developers.google.com/doubleclick-advertisers/") ）を参照してください。
+Google Cloud Storageは、Googleのクラウド内にデータを保管するためのインターネットサービスです。DomoのDCM via Google Cloud Storageコネクターを使用すると、DoubleClick Campaign ManagerとDoubleClick Bid Managerのデータを取得することができます。コネクターはインプレッションレベルのデータを取得し、自動的にデータをJoinできます。DoubleClick Campaign Manager APIの詳細については、ウェブサイト（[https://developers.google.com/double...k-advertisers/](https://developers.google.com/doubleclick-advertisers/)）を参照してください。
 
-<Note>
-**注記：** このコネクターを作成するためのユーザーインターフェースは、Data Centerのコネクターリストにまだ掲載されていません。つまり、自分でコネクターを設定することはできません。ただし、Domoでは皆様のコネクターを設定し、ご自身のデータをDomoに取り込めるようにします。CSMまたはDomoまでいつでもお問い合わせください。連絡先に関する情報は、「 ヘルプとサポート
+<Note>**注記：**このコネクターを作成するためのユーザーインターフェースは、Data Centerのコネクターリストにまだ掲載されていません。つまり、自分でコネクターを設定することはできません。ただし、Domoでは皆様のコネクターを設定し、ご自身のデータをDomoに取り込めるようにします。CSMまたはDomoまでいつでもお問い合わせください。連絡先に関する情報は、「ヘルプとサポート」を参照してください。</Note>
 
-」を参照してください。
+|                                |                                                                                                                                                                       |
+| ------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **主な使用事例**                     | このコネクターは、Google Cloud StorageからDCMテーブルをDomoに取り込みます。マッチテーブルを含めるよう指定すると、これらのテーブルがJoinされます。                                                                              |
+| **主なメトリクス**                    | コネクターは未加工データを取り込みますが、このデータを集計して次のようなメトリクスを表示できます。   - インプレッション数 - クリック数 - CTR - リッチメディア配信 - DCMキャンペーンのアクティビティ                                                         |
+| **社内における主な権限**                 | - データスペシャリスト - アナリスト - Major Domo                                                                                                                                     |
+| **平均導入時間**                     | このコネクターの実装の各フェーズにかかる平均時間は次の通りです。   - Google Cloud Storageへの4つのテーブルのエクスポートを設定する - 2時間 - Domoで認証情報を設定する - 15分以内 - コネクターを設定する - 20分   合計時間はDCMから取得されるファイルのサイズによっても異なります。 |
+| **使いやすさ（1～10の段階。1が「最も使いやすい」）** | 7                                                                                                                                                                     |
 
-</Note>
-
-| | |
-|:---|:---|
-| **主な使用事例** | このコネクターは、Google Cloud StorageからDCMテーブルをDomoに取り込みます。マッチテーブルを含めるよう指定すると、これらのテーブルがJoinされます。 |
-| **主なメトリクス** | コネクターは未加工データを取り込みますが、このデータを集計して次のようなメトリクスを表示できます。<ul><li>インプレッション数</li><li>クリック数</li><li>CTR</li><li>リッチメディア配信</li><li>DCMキャンペーンのアクティビティ</li></ul> |
-| **社内における主な権限** | <ul><li>データスペシャリスト</li><li>アナリスト</li><li>Major Domo</li></ul> |
-| **平均導入時間** | このコネクターの実装の各フェーズにかかる平均時間は次の通りです。<ul><li>Google Cloud Storageへの4つのテーブルのエクスポートを設定する - 2時間</li><li>Domoで認証情報を設定する - 15分以内</li><li>コネクターを設定する - 20分</li></ul>合計時間はDCMから取得されるファイルのサイズによっても異なります。 |
-| **使いやすさ（1～10の段階。1が「最も使いやすい」）** | 7 |
-
-DoubleClick Campaign Managerアカウントには、Data Centerから接続できます。このトピックでは、DoubleClick Campaign Managerコネクターのユーザーインターフェースに固有のフィールドとメニューについて説明します。DataSetの追加や更新スケジュールの設定、DataSet情報の編集に関する一般的な情報は、「 [コネクターを使用してDataSetを追加する](/ja/s/article/360042926274?language=en_US "コネクターを使用してDataSetを追加する") 」を参照してください。
+DoubleClick Campaign Managerアカウントには、Data Centerから接続できます。このトピックでは、DoubleClick Campaign Managerコネクターのユーザーインターフェースに固有のフィールドとメニューについて説明します。DataSetの追加や更新スケジュールの設定、DataSet情報の編集に関する一般的な情報は、「[コネクターを使用してDataSetを追加する](/ja/s/article/360042926274)」を参照してください。
 
 ## 必要条件
 
@@ -58,44 +53,42 @@ GoogleアカウントにアクセスしてDataSetを作成するには、接続�
 
 また、このコネクターを設定する前に、DCMからGoogle Cloud Storageに次の4つのテーブルをエクスポートする必要があります。
 
-* Activities
-* Clicks
-* Impressions
-* Rich Media
+- Activities
+- Clicks
+- Impressions
+- Rich Media
 
 次のページでは、上記4つのテーブルで使用されるすべてのフィールドの名前を確認できます。
 
-[https://developers.google.com/doubleclick-advertisers/udt/reference/v1/file-format](https://developers.google.com/doubleclick-advertisers/udt/reference/v1/file-format "https://developers.google.com/doubleclick-advertisers/udt/reference/v1/file-format")
+[https://developers.google.com/doubleclick-advertisers/udt/reference/v1/file-format](https://developers.google.com/doubleclick-advertisers/udt/reference/v1/file-format)
 
 出力ファイル名は変更しないでください。Googleは自動的にこれらのファイル名を割り当てます。
 
 ## DCM via Google Cloud Storageアカウントに接続する
 
-このセクションでは、DCM via Google Cloud Storageコネクターページの **［認証情報］** および **［詳細］** ペインのオプションについて説明します。このページのほかのペインの項目である **［スケジュール設定］** や **［DataSetに名前を付け、説明を入力］** に関しては、ほとんどのタイプのコネクターで共通しています。詳細については「 [コネクターを使用してDataSetを追加する](/ja/s/article/360042926274?language=en_US "コネクターを使用してDataSetを追加する") 」を参照してください。
+このセクションでは、DCM via Google Cloud Storageコネクターページの**［認証情報］**および**［詳細］**ペインのオプションについて説明します。このページのほかのペインの項目である**［スケジュール設定］**や**［DataSetに名前を付け、説明を入力］**に関しては、ほとんどのタイプのコネクターで共通しています。詳細については「[コネクターを使用してDataSetを追加する](/ja/s/article/360042926274)」を参照してください。
 
 ### ［認証情報］ペイン
 
-Domo DCM via Google Cloud Storageコネクターは、接続にOAuthを使用します。そのため、Domo内での認証情報の入力は必要ありません。 **［接続］** をクリック（または、Domoに既存のDCM via Google Cloud Storageアカウントがある場合は **［アカウントを追加］** を選択）すると、Google OAuth画面が開き、Googleの認証情報を入力できます。有効なGoogleの認証情報を一度入力しておくと、いつでも同じアカウントを使用して新しいDCM via Google Cloud Storage DataSetを作成できます。コネクターのアカウントは Data Center の **［アカウント］** タブで管理できます。このタブの詳細については、「 [コネクターのユーザーアカウントを管理する](/ja/s/article/360042926054?language=en_US "コネクターのユーザーアカウントを管理する") 」を参照してください。
+Domo DCM via Google Cloud Storageコネクターは、接続にOAuthを使用します。そのため、Domo内での認証情報の入力は必要ありません。**［接続］**をクリック（または、Domoに既存のDCM via Google Cloud Storageアカウントがある場合は**［アカウントを追加］**を選択）すると、Google OAuth画面が開き、Googleの認証情報を入力できます。有効なGoogleの認証情報を一度入力しておくと、いつでも同じアカウントを使用して新しいDCM via Google Cloud Storage DataSetを作成できます。コネクターのアカウントはData Centerの**［アカウント］**タブで管理できます。このタブの詳細については、「[コネクターのユーザーアカウントを管理する](/ja/s/article/360042926054)」を参照してください。
 
-<Note>
-**注記：** Domoで接続する際、既にGoogleにログインしている場合は、 **［アカウントを追加］** をクリックすると自動的に認証されます。ログインしているアカウントとは異なるアカウントに接続する場合は、まずGoogleからログアウトする必要があります。
-
-</Note>
+<Note>**注記：**Domoで接続する際、既にGoogleにログインしている場合は、**［アカウントを追加］**をクリックすると自動的に認証されます。ログインしているアカウントとは異なるアカウントに接続する場合は、まずGoogleからログアウトする必要があります。</Note>
 
 ### ［詳細］ペイン
 
-このペインには、メインとなる **［Report］** メニューのほか、選択したレポートタイプに応じて表示/非表示になる様々なメニューが含まれています。
+このペインには、メインとなる**［Report］**メニューのほか、選択したレポートタイプに応じて表示/非表示になる様々なメニューが含まれています。
 
-<table border="1" cellpadding="1" cellspacing="1" data-aura-rendered-by="33:195;a"><thead><tr><th colspan="1" rowspan="1"><p> メニュー </p></th><th colspan="1" rowspan="1"><p> 説明 </p></th></tr></thead><tbody><tr><td colspan="1" rowspan="1"><p> Report </p></td><td colspan="1" rowspan="1"><p> 実行するDCM via Google Cloud Storageレポートを選択します。Master Reportでは、4つのDCMテーブルがすべて1つのレポートに取り込まれます（これらのテーブルの詳細については、「 <a href="#h_34407b13-454e-4a76-b215-974ff29a27ab" target="_blank" title="必要条件"> 必要条件 </a> 」を参照してください）。ほかのすべてのレポートでは、マッチテーブルの有無にかかわらず、個別のDCMテーブルを取得できます。マッチテーブルは、テーブル間のJoinを実行するために使用されます。 </p><p> 次のレポートが利用できます。 </p><table border="1" cellpadding="1" cellspacing="1"><tbody><tr><td colspan="1" rowspan="1"> Activities Raw Data </td><td colspan="1" rowspan="1"> DCM Activitiesテーブルから未加工データを取得します。 </td></tr><tr><td colspan="1" rowspan="1"> Activities Report with Match Tables </td><td colspan="1" rowspan="1"> DCMアクティビティデータをマッチテーブルとともに取得します。 </td></tr><tr><td colspan="1" rowspan="1"> Clicks Raw Data </td><td colspan="1" rowspan="1"> DCM Clicksテーブルから未加工データを取得します。 </td></tr><tr><td colspan="1" rowspan="1"> Clicks Report with Match Tables </td><td colspan="1" rowspan="1"> DCMクリック数データをマッチテーブルとともに取得します。 </td></tr><tr><td colspan="1" rowspan="1"> Impressions Raw Data </td><td colspan="1" rowspan="1"> DCM Impressionsテーブルから未加工データを取得します。 </td></tr><tr><td colspan="1" rowspan="1"> Impressions Report with Match Tables </td><td colspan="1" rowspan="1"> DCMインプレッション数データをマッチテーブルとともに取得します。 </td></tr><tr><td colspan="1" rowspan="1"> Master Report </td><td colspan="1" rowspan="1"> Activities、Clicks、Impressions、Rich MediaのすべてのDCMテーブルのデータを使用してレポートをコンパイルします。 </td></tr><tr><td colspan="1" rowspan="1"> Rich Media Raw Data </td><td colspan="1" rowspan="1"> DCM Rich Mediaテーブルから未加工データを取得します。 </td></tr><tr><td colspan="1" rowspan="1"> Rich Media Report with Match Tables </td><td colspan="1" rowspan="1"> DCMリッチメディアデータをマッチテーブルとともに取得します。 </td></tr></tbody></table><p></p></td></tr><tr><td colspan="1" rowspan="1"> Bucket Name </td><td colspan="1" rowspan="1"> DCMファイルが保存されているGoogle Cloud Storage内のバケットの名前を入力します。 </td></tr><tr><td colspan="1" rowspan="1"> Backfill Days for Initial Run </td><td colspan="1" rowspan="1"> 初回の実行で遡ってデータを取得する日数を入力します。ファイルサイズによっては、あまり多くの日数をバックフィルできない場合があります。 </td></tr></tbody></table>
+| メニュー | 説明  |
+| ---- | --- |
+| Report | 実行するDCM via Google Cloud Storageレポートを選択します。Master Reportでは、4つのDCMテーブルがすべて1つのレポートに取り込まれます（これらのテーブルの詳細については、「必要条件」を参照してください）。ほかのすべてのレポートでは、マッチテーブルの有無にかかわらず、個別のDCMテーブルを取得できます。マッチテーブルは、テーブル間のJoinを実行するために使用されます。  次のレポートが利用できます。<table><tbody><tr><td>Activities Raw Data</td><td>DCM Activitiesテーブルから未加工データを取得します。</td></tr><tr><td>Activities Report with Match Tables</td><td>DCMアクティビティデータをマッチテーブルとともに取得します。</td></tr><tr><td>Clicks Raw Data</td><td>DCM Clicksテーブルから未加工データを取得します。</td></tr><tr><td>Clicks Report with Match Tables</td><td>DCMクリック数データをマッチテーブルとともに取得します。</td></tr><tr><td>Impressions Raw Data</td><td>DCM Impressionsテーブルから未加工データを取得します。</td></tr><tr><td>Impressions Report with Match Tables</td><td>DCMインプレッション数データをマッチテーブルとともに取得します。</td></tr><tr><td>Master Report</td><td>Activities、Clicks、Impressions、Rich MediaのすべてのDCMテーブルのデータを使用してレポートをコンパイルします。</td></tr><tr><td>Rich Media Raw Data</td><td>DCM Rich Mediaテーブルから未加工データを取得します。</td></tr><tr><td>Rich Media Report with Match Tables</td><td>DCMリッチメディアデータをマッチテーブルとともに取得します。</td></tr></tbody></table> |
+| Bucket Name | DCMファイルが保存されているGoogle Cloud Storage内のバケットの名前を入力します。 |
+| Backfill Days for Initial Run | 初回の実行で遡ってデータを取得する日数を入力します。ファイルサイズによっては、あまり多くの日数をバックフィルできない場合があります。 |
 
 ### その他のペイン
 
-スケジュール設定、再試行、更新に関するオプションなど、コネクターインターフェースのその他のペインに表示されるオプションについては、「 [コネクターを使用してDataSetを追加する](/ja/s/article/360042926274?language=en_US "コネクターを使用してDataSetを追加する") 」を参照してください。
+スケジュール設定、再試行、更新に関するオプションなど、コネクターインターフェースのその他のペインに表示されるオプションについては、「[コネクターを使用してDataSetを追加する](/ja/s/article/360042926274)」を参照してください。
 
 ## トラブルシューティング
 
-* バケット名とレポートが正しいことを確認します。
-* 必要なテーブルがDCMからGoogle Cloud Storageにエクスポートされていることを確認します（詳細については、「
-  [必要条件](#h_34407b13-454e-4a76-b215-974ff29a27ab "必要条件") 」を参照してください）。
-
-
+- バケット名とレポートが正しいことを確認します。
+- 必要なテーブルがDCMからGoogle Cloud Storageにエクスポートされていることを確認します（詳細については、「必要条件」を参照してください）。

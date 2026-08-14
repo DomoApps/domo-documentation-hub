@@ -1,10 +1,11 @@
 ---
 title: "Archiving Historical Data Using a DataFlow"
+excerpt: "Archive year-to-date data into a historical DataSet using a recursive MySQL stored procedure or a Magic ETL DataFlow."
 ---
 
 ## Intro
 
-Let's say you put your information into a year-to-date DataSet that’s one month behind, starting by loading January’s data in February. Because this is a year-to-date DataSet, once February rolls around the next year, the data from the previous year disappears from the DataSet to make way for the new current year’s data. What if you wanted to archive the data into another DataSet once December’s data is loaded in the year-to-date file? As it turns out, there are a couple of ways to accomplish that. They can be done both in MySQL and Magic ETL.
+Let's say you put your information into a year-to-date DataSet that's one month behind, starting by loading January's data in February. Because this is a year-to-date DataSet, once February rolls around the next year, the data from the previous year disappears from the DataSet to make way for the new current year's data. What if you wanted to archive the data into another DataSet once December's data is loaded in the year-to-date file? As it turns out, there are a couple of ways to accomplish that. They can be done both in MySQL and Magic ETL.
 
 This process applies to any DataSet containing any year-to-date data. Once it hits a year mark, you can archive it for historical purposes.
 
@@ -53,7 +54,7 @@ Below is the code for the stored procedure:
 
 `-- that's identical to another table, but leave it with no data in it.`
 
-`-- We’re going to use this trick to create a table with the same`
+`-- We're going to use this trick to create a table with the same`
 
 `-- structure as the year-to-date-data`
 
@@ -81,7 +82,7 @@ Below is the code for the stored procedure:
 
 `-- The year of data to be archived is last year's data. Remember that`
 
-`-- the year-to-date data is a month behind, so December’s data won’t`
+`-- the year-to-date data is a month behind, so December's data won't`
 
 `-- be loaded until January of the next year.`
 
@@ -123,7 +124,7 @@ To call the stored procedure...
 
 `CALL archive();`
 
-Appending year-to-date data (if it’s ready to archive) to historical archive data (step name is **DataFlow\_output**)...
+Appending year-to-date data (if it's ready to archive) to historical archive data (step name is **DataFlow\_output**)...
 
 `-- Union whatever's in archive_data to thie historical table. If the coniditons for moving the data weren't met, archive_data will be empty.`
 
@@ -137,7 +138,7 @@ SELECT     \*
 
 `FROM archive_data`
 
-This compares what’s already in the archived DataSet to what’s being put in. The MAX dates for the data are matched. Then, we create a table that’s going to hold the data to be archived. We can use a shortcut of SELECT \* from the table with a limit of 1.  Then you truncate the table. This is a quick way to create the table schema without having to go through the process manually. That way, we don’t have to replicate the table schema; it does it automatically.
+This compares what's already in the archived DataSet to what's being put in. The MAX dates for the data are matched. Then, we create a table that's going to hold the data to be archived. We can use a shortcut of SELECT \* from the table with a limit of 1.  Then you truncate the table. This is a quick way to create the table schema without having to go through the process manually. That way, we don't have to replicate the table schema; it does it automatically.
 
 Run a couple of checks:
 
@@ -145,7 +146,7 @@ Run a couple of checks:
 * Is it January? (If so, December's DataSet will be loaded.)
 * Is the month to be archived December?
 
-Then the last piece of code checks to make sure that the data to be archived hasn’t already been archived. Once it’s archived you don’t want it to archive it again.
+Then the last piece of code checks to make sure that the data to be archived hasn't already been archived. Once it's archived you don't want it to archive it again.
 
 If it passes, it will be put in the archive data table that was created above. Then, later, all you need to do is just a simple union all with the rest of the archived data. This puts everything together. The process only archives it the one time.
 
@@ -153,7 +154,7 @@ If it passes, it will be put in the archive data table that was created above. T
 
 This method is not as straightforward as using MySQL, but the DataFlow uses the same logic.
 
-1. To get the MAX date in Magic, you have to do a **Group By** transform on a column that is identical in every row. So the first step is to add a column with a constant value using the **Add Constant** transform. In this case, I’ve given it a numerical value of 1 and named it "One." This is done twice—once for the year-to-date premium data and once for the historical archive data.
+1. To get the MAX date in Magic, you have to do a **Group By** transform on a column that is identical in every row. So the first step is to add a column with a constant value using the **Add Constant** transform. In this case, I've given it a numerical value of 1 and named it "One." This is done twice—once for the year-to-date premium data and once for the historical archive data.
      
    <Frame><img alt="archivingdata3.png" src="/images/kb/ka05w00000123jQ-00N5w00000Ri7BU-0EM5w000005vOwV.png"/></Frame>
 2. Insert a **Group By** transform and group by the column we just created ("One"), create a new column for each grouping, and select **Maximum** for the "Date" column. This step will also be done twice—once for the year-to-date premium data and once for the historical archive data. But you need to give different names to each new aggregated column.
@@ -168,7 +169,7 @@ This method is not as straightforward as using MySQL, but the DataFlow uses the 
    Your results will contain the maximum date in the year-to-date data, the maximum date in the historical archive data, and two columns containing "One."
      
    <Frame><img alt="archivingdata7.png" src="/images/kb/ka05w00000123jQ-00N5w00000Ri7BU-0EM5w000005vOwJ.png"/></Frame>
-4. Use an **Add Constant** to add today’s date to the other dates in the DataSet.
+4. Use an **Add Constant** to add today's date to the other dates in the DataSet.
      
    <Frame><img alt="archivingdata8.png" src="/images/kb/ka05w00000123jQ-00N5w00000Ri7BU-0EM5w000005vOw9.png"/></Frame>
 5. Insert a **Date Operations** transform and create the columns "Current Month" and "Current Year" from the column "Today" and "Data Month" and "Data Year" from the column "MaxDataDate."
@@ -191,10 +192,10 @@ You now have all the dates and information you need to determine whether or not 
 If this step passes all the checks, it will contain all the data from the year-to-date DataSet. If not, it will contain nothing.
   
 <Frame><img alt="archivingdata14.png" src="/images/kb/ka05w00000123jQ-00N5w00000Ri7BU-0EM5w000005vOwA.png"/></Frame>
-9. Use a **Select Columns** transform to get rid of all the extra columns we created to make the schema match what’s in the historical data archive.
+9. Use a **Select Columns** transform to get rid of all the extra columns we created to make the schema match what's in the historical data archive.
      
    <Frame><img alt="archivingdata15.png" src="/images/kb/ka05w00000123jQ-00N5w00000Ri7BU-0EM5w000005vOwN.png"/></Frame>
-10. Add an **Append Rows** transform to append the year-to-date DataSet (if applicable) to the historical archive DataSet. Be sure to select **Include all columns** from the dropdown. If you’ve done everything correctly, a “No changes” message will appear beside each input DataSet.
+10. Add an **Append Rows** transform to append the year-to-date DataSet (if applicable) to the historical archive DataSet. Be sure to select **Include all columns** from the dropdown. If you've done everything correctly, a “No changes” message will appear beside each input DataSet.
       
     <Frame><img alt="archivingdata16.png" src="/images/kb/ka05w00000123jQ-00N5w00000Ri7BU-0EM5w000005vOw7.png"/></Frame>
 11. Under **Settings**, check the box to make sure the transform will run whenever the year-to-date DataSet gets updated.
@@ -206,7 +207,7 @@ If this step passes all the checks, it will contain all the data from the year-t
 
 If there are no complex requirements for determining whether or not to archive the year-to-date data, and you know that the year-to-date DataSet will be complete by a certain date, then you can create a DataFlow that does nothing but archive the data, and then you can use a trick to schedule to run it on a certain date every year.
 
-For our purposes, let’s suppose that we know the year-to-date DataSet will be complete and final by January 20 every year. The first thing we will need to do is create a CSV DataSet and schedule it to update every year on January 20.
+For our purposes, let's suppose that we know the year-to-date DataSet will be complete and final by January 20 every year. The first thing we will need to do is create a CSV DataSet and schedule it to update every year on January 20.
 
 1. Navigate to https:// *yourinstancename*. [domo.com/connectors](http://domo.com/connectors) /com.domo.connector.csv.easy.
 2. Put anything that makes sense into the box. Here we create a column called "Date" with a value of 1800-01-01.
@@ -248,7 +249,7 @@ Finally, save, but **do not run the DataFlow!** Otherwise it immediately archive
 
 ### Method #2 Using Magic ETL
 
-The automatically scheduled Magic ETL simply appends year-to-date data to historical archive data. To add the automatic scheduling, you have to add the Auto Update DataSet and check the setting to run the transform whenever it updates. Unlike with a MySQL DataFlow, with Magic ETL, you can’t just add an input DataSet and not incorporate it into a transform because Magic will error out if you try. So you have do a couple of things to incorporate it into the DataFlow, but make sure it doesn’t actually do anything to the data.
+The automatically scheduled Magic ETL simply appends year-to-date data to historical archive data. To add the automatic scheduling, you have to add the Auto Update DataSet and check the setting to run the transform whenever it updates. Unlike with a MySQL DataFlow, with Magic ETL, you can't just add an input DataSet and not incorporate it into a transform because Magic will error out if you try. So you have do a couple of things to incorporate it into the DataFlow, but make sure it doesn't actually do anything to the data.
   
 <Frame><img alt="archivingdata23.png" src="/images/kb/ka05w00000123jQ-00N5w00000Ri7BU-0EM5w000005vOwL.png"/></Frame>
 1. Add the "Auto Update" DataSet as an **Input Dataset**.
@@ -262,4 +263,4 @@ The automatically scheduled Magic ETL simply appends year-to-date data to histor
 4. Insert an **Append** transform in which you select **Include All Columns** in the first dropdown.
      
    <Frame><img alt="archivingdata26.png" src="/images/kb/ka05w00000123jQ-00N5w00000Ri7BU-0EM5w000005vOwU.png"/></Frame>
-5. Save, but **do not run the DataFlow**! If you run this DataFlow, it will append whatever’s currently in the year-to-date DataSet to the archived data DataSet.
+5. Save, but **do not run the DataFlow**! If you run this DataFlow, it will append whatever's currently in the year-to-date DataSet to the archived data DataSet.

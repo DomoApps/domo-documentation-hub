@@ -1,115 +1,101 @@
 ---
-title: "Magic ETL on Snowflake (Beta)"
+title: "Magic ETL on Snowflake"
+excerpt: "Run Magic ETL transforms directly inside Snowflake using Cloud Amplifier integration to keep data secure without moving it out of Snowflake."
 ---
 
-import {InlineImage} from "/snippets/InlineImage.mdx";
+## Intro
 
-### Intro
-
-Magic ETL on Snowflake uses the Snowflake-Cloud Amplifier integration to give Snowflake users the power of Magic ETL transforms without moving data or requiring assistance from data engineers. While keeping your data secure inside your existing data structure, Magic ETL on Snowflake makes self-serve transformation possible for low-code users and reduces the burden on engineering resources.
+Magic ETL on Snowflake uses the Snowflake Cloud Integration to give Snowflake users the power of Magic ETL transforms without moving data or requiring assistance from data engineers. While keeping your data secure inside your existing data structure, Magic ETL on Snowflake makes self-serve transformation possible for low-code users and reduces the burden on engineering resources.
 
 <Note>
-  **Note:** This feature is in beta. To enable it, contact your Domo account team. Magic ETL on Snowflake is only available to customers on the Domo Consumption agreement.
+  **Note:** Magic ETL on Snowflake is only available to customers on the Domo Consumption agreement.
 </Note>
 
 ---
 
-### Prerequisites
+## Prerequisites
 
 To use this feature, complete the items below in Domo and Snowflake.
 
-# Domo Requirements
+### Domo Requirements
 
 Complete the following in Domo:
 
 * Configure
-  [write capability](https://domo-support.domo.com/s/article/4402322966807?language=en_US#write_setup) for Snowflake with Cloud Amplifier.
+  [write capability](/s/article/4402322966807#account-creation-—-write) for Snowflake with Cloud Integrations.
 * For at least one Snowflake warehouse, choose **Transform** as the operation.
-  + This MUST be on the same Cloud Amplifier integration configured with write capability.
+  + This MUST be on the same Cloud Integration configured with write capability.
       
-    <Frame><img alt="transform operation.jpg" src="/images/kb/ka0Vq000000AMQf-00N5w00000Ri7BU-0EMVq000000w6eX.jpg" style={{width: 600, height: 421}}/></Frame>
-* All input DataSets must be part of the same Snowflake-Cloud Amplifier integration. A Magic ETL DataFlow with inputs from the Domo cloud cannot execute on the Snowflake cloud.
+    <Frame><img alt="transform operation.jpg" src="/images/kb/ka0Vq000000AMQf-00N5w00000Ri7BU-0EMVq000000w6eX.jpg"/></Frame>
+* All input DataSets must be part of the same Snowflake Cloud Integration. A Magic ETL DataFlow with inputs from the Domo cloud cannot execute on the Snowflake cloud.
   + Inputs from more than one Snowflake cloud are not supported.
 
-# Snowflake Requirements
+### Snowflake Requirements
 
 Complete the following in Snowflake:
 
-* The Snowflake role of the service account used in the Snowflake-Cloud Amplifier integration needs SELECT, MODIFY, USAGE, and CREATE privileges on the tables you are referencing as inputs. This should be addressed by the commands run when you configure write capability.
+* The Snowflake role of the service account used in the Snowflake Cloud Integration needs SELECT, MODIFY, USAGE, and CREATE privileges on the tables you are referencing as inputs. This should be addressed by the commands run when you configure write capability.
 
-### Required Grant
+## Required Grant
 
 To use Magic ETL on Snowflake, users must have the following grant enabled for their role:
 
 * **Edit Adrenaline DataFlow —** Allows users to create, edit, and run Adrenaline DataFlows to which they have access.
 
-### Access Magic ETL on Snowflake
+## Access Magic ETL on Snowflake
 
-You can use this feature in the Magic ETL interface after completing a Snowflake-Cloud Amplifier transform integration.
+You can use this feature in the Magic ETL interface after completing a Snowflake Cloud Integration transform configuration.
 
 Access Magic ETL from the details page of any DataSet by selecting **Open With** > **Magic ETL**.
 
-<Frame><img alt="open with magic.jpg" src="/images/kb/ka0Vq00000032LR-00N5w00000Ri7BU-0EMVq000000w57N.jpg" style={{width: 875, height: 306}}/></Frame>
-### Use Magic ETL on Snowflake
+<Frame><img alt="open with magic.jpg" src="/images/kb/ka0Vq00000032LR-00N5w00000Ri7BU-0EMVq000000w57N.jpg"/></Frame>
+## Use Magic ETL on Snowflake
 
 Magic ETL on Snowflake allows you to use the Magic ETL interface to *define* a data transformation, but the transformation *executes* on Snowflake.
 
-When you configure a Snowflake-Cloud Amplifier integration to allow transform operations, a dropdown displays in the Magic ETL editor, where you can choose where the ETL executes. The dropdown provides options for each of the available Snowflake clouds.
+When you configure a Snowflake Cloud Integration to allow transform operations, a dropdown displays in the Magic ETL editor, where you can choose where the ETL executes. The dropdown provides options for each of the available Snowflake clouds.
 
-<Frame><img alt="dropdown.jpg" src="/images/kb/ka0Vq000000AMQf-00N5w00000Ri7BU-0EMVq000000w4o1.jpg" style={{width: 601, height: 303}}/></Frame>
-When a Magic ETL on Snowflake DataFlow executes for the first time, a new table is created in the Snowflake database configured as part of the write setup of the Snowflake-Cloud Amplifier integration. By default, all subsequent runs of the Magic ETL DataFlow are configured with the Replace update method, but you can choose to use the Append method. Learn about [DataSet update methods](https://domo-support.domo.com/s/article/360043430733?language=en_US).
+<Frame><img alt="dropdown.jpg" src="/images/kb/ka0Vq000000AMQf-00N5w00000Ri7BU-0EMVq000000w4o1.jpg"/></Frame>
+When a Magic ETL on Snowflake DataFlow executes for the first time, a new table is created in the Snowflake database configured as part of the write setup of the Snowflake Cloud Integration. By default, all subsequent runs of the Magic ETL DataFlow are configured with the Replace update method, but you can choose to use the Append method. Learn about [DataSet update methods](https://domo-support.domo.com/s/article/360043430733?language=en_US).
 
 <Tip>
   **Tip:** With Magic ETL on Snowflake, you can use Snowflake Pass-Through SQL in Magic ETL to write and execute SQL queries directly on your Snowflake data. Learn [more](/s/article/000005815).
 </Tip>
 
-### FAQ
+## FAQ
 
 <AccordionGroup>
 <Accordion title="Can I configure Magic ETL DataFlow to use the Append method when it executes on Snowflake?">
 
-
 Yes. The default method is Replace, but you can change it to Append.
-
 
 </Accordion>
 <Accordion title="Is subset processing supported?">
 
-
 Yes, subset processing is supported by leveraging Snowflake Dynamic tables. Learn more about [subset processing](/s/article/000005150).
-
 
 </Accordion>
 <Accordion title="Can Magic ETL use existing partitions on my Snowflake table when running a DataFlow?">
 
-
-Yes. Magic ETL can leverage optimizations like cluster keys and cluster tables at execution time without additional configuration. Learn about [configuring these items](https://docs.snowflake.com/en/user-guide/tables-clustering-keys) <InlineImage src="/images/kb/ka0Vq000000AMQf-00N5w00000Ri7BU-0EMVq000000wIpO.jpg" /> in Snowflake documentation.
-
+Yes. Magic ETL can leverage optimizations like cluster keys and cluster tables at execution time without additional configuration. Learn about [configuring these items](https://docs.snowflake.com/en/user-guide/tables-clustering-keys) <img src="/images/kb/ka0Vq000000AMQf-00N5w00000Ri7BU-0EMVq000000wIpO.jpg" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/> in Snowflake documentation.
 
 </Accordion>
 <Accordion title="Can I limit which users in Domo execute Magic ETL DataFlows on Snowflake?">
 
-
 Yes. Only Domo users with the Edit Adrenaline DataFlow grant can execute DataFlows.
-
 
 </Accordion>
 <Accordion title="Can I take a Magic ETL DataFlow originally configured to run in Magic ETL on Domo and convert it to execute on my Snowflake cloud?">
 
-
 Yes — if all inputs for the DataFlow are in that Snowflake cloud and if the DataFlow uses the Replace or Append update method. If the DataFlow was configured with the Upsert or Partition method, it will error. Learn about [DataSet update methods](https://domo-support.domo.com/s/article/360043430733?language=en_US).
-
 
 </Accordion>
 <Accordion title="Are the Python and R scripting tiles supported?">
 
-
 No. The Python and R scripting tiles are not supported for Magic ETL on Snowflake.
-
 
 </Accordion>
 <Accordion title="Am I charged Domo credits for a Magic ETL DataFlow executions on Snowflake?">
-
 
 Yes. Please refer to your sales agreement for credit consumption terms.
 

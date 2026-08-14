@@ -1,25 +1,21 @@
 ---
 title: "Form Builder App"
+excerpt: "Form Builder App でカスタマイズしたフォーム、テンプレート、アンケートを作成し、Form Viewer から収集した回答データを Domo に同期します。"
 ---
 
-import { InlineImage } from "/snippets/InlineImage.mdx";
+## はじめに
 
-### はじめに
+Form Builder Appでは、カスタマイズされたフォーム、フォームテンプレート、ユーザーからのフィードバックを収集するためのアンケートを作成および編集できます。フォームにデータを入力するには、[Form Viewer](/s/article/360042933614) Appを使用します。Domo Appstoreから両方のAppをダウンロードしてインストールできます。Form Builderはトライアルモードでダウンロードできます。Appを購入すると、トライアルバージョンはフルバージョンに変換されます。
 
-Form Builder Appでは、カスタマイズされたフォーム、フォームテンプレート、ユーザーからのフィードバックを収集するためのアンケートを作成および編集できます。フォームにデータを入力するには、 [Form Viewer](/s/article/360042933614) Appを使用します。Domo Appstoreから両方のAppをダウンロードしてインストールできます。Form Builderはトライアルモードでダウンロードできます。Appを購入すると、トライアルバージョンはフルバージョンに変換されます。
+<Note>**注記：**Form Builderのトライアルバージョンに機能の制限は**ありません**。</Note>
 
-<Note>
-  **注記：** Form Builderのトライアルバージョンに機能の制限は **ありません** 。
+Form Builderは、複数のDomoダッシュボードに作成できます。Form Viewerを使用してフォームに入力された回答データは、Appデータベースに保存され、Domo Data Centerに同期されます。通常は、その後、Domoでデータを変換する必要があります。
 
-</Note>
-
-Form Builderは、複数のDomoダッシュボードに作成できます。Form Viewerを使用してフォームに入力された回答データは、Appデータベースに保存され、Domo Data Centerに同期されます。通常は、その後、 Domoでデータを変換する 必要があります。
-
-# 回答DataSet
+## 回答DataSet
 
 Form Builderで作成した1つのフォームを使用して、1つまたは複数のForm Viewerのインスタンスでデータを収集することも、Form Builder自体でデータを収集することもできます。
 
-##### 例
+## 例
 
 例えば、ユーザーAとユーザーBが、それぞれ別のForm Viewerのインスタンスを使用して、同じフォームにデータを入力するとします。また、Form Builderでフォームを作成したユーザーCも同じフォームにデータを入力するとします。
 
@@ -35,132 +31,105 @@ Form Builderで作成した1つのフォームを使用して、1つまたは複
 
 ---
 
-* [必要条件](#prerequisites)
-* [設定](#configuration)
-* [フォームを作成する](#create_a_form)
-  + [基本的なフォームの定義](#basic_form_definition)
-  + [回答タイプ](#response_types)
-  + [一括回答](#bulk_response)
-  + [フォームの設定](#form_settings)
-  + [セクション](#sections)
-  + [項目セクション](#item_sections)
-  + [表セクション](#table_sections)
-* [表カードを接続する](#connect_table_card)
-  + [表の列](#table_columns)
-  + [表フィルター](#table_filters)
-  + [表の設定](#table_settings)
-* [詳細な項目設定](#advanced_item_configuration)
-* [ページフィルターを使う](#use_page_filters)
-* [設定例](#configuration_use_case)
-
----
-
-### 必要条件
+## 必要条件
 
 フォーム、テンプレート、またはアンケートを作成する前に、Domoインスタンスで以下のグループを作成しておく必要があります。
 
-* \_FB\_CreateForms\_
-* \_FB\_CreateTemplate\_
+- \_FB\_CreateForms\_
+- \_FB\_CreateTemplate\_
 
 Form Builderを使用している間、これらのグループはグループメンバーに固有の権限セットを付与します。
 
-* **\_FB\_CreateForms\_** グループのメンバーには、自分が属するDomoグループ用にフォームを作成して管理する権限が付与されます。
-* **\_FB\_CreateTemplate\_** グループのメンバーには、すべてのDomoグループとユーザー用にアンケート、テンプレート、フォームを管理する権限が付与されます。
+- **\_FB\_CreateForms\_**グループのメンバーには、自分が属するDomoグループ用にフォームを作成して管理する権限が付与されます。
+- **\_FB\_CreateTemplate\_**グループのメンバーには、すべてのDomoグループとユーザー用にアンケート、テンプレート、フォームを管理する権限が付与されます。
 
-  <Note>
-    **注記：** フォームにデータを入力するには、これらのグループのメンバーである必要はありません。フォームの作成および編集が必要なユーザーのみがグループのメンバーである必要があります。
+<Note>**注記：**フォームにデータを入力するには、これらのグループのメンバーである必要はありません。フォームの作成および編集が必要なユーザーのみがグループのメンバーである必要があります。</Note>
 
-  </Note>
+## 設定
 
-### 設定
+[Appstore](https://www.domo.com/appstore/)からForm Builderをダウンロードします。Appをダウンロードすると、自動的にそのダッシュボードが作成されます。App用のカードはDomo [Asset Library](/s/article/4403442101143)から追加できます。
 
-[Appstore](https://www.domo.com/appstore/) からForm Builderをダウンロードします。Appをダウンロードすると、自動的にそのダッシュボードが作成されます。App用のカードはDomo [Asset Library](/s/article/4403442101143) から追加できます。
-
-<Note>
-  **注記：** Appの新しいカードを展開すると、「An error occurred while fetching data from the server」というエラーメッセージが表示される場合があります。これは、カードを保存するまで、基盤となるアプリケーションデータの一部が作成されないためです。このエラーは無視できます。
-
-</Note>
+<Note>**注記：**Appの新しいカードを展開すると、「An error occurred while fetching data from the server」というエラーメッセージが表示される場合があります。これは、カードを保存するまで、基盤となるアプリケーションデータの一部が作成されないためです。このエラーは無視できます。</Note>
 
 Form Builderを使用するには、Form Builder用に配置されているダッシュボードにアクセスし、この記事で後ほど説明するタスクのいずれかを選択します。
 
-#### FormDefinition DataSet
+### FormDefinition DataSet
 
 Form Builderで最初のフォームを作成した後、一連のFormDefinition DataSetがDomoに作成され、Data Centerに表示されます。これらのDataSetにはフォームを定義するメタデータが含まれています。Appを使用するには、これらのFormDefinition DataSetをForm Viewerに接続する必要があります。
 
-<Warning>
-  **重要：** Appアセットを所有するユーザーは、アクティブなユーザーである必要があります。非アクティブなユーザーの場合、DataSetは更新されません。
-
-</Warning>
+<Warning>**重要：**Appアセットを所有するユーザーは、アクティブなユーザーである必要があります。非アクティブなユーザーの場合、DataSetは更新されません。</Warning>
 
 FormDefinition DataSetは以下の通りです。
 
-* ExportForms
-* ExportGroups
-* ExportTags
-* ExportSubmittedUsers
-* ExportSections
-* ExportItems
-* ExportColumns
-* ExportFilters
-* ExportPreviousResponseItems
+- ExportForms
+- ExportGroups
+- ExportTags
+- ExportSubmittedUsers
+- ExportSections
+- ExportItems
+- ExportColumns
+- ExportFilters
+- ExportPreviousResponseItems
 
-Form ViewerでこれらのDataSetに接続する方法については、「 [Form Viewer](/s/article/360042933614) 」を参照してください。
+Form ViewerでこれらのDataSetに接続する方法については、「[Form Viewer](/s/article/360042933614)」を参照してください。
 
-[このページのトップへ](#intro)
+## フォームを作成する
 
-### フォームを作成する
+Appのインストール後、**\_FB\_CreateForms\_**グループまたは**\_FB\_CreateTemplate\_**グループのメンバーであれば、フォームを作成および管理するためのアクセス権が付与されています。
 
-Appのインストール後、 **\_FB\_CreateForms\_** グループまたは **\_FB\_CreateTemplate\_** グループのメンバーであれば、フォームを作成および管理するためのアクセス権が付与されています。
+1. Form Builderカードを開いて**［Form］**タブに進みます。
 
-1. Form Builderカードを開いて
-**［Form］** タブに進みます。
+2.  **［Create Form］**を選択します。
 
-2. **［Create Form］** を選択します。
+<Frame>![create_form.png](/images/kb/ja/0EM5w000005vXlx.png)</Frame>
 
-<Frame><img alt="create_form.png" src="/images/kb/ka0Vq000000BsDB-00N5w00000Ri7BU-0EM5w000005vXlx.png" style={{width: 844, height: 117}}/></Frame>
 フォームエディターが表示されます。
 
 3. フォームを定義します。フォームの定義については以下を参照してください。
 
-# 基本的なフォームの定義
+## 基本的なフォームの定義
 
 フォームエディターで以下の項目を使用して基本的なフォーム定義を設定することにより、新規フォームを作成したり、既存のフォームを管理したりするときに、ユーザーがフォームをどのように検索し、操作するかを選択できます。
 
-* **［Name］ —** フォームの名前
-* **［Description］（オプション） —** フォームの説明
-* **［Tags］（オプション） —** フォームを迅速に見つけられるようにする検索可能なタグ
-* **［Groups］（オプション） —** フォームに返信することを許可されているユーザー（1つ以上のグループで指定）
-* **［Response Type］（必須） —** 回答の制限とフォーマットを決定します
-* **［Form Settings］（オプション） —** ユーザーがフォームを操作できる様々な方法
+- **［Name］ —** フォームの名前
+- **［Description］（オプション） —** フォームの説明
+- **［Tags］（オプション） —** フォームを迅速に見つけられるようにする検索可能なタグ
+- **［Groups］（オプション） —** フォームに返信することを許可されているユーザー（1つ以上のグループで指定）
+- **［Response Type］（必須） —** 回答の制限とフォーマットを決定します
+- **［Form Settings］（オプション） —** ユーザーがフォームを操作できる様々な方法
 
-<Frame><img alt="Screen_Shot_2022-05-04_at_5.00.49_PM.png" src="/images/kb/ka0Vq000000BsDB-00N5w00000Ri7BU-0EM5w000005vXmK.png" style={{width: 900, height: 777}}/></Frame>
-[このページのトップへ](#intro)
+<Frame>![Screen_Shot_2022-05-04_at_5.00.49_PM.png](/images/kb/ja/0EM5w000005vXmK.png)</Frame>
 
-#### 回答タイプ
+## 回答タイプ
 
 エンドユーザーがフォームをどのように操作できるかを管理する回答タイプには、複数のタイプがあります。各タイプは特定の使用事例に適しています。下表は、フォームエディターで利用可能な4つの回答タイプの定義および使用事例に関するメモを示します。
 
 一括回答の定義は、表の下にあります。
 
-<table border="1" cellpadding="1" cellspacing="1" data-aura-rendered-by="33:202;a"><thead><tr><th colspan="1" rowspan="1"><p> 回答タイプ </p></th><th colspan="1" rowspan="1"><p> 説明 </p></th></tr></thead><tbody><tr><td colspan="1" rowspan="1"><p> Crowdsourced <br/> (Collaborative) </p></td><td colspan="1" rowspan="1"><p> Crowdsourced回答では、複数のユーザーが同じ投稿に貢献できます。 </p><p> アクティブな投稿を読み込むと、ユーザーはほかのユーザーの未送信の回答を見ることができます。 </p><p> ユーザーは送信せずにフォーム送信を保存し、後で戻って送信前に修正することができます。 </p></td></tr><tr><td colspan="1" rowspan="1"><p> One response per user </p></td><td colspan="1" rowspan="1"><p> 各ユーザーは1つの回答しか送信できません。 </p><p> このタイプは、投票の収集やほかの1回限りの回答の取得に役立ちます。 </p></td></tr><tr><td colspan="1" rowspan="1"><p> Multiple responses per user </p></td><td colspan="1" rowspan="1"><p> ユーザーは複数の回答を送信できます。 </p><p> このタイプは、メンテナンスリクエストなど、何度もデータを収集する場合に役立ちます。 </p></td></tr><tr><td colspan="1" rowspan="1"><p> Multi-session form </p></td><td colspan="1" rowspan="1"><p> ユーザーは複数の回答を送信できます。一度に複数の名前付きセッションをアクティブにすることができます。フォームにアクセスすると、新しい入力の開始または既存のセッションの再開が要求されます。 </p><p> 既存のセッションの名前を変更するには、セッション名を選択してテキスト入力をアクティブにし、希望するタイトルを入力し、クリックしてテキスト入力を終了して新しい名前を保存します。 <a id="bulk_response" target="_blank"></a></p><p> ユーザーは送信せずにフォーム送信を保存し、後で戻って送信前に修正することができます。 </p></td></tr></tbody></table>
+| 回答タイプ                         | 説明                                                                                                                                                                                                                                 |
+| ----------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Crowdsourced  (Collaborative) | Crowdsourced回答では、複数のユーザーが同じ投稿に貢献できます。  アクティブな投稿を読み込むと、ユーザーはほかのユーザーの未送信の回答を見ることができます。  ユーザーは送信せずにフォーム送信を保存し、後で戻って送信前に修正することができます。                                                                                                   |
+| One response per user         | 各ユーザーは1つの回答しか送信できません。  このタイプは、投票の収集やほかの1回限りの回答の取得に役立ちます。                                                                                                                                                                           |
+| Multiple responses per user   | ユーザーは複数の回答を送信できます。  このタイプは、メンテナンスリクエストなど、何度もデータを収集する場合に役立ちます。                                                                                                                                                                      |
+| Multi-session form            | ユーザーは複数の回答を送信できます。一度に複数の名前付きセッションをアクティブにすることができます。フォームにアクセスすると、新しい入力の開始または既存のセッションの再開が要求されます。  既存のセッションの名前を変更するには、セッション名を選択してテキスト入力をアクティブにし、希望するタイトルを入力し、クリックしてテキスト入力を終了して新しい名前を保存します。  ユーザーは送信せずにフォーム送信を保存し、後で戻って送信前に修正することができます。 |
 
-##### 一括回答
+### 一括回答
 
-一括回答オプションは、フォームエディターの **［Response Type］** メニューでは利用できません。使用するには、以下の手順に従ってください。
+一括回答オプションは、フォームエディターの**［Response Type］**メニューでは利用できません。使用するには、以下の手順に従ってください。
 
-1. フォームエディターの
-**［Form Settings］** で、 **［Allow bulk response uploads］** ボックスにチェックを入れます。
+1. フォームエディターの**［Form Settings］**で、**［Allow bulk response uploads］**ボックスにチェックを入れます。
 
-<Frame><img alt="allow_bulk_response.png" src="/images/kb/ka0Vq000000BsDB-00N5w00000Ri7BU-0EM5w000005vXli.png" style={{width: 620, height: 428}}/></Frame>
+<Frame>![allow_bulk_response.png](/images/kb/ja/0EM5w000005vXli.png)</Frame>
+
 2. Form Builderでフォームの設定を終了します。
 
-3. **Form Viewer** で **［Bulk Upload］** を選択します。
-
+3. **Form Viewer**で**［Bulk Upload］**を選択します。  
 ［Bulk Upload］メニューが表示されます。
 
-4. **［Download Template］** を選択します。
+4. **［Download Template］**を選択します。
 
-<Frame><img src="/images/kb/ka0Vq000000BsDB-00N5w00000Ri7BU-0EM5w000005vXmf.png" /></Frame>
+<Frame>![mceclip3.png](/images/kb/ja/0EM5w000005vXmf.png)</Frame>
+
 一括回答テンプレートはカンマ区切り値ファイル（.CSV）形式でフォーマットされます。デフォルトでは、最初の4行には重要なメタデータが含まれており、アップロード時にファイルと回答を正しく解析して送信できます。テンプレートのデフォルト値は、上から順に以下の通りです。
 
 1. Section ID
@@ -168,224 +137,226 @@ Appのインストール後、 **\_FB\_CreateForms\_** グループまたは **\
 3. Question ID
 4. Question Name
 
-<Note>
-  **注記：** これらの値およびその他の回答データの詳細については、「 [フォーム回答データについて](/s/article/9485049422103) 」を参照してください。
-
-</Note>
+<Note>**注記：**これらの値およびその他の回答データの詳細については、「[フォーム回答データについて](/s/article/9485049422103)」を参照してください。</Note>
 
 5. 回答を.CSVファイルに入力します。
 
-6. Form Viewerで、
-**［Bulk Upload］** > **［Upload Bulk Responses］** を選択します。
+6. Form Viewerで、**［Bulk Upload］**>**［Upload Bulk Responses］**を選択します。
 
 7. 回答を記入したファイルをアップロードします。
 
 8. 一括回答が処理されるまで待ちます。エラーが見つかると、通知が送信され、エラーが解決されるまですべての回答が却下されます。
 
-<Warning>
-  **重要：** 一括回答テンプレートの最初の4行は未変更のままにする必要があります。変更されたテンプレートは送信時に却下される可能性があります。
+<Warning>**重要：**一括回答テンプレートの最初の4行は未変更のままにする必要があります。変更されたテンプレートは送信時に却下される可能性があります。</Warning>
 
-</Warning>
-
-[このページのトップへ](#intro)
-
-#### フォームの設定
+### フォームの設定
 
 下表は、フォームエディターで利用可能な各フォーム設定の定義を示します。
 
-<table border="1" cellpadding="1" cellspacing="1" data-aura-rendered-by="33:202;a"><thead><tr><th colspan="1" rowspan="1"><p> 設定 </p></th><th colspan="1" rowspan="1"><p> 説明 </p></th></tr></thead><tbody><tr><td colspan="1" rowspan="1"><p> Show submit button on every page </p></td><td colspan="1" rowspan="1"><p> 送信ボタンをすべてのページに表示するか、フォームの最後のページにのみに表示するかを指定します。 </p></td></tr><tr><td colspan="1" rowspan="1"><p> Make all questions required </p></td><td colspan="1" rowspan="1"><p><b> ボックスにチェックを入れた場合 — </b> ユーザーはフォームを送信する前にすべての質問に対して有効な回答を入力する必要があります（表セクションには適用されません）。 </p><p><b> ボックスのチェックを外した場合 — </b> ユーザーは「optional」とマークされた質問には回答しないことを選択できます。 </p><p><br/><b> 注記： </b><b> ［Make all questions required］ </b> ボックスにチェックを入れると、個別の質問に対して必要な設定を変更できなくなります。 </p></td></tr><tr><td colspan="1" rowspan="1"><p> Allow bulk response uploads </p></td><td colspan="1" rowspan="1"><p> ユーザーが一括送信できるかどうかを示します（「 <a href="#bulk_response" target="_blank"> 一括回答 </a> 」を参照）。 </p></td></tr><tr><td colspan="1" rowspan="1"><p> Allow previous submissions to be viewed </p></td><td colspan="1" rowspan="1"><p> ユーザーが以前に送信したフォームの回答を表示できるかどうかを示します。 <br/><br/><b> ［Select preview fields］ </b> を使用すると、 <b> ［Previous Submissions］ </b> ページに表示されるフィールドをユーザーが設定できるようになります。 </p></td></tr><tr><td colspan="1" rowspan="1"> Allow previous submissions to be edited </td><td colspan="1" rowspan="1"><p> ユーザーが以前に送信したフォームの回答を編集できるかどうかを示します。 </p><p><b> ［Allow previous submissions to be viewed］ </b> が有効になっていないと利用できません。 </p></td></tr><tr><td colspan="1" rowspan="1"> Allow previous submissions to be deleted </td><td colspan="1" rowspan="1"><p> ユーザーが以前に送信したフォームの回答を削除できるかどうかを示します。 <a id="sections" target="_blank"></a></p><p><b> ［Allow previous submissions to be viewed］ </b> が有効になっていないと利用できません。 </p></td></tr></tbody></table>
+| 設定                               | 説明                                              |
+| -------------------------------- | ----------------------------------------------- |
+| Show submit button on every page | 送信ボタンをすべてのページに表示するか、フォームの最後のページにのみに表示するかを指定します。 |
+| Make all questions required | **ボックスにチェックを入れた場合 —** ユーザーはフォームを送信する前にすべての質問に対して有効な回答を入力する必要があります（表セクションには適用されません）。  **ボックスのチェックを外した場合 —** ユーザーは「optional」とマークされた質問には回答しないことを選択できます。  <Note>**注記：****［Make all questions required］**ボックスにチェックを入れると、個別の質問に対して必要な設定を変更できなくなります。</Note> |
+| Allow bulk response uploads | ユーザーが一括送信できるかどうかを示します（「一括回答」を参照）。 |
+| Allow previous submissions to be viewed | ユーザーが以前に送信したフォームの回答を表示できるかどうかを示します。  **［Select preview fields］**を使用すると、**［Previous Submissions］**ページに表示されるフィールドをユーザーが設定できるようになります。 |
+| Allow previous submissions to be edited | ユーザーが以前に送信したフォームの回答を編集できるかどうかを示します。  **［Allow previous submissions to be viewed］**が有効になっていないと利用できません。 |
+| Allow previous submissions to be deleted | ユーザーが以前に送信したフォームの回答を削除できるかどうかを示します。  **［Allow previous submissions to be viewed］**が有効になっていないと利用できません。 |
 
-[このページのトップへ](#intro)
-
-#### セクション
+### セクション
 
 フォーム定義を入力したら、フォームに質問を追加する前に、少なくとも1つのセクションを追加する必要があります。定義する各セクションは、エンドユーザーがデータを入力するときにフォームのページとして表示されます。関連する質問を同じセクションにまとめておくと便利です。
 
 Form Builderは2つのタイプのセクションをサポートしています。
 
-* **項目セクション** **—** テキスト入力やドロップダウン選択など、標準の質問タイプをサポートしています。
-* **表セクション** **—** 表カードを使ってユーザーに項目入力を要求します。
+- **項目セクション**  **—** テキスト入力やドロップダウン選択など、標準の質問タイプをサポートしています。
+- **表セクション**  **—** 表カードを使ってユーザーに項目入力を要求します。
 
-##### セクションを追加する
+#### セクションを追加する
 
-フォームエディターの右側のセクション管理メニューで、 <InlineImage src="/images/kb/ja/ka0Vq000000LmzK-00N5w00000Ri7BU-0EM5w000005vXmf-1.png" /> **［Add Item Section］** または <InlineImage src="/images/kb/ja/ka0Vq000000LmzK-00N5w00000Ri7BU-0EM5w000005vXmb.png" /> **［Add Table Section］** を選択します。
+フォームエディターの右側のセクション管理メニューで、**<Frame>![mceclip3.png](/images/kb/ja/0EM5w000005vXmf.png)</Frame>** **［Add Item Section］**または<img src="/images/kb/ja/0EM5w000005vXmb.png" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/> **［Add Table Section］**を選択します。
 
-<Frame><img alt="section_management_menu.png" src="/images/kb/ka0Vq000000BsDB-00N5w00000Ri7BU-0EM5w000005vXlm.png"/></Frame>
+<Frame>![section_management_menu.png](/images/kb/ja/0EM5w000005vXlm.png)</Frame>
+
 新しい名前のないセクションはフォームエディターの下に表示されます。
 
-整理しておくために **［Section Name］** を入力して、各セクションに名前を付けることを推奨します。
+整理しておくために**［Section Name］**を入力して、各セクションに名前を付けることを推奨します。
 
-<Frame><img alt="section.png" src="/images/kb/ka0Vq000000BsDB-00N5w00000Ri7BU-0EM5w000005vXmc.png"/></Frame>
-##### セクションを並べ替える
+<Frame>![section.png](/images/kb/ja/0EM5w000005vXmc.png)</Frame>
 
-1. セクション管理メニューで
-<InlineImage src="/images/kb/ja/ka0Vq000000LmzK-00N5w00000Ri7BU-0EM5w000005vXma.png" /> **［Reorder］** を選択します。
+#### セクションを並べ替える
 
-**［Reorder Sections］** モーダルが表示されます。
-
-<Frame><img alt="Screen_Shot_2022-09-19_at_5.08.08_PM.png" src="/images/kb/ka0Vq000000BsDB-00N5w00000Ri7BU-0EM5w000005vXmM.png"/></Frame>
-2. カーソルが手の形に変わるまで、移動したいセクションの
-<InlineImage src="/images/kb/ja/ka0Vq000000LmzK-00N5w00000Ri7BU-0EM5w000005vXlw.png" /> クリック&ドラッグハンドルにカーソルを合わせます。
+1. セクション管理メニューで<img src="/images/kb/ja/0EM5w000005vXma.png" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/> **［Reorder］**を選択します。  
+**［Reorder Sections］**モーダルが表示されます。  <img src="/images/kb/ja/0EM5w000005vXmM.png" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/> 2. カーソルが手の形に変わるまで、移動したいセクションの<img src="/images/kb/ja/0EM5w000005vXlw.png" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/> クリック&ドラッグハンドルにカーソルを合わせます。
 
 3. ハンドルをクリックしてセクションを希望する位置にドラッグします。
 
-##### セクションを削除する
+#### セクションを削除する
 
-1. 削除するセクションを見つけ、
-<InlineImage src="/images/kb/ja/ka0Vq000000LmzK-00N5w00000Ri7BU-0EM5w000005vXls.png" /> **［More Options］** を選択します。
+1. 削除するセクションを見つけ、<img src="/images/kb/ja/0EM5w000005vXls.png" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/> **［More Options］**を選択します。
 
-<Frame><img alt="section_options.png" src="/images/kb/ka0Vq000000BsDB-00N5w00000Ri7BU-0EM5w000005vXm0.png"/></Frame>
-2. <InlineImage src="/images/kb/ja/ka0Vq000000LmzK-00N5w00000Ri7BU-0EM5w000005vXmI.png" /> **［Delete］** を選択します。
+<Frame>![section_options.png](/images/kb/ja/0EM5w000005vXm0.png)</Frame>
 
-削除を確認するダイアログが表示されます。再度 **［Delete］** を選択すると、セクションが削除されます。この操作を取り消すことはできません。
+2. **<Frame>![mceclip10.png](/images/kb/ja/0EM5w000005vXmI.png)</Frame>****［Delete］**を選択します。
 
-<Frame><img alt="Screen_Shot_2022-09-19_at_4.27.51_PM.png" src="/images/kb/ka0Vq000000BsDB-00N5w00000Ri7BU-0EM5w000005vXm5.png"/></Frame>
-[このページのトップへ](#intro)
-
-# 項目セクション
+削除を確認するダイアログが表示されます。再度**［Delete］**を選択すると、セクションが削除されます。この操作を取り消すことはできません。  <img src="/images/kb/ja/0EM5w000005vXm5.png" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/> # 項目セクション
 
 下表は、項目セクションでサポートされている項目と質問のタイプの定義を示します。
 
-<table border="1" cellpadding="1" cellspacing="1" data-aura-rendered-by="33:202;a"><thead><tr><th colspan="1" rowspan="1"><p> アイコン </p></th><th colspan="1" rowspan="1"><p> 名前 </p></th><th colspan="1" rowspan="1"><p> 説明 </p></th></tr></thead><tbody><tr><td colspan="1" rowspan="1"><p><InlineImage src="/images/kb/ja/ka0Vq000000LmzK-00N5w00000Ri7BU-0EM5w000005vXmS.png" /></p></td><td colspan="1" rowspan="1"><p> Title and Description </p></td><td colspan="1" rowspan="1"><p> 追加のメタデータおよびコンテキスト情報。 </p><p> 単一のセクション内で論理的な切れ目を作成する場合や、単純に追加情報を提供する場合に使用できます。 </p></td></tr><tr><td colspan="1" rowspan="1"><p><InlineImage src="/images/kb/ja/ka0Vq000000LmzK-00N5w00000Ri7BU-0EM5w000005vXmg.png" /></p></td><td colspan="1" rowspan="1"><p> Text </p></td><td colspan="1" rowspan="1"><p> 自由形式のテキストによる回答をユーザーに要求します。 </p></td></tr><tr><td colspan="1" rowspan="1"><p><InlineImage src="/images/kb/ja/ka0Vq000000LmzK-00N5w00000Ri7BU-0EM5w000005vXmd.png" /></p></td><td colspan="1" rowspan="1"><p> Dropdown </p></td><td colspan="1" rowspan="1"><p> ユーザーによる入力を設定可能なオプションのリストに限定します。 </p></td></tr><tr><td colspan="1" rowspan="1"><p><InlineImage src="/images/kb/ja/ka0Vq000000LmzK-00N5w00000Ri7BU-0EM5w000005vXmQ.png" /></p></td><td colspan="1" rowspan="1"><p> Date </p></td><td colspan="1" rowspan="1"><p></p><p> 日付または日付範囲をユーザーに要求します。 </p><p></p></td></tr><tr><td colspan="1" rowspan="1"><InlineImage src="/images/kb/ja/ka0Vq000000LmzK-00N5w00000Ri7BU-0EM5w000005vXmN.png" /></td><td colspan="1" rowspan="1"> Image </td><td colspan="1" rowspan="1"> フォームに画像を表示します（ユーザー入力をサポートしていません）。 </td></tr><tr><td colspan="1" rowspan="1"><InlineImage src="/images/kb/ja/ka0Vq000000LmzK-00N5w00000Ri7BU-0EM5w000005vXll.png" /></td><td colspan="1" rowspan="1"> Lookup </td><td colspan="1" rowspan="1"> 表カードの固有の値からオプションリストを生成するドロップダウンの質問（PDPに対応） </td></tr><tr><td colspan="1" rowspan="1"><InlineImage src="/images/kb/ja/ka0Vq000000LmzK-00N5w00000Ri7BU-0EM5w000005vXlk.png" /></td><td colspan="1" rowspan="1"> File Attachment </td><td colspan="1" rowspan="1"> ユーザーが回答の一部としてファイルを添付できるようにします。 </td></tr></tbody></table>
+| アイコン                                                               | 名前                    | 説明                                                                     |
+| ------------------------------------------------------------------ | --------------------- | ---------------------------------------------------------------------- |
+| <Frame>![mceclip12.png](/images/kb/ja/0EM5w000005vXmS.png)</Frame> | Title and Description | 追加のメタデータおよびコンテキスト情報。  単一のセクション内で論理的な切れ目を作成する場合や、単純に追加情報を提供する場合に使用できます。 |
+| <Frame>![mceclip13.png](/images/kb/ja/0EM5w000005vXmg.png)</Frame> | Text                  | 自由形式のテキストによる回答をユーザーに要求します。                                             |
+| <Frame>![mceclip14.png](/images/kb/ja/0EM5w000005vXmd.png)</Frame> | Dropdown              | ユーザーによる入力を設定可能なオプションのリストに限定します。                                        |
+| <Frame>![mceclip15.png](/images/kb/ja/0EM5w000005vXmQ.png)</Frame> | Date                  | 日付または日付範囲をユーザーに要求します。                                                  |
+| <Frame>![mceclip16.png](/images/kb/ja/0EM5w000005vXmN.png)</Frame> | Image                 | フォームに画像を表示します（ユーザー入力をサポートしていません）。                                      |
+| <Frame>![mceclip17.png](/images/kb/ja/0EM5w000005vXll.png)</Frame> | Lookup                | 表カードの固有の値からオプションリストを生成するドロップダウンの質問（PDPに対応）                             |
+| <Frame>![mceclip18.png](/images/kb/ja/0EM5w000005vXlk.png)</Frame> | File Attachment       | ユーザーが回答の一部としてファイルを添付できるようにします。                                         |
 
-項目タイプを選択するには、セクション定義の下部にある項目管理メニューのアイコンを選択します。項目と質問のタイプの詳細については、後述の「 [詳細な項目設定](#h_01F8B1N35Y7EB17B52QDJ9ZJVQ) 」を参照してください。
+項目タイプを選択するには、セクション定義の下部にある項目管理メニューのアイコンを選択します。項目と質問のタイプの詳細については、後述の「詳細な項目設定」を参照してください。
 
-<Frame><img src="/images/kb/ka0Vq000000BsDB-00N5w00000Ri7BU-0EM5w000005vXlo.png" /></Frame>
-[このページのトップへ](#intro)
+<Frame>![mceclip20.png](/images/kb/ja/0EM5w000005vXlo.png)</Frame>
 
-# 表セクション
+## 表セクション
 
-<Frame><img src="/images/kb/ka0Vq000000BsDB-00N5w00000Ri7BU-0EM5w000005vXmU.png" /></Frame>
+<Frame>![mceclip1.png](/images/kb/ja/0EM5w000005vXmU.png)</Frame>
+
 表セクションはDomo表カードを利用してデータを表示し、ユーザーに行/列フォーマットの入力を要求します。
 
-表セクションを選択したら、セクションで **［Table Card］** メニューを選択し、表カードのあるページ/ダッシュボードを見つけて選択します。
+表セクションを選択したら、セクションで**［Table Card］**メニューを選択し、表カードのあるページ/ダッシュボードを見つけて選択します。
 
-<Frame><img alt="Screen_Shot_2022-09-20_at_2.57.52_PM.png" src="/images/kb/ka0Vq000000BsDB-00N5w00000Ri7BU-0EM5w000005vXm9.png"/></Frame>
-次のメニューコントロールを使用して、選択したページ/ダッシュボードから表カードを探します。使用する表カードを選択し、 **［Connect］** をクリックして接続プロセスを開始します。
+<Frame>![Screen_Shot_2022-09-20_at_2.57.52_PM.png](/images/kb/ja/0EM5w000005vXm9.png)</Frame>
 
-<Frame><img alt="Screen_Shot_2022-09-20_at_2.59.31_PM.png" src="/images/kb/ka0Vq000000BsDB-00N5w00000Ri7BU-0EM5w000005vXm1.png"/></Frame>
-<Note>
-  **注記：** 表セクションはPDPをサポートしています。
+次のメニューコントロールを使用して、選択したページ/ダッシュボードから表カードを探します。使用する表カードを選択し、**［Connect］**をクリックして接続プロセスを開始します。
 
-</Note>
+<Frame>![Screen_Shot_2022-09-20_at_2.59.31_PM.png](/images/kb/ja/0EM5w000005vXm1.png)</Frame>
 
-[このページのトップへ](#intro)
+<Note>**注記：**表セクションはPDPをサポートしています。</Note>
 
-# 表カードを接続する
+## 表カードを接続する
 
 表セクションに接続する表カードを選択すると、モーダルが表示されます。
 
 表から1つ以上の列を選択する必要があります。その列の値を結合すると、各行を一意に識別できます。表カードには、固有のID列を持つものも、複数の識別子列を必要とするものもあります。下記の例では、識別子列は地域、州、都市です。
 
-識別子列を選択したら、 **［Connect］** を選択して接続処理を完了します。
+識別子列を選択したら、**［Connect］**を選択して接続処理を完了します。
 
-<Frame><img src="/images/kb/ka0Vq000000BsDB-00N5w00000Ri7BU-0EM5w000005vXln.png" /></Frame>
-#### 表の列
+<Frame>![mceclip25.png](/images/kb/ja/0EM5w000005vXln.png)</Frame>
+
+## 表の列
 
 接続処理が完了すると、Form Builderのフォームの表セクションに表カードを構成する列のリストが表示されます。列のリスト項目の右側にあるメニューオプションで利用可能なオプションを選択すると、列の入力タイプを変更できます。
 
-<Frame><img src="/images/kb/ka0Vq000000BsDB-00N5w00000Ri7BU-0EM5w000005vXmB.png" /></Frame>
+<Frame>![mceclip26.png](/images/kb/ja/0EM5w000005vXmB.png)</Frame>
+
 下表は、表列がサポートする入力タイプを説明しています。
 
-<Note>
-  **注記：** 識別子列を入力列として設定することはできません。
+<Note>**注記：**識別子列を入力列として設定することはできません。</Note>
 
-</Note>
+| 入力                    | 説明                                                                                                                                                                                                                                                       | カスタム列のサポート | 既存の列のサポート |
+| --------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------- | --------- |
+| None                  | 入力コントロールがありません。  表カードから既存のデータを表示します。                                                                                                                                                                                                                     | いいえ        | はい        |
+| Checkbox              | ボックスにチェックを入れて表から1行以上を選択します。                                                                                                                                                                                                                              | はい         | はい        |
+| Dropdown              | ユーザーによる入力を、フォームエディターで設定した値セットのみに制限します。  <Frame>![mceclip28.png](/images/kb/ja/0EM5w000005vXmi.png)</Frame>                                                                                                                                               | はい         | はい        |
+| Lookup                | 表カードの列からユーザー入力を固有の値のみに制限します。検索オプションを設定するには、ページ、カード、列を選択します。  <Frame>![mceclip29.png](/images/kb/ja/0EM5w000005vXmD.png)</Frame>                                                                                                                          | はい         | はい        |
+| Single Select (radio) | 表から1行を選択/マークします。                                                                                                                                                                                                                                         | はい         | はい        |
+| Text                  | 自由形式のテキスト入力を許可します。                                                                                                                                                                                                                                       | はい         | はい        |
+| Validated Input       | 正しい入力コントロールタイプを表示するために表カードの列に割り当てられたタイプを検出します。  サポートされているタイプ：   - ［Text］ — 自由形式。検証は強制されていません。 - ［Date (short)］ — 時間値をサポートしていません。 - ［Date (datetime)］ — 時間値をサポートしています。 - ［Numeric (long)］ — 小数点をサポートしていません。 - ［Numeric (decimal/double)］ — 小数点をサポートしています。 | いいえ        | はい        |
 
-<table border="1" cellpadding="1" cellspacing="1" data-aura-rendered-by="33:202;a"><thead><tr><th colspan="1" rowspan="1"><p> 入力 </p></th><th colspan="1" rowspan="1"><p> 説明 </p></th><th colspan="1" rowspan="1"><p> カスタム列のサポート </p></th><th colspan="1" rowspan="1"> 既存の列のサポート </th></tr></thead><tbody><tr><td colspan="1" rowspan="1"><p> None </p></td><td colspan="1" rowspan="1"><p> 入力コントロールがありません。 </p><p> 表カードから既存のデータを表示します。 </p></td><td colspan="1" rowspan="1"><p> いいえ </p></td><td colspan="1" rowspan="1"> はい </td></tr><tr><td colspan="1" rowspan="1"><p> Checkbox </p></td><td colspan="1" rowspan="1"><p> ボックスにチェックを入れて表から1行以上を選択します。 </p></td><td colspan="1" rowspan="1"><p> はい </p></td><td colspan="1" rowspan="1"> はい </td></tr><tr><td colspan="1" rowspan="1"><p> Dropdown </p></td><td colspan="1" rowspan="1"><p> ユーザーによる入力を、フォームエディターで設定した値セットのみに制限します。 </p><p><img alt="mceclip28.png" src="/images/kb/ka0Vq000000BsDB-00N5w00000Ri7BU-0EM5w000005vXmi.png"/></p></td><td colspan="1" rowspan="1"><p> はい </p></td><td colspan="1" rowspan="1"> はい </td></tr><tr><td colspan="1" rowspan="1"><p> Lookup </p></td><td colspan="1" rowspan="1"><p> 表カードの列からユーザー入力を固有の値のみに制限します。検索オプションを設定するには、ページ、カード、列を選択します。 </p><p><img alt="mceclip29.png" src="/images/kb/ka0Vq000000BsDB-00N5w00000Ri7BU-0EM5w000005vXmD.png"/></p></td><td colspan="1" rowspan="1"><p></p><p> はい </p><p></p></td><td colspan="1" rowspan="1"> はい </td></tr><tr><td colspan="1" rowspan="1"> Single Select (radio) </td><td colspan="1" rowspan="1"> 表から1行を選択/マークします。 </td><td colspan="1" rowspan="1"> はい </td><td colspan="1" rowspan="1"> はい </td></tr><tr><td colspan="1" rowspan="1"> Text </td><td colspan="1" rowspan="1"> 自由形式のテキスト入力を許可します。 </td><td colspan="1" rowspan="1"> はい </td><td colspan="1" rowspan="1"> はい </td></tr><tr><td colspan="1" rowspan="1"> Validated Input </td><td colspan="1" rowspan="1"><p> 正しい入力コントロールタイプを表示するために表カードの列に割り当てられたタイプを検出します。 </p><p> サポートされているタイプ： </p><ul><li> ［Text］ — 自由形式。検証は強制されていません。 </li><li> ［Date (short)］ — 時間値をサポートしていません。 </li><li> ［Date (datetime)］ — 時間値をサポートしています。 </li><li> ［Numeric (long)］ — 小数点をサポートしていません。 </li><li> ［Numeric (decimal/double)］ — 小数点をサポートしています。 </li></ul></td><td colspan="1" rowspan="1"> いいえ </td><td colspan="1" rowspan="1"> はい </td></tr></tbody></table>
+列リストの下部にある**［Add Column］**を選択すると、カスタム列を追加できます。カスタム列の名前を変更するには、名前を表示するスペースの上にカーソルを置き、グレーのボックスを選択してテキストエディターをアクティブにします。希望する名前を入力し、クリックしてテキスト入力の外側をクリックします。
 
-列リストの下部にある **［Add Column］** を選択すると、カスタム列を追加できます。カスタム列の名前を変更するには、名前を表示するスペースの上にカーソルを置き、グレーのボックスを選択してテキストエディターをアクティブにします。希望する名前を入力し、クリックしてテキスト入力の外側をクリックします。
+<Frame>![blobid1.png](/images/kb/ja/0EM5w000005vXlu.png)</Frame>
 
-<Frame><img alt="blobid1.png" src="/images/kb/ka0Vq000000BsDB-00N5w00000Ri7BU-0EM5w000005vXlu.png"/></Frame>
-カスタム列を削除したり、既存の列の可視化を変更したりするには、列のリスト項目の左側にカーソルを置き、 <InlineImage src="/images/kb/ja/ka0Vq000000LmzK-00N5w00000Ri7BU-0EM5w000005vXme.png" /> **［Delete］** または <InlineImage src="/images/kb/ja/ka0Vq000000LmzK-00N5w00000Ri7BU-0EM5w000005vXlq.png" /> **［Hide Column］** を選択します。
+カスタム列を削除したり、既存の列の可視化を変更したりするには、列のリスト項目の左側にカーソルを置き、<img src="/images/kb/ja/0EM5w000005vXme.png" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/> **［Delete］**または<img src="/images/kb/ja/0EM5w000005vXlq.png" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/> **［Hide Column］**を選択します。
 
-<Frame><img src="/images/kb/ka0Vq000000BsDB-00N5w00000Ri7BU-0EM5w000005vXlt.png" /></Frame>
-[このページのトップへ](#intro)
+<Frame>![mceclip30.png](/images/kb/ja/0EM5w000005vXlt.png)</Frame>
 
-#### 表フィルター（フィルターフィールド）
+### 表フィルター（フィルターフィールド）
 
-**［Filter Field］** サブメニューの下で、表の行をフィルターするために使用できるフィールドを管理できます。フィルターフィールドは、割り当てられた列の固有の値を含むドロップダウンメニュー（選択ボックス）です。ユーザーがこれらのフィールドの選択を変更して新しい選択を適用すると、フィルターされた表カードのビューが読み込まれ、フィルター設定に一致する行のみが表示されます。フィルターフィールドを追加するには、 **［Filter Field］** 入力コントロールから列を選択し、 **［Add Filter］** をクリックします。ユーザーが単一のフィルターで複数の値を選択できるようにするには、リスト項目の右側にある **［multi-select］** ボックスにチェックを入れます。
+**［Filter Field］**サブメニューの下で、表の行をフィルターするために使用できるフィールドを管理できます。フィルターフィールドは、割り当てられた列の固有の値を含むドロップダウンメニュー（選択ボックス）です。ユーザーがこれらのフィールドの選択を変更して新しい選択を適用すると、フィルターされた表カードのビューが読み込まれ、フィルター設定に一致する行のみが表示されます。フィルターフィールドを追加するには、**［Filter Field］**入力コントロールから列を選択し、**［Add Filter］**をクリックします。ユーザーが単一のフィルターで複数の値を選択できるようにするには、リスト項目の右側にある**［multi-select］**ボックスにチェックを入れます。
 
-<Frame><img src="/images/kb/ka0Vq000000BsDB-00N5w00000Ri7BU-0EM5w000005vXmh.png" /></Frame>
-#### 表の設定
+<Frame>![mceclip0.png](/images/kb/ja/0EM5w000005vXmh.png)</Frame>
+
+### 表の設定
 
 表セクションの表示方法と使用方法を管理するために、以下の設定がサポートされています。
 
-<table border="1" cellpadding="1" cellspacing="1" data-aura-rendered-by="33:202;a"><thead><tr><th colspan="1" rowspan="1"><p> 設定 </p></th><th colspan="1" rowspan="1"><p> 説明 </p></th></tr></thead><tbody><tr><td colspan="1" rowspan="1"><p> Freeze identifier columns </p></td><td colspan="1" rowspan="1"><p> 表の左側に識別子列を固定し、常に表示されるようにします。 </p><p> 表示または変更されている個別の行を識別するのに役立ちます。 </p></td></tr><tr><td colspan="1" rowspan="1"><p> Interdependent filter fields </p></td><td colspan="1" rowspan="1"><p> 前の選択にもとづいて、それぞれの表フィルターフィールドのオプションにフィルターをかけます。 </p></td></tr><tr><td colspan="1" rowspan="1"><p> Prefer page filters over filter fields </p></td><td colspan="1" rowspan="1"><p> 有効にすると、ページフィルターの設定にもとづいて表にフィルターをかけます。これにより、より多様なフィルターが可能になります。 </p><p> フォームでページフィルターを有効にする手順については、「 <a href="https://domo-support.domo.com/s/article/360043438373#h_01F8B8E69Z57MSA91Z294BF498" target="_self"> ページフィルターを使用する </a> 」を参照してください。 <a id="advanced_item_configuration" target="_blank"></a></p></td></tr></tbody></table>
+| 設定                                     | 説明                                                                                                                                                                              |
+| -------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Freeze identifier columns              | 表の左側に識別子列を固定し、常に表示されるようにします。  表示または変更されている個別の行を識別するのに役立ちます。                                                                                                                     |
+| Interdependent filter fields           | 前の選択にもとづいて、それぞれの表フィルターフィールドのオプションにフィルターをかけます。                                                                                                                                   |
+| Prefer page filters over filter fields | 有効にすると、ページフィルターの設定にもとづいて表にフィルターをかけます。これにより、より多様なフィルターが可能になります。  フォームでページフィルターを有効にする手順については、「[ページフィルターを使用する](/ja/s/article/360043438373)」を参照してください。 |
 
-[このページのトップへ](#intro)
-
-### 詳細な項目設定
+## 詳細な項目設定
 
 下表は、様々な項目と質問タイプでサポートされている設定を示しています。
 
-<table border="1" cellpadding="1" cellspacing="1" data-aura-rendered-by="33:202;a"><thead><tr><th colspan="1" rowspan="1"><p> 項目/質問のタイプ </p></th><th colspan="1" rowspan="1"><p> 設定 </p></th><th colspan="1" rowspan="1"><p> 説明 </p></th></tr></thead><tbody><tr><td colspan="1" rowspan="2"><p> All item and question types </p></td><td colspan="1" rowspan="1"><p> Descriptions </p></td><td colspan="1" rowspan="1"><p> 質問の追加情報とコンテキストを提供します。 </p></td></tr><tr><td colspan="1" rowspan="1"><p> Required questions </p></td><td colspan="1" rowspan="1"><p> ユーザー入力を受け付けるすべての項目には、 <b> ［required］ </b> フラグを付けることができます。これにより、回答が得られるまでフォームの送信が禁止されます（［Title and Description］と［Image］は、ユーザー入力を受け付けないため、 <b> ［required］ </b> 設定をサポートしていません）。 </p><p> 各質問は個別に［required］とマークすることも、フォームレベル設定（「 <a href="https://domo-support.domo.com/s/article/360043438373#h_01F8B9BS8F312PHP7HNZ41X0G0" target="_self"> フォーム設定 </a> 」を参照）を使用してすべての質問を同時にマークすることもできます。 </p></td></tr><tr><td colspan="1" rowspan="1"><p> Text questions </p></td><td colspan="1" rowspan="1"><p> Multiline </p></td><td colspan="1" rowspan="1"><p> 長いテキスト入力を表示するには、 <b> ［Multiline］ </b> 設定を使用します（テキスト領域）。 </p></td></tr><tr><td colspan="1" rowspan="2"><p> Dropdown questions </p></td><td colspan="1" rowspan="1"><p> Multiselect </p></td><td colspan="1" rowspan="1"><p></p><p> ユーザーが回答に対して複数の値を選択できるようにするには、 <b> ［Multiselect］ </b> 設定を有効にします。 </p><p></p></td></tr><tr><td colspan="1" rowspan="1"> Explanation field </td><td colspan="1" rowspan="1"> 選択に関する追加情報をユーザーに要求するには、 <InlineImage src="/images/kb/ja/ka0Vq000000LmzK-00N5w00000Ri7BU-0EM5w000005vXly.png" /> をクリックして <b> ［Additional Options］ </b> メニューを開き、 <b> ［Include Explanation Field］ </b> を選択して説明フィールドを追加します。プロンプトのメッセージを選択するには、新しく表示されるテキストボックスに任意のメモを入力します。ここを空のままにすると、デフォルトのメッセージ「Please explain your response」が使用されます。 </td></tr><tr><td colspan="1" rowspan="1"> Date questions </td><td colspan="1" rowspan="1"> Date Range </td><td colspan="1" rowspan="1"><b> ［Date Range］ </b> 設定を有効にすると、ユーザーが日付範囲（開始日と終了日）を選択できるようになります。 </td></tr><tr><td colspan="1" rowspan="2"><p> Lookup questions </p><p> 検索の質問を設定するには、選択/入力コントロールに表示されるオプションの取得元となるページ、カード、列を選択します。 </p></td><td colspan="1" rowspan="1"> Use Page Filters to filter available options </td><td colspan="1" rowspan="1"> 必要な値をすばやく簡単に見つけるために、ページフィルターを使用してオプションリストを絞り込むことができます（設定手順については、「 <a href="https://domo-support.domo.com/s/article/360043438373#h_01F8B8E69Z57MSA91Z294BF498" target="_self"> ページフィルターを使用する </a> 」を参照）。 </td></tr><tr><td colspan="1" rowspan="1"> Filter based on preceding lookup question responses </td><td colspan="1" rowspan="1"><p> 同じセクションで <b> 同じ表カードから作成 </b> した検索の質問が複数ある場合、前の検索の質問の選択値を使用して、以降の検索の質問で利用可能なオプションにフィルターをかける依存関係を構築できます。依存関係を構築する際に注意すべき点がいくつかあります。 </p><ul><li> 検索の質問は、 <b> 同じ表カードの異なる列 </b> から作成されたほかの検索の質問にのみ依存できます。 </li><li> 検索の質問は、同じセクションのほかの検索の質問にのみ依存できます。 </li><li> セクションの検索の質問の表示順序が変更された場合、依存関係が壊れてしまう可能性があるため、順序の変更によって直接影響を受ける質問のために再構築する必要があります。 </li><li> アクティブな回答セッションで依存する検索の質問を表示すると、親が回答を持つまで子の検索の質問は無効になります（ユーザー入力が禁止されます）。 </li></ul><p> 設定例については、「 <a href="https://domo-support.domo.com/s/article/360043438373#h_01F8BFJCZDH668PWC6S9T0Q0XA" target="_self"> 設定例 </a> 」の「 <a href="https://domo-support.domo.com/s/article/360043438373#h_01F8BFJMKMHSNW1A9W2XBXY5VQ" target="_self"> 依存する検索の質問 </a> 」を参照してください。 </p></td></tr><tr><td colspan="1" rowspan="1"> File attachment </td><td colspan="1" rowspan="1"> Allowed file types </td><td colspan="1" rowspan="1"><p> アップロードするファイルのフォーマットを常に正しいタイプに制限できます。タイプが選択されていない場合、Domoファイルサービスがサポートするフォーマットのファイルを使用できます。 </p><p><b> 注記： </b> ユーザーが添付ファイルを送信した場合、次のURLを使ってDomoのインスタンス内からファイルを読み取ります： https://\{INSTANCE}.domo.com/api/data/v1/data-files/\{FILE_ID} 。 <br/> INSTANCEはユーザーの個別のDomoインスタンスであり、FILE_IDは出力DataSetで返されるフォームの一意の識別子です。 <a id="use_page_filters" target="_blank"></a><br/> 連結を使用してBeast ModeまたはETLを介して完全なURLを生成することを検討してください。 </p></td></tr></tbody></table>
+| 項目/質問のタイプ                                                                    | 設定                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           | 説明                                                                                                                                              |
+| ---------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| All item and question types                                                  | Descriptions                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 | 質問の追加情報とコンテキストを提供します。                                                                                                                           |
+| Required questions                                                           | ユーザー入力を受け付けるすべての項目には、**［required］**フラグを付けることができます。これにより、回答が得られるまでフォームの送信が禁止されます（［Title and Description］と［Image］は、ユーザー入力を受け付けないため、**［required］**設定をサポートしていません）。  各質問は個別に［required］とマークすることも、フォームレベル設定（「[フォーム設定](/ja/s/article/360043438373)」を参照）を使用してすべての質問を同時にマークすることもできます。                                                                                                                                                                                                                                     |                                                                                                                                                 |
+| Text questions                                                               | Multiline                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    | 長いテキスト入力を表示するには、**［Multiline］**設定を使用します（テキスト領域）。                                                                                                |
+| Dropdown questions                                                           | Multiselect                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  | ユーザーが回答に対して複数の値を選択できるようにするには、**［Multiselect］**設定を有効にします。                                                                                        |
+| Explanation field                                                            | 選択に関する追加情報をユーザーに要求するには、  <img src="/images/kb/ja/0EM5w000005vXly.png" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/>  をクリックして**［Additional Options］**メニューを開き、**［Include Explanation Field］**を選択して説明フィールドを追加します。プロンプトのメッセージを選択するには、新しく表示されるテキストボックスに任意のメモを入力します。ここを空のままにすると、デフォルトのメッセージ「Please explain your response」が使用されます。                                                                                                                                                                      |                                                                                                                                                 |
+| Date questions                                                               | Date Range                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   | **［Date Range］**設定を有効にすると、ユーザーが日付範囲（開始日と終了日）を選択できるようになります。                                                                                      |
+| Lookup questions  検索の質問を設定するには、選択/入力コントロールに表示されるオプションの取得元となるページ、カード、列を選択します。 | Use Page Filters to filter available options                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 | 必要な値をすばやく簡単に見つけるために、ページフィルターを使用してオプションリストを絞り込むことができます（設定手順については、「[ページフィルターを使用する](/ja/s/article/360043438373)」を参照）。 |
+| Filter based on preceding lookup question responses                          | 同じセクションで**同じ表カードから作成**した検索の質問が複数ある場合、前の検索の質問の選択値を使用して、以降の検索の質問で利用可能なオプションにフィルターをかける依存関係を構築できます。依存関係を構築する際に注意すべき点がいくつかあります。   - 検索の質問は、**同じ表カードの異なる列**から作成されたほかの検索の質問にのみ依存できます。 - 検索の質問は、同じセクションのほかの検索の質問にのみ依存できます。 - セクションの検索の質問の表示順序が変更された場合、依存関係が壊れてしまう可能性があるため、順序の変更によって直接影響を受ける質問のために再構築する必要があります。 - アクティブな回答セッションで依存する検索の質問を表示すると、親が回答を持つまで子の検索の質問は無効になります（ユーザー入力が禁止されます）。   設定例については、「[設定例](/ja/s/article/360043438373)」の「[依存する検索の質問](/ja/s/article/360043438373)」を参照してください。 |                                                                                                                                                 |
+| File attachment | Allowed file types | アップロードするファイルのフォーマットを常に正しいタイプに制限できます。タイプが選択されていない場合、Domoファイルサービスがサポートするフォーマットのファイルを使用できます。  <Note>**注記：**ユーザーが添付ファイルを送信した場合、次のURLを使ってDomoのインスタンス内からファイルを読み取ります：[https://&#123;INSTANCE&#125;.domo.com/api/data/v1/data-files/&#123;FILE\_ID&#125;](https://%5C%7Binstance%7D.domo.com/api/data/v1/data-files/%7BFILE_ID%7D)。 INSTANCEはユーザーの個別のDomoインスタンスであり、FILE\_IDは出力DataSetで返されるフォームの一意の識別子です。 連結を使用してBeast ModeまたはETLを介して完全なURLを生成することを検討してください。</Note> |
 
-[このページのトップへ](#intro)
-
-### ページフィルターを使う
+## ページフィルターを使う
 
 フォームがDomoの統合コンポーネントの一部のように感じられるように、Form BuilderとForm Viewerのアプリケーションはページフィルターをサポートしています。以下の手順に従い、DataSetをアプリケーションに接続し、ページフィルターを有効にします。
 
-#### データをForm BuilderとForm Viewerに接続する
+### データをForm BuilderとForm Viewerに接続する
 
 1. Form BuilderまたはForm Viewerを開きます。
 
-2. **［Card options］** を選択します。
+2. **［Card options］**を選択します。
 
-3. **［Edit Card］** を選択します。
-
+3. **［Edit Card］**を選択します。  
 カードエディターが開きます。
 
-4. 一番下までスクロールして
-**FilterConfiguration** DataSetのリストを検索します。
-
+4. 一番下までスクロールして**FilterConfiguration** DataSetのリストを検索します。  
 Form BuilderとForm Viewerの両方で25個のプレースホルダーDataSetを使用し、表や検索フィルターに使用するDataSetを変更できます。
 
-5. 使用していない
-**FilterConfiguration** DataSetのいずれかを選択します。
+5. 使用していない**FilterConfiguration** DataSetのいずれかを選択します。
 
-6. **［Select DataSet］** でDataSetを選択します。
-
-**［Select a DataSet］** モーダルが表示されます。
+6. **［Select DataSet］**でDataSetを選択します。  
+**［Select a DataSet］**モーダルが表示されます。
 
 7. アプリケーションに接続するDataSetを検索して選択します。
 
-8. **［Choose DataSet］** を選択します。
+8. **［Choose DataSet］**を選択します。
 
-9. **［Save & Finish］** を選択して、エディターを閉じます。
-
+9. **［Save & Finish］**を選択して、エディターを閉じます。  
 DataSetをアプリケーションに接続すると、そのページフィルターが関連するクエリにも適用されます。
 
-<Note>
-  **注記：** ページフィルターは、検索の質問/表セクションの作成に使用された表カードが、ページフィルターが対象としているDataSetと一致している場合、検索の質問または表セクションにのみ適用されます。
+<Note>**注記：**ページフィルターは、検索の質問/表セクションの作成に使用された表カードが、ページフィルターが対象としているDataSetと一致している場合、検索の質問または表セクションにのみ適用されます。</Note>
 
-</Note>
-
-[このページのトップへ](#intro)
-
-### 設定例
+## 設定例
 
 以下の表カードがあるとします。
 
-<Frame><img src="/images/kb/ka0Vq000000BsDB-00N5w00000Ri7BU-0EM5w000005vXmL.png" /></Frame>
+<Frame>![mceclip38.png](/images/kb/ja/0EM5w000005vXmL.png)</Frame>
+
 この表カードを使用すると、列ごとに検索の質問を作成できます。
 
-<table border="1" cellpadding="1" cellspacing="1" data-aura-rendered-by="33:202;a"><thead></thead><tbody><tr><td colspan="1" rowspan="1"><p> 地域の検索の質問 </p><p><img alt="mceclip40.png" src="/images/kb/ka0Vq000000BsDB-00N5w00000Ri7BU-0EM5w000005vXlz.png" style={{width: 449, height: 342}}/></p></td></tr><tr><td colspan="1" rowspan="1"><p> 州の検索の質問 </p><p><img alt="mceclip41.png" src="/images/kb/ka0Vq000000BsDB-00N5w00000Ri7BU-0EM5w000005vXlv.png" style={{width: 451, height: 526}}/></p></td></tr><tr><td colspan="1" rowspan="1"><p> 都市の検索の質問 </p><p><img alt="mceclip43.png" src="/images/kb/ka0Vq000000BsDB-00N5w00000Ri7BU-0EM5w000005vXmO.png" style={{width: 449, height: 524}}/></p></td></tr></tbody></table>
+| 地域の検索の質問  <Frame>![mceclip40.png](/images/kb/ja/0EM5w000005vXlz.png)</Frame> |
+| 州の検索の質問  <Frame>![mceclip41.png](/images/kb/ja/0EM5w000005vXlv.png)</Frame> |
+| 都市の検索の質問  <Frame>![mceclip43.png](/images/kb/ja/0EM5w000005vXmO.png)</Frame> |
 
-州のリストを、ユーザーが **地域** の検索の質問で選択した地域内の州に限定する場合、 **州** の検索の質問の下にある **［Use previous lookup question response to filter available options］** というメニューで **［State］** を選択することができます。新しい **州** の検索の質問の設定：
+州のリストを、ユーザーが**地域**の検索の質問で選択した地域内の州に限定する場合、**州**の検索の質問の下にある**［Use previous lookup question response to filter available options］**というメニューで**［State］**を選択することができます。新しい**州**の検索の質問の設定：
 
-<Frame><img alt="mceclip44.png" src="/images/kb/ka0Vq000000BsDB-00N5w00000Ri7BU-0EM5w000005vXmJ.png" style={{width: 450, height: 525}}/></Frame>
-同様に、利用可能な都市を **州** の検索の質問でユーザーによって選択された州の都市に限定するには、以下のように **都市** の検索の質問を設定できます。
+<Frame>![mceclip44.png](/images/kb/ja/0EM5w000005vXmJ.png)</Frame>
 
-<Frame><img alt="mceclip45.png" src="/images/kb/ka0Vq000000BsDB-00N5w00000Ri7BU-0EM5w000005vXlj.png" style={{width: 450, height: 525}}/></Frame>
+同様に、利用可能な都市を**州**の検索の質問でユーザーによって選択された州の都市に限定するには、以下のように**都市**の検索の質問を設定できます。
+
+<Frame>![mceclip45.png](/images/kb/ja/0EM5w000005vXlj.png)</Frame>
+
 アクティブなセッションでユーザーがこれらの質問を表示すると、次のように表示されます。
 
-<Frame><img src="/images/kb/ka0Vq000000BsDB-00N5w00000Ri7BU-0EM5w000005vXm3.png" /></Frame>
-**州** を **地域** に依存させると、ユーザーが地域を選択するまで **州** の入力も無効になります。また、利用可能な **州** の値は選択された **地域** に対応する値に、 **都市** の値は選択された **州** に対応する値に制限されます。
+<Frame>![mceclip46.png](/images/kb/ja/0EM5w000005vXm3.png)</Frame>
 
-<table border="1" cellpadding="1" cellspacing="1" data-aura-rendered-by="33:202;a"><thead></thead><tbody><tr><td colspan="1" rowspan="1"><p><img alt="mceclip48.png" src="/images/kb/ka0Vq000000BsDB-00N5w00000Ri7BU-0EM5w000005vXlh.png"/></p></td><td colspan="1" rowspan="1"><p><img alt="mceclip47.png" src="/images/kb/ka0Vq000000BsDB-00N5w00000Ri7BU-0EM5w000005vXmj.png"/></p></td></tr></tbody></table>
+**州**を**地域**に依存させると、ユーザーが地域を選択するまで**州**の入力も無効になります。また、利用可能な**州**の値は選択された**地域**に対応する値に、**都市**の値は選択された**州**に対応する値に制限されます。
 
-[このページのトップへ](#intro)
+| <Frame>![mceclip48.png](/images/kb/ja/0EM5w000005vXlh.png)</Frame> | <Frame>![mceclip47.png](/images/kb/ja/0EM5w000005vXmj.png)</Frame> |
 
-日本語

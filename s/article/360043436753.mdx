@@ -1,133 +1,204 @@
 ---
-title: "Microsoft OneDrive for Business Connector"
+title: "Microsoft OneDrive Business Connector"
+excerpt: "Configure Domo's Microsoft OneDrive for Business connector to import files from your OneDrive account into a DataSet using OAuth credentials."
 ---
 
 ## Intro
 
-Microsoft OneDrive for Business is an online file sharing and personal cloud content management service for businesses. For more information about the OneDrive API, see [https://msdn.microsoft.com/en-us/lib.../dn659752.aspx](https://msdn.microsoft.com/en-us/library/office/dn659752.aspx "https://msdn.microsoft.com/en-us/library/office/dn659752.aspx").
+Microsoft OneDrive for Business is an online file sharing and personal cloud content management service for businesses. For more information about the OneDrive API, see [https://msdn.microsoft.com/en-us/lib.../dn659752.aspx](https://msdn.microsoft.com/en-us/library/office/dn659752.aspx).
 
-You connect to your OneDrive for Business account in the Data Center. This topic discusses the fields and menus that are specific to the OneDrive for Business connector user interface. General information for adding DataSets, setting update schedules, and editing DataSet information is discussed in [Adding a DataSet Using a Connector](https://domo-support.domo.com/s/article/360042926274?language=en_US "Adding a DataSet Using a Connector").
+You connect to your OneDrive for Business account in the Data Center. This topic discusses the fields and menus that are specific to the OneDrive for Business connector user interface. General information for adding DataSets, setting update schedules, and editing DataSet information is discussed in [Adding a DataSet Using a Connector](/s/article/360042926274).
 
 ## Prerequisites
 
 To connect to your OneDrive for Business account and create a DataSet, you must have the following:
 
-* A OneDrive for Business client secret
-* A Microsoft username and password
+- A OneDrive for Business client secret
+- A Microsoft username and password
 
 If you are using the Microsoft Graph, you will need to set your redirect\_uri to a different URL depending on whether you are using a newly registered or existing app.
 
-* If you are using a *newly registered* app, set your redirect\_uri to https://oauth.domo.com/api/data/v1/oauth/providers/onedrive-business/exchange.
-* If you are using an *existing* app, set your redirect\_uri to https://oauth.domo.com/api/data/v1/oauth/providers/microsoft-onedrive-business/exchange.
+- If you are using a *newly registered* app, set your redirect\_uri to https://oauth.domo.com/api/data/v1/oauth/providers/onedrive-business/exchange.
+- If you are using an *existing* app, set your redirect\_uri to https://oauth.domo.com/api/data/v1/oauth/providers/microsoft-onedrive-business/exchange.
 
-For instructions about obtaining a OneDrive for Business client ID, and client secret, and registering your app using SharePoint Server 2016, see [https://dev.onedrive.com/app-registration-server.htm](https://dev.onedrive.com/app-registration-server.htm "https://dev.onedrive.com/app-registration-server.htm").
+For instructions about obtaining a OneDrive for Business client ID, client secret, and registering your app using SharePoint Server 2016, see [https://dev.onedrive.com/app-registration-server.htm](https://dev.onedrive.com/app-registration-server.htm).
 
-For instructions about registering your app for Microsoft Graph, see [https://docs.microsoft.com/en-us/onedrive/app-registration.htm](https://docs.microsoft.com/en-us/onedrive/developer/rest-api/getting-started/app-registration "https://docs.microsoft.com/en-us/onedrive/developer/rest-api/getting-started/app-registration")
+For instructions about registering your app for Microsoft Graph, see [https://docs.microsoft.com/en-us/onedrive/app-registration.htm](https://docs.microsoft.com/en-us/onedrive/developer/rest-api/getting-started/app-registration)
 
 To connect to Microsoft OneDrive for Business to retrieve the information, you must have the following:
 
-* An installed Microsoft Azure app.
-* The CLIENT ID and CLIENT SECRET. To generate an app and locate these credentials, see [Microsoft's documentation](https://docs.microsoft.com/en-us/azure/active-directory/develop/quickstart-register-app "Microsoft's documentation"). You may need the following information to register for the app:
+- An installed Microsoft Azure app.
+- The CLIENT ID and CLIENT SECRET. To generate an app and locate these credentials, see [Microsoft's documentation](https://docs.microsoft.com/en-us/azure/active-directory/develop/quickstart-register-app). You may need the following information to register for the app:
 
-  + **Azure Portal:** [https://portal.azure.com/](https://portal.azure.com/ "https://portal.azure.com/")
-  + **Sharepoint App to Register:** SharePoint Online Rest API
-  + **Domo Re-direct URL:** [https://oauth.domo.com/api/data/v1/oauth/providers/microsoft-onedrive-business/exchange](https://oauth.domo.com/api/data/v1/oauth/providers/microsoft-onedrive-business/exchange "https://oauth.domo.com/api/data/v1/oauth/providers/microsoft-onedrive-business/exchange")
-* The Microsoft OneDrive for Business Connector needs the following API permissions.
+  - **Azure Portal:** [https://portal.azure.com/](https://portal.azure.com/)
+  - **Sharepoint App to Register:** SharePoint Online Rest API
+  - **Domo Re-direct URL:** [https://oauth.domo.com/api/data/v1/oauth/providers/microsoft-onedrive-business/exchange](https://oauth.domo.com/api/data/v1/oauth/providers/microsoft-onedrive-business/exchange)
+- The Microsoft OneDrive for Business Connector needs the following API permissions.
 
-  + User.Read
-  + Files.Read.All
-  + offline\_access
+  - User.Read
+  - Files.Read.All
+  - offline\_access
 
 ## Setting Up the Azure Portal Video
 
-To set up the Azure portal, watch the YouTube video, [How to Set Up the OneDrive for Business Connector](https://www.youtube.com/watch?v=NN9e05qEa3A "How to Set Up the One Drive for Business Connector").
+To set up the Azure portal, watch the YouTube video, [How to Set Up the OneDrive for Business Connector](https://www.youtube.com/watch?v=NN9e05qEa3A).
 
 ### To Obtain the OneDrive CLIENT ID:
 
-1. Go to [https://portal.azure.com](https://portal.azure.com/ "https://portal.azure.com").
-2. Select **Microsoft Entra ID** ([https://learn.microsoft.com/en-us/entra/fundamentals/new-name](https://learn.microsoft.com/en-us/entra/fundamentals/new-name "https://learn.microsoft.com/en-us/entra/fundamentals/new-name") ) **> App registrations**.
+1. Go to [https://portal.azure.com](https://portal.azure.com/).
+2. Select **Microsoft Entra ID** ([https://learn.microsoft.com/en-us/entra/fundamentals/new-name](https://learn.microsoft.com/en-us/entra/fundamentals/new-name))**> App registrations**.
 3. Find and click on your web app.
 4. The "application" ID is your CLIENT ID.
 
 ### To obtain the OneDrive CLIENT SECRET:
 
-1. Go to [https://portal.azure.com](https://portal.azure.com/ "https://portal.azure.com").
-2. Select **Microsoft Entra ID** ([https://learn.microsoft.com/en-us/entra/fundamentals/new-name](https://learn.microsoft.com/en-us/entra/fundamentals/new-name "https://learn.microsoft.com/en-us/entra/fundamentals/new-name") ) **> App registrations**.
+1. Go to [https://portal.azure.com](https://portal.azure.com/).
+2. Select **Microsoft Entra ID** ([https://learn.microsoft.com/en-us/entra/fundamentals/new-name](https://learn.microsoft.com/en-us/entra/fundamentals/new-name))**> App registrations**.
 3. Find and click on your web app.
 4. Open **Certificates and secrets**.
 5. Click **+New Value**.
 6. Provide the value description and the expiry period for your secret. Click **Add**.
-7. Your new value will appear. Copy the Value field and paste it in your Domo connector Value field.   
-   
-   <Frame><img alt="Secret.png" src="/images/kb/ka0Vq000000A67N-00N5w00000Ri7BU-0EM5w000005vO71.png"/></Frame>
+7. Your new value will appear. Copy the Value field and paste it in your Domo connector Value field. <img alt="Secret.png" src="/images/kb/0EM5w000005vO71.png" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/>
 
 ### Creating an Azure App for Enterprise OAuth
 
 To create a Microsoft Azure app, do the following:
 
-1. Log into [https://portal.azure.com](https://portal.azure.com/ "https://portal.azure.com").
-2. Click on **App registrations**.
-   
-   <Frame><img alt="Capture1.PNG" src="/images/kb/ka05w000001236O-00N5w00000Ri7BU-0EM5w000005vNz7.png"/></Frame>
+1. Log into [https://portal.azure.com](https://portal.azure.com/).
+2. Click on **App registrations**. <img alt="Capture1.PNG" src="/images/kb/0EM5w000005vO6q.png" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/> 3. Click **New registration**.
+4. Enter the application name and select the supported account type. Enter the Redirect URI for Web as [https://oauth.domo.com/api/data/v1/oauth/providers/microsoft-onedrive-business/exchange](https://oauth.domo.com/api/data/v1/oauth/providers/microsoft-onedrive-business/exchange).  
+     
 
-3. Click **New registration**.
-4. Enter the application name and select the supported account type. Enter the Redirect URI for Web as
-   [https://oauth.domo.com/api/data/v1/oauth/providers/microsoft-onedrive-business/exchange](https://oauth.domo.com/api/data/v1/oauth/providers/microsoft-onedrive-business/exchange "https://oauth.domo.com/api/data/v1/oauth/providers/microsoft-onedrive-business/exchange").
-   
-   <Frame><img src="/images/kb/ka0Vq000000Hfun-00N5w00000Ri7BU-0EMVq000002NpNF.jpg" style={{width: 869, height: 555}}/></Frame>
-
+   <Frame>![Screenshot](/images/kb/0EMVq000002NpNF.jpg)</Frame>
 5. Click **Register**.
-6. Now, click **API Permissions**.
-   
-   <Frame><img alt="API_permission.png" src="/images/kb/ka0Vq0000006d0H-00N5w00000Ri7BU-0EM5w000005vO6o.png"/></Frame>
-
-7. Click **+Add Permissions** button.
-   
-   <Frame><img alt="Capture8.PNG" src="/images/kb/ka05w00000123LH-00N5w00000Ri7BU-0EM5w000005vO61.png"/></Frame>
-
-8. Select **Microsoft Graph > Delegated Permissions**.
+6. Now, click **API Permissions**. <img alt="API_permission.png" src="/images/kb/0EM5w000005vO6o.png" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/> 7. Click **+Add Permissions** button.  
 9. Select the permissions as required.
-10. After adding the permissions, all configured permissions will be listed as below.
-      
-   <Frame><img alt="Permissions modified.jpg" src="/images/kb/ka0Vq000000Hfun-00N5w00000Ri7BU-0EMVq000002NqUb.jpg" style={{width: 1545, height: 648}}/></Frame>
+10. After adding the permissions, all configured permissions will be listed as below.  
+
+    <Frame>![Permissions modified.jpg](/images/kb/0EMVq000002NqUb.jpg)</Frame>
 
 ## Connecting to Your OneDrive for Business Account
 
-This section enumerates the **Permission** settings within Microsoft needed for Domo access as well as options in the **Credentials** and **Details** panes in the OneDrive for Business Connector page. The components of the other panes in this page, **Scheduling** and **Name & Describe Your DataSet**, are universal across most connector types and are discussed in greater length in [Adding a DataSet Using a Data Connector](https://domo-support.domo.com/s/article/360042926274?language=en_US "Adding a DataSet Using a Data Connector").
+This section enumerates the **Permission** settings within Microsoft needed for Domo access as well as options in the **Credentials** and **Details** panes in the OneDrive for Business Connector page. The components of the other panes in this page, **Scheduling** and **Name & Describe Your DataSet**, are universal across most connector types and are discussed in greater length in [Adding a DataSet Using a Data Connector](/s/article/360042926274).
 
 ### Credentials Pane
 
-This pane contains fields for entering credentials to connect to your OneDrive for Business account. The following table describes what is needed for each field:
+This pane contains fields for entering credentials to connect to your OneDrive for Business account. The following table describes what is needed for each field:  
 
-<table border="1" cellpadding="1" cellspacing="1" data-aura-rendered-by="33:195;a"><thead><tr><th colspan="1" rowspan="1"><p><span class="s1"> Field </span></p></th><th colspan="1" rowspan="1"><p><span class="s1"> Description </span></p></th></tr></thead><tbody><tr><td colspan="1" rowspan="1"><p> Client ID </p></td><td colspan="1" rowspan="1"><p> Enter your OneDrive for Business client ID. </p></td></tr><tr><td colspan="1" rowspan="1"><p> Client Secret </p></td><td colspan="1" rowspan="1"><p> Enter your OneDrive for Business client secret. </p></td></tr></tbody></table>
+| Field | Description |
+|-------|-------------|
+| Client ID | Enter your OneDrive for Business client ID. |
+| Client Secret | Enter your OneDrive for Business client secret. |
 
-Once you have entered these credentials, you are taken to the Microsoft login screen, where you can enter the username and password for your Microsoft account. After you successfully connect, you can use the same account any time you go to create a new OneDrive for Business DataSet. You can manage connector accounts in the **Accounts** tab in the Data Center. For more information about this tab, see [Managing User Accounts for Connectors](https://domo-support.domo.com/s/article/360042926054?language=en_US "Managing User Accounts for Connectors").
+Once you have entered these credentials, you are taken to the Microsoft login screen, where you can enter the username and password for your Microsoft account. After you successfully connect, you can use the same account any time you go to create a new OneDrive for Business DataSet. You can manage connector accounts in the **Accounts** tab in the Data Center. For more information about this tab, see [Managing User Accounts for Connectors](/s/article/360042926054).
 
 ### Details Pane
 
-This pane contains a primary **Reports** menu, along with various other menus which may or may not appear depending on the report type you select.
+This pane contains a primary **Report** menu, along with various other menus which may or may not appear depending on the report type you select.
 
-<table border="1" cellpadding="1" cellspacing="1" data-aura-rendered-by="33:195;a"><thead><tr><th colspan="1" rowspan="1"><p> Menu </p></th><th colspan="1" rowspan="1"><p> Description </p></th></tr></thead><tbody><tr><td colspan="1" rowspan="1"><p> Report </p></td><td colspan="1" rowspan="1"><p> Select the OneDrive for Business report you want to run. The following reports are available: </p><table border="1" cellpadding="1" cellspacing="1"><tbody><tr><td colspan="1" rowspan="1"> Children </td><td colspan="1" rowspan="1"> Lists the children of the item with the specified folder or path. </td></tr><tr><td colspan="1" rowspan="1"> Default Drive </td><td colspan="1" rowspan="1"> Returns metadata about the authenticated user's default drive in OneDrive </td></tr><tr><td colspan="1" rowspan="1"> Download Children Shared File </td><td colspan="1" rowspan="1"> Downloads a Shared file from children folder into Domo as a DataSet. You specify the file type and file/folder or path, along with other information. </td></tr><tr><td colspan="1" rowspan="1"> Download File </td><td colspan="1" rowspan="1"> Downloads a file into Domo as a DataSet. You specify the file type and file/folder or path, along with other information. </td></tr><tr><td colspan="1" rowspan="1"> Download Nested Children Shared File </td><td colspan="1" rowspan="1"> Downloads a shared file from nested children folder into Domo as a DataSet. You specify the folder name and the compelte file path, along with other information. </td></tr><tr><td colspan="1" rowspan="1"> Download Shared File </td><td colspan="1" rowspan="1"> Downloads a Shared file into Domo as a DataSet. You specify the file type and file/folder or path, along with other information. </td></tr><tr><td colspan="1" rowspan="1"> Drive By Id </td><td colspan="1" rowspan="1"> Lists drives for a selected drive ID. </td></tr><tr><td colspan="1" rowspan="1"> Drives </td><td colspan="1" rowspan="1"> Lists the available drives for the authenticated user. </td></tr><tr><td colspan="1" rowspan="1"> Properties </td><td colspan="1" rowspan="1"> Returns properties for the item with the specified file/folder or path. </td></tr><tr><td colspan="1" rowspan="1"> Recent Items </td><td colspan="1" rowspan="1"> Returns a list of items that have been recently used by the authenticated user. This list includes items that are in the user's drive as well as items they have access to from other drives. </td></tr><tr><td colspan="1" rowspan="1"> Shared Items </td><td colspan="1" rowspan="1"> Lists items that are shared with the authenticated user. </td></tr></tbody></table></td></tr><tr><td colspan="1" rowspan="1"> Addressing </td><td colspan="1" rowspan="1"> Specify whether the addressing for the item is ID-based (in which case, you specify a file or folder name) or path-based (in which case, you specify the file path). </td></tr><tr><td colspan="1" rowspan="1"> Path </td><td colspan="1" rowspan="1"> Enter the relative path of the file or folder you want to retrieve a report for. For example: <span class="mt-font-courier-new"> /Documents/test.csv </span></td></tr><tr><td colspan="1" rowspan="1"> File/Folder Name </td><td colspan="1" rowspan="1"> Enter the name (or a portion of the name), without extension, of the MS OneDrive file/folder to retrieve. The connector returns the most recently created or modified file matching the name, based on what you have selected in the <b> Date Field </b> menu. </td></tr><tr><td colspan="1" rowspan="1"> Match Type </td><td colspan="1" rowspan="1"> Specify whether the retrieve file starts with or contains the name you have entered in <b> File Name </b>. </td></tr><tr><td colspan="1" rowspan="1"> Parent Folder/Parent Folder Name </td><td colspan="1" rowspan="1"> Enter a complete folder name (not case-sensitive) to limit the file search to a specific folder's root contents. Subfolders are ignored. If you leave this blank, the search includes all files in all folders for which you have access. </td></tr><tr><td colspan="1" rowspan="1"> Date Field </td><td colspan="1" rowspan="1"><p> Specify whether to retrieve a file based on its creation or last modified date. This is useful when there are multiple files containing the name you have entered in <b> File Name </b>. </p></td></tr><tr><td colspan="1" rowspan="1"> File Type </td><td colspan="1" rowspan="1"> Select the file type for the data file you want to retrieve. </td></tr><tr><td colspan="1" rowspan="1"> Is Password Protected? </td><td colspan="1" rowspan="1"> Select whether the file is password-protected. </td></tr><tr><td colspan="1" rowspan="1"> Sheet Name </td><td colspan="1" rowspan="1"> Enter the sheet name you want to retrieve in the specified spreadsheet. </td></tr><tr><td colspan="1" rowspan="1"> Sheet Name Match Type </td><td colspan="1" rowspan="1"> Select the match type you want to perform on the sheet name. </td></tr><tr><td colspan="1" rowspan="1"> File Name or Portion of File Name to Search For in ZIP </td><td colspan="1" rowspan="1"> Enter the name of the zipped file to retrieve. Leave blank to retrieve the first zipped file. </td></tr><tr><td colspan="1" rowspan="1"> Zipped File Type </td><td colspan="1" rowspan="1"> Select the file type for the zipped data file you want to retrieve. </td></tr><tr><td colspan="1" rowspan="1"> Drive ID </td><td colspan="1" rowspan="1"> Select the drive you want to retrieve information for. </td></tr></tbody></table>
+#### Report
+
+Select the OneDrive for Business report you want to run. The following reports are available:
+
+| Report Name | Description |
+|-------------|-------------|
+| Download Shared File (Using SharingURL) | Downloads a shared file into Domo as a DataSet. You specify the file type, file or folder path, and other information. |
+| Children | Lists the children of the item with the specified folder or path. |
+| Default Drive | Returns metadata about the authenticated user's default drive in OneDrive. |
+| Download File | Downloads a file into Domo as a DataSet. You specify the file type, file or folder path, and other information. |
+| Drive By Id | Lists drives for a selected drive ID. |
+| Drives | Lists the available drives for the authenticated user. |
+| Properties | Returns properties for the item with the specified file/folder or path. |
+| Recent Items | Returns a list of items that have been recently used by the authenticated user. This list includes items that are in the user's drive as well as items they have access to from other drives. |
+| Shared Items — DEPRECATED | Lists items that are shared with the authenticated user. |
+| Download Nested Children Shared File — DEPRECATED | Downloads a shared file from a nested children folder into Domo as a DataSet. You specify the folder name and the complete file path, along with other information. |
+| Download Shared File (Search Endpoint) — DEPRECATED | Downloads a shared file into Domo as a DataSet. You specify the file type, file or folder path, and other information. |
+| Download Shared File (SharedWithMe Endpoint) — DEPRECATED | Downloads a shared file into Domo as a DataSet. You specify the file type and file/folder or path, along with other information. |
+| Download Children Shared File — DEPRECATED | Downloads a shared file from the children folder into Domo as a DataSet. You specify the file type, file or folder path, and other information. |
+
+<Note>**Deprecated reports:** Use the **Download Shared File (Using SharingURL)** report instead of any of the deprecated reports listed above.</Note>
+
+#### Other Menus
+
+The following menus may also appear depending on the report you select:
+
+| Menu | Description |
+|------|-------------|
+| Addressing | Specify whether the addressing for the item is ID-based (in which case, you specify a file or folder name) or path-based (in which case, you specify the file path). |
+| Path | Enter the relative path of the file or folder you want to retrieve a report for. For example: `/Documents/test.csv` |
+| File/Folder Name | Enter the name (or a portion of the name), without extension, of the MS OneDrive file/folder to retrieve. The connector returns the most recently created or modified file matching the name, based on what you have selected in the **Date Field** menu. |
+| Match Type | Specify whether the retrieve file starts with or contains the name you have entered in **File Name**. |
+| Parent Folder/Parent Folder Name | Enter a complete folder name (not case-sensitive) to limit the file search to a specific folder's root contents. Subfolders are ignored. If you leave this blank, the search includes all files in all folders for which you have access. |
+| Date Field | Specify whether to retrieve a file based on its creation or last modified date. This is useful when there are multiple files containing the name you have entered in **File Name**. |
+| File Type | Select the file type for the data file you want to retrieve. |
+| Is Password Protected? | Select whether the file is password-protected. |
+| File Password | Enter the file password. |
+| Sheet Name | Enter the sheet name you want to retrieve in the specified spreadsheet. |
+| Sheet Name Match Type | Select the match type you want to perform on the sheet name. |
+| File Name or Portion of File Name to Search For in ZIP | Enter the name of the zipped file to retrieve. Leave blank to retrieve the first zipped file. |
+| Zipped File Type | Select the file type for the zipped data file you want to retrieve. |
+| Drive ID | Select the drive you want to retrieve information for. |
+| Shared File Name | Enter the shared file name with extension. |
+| Sharing URL | Enter the URL generated by OneDrive when you select <b>Copy Link</b> from the <b>Sharing</b> menu. |
+| Shared Folder Name | Enter the name of the parent shared folder. |
+| Nested shared file Path | Enter the full path to the shared file, including the file extension. For example, Folder1/Folder2/test.csv. |
+| Shared Folder Name | Enter the name of the parent shared folder. |
+| File Or Folder | Specify whether the item is a folder or a file. |
+| File Password | Enter the file password. |
+
+### Advanced Pane
+
+Configure options for the file you want to import into Domo.
+
+| Field         | Description                     |
+| ------------- | ------------------------------- |
+| Enter your data tag  | Enter the XML tag that contains the data you want to import.         |
+| Do you require attributes in data?  | Select Yes to include attribute values in the imported data.         |
+| Enter fields to exclude  | Specify the comma separated list of fields you want to exclude from the XML import.         |
+| Enter XPath expression  | Enter your XPath query using standard XPath syntax as defined by the World Wide Web Consortium (W3C). For more information, see http://www.w3.org/TR/2014/REC-xpath-30-20140408/.         |
+| Header Start Row  | Enter the row number that contains the column headers in the data set.        |
+| Data Start Row  | Enter the row number where the data begins in the data set.         |
+| Footer  | Enter the number of rows to skip at the end of the data set. For example, enter 2 to exclude the last two rows.         |
+| Blank Rows Handling  | Specify how blank rows are handled during import. Select <b>Stop at the first blank row</b> to end the import when a blank row is encountered, or select <b>Skip blank rows</b> to ignore blank rows and continue importing data.         |
+| Delimiter  | Select the delimiter used to separate values in the CSV file.         |
+| Custom Delimiter  | Enter the character used to separate values in the CSV file. Use \t for a tab delimiter or a Unicode character in the \\uxxxx format (for example, \\u005E).         |
+| Quote Character | Select the character used to enclose text values in the CSV file. The double quotation mark (") is the standard quote character for CSV files.         |
+| Custom Quote Character  | Enter the character used to enclose text values in the CSV file. To specify a Unicode character, use the \\uxxxx format (for example, \\u005E).         |
+| Escape character  | Select the escape character for parsing CSV files.         |
+| Custom Escape Character  | Enter the CSV escape character. Enter Unicode characters in \\uxxxx form (for example, \\u005E)         |
+| File Encoding | Select the character encoding used by the file. The default encoding is UTF-8.         |
 
 ## FAQ
 
 <AccordionGroup>
+
+<Accordion title="Which report can I use to download a file that has been shared with me?">
+You can use the **Download Shared File (Using SharingURL)** report to access shared files. This report supports the following file formats: CSV, XLS, XLSX, XML, ZIP, and GZIP.
+</Accordion>
+
+<Accordion title="What is the procedure for obtaining the Sharing URL required by the Download Shared File (Using SharingURL) report?">
+The Sharing URL can be obtained through two distinct methods:
+
+- - **Browser Address Bar:** Use the file's URL as displayed in the browser address bar during file viewing.
+  - **OneDrive Generation:** Utilize the URL generated by **OneDrive** upon selecting **Copy link** from the **Share** menu.  
+
+    <Frame>![Screenshot](/images/kb/0EMVq00000E79cn.jpg)</Frame>
+</Accordion>
+
+<Accordion title="I have a dataset that uses one of the deprecated reports to get a shared file. Do I need to recreate my dataset?">
+Dataset recreation isnot required. You can change the report the connector is using in the connector details to **Download Shared File (Using SharingURL)** report and enter the URL of the target file. The dataset settings and schema will remain unchanged.
+</Accordion>
+
 <Accordion title="What kind of credentials do I need to power up this connector?">
-
-You need the client id and client secret of your OneDrive App.
-
+You need the client ID and client secret of your OneDrive App.
 </Accordion>
 
 <Accordion title="How often can the data be updated?">
-
 Datasets should be set to update no more than once per hour.
-
 </Accordion>
 
 <Accordion title="Are there any API limits that I need to be aware of?">
-
-Microsoft limits API calls on a per user/per app basis. To prevent rate limiting, reduce the number of datasets scheduled to run at the same time.
-
+Microsoft limits API calls on a per-user/per-app basis. To prevent rate limiting, reduce the number of datasets scheduled to run at the same time.
 </Accordion>
-</AccordionGroup>
 
+</AccordionGroup>

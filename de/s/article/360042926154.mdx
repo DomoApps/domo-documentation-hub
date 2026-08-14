@@ -1,0 +1,67 @@
+---
+title: "Optimales Vorgehen zum Verwalten von DataSets"
+excerpt: "Befolgen Sie bewährte Verfahren für die Benennung, Beschreibung und Datensteuerung von DataSets sowie für die Pflege von DataFlows in Domo."
+---
+
+Ansicht der Seitenzusammenfassung
+
+## Allgemein bestes Vorgehen
+
+- Stellen Sie sicher, dass jedes DataSet, das Sie erstellen oder importieren, einen Namen und eine Beschreibung mit konkreten Details darüber hat, was das DataSet enthält.
+- Verzichten Sie darauf, den Namen des Konnektors, den Sie verwenden, im DataSet-Titel mit anzugeben, um Redundanz zu vermeiden.
+- Fügen Sie keine Datumsbereiche zum DataSet-Namen hinzu (beispielsweise „Google Analytics 2016“). Die meisten DataSets werden mit einem automatischen Zeitplan eingerichtet, sodass der Name schnell veraltet sein kann. Diese Vorgehensweise hilft Ihnen außerdem zu vermeiden, dass Sie das DataSet und alle anderen DataSets mit Datumsangaben im Namen umbenennen müssen.
+- Schreiben Sie für DataSet-Beschreibungen eine kurze Beschreibung, welche Daten abgerufen werden, wie etwa Ausgaben, Eindrücke etc. Sie können die Aktualisierungsfrequenz in der Beschreibung angeben, aber dies wird oft davon abhängen, ob das Element für typische Benutzer wichtig ist.
+- Bestimmen Sie stets einen Besitzer des DataSets. Diese Person sollte für diese Daten verantwortlich sein. Falls eine Person ein DataSet einrichtet und es dann nicht zum Besitzer der Daten überträgt, der für dessen Aktualisierung verantwortlich sein soll, erhält die Person, die das DataSet erstellt hat (nicht der ernannte Besitzer) eine Mitteilung, falls das DataSet kollabiert. Der ernannte Besitzer, dessen Aufgabe es ist, das DataSet zu reparieren, erhält hingegen keine Mitteilung.
+- Da die Datenabstammung in DataSets nur schwer zu ermitteln ist, sollten Sie in Ihren DataFlow- oder DataSet-Beschreibungen die Dateneingaben und -ausgaben eines DataFlows hinzufügen, sodass zukünftige Benutzer Informationen, die für das DataSet oder den DataFlow relevant sind, zurückverfolgen können. Fügen Sie außerdem die Frequenz des DataFlows hinzu und geben Sie an, ob er automatisiert oder zeitlich geplant ist.
+
+  - **Vorgeschlagene DataFlow DataSet-Beschreibungen:**
+
+    - Eingabe-DataSets:
+    - Ausgabe-DataSets:
+    - Ausführungshäufigkeit:
+- Wenn Sie DataFlows erstellen, die ein berechnetes Feld enthalten, sollten Sie ein Präfix oder Suffix wie „CALC“ hinzufügen, damit zukünftige Benutzer wissen, dass sich ein berechnetes Feld im DataFlow befindet. Wenn Sie später eine Fehlerbehebung im DataFlow vornehmen, ist es viel einfacher zu bestimmen, ob Sie sich der Berechnungen bewusst sind.
+
+  - **Namensgebung mit Präfixen und jeweiliger Erläuterung empfohlen**
+
+    - PROD: Produktion; Karten mit diesem DataSet erstellen.
+    - INT: Zwischen-DataSet für DataFlow; PROD-DataSet zur Beschreibung hinzufügen.
+    - DEV: Prüfen der Daten; nach der Prüfung auf PROD ändern.
+    - TEMP: Verwendet für ad hoc-Anfragen und Prüfungen; vierteljährlich löschen.
+    - TEST: Verwendet, um einen Konnektor oder ein DataSet zu prüfen.
+  - **Namensgebung mit Suffixen empfohlen**
+
+    - CALC: Berechnete Felder wurden durch den ETL-Prozess hinzugefügt.
+- Bevor Sie während der Erstellung eines BeastMode die Option „Berechnung teilen“ wählen, bestimmen Sie, wann es effektiv ist, diese Option zu wählen. Wenn die Berechnung ein allgemeines Feld ist, das viele Personen nutzen werden, ist es eine gute Idee, die Berechnung zu teilen. Wenn es eine einmalige, ad hoc-Funktion ist, ist es besser, sie nicht zu teilen, da sie ansonsten für andere Benutzer, die nicht verstehen, wie sie im Kontext zu verwenden ist, zu Problemen führen kann.
+
+## Datensteuerung
+
+- Wenn Ihr Unternehmen ein umfassendes Steuerungsmodell erstellen möchte, haben Sie die Option, Kommentare zu einer BeastMode-Berechnung für ein DataSet hinzuzufügen. Diese Kommentare, bei denen es sich im Prinzip um Metadaten innerhalb der BeastMode-Berechnung selbst handelt, können den Verfasser der BeastMode-Berechnung identifizieren und ein Datum und eine Beschreibung darüber, was der BeastMode bewirkt, erstellen. Auf diese Weise können andere Personen auf diese nützlichen Informationen zugreifen, wenn sie bestimmen, ob sie diese in ihren Karten verwenden möchten, oder an wen sie sich wenden müssen, falls sie Fragen dazu haben.
+
+  - **Beispiel: Metadaten für BeastMode mit Identifikation des Verfassers, Erstellungsdatum, kurzer Beschreibung**
+
+/\* Verfasser:
+
+Erstellungsdatum:
+
+Beschreibung:
+
+  \*/
+
+- Wenn Sie eine Testverbindung an einem neuen DataSet durchführen, setzen Sie es stets auf manuelles Aktualisieren, anstatt das Einrichten eines automatischen Feeds zu versuchen. Sie möchten nicht, dass ein Test- oder Problem-DataSet regelmäßig hochgeladen wird.
+- Lassen Sie die DataSets regelmäßig vom Major Domo oder einem anderen wichtigen Projektbeteiligten prüfen, um sicherzustellen, dass es keine überflüssigen DataSets, DataSets ohne Karten oder DataSets ohne verbundene DataFlows gibt.
+- Der MajorDomo kann Karten im Data Center prüfen, indem er nach der Anzahl an Karten sortiert. Falls Sie mehrere Karten ohne verbundene DataSets finden, können Sie diese entweder einzeln löschen, oder sich an den Besitzer der DataSets wenden, um festzustellen, warum sich die Karten in Domo befinden und, sofern notwendig, den Besitzer bitten das/die DataSet(s) zu löschen.
+- Bei der Prüfung von ungenutzten DataFlows ist diese Unterscheidung ein wenig komplizierter, aber wenn Sie sehen, dass er 1 – 2 Monate nicht mehr gelaufen ist, ist dies ein Zeichen dafür, dass es keinen Zeitplan für ihn gibt und sie ihn löschen können, oder gemeinsam mit dem Besitzer herausfinden können, was damit los ist.
+- Nehmen Sie beim Einrichten der Datensteuerung individuelle Zuweisung für alle Tools vor. Sie können beispielsweise eine Person zur Prüfung der Workbench zuteilen, eine zur Prüfung aller sozialen Daten, eine zur Prüfung von Magic ETL-Daten und so weiter. Wenn jedem Datentyp ein Besitzer zugewiesen ist, ist sichergestellt, dass diese Ressourcen stets geprüft werden. Dies kann dabei helfen, Ihre DataSet-Anforderungen zu erfüllen und die Anzahl an Problemen zu senken, die an das Center of Excellence herangetragen werden.
+- Halten Sie einen Prozess für den Benutzer bereit, um
+
+  - die Daten hochzuladen.
+  - zu prüfen, ob die Daten korrekt sind, entweder in Workbench oder in einem anderen Tool.
+  - die Daten erneut in Domo zu prüfen, um sicherzustellen, dass Ihre Zahlen wie erwartet wiedergegeben weren.
+  - Gehen Sie jeden einzelnen Schritt des Prozesses durch, um sicherzustellen, dass Ihre Daten korrekt sind und Sie Karten daraus erstellen können.
+  - Nachdem Sie die Daten geprüft haben, stellen Sie sicher, dass Card Builder das DataSet versteht.
+  - Nachdem die Karte erstellt wurde, lassen Sie die Karte von Ihrem Datenbesitzer prüfen, da die Person, welche die Karte erstellt hat, möglicherweise eine Dimension in Bezug auf das Filtern übersehen hat.
+
+Durch die Prüfschritte im Verlauf des gesamten Prozesses stellen Sie sicher, dass die Zahlen wie erwartet erscheinen und in einer komplexen Datenstruktur keine Details fehlen oder Berechnungen auftauchen, die keinen Sinn ergeben.
+
+- Sorgen Sie dafür, dass die Prüfer stets ein Auge auf Fehler und fehlgeschlagene Ausführungen haben. Stellen Sie sicher, dass diese Personen Anmeldedaten und Zugriff auf Konten haben, sofern es sich nicht um den berechtigen Besitzer handelt.
+- Ein optimales Vorgehen sieht die Prüfung des Data Center einmal pro Monat vor. Stellen Sie außerdem sicher, dass alle wichtigen DataFlows und DataSets funktionieren. Bestätigen Sie zudem, ob alle Anmeldedaten funktionieren, oder erteilen Sie erneute Berechtigungen, für Anmeldedaten, die abgelaufen sind.

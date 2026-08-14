@@ -1,135 +1,104 @@
 ---
 title: "Snowflake上のMagic ETL（ベータ版）"
+excerpt: "Snowflake と Cloud Amplifier の統合を利用して、データを既存のデータ構造内で安全に保ちつつ Magic ETL 変換を実行する方法と必要条件を説明します。"
 ---
 
-import {InlineImage} from "/snippets/InlineImage.mdx";
+## はじめに
 
-### はじめに
-
-Snowflake上のMagic ETLを使用すると、SnowflakeのユーザーはSnowflakeとCloud Amplifierの統合を利用して、データを転送したりデータエンジニアに手助けを求めたりすることなく、Magic ETL変換のパワーを活用することができます。Snowflake上のMagic ETLは、データを既存のデータ構造内で安全に保ちながら、ローコードユーザーに対してセルフサービスの変換を可能にし、エンジニアリングリソースへの負担を軽減します。
+Snowflake上のMagic ETLを使用すると、SnowflakeのユーザーはSnowflakeのCloud Integrationsを利用して、データを転送したりデータエンジニアに手助けを求めたりすることなく、Magic ETL変換のパワーを活用することができます。Snowflake上のMagic ETLは、データを既存のデータ構造内で安全に保ちながら、ローコードユーザーに対してセルフサービスの変換を可能にし、エンジニアリングリソースへの負担を軽減します。
 
 <Note>
   **注記：** この機能はベータ版です。有効化するには、Domoアカウントチームにお問い合わせください。Snowflake上のMagic ETLは、Domoコンサンプション契約を締結されたお客様のみが利用できます。
 
 </Note>
 
----
-
-* [必要条件](#prerequisites)
-* [必要な許可](#required_grant)
-* [Snowflake上のMagic ETLにアクセスする](#access_magic_etl_on_snowflake)
-* [Snowflake上のMagic ETLを使用する](#use_magic_etl_on_snowflake)
-* [よくある質問](#faq)
-
----
-
-### 必要条件
+## 必要条件
 
 この機能を使用するには、DomoとSnowflakeで以下の項目を完了する必要があります。
 
-# Domoの必要条件
+### Domoの必要条件
 
 Domoで以下の手順を実行します。
 
-* Cloud AmplifierでSnowflakeの
-  [書き込み機能](/ja/s/article/4402322966807#write_setup) を設定します。
+* Cloud IntegrationsでSnowflakeの
+  [書き込み機能](/ja/s/article/4402322966807) を設定します。
 * 少なくとも1つのSnowflakeウェアハウスで、操作として **［変換］** を選択します。
-  + これは、書き込み機能が設定されたのと同じCloud Amplifier統合上にある必要があります。
+  + これは、書き込み機能が設定されたのと同じCloud Integrations上にある必要があります。
       
-    <Frame><img alt="transform operation.jpg" src="/images/kb/ka0Vq000000AMQf-00N5w00000Ri7BU-0EMVq000000w6eX.jpg" style={{width: 600, height: 421}}/></Frame>
-* すべての入力DataSetは、同じSnowflake - Cloud Amplifier統合の一部である必要があります。Domoクラウドからの入力が含まれているMagic ETL DataFlowは、Snowflakeクラウド上では実行できません。
+    <Frame><img alt="transform operation.jpg" src="/images/kb/ka0Vq000000AMQf-00N5w00000Ri7BU-0EMVq000000w6eX.jpg"/></Frame>
+* すべての入力DataSetは、同じSnowflake Cloud Integrationsの一部である必要があります。Domoクラウドからの入力が含まれているMagic ETL DataFlowは、Snowflakeクラウド上では実行できません。
   + 複数のSnowflakeクラウドからの入力はサポートされていません。
 
-# Snowflakeの必要条件
+### Snowflakeの必要条件
 
 Snowflakeで以下を完了します。
 
-* Snowflake - Cloud Amplifier統合で使用するサービスアカウントのSnowflakeロールでは、入力として参照する表のSELECT、MODIFY、USAGE、CREATE権限が必要です。これは、書き込み機能を設定する際に実行するコマンドで対処する必要があります。
+* Snowflake Cloud Integrationsで使用するサービスアカウントのSnowflakeロールでは、入力として参照する表のSELECT、MODIFY、USAGE、CREATE権限が必要です。これは、書き込み機能を設定する際に実行するコマンドで対処する必要があります。
 
-### 必要な許可
+## 必要な許可
 
 Snowflake上のMagic ETLを使用するためには、ユーザーの権限で以下の許可が有効になっている必要があります。
 
 * **Adrenaline DataFlowを編集 —** ユーザーは、アクセス権のあるAdrenaline DataFlowを作成、編集、実行できます。
 
-[このページのトップへ](#intro)
+## Snowflake上のMagic ETLにアクセスする
 
-### Snowflake上のMagic ETLにアクセスする
-
-この機能は、Snowflake - Cloud Amplifier変換統合の完了後に、Magic ETLインターフェースで使用できます。
+この機能は、Snowflake Cloud Integrationsの変換設定の完了後に、Magic ETLインターフェースで使用できます。
 
 Magic ETLにアクセスするには、任意のDataSetの詳細ページで、 **［開く：］** > **［Magic ETL］** を選択します。
 
-<Frame><img alt="open with magic.jpg" src="/images/kb/ka0Vq00000032LR-00N5w00000Ri7BU-0EMVq000000w57N.jpg" style={{width: 875, height: 306}}/></Frame>
-[このページのトップへ](#intro)
+<Frame><img alt="open with magic.jpg" src="/images/kb/ka0Vq00000032LR-00N5w00000Ri7BU-0EMVq000000w57N.jpg"/></Frame>
 
-### Snowflake上のMagic ETLを使用する
+## Snowflake上のMagic ETLを使用する
 
 Snowflake上のMagic ETLでは、Magic ETLのインターフェースでデータ変換を *定義* できますが、変換はSnowflake上で *実行* されます。
 
-Snowflake - Cloud Amplifier統合を設定して変換操作を許可すると、Magic ETLエディターにドロップダウンが表示され、ETLを実行する場所を選択できます。ドロップダウンには、利用可能なSnowflakeクラウドごとにオプションが用意されています。
+Snowflake Cloud Integrationsを設定して変換操作を許可すると、Magic ETLエディターにドロップダウンが表示され、ETLを実行する場所を選択できます。ドロップダウンには、利用可能なSnowflakeクラウドごとにオプションが用意されています。
 
-<Frame><img alt="dropdown.jpg" src="/images/kb/ka0Vq000000AMQf-00N5w00000Ri7BU-0EMVq000000w4o1.jpg" style={{width: 601, height: 303}}/></Frame>
-SnowflakeのDataflow上でMagic ETLを初めて実行すると、Snowflake - Cloud Amplifier統合の書き込み設定の一部として構成されたSnowflakeデータベースに新しい表が作成されます。デフォルトでは、Magic ETLのDataFlowのそれ以降の実行はすべて、更新方法がReplaceメソッドで設定されますが、Appendメソッドを選択することもできます。DataSetの更新方法については、 [こちら](/ja/s/article/360043430733) をご覧ください。
+<Frame><img alt="dropdown.jpg" src="/images/kb/ka0Vq000000AMQf-00N5w00000Ri7BU-0EMVq000000w4o1.jpg"/></Frame>
+SnowflakeのDataflow上でMagic ETLを初めて実行すると、Snowflake Cloud Integrationsの書き込み設定の一部として構成されたSnowflakeデータベースに新しい表が作成されます。デフォルトでは、Magic ETLのDataFlowのそれ以降の実行はすべて、更新方法がReplaceメソッドで設定されますが、Appendメソッドを選択することもできます。DataSetの更新方法については、 [こちら](/ja/s/article/360043430733) をご覧ください。
 
 <Tip>
   **ヒント：** Snowflake上のMagic ETLを使用すると、Magic ETLでSnowflake SQLパススルーSQLを使用して、Snowflakeデータに直接SQLクエリを記述して実行できます。詳細については、 [こちら](/s/article/000005815) を参照してください。
 
 </Tip>
 
-[このページのトップへ](#intro)
-
-### よくある質問
+## よくある質問
 
 <AccordionGroup>
 <Accordion title="Magic ETL DataFlowをSnowflake上で実行する際に、Appendメソッドを使用するように設定できますか？">
 
-
 はい。デフォルトはReplaceメソッドですが、Appendメソッドに変更できます。
-
 
 </Accordion>
 <Accordion title="サブセット処理はサポートされていますか？">
 
-
 はい。サブセット処理は、Snowflake動的テーブルを活用してサポートされています。サブセット処理の詳細については、 [こちら](/s/article/000005150) をご覧ください。
-
 
 </Accordion>
 <Accordion title="Magic ETLでは、DataFlowの実行時にSnowflake表の既存のパーティションを使用できますか？">
 
-
-はい。Magic ETLでは、追加設定なしで、実行時にクラスターキーやクラスターテーブルなどの最適化を活用することができます。これらの項目の設定の詳細については、 [Snowflakeのドキュメント](https://docs.snowflake.com/ja/user-guide/tables-clustering-keys) <InlineImage src="/images/kb/ja/ka0Vq000000EDru-00N5w00000Ri7BU-0EMVq000000wIpO.jpg" /> を参照してください。
-
+はい。Magic ETLでは、追加設定なしで、実行時にクラスターキーやクラスターテーブルなどの最適化を活用することができます。これらの項目の設定の詳細については、 [Snowflakeのドキュメント](https://docs.snowflake.com/ja/user-guide/tables-clustering-keys) <img src="/images/kb/ja/ka0Vq000000EDru-00N5w00000Ri7BU-0EMVq000000wIpO.jpg" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/> を参照してください。
 
 </Accordion>
 <Accordion title="Snowflake上でMagic ETL DataFlowを実行するDomoのユーザー数を制限できますか？">
 
-
 はい。DataFlowを実行できるのは、Adrenaline DataFlowの編集権限を持つDomoユーザーのみです。
-
 
 </Accordion>
 <Accordion title="DomoのMagic ETLで実行するように設定されたMagic ETL DataFlowを、Snowflakeクラウド上で実行するように変換することはできますか？">
 
-
 はい。ただし変換できるのは、DataFlowのすべての入力がそのSnowflakeクラウド上にあり、DataFlowの更新方法にReplaceまたはAppendメソッドが使用されている場合です。DataFlowがUpsertメソッドまたはPartitionメソッドで設定されている場合は、エラーになります。DataSetの更新方法については、 [こちら](/ja/s/article/360043430733) をご覧ください。
-
 
 </Accordion>
 <Accordion title="PythonとRスクリプトタイルはサポートされていますか？">
 
-
 いいえ。Snowflake上のMagic ETLでは、PythonとRスクリプトタイルはサポートされていません。
-
 
 </Accordion>
 <Accordion title="Snowflake上でMagic ETL DataFlowを実行する場合、Domoクレジットに課金されますか？">
 
-
 はい。クレジットのコンサンプション条件については、販売契約を参照してください。
-
-[このページのトップへ](#intro)
 
 <Note>
   **次のステップ：** Magic ETL DataFlowの [作成方法](/s/article/360055259234) またはMagic ETLのドラッグアンドドロップインターフェースで使用可能な [アクションタイル](https://domo-support.domo.com/s/topic/0TO5w000000ZdTHGA0/tiles) についての詳細をご確認ください。

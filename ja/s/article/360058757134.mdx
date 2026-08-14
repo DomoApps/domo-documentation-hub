@@ -1,98 +1,105 @@
 ---
 title: "Snowflake Managed Unloadコネクター"
+excerpt: "Snowflake Managed Unload コネクターを設定し、Snowflake から内部 Amazon S3 にデータをアンロードして大規模クエリの結果を Domo に取り込みます。"
 ---
 
-<Note>
-**注記：** Snowflakeは2025年11月以降、ユーザー名とパスワードによる認証メカニズムのサポートを終了します。そのため、このConnectorの提供を段階的に終了します。代わりに、以下のいずれかの接続方法の利用をご検討ください。
+<Note>**注記：**Snowflakeは2025年11月以降、ユーザー名とパスワードによる認証メカニズムのサポートを終了します。そのため、このConnectorの提供を段階的に終了します。代わりに、以下のいずれかの接続方法の利用をご検討ください。</Note>
 
-* [Cloud Amplifier](/ja/s/article/4402322966807 "Cloud Amplifier")
-* [Snowflake Key Pair Internal Managed Unloadコネクター](/ja/s/article/360061224493 "Snowflake Key Pair Internal Managed Unloadコネクター")
-* [Snowflake OAuth Internal Unload v2コネクター](/ja/s/article/1500010196881 "Snowflake OAuth Internal Unload v2コネクター")
-
-</Note>
+- [Cloud Amplifier](/ja/s/article/4402322966807)
+- [Snowflake Key Pair Internal Managed Unloadコネクター](/s/article/360061224493)
+- [Snowflake OAuth Internal Unload v2コネクター](/s/article/1500010196881)
 
 ## はじめに
 
-Snowflakeは、クラウドベースのアナリティクスデータウェアハウスシステムです。DomoのSnowflake Managed Unloadコネクターを使用すると、データをSnowflakeデータベースからAmazon S3の内部にアンロードできます。その後、ファイルは社内のS3からDomoにダウンロードされます。非常に大きなクエリを実行している場合は、このコネクターがほかのSnowflakeコネクターよりも優先されます。Snowflake APIの詳細については、Snowflakeのウェブサイト（ [https://docs.snowflake.com/ja](https://docs.snowflake.com/ja "https://docs.snowflake.com/ja") ）を参照してください。
+Snowflakeは、クラウドベースのアナリティクスデータウェアハウスシステムです。DomoのSnowflake Managed Unloadコネクターを使用すると、データをSnowflakeデータベースからAmazon S3の内部にアンロードできます。その後、ファイルは社内のS3からDomoにダウンロードされます。非常に大きなクエリを実行している場合は、このコネクターがほかのSnowflakeコネクターよりも優先されます。Snowflake APIの詳細については、Snowflakeのウェブサイト（[https://docs.snowflake.com/ja](https://docs.snowflake.com/ja)）を参照してください。
 
-Snowflake Managed Unloadアカウントには、Data Centerから接続します。このトピックでは、Snowflake Managed Unloadコネクターのユーザーインターフェースに固有のフィールドとメニューについて説明します。DataSetの追加や更新スケジュールの設定、DataSet情報の編集に関する一般的な情報は、「 [コネクターを使用してDataSetを追加する](/ja/s/article/360042926274 "コネクターを使用してDataSetを追加する") 」を参照してください。
+Snowflake Managed Unloadアカウントには、Data Centerから接続します。このトピックでは、Snowflake Managed Unloadコネクターのユーザーインターフェースに固有のフィールドとメニューについて説明します。DataSetの追加や更新スケジュールの設定、DataSet情報の編集に関する一般的な情報は、「[コネクターを使用してDataSetを追加する](/ja/s/article/360042926274)」を参照してください。
 
 ## 必要条件
 
 Snowflake Managed Unloadアカウントに接続し、DataSetを作成するには、以下が必要です。
 
-* アカウントのフルネーム（Snowflakeが提供）。米国西部地域は
-  ****account\_name**** 、その他の地域は ****account\_name.region\_id**** です。これは、Snowflake URLの https:// の直後に続く部分です。
+- アカウントのフルネーム（Snowflakeが提供）。米国西部地域は****account\_name****、その他の地域は****account\_name.region\_id****です。これは、Snowflake URLのhttps://の直後に続く部分です。  
     
-  アカウントのフルネームには、アカウントがホストされる地域とクラウドプラットフォームを識別する追加のセグメントが含まれる場合があることに注意してください。以下の表に、クラウドプラットフォームまたは地域別のアカウント名の例を示します。各行では、アカウント名が「xy12345」であると仮定しています。
-    
-  <Frame><img alt="snowflake_account_names.png" src="/images/kb/ka05w00000123Kt-00N5w00000Ri7BU-0EM5w000005vO5S.png"/></Frame>
-
-* Snowflakeホストへの接続に使用するユーザー名とパスワード。
+  アカウントのフルネームには、アカウントがホストされる地域とクラウドプラットフォームを識別する追加のセグメントが含まれる場合があることに注意してください。以下の表に、クラウドプラットフォームまたは地域別のアカウント名の例を示します。各行では、アカウント名が「xy12345」であると仮定しています。<img alt="snowflake_account_names.png" src="/images/kb/ja/0EM5w000005vO5c.png" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/>
+- Snowflakeホストへの接続に使用するユーザー名とパスワード。
 
 Snowflake Managed Unloadコネクターでは、通常のSnowflakeコネクターよりも多くの権限が必要になります。権限に関するコマンドのリストを次に示します。
 
-<table border="1" data-aura-rendered-by="33:195;a"><tbody><tr><td colspan="1" rowspan="1"> CREATE STAGE </td><td colspan="1" rowspan="1"><span> 新しいステージを作成し、テーブルからファイルにデータをアンロードします。 </span></td></tr><tr><td colspan="1" rowspan="1"> COPY INTO &lt;場所&gt; </td><td colspan="1" rowspan="1"><span> テーブルのすべての行を、1つ以上のファイルにアンロードしてステージに移動するようコマンドします。 </span></td></tr><tr><td colspan="1" rowspan="1"><span> CREATE FILE FORMAT </span></td><td colspan="1" rowspan="1"> ファイルフォーマットを作成します。 </td></tr><tr><td colspan="1" rowspan="1"> LIST </td><td colspan="1" rowspan="1"><span> ステージングされたファイルのリストを返します。 </span></td></tr><tr><td colspan="1" rowspan="1"><span> GET </span></td><td colspan="1" rowspan="1"><span> 上記で作成されたSnowflakeステージからデータファイルをダウンロードします。 </span></td></tr><tr><td colspan="1" rowspan="1"><span> REMOVE </span></td><td colspan="1" rowspan="1"><span> ステージングされ、テーブルからアンロードされたファイルを削除します。 </span></td></tr></tbody></table>
+|                    |                                                  |
+| ------------------ | ------------------------------------------------ |
+| CREATE STAGE       | 新しいステージを作成し、テーブルからファイルにデータをアンロードします。             |
+| COPY INTO \<場所\>     | テーブルのすべての行を、1つ以上のファイルにアンロードしてステージに移動するようコマンドします。 |
+| CREATE FILE FORMAT | ファイルフォーマットを作成します。                                |
+| LIST               | ステージングされたファイルのリストを返します。                          |
+| GET                | 上記で作成されたSnowflakeステージからデータファイルをダウンロードします。        |
+| REMOVE             | ステージングされ、テーブルからアンロードされたファイルを削除します。               |
 
 ## Snowflake Managed Unloadアカウントに接続する
 
-このセクションでは、 Snowflake Managed Unload コネクターページの **［認証情報］** ペインと **［詳細］** ペインのオプションについて説明します。このページのほかのペインの項目である **［スケジュール設定］** や **［DataSetに名前を付け、説明を入力］** に関しては、ほとんどのタイプのコネクターで共通しています。詳細については、「 [コネクターを使用してDataSetを追加する](/ja/s/article/360042926274 "コネクターを使用してDataSetを追加する") 」を参照してください。
+このセクションでは、Snowflake Managed Unloadコネクターページの**［認証情報］**ペインと**［詳細］**ペインのオプションについて説明します。このページのほかのペインの項目である**［スケジュール設定］**や**［DataSetに名前を付け、説明を入力］**に関しては、ほとんどのタイプのコネクターで共通しています。詳細については、「[コネクターを使用してDataSetを追加する](/ja/s/article/360042926274)」を参照してください。
 
 ## ［認証情報］ペイン
 
-このペインには、 Snowflake Managed Unload アカウントに接続するための認証情報を入力するフィールドがあります。以下の表は、各フィールドに必要な内容を説明しています。
+このペインには、Snowflake Managed Unloadアカウントに接続するための認証情報を入力するフィールドがあります。以下の表は、各フィールドに必要な内容を説明しています。
 
-<table border="1" cellpadding="1" cellspacing="1" data-aura-rendered-by="33:195;a"><thead><tr><th colspan="1" rowspan="1"><p><span class="s1"> フィールド </span></p></th><th colspan="1" rowspan="1"><p><span class="s1"> 説明 </span></p></th></tr></thead><tbody><tr><td colspan="1" rowspan="1"> Account Name </td><td colspan="1" rowspan="1"> Snowflakeアカウント名を入力します。詳細については、「 <a href="#h_01ES6VKF5A1N9WPTTBV00ZQDBF" target="_self" title="Snowflake Managed Unload"> 必要条件 </a> 」を参照してください。 </td></tr><tr><td colspan="1" rowspan="1"> Username </td><td colspan="1" rowspan="1"> Snowflakeホストへの接続に使用するユーザー名を入力します。 </td></tr><tr><td colspan="1" rowspan="1"> Password </td><td colspan="1" rowspan="1"> Snowflakeホストへの接続に使用するパスワードを入力します。 </td></tr><tr><td colspan="1" rowspan="1"> Role </td><td colspan="1" rowspan="1"> 権限を入力します。 </td></tr></tbody></table>
+| フィールド        | 説明                                                                              |
+| ------------ | ------------------------------------------------------------------------------- |
+| Account Name | Snowflakeアカウント名を入力します。詳細については、「必要条件」を参照してください。 |
+| Username     | Snowflakeホストへの接続に使用するユーザー名を入力します。                                               |
+| Password     | Snowflakeホストへの接続に使用するパスワードを入力します。                                               |
+| Role         | 権限を入力します。                                                                       |
 
-有効な Snowflake Managed Unload 認証情報を一度入力しておくと、いつでも同じアカウントを使用して、新しい Snowflake Managed Unload DataSetを作成することができます。コネクターアカウントは、Data Centerの **［アカウント］** タブで管理できます。このタブの詳細については、「 [コネクター/アダプターアカウントを管理する](/ja/s/article/360042926054 "コネクター/アダプターアカウントを管理する") 」を参照してください。
+有効なSnowflake Managed Unload認証情報を一度入力しておくと、いつでも同じアカウントを使用して、新しいSnowflake Managed Unload DataSetを作成することができます。コネクターアカウントは、Data Centerの**［アカウント］**タブで管理できます。このタブの詳細については、「[コネクター/アダプターアカウントを管理する](/ja/s/article/360042926054)」を参照してください。
 
 ## ［詳細］ペイン
 
-このペインには、メインとなる **［Reports］** メニューのほか、選択したレポートタイプに応じて表示/非表示になる様々なメニューが含まれています。
+このペインには、メインとなる**［Reports］**メニューのほか、選択したレポートタイプに応じて表示/非表示になる様々なメニューが含まれています。
 
-<table border="1" cellpadding="1" cellspacing="1" data-aura-rendered-by="33:195;a"><thead><tr><th colspan="1" rowspan="1"><p> メニュー </p></th><th colspan="1" rowspan="1"><p> 説明 </p></th></tr></thead><tbody><tr><td colspan="1" rowspan="1"><p> Report </p></td><td colspan="1" rowspan="1"><p> クエリタイプを選択します。以下のクエリタイプを利用できます。 </p><table border="1" cellpadding="1" cellspacing="1"><tbody><tr><td colspan="1" rowspan="1"> Custom Query </td><td colspan="1" rowspan="1"> 実行するSQLクエリを入力します。 </td></tr><tr><td colspan="1" rowspan="1"> Query Builder </td><td colspan="1" rowspan="1"> クエリを自動生成するテーブルとフィールドを選択します。 </td></tr></tbody></table></td></tr><tr><td colspan="1" rowspan="1"><p> Query </p></td><td colspan="1" rowspan="1"><p> データを取得するSQLクエリを入力します。 <b><b> クエリヘルパー </b></b> パラメーターを使用して、使用可能なSQLクエリを記述できます。 <b><b> クエリヘルパー </b></b> を使用するには、以下を行います。 </p><ol><li><p> 各メニューで、目的のウェアハウス、データベーススキーマ、データベースオブジェクト、およびテーブルの列またはビューを選択します。 </p></li><li><p><b><b> ［Query Helper］ </b></b> フィールドに表示されるSQLステートメントをコピーします。 </p></li><li><p> コピーしたSQLステートメントを <b><b> ［Query］ </b></b> フィールドに貼り付けます。 </p></li></ol></td></tr><tr><td colspan="1" rowspan="1"> Warehouses </td><td colspan="1" rowspan="1"> 取得したいデータが格納されているウェアハウスを選択します。このリストには、認証情報にもとづいてアクセス権のあるすべてのウェアハウスが表示されます。 </td></tr><tr><td colspan="1" rowspan="1"> Databases </td><td colspan="1" rowspan="1"> 取得したいデータが格納されているデータベースを選択します。このリストには、認証情報にもとづいてアクセス権のあるすべてのデータベースが表示されます。 </td></tr><tr><td colspan="1" rowspan="1"> Database Schemas </td><td colspan="1" rowspan="1"> 取得したいデータが格納されているデータベーススキーマを選択します。このリストには、認証情報にもとづいてアクセス権のあるすべてのスキーマが表示されます。 </td></tr><tr><td colspan="1" rowspan="1"> Database Objects </td><td colspan="1" rowspan="1"> 取得したいデータが格納されているデータベースオブジェクトを選択します。このリストには、認証情報にもとづいてアクセス権のあるすべてのオブジェクトが表示されます。 </td></tr><tr><td colspan="1" rowspan="1"> Database Views </td><td colspan="1" rowspan="1"> 取得したいデータベースビューを選択します。このリストには、認証情報にもとづいてアクセス権のあるすべてのビューが表示されます。データベースビューを選択しない場合は、コネクターはデータベーススキーマ全体を取得します。 </td></tr><tr><td colspan="1" rowspan="1"> Database Tables </td><td colspan="1" rowspan="1"> 取得したいデータベーステーブルを選択します。このリストには、認証情報にもとづいてアクセス権のあるすべてのテーブルが表示されます。データベーステーブルを選択しない場合は、コネクターはデータベーススキーマ全体を取得します。 </td></tr><tr><td colspan="1" rowspan="1"> Table Columns </td><td colspan="1" rowspan="1"> 取得したいテーブルの列を選択します。このリストには、認証情報にもとづいてアクセス権のあるすべての列が表示されます。テーブルの列を選択しないと、コネクターは選択したデータベーステーブル全体を取得します。 </td></tr><tr><td colspan="1" rowspan="1"> Query Helper </td><td colspan="1" rowspan="1"> 上部のメニューから、ウェアハウス、データベース、スキーマ、テーブルなどを選択すると、利用可能なSQLクエリがこのフィールドに作成されます。このフィールドのSQLステートメントをコピーして、 <b><b> ［Query］ </b></b> フィールドに貼り付けます。詳細は、上記の「 <b><b> Query </b></b> 」を参照してください。 </td></tr><tr><td colspan="1" rowspan="1"> Partition Support </td><td colspan="1" rowspan="1"> データをパーティション分割するかどうかを選択します。 </td></tr><tr><td colspan="1" rowspan="1"> Past Days </td><td colspan="1" rowspan="1"> データを取得する過去の日数を入力します。値はXとすることができ、この場合Xは正の整数です。例：30。 </td></tr><tr><td colspan="1" rowspan="1"> Date Format </td><td colspan="1" rowspan="1"> 必要な日付形式を選択します。デフォルトでは、 <b> yyyy-MM-dd </b> が使用されます。 </td></tr><tr><td colspan="1" rowspan="1"> Custom Date Format </td><td colspan="1" rowspan="1"> カスタマイズされた日付形式を入力します。 </td></tr><tr><td colspan="1" rowspan="1"> Query Tag </td><td colspan="1" rowspan="1"> SnowflakeでConnector SQLの実行に <b> クエリタグ </b> としてタグ付けするために使用できるオプションのパラメーターです。 </td></tr></tbody></table>
+| メニュー | 説明  |
+| ---- | --- |
+| Report | クエリタイプを選択します。以下のクエリタイプを利用できます。<table><tbody><tr><td>Custom Query</td><td>実行するSQLクエリを入力します。</td></tr><tr><td>Query Builder</td><td>クエリを自動生成するテーブルとフィールドを選択します。</td></tr></tbody></table> |
+| Query | データを取得するSQLクエリを入力します。****クエリヘルパー****パラメーターを使用して、使用可能なSQLクエリを記述できます。****クエリヘルパー****を使用するには、以下を行います。   1. 各メニューで、目的のウェアハウス、データベーススキーマ、データベースオブジェクト、およびテーブルの列またはビューを選択します。 2. ****［Query Helper］****フィールドに表示されるSQLステートメントをコピーします。 3. コピーしたSQLステートメントを****［Query］****フィールドに貼り付けます。 |
+| Warehouses | 取得したいデータが格納されているウェアハウスを選択します。このリストには、認証情報にもとづいてアクセス権のあるすべてのウェアハウスが表示されます。 |
+| Databases | 取得したいデータが格納されているデータベースを選択します。このリストには、認証情報にもとづいてアクセス権のあるすべてのデータベースが表示されます。 |
+| Database Schemas | 取得したいデータが格納されているデータベーススキーマを選択します。このリストには、認証情報にもとづいてアクセス権のあるすべてのスキーマが表示されます。 |
+| Database Objects | 取得したいデータが格納されているデータベースオブジェクトを選択します。このリストには、認証情報にもとづいてアクセス権のあるすべてのオブジェクトが表示されます。 |
+| Database Views | 取得したいデータベースビューを選択します。このリストには、認証情報にもとづいてアクセス権のあるすべてのビューが表示されます。データベースビューを選択しない場合は、コネクターはデータベーススキーマ全体を取得します。 |
+| Database Tables | 取得したいデータベーステーブルを選択します。このリストには、認証情報にもとづいてアクセス権のあるすべてのテーブルが表示されます。データベーステーブルを選択しない場合は、コネクターはデータベーススキーマ全体を取得します。 |
+| Table Columns | 取得したいテーブルの列を選択します。このリストには、認証情報にもとづいてアクセス権のあるすべての列が表示されます。テーブルの列を選択しないと、コネクターは選択したデータベーステーブル全体を取得します。 |
+| Query Helper | 上部のメニューから、ウェアハウス、データベース、スキーマ、テーブルなどを選択すると、利用可能なSQLクエリがこのフィールドに作成されます。このフィールドのSQLステートメントをコピーして、****［Query］****フィールドに貼り付けます。詳細は、上記の「****Query****」を参照してください。 |
+| Partition Support | データをパーティション分割するかどうかを選択します。 |
+| Past Days | データを取得する過去の日数を入力します。値はXとすることができ、この場合Xは正の整数です。例：30。 |
+| Date Format | 必要な日付形式を選択します。デフォルトでは、**yyyy-MM-dd**が使用されます。 |
+| Custom Date Format | カスタマイズされた日付形式を入力します。 |
+| Query Tag | SnowflakeでConnector SQLの実行に**クエリタグ**としてタグ付けするために使用できるオプションのパラメーターです。 |
 
 ## その他のペイン
 
-スケジュール設定、再試行、更新に関するオプションなど、コネクターインターフェースのその他のペインに表示されるオプションについては、「 [コネクターを使用してDataSetを追加する](/ja/s/article/360042926274 "コネクターを使用してDataSetを追加する") 」を参照してください。
+スケジュール設定、再試行、更新に関するオプションなど、コネクターインターフェースのその他のペインに表示されるオプションについては、「[コネクターを使用してDataSetを追加する](/ja/s/article/360042926274)」を参照してください。
 
 ## よくある質問
 
 <AccordionGroup>
-<Accordion title="# このコネクターはいつ使用しますか？">
 
-
+<Accordion title="このコネクターはいつ使用しますか？">
 Snowflake KeyPair Internal Managed Unloadコネクターは、ユーザーが定義したS3バケットにデータをアンロードしてからDomoにデータを取り込むことで、SnowflakeからDomoにデータをインポートします。このコネクターはあらゆるサイズのDataSetに適しており、非常に大きなDataSetで推奨されます。接続するには、Snowflakeのローカルのユーザー名とシークレットキーが必要です。
-
-
 </Accordion>
-<Accordion title="# 注意すべきAPI制限はありますか？">
 
-
+<Accordion title="注意すべきAPI制限はありますか？">
 制限は使用するサーバー構成によって異なります。
-
-
 </Accordion>
-<Accordion title="# データはどれくらいの頻度で更新されますか？">
 
-
+<Accordion title="データはどれくらいの頻度で更新されますか？">
 DataSetは15分ごとに実行できます。ただし、クエリの実行時間によっては、DataSetの実行頻度が低くなる場合があります。
-
-
 </Accordion>
-<Accordion title="# クエリの記述の際に注意すべき点はありますか？">
 
-
+<Accordion title="クエリの記述の際に注意すべき点はありますか？">
 すべての単語、テーブル名、フィールド名が正しく記述されていることを確認します。クエリのヘルプについては、［Query Helper］フィールドを参照してください。
-
-
 </Accordion>
-<Accordion title="# Snowflakeデータベースに接続できない理由は何ですか？IPアドレスをホワイトリストに登録する必要がありますか？">
 
-
-Snowflakeデータベースに接続する前に、接続するポート上のデータベースサーバーにあるいくつかのIPアドレスをホワイトリストに登録する必要があります。IPアドレスの詳細なリストは、「 [DomoでIPアドレスをホワイトリストに登録する](/ja/s/article/360043439173 "DomoでIPアドレスをホワイトリストに登録する") 」を参照してください。
-
-
-
+<Accordion title="Snowflakeデータベースに接続できない理由は何ですか？IPアドレスをホワイトリストに登録する必要がありますか？">
+Snowflakeデータベースに接続する前に、接続するポート上のデータベースサーバーにあるいくつかのIPアドレスをホワイトリストに登録する必要があります。IPアドレスの詳細なリストは、「[DomoでIPアドレスをホワイトリストに登録する](/ja/s/article/360043439173)」を参照してください。
 </Accordion>
+
 </AccordionGroup>

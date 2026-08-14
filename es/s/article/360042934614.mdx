@@ -1,0 +1,120 @@
+---
+title: "Crear y eliminar políticas de permisos personalizados de datos"
+excerpt: "Cree y elimine políticas de permisos personalizados de datos en los DataSets para filtrar las filas que ven los usuarios y grupos específicos."
+---
+
+## Introducción
+
+Puede crear una experiencia personalizada para usuarios y grupos de Domo al configurar las políticas de permisos personalizados de datos en los DataSets. Estas políticas permiten filtrar datos en los DataSets para usuarios y grupos específicos. De esta forma, dichos usuarios y grupos solo pueden ver los datos pertinentes para ellos al consultar las tarjetas de indicador de desempeño clave y las tarjetas Sumo que tengan aplicadas las políticas de permisos personalizados de datos.
+
+Por ejemplo, puede tener una tarjeta en la que se muestra un mapa con datos de dos regiones de Estados Unidos, Este y Oeste. Podría crear dos políticas de permisos personalizados de datos; una para la región "Oeste" y otra para la región "Este". Para la política del "Oeste", seleccionaría a aquellos vendedores que trabajan en la región occidental, y para la política del "Este" seleccionaría a los que trabajan en la región oriental. Si Larry, un vendedor que reside en Washington, abriera la tarjeta, *solo* podría ver los datos relativos a los estados de la región Oeste; todos los estados de la región oriental aparecerían sin datos.
+
+Las políticas de permisos personalizados de datos también se aplican en otras herramientas de Domo, como alertas y DataFusions. Al suscribirse a una alerta de una tarjeta alimentada por un DataSet de permisos personalizados de datos, dicha alerta se personaliza para reflejar las políticas de permisos personalizados de datos en vigor. Al crear un DataFusion a partir de uno o varios DataSets de entrada con políticas de permisos personalizados de datos en vigor, estas se incorporan al DataSet de salida.
+
+## Creación de políticas de permisos personalizados de datos
+
+Puede crear y administrar políticas de permisos personalizados de datos en Data Center.
+
+**Para crear una política de permisos personalizados de datos:**
+
+1. Haga clic en <img alt="data_center_datasets_icon.png" src="/images/kb/es/0EM5w000005wKFN.png" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/> **> Data Center**.
+2. Haga clic en **DataSets** en el panel de navegación izquierdo.
+3. Busque el DataSet al que desea aplicar la política y haga clic en él.
+4. Haga clic en la pestaña **Permisos personalizados de datos**.  
+   <Frame>
+   ![pdp_tab2.png](/images/kb/es/0EM5w000005wKFB.png)
+   </Frame>
+5. (Opcional) Haga clic en el botón **Impacto** para abrir una lista de las tarjetas y alertas a las que afectarán las políticas de permisos personalizados de datos de este DataSet.   
+   Aunque no es obligatorio, es muy recomendable que revise esta lista antes de continuar. Para obtener más información, consulte Visualización de los resultados de los permisos personalizados de datos.
+6. (Opcional) Si hay alguien más aparte del propietario del DataSet y los usuarios "administradores" que deba tener acceso a todos los datos de este DataSet, conceda permiso total al usuario; para ello, siga estos pasos:
+
+   1. Haga clic en <img alt="pdp_users_icon.png" src="/images/kb/es/0EM5w000005wKF3.png" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/> en la fila **Todas las filas**.
+   2. En el cuadro de diálogo **Agregar grupos y personas**, escriba el nombre de una persona o un grupo que deba tener acceso total a los datos. Seleccione un nombre para agregarlo a la política.
+   3. Haga clic en **Aplicar**.
+
+      <Warning>
+      **Importante:** Si se trata de un DataSet de entrada de un DataFlow, es muy recomendable que conceda acceso total al propietario del DataSet; de lo contrario, el DataFlow podría romperse al establecer las políticas de permisos personalizados de datos.
+      </Warning>
+7. Haga clic en **Agregar política**.
+8. Escriba un nombre descriptivo para esta política.
+9. Haga clic en **Agregar datos** para abrir el cuadro de diálogo **Agregar acceso a datos**.
+10. En el menú desplegable **Nombre de columna**, seleccione la columna que desea filtrar.
+11. En el campo **Buscar/agregar valores de filas**, escriba el nombre de una fila que desee filtrar. Seleccione el nombre de una fila para agregarlo a la política.
+12. (Opcional) Repita el paso 8 todas las veces necesarias hasta haber agregado todas las filas que desee filtrar.
+13. Haga clic en **Aplicar**.
+14. Haga clic en <img alt="pdp_users_icon.png" src="/images/kb/es/0EM5w000005wKF3.png" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/> para abrir el cuadro de diálogo **Agregar grupos y personas**.
+15. En el campo **Buscar/agregar grupos y personas**, escriba el nombre de una persona o grupo que desee agregar a la política. Seleccione un nombre para agregarlo a la política.
+16. (Opcional) Repita el paso 12 tantas veces como sea necesario hasta agregar todos los grupos y usuarios deseados a esta política.
+17. Haga clic en **Guardar**.
+
+A continuación, se crea la política. Sin embargo, aún no se ha aplicado a este DataSet. Para activar los permisos personalizados de datos para el DataSet, haga clic en <img alt="enable_pdp.png" src="/images/kb/es/0EM5w000005wKFA.png" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/> junto al texto "Habilitar PDP". Ahora, esta política afectará a todos los elementos de Domo alimentados por este DataSet o asociados con él y este incluirá una marca de <img alt="pdp_stamp.png" src="/images/kb/es/0EM5w000005wKFL.png" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/> para informar a los usuarios de que no están viendo todos los datos disponibles debido a la aplicación de los permisos personalizados de datos.
+
+Para desactivar esta política, haga clic en <img alt="disable_pdp.png" src="/images/kb/es/0EM5w000005wKF2.png" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/>.
+
+Puede agregar varias políticas al mismo DataSet; para ello, haga clic en **Agregar política** en la pestaña **Permisos personalizados de datos** del DataSet y repita los pasos anteriores.
+
+### Adición de usuarios a varias políticas de permisos personalizados de datos
+
+Pueden darse ocasiones en las que desee agregar un usuario o grupo a más de una política en el mismo DataSet. Por ejemplo, puede haber un vendedor llamado "Ted" que trabaja en la región "Este", pero necesita acceder a los datos de California. Para ello, agregue una *nueva* política en la que los datos de California se apliquen a Ted. Agregar "California" a la política existente en la que ha seleccionado la región Este *no funcionará*; el DataSet aparece vacío. Esto se debe a que, al seleccionar varios valores del mismo DataSet, se aplica una instrucción AND, y como "California" nunca se encuentra en la región Este del DataSet, la política impide que los datos aparezcan. Sin embargo, las políticas independientes en el mismo DataSet se consideran como instrucciones OR; por tanto, los datos de Ted aparecen tanto para la región Este como para California.
+
+### Visualización de los resultados de los permisos personalizados de datos
+
+Al hacer clic en el botón **Impacto**, puede abrir un cuadro de diálogo en el que se muestra cómo la configuración de políticas de permisos personalizados de datos para un DataSet afectará a los DataFlows y las tarjetas vinculados al DataSet. Ningún DataFlow afectado se encuentra en la pestaña **Atención** y ninguna tarjeta afectada aparece en la pestaña **Personalizada**. Si las políticas no afectan a ningún DataFlow o tarjeta, no aparece ninguna pestaña.
+
+Es muy recomendable que vea los resultados de los permisos personalizados de datos antes de crear políticas en un DataSet, sobre todo si el DataSet es un DataSet de entrada de un DataFlow. En el caso de que un DataFlow se rompa al configurar políticas de permisos personalizados de datos en este DataSet, se proporciona un botón **Solucionar**. También puede incluir el propietario del DataFlow en el grupo **Todas las filas**, lo que garantizará que el DataFlow no se rompa.
+
+### Vista previa de los DataSets afectados por las políticas de permisos personalizados de datos
+
+Todas las políticas de permisos personalizados de datos permiten previsualizar los datos del DataSet afectados por dicha política. Después de crear una política, una práctica recomendada es previsualizar los datos de dicha política para asegurarse de que solo aparecen los datos necesarios.
+
+**Para previsualizar un DataSet para una política de permisos personalizados de datos:**
+
+1. En la pestaña **Permisos personalizados de datos** del DataSet que desea previsualizar, mantenga el cursor sobre la fila de la política que desea previsualizar.
+2. Haga clic en el icono del ojo <img alt="pdp_preview.png" src="/images/kb/es/0EM5w000005wKEx.png" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/> para abrir la vista previa.
+3. Haga clic en **Listo** cuando haya terminado de previsualizar los datos.
+
+### Escenario de ejemplo: permisos personalizados de datos aplicados a una tarjeta
+
+Este claro ejemplo muestra cómo agregar políticas de permisos personalizados de datos a una tarjeta afecta a la forma en que los datos de la tarjeta se muestran a distintos usuarios. Supongamos que la empresa "Kablinko Electronics" realiza un seguimiento de las ventas en todo Estados Unidos con un DataSet en el que las ventas están desglosadas por las regiones "Este" y "Oeste". Los datos se presentan con un mapa de Estados Unidos. De forma predeterminada, no hay ninguna política de permisos personalizados de datos en vigor, por lo que todos los datos del DataSet aparecen como se indica a continuación:
+
+<Frame>![pdp_example_1.png](/images/kb/es/0EM5w000005wKFD.png)</Frame>
+
+Ross Janssen, el jefe del departamento de ventas, desea asegurarse de que los vendedores de cada región solo pueden ver los datos que les corresponden. Todos los vendedores pertenecen a uno de los cuatro grupos ("Kablinko Este", "Kablinko Oeste", "Kablinko Sur" y "Kablinko Central"), por lo que es tan sencillo como conectar cada grupo a una política filtrada por la región que proceda.
+
+Ross accede a Data Center, busca el DataSet pertinente y hace clic en **Permisos personalizados de datos** para abrir la pestaña PDP del DataSet. Escribe el nombre de una política ("Región Este") y, a continuación, hace clic en **Agregar datos** para abrir el cuadro de diálogo **Agregar acceso a datos**. Selecciona "Región" como columna y "Este" como valor y, a continuación, aplica los cambios. Por último, selecciona el grupo "Kablinko Este" en el cuadro de diálogo **Agregar grupos y personas** y guarda la nueva política. Después repite los mismos pasos para una política "Región Oeste", seleccionando "Oeste" como valor y "Kablinko Oeste" como grupo. No crea ninguna política para "Kablinko Central" o "Kablinko Sur".   
+  
+La pestaña **Permisos personalizados de datos** de Ross del DataSet ahora aparece como sigue:
+
+<Frame>![pdp_example_2.png](/images/kb/es/0EM5w000005wKF1.png)</Frame>
+
+Ahora que las políticas están en vigor, los usuarios de los tres grupos ven los datos del mapa de forma distinta en función de la política de su grupo. Un usuario del grupo "Este" vería la tarjeta de la forma siguiente:
+
+<Frame>![pdp_example_3.png](/images/kb/es/0EM5w000005wKFQ.png)</Frame>
+
+Tenga en cuenta que los datos solo aparecen para los estados de la "Región Este". Tenga en cuenta también que el total del diagrama ha cambiado para reflejar la política de permisos personalizados de datos (era 1 453 971,45 en la versión del diagrama sin permisos personalizados de datos) y que aparece una marca <img alt="pdp_stamp.png" src="/images/kb/es/0EM5w000005wKFL.png" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/> cerca del título para indicar que esta vista muestra una versión filtrada de los datos según los permisos personalizados de datos.
+
+Del mismo modo, un usuario del grupo "Oeste" vería la tarjeta de la forma siguiente:
+
+<Frame>![pdp_example_4.png](/images/kb/es/0EM5w000005wKFF.png)</Frame>
+
+Como Ross no creó políticas para "Kablinko Central" o "Kablinko Sur", los usuarios de estos grupos que intenten acceder a la tarjeta verían lo siguiente:
+
+<Frame>![pdp_example_5.png](/images/kb/es/0EM5w000005wKF4.png)</Frame>
+
+A continuación, estos usuarios podrían hacer clic en el botón **Solicitar acceso** para enviar un mensaje en Buzz a Ross (el propietario del DataSet), para pedirle que cree las políticas necesarias para que puedan ver los "segmentos" de datos pertinentes. Para obtener más información sobre Buzz, consulte [Buzz](/s/topic/0TO5w000000ZanCGAS).
+
+## Eliminación de políticas de permisos personalizados de datos
+
+Puede eliminar una política de permisos personalizados de datos en la pestaña **Permisos personalizados de datos** del DataSet que tiene la política aplicada. Al eliminar una política, ya no se aplica a las tarjetas, alertas, DataFlows, etc.
+
+<Warning>
+**Importante:** La eliminación de todas las políticas de un DataSet desactiva los permisos personalizados de datos del DataSet, y todos los usuarios con acceso podrán ver los datos.
+</Warning>
+
+**Para eliminar una política de permisos personalizados de datos:**
+
+1. En la pestaña **Permisos personalizados de datos** del DataSet que tiene las políticas que desea eliminar, mantenga el cursor sobre la fila de la política que desea quitar.
+2. Haga clic en el icono de la papelera <img alt="delete_alert.png" src="/images/kb/es/0EM5w000005wKFC.png" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/> para eliminar la política.
+3. Haga clic en **Eliminar** para confirmar la eliminación.   
+   Si se trata de la única política aplicada al DataSet, aparece una advertencia para avisar de que todos los usuarios con acceso podrán ver los datos si la política se elimina.
+4. Si está seguro de que desea realizar esta acción, vuelva a hacer clic en **Eliminar**.

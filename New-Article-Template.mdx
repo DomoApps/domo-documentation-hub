@@ -1,67 +1,147 @@
 ---
 title: "New Article Template"
+excerpt: "Brief one-sentence summary of what this article covers."
 ---
 
+{/*
+BETA FEATURES
 
+---
 
-## Intro 
+The standard beta Note lives in /snippets/BetaNote.mdx so its wording and
+links stay identical everywhere. To use it, add this import on its own line
+directly below the frontmatter above:
 
-Here is your introductory text to the article. 
+  import { BetaNote } from '/snippets/BetaNote.mdx';
 
-This is how you embed [internal article links](/s/article/Article-Title). 
+Then place <BetaNote /> where the Note should appear. (For a release-notes-style
+roundup that lists several beta features, use <BetaNote generic /> instead — it
+omits the leading "This feature is in beta." sentence.)
+
+For localized articles, use the language-specific export from the same file:
+  Spanish:  import { BetaNoteEs } from '/snippets/BetaNote.mdx';  →  <BetaNoteEs /> / <BetaNoteEs generic />
+  French:   import { BetaNoteFr } from '/snippets/BetaNote.mdx';  →  <BetaNoteFr /> / <BetaNoteFr generic />
+  German:   import { BetaNoteDe } from '/snippets/BetaNote.mdx';  →  <BetaNoteDe /> / <BetaNoteDe generic />
+  Japanese: import { BetaNoteJa } from '/snippets/BetaNote.mdx';  →  <BetaNoteJa /> / <BetaNoteJa generic />
+
+If the entire article covers a beta feature, add `tag: "Beta"` to the
+frontmatter above and place <BetaNote /> immediately after the frontmatter,
+above the Intro.
+
+If only a section of the article is beta, add a Badge to that section's
+heading instead — <Badge className="text-primary bg-primary/10 font-bold">Beta</Badge> —
+and place <BetaNote /> under the FIRST beta section only (one Note per
+article). Do not repeat it under additional beta sections.
+
+Do not append `(Beta)` or `(BETA)` to titles or headings — the tag and Badge
+carry that signal. See Domo-KB-Style-Guide.mdx › Beta Features for details.
+
+---
+
+EMBEDDED DOMO CONTENT
+
+---
+
+To embed live Domo content (a dashboard or card) in an article, add this import
+on its own line directly below the frontmatter above:
+
+  import { DomoEmbed } from '/snippets/DomoEmbed.mdx';
+
+Then place the component wherever the embed should appear:
+
+  <DomoEmbed
+    src="https://embed.domo.com/embed/pages/XXXXX"
+    width="100%"
+    initialHeight="600"
+  />
+
+The src prop (required) is the Domo embed URL. width and initialHeight are
+optional and default to "100%" and "600" respectively. See
+Domo-KB-Style-Guide.mdx › Embedded Domo Content for the full prop reference
+and usage guidelines.
+*/}
+
+## Intro
+
+This article explains how to [action 1], [action 2], and [action 3].
+
+This is how you embed [internal article links](/s/article/Article-Title).
 
 And this is how you embed [external links](https://www.domo.com).
 
-
-
 ---
 
-
-
-## Required Grants 
+## Required Grants
 
 Write required grants here.
 
+## Here Is Step One
 
-
-## Here Is Step One 
-
-Follow these steps: 
+Follow these steps:
 
 1. First step with auto-sizing screenshot.
-   
+
    <Frame>![alt-text-here](/images/kb/image-title.png)</Frame>
 
-2. Second step with <img alt="alt-text-here" src="/images/kb/image-title.png" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/> inline image or icon.
+2. Second step with an inline icon <i className="icon-gear sm" aria-hidden="true" /> from the Domo icon font. Browse available icons at [Domo Icons](https://git.empdev.domo.com/pages/Development/DomoIcons/#!/icons/domocons). For a third-party brand logo (AWS, OpenAI, and the like), don't upload an image — see the style guide's *Brand and Third-Party Logos* section for the coded options.
 
 3. Third step with specifically-sized screenshot.
 
-   <Frame><img alt="alt-text-here" src="/images/kb/image-title.png" style={{width: 500, height: 500}}/></Frame>
+   <Frame>
+     <img
+       alt="alt-text-here"
+       src="/images/kb/image-title.png"
+     />
+   </Frame>
 
+4. Fourth step with an inline looping video (plays automatically, like a moving screenshot).
 
-Here is a bullet-point list: 
+   <Frame>
+     <video
+       autoPlay
+       muted
+       loop
+       playsInline
+       className="w-full aspect-video rounded-xl"
+       src="/images/kb/video-title.mp4"
+     ></video>
+   </Frame>
 
--  First item 
--  Second item 
+5. Fifth step with an embedded video (user selects play; includes controls).
 
+   <Frame>
+     <iframe
+       allowfullscreen=""
+       frameborder="0"
+       height="315"
+       width="560"
+       src="https://www.youtube.com/embed/VIDEO_ID"
+       title="YouTube video player"
+     ></iframe>
+   </Frame>
+
+Here is a bullet-point list:
+
+- First item
+- Second item
 
 You can also write a bullet-point list:
 
-*  First item 
-*  Second item
-   * Here is a sub-item under Second item
-      * Here is a sub-sub item under Second item
+- First item
+- Second item
+  - Here is a sub-item under Second item
+    - Here is a sub-sub item under Second item
 
+Here is a description list:
 
+- **First Item —** description of first item
+- **Second Item —** description of second item
 
+## Here Is Step Two
 
-## Here Is Step Two 
-
-*This is how you write italicized text*.
+_This is how you write italicized text_.
 
 <Note>**Note:** Your note text goes here.</Note>
-
-
 
 ### Here Is a Sub Header
 
@@ -71,13 +151,15 @@ You can also write a bullet-point list:
 
 <Tip>**Tip:** Write your user tip here.</Tip>
 
+<Tooltip tip="This is a tooltip!">
+  Hover over me
+</Tooltip>
+
 
 
 #### Here Is a Sub-Sub Header
 
-
 `This is how you write a code block`
-
 
 ```
 {
@@ -85,32 +167,56 @@ You can also write a bullet-point list:
 }
 ```
 
+{/* This is a comment inside MDX and won't be rendered. */}
 
+This is how you write a tabbed code block to show the same code in multiple languages:
+
+<CodeGroup>
+
+```javascript JavaScript
+// Your JavaScript code here
+```
+
+```python Python
+# Your Python code here
+```
+
+</CodeGroup>
 
 ## Here Is Step Three
 
 This is a table:
 
-| First Column | Second Column | 
+| First Column | Second Column |
 | ------------ | ------------- |
 | Row text 1   | Row text 1    |
 | Row text 2   | Row text 2    |
 | Row text 3   | Row text 3    |
 
+Pad all table cells with spaces so that pipes align vertically across all rows, including the header separator row. Use `<br/>` to separate multiple lines of plain text within a cell. Do not use `<br/>` between multiple callout elements (`<Note>`, `<Warning>`, `<Tip>`, etc.) — they create their own line breaks. Use `<br/>` before a callout only when it follows plain text:
 
+| First Column                | Second Column                                                           |
+| --------------------------- | ----------------------------------------------------------------------- |
+| Row with multi-line content | First line of cell content.<br/>Second line of cell content.            |
+| Row with a note             | Cell content.<br/><Note>**Note:** Note text in a table cell.</Note>     |
+| Row with two callouts       | <Note>**Note:** First note.</Note><Warning>**Warning:** Text.</Warning> |
+
+This is how you write a nested table (a table within a table cell). Write the inner table as HTML:
+
+| Outer Column 1 | Outer Column 2                                                                                                                      |
+| -------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| Row 1          | <table><thead><tr><th>Inner Col 1</th><th>Inner Col 2</th></tr></thead><tbody><tr><td>Value</td><td>Value</td></tr></tbody></table> |
 
 ## FAQ
-
 
 <AccordionGroup>
 
 <Accordion title="Frequently asked question 1?">
-Frequently asked answer.
+  Frequently asked answer.
 </Accordion>
 
 <Accordion title="Frequently asked question 2?">
-Frequently asked answer.
+  Frequently asked answer.
 </Accordion>
 
 </AccordionGroup>
-

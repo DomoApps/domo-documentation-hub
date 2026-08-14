@@ -1,223 +1,163 @@
 ---
 title: "Observability Metrics"
+excerpt: "Use Observability Metrics to pull DomoStats-style reports from target Domo instances and aggregate them in your primary instance."
 ---
 
-import {InlineImage} from "/snippets/InlineImage.mdx";
-
-### Intro
+## Intro
 
 Observability Metrics lets you pull DomoStats-style reports from target instances and bring them into your primary instance. This article provides information on adding a Domo Token Access account and creating, scheduling, running, and cloning jobs with Observability Metrics.
 
-
 ---
 
-### Access Observability Metrics
+## Access Observability Metrics
 
-1. In the navigation header, go to
-   **More** > **Admin.** The Admin Settings display.
-2. In the
-   **Governance** menu, select **Toolkit.**
-     
+1. In the navigation header, go to **More** > **Admin.** The Admin Settings display.
+2. In the **Governance** menu, select **Toolkit.**   
    The Toolkit opens.
-3. Under either
-   **Your Tools** or **Available Tools**, select **Observability Metrics**.
+3. Under either **Your Tools** or **Available Tools**, select **Observability Metrics**.
 
-   <Frame><img alt="Screenshot 2025-02-11 at 1.12.16 PM.png" src="/images/kb/ka0Vq000000N0H3-00N5w00000Ri7BU-0EMVq000005KBm1.jpg" style={{width: 410, height: 429}}/></Frame>
-   <Note>
-     **Note:**
-     If the
-     **Toolkit**
-     option does not display in the
-     **Governance**
-     menu, ensure your user role has the required grants. You may need to enable the Toolkit by reaching out to your account team.
+   <Frame>![Screenshot 2025-02-11 at 1.12.16 PM.png](/images/kb/0EMVq000005KBm1.jpg)</Frame>
 
-   </Note>
+<Note>**Note:** If the **Toolkit** option does not display in the **Governance** menu, ensure your user role has the required grants. You may need to enable the Toolkit by reaching out to your account team.</Note>
 
-### Required Grants
+## Required Grants
 
 To access the Governance Toolkit, you will need one of two grants enabled:
 
-1. **Create Custom Pipeline Processes —**
-   Allows you to create, update, share, and delete jobs.
-     
+1. **Create Custom Pipeline Processes —** Allows you to create, update, share, and delete jobs.  
    Only allows you to view jobs that they created or jobs that have been shared with them.
-2. **Administer Custom Pipeline Processes —**
-   Allows you to create, update, share, and delete jobs.
-     
+2. **Administer Custom Pipeline Processes —** Allows you to create, update, share, and delete jobs.   
    Also allows you to see all jobs within the pipeline.
 
 Grants can be added to a custom user role. By default, the Administer Custom Pipeline Process grant is enabled for Admin users.
 
-In addition to either the Create Custom Pipeline Processes or the Administer Custom Pipeline Processes grant, you must have all the following grants enabled to access the Governance Toolkit:
+In addition to either the Create Custom Pipeline Processes or the Administer Custom Pipeline Processes grant, you must have all the following grants enabled to access the Governance Toolkit: 
 
-* **Export from Domo**
-  — Allows you to export data, Cards, or reports from Domo to external formats or destinations.
-* **Manage all access tokens and API clients**
-  — Allows you to create, view, and manage all access tokens and API clients used to connect external tools or services to Domo.
-* **Manage all Cards, Pages, Apps (App Studio), and Reports (Report Builder)**
-  — Allows you to create, edit, move, and delete any Card, Page, App, or Report in Domo, regardless of ownership.
-* **Manage DataSet**
-  — Allows you to create, edit, replace, and delete any DataSet in Domo, including its schema and data connections.
-* **View activity logs**
-  — Allows you to access and review detailed logs of user and system activity within your Domo instance.
-* **View usage metrics**
-  — Allows you to view instance-level usage data, including activity and resource metrics across Domo.
+- **Export from Domo** — Allows you to export data, Cards, or reports from Domo to external formats or destinations.
+- **Manage all access tokens and API clients** — Allows you to create, view, and manage all access tokens and API clients used to connect external tools or services to Domo.
+- **Manage all Cards, Pages, Apps (App Studio), and Reports (Report Builder)** — Allows you to create, edit, move, and delete any Card, Page, App, or Report in Domo, regardless of ownership.
+- **Manage DataSet** — Allows you to create, edit, replace, and delete any DataSet in Domo, including its schema and data connections.
+- **View activity logs** — Allows you to access and review detailed logs of user and system activity within your Domo instance.
+- **View usage metrics** — Allows you to view instance-level usage data, including activity and resource metrics across Domo.
 
-To learn more about custom roles and grants, see [Manage User Roles and Grants](https://domo-support.domo.com/s/article/360043438973?language=en_US).
+To learn more about custom roles and grants, see [Manage User Roles and Grants](/s/article/360043438973).
 
-
-
-### Add a Domo Access Token Account
+## Add a Domo Access Token Account
 
 To connect to another instance and pull a report, you must create a Domo Access Token account. There are two options for creating this account: an access token or a username and password. Only one option is required.
 
-1. In the navigation header, go to
-   **Data.**
-2. From the left side rail, select
-   <InlineImage src="/images/kb/ka0Vq000000N0H3-00N5w00000Ri7BU-0EMVq000005LMh0.jpg" /> **Accounts.**
-3. Select
-   **+ Add New** > **Account** to open the **Add Account** modal.
-4. In the modal, search for and select
-   **Domo Access Token**.
-     
-   Two options display for creating an account. Only one option is required.
-     
-   1. With an access token. To generate an access token, follow the steps in the section below (see Generating Access Tokens). Then, return to this task and paste the token into the
-      **Option 1: Remote Instance Access Token** field in the Add Account modal.
+1. In the navigation header, go to **Data.**
+2. From the left side rail, select <img alt="accounts icon.jpg" src="/images/kb/0EMVq000005LMh0.jpg" style={{width: 24, height: 23, display: 'inline', verticalAlign: 'start', margin: '0'}}/> **Accounts.**
+3. Select **+ Add New**> **Account** to open the **Add Account** modal.
+4. In the modal, search for and select **Domo Access Token**.  
+   Two options display for creating an account. Only one option is required.   
+      
+   1. With an access token. To generate an access token, follow the steps in the section below (see Generating Access Tokens). Then, return to this task and paste the token into the **Option 1: Remote Instance Access Token** field in the Add Account modal.
 
-      <Frame><img alt="2022-08-22_12-08-54.png" src="/images/kb/ka0Vq000000N0H3-00N5w00000Ri7BU-0EM5w000005vNmp.png" style={{width: 330, height: 352}}/></Frame>
+      <Frame>![2022-08-22_12-08-54.png](/images/kb/0EM5w000005vNmp.png)</Frame>
    2. With a username and password. This is the same username and password used in the target Domo instance.
-5. Select
-   **Connect**.
+5. Select **Connect**.
 
-<Frame><img alt="Screen_Shot_2022-08-18_at_4.04.37_PM.png" src="/images/kb/ka0Vq000000N0H3-00N5w00000Ri7BU-0EM5w000005vNmc.png" style={{width: 430, height: 459}}/></Frame>
+<Frame>![Screen_Shot_2022-08-18_at_4.04.37_PM.png](/images/kb/0EM5w000005vNmc.png)</Frame>
+
 Your Domo Access Token account is now created.
 
+ 
 
+### Generate an Access Token
 
-# Generate an Access Token
-
-1. In the navigation header on your target instance, go to
-   **More** > **Admin**.
-2. Under
-   **Authentication**, select **Access tokens**.
-3. Select
-   **+ Generate access token** and search for the Domo user requesting the access token.
-
-   Choose an expiration date and select **Generate**.
-     
+1. In the navigation header on your target instance, go to **More** > **Admin**.
+2. Under **Authentication**, select **Access tokens**.
+3. Select**+ Generate access token** and search for the Domo user requesting the access token.   Choose an expiration date and select **Generate**.  
    An access token displays.
 4. Copy the access token. The token is no longer available when you navigate away from the page.
 
-<Frame><img alt="2022-08-18_16-09-42.png" src="/images/kb/ka0Vq000000N0H3-00N5w00000Ri7BU-0EM5w000005vNmo.png" style={{width: 515, height: 92}}/></Frame>
-### Create a Job
+<Frame>![2022-08-18_16-09-42.png](/images/kb/0EM5w000005vNmo.png)</Frame>
 
-1. [Access Observability Metrics](#access_observability_metrics)
-   .
-2. Select
-   **+ New Job**.
-3. In the
-   **Job Details**, fill out the following information:
-   * (Required) Job name
-   * (Optional) Job description
-4. In the
-   **Configuration** section of the **Job Details** tab, specify the following:
-   * Select the account for your instance (this account must be created prior to creating a job).
-   * Enter the URL of the instance (*domain*. [domo.com](http://domo.com) ). Remember to include " [domo.com](http://domo.com)" at the end of your URL.
-   * Select an option for where you'd like to save run logs:
+## Create a Job
+
+1. [Access Observability Metrics](#access-observability-metrics).
+2. Select **+ New Job**.
+3. In the **Job Details**, fill out the following information: 
+   - (Required) Job name
+   - (Optional) Job description
+4. In the **Configuration** section of the **Job Details** tab, specify the following:
+   - Select the account for your instance (this account must be created prior to creating a job).
+   - Enter the URL of the instance (*domain*.domo.com). Remember to include "domo.com" at the end of your URL.
+   - Select an option for where you'd like to save run logs:
      1. New DataSet
-        + Creates a new DataSet in your Domo instance. All runs of the job will write logging to the new DataSet.
+        - Creates a new DataSet in your Domo instance. All runs of the job will write logging to the new DataSet.
      2. Existing DataSet
-        + Existing DataSet allows you to combine multiple Domo Observability Metric jobs into a single logging DataSet.
-        + Must be a DataSet created by the Domo Observability Metrics tool.
-        + The existing DataSet must already contain rows of data.
-5. In the
-   **Report and DataSet Mapping** section of the **Job Details** tab, specify the following:
-   * Select a report type from the menu.
-   * Adjust toggle to either New DataSet or Existing Dataset
-     + If you choose New DataSet, enter a name in the
-       **New DataSet Name** field.
-     + If you choose Existing Dataset, select a DataSet from the menu.
-
-     <Warning>
-       **Important:**
-
-       * Using an existing DataSet will overwrite the data that exists on that DataSet.
-       * Each report should have a different DataSet. Different report types cannot use the same DataSet.
-
-     </Warning>
-
-6. Select
-   **Submit**.
-     
-   The new job now appears in the job list on the main Observability Metrics page.
-7. (Optional) To add multiple reports, select
-   **+ Add Another Report**. Repeat the previous steps.
-
-<Frame><img alt="Screen_Shot_2022-08-18_at_5.12.12_PM.png" src="/images/kb/ka0Vq000000N0H3-00N5w00000Ri7BU-0EM5w000005vNmk.png" style={{width: 896, height: 369}}/></Frame>
-### Schedule a Job
-
-1. [Access Observability Metrics](#access_observability_metrics)
-   .
-2. In the
-   **Scheduling** tab, complete the following:
-   * Select the frequency the job should run.
-
-   <Note>
-     **Note:**
-     Some inputs are disabled depending on the chosen reports. Reports for “People” and “Group Membership” are the only reports that can be triggered more frequently than daily. They must be in a job with no other reports to run more frequently.
-
-   </Note>
-
-   * Switch the toggle to **Active**.
-
-<Frame><img alt="mceclip1.png" src="/images/kb/ka0Vq000000N0H3-00N5w00000Ri7BU-0EM5w000005vNmm.png" style={{width: 649, height: 104}}/></Frame>
-The job runs according to your specified frequency.
-
-
-
-### Run a Job
-
-A job will execute according to the schedule set in the **Scheduling** tab when the toggle is switched to **Active**. When the toggle is **Disabled**, the job only executes when it is manually run.
-
-<Frame><img alt="Screen_Shot_2022-08-24_at_5.27.23_PM.png" src="/images/kb/ka0Vq000000N0H3-00N5w00000Ri7BU-0EM5w000005vNme.png" style={{width: 847, height: 191}}/></Frame>
-You can manually run a job by selecting <InlineImage src="/images/kb/ka0Vq000000N0H3-00N5w00000Ri7BU-0EMVq000005KDFx.jpg" /> **Job Options** > **Run Job.**
-
-<Frame><img alt="Screenshot 2025-02-11 at 1.25.00 PM.png" src="/images/kb/ka0Vq000000N0H3-00N5w00000Ri7BU-0EMVq000005K7os.jpg" style={{width: 208, height: 213}}/></Frame>
-After a job runs, the **Report and DataSet Mapping** section shows the output DataSets next to each row that has been run. This information can be found in the **Job Details** view.
-
-<Frame><img alt="mceclip2.png" src="/images/kb/ka0Vq000000N0H3-00N5w00000Ri7BU-0EM5w000005vNmn.png"/></Frame>
-You can change the DataSet where run logs are saved in the **Report and DataSet Mapping** section of the **Job Details**.
-
-1. Select
-   **Edit** in the job's details.
-2. Select the current DataSet.
-     
-   A search menu displays containing all available DataSets in your instance.
-3. Search for the replacement DataSet. Select
-   **Choose DataSet**.
-
-The job saves run logs in the updated DataSet.
+        - Existing DataSet allows you to combine multiple Domo Observability Metric jobs into a single logging DataSet.
+        - Must be a DataSet created by the Domo Observability Metrics tool.
+        - The existing DataSet must already contain rows of data.
+5. In the **Report and DataSet Mapping** section of the **Job Details** tab, specify the following:
+   - Select a report type from the menu.
+   - Adjust toggle to either New DataSet or Existing Dataset
+     - If you choose New DataSet, enter a name in the **New DataSet Name** field.
+     - If you choose Existing Dataset, select a DataSet from the menu.
 
 <Warning>
-  **Important:**
-  The Activity Log report only goes back two weeks from the current date. This is expected behavior.
+
+**Important:** - Using an existing DataSet will overwrite the data that exists on that DataSet.
+- Each report should have a different DataSet. Different report types cannot use the same DataSet.
 
 </Warning>
 
-### Clone a Job
+6. Select **Submit**.   
+   The new job now appears in the job list on the main Observability Metrics page.
+7. (Optional) To add multiple reports, select **+ Add Another Report**. Repeat the previous steps.
+
+<Frame>![Screen_Shot_2022-08-18_at_5.12.12_PM.png](/images/kb/0EM5w000005vNmk.png)</Frame>
+
+## Schedule a Job
+
+1. [Access Observability Metrics](#access-observability-metrics).
+2. In the **Scheduling** tab, complete the following:
+   - Select the frequency the job should run.
+
+<Note>**Note:** Some inputs are disabled depending on the chosen reports. Reports for “People” and “Group Membership” are the only reports that can be triggered more frequently than daily. They must be in a job with no other reports to run more frequently.</Note>
+
+- - Switch the toggle to **Active**.
+
+<Frame>![mceclip1.png](/images/kb/0EM5w000005vNmm.png)</Frame>
+
+The job runs according to your specified frequency.
+
+## Run a Job
+
+A job will execute according to the schedule set in the **Scheduling** tab when the toggle is switched to **Active**. When the toggle is **Disabled**, the job only executes when it is manually run.
+
+<Frame>![Screen_Shot_2022-08-24_at_5.27.23_PM.png](/images/kb/0EM5w000005vNme.png)</Frame>
+
+You can manually run a job by selecting <img alt="Screenshot 2025-02-11 at 1.24.37 PM.png" src="/images/kb/0EMVq000005KDFx.jpg" style={{width: 23, height: 21, display: 'inline', verticalAlign: 'start', margin: '0'}}/> **Job Options** > **Run Job.**
+
+<Frame>![Screenshot 2025-02-11 at 1.25.00 PM.png](/images/kb/0EMVq000005K7os.jpg)</Frame>
+
+After a job runs, the **Report and DataSet Mapping** section shows the output DataSets next to each row that has been run. This information can be found in the **Job Details** view.
+
+<Frame>![mceclip2.png](/images/kb/0EM5w000005vNmn.png)</Frame>
+
+You can change the DataSet where run logs are saved in the **Report and DataSet Mapping** section of the** Job Details**.
+
+1. Select **Edit** in the job's details.
+2. Select the current DataSet.  
+   A search menu displays containing all available DataSets in your instance.
+3. Search for the replacement DataSet. Select **Choose DataSet**.
+
+The job saves run logs in the updated DataSet.
+
+<Warning>**Important:** The Activity Log report only goes back two weeks from the current date. This is expected behavior.</Warning>
+
+## Clone a Job
 
 To create jobs for more instances with the same reports and run logs DataSet, you can clone an existing job.
 
-1. [Access Observability Metrics](#access_observability_metrics)
-   .
-     
+1. [Access Observability Metrics](#access-observability-metrics).  
    A list of jobs in your instance displays.
-2. Hover over a job in the list. Select
-   <InlineImage src="/images/kb/ka0Vq000000N0H3-00N5w00000Ri7BU-0EMVq000005KDW5.jpg" /> **Job Options** > **Clone.** The **Clone Job** modal displays.
-3. Enter a name, optional description, instance URL, and select the instance's
-   Access Token account.
+2. Hover over a job in the list. Select <img alt="Screenshot 2025-02-11 at 1.24.37 PM.png" src="/images/kb/0EMVq000005KDW5.jpg" style={{width: 24, height: 22, display: 'inline', verticalAlign: 'start', margin: '0'}}/> **Job Options** > **Clone.** The **Clone Job** modal displays.
+3. Enter a name, optional description, instance URL, and select the instance's Access Token account.
 
-<Frame><img alt="Screen_Shot_2022-08-18_at_5.14.12_PM.png" src="/images/kb/ka0Vq000000N0H3-00N5w00000Ri7BU-0EM5w000005vNmq.png" style={{width: 550, height: 401}}/></Frame>
-4. Select
-   **Clone Job**. The cloned job appears in the job list on the main Observability Metrics page.
+**<Frame>![Screen_Shot_2022-08-18_at_5.14.12_PM.png](/images/kb/0EM5w000005vNmq.png)</Frame>**
+
+4. Select **Clone Job**.The cloned job appears in the job list on the main Observability Metrics page.

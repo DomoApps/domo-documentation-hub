@@ -1,0 +1,110 @@
+---
+title: "Marketing Attribution | 実装ガイド"
+excerpt: "Marketing Attribution App をインストールし、Grid Builder と DataFlow を使ってオポチュニティーとキャンペーンメンバーのデータをマッピング・接続します。"
+---
+
+## はじめに
+
+Marketing Attribution Appをインストールしていただきありがとうございます。このガイドは、このAppをご自身のデータと接続するためのサポートを目的として書かれたものです。このAppの購入処理を完了すると、このガイドのすべてのステップを実行することができます。最初のステップでは、AppとAppのDataFlowがAppstoreから正しくダウンロードされていること、そしてデータがAppで使用される正しいフォーマットであることを確認します。
+
+<Frame>![marketingattribution.png](/images/kb/ja/0EM5w000005vONr.png)</Frame>
+
+## 必要条件
+
+Marketing Attribution Appは、データをAppが必要とするスキーマにマップする、Grid Builderと呼ばれるツールを使用しています。Grid Builderにまだ慣れていない場合は、[こちら](https://developer.domo.com/docs/installation-guides/grid-builder-walkthrough)でGrid Builderのウォークスルーを参照してください。必要ではありませんが、MySQLクエリがどのように機能するかについて、実経験にもとづく知識があると便利です。
+
+以下の図は、データがDataFlowを通じて供給され、Appに出力される順序を表示しています。
+
+<Frame>![gridbuilder.png](/images/kb/ja/0EM5w000005vONe.png)</Frame>
+
+Grid Builderの動作に慣れたら、次のステップに従い、Marketing Attribution AppとDataFlowがDomoインスタンスに適切に展開されていることを確認します。
+
+- DomoのAppstoreからMarketing Attribution Appを購入した場合は、AppStoreのAppのページにある**［Try It］**ボタンを選択して、AppとそのDataFlowをお使いのDomoインスタンスに展開してください。インスタンスでAppを使用するページに名前を付けるように求められます。
+- DataFlowがインスタンスに適切に展開されていることを再度確認します。確認するには、Domoの右上隅にあるメニューボタンを選択し、Domoの上部にある**［データ］**ボタンをクリックして、Data Centerに移動します（下の画像を参照）。<img alt="Data_Tab.png" src="/images/kb/ja/0EM5w000005vONo.png" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/>
+- Data Centerの画面左側から**［DataFlow］**を選択し、Data Centerの検索バーを使用して、「Marketing Attribution」を検索します。検索語に一致するDataFlowを見つけることができます。
+
+これらのすべてのステップに従っても、作成したページに、またはそのDataFlowでAppが見つからない場合、テクニカルサポートまでお問い合わせください。サポートへのお問い合わせ方法については、「[ヘルプとサポート](/s/article/360042922874)」を参照してください。
+
+## ステップ1：データを準備する
+
+Marketing Attribution Appは、各アトリビューションモデル（ファーストタッチ、ラストタッチ、リニア、位置、時間減衰）全体でタッチポイントを比較します。つまり、このAppを実行するには2つのメインテーブルが必要です。1つのテーブルは「オポチュニティーの現在の詳細」テーブルになり、もう1つのテーブルは「キャンペーンメンバーの詳細」テーブルになります。下の例では、2つのテーブルを構成する4つのテーブルが表示されます。DataFlowを正常に実行するためには、特定の列が必要です。以下のテーブルスキーマでは、必要な列がすべて表示されます。一度Grid Builderに記入すると、列名がマップされるため、スキーマに合わせて列名を変更する必要はありませんが、フィルターオプションとして使用するほかのカテゴリー列をテーブルに追加することもできます（下記の例を参照）。
+
+<Frame>![Screen_Shot_2019-10-29_at_1.34.18_PM.png](/images/kb/ja/0EM5w000005vONk.png)</Frame>
+
+ 
+
+<Frame>![Screen_Shot_2019-10-29_at_1.34.26_PM.png](/images/kb/ja/0EM5w000005vONv.png)</Frame>
+
+テーブルがどのように結合されているかの詳細については、以下のエンティティ関係図を参照してください。複数のテーブルを使用して、Grid BuilderでテーブルをJoinして必要なテーブルを作成することもできます。この例で分かるように、キャンペーンテーブルはName列をキャンペーンテーブルに、連絡先テーブルはAccountIdをキャンペーンメンバーにJoinし、AccountIdはすべてをオポチュニティーテーブルにJoinするために使われます。Grid Builderのステップでは、このドキュメントでこれらのJoinの方法を説明します。
+
+<Frame>![schema.png](/images/kb/ja/0EM5w000005vONg.png)</Frame>
+
+**注記：**
+
+- Marketing Attribution Appには、Appから削除することも位置を変更することもできない「HIRING MNGR」と書かれた採用マネージャーフィルターが組み込まれています。
+- メールアイコンを選択して、Appで採用マネージャーに連絡を取ることができます。これらのメッセージは「Marketing Attribution — Email Forms」のDataSetで自動化されています。メッセージを変更するには、「Email Forms」DataSetをクリックし、スパナメニューアイコンをクリックして**［ウェブフォームを編集］**を選択します。
+- 日付列と第一グループ列を使用してデータをJoinできるのであれば、複数のDataSetをAppのソースデータとして使用できます。Grid BuilderでJoinを行う方法については、このドキュメントの後のセクションで説明します。
+- 列が不足している場合は、MySQLを使用してDataFlowにデフォルト値を設定し、列を作成できます。例えば、LinkedInURL列がなかった場合、その列のすべての値を「None」に設定することができます。これは、どの営業担当者の写真もAppにないものの、実行を終了することを意味します。何らかの列がない場合、DataFlowはエラーで停止します。
+
+### キータームと計算：
+
+- **ファーストタッチ：**顧客を引き入れた最初のマーケティングチャネルに与えられた期間 - ファーストタッチに対して100％クレジット。
+- **ラストタッチ：**その結果顧客のコンバージョンにつながる最後のマーケティングチャネルに与えられた期間 - ラストタッチに対して100％クレジット。
+- **リニア：**カスタマージャーニーのすべてのマーケティングタッチにクレジットを与えます。すべてのタッチに対するクレジットと同じです。
+- **位置：**ファーストタッチとラストタッチに、ほかのタッチよりも大きいクレジットを与えます。最初とラストタッチに対してそれぞれ40％クレジットが与えられ、残りの20％はほかのタッチに均等に分割されます。
+- **時間減衰：**複数のタッチポイントにクレジットを与えますが、顧客のコンバージョンにより近いマーケティングのタッチポイントにより多くのクレジットを与えます。この計算式は2（タッチポイントの日からコンバージョンの日までの差/半減期の日数^-1）で、半減期のデフォルト値は15です。半減期の値は設定ウェブフォームで変更できます。この計算式は各タッチポイントについて数値を生成し、合計値を作成するために、これらの数値はすべてのタッチポイントに対して合計され、次にこの式が各タッチポイントで再度実行され、最終的に100％のパーセンテージ部分になるように合計値を出し、それで割り算されます。
+
+## ステップ2：DataFlowにソースデータを追加する
+
+データを準備したらすぐに、DataFlowに進み、AppのDataFlowにデータを入力として追加する必要があります。
+
+次のステップに従ってデータを入力します。
+
+- Domoの右上隅にあるメニューボタンを選択し、Domoの上部にある［データ］ボタンをクリックして、Data Centerに移動します（下の画像を参照）。<img alt="Data_Tab.png" src="/images/kb/ja/0EM5w000005vONo.png" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/>
+- Data Centerの画面左側から**［DataFlow］**を選択し、Data Centerの検索バーで［Marketing Attribution］を検索します。検索語を含むDataSetを見つける必要があります。
+- DataFlowを選択して詳細ビューに進み、ページ右側の鉛筆のアイコンをクリックして、DataFlowを編集します。
+- 各DataSetの角にある**［x］**をクリックして、サンプルDataSetの「Contact」、「Opportunity」、「Campaign Member」、「Salesforce Campaign」を削除します。「Marketing Attribution - Grid Builder」と「Marketing Attribution - Settings」のDataSetを保持します。
+- **［DataSetを選択］**ボタンをクリックして、Appのために作成したDataSetを検索し、それらを選択して追加します。
+- DataSetを追加したら、ページの下部までスクロールし、**［保存］**ボタンをクリックします。
+- Data Centerに戻ります。
+
+<Frame>![editmysql.png](/images/kb/ja/0EM5w000005vONm.png)</Frame>
+
+## ステップ3：Grid Builderを編集する
+
+3番目のステップでは、入力データと一致するようにGrid Builderの適切なフィールドを編集する必要があります。このガイドでは、この作業の基本的なステップを説明しますが、Grid Builderの機能や使用方法に関するより包括的なチュートリアルについては、「[Grid Builder Walkthrough](https://developer.domo.com/docs/installation-guides/grid-builder-walkthrough)」を参照してください。変更を加えるとき、このプロセス中にウェブブラウザーにエラーが発生した場合に備えて、作業内容をExcelスプレッドシートに時々コピーしてすべての変更を追跡することを推奨します。
+
+以下のステップに従ってGrid Builderを編集します。
+
+- Marketing Attribution Appに付属しているGrid Builderウェブフォームに進みます。ウェブフォームはDataSetの一種なので、DataFlowタブではなくDataSetタブで検索する必要があります。「Marketing Attribution - Grid Builder」の名前がつけられます。DataSetを選択し、詳細ビューで右側にあるスパナメニューアイコンを選択し、**［ウェブフォームを編集］**をクリックします。
+
+<Frame>![123456.png](/images/kb/ja/0EM5w000005vONt.png)</Frame>
+
+- C101から下のSELECT列で、サンプル値を、Appで利用するFROM列の列の名前に置き換えます。この列で独自のデータをAppにマップします。フィルターとしてさらに追加したい列があれば、行を追加する必要がある場合があります（上の画像例の#1を参照）。
+- FROM列で、行C101の値を最初のDataSetの名前に一致するように変更し、Appのソースデータとして使用するすべてのテーブルに対してこのステップを繰り返します。新しいDataSetにはそれぞれ、「C」列の次の100の倍数の値を割り当てる必要があります。例えば、2番目のDataSetを201で、3番目を301で開始します（上の画像例の#2を参照）。
+- C101から下のAS列には、SELECT列の列名が表示されます。これらの名前は上のテーブルのスキーマに一致していなければならず、また既に正しく一覧表示されていなければなりません。Appでフィルターとして使用するために追加の列を追加しない限り、AS列を変更する必要はありません。この列を使用する場合、AS列の名前にスペース、数字、特殊文字の使用を避けてください。例えば、Gross SalesではなくGross\_Salesを使用します（上の画像例の#4を参照）。
+- 「Include」列で、Joinのためにだけ使用されるのではないDataSetから含める各行に1を配置します。その列を含めない場合は、「Include」列に0を配置します。
+- Joinするには、C201行目の「JoinType」列と「JoinCondition」列、または新しいテーブルを開始する列のいずれかに記入してください。「JoinType」はすべて大文字である必要があり、MySQLによって使用されるあらゆるタイプのJoinであり得ます。追加のJoinは通常、「JoinType」としてLEFTを使用します。「JoinCondition」列は、DataSetから列が読み込まれた行を参照します。「JoinCondition」は以下のようになります：`Ctable#.COLUMNNAME = Ctable#.COLUMNNAME`（上の画像例の#6を参照）。
+- データから情報を入力すると、次にフィルターの設定が必要になります。フィルターとして使用するDataSet内の列を参照するGrid Builderの各行で、3つのフィルター列「FilterId」、「FilterName」と「FilterInputType」を更新する必要があります。AppStoreからダウンロードしたサンプルAppにはフィルターがないため、下の画像例を参照する必要があります。
+
+<Frame>![additionalfilters.png](/images/kb/ja/0EM5w000005vONq.png)</Frame>
+
+- フィルターとして使用するほかの行では、「FilterId」列に1ずつ増える数（3、4、5など）を使用し、最小の数を一番上の行に置きます。「FilterName」列でフィルター名を定義し、「FilterInputType」に対して「複数選択」または「単一選択」を使用し、「FilterIsPrimary」と「FilterIsPrimaryGroup」は空のままにします。2つのフィルタータイプの詳細については、「[Grid Builder Walkthrough](https://developer.domo.com/docs/installation-guides/grid-builder-walkthrough)」を参照してください（上の画像例を参照）。
+- ページの上部にある**［保存して次へ］**を選択して、編集したDataSetを保存します。
+
+Grid Builderに必要な変更を加えたら、Data Centerに移動し、Marketing AttributionのDataFlowを実行します。DataFlowが正常に実行された場合、Grid Builderに正しく入力されているでしょう。このプロセス中にエラーが発生した場合は、「[Grid Builder Walkthrough](https://developer.domo.com/docs/installation-guides/grid-builder-walkthrough)」を参照するか、テクニカルサポートにお問い合わせください。サポートへのお問い合わせ方法については、「[ヘルプとサポート](/s/article/360042922874)」を参照してください。
+
+## ステップ4：検証する
+
+Grid Builderを設定したら、Marketing Attribution Appをチェックしてメトリクスを検証する準備が整います。
+
+検証のために以下のプロセスを推奨します。
+
+- KPIカードを作成して、メトリクスをテストします。Appからの出力データではなく、ソースデータにもとづいて作成します。例えば、Appで営業担当者ごとの販売傾向を表示している場合は、営業担当者ごとの売上高を表示し、KPIカードの日付範囲をAppが表示する日付範囲の1つと一致させる棒グラフタイプのカードを作成します
+- KPIカードのデータをAppのデータと比較します。カードとAppでも、フィルターオプションと日付範囲が一致していることを確認してください。
+- 不一致があれば、Grid BuilderでJoinの条件やグループ化を変更する必要があるか確認してください。計算も再確認してください。
+- 検証する必要があるメトリクスがあれば、この処理を繰り返します。
+
+### おめでとうございます。
+
+Marketing Attribution Appを起動できるようになりました。データを最大限に活用しましょう。質問がある場合、またはトラブルシューティングのサポートが必要な場合は、テクニカルサポートまでお問い合わせください。サポートへのお問い合わせ方法については、「[ヘルプとサポート](/s/article/360042922874)」を参照してください。

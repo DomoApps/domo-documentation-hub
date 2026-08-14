@@ -1,148 +1,126 @@
 ---
 title: "Snowflakeコネクター"
+excerpt: "Snowflake コネクターを設定し、アカウント名、ユーザー名、パスワード、ウェアハウス、データベースを指定して SQL クエリで Snowflake から DataSet を取得します（ユーザー名/パスワード認証は 2025 年に終了予定）。"
 ---
 
-import { InlineImage } from "/snippets/InlineImage.mdx";
+<Note>
 
-**注記：** **Snowflakeは2025年11月以降、ユーザー名とパスワードによる認証メカニズムのサポートを終了します。そのため、このConnectorは以下のスケジュールで提供を段階的に終了します。
-
-- 2025年8月1日(米国時間): このConnectorを使った新規DataSetの作成が出来なくなります。既存のDataSetの更新は継続されます。
-
-- 2025年10月1日(米国時間): このConnectorを使ったすべてのDataSetの更新が停止します。
-
+**注記：** **Snowflakeは2025年11月以降、ユーザー名とパスワードによる認証メカニズムのサポートを終了します。そのため、このConnectorは以下のスケジュールで提供を段階的に終了します。  
+- 2025年8月1日(米国時間): このConnectorを使った新規DataSetの作成が出来なくなります。既存のDataSetの更新は継続されます。  
+- 2025年10月1日(米国時間): このConnectorを使ったすべてのDataSetの更新が停止します。  
 代わりに、以下のいずれかの接続方法のご利用をご検討ください。**
 
-* [Cloud Amplifier](/ja/s/article/4402322966807 "Cloud Amplifier")
-* [Snowflake Enterprise OAuthコネクター](/ja/s/article/000005534 "Snowflake Enterprise OAuthコネクター")
-* [Snowflake Key Pair Authenticationコネクター](/ja/s/article/360042931854 "Snowflake Key Pair Authenticationコネクター")
-* [Snowflake OAuthコネクター](/ja/s/article/360061552054 "Snowflake OAuthコネクター")
+</Note>
+
+- [Cloud Amplifier](/ja/s/article/4402322966807)
+- [Snowflake Enterprise OAuthコネクター](/ja/s/article/000005534)
+- [Snowflake Key Pair Authenticationコネクター](/ja/s/article/360042931854)
+- [Snowflake OAuthコネクター](/ja/s/article/360061552054)
 
 ## はじめに
 
-Snowflakeは、すべてのデータを簡単にまとめて、分析する必要のあるすべてのユーザーとシステムが利用できるようにするData Warehouseです。DomoのSnowflakeコネクターを使用してSQLクエリを入力すると、指定したウェアハウス、データベース、およびデータベーススキーマからデータを取得できます。Snowflake APIの詳細については、 [https://docs.snowflake.net/manuals](https://docs.snowflake.net/manuals "https://docs.snowflake.net/manuals") を参照してください。
+Snowflakeは、すべてのデータを簡単にまとめて、分析する必要のあるすべてのユーザーとシステムが利用できるようにするData Warehouseです。DomoのSnowflakeコネクターを使用してSQLクエリを入力すると、指定したウェアハウス、データベース、およびデータベーススキーマからデータを取得できます。Snowflake APIの詳細については、[https://docs.snowflake.net/manuals](https://docs.snowflake.net/manuals)を参照してください。
 
-Snowflakeコネクターは、クエリを使用してデータベースからデータを取得する「データベース」コネクターです。Data Centerでは、ウィンドウ上部のツールバーで **［データベース］** をクリックすることで、このデータベースコネクターやほかのデータベースコネクターのコネクターページにアクセスできます。
+Snowflakeコネクターは、クエリを使用してデータベースからデータを取得する「データベース」コネクターです。Data Centerでは、ウィンドウ上部のツールバーで**［データベース］**をクリックすることで、このデータベースコネクターやほかのデータベースコネクターのコネクターページにアクセスできます。
 
-このトピックでは、Snowflakeコネクターユーザーインターフェースに固有のフィールドとメニューについて説明します。DataSetの追加や更新スケジュールの設定、DataSet情報の編集に関する一般的な情報は、「 [コネクターを使用してDataSetを追加する](/ja/s/article/360042926274 "コネクターを使用してDataSetを追加する") 」を参照してください。
+このトピックでは、Snowflakeコネクターユーザーインターフェースに固有のフィールドとメニューについて説明します。DataSetの追加や更新スケジュールの設定、DataSet情報の編集に関する一般的な情報は、「[コネクターを使用してDataSetを追加する](/s/article/360042926274)」を参照してください。
 
 ## 必要条件
 
 Snowflakeデータベースに接続し、DataSetを作成するには、以下が必要です。
 
-* アカウントのフルネーム（Snowflakeが提供）。これは、Snowflake URLの
-  https:// の直後に続く部分です。
-
-  アカウントのフルネームには、アカウントがホストされる地域とクラウドプラットフォームを識別する追加のセグメントが含まれる場合があることに注意してください。以下の表に、クラウドプラットフォームまたは地域別のアカウント名の例を示します。各行に対して、アカウント名が「xy12345」
-
-  <InlineImage src="/images/kb/ka05w00000123Kt-00N5w00000Ri7BU-0EM5w000005vO5S.png" />
+- アカウントのフルネーム（Snowflakeが提供）。これは、Snowflake URLのhttps://の直後に続く部分です。  
+    
+  アカウントのフルネームには、アカウントがホストされる地域とクラウドプラットフォームを識別する追加のセグメントが含まれる場合があることに注意してください。以下の表に、クラウドプラットフォームまたは地域別のアカウント名の例を示します。各行に対して、アカウント名が「xy12345」<img alt="snowflake_account_names.png" src="/images/kb/ja/0EM5w000005wLoB.png" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/>
 
   であると仮定しています。
-* Snowflakeアカウントのユーザー名とパスワード。
+- Snowflakeアカウントのユーザー名とパスワード。
 
 ## Snowflakeアカウントに接続する
 
-このセクションでは、Snowflakeコネクターページの **［認証情報］** ペインと **［詳細］** ペインのオプションについて説明します。このページのほかのペインの項目である **［スケジュール設定］** や **［DataSetに名前を付け、説明を入力］** に関しては、ほとんどのタイプのコネクターで共通しています。詳細については「 [コネクターを使用してDataSetを追加する](/ja/s/article/360042926274 "コネクターを使用してDataSetを追加する") 」を参照してください。
+このセクションでは、Snowflakeコネクターページの**［認証情報］**ペインと**［詳細］**ペインのオプションについて説明します。このページのほかのペインの項目である**［スケジュール設定］**や**［DataSetに名前を付け、説明を入力］**に関しては、ほとんどのタイプのコネクターで共通しています。詳細については「[コネクターを使用してDataSetを追加する](/s/article/360042926274)」を参照してください。
 
 ### ［認証情報］ペイン
 
 このペインには、Snowflakeアカウントに接続するための認証情報を入力するフィールドがあります。下表は、各フィールドに必要な内容を説明しています。
 
-<table border="1" cellpadding="1" cellspacing="1" data-aura-rendered-by="33:195;a"><thead><tr><th colspan="1" rowspan="1"><p> フィールド </p></th><th colspan="1" rowspan="1"><p> 説明 </p></th></tr></thead><tbody><tr><td colspan="1" rowspan="1"><p> Account Name </p></td><td colspan="1" rowspan="1"><p> Snowflakeアカウント名を入力します。アカウント名を検索する方法については、「必要条件」を参照してください。 </p></td></tr><tr><td colspan="1" rowspan="1"><p> Username </p></td><td colspan="1" rowspan="1"><p> Snowflakeアカウントに関連するユーザー名を入力します。 </p></td></tr><tr><td colspan="1" rowspan="1"><p> Password </p></td><td colspan="1" rowspan="1"><p> Snowflakeアカウントに関連するパスワードを入力します。 </p></td></tr><tr><td colspan="1" rowspan="1"><p> Role </p></td><td colspan="1" rowspan="1"><p><span> 権限を入力します。 </span></p></td></tr></tbody></table>
+| フィールド        | 説明                                                        |
+| ------------ | --------------------------------------------------------- |
+| Account Name | Snowflakeアカウント名を入力します。アカウント名を検索する方法については、「必要条件」を参照してください。 |
+| Username     | Snowflakeアカウントに関連するユーザー名を入力します。                           |
+| Password     | Snowflakeアカウントに関連するパスワードを入力します。                           |
+| Role         | 権限を入力します。                                                 |
 
-Snowflakeの有効な認証情報を入力すると、SnowflakeのDataSetを作成する際にいつでもDomoで同じアカウントを使用できます。コネクターのアカウントは Data Center の **［アカウント］** タブで管理できます。このタブの詳細については、「 [コネクターのユーザーアカウントを管理する](/ja/s/article/360042926054 "コネクターのユーザーアカウントを管理する") 」を参照してください。
+Snowflakeの有効な認証情報を入力すると、SnowflakeのDataSetを作成する際にいつでもDomoで同じアカウントを使用できます。コネクターのアカウントはData Centerの**［アカウント］**タブで管理できます。このタブの詳細については、「[コネクターのユーザーアカウントを管理する](/s/article/360042926054)」を参照してください。
 
 ### ［詳細］ペイン
 
 このペインには、SQLクエリを入力したり、取得するデータの場所を指定したりするための多数のフィールドとメニューがあります。
 
-<table border="1" cellpadding="1" cellspacing="1" data-aura-rendered-by="33:195;a"><thead><tr><th colspan="1" rowspan="1"><p> パラメーター </p></th><th colspan="1" rowspan="1"><p> 説明 </p></th></tr></thead><tbody><tr><td colspan="1" rowspan="1"><p> Query Type </p></td><td colspan="1" rowspan="1"><p> クエリタイプを選択します。 </p><table border="1"><tbody><tr><td colspan="1" rowspan="1"> Enter Query </td><td colspan="1" rowspan="1"> ユーザー定義のクエリを入力するオプションが有効になります。 </td></tr><tr><td colspan="1" rowspan="1"> Query History </td><td colspan="1" rowspan="1"> 定義済みクエリを使用して、Snowflakeクエリ履歴から過去70日間のデータを取得します。 </td></tr><tr><td colspan="1" rowspan="1"> Table Information </td><td colspan="1" rowspan="1"> アカウントに作成されたオブジェクトのメタデータ情報を取得します。 </td></tr><tr><td colspan="1" rowspan="1"> Warehouse Metering History </td><td colspan="1" rowspan="1"> 過去70日間のウェアハウスの使用状況と計測情報を取得します。 </td></tr></tbody></table></td></tr><tr><td colspan="1" rowspan="1"><p> Query </p></td><td colspan="1" rowspan="1"><p> データを取得するために使用するSQLクエリを入力します。 <b> ［Query Helper］ </b> パラメーターを使用して、使用可能なSQLクエリを記述できます。 <b> ［Query Helper］ </b> を使用するには、以下を実行します。 </p><ol><li><p> 各メニューで、目的のウェアハウス、データベース、データベーススキーマ、データベース表、表の列を選択します。 </p></li><li><p><b> ［Query Helper］ </b> フィールドに表示されるSQLステートメントをコピーします。 </p></li><li><p> コピーしたSQLステートメントを <b> ［Query］ </b> フィールドに貼り付けます。 </p></li></ol></td></tr><tr><td colspan="1" rowspan="1"><p> Warehouses </p></td><td colspan="1" rowspan="1"><p> 取得したいデータが格納されているウェアハウスを選択します。このリストには、認証情報にもとづいてアクセスできるすべてのウェアハウスが表示されます。 </p></td></tr><tr><td colspan="1" rowspan="1"><p> Databases </p></td><td colspan="1" rowspan="1"><p> 取得したいデータが格納されているデータベースを選択します。このリストには、認証情報にもとづいてアクセスできるすべてのデータベースが表示されます。 </p></td></tr><tr><td colspan="1" rowspan="1"><p> Database Schema </p></td><td colspan="1" rowspan="1"><p> 取得したいデータが含まれているデータベーススキーマを選択します。このリストには、認証情報にもとづいてアクセスできるすべてのスキーマが表示されます。 </p></td></tr><tr><td colspan="1" rowspan="1"><p> Database Tables（オプション） </p></td><td colspan="1" rowspan="1"><p> 取得するデータベース表を選択します。このリストには、認証情報にもとづいてアクセスできるすべての表が表示されます。データベース表を選択しない場合は、コネクターはデータベーススキーマ全体を取得します。 </p></td></tr><tr><td colspan="1" rowspan="1"><p> Table Columns（オプション） </p></td><td colspan="1" rowspan="1"><p> 取得する表の列を選択します。このリストには、認証情報にもとづいてアクセスできるすべての列が表示されます。表の列を選択しないと、コネクターは選択したデータベース表全体を取得します。 </p></td></tr><tr><td colspan="1" rowspan="1"><p> Query Helper（オプション） </p></td><td colspan="1" rowspan="1"><p> 上のメニューから、ウェアハウス、データベース、スキーマ、表などを選択すると、利用可能なSQLクエリがこのフィールドに作成されます。このフィールドのSQLステートメントをコピーして、 <b> ［Query］ </b> フィールドに貼り付けます。詳細については、上記の「 <b> Query </b> 」を参照してください。 </p></td></tr><tr><td colspan="1" rowspan="1"> Fetch Size（オプション） </td><td colspan="1" rowspan="1"> メモリのパフォーマンスのフェッチサイズを入力します。空白にすると、デフォルトサイズの1000が適用されます。DataSetに「メモリ不足」エラーが発生した場合は、フェッチサイズの縮小を試みます。 </td></tr></tbody></table>
+| パラメーター | 説明  |
+| ------ | --- |
+| Query Type | クエリタイプを選択します。<table><tbody><tr><td>Enter Query</td><td>ユーザー定義のクエリを入力するオプションが有効になります。</td></tr><tr><td>Query History</td><td>定義済みクエリを使用して、Snowflakeクエリ履歴から過去70日間のデータを取得します。</td></tr><tr><td>Table Information</td><td>アカウントに作成されたオブジェクトのメタデータ情報を取得します。</td></tr><tr><td>Warehouse Metering History</td><td>過去70日間のウェアハウスの使用状況と計測情報を取得します。</td></tr></tbody></table> |
+| Query  | データを取得するために使用するSQLクエリを入力します。**［Query Helper］**パラメーターを使用して、使用可能なSQLクエリを記述できます。**［Query Helper］**を使用するには、以下を実行します。   1. 各メニューで、目的のウェアハウス、データベース、データベーススキーマ、データベース表、表の列を選択します。 2. **［Query Helper］**フィールドに表示されるSQLステートメントをコピーします。 3. コピーしたSQLステートメントを**［Query］**フィールドに貼り付けます。 |
+| Warehouses | 取得したいデータが格納されているウェアハウスを選択します。このリストには、認証情報にもとづいてアクセスできるすべてのウェアハウスが表示されます。 |
+| Databases | 取得したいデータが格納されているデータベースを選択します。このリストには、認証情報にもとづいてアクセスできるすべてのデータベースが表示されます。 |
+| Database Schema | 取得したいデータが含まれているデータベーススキーマを選択します。このリストには、認証情報にもとづいてアクセスできるすべてのスキーマが表示されます。 |
+| Database Tables（オプション） | 取得するデータベース表を選択します。このリストには、認証情報にもとづいてアクセスできるすべての表が表示されます。データベース表を選択しない場合は、コネクターはデータベーススキーマ全体を取得します。 |
+| Table Columns（オプション） | 取得する表の列を選択します。このリストには、認証情報にもとづいてアクセスできるすべての列が表示されます。表の列を選択しないと、コネクターは選択したデータベース表全体を取得します。 |
+| Query Helper（オプション） | 上のメニューから、ウェアハウス、データベース、スキーマ、表などを選択すると、利用可能なSQLクエリがこのフィールドに作成されます。このフィールドのSQLステートメントをコピーして、**［Query］**フィールドに貼り付けます。詳細については、上記の「**Query**」を参照してください。 |
+| Fetch Size（オプション） | メモリのパフォーマンスのフェッチサイズを入力します。空白にすると、デフォルトサイズの1000が適用されます。DataSetに「メモリ不足」エラーが発生した場合は、フェッチサイズの縮小を試みます。 |
 
-### <InlineImage src="/images/kb/ka0Vq000000FV1t-00N5w00000Ri7BU-0EM5w000005vO5s.png" /> その他のペイン
+### <Frame>![snowflake_ui.png](/images/kb/ja/0EM5w000005wLoE.png)</Frame> その他のペイン
 
-スケジュール設定、再試行、更新に関するオプションなど、コネクターインターフェースのその他のペインに表示されるオプションについては、「 [コネクターを使用してDataSetを追加する](/ja/s/article/360042926274) 」を参照してください。
+スケジュール設定、再試行、更新に関するオプションなど、コネクターインターフェースのその他のペインに表示されるオプションについては、「[コネクターを使用してDataSetを追加する](/s/article/360042926274)」を参照してください。
 
 ## よくある質問
 
 <AccordionGroup>
-<Accordion title="# このコネクターはいつ使用しますか？">
 
-
+<Accordion title="このコネクターはいつ使用しますか？">
 このコネクターを使うと、SnowflakeのJDBCドライバを使用して、データをSnowflakeからDomoにインポートすることができます。Snowflakeアカウント名、ローカルユーザー名、パスワードでこのコネクターを使用して、Snowflakeから小規模なものから大規模なものまで様々なDataSetを取り込みます。
-
-
 </Accordion>
-<Accordion title="# Snowflakeではどの権限が必要ですか？">
 
-
+<Accordion title="Snowflakeではどの権限が必要ですか？">
 Snowflakeでは、CREATE TABLE、COPY INTO、PUT、CREATE FILE FORMAT、REMOVE、LISTの権限が必要です。
-
-
 </Accordion>
-<Accordion title="# このコネクターを作成するにはどのような認証情報が必要ですか？">
 
-
+<Accordion title="このコネクターを作成するにはどのような認証情報が必要ですか？">
 アカウント名（Snowflakeが提供）、Snowflakeのユーザー名、秘密キーが必要です。暗号化された秘密キーを作成する場合は、秘密キーファイルの暗号化に使用されるパスフレーズが必要になります。自分の権限名を入力することもできます。
-
-
 </Accordion>
-<Accordion title="# 同じアカウントを使用して複数のDataSetを作成することはできますか？">
 
-
+<Accordion title="同じアカウントを使用して複数のDataSetを作成することはできますか？">
 はい
-
-
 </Accordion>
-<Accordion title="# 入力DataSet IDはどのように見つけることができますか？">
 
-
-Domoの入力DataSet IDは、データのエクスポート元となるDataSetのURLで見つけることができます。例：
-https://customer.domo.com/datasources/aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee/details/settings
-
-
+<Accordion title="入力DataSet IDはどのように見つけることができますか？">
+Domoの入力DataSet IDは、データのエクスポート元となるDataSetのURLで見つけることができます。例：https://customer.domo.com/datasources/aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee/details/settings
 </Accordion>
-<Accordion title="# 注意すべきAPI制限はありますか？">
 
-
+<Accordion title="注意すべきAPI制限はありますか？">
 制限は使用するサーバー構成によって異なります。
-
-
 </Accordion>
-<Accordion title="# データはどれくらいの頻度で更新されますか？">
 
-
+<Accordion title="データはどれくらいの頻度で更新されますか？">
 DataSetは15分ごとに実行できます。ただし、クエリの実行時間によっては、DataSetの実行頻度が低くなる場合があります。
-
-
 </Accordion>
-<Accordion title="# クエリの記述の際に注意すべき点はありますか？">
 
-
+<Accordion title="クエリの記述の際に注意すべき点はありますか？">
 すべての単語、表名、フィールド名が正しく記述されていることを確認します。クエリのヘルプについては、［Query Helper］フィールドを参照してください。
-
-
 </Accordion>
-<Accordion title="# Snowflakeデータベースに接続できない理由は？IPアドレスのホワイトリスト登録が必要でしょうか？">
 
-
-Snowflakeデータベースに接続する前に、接続するポート上のデータベースサーバーにある多数のIPアドレスをホワイトリストに登録する必要があります。IPアドレスの詳細なリストは、「 [コネクターとフェデレーテッドアダプターのIPアドレスをホワイトリストに登録する](/ja/s/article/360043630093) 」を参照してください。
-
-
+<Accordion title="Snowflakeデータベースに接続できない理由は？IPアドレスのホワイトリスト登録が必要でしょうか？">
+Snowflakeデータベースに接続する前に、接続するポート上のデータベースサーバーにある多数のIPアドレスをホワイトリストに登録する必要があります。IPアドレスの詳細なリストは、「[コネクターとフェデレーテッドアダプターのIPアドレスをホワイトリストに登録する](/s/article/360043630093)」を参照してください。
 </Accordion>
-<Accordion title="# これはプロダクションレベルのコネクターですか？">
 
-
+<Accordion title="これはプロダクションレベルのコネクターですか？">
 はいこのコネクターは、あらゆるサイズのDataSetを対象として設計されています。
-
-
 </Accordion>
-<Accordion title="# ウェアハウス、データベース、スキーマなどのリストが正しく表示されない理由は？">
 
-
+<Accordion title="ウェアハウス、データベース、スキーマなどのリストが正しく表示されない理由は？">
 Snowflakeでアカウントに入力されたユーザー権限にもとづいてアクセスできるコンテンツのみが表示されます。目的のものが見つからない場合は、権限がそのウェアハウス、データベース、表などにアクセスできることを確認してください。
 
 Snowflakeで権限を入力しない場合、デフォルトではSYSADMIN権限が使用されます。
-
-
-
 </Accordion>
+
 </AccordionGroup>

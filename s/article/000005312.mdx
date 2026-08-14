@@ -1,92 +1,91 @@
 ---
-title: "> Domo on Amazon Redshift (RECOMMENDED)"
+title: "Domo on Amazon Redshift"
+excerpt: "Connect Domo Cloud Integrations to Amazon Redshift so you can query and visualize Redshift data directly without moving or duplicating it."
 ---
 
-import {InlineImage} from "/snippets/InlineImage.mdx";
+## Intro
 
-# Intro
-
-With Cloud Amplifier, you can power your Domo instance using Amazon Redshift. After setup is complete, you can begin using virtual tables that read from Redshift to create cards, set up Alerts, or serve as inputs in Magic ETL DataFlows.
-
-This guide is written for users who are familiar with Redshift and provides the steps for registering Redshift with Cloud Amplifier as well as some common troubleshooting techniques. To learn more about Cloud Amplifier, see the [overview](https://domo-support.domo.com/s/article/4412849158167).
-
-<Frame><img alt="redshift icon.jpeg" src="/images/kb/ka0Vq0000000Rcv-00N5w00000Ri7BU-0EM5w000006v2XQ.jpg" style={{width: 138.999, height: 139.979}}/></Frame>
+This article explains how to connect Domo's Cloud Integrations to Amazon Redshift, allowing you to query and visualize Amazon Redshift data directly in Domo without moving or duplicating data.
 
 ---
 
-# Prerequisites
+## Prerequisites
 
-Before configuring the Redshift–Cloud Amplifier connection, we recommend that you complete the following:
+You must have an AWS account with access to Redshift to move forward.
 
-* Create a Redshift service user — We recommend creating a new Redshift user specifically for this integration. Any account with "Usage" and "Select" privileges for the schemas and tables, respectively, can be used, but a service user is typically best practice.
-  + The service user must have "Usage" privileges for the schemas that you want to read from in Redshift.
-  + The service user must have "Select" privileges on the tables that you want to read from in Redshift.
-  + The service user must have "Select" privileges on the
-    **svv\_table\_info** system view.
-    - See
-      [how to grant a user/role](https://docs.aws.amazon.com/redshift/latest/dg/r_GRANT.html)"Usage" or "Select" privileges on a schema or table, respectively.
-* Create a Domo service account — We recommend creating a new Domo account specifically for this integration. The account role must have the Manage Cloud Accounts and Manage DataSet grants enabled. To learn more about roles and grants, see
-  [Managing Custom Roles](/s/article/360043438973).
+## Create or Manage Your Amazon Redshift Integrations
 
-#### Allowlisting IP Addresses
+To access the integration management interface, follow these steps:
 
-Before you can connect to a Redshift database, you must place on an allowlist a number of IP addresses on your database server on the port you want to connect to. See our documentation for a full list of [IP addresses](/s/article/360043630093).
+1. Navigate to **Data Warehouse**.
+2. Select **Connect Data**.
+3. From the list of Cloud Integrations, choose **Amazon Redshift**.  
+   The **Domo on Amazon Redshift** page appears.
+4. Select **Connect Amazon Redshift** to start creating a new integration (see the [integration setup instructions](#create-an-amazon-redshift-integration-in-domo)).
+5. Select **Manage Integrations** to modify existing integrations.  
+   A list of available integrations displays.
+6. Select the wrench icon next to an integration to view available options.   
+   The options shown depend on your access level.
 
-# Setup
+<Frame>![Screenshot](/images/kb/0EMVu00000TFiRR.jpg)</Frame>
 
-Follow these steps to configure Read access and begin referencing Redshift tables from within Domo using Cloud Amplifier:
+## Create an Amazon Redshift Integration in Domo
 
-1. Log into your Domo service account.
-2. In the navigation header, select
-   **Data**. The Data Center displays.
-3. If you are not already there, use the left side rail to go to the
-     
-   <InlineImage src="/images/kb/ka0Vq000000BCKP-00N5w00000Ri7BU-0EM5w000006wDbN.png" /> **Data Warehouse**.
-4. In the main area of the screen, select the molecule to bring it into focus.
+Every Amazon Redshift integration in Domo requires an authenticated AWS service account. Once created, a single service account can be reused across multiple integrations.
 
-   <Frame><img alt="molecule.jpeg" src="/images/kb/ka0Vq000000BCKP-00N5w00000Ri7BU-0EM5w000006wDev.jpg" style={{width: 632.997, height: 436.989}}/></Frame>
+Follow these steps to create an Amazon Redshift integration in Domo:
 
-   <Frame><img alt="molecule zoom.jpeg" src="/images/kb/ka0Vq000000BCKP-00N5w00000Ri7BU-0EM5w000006wDdZ.jpg" style={{width: 195.994, height: 215.98}}/></Frame>
+1. Provide a name for the integration. This is simply a label to help you identify the integration within Domo. It does not need to match any names in Amazon Redshift and can be changed later if needed.  
 
-5. Select
-   **<InlineImage src="/images/kb/ka0Vq000000BCKP-00N5w00000Ri7BU-0EM5w000005vNtv.png" />** **Add New Cloud**.
-     
-   The add new integration modal displays.
-6. From the
-   **Native integration** menu, select **Redshift.**
+   
+<Tip>**Tip:** Multiple Amazon Redshift integrations can exist in the same Domo instance, created by you or your colleagues. Clear naming helps users select the correct integration later. For example, separate integrations might be created to connect different tables or manage access levels.
+2. (Optional) Add a description to explain the purpose of this integration and who created it. Most users will only see the integration name in menus and lists. The description is visible only when viewing integration details.
+3. Select an existing Amazon Redshift service account from the drop-down menu or select **Add account** to create a new one.</Tip>
 
-   <Frame><img alt="select redshift.jpg" src="/images/kb/ka0Vq000000BCKP-00N5w00000Ri7BU-0EM5w000006wDfZ.jpg" style={{width: 526.996, height: 358.999}}/></Frame>
+<Frame>![Screenshot](/images/kb/0EMVu00000TFXmB.jpg)</Frame>
 
-7. Select
-   **+ Add New Integration**.
+You can change the service account later, but switching accounts may require remapping DataSets and ETLs if the new account lacks access to previously used tables. User access may also be affected unless privileges are identical.
 
-   <Frame><img alt="new redshift integration.jpg" src="/images/kb/ka0Vq000000BCKP-00N5w00000Ri7BU-0EM5w000006wDfj.jpg" style={{width: 530, height: 371.982}}/></Frame>
+**Understanding the Architecture**
 
-8. Enter the following Redshift setup information:
-   * **Integration name —**
-     A unique name to help you identify the integration in Domo.
-   * (Optional)
-     **Integration description —** A description of the integration.
-   * **Redshift username**
-   * **Redshift password**
-   * **Redshift connection URL —**
-     This is the JDBC URL for the given database cluster that you are connecting to.
+There are three levels in this setup:
 
-     <Frame><img alt="redshift setup info.jpg" src="/images/kb/ka0Vq000000BCKP-00N5w00000Ri7BU-0EM5w000006wDg8.jpg" style={{width: 551.989, height: 382.997}}/></Frame>
+- Amazon Redshift instance – Exists independently of Domo.
+- Amazon Redshift service account – Defined in Domo and connects to the Amazon Redshift instance.
+- Amazon Redshift integration – Uses the service account and adds settings such as connected tables and caching behavior.
 
-9. Select
-   **Next**. Your Read configuration is now complete.
+<Note>**Note:** Multiple service accounts can connect to the same Amazon Redshift instance. Multiple integrations can share a single service account.</Note>
 
-   <Frame><img alt="redshift configured.jpg" src="/images/kb/ka0Vq000000BCKP-00N5w00000Ri7BU-0EM5w000006wDgN.jpg" style={{width: 551.982, height: 382.99}}/></Frame>
+**Access and Sharing**
 
-10. (Optional) Select
-    **Choose Tables to Connect** to create DataSets in Domo. Navigate to the tables you want to use by selecting the appropriate Amazon database > schema > tables.
+- Initially, only the owner of the service account has access.
+- The owner can share access with individuals or groups.
+- If multiple integrations use the same service account, they inherit the same user privileges.
+- Changes to privileges affect all integrations tied to that account.
 
-    <Frame><img alt="select redshift tables.jpg" src="/images/kb/ka0Vq000000BCKP-00N5w00000Ri7BU-0EM5w000006wDfk.jpg" style={{width: 551.982, height: 382.99}}/></Frame>
+To review access settings, go to the Accounts Page and select Account sharing next to the relevant Amazon Redshift service account.
 
-11. Select
-    **Create DataSets**.
+<Tip>**Tip:** You can create multiple service accounts for the same PostgreSQL instance.  
+Reasons for doing this include:  
+Example A: Managing user access separately for different integrations.  
+Example B: Applying different caching TTL settings while sharing user access.</Tip>
 
-# Use Redshift-sourced DataSets
+## Create an Amazon Redshift Service Account in Domo
 
-When you use Redshift-sourced DataSets in a DataFlow, the data is queried live from Redshift at the time the flow is executed.
+Every Amazon Redshift integration in Domo relies on an authenticated Amazon Redshift service account. Once created, this account can be reused across multiple Amazon Redshift integrations.
+
+Domo provides a dedicated Accounts Page where you can create and manage service accounts for various external services, including Amazon Redshift. After creation, your Amazon Redshift service account will appear on this page.
+
+<Warning>**Important:** Creating a PostgreSQL service account in Domo allows you, other account owners, Domo admins, and anyone with whom the account is shared, to use its credentials to access PostgreSQL and create connected DataSets in Domo. Users will not have access to sensitive values such as passwords, tokens, or keys used by the service account to connect to PostgreSQL.</Warning>
+
+Follow these steps to create an Amazon Redshift service account in Domo:
+
+1. Choose a name to identify this Amazon Redshift service account within Domo.
+   - The name can be changed later.
+   - Use clear, distinctive names to avoid confusion between Amazon Redshift accounts and integrations.
+   - You can create multiple service accounts even if they all point to the same Amazon Redshift instance.
+2. Enter the connection URL for your Amazon Redshift instance.
+3. Enter your Redshift Username.
+4. Enter your Redshift Password.
+
+<Frame>![Screenshot](/images/kb/0EMVu00000TFipd.jpg)</Frame>

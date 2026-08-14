@@ -1,12 +1,11 @@
 ---
 title: "DomoでInContact Echoデータに接続する"
+excerpt: "Domo の JSON Advanced コネクターと Echo API キーを使用し、InContact Echo のアンケート結果を Domo に取り込みます。"
 ---
 
 ## はじめに
 
-InContact Echoは、通話直後にフィードバックを収集して顧客満足度を測定するアンケートシステムです。Domoの [JSON Advancedコネクター](/ja/s/article/360042932034 "JSON Advancedコネクター") を使って、InContact Echo APIからアンケート結果を取得できます。InContact Echo APIの詳細については、
-http://echo.incontact.com/echo/help.taf?_UserReference=7F00000146FFB91CDA7A004BDD05589A3AF8&topic=Echo%20API
-を参照してください。
+InContact Echoは、通話直後にフィードバックを収集して顧客満足度を測定するアンケートシステムです。Domoの[JSON Advancedコネクター](/s/article/360042932034)を使って、InContact Echo APIからアンケート結果を取得できます。InContact Echo APIの詳細については、[http://echo.incontact.com/echo/help.taf?\_UserReference=7F00000146FFB91CDA7A004BDD05589A3AF8&topic=Echo%20API](http://echo.incontact.com/echo/help.taf?_UserReference=7F00000146FFB91CDA7A004BDD05589A3AF8&topic=Echo%20API)を参照してください。
 
 ## 必要条件
 
@@ -14,51 +13,47 @@ InContact Echoデータに接続するには、InContact担当者からEcho API�
 
 `auth: ABCDEFG8-ABCD-1234-5678-ABCDEF123456`
 
-認証に関する詳細は、Echo APIドキュメントの「 **Authorization** 」セクションを参照してください。
+認証に関する詳細は、Echo APIドキュメントの「**Authorization**」セクションを参照してください。
 
 ## 接続するステップ
 
 **InContact Echoデータに接続するには：**
 
-1. Domoで、
-   [JSON Advanced接続](/ja/s/article/360042932034 "JSON Advancedコネクター") を新規に作成します。
+1. Domoで、[JSON Advanced接続](/s/article/360042932034)を新規に作成します。
 
-   1. **［認証情報］** セクションで：
+   1. **［認証情報］**セクションで：
 
       1. アカウントプロバイダーのタイトルを「JSON Account」から「Blank」に変更して、このセクションには認証情報が入力されていないことを示します（代わりに、認証情報はコネクターのHTTPSヘッダーセクションに入力されます）。
-      2. **［Username］** フィールドと **［Password］** フィールドは空白のままにします。
-      3. **［Connect］** をクリックします。
-
+      2. **［Username］**フィールドと**［Password］**フィールドは空白のままにします。
+      3. **［Connect］**をクリックします。  
          アカウントプロバイダー「Blank」が作成されます。
-      4. **［Save］** をクリックします。
-   2. **［詳細］** セクションで：
+      4. **［Save］**をクリックします。
+   2. **［詳細］**セクションで：
 
-      1. **［What is the connection method to access the JSON file?］** ドロップダウンで、 **［HTTP Request］** を選択します。
-      2. **［Enter the URL to Your JSON File］** フィールドで、リクエストするURLを入力します。
-
-         手順については、APIドキュメントの **［Request］** セクションを参照してください。
-
-         リクエストURLの例は以下のようになります：
-
-         `https://echo.incontact.com/company/api/echoapi.taf?classname=surveys&method=getSurveyName&outputtype=JSON&p1=101`
+      1. **［What is the connection method to access the JSON file?］**ドロップダウンで、**［HTTP Request］**を選択します。
+      2. **［Enter the URL to Your JSON File］**フィールドで、リクエストするURLを入力します。  
+         手順については、APIドキュメントの**［Request］**セクションを参照してください。  
+            
+          リクエストURLの例は以下のようになります：  
+            
+          `https://echo.incontact.com/company/api/echoapi.taf?classname=surveys&method=getSurveyName&outputtype=JSON&p1=101`
 
 <Note>
+**注記：**出力をJSONとして取得するには、&outputtype=JSONパラメーターを含める必要があります。
 
-**注記：** 出力をJSONとして取得するには、 &outputtype=JSON パラメーターを含める必要があります。
+- **［Do you require additional options?］**ドロップダウンで、**［Yes］**を選択します。
+- **［HTTPS Headers］**フィールドに、InContactから受け取ったAPIキーを入力します。  
+   詳細は、上述の「必要条件」を参照してください。
+- **［Save］**をクリックします。  
+     
+   
 
-* **［Do you require additional options?］** ドロップダウンで、 **［Yes］** を選択します。
-* **［HTTPS Headers］** フィールドに、InContactから受け取ったAPIキーを入力します。
-
-  詳細は、上述の「必要条件」を参照してください。
-* **［Save］** をクリックします。
-
-  <Frame><img alt="" src="/images/kb/ka05w000001233z-00N5w00000Ri7BU-0EM5w000005vNwp.png" style={{width: 472, height: 854}}/></Frame>
+  <Frame>![Screenshot](/images/kb/ja/0EM5w000005vNwp.png)</Frame>
 
 </Note>
 
 ## ベストプラクティス
 
-+ InContact Echoに接続する場合のベストプラクティスは、完全な「Replace」で1日1回実行するようにスケジュールすることです。ただし、「Append」で実行して、時系列でスナップショットを提供することも可能です。
-+ APIには既知の制限がないので、最大15分までコネクターを実行するようにスケジュールすることができます。ただし、特定のアカウントにこの更新頻度を妨げるようなAPI制限があるかどうかは、InContact担当者に確認してください。
-+ このAPIの主な用途は、アンケートデータの収集です。アンケートのエンドポイントは、
-  https://echo.incontact.com/company/api/echoapi.taf?classname=surveys&method=getSurveyResults&p1=101 のようになります。これについては、APIドキュメントの「 **SURVEYS/getSurveyResults** 」セクションで説明されています。1回のAPIプルで複数のアンケートを取得することができます。これについては、APIドキュメントの「 **Request** 」セクションで説明されています。
+- InContact Echoに接続する場合のベストプラクティスは、完全な「Replace」で1日1回実行するようにスケジュールすることです。ただし、「Append」で実行して、時系列でスナップショットを提供することも可能です。
+- APIには既知の制限がないので、最大15分までコネクターを実行するようにスケジュールすることができます。ただし、特定のアカウントにこの更新頻度を妨げるようなAPI制限があるかどうかは、InContact担当者に確認してください。
+- このAPIの主な用途は、アンケートデータの収集です。アンケートのエンドポイントは、[https://echo.incontact.com/company/api/echoapi.taf?classname=surveys&method=getSurveyResults&p1=101](https://echo.incontact.com/company/api/echoapi.taf?classname=surveys&method=getSurveyResults&p1=101)のようになります。これについては、APIドキュメントの「**SURVEYS/getSurveyResults**」セクションで説明されています。1回のAPIプルで複数のアンケートを取得することができます。これについては、APIドキュメントの「**Request**」セクションで説明されています。

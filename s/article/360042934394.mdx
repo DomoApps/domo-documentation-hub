@@ -1,182 +1,162 @@
 ---
 title: "Time Zone Formatting"
+excerpt: "Set personal and company time zones in Domo to control alert delivery, scheduled reports, and visualization display."
 ---
 
-### Intro
+## Intro
 
 There are two types of time zones in Domo: personal and company. Anyone can define their personal time zone in Domo to determine when they receive alerts, notifications, and scheduled reports. Admin-level users can define a company time zone for the entire instance to standardize how visualizations display.
 
 <Note>
-  **Note:** Throughout this article, we use the following time-related abbreviations:
 
-  * UTC (Coordinated Universal Time)
-  * EST (Eastern Standard Time)
-  * PST (Pacific Standard Time)
+**Note:** Throughout this article, we use the following time-related abbreviations:
 
+- UTC (Coordinated Universal Time)
+- EST (Eastern Standard Time)
+- PST (Pacific Standard Time)
 </Note>
-
 
 ---
 
-### Personal Time Zone
+## Personal Time Zone
 
 You can define your personal time zone in the user settings to manage when notifications, alerts, and scheduled reports are delivered.
 
-# Define Your Personal Time Zone
+### Define Your Personal Time Zone
 
 Follow these steps to define your personal time zone:
 
 1. In the navigation, select your profile picture.
 2. Select **Settings**.
-3. Go to the **Loca** **lization** tab.
+3. Go to the **Localization** tab.  
      
-   <Frame><img alt="localization tab.jpg" src="/images/kb/ka0Vq000000Mzsr-00N5w00000Ri7BU-0EMVq000000tew5.jpg" style={{width: 455, height: 86}}/></Frame>
-4. (Conditional) Under **Timezone**, you can either choose your own time zone or choose to use the company time zone:
+
+   <Frame>![localization tab.jpg](/images/kb/0EMVq000000tew5.jpg)</Frame>
+4. (Conditional) Under **Timezone**, you can either choose your own time zone or choose to use the company time zone:  
      
-   * Expand the dropdown and choose a time zone.
+   - Expand the dropdown and choose a time zone.  
        
-     <Frame><img alt="choose time zone.jpg" src="/images/kb/ka0Vq000000Mzsr-00N5w00000Ri7BU-0EMVq000000tbLW.jpg" style={{width: 451, height: 269}}/></Frame>
-     In the confirmation dialog, select **OK** to keep your changes.
+
+     <Frame>![choose time zone.jpg](/images/kb/0EMVq000000tbLW.jpg)</Frame>
+
        
-     <Frame><img alt="confirm change.jpg" src="/images/kb/ka0Vq000000Mzsr-00N5w00000Ri7BU-0EMVq000000tfgr.jpg" style={{width: 349, height: 139}}/></Frame>
-   * Below the **Timezone** dropdown, verify the company time zone and select **Set as timezone**.
        
-     <Frame><img alt="set at timezone.jpg" src="/images/kb/ka0Vq000000Mzsr-00N5w00000Ri7BU-0EMVq000000tb8c.jpg" style={{width: 451, height: 269}}/></Frame>
-   * In the confirmation dialog, select **OK** to keep your changes.
+     In the confirmation dialog, select **OK** to keep your changes.  
        
-     <Frame><img alt="confirm change.jpg" src="/images/kb/ka0Vq000000Mzsr-00N5w00000Ri7BU-0EMVq000000tfgr.jpg" style={{width: 350, height: 139}}/></Frame>
-     <Note>
-       **Note:** Updating your personal time zone doesn't offset any DATETIME data you are viewing in Domo to display in your personal time zone. Only the [company time zone](#company_time_zone) offsets any DATETIME data. Learn more about [DATETIME considerations around Domo](#datetime_considerations).
 
-     </Note>
+     <Frame>![confirm change.jpg](/images/kb/0EMVq000000tfgr.jpg)</Frame>
+   - Below the **Timezone** dropdown, verify the company time zone and select **Set as timezone**.  
+       
 
-### Company Time Zone
+     <Frame>![set at timezone.jpg](/images/kb/0EMVq000000tb8c.jpg)</Frame>
+   - In the confirmation dialog, select **OK** to keep your changes.  
+       
 
-The company time zone is the default for the entire instance. By default, the company time zone is UTC. You do not have to define a company time zone. If all your Domo data is in the same time zone, you don't need to set a company time zone. There are additional considerations to be aware of around defining a company time zone versus not defining one. See a list of them [below](#defined_versus_undefined).
+     <Frame>![confirm change.jpg](/images/kb/0EMVq000000tfgr.jpg)</Frame>
 
-<Warning>
-  **Important:** If all of your data in Domo is in the same time zone, you do NOT need to set the time zone.
+<Note>**Note:** Updating your personal time zone doesn't offset any DATETIME data you are viewing in Domo to display in your personal time zone. Only the [company time zone](#company-time-zone) offsets any DATETIME data. Learn more about [DATETIME considerations around Domo](#datetime-considerations-around-domo).</Note>
 
-</Warning>
+## Company Time Zone
 
-# Required Grant
+The company time zone is the default for the entire instance. By default, the company time zone is UTC. You do not have to define a company time zone. If all your Domo data is in the same time zone, you don't need to set a company time zone. There are additional considerations to be aware of around defining a company time zone versus not defining one. See a list of them [below](#defined-company-time-zone-vs-undefined-company-time-zone).
+
+<Warning>**Important:** If all of your data in Domo is in the same time zone, you do NOT need to set the time zone.</Warning>
+
+### Required Grant
 
 To set the company time zone, you must be an Admin or have a custom role with the following grant enabled:
 
 **(Admin-level) Manage All Company Settings** **—** This grant permits the user to manage company metadata, authentication rules, security, publishing, and more.
 
-# Defined Company Time Zone vs. Undefined Company Time Zone
+### Defined Company Time Zone vs. Undefined Company Time Zone
 
 You aren't required to define a company time zone, but there are some considerations to be aware of.
 
-<Warning>
-  **Important:** Domo assumes *all* DATETIME data loaded into it is in UTC at loading time.
+<Warning>**Important:** Domo assumes *all* DATETIME data loaded into it is in UTC at loading time.</Warning>
 
-  For example, if a DataSet loaded into Domo has DATETIME values in PST, Domo does not register this. Conversions (like the company time zone) applied as if the data is in UTC. In our example, the data would be rendered as PST -8:00 (the difference between PST and UTC).
-
-</Warning>
+For example, if a DataSet loaded into Domo has DATETIME values in PST, Domo does not register this. Conversions (like the company time zone) applied as if the data is in UTC. In our example, the data would be rendered as PST -8:00 (the difference between PST and UTC).
 
 ***When there is a defined company time zone, the following is true:***
 
-* Because Domo assumes all DATETIME data loaded into it is in UTC, if there is a defined company time zone, the data is adjusted as if from UTC to the selected time zone. If the data loaded is not in UTC, this will cause issues with how visualizations display DATETIME data. The data itself remains unchanged.
-* The difference between the company time zone and UTC is added or subtracted from all DATETIME values whenever data is:
-  + Rendered for display in a DataSet preview
-  + Rendered for display on a card
-  + Used in a calculation
-* The Day/Week/Month date grain on cards and dashboards honors the defined company time zone.
-* Days begin at midnight for the company time zone.
-* The company time zone applies to all DataSets in Domo and does NOT affect any standard date and time values within your data; it only affects DATETIME values.
+- Because Domo assumes all DATETIME data loaded into it is in UTC, if there is a defined company time zone, the data is adjusted as if from UTC to the selected time zone. If the data loaded is not in UTC, this will cause issues with how visualizations display DATETIME data. The data itself remains unchanged.
+- The difference between the company time zone and UTC is added or subtracted from all DATETIME values whenever data is:
+  - Rendered for display in a DataSet preview
+  - Rendered for display on a card
+  - Used in a calculation
+- The Day/Week/Month date grain on cards and dashboards honors the defined company time zone.
+- Days begin at midnight for the company time zone.
+- The company time zone applies to all DataSets in Domo and does NOT affect any standard date and time values within your data; it only affects DATETIME values.
 
 ***When there is not a defined company time zone, the following is true:***
 
-All data displays in UTC and there is no way to convert DATETIME fields to your global corporate time. An example of DATETIME data is: 2014-08-14 15:05:30.
+All data displays in UTC and there is no way to convert DATETIME fields to your global corporate time. An example of DATETIME data is: 2014-08-14 15:05:30.   
   
-For example, if you're in New York City in July and your date displays in UTC, the date changes at 8:00 PM since UTC is 4 hours ahead of New York City (in the Eastern Time Zone) during Daylight Saving Time.
+For example, if you're in New York City in July and your date displays in UTC, the date changes at 8:00 PM since UTC is 4 hours ahead of New York City (in the Eastern Time Zone) during Daylight Saving Time.   
   
 In the same scenario in December, the date changes at 7:00 PM because UTC is 5 hours ahead of EST.
 
-See more [DATETIME considerations](#datetime_considerations) below.
+See more [DATETIME considerations](#datetime-considerations-around-domo) below.
 
-# Define the Company Time Zone
+### Define the Company Time Zone
 
-Admins and others with the [required grant](#required_grant) can define the company time zone by following these steps:
+Admins and others with the [required grant](#required-grant) can define the company time zone by following these steps:
 
 1. Navigate to the Admin Settings.
 2. Under **Company settings**, select **Company overview**.
 3. Under **Formatting**, choose an option from the **Time zone** dropdown.
 
-   <Frame><img alt="time zone update.jpg" src="/images/kb/ka0Vq000000Mzsr-00N5w00000Ri7BU-0EMVq000000tZoN.jpg" style={{width: 450, height: 439}}/></Frame>
+   <Frame>![time zone update.jpg](/images/kb/0EMVq000000tZoN.jpg)</Frame>
 4. Select **Save** to keep your changes.
 
-   <Frame><img alt="save time zone.jpg" src="/images/kb/ka0Vq000000Mzsr-00N5w00000Ri7BU-0EM5w000006v0YH.jpg" style={{width: 650, height: 229.993}}/></Frame>
-### DATETIME Considerations Around Domo
+   <Frame>![save time zone.jpg](/images/kb/0EM5w000006v0YH.jpg)</Frame>
 
-<Tip>
-  **Tip:** Watch [how data time zones are stored vs displayed](https://www.youtube.com/watch?v=joU8h2vEqh4) in Domo and why it matters.
+## DATETIME Considerations Around Domo
 
-</Tip>
+<Tip>**Tip:** Watch [how data time zones are stored vs displayed](https://www.youtube.com/watch?v=joU8h2vEqh4) in Domo and why it matters.</Tip>
 
----
-
-Learn about DATETIME data in various features around Domo:
-
-* [Connecting data](#connecting_data)
-* [DataFlows and transforms](#dataflows_and_transforms)
-  + [Transform time zones with a calculation or DataFlow](#transform_time_zones_with_calculation_or_dataflow)
-  + [Adjust calculations for Daylight Saving Time](#adjust_calculations_for_daylight_saving_time)
-  + [Convert time zones with a MySQL DataFlow](#convert_time_zones_with_mysql_dataflow)
-  + [Schedule DataSets and DataFlows](#schedule_datasets_and_dataflows)
-* [Code Engine](#code_engine)
-* [Workbench](#workbench)
-
----
-
-# Connecting Data
+### Connecting Data
 
 Since Domo expects that all input DATETIME values are in UTC, note the following:
 
-* DATETIME values are not converted to UTC during import from self-managed DataSets (such as Excel, Box, Google Sheets, or file upload). Data in these sources must be stored in UTC before import.
-* DATETIME values are not converted to UTC during import from certain connectors (such as Qualtrics, Adobe Analytics, and SurveyMonkey). However, most connectors deliver UTC values by default.
+- DATETIME values are not converted to UTC during import from self-managed DataSets (such as Excel, Box, Google Sheets, or file upload). Data in these sources must be stored in UTC before import.
+- DATETIME values are not converted to UTC during import from certain connectors (such as Qualtrics, Adobe Analytics, and SurveyMonkey). However, most connectors deliver UTC values by default.
 
-<Note>
-  **Important:** Always check that values coming from any connector are in UTC to ensure time zone conversions happen correctly.
+    
 
-</Note>
+  
+<Warning>**Important:** Always check that values coming from any connector are in UTC to ensure time zone conversions happen correctly.</Warning>
 
-<Note>
-  **Note:** If a DATETIME column is brought into Domo as a string data type rather than a DATETIME, it is not converted based on the time zone settings.
+    
 
-</Note>
+  
+<Note>**Note:** If a DATETIME column is brought into Domo as a string data type rather than a DATETIME, it is not converted based on the time zone settings.</Note>
 
-# DataFlows and Transforms
+### DataFlows and Transforms
 
 DataFlows operate on the raw data values stored in the database, not on converted values. You receive different calculated results when grouping values with a DATETIME field in a DataFlow (raw values) compared to doing the same grouping on a card with the converted values.
 
 Dynamic date and time value functions in DataFlows and calculations are unaffected by any time zone set in your instance. The following functions will always reference UTC:
 
-+ `CURDATE()`
-+ `CURRENT_DATE()`
-+ `CURRENT_TIME()`
-+ `CURRENT_TIMESTAMP()`
-+ `CURTIME()`
-+ `NOW()`
-+ `SYSDATE()`
+- - `CURDATE()`
+  - `CURRENT_DATE()`
+  - `CURRENT_TIME()`
+  - `CURRENT_TIMESTAMP()`
+  - `CURTIME()`
+  - `NOW()`
+  - `SYSDATE()`
 
-<Tip>
-  **Tip:** You can use the `SUBDATE` or `ADDDATE` functions in Beast Modes to adjust these values as needed. See the [Beast Mode Functions Reference Guide](/s/article/360043429933 "Beast Mode Functions Reference Guide") for more information.
-
-</Tip>
+<Tip>**Tip:** You can use the `SUBDATE` or `ADDDATE` functions in Beast Modes to adjust these values as needed. See the [Beast Mode Functions Reference Guide](/s/article/360043429933) for more information.</Tip>
 
 #### Transform Time Zones with a Calculation or DataFlow
 
-You can transform time zones with either a calculation or DataFlow, but it’s important to note that there are situations where one solution may be better than the other.
+You can transform time zones with either a calculation or DataFlow, but it's important to note that there are situations where one solution may be better than the other.
 
 ##### Transform with a Calculation
 
 It's more appropriate to transform a time zone with a calculation when the output field meets the following requirements:
 
-* The output field doesn't need to be used as the Date Range Field on the card (given that you cannot currently use calculations for the Date Range Field).
-* The output field doesn't need to be used in other calculations (this would require duplicating the transformation code in every location where the field will be used).
+- The output field doesn't need to be used as the Date Range Field on the card (given that you cannot currently use calculations for the Date Range Field).
+- The output field doesn't need to be used in other calculations (this would require duplicating the transformation code in every location where the field will be used).
 
 ##### Adjust Calculations for Daylight Saving Time
 
@@ -184,12 +164,9 @@ Timestamp outputs for DataFlows are according to the company time zone of your i
 
 This can cause issues when writing calculations off these fields/functions and if your state recognizes Daylight Saving Time. You can create a calculation to convert UTC into the correct time zone while also taking Daylight Saving Time into account. See the example below.
 
-Specifically, this formula provides the value of the `date` column shifted according to whether you’re affected by Daylight Saving Time.
+Specifically, this formula provides the value of the `date` column shifted according to whether you're affected by Daylight Saving Time.
 
-<Note>
-  **Note:** Daylight Saving Time for the United States begins at 2:00 AM on the second Sunday in March and ends at 2:00 AM on the first Sunday in November.
-
-</Note>
+<Note>**Note:** Daylight Saving Time for the United States begins at 2:00 AM on the second Sunday in March and ends at 2:00 AM on the first Sunday in November.</Note>
 
 ```
 CASE
@@ -223,54 +200,49 @@ Domo doesn't provide detailed documentation on using MySQL functions. There are 
 
 If you have a defined company time zone, DataSet schedules are still specified using UTC values. There is a UTC label on those scheduling fields.
 
-<Frame><img alt="utc labels.jpg" src="/images/kb/ka0Vq000000Mzsr-00N5w00000Ri7BU-0EMVq000000tshK.jpg" style={{width: 499, height: 202}}/></Frame>
+<Frame>![utc labels.jpg](/images/kb/0EMVq000000tshK.jpg)</Frame>
+
 Runtimes displayed in the **History** tab for DataSets and DataFlows always display in the time zone of the computer that you are viewing them from.
 
-<Frame><img alt="runtime format.jpg" src="/images/kb/ka0Vq000000Mzsr-00N5w00000Ri7BU-0EMVq000000tuET.jpg" style={{width: 600, height: 417}}/></Frame>
-# Code Engine
+<Frame>![runtime format.jpg](/images/kb/0EMVq000000tuET.jpg)</Frame>
+
+### Code Engine
 
 The Code Engine editor assumes UTC while running.
 
-<Frame><img alt="image (4).png" src="/images/kb/ka0Vq000000Mzsr-00N5w00000Ri7BU-0EMVq00000136OT.jpg" style={{width: 400, height: 277}}/></Frame>
-# Workbench
+<Frame>![image (4).png](/images/kb/0EMVq00000136OT.jpg)</Frame>
+
+### Workbench
 
 DATETIME values are not converted to UTC during Workbench uploads unless a Shift Date Timezone transform is applied to the DataSet job. See [Setting the Timezone for a Workbench 5 Job](/s/article/360042932854).
 
-**Note:** Scheduled runtimes for Workbench DataSet jobs follow the clock of the machine that Workbench is installed on. Company time zone settings do not affect Workbench scheduling.
+ 
 
-### FAQ
+<Note>**Note:** Scheduled runtimes for Workbench DataSet jobs follow the clock of the machine that Workbench is installed on. Company time zone settings do not affect Workbench scheduling.</Note>
+
+## FAQ
 
 <AccordionGroup>
+
 <Accordion title="Why do my cards show data at the wrong hour/day?">
+This may be due to a conflict between your input data and your company time zone. Learn about the [company time zone](#company-time-zone) above.
 
-
-This may be due to a conflict between your input data and your company time zone. Learn about the [company time zone](#company_time_zone) above.
-
-You can also learn how Domo handles [DATETIME data](#datetime_data_in_domo).
-
-
+You can also learn how Domo handles [DATETIME data](#datetime-considerations-around-domo).
 </Accordion>
+
 <Accordion title="I scheduled my DataSet to update at a particular time. Why does the update history show it running at a different time?">
-
-
 When you schedule an update for a DataSet, the schedule is based on UTC. However, the time displayed in the update history is the actual update time based on your defined company time zone. If you see a conflict between the scheduled time and the displayed time, verify that the job is scheduled correctly using UTC.
 
-If Daylight Saving Time is an issue, you may have to update your connector schedule twice yearly to account for the change. See [Adjust Calculations for Daylight Saving Time](#adjust_calculations_for_daylight_saving_time).
-
-
+If Daylight Saving Time is an issue, you may have to update your connector schedule twice yearly to account for the change. See [Adjust Calculations for Daylight Saving Time](#adjust-calculations-for-daylight-saving-time).
 </Accordion>
+
 <Accordion title="Why are the times not what I expect in my timestamps in my DataSets?">
-
-
 There are two likely causes for this:
+* The most common cause is that your company time zone isn't defined properly. Learn how to [define your company time zone](#define-the-company-time-zone) above.
 
-  a) The most common cause is that your company time zone isn't defined properly. Learn how to [define your company time zone](#define_company_time_zone)
-
-  above.
-
-  b) The other common cause is that your DataSet was scheduled to upload in a time zone other than UTC and your system is shifting the timestamp to align with your defined [company time zone](#company_time_zone). This means Domo assumes your data is coming in as UTC, even though it isn’t.
+* The other common cause is that your DataSet was scheduled to upload in a time zone other than UTC and your system is shifting the timestamp to align with your defined [company time zone](#company-time-zone). This means Domo assumes your data is coming in as UTC, even though it isn't.
 
 To solve this, you can either adjust your DataSet/connector upload schedule or create a calculation or DataFlow to resolve the conflict between the time zones.
-
 </Accordion>
+
 </AccordionGroup>

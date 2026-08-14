@@ -1,12 +1,13 @@
 ---
 title: "Magic ETLにおけるDataSet更新方法"
+excerpt: "Magic ETL の出力 DataSet タイルで利用できる置き換え、追加、パーティション、Upsert の 4 つの更新方法と、それぞれの用途を説明します。"
 ---
 
-### はじめに
+## はじめに
 
 Magic ETLの出力DataSetタイルには、置き換え、追加、パーティション、Upsertの4つのDataSet更新方法があります。DataFlowの最適な更新方法は、ユースケースによって異なります。
 
-### 更新方法
+## 更新方法
 
 以下の表に、使用できる各方法の基本的な定義を示します。各方法の詳細については、リンク先を参照してください。
   
@@ -14,26 +15,24 @@ Magic ETLの出力DataSetタイルには、置き換え、追加、パーティ�
 
 <table border="1" cellpadding="1" cellspacing="1" data-aura-rendered-by="33:206;a"><thead><tr><th colspan="1" rowspan="1"><p> 項目 </p></th><th colspan="1" rowspan="1"><p> 説明 </p></th></tr></thead><tbody><tr><td colspan="1" rowspan="1"><p><a href="#replace" target="_self"> 置き換え </a></p></td><td colspan="1" rowspan="1"><p> 実行するたびに、出力DataSetの内容が最新の結果に置き換えられます。 </p></td></tr><tr><td colspan="1" rowspan="1"><p><a href="#append" target="_self"> 追加 </a></p></td><td colspan="1" rowspan="1"><p> 実行するたびに、その結果が出力DataSetに新しいバッチとして追加されます。 </p></td></tr><tr><td colspan="1" rowspan="1"><p><a href="#partition" target="_self"> パーティション </a></p></td><td colspan="1" rowspan="1"><p> 実行するたびに、名前（特定の列の値）に従って行がバッチにグループ化されます。DataSet内の固有の各バッチ名は、パーティションと呼ばれます。これらのパーティションはすべてDataSetに追加され、名前が一致する既存のパーティションはすべて置き換えられます。 </p><p> 最終的に、パーティションフィルター式が指定されている場合、すべてのパーティションがその式に対して評価され、パスしなかったものは削除されます。 </p></td></tr><tr><td colspan="1" rowspan="1"><p><a href="#upsert" target="_self"> Upsert </a></p></td><td colspan="1" rowspan="1"><p> 実行するたびに、定義されたキー（DataSet内の一意な行を示す列または列の組み合わせからの値）を使用して、実行結果の行と出力DataSet内の行が比較されます。 <a id="replace" target="_blank"></a><br/><br/> 出力DataSet内の既存の行と一致するキーを持つ行は、出力DataSet内で更新されます。 <br/> 出力DataSet内にまだ存在しないキーを持つ行は、出力DataSetに追加されます。 <br/></p></td></tr></tbody></table>
 
-### 置き換え
+## 置き換え
 
 置き換えは、Magic ETLのデフォルトの更新方法です。これにより、DataSet内の既存のデータがすべて削除され、Magic ETL DataFlowの実行による新しいバッチデータに置き換えられます。この方法は、出力DataSetが比較的小さい場合や、DataFlowを実行するたびにすべてのデータを更新する必要がある場合に適しています。
 
-<Frame><img alt="Replace (1).gif" src="/images/kb/ka0Vq0000002DkL-00N5w00000Ri7BU-0EM5w000006vuq4.jpg" style={{width: 710.994, height: 400}}/></Frame>
-[このページのトップへ](#intro)
+<Frame><img alt="Replace (1).gif" src="/images/kb/ka0Vq0000002DkL-00N5w00000Ri7BU-0EM5w000006vuq4.jpg"/></Frame>
 
-### 追加
+## 追加
 
 追加では、Magic ETL DataFlowの実行に起因するすべてのデータを取得し、出力DataSetに追加します。この方法では、出力DataSet内の既存のデータを一切考慮しないため、重複の可能性を考慮することなしに新しいデータを追加します。追加は、DataFlowを実行するたびに、既存の出力DataSetに新しい行を追加する必要がある場合に適しています。ただし、この更新方法は脆弱であり、データが重複したり欠落したりする可能性があります。
 
-<Frame><img alt="Screenshot 2023-09-19 at 12.42.43 PM.png" src="/images/kb/ka0Vq0000002DkL-00N5w00000Ri7BU-0EM5w000006vubZ.jpg" style={{width: 710, height: 453.999}}/></Frame>
-[このページのトップへ](#intro)
+<Frame><img alt="Screenshot 2023-09-19 at 12.42.43 PM.png" src="/images/kb/ka0Vq0000002DkL-00N5w00000Ri7BU-0EM5w000006vubZ.jpg"/></Frame>
 
-### パーティション
+## パーティション
 
 パーティションは、データをグループに整理して、データの更新をより迅速かつ効率的に行う方法です。以下の図は、データをパーティションに置き換えて追加する方法を示しています。
 
-<Frame><img alt="partition graphic.jpg" src="/images/kb/ka0Vq0000002DkL-00N5w00000Ri7BU-0EM5w000006vuj3.jpg" style={{width: 710, height: 453.999}}/></Frame>
-# パーティションの基礎
+<Frame><img alt="partition graphic.jpg" src="/images/kb/ka0Vq0000002DkL-00N5w00000Ri7BU-0EM5w000006vuj3.jpg"/></Frame>
+### パーティションの基礎
 
 パーティションについては、一般的に、物理的な百科事典（同じセットの一部でありながら個々の異なる巻を集めたもの）に例えて考えると理解しやすいでしょう。例えば、セット内の1巻が改版により再出版された場合、セット全体を取り替えるのではなく、改版された新しい巻だけを購入できます。パーティションは、データを別々のコレクション（サブセット）に分割します。これにより、一部のデータを置き換えるときに、すべてのデータを置き換える必要がなくなります。パーティションの使用時にデータを追加することは、百科事典の新しい巻を購入し、コレクションの最後に追加することに似ています。
 
@@ -43,7 +42,7 @@ DataSetにパーティションが定義されると、新しいデータはパ�
 
 例えば、入力DataSetに3月1日、3月2日、3月3日のデータが含まれている場合（パーティションはその日付にもとづいて定義されている）、出力DataSetの3月1日、2日、3日の既存データは、新しい入力データで置き換えられます。
 
-# パーティションのベストプラクティス
+### パーティションのベストプラクティス
 
 適切なパーティションには、パーティショニングの優れた処理速度を活用するのに十分なサイズと、固有のニーズに対応できる十分な粒度が必要です。
 
@@ -56,7 +55,7 @@ DataSetにパーティションが定義されると、新しいデータはパ�
 
 </Warning>
 
-# パーティションを設定する
+### パーティションを設定する
 
 Magic ETLでDataSetを更新する方法としてパーティションを設定するには、以下の手順を実行します。
 
@@ -69,32 +68,30 @@ Magic ETLでDataSetを更新する方法としてパーティションを設定�
 2. エディターの **［設定］** タブ で、更新方法として **［パーティション］** を選択します。
 3. **［パーティション列の名］** ドロップダウンから、データの分割に使用する列を選択します。
      
-   <Frame><img alt="Screenshot 2024-09-05 at 3.18.34 PM.png" src="/images/kb/ka0Vq0000008Ym5-00N5w00000Ri7BU-0EMVq000002ZgKz.jpg" style={{width: 799, height: 474}}/></Frame>
+   <Frame><img alt="Screenshot 2024-09-05 at 3.18.34 PM.png" src="/images/kb/ka0Vq0000008Ym5-00N5w00000Ri7BU-0EMVq000002ZgKz.jpg"/></Frame>
 4. （オプション）出力DataSetに継続的に保持するパーティションの保持ポリシーを設定する場合は、 **［保持するパーティションを指定します］** というラベルの付いたトグルスイッチを切り替えます。
 5. （条件付き） **［保持するパーティションを指定します］** オプションを有効にすると、式を入力できるフィールドが表示されます。この式は指定されたパーティションをすべて保持します。その他のパーティションはすべて削除されます。
      
    **注記：** このフィールドは、「 [partition.name](http://partition.name) 」式のみを検証します。
      
-   <Frame><img alt="Screenshot 2024-09-05 at 3.21.06 PM.png" src="/images/kb/ka0Vq0000008Ym5-00N5w00000Ri7BU-0EMVq000002ZgXt.jpg" style={{width: 798, height: 451}}/></Frame>
+   <Frame><img alt="Screenshot 2024-09-05 at 3.21.06 PM.png" src="/images/kb/ka0Vq0000008Ym5-00N5w00000Ri7BU-0EMVq000002ZgXt.jpg"/></Frame>
    <Tip>
      **ヒント：** DataFlowにサブセット処理を追加する方法については、「 [Magic ETLのサブセット処理](/s/article/000005150) 」を参照してください。
 
    </Tip>
 
-[このページのトップへ](#intro)
-
-### Upsert
+## Upsert
 
 Upsertでは、行レベルの固有のキーにもとづき、DataSet全体を再処理せずに、出力DataSetの行を更新できます。以下の図は、Upsertによるデータの置き換えと追加を表しています。
 
-<Frame><img alt="merge graphic.jpg" src="/images/kb/ka0Vq0000002DkL-00N5w00000Ri7BU-0EM5w000006vuff.jpg" style={{width: 710, height: 453.999}}/></Frame>
-# Upsertの基本
+<Frame><img alt="merge graphic.jpg" src="/images/kb/ka0Vq0000002DkL-00N5w00000Ri7BU-0EM5w000006vuff.jpg"/></Frame>
+### Upsertの基本
 
 Upsertでは、DataSet全体をDataFlowの実行ごとに置き換えたり、DataFlowの実行で受信するすべての行を追加したりするのではなく、受信した行が新規レコードであるか出力DataSetの既存の行であるかに応じて、データの追加または置き換えが行われます。
 
 Upsertではキーを使用します。このキーは、DataFlowの実行によって生成されたレコードが新規であるか、出力DataSetに既に存在するかを示します。行のキー値が既存の行のキー値と一致する場合、既存の行は受信行に置き換えられます。一致する値がない場合、受信行は新しい行として扱われ、出力DataSetに追加されます。
 
-# Upsertのベストプラクティス
+### Upsertのベストプラクティス
 
 Upsertキーは、単一の行の値、または複数の行の値の組み合わせにすることができますが、その行の一意性を示す必要があります。列内に重複する値がある場合は、Upsertキーを特定することができません。また、列にNULL値が含まれている場合も、Upsertキーを特定できません。
 
@@ -102,7 +99,7 @@ Upsertが更新方法として適しているのは、DataSet全体に散在す�
 
 Magic ETL DataFlowの更新方法としてUpsertが利用できることで、出力DataSetを更新するために再帰的なDataFlowを作成する必要がなくなります。
 
-# Upsertの設定
+### Upsertの設定
 
 Magic ETLでDataSetを更新する方法としてUpsertを設定するには、以下の手順を実行します。
 
@@ -110,7 +107,6 @@ Magic ETLでDataSetを更新する方法としてUpsertを設定するには、�
 2. エディターの **［設定］** タブで、 **［更新方法］** ドロップダウンから［Upsert］を選択します。
 3. **［Upsertキー］** ドロップダウンから、データのUpsertキーを識別するのに使用する列を選択します。
      
-   <Frame><img alt="upsert output.jpg" src="/images/kb/ka0Vq0000008Ym5-00N5w00000Ri7BU-0EMVq000002Zipp.jpg" style={{width: 800, height: 422}}/></Frame>
-[このページのトップへ](#intro)
+   <Frame><img alt="upsert output.jpg" src="/images/kb/ka0Vq0000008Ym5-00N5w00000Ri7BU-0EMVq000002Zipp.jpg"/></Frame>
 
 日本語

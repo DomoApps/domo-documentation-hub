@@ -19,164 +19,144 @@ Use the original source material and the Article Intake Summary as the authorita
 
 ---
 
-## Step 2: Gather release information
+## Step 2: Look up PM ownership
 
-After the Article Intake Summary is confirmed, ask the following two questions before writing:
+Before gathering release information, identify the PM who owns this article's feature area. Search `Article-PM-Ownership-Reference.mdx` for the closest matching Feature name:
+
+```bash
+grep -i "feature keyword" Article-PM-Ownership-Reference.mdx | head -5
+```
+
+If the feature is brand-new and not yet in the reference, find the closest matching Feature in the reference (or in `Feature - Owning Squad, PM, Eng, UX.csv`) and note that PM as the likely owner. Surface the PM name to the user so they can route review, approvals, or follow-up questions.
+
+---
+
+## Step 3: Gather release information
+
+After the Article Intake Summary is confirmed, ask the following questions before writing:
 
 1. **Release status:** What is the release status of the feature(s) covered in this article? For each distinct feature or section, is it GA (generally available) or beta? If mixed, which parts are beta?
 2. **Planned branch cut date:** What is the planned **branch cut date** for this release? This is the internal branch name (NOT the feature release date).
+3. **Feature switch date:** (Ask only if the article is tied to a GA release.) On what date do customers see the feature? This determines the branch name and the base branch (see **Step 8**). Do not try to derive it from the branch cut date; if the user doesn't know it, tell them the article can't be routed to a GA branch until they get it from the PM or release checklist.
 
 ---
 
-## Step 3: Write the article
+## Step 4: Read the style guide and article template
 
-Once the Article Intake Summary and release information are confirmed, create the MDX file. Do not ask for any information already answered.
+Before writing, read both of these files:
+
+1. **`Domo-KB-Style-Guide.mdx`** — the authoritative style guide. Apply every rule in this file when writing the article.
+2. **`New-Article-Template.mdx`** — the canonical file structure and encoding conventions (frontmatter, section order, image syntax, callout components, code blocks, tables, etc.). Use this as the structural template for the new article.
+
+---
+
+## Step 5: Write the article
+
+Once the Article Intake Summary, release information, style guide, and template are all loaded, create the MDX file. Do not ask for any information already answered.
 
 Create a new MDX file in `s/article/` using the filename format `Article-Title-Here.mdx` (Title Case, hyphen-separated, no special characters).
 
-The file must follow the structure and conventions below exactly.
+Follow the structure from `New-Article-Template.mdx` and apply all style rules from `Domo-KB-Style-Guide.mdx` exactly.
 
----
+### Use canonical grant wording in Required Grants
 
-## File Structure
+When writing the **Required Grants** section, do not invent grant descriptions. Most grants are already described in the standard format elsewhere in the KB — search for and reuse the existing wording so the grant reads consistently across articles:
 
-```mdx
----
-title: "Article Title Here"
----
-
-
-
-## Intro
-
-Brief overview of what this article covers and why it matters to the user. One to three sentences.
-
----
-
-
-
-## Required Grants
-
-List the grants a user needs to complete the tasks in this article. If none are required, write "No special grants are required."
-
-
-
-## Access [Feature Name]
-
-Step-by-step instructions for navigating to the feature. Use numbered steps.
-
-1. In the navigation header, select **[Menu Item]**.
-   The [result of the action].
-
-2. Select **[Next Element]**.
-
-
-
-## Create [Something]
-
-Step-by-step instructions. Follow the CRUD order (Create, Review, Update, Delete) — only include sections that apply.
-
-1. First step. Include orienting language if needed.
-   
-   <Frame>![Alt text describing the screenshot](/images/kb/image-name.png)</Frame>
-
-2. Second step. Always an action.
-
-3. (Optional) Optional step.
-
-4. (Conditional) Conditional step.
-
-
-
-## FAQ
-
-
-<AccordionGroup>
-
-<Accordion title="Frequently asked question?">
-Frequently asked answer.
-</Accordion>
-
-<Accordion title="Frequently asked question?">
-Frequently asked answer.
-</Accordion>
-
-</AccordionGroup>
+```bash
+grep -rn "Grant Name —" s/article/
 ```
 
+Reuse the existing description verbatim (adjusting only to fit the em-dash format). If no article describes the grant, write a concise one-sentence description and flag it to the user as newly authored. See `Domo-KB-Style-Guide.mdx` › **Required Grants** › _Use canonical grant wording_.
+
+### Apply the beta convention (if applicable)
+
+Use the release-status answer from Step 3 to decide which beta treatment, if any, to apply. The full convention lives in `Domo-KB-Style-Guide.mdx` › **Beta Features** — read it before writing.
+
+- **Entire article is beta:** add `tag: "Beta"` to the frontmatter and place the standard beta Note immediately after the frontmatter, above the Intro. Do not append `(Beta)` to the title.
+- **Only certain sections are beta:** append `<Badge className="text-primary bg-primary/10 font-bold">Beta</Badge>` to each beta section's heading. Place the standard beta Note under the **first** beta section only — do not repeat it for subsequent beta sections in the same article. Do not append `(Beta)` to any heading.
+- **Entire article is GA:** no beta tag, badge, or Note.
+
+The `className` on the Badge is required and must be exactly `text-primary bg-primary/10 font-bold` — it matches the sidebar `tag` styling.
+
+The standard beta Note must be used verbatim — do not paraphrase or change the links. Copy it from the style guide.
+
 ---
 
-## Style Rules to Apply
+## Step 6: Style-guide revision pass
 
-**Article structure**
-- Do not include a table of contents — written or linked — at the top of the article. Tables of contents are generated automatically from the article's headings when the page renders on the Knowledge Base site.
+Drafting always introduces style drift. Before finalizing, do an explicit pass against the style guide and revise the article in place. **Do not skip this even if the draft looks right** — the most common misses (intro framing, imperative headings, unpadded tables, lowercase Domo terms, future tense) are easy to introduce and easy to miss without a deliberate re-read.
 
-**Voice and tense**
-- Write in present tense: "This opens the panel" not "This will open the panel."
-- Use active voice. Avoid passive voice unless who performs the action does not matter.
-- Use "select" not "click," except when specifying right-click, left-click, or double-click.
-- Contractions are acceptable unless you need to emphasize "not."
-- Spell out numbers less than 10.
-- Never use "utilize" — use "use."
-- No exclamation points.
-- Use the Oxford comma.
-- Eliminate unnecessary words ("will," "you are able to," "that").
-- Avoid Latin expressions (i.e., e.g., etc.) — use "such as," "as in," or a list.
-- Use "allowlist" and "blocklist," never "whitelist" or "blacklist."
-- Write all headings (article titles, section headings, step headings) in the imperative mood — never the gerund. **Correct:** "Connect Data to Domo" **Incorrect:** "Connecting Data to Domo"
-- When describing a sequence of actions in a step, do not use "once" to denote a causal or dependent relationship — use "after" instead. **Correct:** "After you save the DataSet, select **Done**." **Incorrect:** "Once you save the DataSet, select **Done**."
-- Do not place spaces on either side of an em-dash. **Correct:** "AI tools—such as Claude—secure access" **Incorrect:** "AI tools — such as Claude — secure access"
+1. **Re-read `Domo-KB-Style-Guide.mdx` now, in full** — not from memory. You will have drifted from at least one rule while drafting.
+2. **Audit the article against this checklist** and fix every violation in both the EN file and the JA sibling, if you authored one:
+   - **Frontmatter** — `title` plus a single-sentence `excerpt`; never a `description` field.
+   - **Intro** — opens with "This article explains…" or "This article covers…", states only what the article covers (not why it matters), and is immediately followed by a `---` horizontal rule.
+   - **Headings** — imperative mood at every level (H2–H4); the structural labels (Intro, Required Grants, Prerequisites, FAQ, Troubleshoot, Related Articles) are exempt. Top-level sections are H2, subsections H3+.
+   - **Required Grants** — exact format and canonical grant wording, with the em-dash inside the bold and a space on each side (`**Grant —** description`).
+   - **Callouts** — `<Note>`/`<Warning>`/`<Tip>` with the label and its colon bolded (`**Note:**`), and a blank line before the callout (except inside table cells).
+   - **Tables** — every pipe table padded so columns align. Run `python3 scripts/pad_md_tables.py <file>` to do this mechanically. Normalize any HTML tables (one tag per line, data rows in `<tbody>`).
+   - **Links** — internal links use the file path with no `.mdx` extension and no full URL.
+   - **Em-dashes** — no spaces in prose (`tools—such as`); spaces only in the bolded-term list exception.
+   - **Voice and word choice** — present tense, not "will"; active voice; "after", not causal "once"; no "utilize"; spell out numbers under 10; "allowlist"/"blocklist"; "select", not "click"; Oxford comma; no exclamation points.
+   - **Domo terms** — `DataSet`, `DataFlow`, `DataFusion`, `Beast Mode`, `Workbench`; `dashboard` lowercase except at the start of a sentence or with a type; never "Page" (use "dashboard"). Verify any product term against the **Domo-Specific Terms and Usage** table.
+   - **Beta** — correct convention applied (frontmatter `tag` + verbatim Note for a whole-article beta; Badge + single verbatim Note for section-level).
+   - **Images** — block screenshots wrapped in `<Frame>` with a native `<img>` and descriptive `alt`, no inline `width`/`height`; inline glyphs use the icon font or the inline `<img>` style; never `<Frame>` inside a table cell.
+3. **Revise the article in place** to resolve every issue found, then re-run the table normalizer if you changed any tables.
 
-**Text emphasis**
-- **Bold** static UI elements (fields, menus, buttons, icons). For a series: **Admin** > **Security** > **Whitelist** (do not bold the >).
-- *Italics* for variables the user fills in with their own data.
-- "Quotation marks" for on-screen text not used as an interface element, and for DataSet column names and ETL actions.
-- `Code style` for code snippets.
+---
 
-**Domo-specific terminology (capitalize exactly as shown)**
-- DataSet, DataFlow, DataFusion, Magic ETL, Beast Mode, AppDB
-- Admin Settings (not bolded, not a UI element)
-- Data Center, Alerts Center, Knowledge Base
-- Dashboard (not Page), Dashboard Filters (not Page Filters)
-- Grants (lowercase unless naming a specific grant, e.g., Manage All Users grant)
-- "select" not "click"; "field" not "box"; "pill" for rounded non-button elements
-- Do not use: Dojo (use Community Forums), KPI card (use Visualization Card), image card (use Doc Card), Domo story (use Dashboard), Drilldown (use Drill Path or "drill into"), Page/Page Filters
+## Step 7: Add the new article to navigation
 
-**Links**
-- Internal article links: `[link text](/s/article/Article-Title)`
-- Section links: `[link text](/s/article/Article-Title#section-heading)`
-- External links: `[link text](https://full-url.com)`
+A new article file does not appear on the site until it is registered in `docs.json`. As the final step, invoke the `add-to-nav` skill to place the article in the navigation — do not edit `docs.json` by hand:
 
-**Images**
-- Auto-sized screenshot wrapped in Frame: `<Frame>![alt text](/images/kb/image-name.png)</Frame>`
-- Specifically sized: `<Frame><img alt="alt text" src="/images/kb/image-name.png" style={{width: 500, height: 500}}/></Frame>`
-- Inline icon: `<img alt="alt text" src="/images/kb/icon-name.png" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/>`
-- Screenshots should be taken in Modocorp or a demo instance, not the company instance.
+- **Page path:** `s/article/Article-Title-Here`
+- **Operation:** Insert
+- **Target:** the group or subgroup that best fits the article's topic. If you are unsure where it belongs, let `add-to-nav` surface the placement options and use AskUserQuestion to confirm the location with the user.
 
-**Callout components** (always bold the label)
-- `<Note>**Note:** Text here.</Note>`
-- `<Warning>**Important:** Text here.</Warning>`
-- `<Tip>**Tip:** Text here.</Tip>`
+After `add-to-nav` edits `docs.json`, confirm it is still valid JSON:
 
-**Beta features**
-- Do not put "(Beta)" in the article title. A single article can cover a mix of GA and beta functionality, so beta status is marked at the section level, not the title level.
-- Immediately below the heading for any beta section or feature, add:
-  ```mdx
-  <Note>
-    **Note:** This feature is in beta. Contact your Domo account team to join.
-  </Note>
-  ```
-- If the entire article covers only beta functionality, place this note at the top of the Intro section.
-
-**FAQ**
-- Place at the bottom of the article, above Troubleshooting if it exists.
-- Always use `<AccordionGroup>` containing `<Accordion title="Question?">` items.
-Follow the file structure in `.claude/skills/article-templates/file-structure.md` and apply all style rules in `.claude/skills/article-templates/style-rules.md`. Read both files before writing.
+```bash
+python3 -c "import json; json.load(open('docs.json')); print('docs.json is valid JSON')"
+```
 
 ---
 
 ## Output
 
-1. Write the completed MDX file to `s/article/Article-Title-Here.mdx`.
-2. Tell the user the file path and suggest running `/add-to-nav` to register it in `docs.json` navigation if they want it to appear on the site.
+1. Tell the user the file path of the new MDX article (`s/article/Article-Title-Here.mdx`).
+2. Confirm the article was added to `docs.json` navigation and state where it was placed.
 3. Note any sections left as placeholders (screenshots, specific grant names, etc.) that the user will need to fill in.
+4. State the branch name and PR base branch the article should use, per **Step 8**.
+
+---
+
+## Step 8: Branch and PR routing
+
+Tell the user which branch and base branch this article belongs on. Do not create the branch or open the PR unless they ask.
+
+**If the article is not tied to a GA release:** branch `first.last/short-description`, base `main`. It publishes on the normal weekly KB schedule (PR in by Thursday for the following Monday).
+
+**If the article is tied to a GA release:** use the feature switch date collected in Step 3:
+
+- Branch: `first.last/Article-Title-ga-MM-DD-YYYY` (zero-padded numeric date)
+- Base: the GA branch for that date, named with a spelled-out month, such as `release-ga/may-20-2026`
+
+Confirm the GA branch exists before telling the user to target it:
+
+```bash
+git branch -r | grep release-ga
+```
+
+If it doesn't exist, tell the user the Knowledge Base Administrator needs to create it. Do not tell them to base on `main` instead, because that would publish the article before the feature ships.
+
+See `CLAUDE.md` › **Contribution Workflow** for the full convention.
+
+---
+
+## Step 9: Offer localization
+
+After delivering the output above, ask the user:
+
+> "Would you like to localize this article into Spanish, French, and German? (Note: Japanese localization is handled on a separate pipeline — no action needed there.)"
+
+- **If yes:** invoke the `localize` skill, passing the new article's file path as the argument.
+- **If no:** the skill ends here.

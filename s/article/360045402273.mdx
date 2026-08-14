@@ -1,140 +1,127 @@
 ---
 title: "Magic ETL Tiles: DataSets"
+excerpt: "Configure the Input DataSet, Output DataSet, Writeback, and Query DataSet tiles that source and persist data in a Magic ETL DataFlow."
 ---
 
-import {InlineImage} from "/snippets/InlineImage.mdx";
-
-### Intro
+## Intro
 
 There are three tiles available in the DataSets tab of the Magic ETL interface:
 
-* Input DataSet
-* Output DataSet
-* Writeback
+- Input DataSet
+- Output DataSet
+- Writeback
 
-<Frame><img alt="Screenshot 2024-07-29 at 11.45.57 AM.png" src="/images/kb/ka0Vq000000MHv3-00N5w00000Ri7BU-0EMVq000001yOV7.jpg" style={{width: 200, height: 208}}/></Frame>
+<Frame>![Screenshot 2024-07-29 at 11.45.57 AM.png](/images/kb/0EMVq000001yOV7.jpg)</Frame>
+
 There is an additional tile currently available only with [Domo on Databricks](/s/article/000005289):
 
-* Query DataSet
+- Query DataSet
 
 All Magic ETL DataFlows require at least one input tile and an Output DataSet tile. These tiles represent actual DataSets.
 
-**Input tiles —** Rather than always using an Input DataSet tile in the first position, you can substitute a [SQL tile](https://domo-support.domo.com/s/article/360044876874?language=en_US#sql_tile), which permits writing a custom SELECT statement, or a Query DataSet tile, which goes further by adding functionality for subdividing a query result set into smaller loads.
+**Input tiles —** Rather than always using an Input DataSet tile in the first position, you can substitute a [SQL tile](/s/article/360044876874), which permits writing a custom SELECT statement, or a Query DataSet tile, which goes further by adding functionality for subdividing a query result set into smaller loads.
 
 **Output DataSet tile —** An Output DataSet tile is required at the end of the DataFlow to power Domo cards and apps.
 
-This article describes how to configure the [Input DataSet](#add_an_input_dataset), [Output DataSet](#add_an_output_dataset), [Writeback](#writeback_tile), and [Query DataSet](#query_dataset) tiles. Learn more about the [SQL tile](https://domo-support.domo.com/s/article/360044876874?language=en_US#sql_tile).
+This article describes how to configure the [Input DataSet](#add-an-input-dataset-to-a-dataflow), [Output DataSet](#output-dataset-tile), [Writeback](#writeback-tile), and [Query DataSet](#query-dataset-tile) tiles. Learn more about the [SQL tile](/s/article/360044876874).
 
-<Tip>
-  **Tip:** Learn to [create a Magic ETL DataFlow](/s/article/360055259234 "Creating a Magic ETL DataFlow").
-
-</Tip>
-
-# DataFlows and Personalized Data Permissions (PDP)
-
-<Warning>
-  **Important:** Input DataSets in a DataFlow can't be restricted by PDP policies—all available rows *must* pass through the DataFlow. This means you must apply PDP policies to the output DataSets of a DataFlow, rather than to the input DataSets.
-
-  When you build a DataFlow using an input DataSet with PDP policies in place, the DataFlow breaks unless at least one of the following criteria applies:
-
-  * You have an Admin security profile or a custom role with the Manage DataFlows grant.
-  * You are the DataSet owner.
-  * You are part of the DataSet's All Rows policy. This gives you access to all of the rows in the DataSet.
-
-  To learn how to use PDP with DataFlows, see [PDP and DataFlows/DataFusions](https://domo-support.domo.com/s/article/360042934614?language=en_US#pdp_and_dataflows "http://knowledge.domo.com?cid=pdpdatafusions").
-
-</Warning>
+<Tip>**Tip:** Learn to [create a Magic ETL DataFlow](/s/article/360055259234).</Tip>
 
 ---
 
-* [Add an input DataSet to a DataFlow](#add_an_input_dataset)
-  + [Configure input DataSet tiles](#configure_input_dataset_tiles)
-* [Add an output DataSet to a DataFlow](#add_an_output_dataset)
-  + [Configure output DataSet tiles](#configure_output_dataset_tiles)
-* [Query DataSet tile](#query_dataset)
-* [Writeback tile](#writeback_tile)
+### DataFlows and Personalized Data Permissions (PDP)
 
-  + [Configure writeback tile](#configure_writeback_tile)
-* [Fixed input tile](#fixed_input_tile)
-  + [Input data manually into your Fixed Input tile](#input_data_manually_into_your_fixed_input_tile)
-  + [Upload a file to your Fixed Input tile](#upload_a_file_to_your_fixed_input_tile)
-  + [Use AI to generate sample data for your Fixed Input tile](#use_ai_to_generate_sample_data_for_your_fixed_input_tile)
-  + [Save and use the data in your Fixed Input tile](#save_and_use_the_data_in_your_fixed_input_tile)
-* [FAQ](#faq)
+<Warning>**Important:** Input DataSets in a DataFlow can't be restricted by PDP policies—all available rows *must* pass through the DataFlow. This means you must apply PDP policies to the output DataSets of a DataFlow, rather than to the input DataSets.</Warning>
 
----
+When you build a DataFlow using an input DataSet with PDP policies in place, the DataFlow breaks unless at least one of the following criteria applies:
 
-### Add an Input DataSet to a DataFlow
+- You have an Admin security profile or a custom role with the Manage DataFlows grant.
+- You are the DataSet owner.
+- You are part of the DataSet's All Rows policy. This gives you access to all of the rows in the DataSet.
 
-<Frame><img alt="Input_DataSet_Tile.png" src="/images/kb/ka0Vq000000MHv3-00N5w00000Ri7BU-0EM5w000005vNiz.png"/></Frame>
+To learn how to use PDP with DataFlows, see [PDP and DataFlows/DataFusions](/s/article/360042934614).
+
+## Add an Input DataSet to a DataFlow
+
+<Frame>![Input_DataSet_Tile.png](/images/kb/0EM5w000005vNiz.png)</Frame>
+
 You must add at least one input DataSet to a DataFlow. Virtual DataSets are different from Federated DataSets and are treated differently in Magic ETL. While you can use a Virtual DataSet as an input to Magic ETL, you can't use a Federated DataSet. Follow the steps below:
 
 1. Open Magic ETL.
-2. From the left rail under **DataSets**, drag an Input DataSet tile to the canvas, opening the tile editor below the canvas.
+2. From the left rail under **DataSets**, drag an Input DataSet tile to the canvas, opening the tile editor below the canvas.   
      
-   <Frame><img alt="" src="/images/kb/ka0Vq000000MHv3-00N5w00000Ri7BU-0EMVq0000060rKD.jpg" style={{width: 898, height: 345}}/></Frame>
+
+   <Frame>![Screenshot](/images/kb/0EMVq0000060rKD.jpg)</Frame>
 3. In the tile editor, select **Choose DataSet** to select the input DataSet for the DataFlow.
-   <Note>
-     **Note:** The maximum number of columns allowed in Magic ETL is 1500 columns.
 
-   </Note>
+   
+<Note>**Note:** The maximum number of columns allowed in Magic ETL is 1500 columns.</Note>
 
-   <Frame><img alt="" src="/images/kb/ka0Vq000000MHv3-00N5w00000Ri7BU-0EMVq0000060ld0.jpg" style={{width: 651, height: 389}}/></Frame>
-4. In the **Select a DataSet** modal, find and choose the DataSet. To add more than one input DataSet, you must repeat steps 2–4 for every input DataSet.
      
-   <Frame><img alt="choose dataset.jpg" src="/images/kb/ka0Vq000000MHv3-00N5w00000Ri7BU-0EMVq000001yQru.jpg" style={{width: 400, height: 316}}/></Frame>
-5. (Optional) In the tile editor, go to the **Data** tab to see a preview of the input data.
      
-   <Frame><img alt="" src="/images/kb/ka0Vq000000MHv3-00N5w00000Ri7BU-0EMVq0000060rLq.jpg" style={{width: 892, height: 506}}/></Frame>
-# Configure Input DataSet Tiles
+
+   <Frame>![Screenshot](/images/kb/0EMVq0000060ld0.jpg)</Frame>
+4. In the **Select a DataSet** modal, find and choose the DataSet. To add more than one input DataSet, you must repeat steps 2–4 for every input DataSet.  
+     
+
+   <Frame>![choose dataset.jpg](/images/kb/0EMVq000001yQru.jpg)</Frame>
+5. (Optional) In the tile editor, go to the **Data** tab to see a preview of the input data.  
+     
+
+   <Frame>![Screenshot](/images/kb/0EMVq0000060rLq.jpg)</Frame>
+
+### Configure Input DataSet Tiles
 
 <Note>
-  **View DataSet details:** The **Details** tab of the tile editor includes information about the DataSet like its name, owner, update dates, and column names and types.
-
+**View DataSet details:** The **Details** tab of the tile editor includes information about the DataSet like its name, owner, update dates, and column names and types.
 </Note>
 
 Follow these steps to configure an Input DataSet tile:
 
 1. Drag an **Input DataSet** tile onto the canvas to open the tile editor.
-2. In the tile editor, select **Choose DataSet**. In the modal that displays, select either an existing DataSet or **Create New** to use a new DataSet.
+2. In the tile editor, select **Choose DataSet**. In the modal that displays,select either an existing DataSet or **Create New** to use a new DataSet.  
      
-   <Frame><img alt="choose dataset.jpg" src="/images/kb/ka0Vq000000MHv3-00N5w00000Ri7BU-0EMVq00000231OD.jpg" style={{width: 700, height: 280}}/></Frame>
-3. In the **Configuration** tab of the tile editor, use the **Data** **Selection** dropdown to choose one of the following:
+
+   <Frame>![choose dataset.jpg](/images/kb/0EMVq00000231OD.jpg)</Frame>
+3. In the **Configuration** tab of the tile editor, use the **Data****Selection** dropdown to choose one of the following:  
      
-   <Frame><img alt="data selection dropdown.jpg" src="/images/kb/ka0Vq000000MHv3-00N5w00000Ri7BU-0EMVq0000020HCb.jpg" style={{width: 700, height: 500}}/></Frame>
-   * **All** (default) **—** Loads all rows from the DataSet.
-   * **New —** Loads new rows added to the DataSet since its last successful execution.
-       
-     **Note:** If you choose this option, you must set the data update method to Append, not Replace.
-   * **Filter by batch —** Allows you to choose which batches to load based on creation date or name (for partitions).
-       
-     Choosing this option displays the **Filter by batch** area.
+
+   <Frame>![data selection dropdown.jpg](/images/kb/0EMVq0000020HCb.jpg)</Frame>
+
+   - **All** (default) **—** Loads all rows from the DataSet.
+   - **New —**  Loads new rows added to the DataSet since its last successful execution.   
+     
+<Note>**Note:** If you choose this option, you must set the data update method to Append, not Replace.</Note>
+
+- **Filter by batch —** Allows you to choose which batches to load based on creation date or name (for partitions).  
+     Choosing this option displays the **Filter by batch** area.  
        
      Choose a) whether batches are filtered based on when the data was processed or a custom expression and b) the date parameters. Example: *Data processed* (in the) *last 7 days*.
-       
-     <Frame><img alt="Screenshot 2024-08-01 at 7.18.28 PM.png" src="/images/kb/ka0Vq000000MHv3-00N5w00000Ri7BU-0EMVq000002327N.jpg" style={{width: 497, height: 188}}/></Frame>
+
+     <Frame>![Screenshot 2024-08-01 at 7.18.28 PM.png](/images/kb/0EMVq000002327N.jpg)</Frame>
 4. (Optional) If your input DataSet is partitioned, you can expose the partition name using the **Partition Column Name** field.
-5. In the **Data Handling** area, make any changes to column data types. This prevents any schema changes to the input data from breaking your DataFlow.
+5. In the **Data Handling** area,make any changes to column data types. This prevents any schema changes to the input data from breaking your DataFlow.  
      
-   <Frame><img alt="change data type.jpg" src="/images/kb/ka0Vq000000MHv3-00N5w00000Ri7BU-0EMVq00000232H3.jpg" style={{width: 801, height: 360}}/></Frame>
-6. Use the
-   <InlineImage src="/images/kb/ka0Vq000000MHv3-00N5w00000Ri7BU-0EMVq00000232FR.jpg" /> **Transform settings** to set the special handling for each column, including for **Bad values** and **Null values** in your column.
+
+   <Frame>![change data type.jpg](/images/kb/0EMVq00000232H3.jpg)</Frame>
+6. Use the <img alt="settings.png" src="/images/kb/0EMVq00000232FR.jpg" style={{width: 22, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/> **Transform settings** to set the special handling for each column, including for **Bad values** and **Null values** in your column.  
      
-  
-     <Frame><img src="/images/kb/ka0Vq000000MHv3-00N5w00000Ri7BU-0EMVq00000231ck.jpg" /></Frame>
-     <Frame><img alt="data settings.jpg" src="/images/kb/ka0Vq000000MHv3-00N5w00000Ri7BU-0EMVq00000231BK.jpg" style={{width: 160, height: 274}}/></Frame>
-   
-   <Tip>
-     Learn how to automate DataFlow execution with [Advanced DataFlow Triggering](/s/article/000005216).
 
-   </Tip>
+   <Frame>![bad values.jpg](/images/kb/0EMVq00000231ck.jpg)</Frame>
 
-### Output DataSet Tile
+     
 
-<Frame><img alt="Output_DataSet_Tile.png" src="/images/kb/ka0Vq000000MHv3-00N5w00000Ri7BU-0EM5w000005vNih.png" style={{width: 102, height: 93}}/></Frame>
+   <Frame>![data settings.jpg](/images/kb/0EMVq00000231BK.jpg)</Frame>
+
+Learn how to automate DataFlow execution with [Advanced DataFlow Triggering](/s/article/000005216).
+
+## Output DataSet Tile
+
+<Frame>![Output_DataSet_Tile.png](/images/kb/0EM5w000005vNih.png)</Frame>
+
 You must have an output DataSet in a DataFlow. Use the output DataSet to power up cards (or other DataFlows).
 
-# Configure Output DataSet Tiles
+### Configure Output DataSet Tiles
 
 Follow these steps to configure an Output DataSet tile:
 
@@ -142,16 +129,13 @@ Follow these steps to configure an Output DataSet tile:
 2. In the left panel under **DataSets**, drag an **Output DataSet** tile to the canvas and connect it.
 3. In the tile editor, rename the tile. This is the name of the output DataSet that will display in the Data Center.
 4. Use the **Update Method** dropdown to choose how to handle updated data. Learn about [update methods](/s/article/360043430733) in Domo.
-    <Tip>
-      **Tip:** You can preview the data in the output DataSet by running a preview, selecting the output DataSet tile, and then selecting the **Preview** tab.
 
-      <Frame><img alt="preview output.jpg" src="/images/kb/ka0Vq000000MHv3-00N5w00000Ri7BU-0EMVq00000232nJ.jpg" style={{width: 802, height: 316}}/></Frame>
-    </Tip>
+   
+<Tip>**Tip:** You can preview the data in the output DataSet by running a preview, selecting the output DataSet tile, and then selecting the **Preview** tab.</Tip>
 
-    <Note>
-      **View DataSet details:** After the DataFlow has run at least once, the **Details** tab of the tile editor includes all information about the output DataSet.
+   <Frame>![preview output .jpg](/images/kb/0EMVq00000232nJ.jpg)</Frame>
 
-    </Note>
+   <Note>**View DataSet details:** After the DataFlow has run at least once, the **Details** tab of the tile editor includes all information about the output DataSet.</Note>
 
 5. Select where to write your data by using the **Add DataSet to Cloud** dropdown.
 6. Enter the name of the **Database** where you want to store the data in your cloud.
@@ -159,23 +143,17 @@ Follow these steps to configure an Output DataSet tile:
 8. Enter the name of the **Table** you want to use inside your schema.
 
 <Note>
-  **Notes:**
+**Notes:**
 
-  * The option to
-  **Add DataSet to Cloud** is only available if you are using Cloud Amplifier and have an integration that be configured for writeback.
-  * The
-  **Database,** **Schema**, and **Table** fields will be available if your Cloud Amplifier integration supports location parameters inside your cloud (only Snowflake for now, but coming soon to other engines).
-
+- The option to **Add DataSet to Cloud** is only available if you are using Cloud Integrations and have an integration that be configured for writeback.
+- The **Database,** **Schema**, and **Table** fields will be available if your Cloud Integration supports location parameters inside your cloud (only Snowflake for now, but coming soon to other engines).
 </Note>
 
-### Query DataSet Tile
+## Query DataSet Tile
 
-<Warning>
-  **Important:** Currently, this tile is only available for [Domo on Databricks](/s/article/000005289).
+<Warning>**Important:** Currently, this tile is only available for [Domo on Databricks](/s/article/000005289).</Warning>
 
-</Warning>
-
-You can use the Query DataSet tile to write a query against a DataSet as part of the input configuration process. This can increase efficiency in loading large tables, accessed through Cloud Amplifier, which may be delayed by resource limitations in the underlying Cloud Data Warehouse (CDW). Proper use of this tile may resolve error messages like the following:
+You can use the Query DataSet tile to write a query against a DataSet as part of the input configuration process. This can increase efficiency in loading large tables, accessed through Cloud Integrations, which may be delayed by resource limitations in the underlying Cloud Data Warehouse (CDW). Proper use of this tile may resolve error messages like the following:
 
 ```
 socket timeout?????????
@@ -189,224 +167,213 @@ Although the Query DataSet tile can be used with various data sources, we strong
 
 Apart from a custom SELECT statement, users can specify values for two additional fields:
 
-* Query partition key
-* \# loads
+- Query partition key
+- # loads
 
-# Configure the Query DataSet Tile
+### Configure the Query DataSet Tile
 
 Follow these steps to configure the Query DataSet tile:
 
-1. In Magic ETL, expand the **DataSets** section in the left sidebar and drag a Query DataSet tile to the canvas.
-     
-   **Note:** This is only available for Domo on Databricks users.
+1. In Magic ETL, expand the **DataSets** section in the left sidebar and drag a Query DataSet tile to the canvas.   
+   
+<Note>
+
+**Note:** This is only available for Domo on Databricks users.
 2. In the tile configuration panel below the canvas, use the **Choose** **DataSet** dropdown to select a Databricks DataSet.
 3. Write the query that identifies the data you want to bring into the Magic ETL DataFlow.
-<Note>
-  **Note:** This query must be a select query only, and cannot use CTE (common table expressions).
-
 </Note>
 
-4. Configure the `Query Partition Key`. The recommended process for determining this for Databricks tables appears
-   [below](#configure_partition_key_recommended).
-   <Warning>
-     **Warning:** The `partition key` column should not contain NULL values; these will be ignored. You should only choose a column with exclusively non-NULL values as the partition key.
+   
+<Note>**Note:** This query must be a select query only, and cannot use CTE (common table expressions).</Note>
+4. Configure the `Query Partition Key`. The recommended process for determining this for Databricks tables appears [below](#choose-the-partition-key-recommended-process-for-databricks).
 
-   </Warning>
-
+   
+<Warning>**Warning:** The `partition key` column should not contain NULL values; these will be ignored. You should only choose a column with exclusively non-NULL values as the partition key.</Warning>
 5. Configure the **# of Loads** section?
 
-# Choose the Partition Key (Recommended Process for Databricks)
+### Choose the Partition Key (Recommended Process for Databricks)
 
 When choosing the partition key, the more evenly distributed the row count per column value, the better. For Databricks, we recommend choosing the partition key and defining the number of loads so that the largest batch is no larger than 4GB. Follow the steps below to do this:
 
-1. Find the overall size of a table in the Databricks UI or by querying as follows:
+1. Find the overall size of a table in the Databricks UI or by querying as follows:  
      
    `DESCRIBE DETAIL <catalog>.<schema>.<table>`
-   
 2. Convert the sizeInBytes to GB by dividing by 2^30 = 1024^3.
+3. Divide by the recommended 4GB to obtain a preliminary value for the number of necessary divisions, as follows:  
+     
+   `divisions = ( sizeInBytes / 2^30 ) / 4`  
+     
+       
+<Note>
 
-3. Divide by the recommended 4GB to obtain a preliminary value for the number of necessary divisions, as follows: 
-
-    `divisions = (sizeInBytes / 2^30 ) / 4`
-
-    **Note:** This is only an intermediate calculation, which should not be interpreted as the desired number of loads.
-
+**Note:** This is only an intermediate calculation, which should not be interpreted as the desired number of loads.
 4. Find the table's total row count.
+5. Estimate how many table rows make 4GB, the limit for the largest batch, using the following equation:  
+     
+   `max_rows = row_count / divisions`
+6. You can now begin evaluating which column to use as the partition key. Remember that the column must not contain any NULL values.  
+     
+   Find the number of distinct values present in a candidate column using the following formula:  
+     
+   `SELECT COUNT( DISTINCT <column> ) AS distinct_count`  
+    `FROM <table>;`  
+     
+   You'll use the value for `distinct_count` in a later calculation.
+7. Find out how skewed or lopsided the table would be if partitioned according to this candidate column by examining the largest row counts using this formula:  
+     
+   `SELECT <column>, COUNT(*) AS row_count`  
+    `FROM <table>`  
+    `GROUP BY <column>`  
+    `ORDER BY row_count DESC;`  
+     
+   A batch consists of all rows associated with N distinct partition key values. In a worst-case scenario, the largest batch would be comprised of the partition key values with the N largest row counts. The running total is represented by this query:
 
-5. Estimate how many table rows make 4GB, the limit for the largest batch, using the following equation:             `max_rows = row_count / divisions`
+</Note>
 
-6. You can now begin evaluating which column to use as the partition key. Remember that the column must not contain any NULL values.             
+   `WITH grouped_counts AS (`  
+    `SELECT <column> , COUNT(*) AS row_count`
 
-    Find the number of distinct values present in a candidate column using the following formula:  
-    <br/><br/>           
-    `SELECT COUNT(DISTINCT <column> ) AS distinct_count`        
-    <br/>
-    `FROM <table>;`             
-    <br/><br/>
-    You'll use the value for `distinct_count` in a later calculation.
+   `FROM <table>`  
+    `GROUP BY <column>`
 
-7. Find out how skewed or lopsided the table would be if partitioned according to this candidate column by examining the largest row counts using this formula:
-<br/><br/>
-             `SELECT <column>, COUNT(*) AS row_count`
-             <br/>
-             `FROM <table>`
-             <br/>
-             `GROUP BY <column>`
-             `ORDER BY row_count DESC;`
-             <br/><br/>
-             A batch consists of all rows associated with N distinct partition key values. In a worst-case scenario, the largest batch would be comprised of the partition key values with the N largest row counts. The running total is represented by this query:
-             <br/><br/>
-             `WITH grouped_counts AS (`
-             <br/>
-             `SELECT <column>, COUNT(*) AS row_count`
-             <br/>
-             `FROM <table>`
-             <br/>
-             `GROUP BY <column>`
-             <br/>
-             `)`
-             <br/>
-             `SELECT <column>, row_count, SUM(row_count )`
-             <br/>
-             `OVER (`
-             <br/>
-             `ORDER BY row_count DESC`
-             <br/>
-             `ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW`
-             <br/>
-             `) AS cumulative_row_count`
-             <br/>
-             `FROM grouped_counts`
-             <br/>
-             `ORDER BY row_count DESC;`
-             <br/><br/>
-             For example, let's say a date \<column> is being valued as a partition key candidate:
+   `)`
 
-              <table border="1"><tbody><tr><td colspan="1" rowspan="1"> &lt;column&gt; </td><td colspan="1" rowspan="1"> row_count </td><td colspan="1" rowspan="1"> cumulative_row_count </td></tr><tr><td colspan="1" rowspan="1"> 2024-10-13 </td><td colspan="1" rowspan="1"> 100 </td><td colspan="1" rowspan="1"> 100 </td></tr><tr><td colspan="1" rowspan="1"> 2024-02-21 </td><td colspan="1" rowspan="1"> 80 </td><td colspan="1" rowspan="1"> 180 </td></tr><tr><td colspan="1" rowspan="1"> 2024-05-17 </td><td colspan="1" rowspan="1"> 60 </td><td colspan="1" rowspan="1"> 240 </td></tr><tr><td colspan="1" rowspan="1"> 2024-08-19 </td><td colspan="1" rowspan="1"> 50 </td><td colspan="1" rowspan="1"> 290 </td></tr><tr><td colspan="1" rowspan="1"> 2024-03-06 </td><td colspan="1" rowspan="1"> 30 </td><td colspan="1" rowspan="1"> 320 </td></tr><tr><td colspan="1" rowspan="1"> 2024-02-10 </td><td colspan="1" rowspan="1"> 20 </td><td colspan="1" rowspan="1"> 340 </td></tr><tr><td colspan="1" rowspan="1"> 2024-11-30 </td><td colspan="1" rowspan="1"> 10 </td><td colspan="1" rowspan="1"> 350 </td></tr></tbody></table>
+   `SELECT <column> , row_count, SUM( row_count )`  
+   `OVER (`
 
-   Let's go a step further. How many distinct values for this \<column> could be included in a batch while remaining below the maximum row count (based on 4GB) that we calculated earlier? Here is the query we need:
-     <br/><br/>
-    ``WITH grouped_counts AS (`` 
-    <br/>
-    ``SELECT <column>, COUNT(*) AS row_count``  
-<br/>
-    ``FROM <table>`` 
-<br/>
-    ``GROUP BY <column>`` 
-<br/>
-    ``),`` 
-<br/>
-    ``ranked_counts AS (`` 
-<br/>
-    ``SELECT <column>, row_count, SUM(row_count ) ``
-<br/>
-    ``OVER (``
-<br/>
-    ``ORDER BY row_count DESC  ``
-<br/>
-    ``ROWS BETWEEN UNBOUNDED PRECEDING  ``
-<br/>
+   `ORDER BY row_count DESC`  
+    `ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW`  
+    `) AS cumulative_row_count`  
+   `FROM grouped_counts`  
+   `ORDER BY row_count DESC;`
 
-    ``xAND CURRENT ROW ``
-<br/>
-    ``) AS cumulative_row_count ``
-<br/>
-    ``FROM grouped_counts  ``
+   For example, let's say a date \<column\> is being valued as a partition key candidate:  
+     
 
-<br/>
-    ``) ``
-<br/>
-    ``SELECT COUNT(*) AS max_column_values ``
-<br/>
-    ``FROM ranked_counts ``
-<br/>
-    ``WHERE cumulative_row_count < max_rows;``
-<br/><br/>
-   Replace `max_rows` with the value calculated in step 4, [above](#step_four). Then execute the preceding query to obtain an integer result: `max_column_values`.
-   
-8. If you decide to use this candidate column as the partition key, use the results from steps 6 and 7 to calculate the minimum value for the number of loads required to ensure that the largest load remains below 4GB, as follows, rounding up:
+   |  |  |  |
+   | --- | --- | --- |
+   | \<column\> | row\_count | cumulative\_row\_count |
+   | 2024-10-13 | 100 | 100 |
+   | 2024-02-21 | 80 | 180 |
+   | 2024-05-17 | 60 | 240 |
+   | 2024-08-19 | 50 | 290 |
+   | 2024-03-06 | 30 | 320 |
+   | 2024-02-10 | 20 | 340 |
+   | 2024-11-30 | 10 | 350 |
 
-    `“# loads” >= distinct_count / max_column_values`             
-    
-    Note that the number of loads necessary to remain below 4GB will depend on the choice of column for the partition key. To get a smaller number of loads, choose a column where the values are more uniformly distributed across the table.
+     
+   Let's go a step further. How many distinct values for this \<column\> could be included in a batch while remaining below the maximum row count (based on 4GB) that we calculated earlier? Here is the query we need:   
+     
 
-### Writeback Tile
+   `WITH grouped_counts AS (`  
+    `SELECT <column> , COUNT(*) AS row_count`
 
-<Frame><img alt="Writeback_Tile.png" src="/images/kb/ka0Vq000000MHv3-00N5w00000Ri7BU-0EM5w000005vNii.png" style={{width: 85, height: 102}}/></Frame>
+   `FROM <table>`  
+    `GROUP BY <column>`
+
+   `) ,`
+
+   `ranked_counts AS (`
+
+   `SELECT <column> , row_count , SUM( row_count )`  
+    `OVER (`
+
+   `ORDER BY row_count DESC`  
+    `ROWS BETWEEN UNBOUNDED PRECEDING`
+
+   `xAND CURRENT ROW`  
+    `) AS cumulative_row_count`  
+   `FROM grouped_counts`
+
+   `)`  
+    `SELECT COUNT(*) AS max_column_values`  
+    `FROM ranked_counts`  
+    `WHERE cumulative_row_count < max_rows;`
+
+   Replace `max_rows` with the value calculated in step 4, above. Then execute the preceding query to obtain an integer result: `max_column_values`.
+8. If you decide to use this candidate column as the partition key, use the results from steps 6 and 7 to calculate the minimum value for the number of loads required to ensure that the largest load remains below 4GB, as follows, rounding up:  
+     
+   `“# loads” >= distinct_count / max_column_values`  
+     
+   Note that the number of loads necessary to remain below 4GB will depend on the choice of column for the partition key. To get a smaller number of loads, choose a column where the values are more uniformly distributed across the table.
+
+## Writeback Tile
+
+<Frame>![Writeback_Tile.png](/images/kb/0EM5w000005vNii.png)</Frame>
 
 You can use the Writeback tile to output the transformed data as a DataSet and send the data to another system.
 
-# Configure Writeback Tile
+### Configure Writeback Tile
 
 Follow these steps to configure a Writeback tile:
 
 1. Drag a Writeback tile to the canvas in place of an Input DataSet tile.
-
-2. Rename the Writeback tile and then specify the DataSet name you want to output by selecting   <InlineImage src="/images/kb/ka0Vq000000MHv3-00N5w00000Ri7BU-0EMVq0000060jJS.jpg" /> **Edit** and entering a name and a description.
-
+2. Rename the Writeback tile and then specify the DataSet name you want to output by selecting <img alt="" src="/images/kb/0EMVq0000060jJS.jpg" style={{width: 23, height: 23, display: 'inline', verticalAlign: 'start', margin: '0'}}/> **Edit** and entering a name and a description.
 3. (Optional) Select the **Additional Options** menu and select **Update Method** to either replace (default) or append data.
-
 4. Select **Configure Writeback**, then select the Writeback Connector you want to use.
+5. Connect other tiles to the Writeback tile to complete your DataFlow and end with an Output DataSet tile.
 
-5. Connect other tiles to the Writeback tile to complete your DataFlow and end with an Output DataSet tile.<Note>  **View Writeback tile details:** After the DataFlow has run at least once, the **Details** tab of the tile editor includes all information about the Writeback output DataSet.</Note>
+**View Writeback tile details:** After the DataFlow has run at least once, the **Details** tab of the tile editor includes all information about the Writeback output DataSet.
 
-### Fixed Input Tile
+## Fixed Input Tile
 
-You can use this tile to validate transformations, prototype logic, demonstrate outputs with meaningful placeholder data, or build DataFlows when your input DataSet isn’t available.
+You can use this tile to validate transformations, prototype logic, demonstrate outputs with meaningful placeholder data, or build DataFlows when your input DataSet isn't available.
 
-Find the Fixed Input tile under Datasets in the left panel of the Magic ETL authoring canvas.<Frame><img src="/images/kb/ka0Vq000000MHv3-00N5w00000Ri7BU-0EMVq00000BKvLa.jpg" style={{width: 555, height: 308}}/></Frame><Note>  **Note:** To use AI features in the Fixed Input tile, your instance must have AI Services enabled. If AI Services are not enabled, you can still enter data manually, paste values, or upload files.</Note>
+Find the Fixed Input tile under Datasets in the left panel of the Magic ETL authoring canvas.
 
-# Input Data Manually into Your Fixed Input Tile
+<Frame>![Screenshot](/images/kb/0EMVq00000BKvLa.jpg)</Frame>
+
+<Note>**Note:** To use AI features in the Fixed Input tile, your instance must have AI Services enabled. If AI Services are not enabled, you can still enter data manually, paste values, or upload files.</Note>
+
+### Input Data Manually into Your Fixed Input Tile
 
 To manually input data, follow these steps:
 
 1. Drag the Fixed Input tile from the Datasets section to your canvas.
-
 2. Enter column names in the New Column header fields.
-
 3. Select the small text under the left side of each column name to set the data type.
-
 4. Enter data directly into the table.
+5. *(Optional)* Copy and paste data from another source into the rows and columns.
 
-5. *(Optional)* Copy and paste data from another source into the rows and columns.<Frame><img src="/images/kb/ka0Vq000000MHv3-00N5w00000Ri7BU-0EMVq00000BKw6M.jpg" style={{width: 558, height: 322}}/></Frame>
+<Frame>![Screenshot](/images/kb/0EMVq00000BKw6M.jpg)</Frame>
 
-# Upload a File to Your Fixed Input Tile
+### Upload a File to Your Fixed Input Tile
 
 To upload a file, follow these steps:
 
-  1. Drag the Fixed Input tile from Datasets to your canvas.
-  
-  2. Select the **Generate data / Upload** button in the lower-right corner.        <Frame><img alt="A screenshot of a computerAI-generated content may be incorrect." src="/images/kb/ka0Vq000000MHv3-00N5w00000Ri7BU-0EMVq00000BKxbt.jpg" style={{width: 516, height: 298}}/></Frame>
-  
-  3. In the modal, go to the **Upload File** tab.        <Frame><img alt="A screenshot of a computerAI-generated content may be incorrect." src="/images/kb/ka0Vq000000MHv3-00N5w00000Ri7BU-0EMVq00000BKxaH.jpg" style={{width: 239, height: 224}}/></Frame>
-  
-  4. Drag and drop your file or select the **Upload File** button.
-  
-  5. Specify whether the file includes header rows, then select Import.        
-  
-      Your data appears in the configuration panel. You can add columns, edit values, or use it as-is.
+1. Drag the Fixed Input tile from Datasets to your canvas.
+2. Select the **Generate data / Upload** button in the lower-right corner.  
 
-<Frame><img src="/images/kb/ka0Vq000000MHv3-00N5w00000Ri7BU-0EMVq00000BKxjx.jpg" style={{width: 619, height: 353}}/></Frame>
+   <Frame>![A screenshot of a computerAI-generated content may be incorrect.](/images/kb/0EMVq00000BKxbt.jpg)</Frame>
+3. In the modal, go to the **Upload File** tab.  
 
-<Warning>  **Important:** You can upload up to 10,000 rows and 1,000 columns per file. Supported formats include.csv and.xlsx.</Warning>
+   <Frame>![A screenshot of a computerAI-generated content may be incorrect.](/images/kb/0EMVq00000BKxaH.jpg)</Frame>
+4. Drag and drop your file or select the **Upload File** button.
+5. Specify whether the file includes header rows, then select Import.  
+   Your data appears in the configuration panel. You can add columns, edit values, or use it as-is.
 
-# Use AI to Generate Sample Data for Your Fixed Input Tile
+<Frame>![Screenshot](/images/kb/0EMVq00000BKxjx.jpg)</Frame>
 
-To generate sample data using AI, follow the steps below.Alternatively, you can generate AI data for a single column by selecting the **sparkle icon** <InlineImage src="/images/kb/ka0Vq000000MHv3-00N5w00000Ri7BU-0EMVq00000BKxvF.jpg" /> in that column’s header. Enter a short description of the values and the number of rows. This method is faster than generating an entire DataSet but may still take a few seconds.
+<Warning>**Important:** You can upload up to 10,000 rows and 1,000 columns per file. Supported formats include .csv and .xlsx.</Warning>
+
+### Use AI to Generate Sample Data for Your Fixed Input Tile
+
+To generate sample data using AI, follow the steps below.
+
+Alternatively, you can generate AI data for a single column by selecting the **sparkle icon** <img alt="A purple star with three crossesAI-generated content may be incorrect." src="/images/kb/0EMVq00000BKxvF.jpg" style={{width: 14, height: 14, display: 'inline', verticalAlign: 'start', margin: '0'}}/> in that column's header. Enter a short description of the values and the number of rows. This method is faster than generating an entire DataSet but may still take a few seconds.
 
 1. Drag the Fixed Input tile to your canvas.
-
 2. Select the **Generate data / Upload** button.
-
 3. In the Generate Data tab, enter a short prompt describing the data (for example: “50 customer transactions with name, date, and amount”).
+4. Choose the number of rows to generate (recommended: 50).  
 
-4. Choose the number of rows to generate (recommended: 50).        <Frame><img alt="A screenshot of a data generatorAI-generated content may be incorrect." src="/images/kb/ka0Vq000000MHv3-00N5w00000Ri7BU-0EMVq00000BKwJG.jpg" style={{width: 209, height: 227}}/></Frame>
-
+   <Frame>![A screenshot of a data generatorAI-generated content may be incorrect.](/images/kb/0EMVq00000BKwJG.jpg)</Frame>
 5. Select **Generate Data**.
+6. Wait a few moments for the table to populate.
 
-6. Wait a few moments for the table to populate.<Frame><img src="/images/kb/ka0Vq000000MHv3-00N5w00000Ri7BU-0EMVq00000BKy6X.jpg" style={{width: 648, height: 281}}/></Frame>
+<Frame>![Screenshot](/images/kb/0EMVq00000BKy6X.jpg)</Frame>
 
-# Save and Use the Data in Your Fixed Input Tile
+### Save and Use the Data in Your Fixed Input Tile
 
 When your Fixed Input data is ready, connect it to any downstream transformation tile in your DataFlow.
 
@@ -414,29 +381,22 @@ The data is stored in the DataFlow definition—not as a standalone DataSet.
 
 To create a separate DataSet, connect the tile to an Output DataSet tile. When the DataFlow runs, Domo creates a new DataSet from that output.
 
-Learn how to configure [Output DataSet Tiles](https://domo-support.domo.com/s/article/360045402273?language=en_US#configure_output_dataset_tiles).
+Learn how to configure [Output DataSet Tiles](/s/article/360045402273).
 
-### FAQ
+## FAQ
 
 <AccordionGroup>
+
 <Accordion title="Why are my decimal columns being truncated to five decimal places?">
-
-
 Domo uses a precision/scale of (19,5) for fixed decimals, meaning that fixed decimals will only ever have 5 digits to the right of the decimal point. You can request that your DataSet be configured to use a higher precision/scale.
-
-
 </Accordion>
+
 <Accordion title="Are there limits to the amount of data I can create in Fixed Input tiles?">
-
-
-Uploaded files are limited to 10,000 rows and 1,000 columns. There’s no defined limit for manually entered or pasted data, though future limits may apply.
-
-
+Uploaded files are limited to 10,000 rows and 1,000 columns. There's no defined limit for manually entered or pasted data, though future limits may apply.
 </Accordion>
+
 <Accordion title="Does the Fixed Input tile create a separate DataSet?">
-
-
 No. Data stays in the DataFlow definition. To create a standalone DataSet, connect it to an Output tile.
-
 </Accordion>
+
 </AccordionGroup>

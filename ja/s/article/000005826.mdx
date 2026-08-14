@@ -1,28 +1,20 @@
 ---
 title: "Snowflake上のMagic ETLのサブセット処理（ベータ）"
+excerpt: "Snowflake で実行する Magic ETL DataFlow でデータ選択オプションと追加・パーティション・Upsert などの更新方法を使用し、データのサブセットのみを処理してコストを抑えます。"
 ---
 
-### はじめに
+## はじめに
 
 Magic ETL DataFlowがSnowflakeで実行されるたびにすべてのデータを処理すると、コストがかさむ場合があります。サブセット処理では、フローの最初にデータ選択オプションが、フローの最後に追加の更新方法が用意されています。そのため、より小さなデータのサブセットを選択してデータを変換できます。
 
 この記事では、使用可能な各オプションについて説明します。
 
 <Note>
-  **完全な置換を実行したい場合でも、** 心配ありません。このオプションはいつでも使用できます。大規模なDataSetを処理する際は、追加、パーティション、Upsertなど、ほかの更新方法を試すことができ、より柔軟性が向上しています。これらの方法については、 [後述のセクション](#update_methods) を参照してください。
+  **完全な置換を実行したい場合でも、** 心配ありません。このオプションはいつでも使用できます。大規模なDataSetを処理する際は、追加、パーティション、Upsertなど、ほかの更新方法を試すことができ、より柔軟性が向上しています。これらの方法については、 後述のセクション を参照してください。
 
 </Note>
 
----
-
-* [必要な許可](#required_grants)
-* [Snowflake上のMagic ETLのサブセット処理にアクセスする](#access_subset_processing)
-* [データ選択オプションで受信データをフィルタリングする](#filter_incoming_data)
-* [出力タイルでの更新方法](#update_methodsa)
-
----
-
-### 必要な許可
+## 必要な許可
 
 DomoでSnowflake上のMagic ETLのサブセット処理を使用するには、次の許可を有効にしておく必要があります。
 
@@ -33,25 +25,23 @@ DomoでSnowflake上のMagic ETLのサブセット処理を使用するには、�
     または
   + 統合共有が有効になっている場合は、統合アカウントへの **［DataFlowを編集］** **の許可** および **［書き込みができます］の許可** 。
       
-    統合を共有する方法については、 [こちら](/ja/s/article/4412849158167#share_integration) を参照してください。
+    統合を共有する方法については、 [こちら](/ja/s/article/4412849158167) を参照してください。
 
     <Warning>
-      **重要：** Snowflake上のMagic ETLのサブセット処理を使用するには、Snowflake-Cloud Amplifierの統合を書き込みおよび変換用に設定する必要があります。統合を設定する方法については、 [こちら](/s/article/4402322966807) を参照してください。
+      **重要：** Snowflake上のMagic ETLのサブセット処理を使用するには、Snowflakeクラウド統合を書き込みおよび変換用に設定する必要があります。統合を設定する方法については、 [こちら](/s/article/4402322966807) を参照してください。
 
     </Warning>
 
-### Snowflake上のMagic ETLのサブセット処理にアクセスする
+## Snowflake上のMagic ETLのサブセット処理にアクセスする
 
 [Snowflake-Domo統合](/s/article/4402322966807) の設定が完了している場合は、Magic ETL内から変換を実行するSnowflakeクラウドを選択できます。
 
-<Frame><img alt="" src="/images/kb/ka0Vq000000AMQf-00N5w00000Ri7BU-0EMVq000000w4o1.jpg" style={{width: 800, height: 403}}/></Frame>
-この記事で説明されている [データ選択オプション](#new_selection_options) は入力タイルの設定時に、 [データ更新方法](#new_update_methods) は出力タイルの設定時に使用できます。
+<Frame><img alt="" src="/images/kb/ka0Vq000000AMQf-00N5w00000Ri7BU-0EMVq000000w4o1.jpg"/></Frame>
+この記事で説明されている データ選択オプション は入力タイルの設定時に、 データ更新方法 は出力タイルの設定時に使用できます。
   
 Magic ETL DataFlowを作成する方法については、 [こちら](/s/article/360055259234) を参照してください。
 
-[このページのトップへ](#intro)
-
-### データ選択オプションで受信データをフィルタリングする
+## データ選択オプションで受信データをフィルタリングする
 
 データが変換フローに入る前に、Magic ETLで入力DataSetタイルを設定する際に使用できるデータ選択オプションを使用して、入力DataSetをフィルタリングすることができます。
 
@@ -61,30 +51,28 @@ Magic ETL DataFlowを作成する方法については、 [こちら](/s/article
      
    Snowflake-Domo統合を確立する必要がある場合は、 [こちら](/s/article/4402322966807) で方法を確認してください。
      
-   <Frame><img alt="" src="/images/kb/ka0Vq000000CPQr-00N5w00000Ri7BU-0EMVq0000075eOz.jpg" style={{width: 900, height: 391}}/></Frame>
+   <Frame><img alt="" src="/images/kb/ka0Vq000000CPQr-00N5w00000Ri7BU-0EMVq0000075eOz.jpg"/></Frame>
 2. 入力DataSetタイルをキャンバスにドラッグし、DataSetを選択します。
 3. キャンバスの下にある設定パネルで **［データの選択］** ドロップダウンを使用し、以下に説明するフィルタリングオプションのいずれかを選択します。
      
-   <Frame><img alt="" src="/images/kb/ka0Vq000000CPQr-00N5w00000Ri7BU-0EMVq0000075ajc.jpg" style={{width: 900, height: 507}}/></Frame>
+   <Frame><img alt="" src="/images/kb/ka0Vq000000CPQr-00N5w00000Ri7BU-0EMVq0000075ajc.jpg"/></Frame>
    * **すべて —** これはデフォルトのオプションです。このオプションでは、DataSetのすべての行が読み込まれます。
    * **新規 —** このオプションでは、DataFlowが最後に正常に実行されて以降にDataSetに追加されたバッチ（再作成されたパーティションを含む）のみが読み込まれます。
    * **バッチでフィルタ— —** このオプションでは、 **［データをインポートするタイミング］** ドロップダウンと **［日付は次にあります：］** ドロップダウンを使用して、読み込むバッチを作成日にもとづいて指定できます。
        
-     <Frame><img alt="" src="/images/kb/ka0Vq000000CPQr-00N5w00000Ri7BU-0EMVq0000075fY0.jpg" style={{width: 752, height: 136}}/></Frame>
+     <Frame><img alt="" src="/images/kb/ka0Vq000000CPQr-00N5w00000Ri7BU-0EMVq0000075fY0.jpg"/></Frame>
      + **カスタマイズされた数式を使用 —** **［バッチでフィルター］** を選択した後に、カスタマイズされた数式を使用してバッチを特定できます。これを行うには、設定パネルで **［バッチでフィルター］** セクションを展開し、 **［データをインポートするタイミング］** ドロップダウンを使用して **［カスタマイズされた数式］** を選択します。
          
-       <Frame><img alt="" src="/images/kb/ka0Vq000000CPQr-00N5w00000Ri7BU-0EMVq0000075j25.jpg" style={{width: 751, height: 281}}/></Frame>
+       <Frame><img alt="" src="/images/kb/ka0Vq000000CPQr-00N5w00000Ri7BU-0EMVq0000075j25.jpg"/></Frame>
        数式フィールドに数式を入力します。矢印アイコンを使用してスクリプトエディターを開きます。
          
        <Columns>
-         <Frame><img alt="" src="/images/kb/ka0Vq000000CPQr-00N5w00000Ri7BU-0EMVq0000075jQH.jpg" style={{width: 750, height: 106}}/></Frame>
-         <Frame><img alt="" src="/images/kb/ka0Vq000000CPQr-00N5w00000Ri7BU-0EMVq0000075jTV.jpg" style={{width: 748, height: 406}}/></Frame>
+         <Frame><img alt="" src="/images/kb/ka0Vq000000CPQr-00N5w00000Ri7BU-0EMVq0000075jQH.jpg"/></Frame>
+         <Frame><img alt="" src="/images/kb/ka0Vq000000CPQr-00N5w00000Ri7BU-0EMVq0000075jTV.jpg"/></Frame>
        </Columns>
        batch. idや、バッチが記録された日付、最後に正常に実行されたDataFlowにもとづいて設定されたカーソルを参照できます。
 
-[このページのトップへ](#intro)
-
-### 出力タイルでの更新方法
+## 出力タイルでの更新方法
 
 Snowflake上のMagic ETL DataFlowでは置換のほかにも、追加、パーティション、Upsertの3種類の更新方法を利用できます。この記事では各方法について詳しく説明しませんが、 [こちら](/s/article/000005541) で詳細を確認できます。
 
@@ -97,27 +85,26 @@ Snowflake上のMagic ETL DataFlowでは置換のほかにも、追加、パー�
 
 1. Magic ETLを開き、 **［コンピューティング］** ドロップダウンからDataFlowを実行するSnowflake統合を選択します。
      
-   <Frame><img alt="" src="/images/kb/ka0Vq000000CPQr-00N5w00000Ri7BU-0EMVq000006anRl.jpg" style={{width: 899, height: 361}}/></Frame>
+   <Frame><img alt="" src="/images/kb/ka0Vq000000CPQr-00N5w00000Ri7BU-0EMVq000006anRl.jpg"/></Frame>
 2. 目的の変換を実現するためのDataFlowを作成します。
    [Magic ETL DataFlowを作成する方法については、](/s/article/360055259234) こちら を参照してください。
 3. 出力DataSetタイルをキャンバスに追加する際に、設定パネルを使用して、使用する更新方法を選択します。
      
-   <Frame><img alt="" src="/images/kb/ka0Vq000000CPQr-00N5w00000Ri7BU-0EMVq0000075jGc.jpg" style={{width: 350, height: 423}}/></Frame>
+   <Frame><img alt="" src="/images/kb/ka0Vq000000CPQr-00N5w00000Ri7BU-0EMVq0000075jGc.jpg"/></Frame>
 4. （条件付き）更新方法に応じて、以下に説明するように出力DataSetタイルを設定します。
      
    * **追加 —** 列を選択する必要はありません。［追加］は、DataFlowの実行のたびに新しいバッチを出力DataSetに追加します。
        
-     <Frame><img alt="" src="/images/kb/ka0Vq000000CPQr-00N5w00000Ri7BU-0EMVq000006aoqr.jpg" style={{width: 450, height: 357}}/></Frame>
+     <Frame><img alt="" src="/images/kb/ka0Vq000000CPQr-00N5w00000Ri7BU-0EMVq000006aoqr.jpg"/></Frame>
    * **パーティション —** パーティションに使用するラベルを含む列名を選択します。このオプションは、名前のついたパーティションを出力DataSetに追加し、同じ名前の既存のパーティションを置き換えます。パーティショニングの詳細については、 [こちら](/ja/s/article/000005541#partition) を参照してください。
      <Warning>
        **重要：** パーティションに使用できる列は1つだけです。パーティションを複数の列の組み合わせにする必要がある場合は、構成要素となる列をDataFlowの一部として連結し、単一の列を作成する必要があります。
 
      </Warning>
 
-<Frame><img alt="" src="/images/kb/ka0Vq000000CPQr-00N5w00000Ri7BU-0EMVq000006ahHb.jpg" style={{width: 551, height: 332}}/></Frame>
+<Frame><img alt="" src="/images/kb/ka0Vq000000CPQr-00N5w00000Ri7BU-0EMVq000006ahHb.jpg"/></Frame>
    * **Upsert —** DataSet内で固有の行を表す列または列の組み合わせを選択します。このオプションは、出力行を追加または置換し、選択した識別子で重複を排除します。Upsertの詳細については、 [こちら](/ja/s/article/000005541#upsert) を参照してください。
        
-     <Frame><img alt="" src="/images/kb/ka0Vq000000CPQr-00N5w00000Ri7BU-0EMVq000006ap0X.jpg" style={{width: 552, height: 314}}/></Frame>
-[このページのトップへ](#intro)
+     <Frame><img alt="" src="/images/kb/ka0Vq000000CPQr-00N5w00000Ri7BU-0EMVq000006ap0X.jpg"/></Frame>
 
 日本語

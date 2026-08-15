@@ -447,7 +447,9 @@ paths:
         If you plan to use sync, note the following:
 
         <Note>
-        **Date formatting:** Documents containing `DATE` or `DATETIME` data must use the format `YYYY-MM-DD` or `YYYY-MM-DDTHH:MM:SSZ` to sync correctly.
+        **Date formatting:** A `DATE` or `DATETIME` column accepts a value stored as a date (write it with `$date`), an ISO 8601 string in `YYYY-MM-DD` or `YYYY-MM-DDTHH:MM:SSZ` form, or epoch milliseconds. All three sync to a real date in the DataSet, so collections already writing date strings need no change.
+
+        Note that syncing correctly is not the same as being queryable as a date: a field stored as a string is a real date in the DataSet but still text to AppDB queries. See [Working with Dates](/portal/API-Reference/Product-APIs/App-DB#working-with-dates).
         </Note>
 
         <Warning>
@@ -1161,7 +1163,12 @@ paths:
     post:
       summary: Create Document (v1, Deprecated)
       deprecated: true
-      description: "**Deprecated.** Use the v2 Create Document endpoint instead. Add a new document to a specified collection."
+      description: |
+        **Deprecated.** Use the v2 Create Document endpoint instead. Add a new document to a specified collection.
+
+        <Note>
+          **Note: storing dates.** To store a value as a date rather than text, wrap it in `$date` — for example `{"content": {"startDate": {"$date": "2026-01-01T00:00:00Z"}}}`. A plain ISO 8601 string is stored as text, and a value that cannot be read as a date is rejected with `400`. Dates are returned as ISO 8601 strings, not wrapped in `$date`. See [Working with Dates](/portal/API-Reference/Product-APIs/App-DB#working-with-dates).
+        </Note>
       tags:
         - App DB API (Product)
       parameters:
@@ -1226,7 +1233,12 @@ paths:
     put:
       summary: Update Document (v1, Deprecated)
       deprecated: true
-      description: "**Deprecated.** Use the v2 Update Document endpoint instead. Modify an existing document in a collection."
+      description: |
+        **Deprecated.** Use the v2 Update Document endpoint instead. Modify an existing document in a collection.
+
+        <Note>
+          **Note: storing dates.** To store a value as a date rather than text, wrap it in `$date` — for example `{"content": {"startDate": {"$date": "2026-01-01T00:00:00Z"}}}`. A plain ISO 8601 string is stored as text, and a value that cannot be read as a date is rejected with `400`. Dates are returned as ISO 8601 strings, not wrapped in `$date`. Because this overwrites the whole `content` object, a date you read from a document and send back unchanged is stored as text — re-wrap it in `$date`. See [Working with Dates](/portal/API-Reference/Product-APIs/App-DB#working-with-dates).
+        </Note>
       tags:
         - App DB API (Product)
       parameters:
@@ -1351,66 +1363,24 @@ paths:
       description: |
         Retrieve documents from a collection via MongoDB query (v2 endpoint).
 
+        ## Supported operators
+
         AppDB supports the full range of MongoDB query predicates. The following operators are **not** supported:
         - `$where` — JavaScript expression evaluation is disabled server-side.
         - `$near` and `$nearSphere` — proximity searches require a geospatial index, which AppDB collections do not have.
 
         All other operators in the [official MongoDB query predicate documentation](https://www.mongodb.com/docs/manual/reference/mql/query-predicates/) are supported, including comparison, logical, array, data type, bitwise, `$expr`, `$jsonSchema`, and `$regex` operators. The geospatial shape operators `$geoWithin` and `$geoIntersects` are also supported when your documents contain GeoJSON data.
 
-        **Querying by date**
+        ## Sample collection
 
-        AppDB has two categories of date fields that require different query approaches. Using the wrong approach for a field type fails silently — no error, just incorrect results.
-
-        **System date fields** (`createdOn`, `updatedOn`) are stored as BSON DateTime by AppDB. Query them using [MongoDB Extended JSON v2](https://www.mongodb.com/docs/manual/reference/mongodb-extended-json/#mongodb-bsontype-Date) `$date` syntax:
-        ```json
-        {"createdOn": {"$gt": {"$date": "2026-01-01"}}}
-        ```
-
-        **Content date fields** — to store a date, wrap the value in `$date` when you write the document:
-        ```json
-        {"content": {"startDate": {"$date": "2026-01-01T00:00:00Z"}}}
-        ```
-        Query it with the same `$date` syntax as a system date field:
-        ```json
-        {"content.startDate": {"$gt": {"$date": "2026-01-01"}}}
-        ```
-        Dates come back as ISO 8601 strings, for example `"2026-01-01T00:00:00.000Z"`. If you already have a timestamp in milliseconds, `{"$date": 1767225600000}` works too.
-
-        **A plain ISO 8601 string is stored as text, not a date.** Text dates are still queryable. ISO 8601 strings sort lexicographically in date order, so comparison operators work directly on them:
-        ```json
-        {"content.startDate": {"$gt": "2026-01-01"}}
-        ```
-        To compare text dates as dates — useful when the stored values mix date-only (`YYYY-MM-DD`) and datetime (`YYYY-MM-DDTHH:MM:SSZ`) precision — convert them at query time with `$toDate`:
-        ```json
-        {
-          "$expr": {
-            "$gt": [
-              {"$toDate": "$content.startDate"},
-              {"$date": "2026-01-01"}
-            ]
-          }
-        }
-        ```
-
-        <Warning>
-          **Mixing up these approaches produces wrong results without an error.**
-
-          `$date` only matches a field stored as a date, and string comparison only matches a field stored as text. Querying across the two always returns empty, whatever the operator you use.
-
-          To check how a field is stored, use `$type`. If `{"someField": {"$type": "date"}}` returns documents, use `$date` syntax. If `{"someField": {"$type": "string"}}` returns documents, use string comparison or `$toDate`.
-
-          One content field can hold both across different documents, if some were written with `$date` and others with a plain string. `$type` is how you tell them apart.
-        </Warning>
-
-        **Aggregation examples**
-
-        The following examples use this sample movie collection:
+        Every example below runs against this movie collection. `releaseDate` was written with `$date`, so it is stored as a date:
         ```json
         [
           {
             "content": {
               "title": "Inception", "genre": "sci-fi",
               "year": 2010, "rating": 8.8,
+              "releaseDate": {"$date": "2010-07-16T00:00:00Z"},
               "tags": ["mind-bending", "action"]
             }
           },
@@ -1418,6 +1388,7 @@ paths:
             "content": {
               "title": "Interstellar", "genre": "sci-fi",
               "year": 2014, "rating": 8.6,
+              "releaseDate": {"$date": "2014-11-07T00:00:00Z"},
               "tags": ["mind-bending", "emotional"]
             }
           },
@@ -1425,6 +1396,7 @@ paths:
             "content": {
               "title": "The Notebook", "genre": "romance",
               "year": 2004, "rating": 7.9,
+              "releaseDate": {"$date": "2004-06-25T00:00:00Z"},
               "tags": ["romantic", "drama"]
             }
           },
@@ -1432,6 +1404,7 @@ paths:
             "content": {
               "title": "Titanic", "genre": "romance",
               "year": 1997, "rating": 7.8,
+              "releaseDate": {"$date": "1997-12-19T00:00:00Z"},
               "tags": ["romantic", "drama", "action"]
             }
           },
@@ -1439,13 +1412,44 @@ paths:
             "content": {
               "title": "The Avengers", "genre": "action",
               "year": 2012, "rating": 8.0,
+              "releaseDate": {"$date": "2012-05-04T00:00:00Z"},
               "tags": ["action", "superhero"]
             }
           }
         ]
         ```
+        That is the write form. Read back, `releaseDate` comes out as an ISO 8601 string — `"2010-07-16T00:00:00.000Z"` — not wrapped in `$date`.
 
-        **Average rating per genre for movies released since 2010**
+        ## Querying documents
+
+        ### By date
+
+        The system timestamps `createdOn` and `updatedOn` are always dates. Query them with `$date`:
+        ```json
+        {"createdOn": {"$gt": {"$date": "2026-01-01"}}}
+        ```
+
+        A field inside `content` is a date only if it was written that way. `releaseDate` in the sample above was, so the same syntax applies:
+        ```json
+        {"content.releaseDate": {"$gte": {"$date": "2010-01-01"}}}
+        ```
+
+        A field written as a plain ISO 8601 string is stored as text instead, and text is compared as text. ISO 8601 sorts lexicographically in date order, so comparison operators still work on it directly:
+        ```json
+        {"content.startDate": {"$gt": "2026-01-01"}}
+        ```
+
+        <Warning>
+          **A date and a text date never match each other.** `$date` matches only a field stored as a date; string comparison matches only a field stored as text. Querying across the two returns an empty result — no error, whichever operator you use.
+
+          Check what a field holds with `$type`. If `{"content.releaseDate": {"$type": "date"}}` returns documents, use `$date`. If `{"content.releaseDate": {"$type": "string"}}` returns documents, use string comparison or `$toDate`. A single field can hold both across different documents.
+        </Warning>
+
+        See [Working with Dates](/portal/API-Reference/Product-APIs/App-DB#working-with-dates) for how to store a date, what a read returns, comparing text dates of mixed precision with `$toDate`, and how dates behave in DataSet sync.
+
+        ## Aggregating documents
+
+        ### Average rating per genre for movies released since 2010
         ```
         ?groupby=content.genre&avg=content.rating avgRating&orderby=avgRating descending
         ```
@@ -1461,7 +1465,7 @@ paths:
         ]
         ```
 
-        **Movie count per genre**
+        ### Movie count per genre
         ```
         ?groupby=content.genre&count=count
         ```
@@ -1474,7 +1478,7 @@ paths:
         ]
         ```
 
-        **Tag frequency across all movies**
+        ### Tag frequency across all movies
 
         `unwind` produces one document per tag value before grouping, so a movie with `["action", "romantic"]` counts once toward each group.
         ```
@@ -1635,7 +1639,12 @@ paths:
           $ref: '#/components/responses/CollectionNotFound'
     post:
       summary: Create Document
-      description: Add a new document to a specified collection.
+      description: |
+        Add a new document to a specified collection.
+
+        <Note>
+          **Note: storing dates.** To store a value as a date rather than text, wrap it in `$date` — for example `{"content": {"startDate": {"$date": "2026-01-01T00:00:00Z"}}}`. A plain ISO 8601 string is stored as text, and a value that cannot be read as a date is rejected with `400`. Dates are returned as ISO 8601 strings, not wrapped in `$date`. See [Working with Dates](/portal/API-Reference/Product-APIs/App-DB#working-with-dates).
+        </Note>
       tags:
         - App DB API (Product)
       parameters:
@@ -1663,8 +1672,8 @@ paths:
                     count: 42
                     unitPriceDecimal: 9.99
                     conversionRateDouble: 0.3333333333333333
-                    startDate: "2026-06-24"
-                    createdAt: "2026-06-24T17:42:06.949Z"
+                    startDate: {"$date": "2026-06-24T00:00:00Z"}
+                    createdAt: {"$date": "2026-06-24T17:42:06.949Z"}
                     isActive: true
                     deletedAt: null
                     address:
@@ -1679,6 +1688,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/Document'
 
+        '400':
+          description: 'Bad request. The request body could not be processed — for example, a `$date` value that cannot be read as a date (an ISO 8601 string, epoch milliseconds, or a `$numberLong` wrapper).'
         '404':
           $ref: '#/components/responses/CollectionNotFound'
 
@@ -1720,7 +1731,12 @@ paths:
 
     put:
       summary: Replace Document
-      description: "Replaces an existing document in a collection — the entire `content` object is overwritten with whatever you send. To update individual fields without replacing the whole document, use the Partially Update Documents endpoint instead."
+      description: |
+        Replaces an existing document in a collection — the entire `content` object is overwritten with whatever you send. To update individual fields without replacing the whole document, use the Partially Update Documents endpoint instead.
+
+        <Note>
+          **Note: storing dates.** To store a value as a date rather than text, wrap it in `$date` — for example `{"content": {"startDate": {"$date": "2026-01-01T00:00:00Z"}}}`. A plain ISO 8601 string is stored as text, and a value that cannot be read as a date is rejected with `400`. Dates are returned as ISO 8601 strings, not wrapped in `$date`. Because this overwrites the whole `content` object, a date you read from a document and send back unchanged is stored as text — re-wrap it in `$date`. See [Working with Dates](/portal/API-Reference/Product-APIs/App-DB#working-with-dates).
+        </Note>
       tags:
         - App DB API (Product)
       parameters:
@@ -1753,8 +1769,8 @@ paths:
                     count: 42
                     unitPriceDecimal: 9.99
                     conversionRateDouble: 0.3333333333333333
-                    startDate: "2026-06-24"
-                    createdAt: "2026-06-24T17:42:06.949Z"
+                    startDate: {"$date": "2026-06-24T00:00:00Z"}
+                    createdAt: {"$date": "2026-06-24T17:42:06.949Z"}
                     isActive: true
                     deletedAt: null
                     address:
@@ -1782,6 +1798,8 @@ paths:
                   campaignName: "Q2 Campaign"
                   region: "West"
                   status: "Inactive"
+        '400':
+          description: 'Bad request. The request body could not be processed — for example, a `$date` value that cannot be read as a date (an ISO 8601 string, epoch milliseconds, or a `$numberLong` wrapper).'
         '404':
           description: Not Found
           content:
@@ -1828,7 +1846,12 @@ paths:
   /api/datastores/v2/collections/{collectionId}/documents/bulk:
     post:
       summary: Bulk Create Documents
-      description: "Add multiple documents to a collection in a single request. Each document is limited to 2 MB."
+      description: |
+        Add multiple documents to a collection in a single request. Each document is limited to 2 MB.
+
+        <Note>
+          **Note: storing dates.** To store a value as a date rather than text, wrap it in `$date` — for example `{"content": {"startDate": {"$date": "2026-01-01T00:00:00Z"}}}`. A plain ISO 8601 string is stored as text, and a value that cannot be read as a date is rejected with `400`. Dates are returned as ISO 8601 strings, not wrapped in `$date`. See [Working with Dates](/portal/API-Reference/Product-APIs/App-DB#working-with-dates).
+        </Note>
       tags:
         - App DB API (Product)
       parameters:
@@ -1862,11 +1885,18 @@ paths:
               example:
                 Created: 2
 
+        '400':
+          description: 'Bad request. The request body could not be processed — for example, a `$date` value that cannot be read as a date (an ISO 8601 string, epoch milliseconds, or a `$numberLong` wrapper).'
         '404':
           $ref: '#/components/responses/CollectionNotFound'
     put:
       summary: Bulk Upsert Documents
-      description: "Insert or update multiple documents in a single request. Documents with a matching `id` are updated; documents without a matching `id` are created. Each document is limited to 2 MB."
+      description: |
+        Insert or update multiple documents in a single request. Documents with a matching `id` are updated; documents without a matching `id` are created. Each document is limited to 2 MB.
+
+        <Note>
+          **Note: storing dates.** To store a value as a date rather than text, wrap it in `$date` — for example `{"content": {"startDate": {"$date": "2026-01-01T00:00:00Z"}}}`. A plain ISO 8601 string is stored as text, and a value that cannot be read as a date is rejected with `400`. Dates are returned as ISO 8601 strings, not wrapped in `$date`. Because this overwrites the whole `content` object, a date you read from a document and send back unchanged is stored as text — re-wrap it in `$date`. See [Working with Dates](/portal/API-Reference/Product-APIs/App-DB#working-with-dates).
+        </Note>
       tags:
         - App DB API (Product)
       parameters:
@@ -1913,6 +1943,8 @@ paths:
                 Updated: 1
                 Created: 1
 
+        '400':
+          description: 'Bad request. The request body could not be processed — for example, a `$date` value that cannot be read as a date (an ISO 8601 string, epoch milliseconds, or a `$numberLong` wrapper).'
         '404':
           $ref: '#/components/responses/CollectionNotFound'
     delete:
@@ -1957,9 +1989,23 @@ paths:
         Returns the number of documents updated. Returns `0` if no documents matched — this is a successful response, not an error.
         `$setOnInsert` has no effect because AppDB partial updates do not perform upserts.
 
-        **Supported update operators:** `currentDate`, `inc`, `min`, `max`, `mul`, `rename`, `set`, `unset`, `addToSet`, `pop`, `pull`, `pullAll`, `push`
+        ## Supported update operators
 
-        **Supported modifiers:** `each`, `position`, `slice`, `sort`
+        `currentDate`, `inc`, `min`, `max`, `mul`, `rename`, `set`, `unset`, `addToSet`, `pop`, `pull`, `pullAll`, `push`
+
+        ## Supported modifiers
+
+        `each`, `position`, `slice`, `sort`
+
+        ## Storing dates
+
+        `$set` accepts a `$date` wrapper, so you can set a field to a real date without rewriting the whole document:
+        ```json
+        {"operation": {"$set": {"content.startDate": {"$date": "2026-01-01T00:00:00Z"}}}}
+        ```
+        `$currentDate` also stores a real date. Either way the field is then queryable with `$date` — see [Working with Dates](/portal/API-Reference/Product-APIs/App-DB#working-with-dates).
+
+        This is also the way to repair a field that was accidentally stored as text: `$set` it with a `$date` wrapper.
 
         See the [MongoDB Update Operators documentation](https://www.mongodb.com/docs/manual/reference/mql/update/) for details.
       tags:
@@ -2029,14 +2075,23 @@ paths:
   /api/datastores/v2/collections/{collectionId}/download:
     get:
       summary: Download Documents
-      description: >-
+      description: |
         Download documents in a collection as a JSON file (served with a
         `Content-Disposition: attachment` header). Each entry is a complete document object
         in the same shape accepted by Import Documents.
 
-        **Hard limit: returns at most 100 documents.** If the collection has more than 100 documents,
-        only the first 100 are returned with no error or warning. Use the List Documents endpoint with
-        `limit`/`offset` pagination to retrieve larger collections.
+        <Warning>
+          **Hard limit: returns at most 100 documents.** If the collection has more than 100 documents,
+          only the first 100 are returned with no error or warning. Use the List Documents endpoint with
+          `limit`/`offset` pagination to retrieve larger collections.
+        </Warning>
+
+        <Note>
+          **Note:** date fields are written out as ISO 8601 strings rather than `$date` wrappers, so
+          importing the file back stores them as text. Re-wrap those fields in `$date` before importing
+          if you need them to stay dates. See
+          [Working with Dates](/portal/API-Reference/Product-APIs/App-DB#working-with-dates).
+        </Note>
       tags:
         - App DB API (Product)
       parameters:
@@ -2058,13 +2113,22 @@ paths:
   /api/datastores/v2/collections/{collectionId}/documents/import:
     put:
       summary: Import Documents
-      description: >-
+      description: |
         Bulk-import complete document objects into a collection — the counterpart to Download
         Documents. Each item must be a full document (including its `id`); documents are
         **upserted by `id`**, so the original `id`, `createdOn`, and `owner` are preserved.
         This is the format produced by Download Documents, which makes the two endpoints a
         copy/restore pair. To add brand-new documents from raw content instead, use Create
         Document. Existing documents not present in the payload are left untouched.
+
+        <Warning>
+          **Warning: a download/import round trip turns dates into text.** Download Documents
+          returns dates as ISO 8601 strings, and an ISO 8601 string imports as text. Any field
+          that was stored as a date comes back as text unless you re-wrap it in `$date` before
+          importing — for example `{"content": {"startDate": {"$date": "2026-01-01T00:00:00Z"}}}`.
+          The field then stops matching `$date` queries, with no error. See
+          [Working with Dates](/portal/API-Reference/Product-APIs/App-DB#working-with-dates).
+        </Warning>
       tags:
         - App DB API (Product)
       parameters:
@@ -2128,9 +2192,23 @@ paths:
         Returns the number of documents updated. Returns `0` if no documents matched — this is a successful response, not an error.
         `$setOnInsert` has no effect because AppDB partial updates do not perform upserts.
 
-        **Supported update operators:** `currentDate`, `inc`, `min`, `max`, `mul`, `rename`, `set`, `unset`, `addToSet`, `pop`, `pull`, `pullAll`, `push`
+        ## Supported update operators
 
-        **Supported modifiers:** `each`, `position`, `slice`, `sort`
+        `currentDate`, `inc`, `min`, `max`, `mul`, `rename`, `set`, `unset`, `addToSet`, `pop`, `pull`, `pullAll`, `push`
+
+        ## Supported modifiers
+
+        `each`, `position`, `slice`, `sort`
+
+        ## Storing dates
+
+        `$set` accepts a `$date` wrapper, so you can set a field to a real date without rewriting the whole document:
+        ```json
+        {"operation": {"$set": {"content.startDate": {"$date": "2026-01-01T00:00:00Z"}}}}
+        ```
+        `$currentDate` also stores a real date. Either way the field is then queryable with `$date` — see [Working with Dates](/portal/API-Reference/Product-APIs/App-DB#working-with-dates).
+
+        This is also the way to repair a field that was accidentally stored as text: `$set` it with a `$date` wrapper.
 
         See the [MongoDB Update Operators documentation](https://www.mongodb.com/docs/manual/reference/mql/update/) for details.
       tags:

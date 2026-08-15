@@ -1,0 +1,99 @@
+## Working with Dates
+
+A field inside a document's `content` holds either a **date** or **text**, depending on how it was written — and in a query the two are not interchangeable. AppDB's own timestamps, `createdOn` and `updatedOn`, are always dates.
+
+### Storing a date
+
+Wrap the value in [`$date`](https://www.mongodb.com/docs/manual/reference/mongodb-extended-json/#mongodb-bsontype-Date):
+
+```json
+{"content": {"enrolledOn": {"$date": "1991-09-01T00:00:00Z"}}}
+```
+
+This works on every endpoint that writes content — create, replace, bulk create, bulk upsert, import, and `$set` in a partial update — and at any depth, including inside an array:
+
+```json
+{"content": {"terms": [{"startedOn": {"$date": "1991-09-01T00:00:00Z"}}]}}
+```
+
+Three value forms are accepted:
+
+| Form                    | Example                                      |
+| ----------------------- | -------------------------------------------- |
+| ISO 8601 string         | `{"$date": "1991-09-01T00:00:00Z"}`          |
+| Epoch milliseconds      | `{"$date": 683683200000}`                    |
+| Canonical Extended JSON | `{"$date": {"$numberLong": "683683200000"}}` |
+
+A date-only string such as `{"$date": "1991-09-01"}` is also accepted and is read as midnight UTC. A value that can't be read as a date is rejected with a `400` response.
+
+<Note>
+  **Note:** `$date` must be the object's only key. `{"$date": "1991-09-01T00:00:00Z", "note": "first year"}` is stored as an ordinary two-field object, not as a date.
+</Note>
+
+### Reading a date back
+
+Dates are returned as ISO 8601 strings, never wrapped in `$date`:
+
+```json
+{"content": {"enrolledOn": "1991-09-01T00:00:00.000Z"}}
+```
+
+<Warning>
+  **Warning: reading a document and writing it back turns its dates into text.** The value you read is a plain string, and a plain string is stored as text. Re-wrap every date field in `$date` before writing the document back, or those fields silently stop matching date queries.
+</Warning>
+
+### Querying a date
+
+Use the same `$date` syntax you would use on `createdOn` or `updatedOn`:
+
+```json
+{"content.enrolledOn": {"$gt": {"$date": "1992-08-30"}}}
+```
+
+### When a field holds text instead
+
+A plain ISO 8601 string is stored as text, not as a date — a field's type is never guessed from its contents. Text dates are still queryable: ISO 8601 sorts lexicographically in date order, so comparison operators work on them directly.
+
+```json
+{"content.signedUpOn": {"$gt": "1991-09-01"}}
+```
+
+If the stored values mix date-only (`YYYY-MM-DD`) and datetime (`YYYY-MM-DDTHH:MM:SSZ`) precision, lexicographic order stops being reliable. Convert at query time instead:
+
+```json
+{
+  "$expr": {
+    "$gt": [
+      {"$toDate": "$content.signedUpOn"},
+      {"$date": "1992-08-30"}
+    ]
+  }
+}
+```
+
+### Telling the two apart
+
+A date and a text date never match each other. `$date` finds only dates, string comparison finds only text, and querying across the two returns nothing regardless of the operator. There is no error — just an empty result.
+
+Use `$type` to see what a field actually holds:
+
+| Query                                         | If it returns documents                                |
+| --------------------------------------------- | ------------------------------------------------------ |
+| `{"content.enrolledOn": {"$type": "date"}}`   | the field is a date — use `$date`                      |
+| `{"content.enrolledOn": {"$type": "string"}}` | the field is text — use string comparison or `$toDate` |
+
+A single field can hold both across different documents, if some were written with `$date` and others with a plain string. Run both queries: if each returns documents, you have a mix.
+
+### Dates and DataSet sync
+
+Sync is a separate layer with looser rules. For a collection column typed `DATE` or `DATETIME`, all of the following sync to a real date in the DataSet:
+
+- a value written with `$date`
+- an ISO 8601 string in `YYYY-MM-DD` or `YYYY-MM-DDTHH:MM:SSZ` form
+- epoch milliseconds
+
+Writing date strings remains a supported way to feed a `DATE` column, so existing collections don't need to change.
+
+<Warning>
+  **Warning: a date in your DataSet does not mean a date in your collection.** A field written as a text string syncs as a real date, so it charts correctly in Domo while remaining text as far as AppDB queries are concerned. If a date range query returns nothing on a field that looks correct in the DataSet, check the field with `$type`.
+</Warning>

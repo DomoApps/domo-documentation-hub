@@ -1366,14 +1366,21 @@ paths:
         {"createdOn": {"$gt": {"$date": "2026-01-01"}}}
         ```
 
-        **Content date fields** are stored as whatever JSON primitive you write. An ISO 8601 string like `"2026-09-01T18:30:00Z"` is stored as a BSON String. Two approaches work:
+        **Content date fields** — to store a date, wrap the value in `$date` when you write the document:
+        ```json
+        {"content": {"startDate": {"$date": "2026-01-01T00:00:00Z"}}}
+        ```
+        Query it with the same `$date` syntax as a system date field:
+        ```json
+        {"content.startDate": {"$gt": {"$date": "2026-01-01"}}}
+        ```
+        Dates come back as ISO 8601 strings, for example `"2026-01-01T00:00:00.000Z"`. If you already have a timestamp in milliseconds, `{"$date": 1767225600000}` works too.
 
-        **String comparison** — ISO 8601 strings sort lexicographically in date order, so standard comparison operators work directly for both date-only (`YYYY-MM-DD`) and datetime (`YYYY-MM-DDTHH:MM:SSZ`) strings:
+        **A plain ISO 8601 string is stored as text, not a date.** Text dates are still queryable. ISO 8601 strings sort lexicographically in date order, so comparison operators work directly on them:
         ```json
         {"content.startDate": {"$gt": "2026-01-01"}}
         ```
-
-        **`$expr` + `$toDate`** — converts the string to a date at query time, enabling `$date` comparisons and handling mixed-precision strings correctly:
+        To compare text dates as dates — useful when the stored values mix date-only (`YYYY-MM-DD`) and datetime (`YYYY-MM-DDTHH:MM:SSZ`) precision — convert them at query time with `$toDate`:
         ```json
         {
           "$expr": {
@@ -1388,9 +1395,11 @@ paths:
         <Warning>
           **Mixing up these approaches produces wrong results without an error.**
 
-          Using `$date` against a content string field always returns empty — BSON DateTime never matches BSON String. Using plain string comparison against a system field like `createdOn` also always returns empty — BSON String never compares against BSON DateTime regardless of the operator used.
+          `$date` only matches a field stored as a date, and string comparison only matches a field stored as text. Querying across the two always returns empty, whatever the operator you use.
 
-          To confirm the stored type of any field, use the `$type` operator. If `{"someField": {"$type": "date"}}` returns documents, use `$date` syntax. If `{"someField": {"$type": "string"}}` returns documents, use string comparison or `$expr` + `$toDate`.
+          To check how a field is stored, use `$type`. If `{"someField": {"$type": "date"}}` returns documents, use `$date` syntax. If `{"someField": {"$type": "string"}}` returns documents, use string comparison or `$toDate`.
+
+          One content field can hold both across different documents, if some were written with `$date` and others with a plain string. `$type` is how you tell them apart.
         </Warning>
 
         **Aggregation examples**

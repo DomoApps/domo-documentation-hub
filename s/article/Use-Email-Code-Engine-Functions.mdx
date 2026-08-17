@@ -1,0 +1,258 @@
+---
+title: "Use Email Code Engine Functions"
+excerpt: "Choose and configure the right email function from Code Engine's Domo Notifications package to send styled emails to Domo users, Groups, and external addresses from a Workflow."
+---
+
+## Intro
+
+This article explains how to choose the right email function from the Domo Notifications package, configure its inputs, and send styled emails to Domo users, Domo Groups, and external addresses from a Workflow.
+
+The package provides several focused email functions—one for each common recipient type, plus a flexible catch-all—and every function produces the same clean, styled email.
+
+---
+
+## Required Grants
+
+To create and manage Code Engine packages, the following grants must be enabled for your role:
+
+- **Manage Code Engine Packages —** Allows you to perform any action on any Code Engine package in the instance. This grant should be given to admins or anyone who helps manage Code Engine.
+- **Create Code Engine Packages —** Allows you to create a new Code Engine package. This grant should be given to anyone who needs to create and add new function packages to the Code Engine repository in your instance.
+
+The email functions belong to a global package that Domo maintains, so you don't need either grant to use them. Anyone with access to Code Engine and Execute permission on the package can call these functions from a Workflow. Contact your Domo account team to enable Code Engine grants for your instance.
+
+Learn more about [grants](/s/article/360043438973).
+
+## Access the Domo Notifications Package
+
+The email functions are part of the **Domo Notifications** package, one of the global packages Domo maintains in the Code Engine library. Because it's a global package, it's available to anyone with access to Code Engine, so you don't need to create or import anything.
+
+There are two ways to use these functions:
+
+- **In a Workflow (most common) —** Add a Code Engine function step, select the **Domo Notifications** package, and choose the email function you need. The step's configuration panel displays the function's inputs so you can map your Workflow Variables to them.
+- **Directly in Code Engine —** Open the **Domo Notifications** package from the Code Engine repository list to review a function's inputs and run it with test values.
+
+For the mechanics of mapping Variables and running functions, see [Code Engine](/s/article/000005173). To build the Workflow that calls a function, see [Create a Workflow](/s/article/000005331).
+
+## Choose the Right Email Function
+
+Start with the shape of your recipient list, then pick the narrowest function that fits. Choosing the most specific function keeps your Workflow readable and its configuration minimal.
+
+| Your goal                                                | Recipients                                    | Use this function         |
+| -------------------------------------------------------- | --------------------------------------------- | ------------------------- |
+| Email one Domo user                                      | A single Domo user                            | `sendEmailToPerson`       |
+| Email several Domo users                                 | Multiple Domo users                           | `sendEmailToPeople`       |
+| Email everyone in one Domo Group                         | A single Domo Group                           | `sendEmailToGroup`        |
+| Email everyone across several Domo Groups                | Multiple Domo Groups                          | `sendEmailToGroups`       |
+| Email a plain list of addresses inside your organization | Internal email addresses                      | `sendEmailToListOfEmails` |
+| Email recipients outside your organization safely        | External email addresses (allowlist-enforced) | `sendExternalEmail`       |
+| Email a mix of addresses, users, and Groups in one send  | Any combination of the above                  | `sendEmailToAnyEntity`    |
+| Build your own recipient logic or need the most control  | Any combination of the above                  | `sendEmail`               |
+
+<Tip>**Tip:** `sendEmail` is the core function that every other email function relies on. The other functions are focused shortcuts around it, so reach for a shortcut first and use `sendEmail` only when you need its full flexibility.</Tip>
+
+## Understand the Common Inputs
+
+Every function in the package shares the same set of optional inputs, described once here. Each function's reference table below lists them again so that each table stands on its own.
+
+| Input             | Type       | Description                                                                                           |
+| ----------------- | ---------- | ----------------------------------------------------------------------------------------------------- |
+| `subject`         | `Text`     | Subject line of the email.                                                                            |
+| `body`            | `Text`     | The message content. Supports HTML; the function wraps it in Domo's styled email layout.              |
+| `attachment`      | `Number`   | A single Domo file ID to attach.                                                                      |
+| `attachments`     | `Number[]` | A list of Domo file IDs to attach.                                                                    |
+| `includeReplyAll` | `Boolean`  | When true, all recipients are copied so that a reply goes to everyone (reply-all). Defaults to false. |
+
+<Note>**Note:** A file ID is the numeric ID of a file stored in Domo, such as a file produced by an earlier step in your Workflow. Use `attachment` for a single file and `attachments` for several.</Note>
+
+## Review the Email Functions
+
+Each function below leads with the goal it serves, the recipient types it accepts, its full list of inputs, and its return value. The `Type` column uses Code Engine data types; a `[]` suffix means the input is a list of that type.
+
+### sendEmailToPerson
+
+Sends an email to a single Domo user in your instance. For example, email the assigned reviewer the moment a request lands in an approval Workflow.
+
+**Best for**: A clean, minimal call when you already have one specific Domo user in mind and don't want to manage lists.
+
+| Parameter         | Type       | Required | Description                                                     | Example                                   |
+| ----------------- | ---------- | -------- | --------------------------------------------------------------- | ----------------------------------------- |
+| `person`          | `Person`   | Yes      | A single Domo user, identified by their Domo user profile.      | `assignedReviewer`                        |
+| `subject`         | `Text`     | No       | Subject line of the email.                                      | `"A request needs your review"`           |
+| `body`            | `Text`     | No       | The message content. Supports HTML.                             | `"<p>A new request is awaiting you.</p>"` |
+| `attachments`     | `Number[]` | No       | A list of Domo file IDs to attach.                              | `[102394, 102395]`                        |
+| `attachment`      | `Number`   | No       | A single Domo file ID to attach.                                | `102394`                                  |
+| `includeReplyAll` | `Boolean`  | No       | Whether to copy all recipients on the email. Defaults to false. | `false`                                   |
+
+**Output**: `true` if the email sent successfully, `false` otherwise.
+
+### sendEmailToPeople
+
+Sends the same email to a list of Domo users at once. For example, notify every member of a project team when a DataSet they depend on finishes refreshing.
+
+**Best for**: Sending to several known Domo users in your instance without building each recipient by hand.
+
+| Parameter         | Type       | Required | Description                                                       | Example                                 |
+| ----------------- | ---------- | -------- | ----------------------------------------------------------------- | --------------------------------------- |
+| `people`          | `Person[]` | Yes      | A list of Domo users, each identified by their Domo user profile. | `projectMembers`                        |
+| `subject`         | `Text`     | No       | Subject line of the email.                                        | `"Your data is ready"`                  |
+| `body`            | `Text`     | No       | The message content. Supports HTML.                               | `"<p>The nightly refresh is done.</p>"` |
+| `attachments`     | `Number[]` | No       | A list of Domo file IDs to attach.                                | `[102394]`                              |
+| `attachment`      | `Number`   | No       | A single Domo file ID to attach.                                  | `102394`                                |
+| `includeReplyAll` | `Boolean`  | No       | Whether to copy all recipients on the email. Defaults to false.   | `true`                                  |
+
+**Output**: `true` if the email sent successfully, `false` otherwise.
+
+### sendEmailToGroup
+
+Sends an email to every member of a single Domo Group. A Domo Group is a pre-defined collection of users managed in your instance, similar to a distribution list. For example, email the entire Finance Group when a month-end report publishes.
+
+**Best for**: Reaching recipients who are already organized into a Group, so you don't have to maintain an individual user list.
+
+| Parameter         | Type       | Required | Description                                                                          | Example                             |
+| ----------------- | ---------- | -------- | ------------------------------------------------------------------------------------ | ----------------------------------- |
+| `group`           | `Group`    | Yes      | A Domo Group—a pre-defined collection of Domo users, similar to a distribution list. | `Finance`                           |
+| `subject`         | `Text`     | No       | Subject line of the email.                                                           | `"Month-end report is live"`        |
+| `body`            | `Text`     | No       | The message content. Supports HTML.                                                  | `"<p>The report is published.</p>"` |
+| `attachments`     | `Number[]` | No       | A list of Domo file IDs to attach.                                                   | `[102394]`                          |
+| `attachment`      | `Number`   | No       | A single Domo file ID to attach.                                                     | `102394`                            |
+| `includeReplyAll` | `Boolean`  | No       | Whether to copy all recipients on the email. Defaults to false.                      | `false`                             |
+
+**Output**: `true` if the email sent successfully, `false` otherwise.
+
+### sendEmailToGroups
+
+The multi-Group version of `sendEmailToGroup`. Sends the same email to every member across multiple Domo Groups at once. For example, email both the Finance and Operations Groups when a shared budget updates.
+
+**Best for**: An audience that spans several pre-defined Groups in Domo.
+
+| Parameter         | Type       | Required | Description                                                                                         | Example                            |
+| ----------------- | ---------- | -------- | --------------------------------------------------------------------------------------------------- | ---------------------------------- |
+| `groups`          | `Group[]`  | Yes      | A list of Domo Groups, each a pre-defined collection of Domo users, similar to a distribution list. | `[Finance, Operations]`            |
+| `subject`         | `Text`     | No       | Subject line of the email.                                                                          | `"Shared budget updated"`          |
+| `body`            | `Text`     | No       | The message content. Supports HTML.                                                                 | `"<p>The budget has changed.</p>"` |
+| `attachments`     | `Number[]` | No       | A list of Domo file IDs to attach.                                                                  | `[102394]`                         |
+| `attachment`      | `Number`   | No       | A single Domo file ID to attach.                                                                    | `102394`                           |
+| `includeReplyAll` | `Boolean`  | No       | Whether to copy all recipients on the email. Defaults to false.                                     | `true`                             |
+
+**Output**: `true` if the email sent successfully, `false` otherwise.
+
+### sendEmailToListOfEmails
+
+Sends the same email to a plain list of email addresses by looping through the list. For example, send a status summary to a fixed set of internal addresses that aren't tied to Domo Groups.
+
+**Best for**: A simple list of email addresses when you want to send the same message to all of them.
+
+| Parameter         | Type       | Required | Description                                                     | Example                                   |
+| ----------------- | ---------- | -------- | --------------------------------------------------------------- | ----------------------------------------- |
+| `to`              | `Text[]`   | Yes      | A list of recipient email addresses.                            | `["dana@example.com", "sam@example.com"]` |
+| `subject`         | `Text`     | No       | Subject line of the email.                                      | `"Weekly status summary"`                 |
+| `body`            | `Text`     | No       | The message content. Supports HTML.                             | `"<p>Here is this week's summary.</p>"`   |
+| `attachments`     | `Number[]` | No       | A list of Domo file IDs to attach.                              | `[102394]`                                |
+| `attachment`      | `Number`   | No       | A single Domo file ID to attach.                                | `102394`                                  |
+| `includeReplyAll` | `Boolean`  | No       | Whether to copy all recipients on the email. Defaults to false. | `false`                                   |
+
+**Output**: None.
+
+<Warning>**Important:** Unlike the other email functions, `sendEmailToListOfEmails` does not return a value, so a Workflow can't confirm whether the send succeeded or branch on the result. If you need to know whether the email sent, use `sendEmailToPeople` or `sendEmailToAnyEntity` instead.</Warning>
+
+### sendExternalEmail
+
+Sends an email to recipients outside your organization, but only to addresses whose domain has been pre-approved in your instance's authorized domains list. It automatically filters out any recipients whose domains aren't on the allowlist, protecting against accidental messaging to unauthorized parties. For example, send an order confirmation to a customer's email address while guaranteeing that messages only reach approved external domains.
+
+**Best for**: Emailing people outside your organization when you need the safety of domain allowlisting.
+
+| Parameter         | Type       | Required | Description                                                     | Example                              |
+| ----------------- | ---------- | -------- | --------------------------------------------------------------- | ------------------------------------ |
+| `to`              | `Text[]`   | Yes      | A list of external recipient email addresses.                   | `["client@partner.com"]`             |
+| `subject`         | `Text`     | No       | Subject line of the email.                                      | `"Your order is confirmed"`          |
+| `body`            | `Text`     | No       | The message content. Supports HTML.                             | `"<p>Thank you for your order.</p>"` |
+| `attachments`     | `Number[]` | No       | A list of Domo file IDs to attach.                              | `[102394]`                           |
+| `attachment`      | `Number`   | No       | A single Domo file ID to attach.                                | `102394`                             |
+| `includeReplyAll` | `Boolean`  | No       | Whether to copy all recipients on the email. Defaults to false. | `false`                              |
+
+**Output**: `true` if the email sent successfully, `false` if it failed or no recipients had authorized domains.
+
+<Note>**Note:** Recipients whose domains aren't on your instance's authorized domains list are removed silently, without an error. Confirm that every domain you intend to reach is on the allowlist. Contact your Domo account team to review or update your authorized domains.</Note>
+
+### sendEmailToAnyEntity
+
+A flexible, all-in-one function that lets you mix and match any combination of raw email addresses, individual Domo users, and Domo Groups in a single send. For example, email a project's owner, the wider stakeholders Group, and an external auditor's address in one request. This makes it one of the most flexible email functions in the package and an ideal choice when your recipient list is mixed or comes from different sources.
+
+**Best for**: A recipient list that combines addresses, users, and Groups, or one assembled from several different sources.
+
+| Parameter         | Type       | Required               | Description                                                                                 | Example                               |
+| ----------------- | ---------- | ---------------------- | ------------------------------------------------------------------------------------------- | ------------------------------------- |
+| `recipientEmail`  | `Text`     | At least one recipient | A single recipient email address.                                                           | `"auditor@partner.com"`               |
+| `recipientEmails` | `Text[]`   | At least one recipient | A list of recipient email addresses.                                                        | `["dana@example.com"]`                |
+| `person`          | `Person`   | At least one recipient | A single Domo user, identified by their Domo user profile.                                  | `projectOwner`                        |
+| `people`          | `Person[]` | At least one recipient | A list of Domo users, each identified by their Domo user profile.                           | `projectMembers`                      |
+| `group`           | `Group`    | At least one recipient | A single Domo Group—a pre-defined collection of Domo users, similar to a distribution list. | `Stakeholders`                        |
+| `groups`          | `Group[]`  | At least one recipient | A list of Domo Groups, each a pre-defined collection of Domo users.                         | `[Finance, Operations]`               |
+| `subject`         | `Text`     | No                     | Subject line of the email.                                                                  | `"Project status"`                    |
+| `body`            | `Text`     | No                     | The message content. Supports HTML.                                                         | `"<p>Here is the latest update.</p>"` |
+| `attachment`      | `Number`   | No                     | A single Domo file ID to attach.                                                            | `102394`                              |
+| `attachments`     | `Number[]` | No                     | A list of Domo file IDs to attach.                                                          | `[102394, 102395]`                    |
+| `includeReplyAll` | `Boolean`  | No                     | Whether to copy all recipients on the email. Defaults to false.                             | `false`                               |
+
+<Warning>**Important:** Provide at least one recipient input—`recipientEmail`, `recipientEmails`, `person`, `people`, `group`, or `groups`—or the function throws an error.</Warning>
+
+**Output**: `true` if the email sent successfully, `false` otherwise.
+
+### sendEmail
+
+The core function that all other email functions rely on. It sends a styled, formatted email to one or more recipients and supports email addresses, Domo users, and Domo Groups at the same time, wrapping your message in an HTML layout automatically. For example, build a single notification step that reaches a support address, an on-call Domo user, and an escalation Group together.
+
+**Best for**: Full control over a mixed recipient list, or building your own recipient logic on top of the function every shortcut is based on.
+
+| Parameter          | Type       | Required               | Description                                                                                  | Example                                  |
+| ------------------ | ---------- | ---------------------- | -------------------------------------------------------------------------------------------- | ---------------------------------------- |
+| `recipientEmails`  | `Text`     | At least one recipient | Email address or addresses of recipients.                                                    | `"support@example.com"`                  |
+| `personRecipients` | `Person[]` | At least one recipient | A list of Domo users, identified by their Domo user profile, to send the email to.           | `[onCallEngineer]`                       |
+| `groupRecipients`  | `Group[]`  | At least one recipient | A list of Domo Groups—pre-defined collections of users managed in Domo—to send the email to. | `[Escalation]`                           |
+| `subject`          | `Text`     | No                     | Subject line of the email.                                                                   | `"System alert"`                         |
+| `body`             | `Text`     | No                     | The message content. Supports HTML.                                                          | `"<p>A system alert was triggered.</p>"` |
+| `attachments`      | `Number[]` | No                     | A list of Domo file IDs to attach.                                                           | `[102394, 102395]`                       |
+| `attachment`       | `Number`   | No                     | A single Domo file ID to attach.                                                             | `102394`                                 |
+| `includeReplyAll`  | `Boolean`  | No                     | Whether to include all recipients in the reply-all headers.                                  | `false`                                  |
+
+<Warning>**Important:** Provide at least one of `recipientEmails`, `personRecipients`, or `groupRecipients`, or the function throws an error.</Warning>
+
+**Output**: `true` if the email sent successfully, `false` if it failed.
+
+## FAQ
+
+<AccordionGroup>
+
+<Accordion title="Which email function should I use?">
+  Start with the shape of your recipient list and pick the narrowest function that fits, using the [Choose the Right Email Function](#choose-the-right-email-function) table. Use a focused function such as `sendEmailToPerson` or `sendEmailToGroup` when your recipients are all one type, and `sendEmailToAnyEntity` or `sendEmail` when the list is mixed.
+</Accordion>
+
+<Accordion title="Do my recipients need Domo accounts?">
+  It depends on the input. The `person`, `people`, `group`, and `groups` inputs (and their `sendEmail` equivalents) reference Domo users and Domo Groups in your instance, so those recipients must exist in Domo. The email-address inputs—`to`, `recipientEmail`, and `recipientEmails`—accept any address and don't require a Domo account.
+</Accordion>
+
+<Accordion title="How do I email recipients outside my organization?">
+  Use `sendExternalEmail`. It sends only to addresses whose domain is on your instance's authorized domains list and silently filters out the rest. Contact your Domo account team to review or update your authorized domains.
+</Accordion>
+
+<Accordion title="How do I attach a file?">
+  Pass a Domo file ID to the `attachment` input for a single file, or a list of file IDs to the `attachments` input for several. A file ID is the numeric ID of a file stored in Domo, such as one produced by an earlier step in your Workflow.
+</Accordion>
+
+<Accordion title="How do I know whether the email sent?">
+  Most functions return `true` if the send succeeded and `false` if it failed, so your Workflow can branch on the result. The exception is `sendEmailToListOfEmails`, which returns nothing. If you need confirmation of success, use `sendEmailToPeople` or `sendEmailToAnyEntity` instead.
+</Accordion>
+
+<Accordion title="Can I format the email body with HTML?">
+  Yes. The `body` input supports HTML, and the function wraps it in Domo's styled email layout so every message arrives in the same clean, consistent format.
+</Accordion>
+
+</AccordionGroup>
+
+## Related Articles
+
+- [Code Engine](/s/article/000005173)
+- [Workflows | Overview](/s/article/000005108)
+- [Workflows | Reference](/s/article/000005797)
+- [Create a Workflow](/s/article/000005331)
+- [Manage Workflows](/s/article/000005179)

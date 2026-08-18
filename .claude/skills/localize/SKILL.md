@@ -14,14 +14,24 @@ The user has provided: $ARGUMENTS
 
 ## Step 0: Retrospective — learn from merged corrections first
 
-**Before translating anything, invoke the `localization-retrospective` skill.** After articles are
-localized by this skill they are human-corrected in a CAT tool and returned as merged PRs; the
-retrospective folds those corrections back into the deterministic glossaries so this run benefits
-from everything learned so far.
+**This is the automatic first action every time this skill runs.** Before anything else — before
+reading the style guide, identifying the article, or asking the article-type questions — ask the
+user this single question and act on the answer:
 
-Invoke the `localization-retrospective` skill. It will ask the user which PR(s) to analyze and
-accepts "none". If the user has no corrected PRs to analyze (the expected state until the Japanese
-correction loop is running), it exits cleanly and you continue to the style guide below.
+> **Would you like to run a translation retrospective first? After articles are localized here they
+> are human-corrected in a CAT tool and returned as merged PRs; a retrospective folds those
+> corrections into the deterministic glossaries so this translation benefits from them. If yes,
+> which merged PR(s) should I analyze? If no, I'll continue with the localization.**
+
+- **If the user names PR(s):** invoke the `localization-retrospective` skill, passing those PR
+  number(s) as its arguments. Let it run to completion (it updates `localization/glossary/<lang>.csv`),
+  then continue to the style guide below so this run uses the freshly updated glossary.
+- **If the user declines** (no / skip / "just translate"): do not invoke the retrospective; continue
+  directly to the style guide below.
+
+Do not skip asking. It won't be needed every run — especially early, before the Japanese correction
+loop has produced any merged PRs — but the question is how this skill always begins, so the user is
+reminded of the learning loop and can feed corrections back the moment they exist.
 
 ---
 

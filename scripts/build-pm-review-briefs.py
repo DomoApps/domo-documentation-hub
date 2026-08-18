@@ -5,8 +5,16 @@ Build per-PM review briefs for KB restructure PM meetings.
 Reads:
   - Article-PM-Ownership-Reference.mdx  (PM → feature → article mapping)
   - _gaps_with_support.json              (community forum gap analysis)
+  - RESTRUCTURE-MANIFEST.md              (canonical Phase 3a-Forum written +
+                                          deferred article tables — source of truth)
+  - s/article/*.mdx                      (scanned for embedded [pm-input] markers)
 
 Outputs one .md file per PM in pm-review-briefs/.
+
+The Phase 3a-Forum data (which new articles were written vs. deferred, and which
+drafted articles still carry open [pm-input] placeholders) is NOT hardcoded here —
+it is parsed from RESTRUCTURE-MANIFEST.md and the article files themselves so the
+briefs can never drift from the manifest. See parse_manifest_forum_* below.
 
 Each brief has four sections:
   1. Content reorganization — how the PM's features map to the new pillars
@@ -27,6 +35,8 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).parent.parent
 OWNERSHIP_FILE = REPO_ROOT / "Article-PM-Ownership-Reference.mdx"
 GAPS_FILE = REPO_ROOT / "_gaps_with_support.json"
+MANIFEST_FILE = REPO_ROOT / "RESTRUCTURE-MANIFEST.md"
+ARTICLE_DIR = REPO_ROOT / "s" / "article"
 OUTPUT_DIR = REPO_ROOT / "pm-review-briefs"
 
 # Features excluded from PM briefs entirely — their articles are outside
@@ -141,53 +151,30 @@ STRUCTURAL_NOTES = {
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# ARTICLE CHECKPOINTS — specific open items flagged during article writing
+# MANIFEST PM-INPUT FLAGS — cross-cutting items with no article marker
 #
-# These are [pm-input] comments embedded in article files that need a PM answer
-# before the placeholder can be replaced with final content. They are rendered
-# as explicit Markdown checkboxes (- [ ]) in Section 3d of the PM brief so they
-# can't be accidentally skimmed over.
+# Open [pm-input] questions embedded in article files are picked up automatically
+# by scan_article_pm_inputs() (below). This constant is ONLY for manifest-recorded
+# PM-input flags that are NOT tied to a single article's inline marker and therefore
+# cannot be scanned — e.g. a link issue spanning several files.
 #
-# To add a new checkpoint: append a tuple to the PM's list.
-# Format: (article_filename, specific_ask, estimated_effort)
+# Source: RESTRUCTURE-MANIFEST.md › Phase 3a › "PM input flag (add to Phase 4.5 briefs)"
+# Format: {pm_name: [(scope_label, ask), ...]}
 # ─────────────────────────────────────────────────────────────────────────────
 
-ARTICLE_CHECKPOINTS = {
-    "Phil Fuchs": [
+MANIFEST_PM_INPUT_FLAGS = {
+    # Getting Started role articles all link to the same `data-consumer-training`
+    # eLearning URL. No single article carries a [pm-input] marker for this, so it
+    # is tracked here. Routed to Jordan Jensen, who owns Education + Onboarding.
+    "Jordan Jensen": [
         (
-            "Beast-Mode-Window-Functions.mdx",
-            "Confirm the supported workaround for filtering on window function results. "
-            "Because Beast Mode window functions are evaluated after chart aggregation, they "
-            "cannot be used as chart Filters. A workaround exists but has not been confirmed "
-            "for documentation. Options likely include: materialize the calculation in Magic "
-            "ETL before bringing into Analyzer; restructure the formula to avoid a "
-            "post-aggregation filter; or other. Please provide the confirmed steps — the FAQ "
-            "accordion in the article has a `[pm-input]` placeholder waiting to be replaced.",
-            "15 min",
-        ),
-        (
-            "Beast-Mode-Window-Functions.mdx",
-            "Review the article for accuracy and completeness. Published 2026-07-15 as the "
-            "#1 Critical gap from community forum analysis. Covers RANK/DENSE_RANK, LAG/LEAD, "
-            "SUM(SUM(x)) OVER running totals, and Top N + Others. Focus especially on whether "
-            "the double-aggregate syntax description is correct and whether any window function "
-            "behaviors have changed recently.",
-            "30 min",
+            "Getting Started role articles — eLearning course URLs",
+            "All Getting Started role articles (Admins, App Builders, Data Engineers, "
+            "Developers) currently link to the same `data-consumer-training` eLearning "
+            "course URL, which is likely wrong for non-consumer roles. Confirm the correct "
+            "course URL for each role (coordinate with the Education / Domo University team).",
         ),
     ],
-    # eLearning course URL placeholder — assign to the Education team PM once confirmed
-    # "TBD — Education team": [
-    #     ("Getting-Started-for-Admins.mdx",
-    #      "Confirm the correct eLearning course URL for Admin roles. Currently all four "
-    #      "Getting Started role articles link to the same 'data-consumer-training' URL.",
-    #      "5 min"),
-    #     ("Getting-Started-for-App-Builders.mdx",
-    #      "Confirm the correct eLearning course URL for App Builder roles.", "5 min"),
-    #     ("Getting-Started-for-Data-Engineers.mdx",
-    #      "Confirm the correct eLearning course URL for Data Engineer roles.", "5 min"),
-    #     ("Getting-Started-for-Developers.mdx",
-    #      "Confirm the correct eLearning course URL for Developer roles.", "5 min"),
-    # ],
 }
 
 
@@ -338,147 +325,14 @@ PHASE3A_PM_ARTICLES = [
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# PHASE 3a-FORUM — NEW ARTICLES FROM FORUM GAP ANALYSIS → OWNING PM
+# PHASE 3a-FORUM — NEW ARTICLES FROM FORUM GAP ANALYSIS
+#
+# The written vs. deferred split is NOT hardcoded. It is parsed at run time from
+# RESTRUCTURE-MANIFEST.md by parse_manifest_forum_written() (the "Net-New Articles"
+# table — articles already drafted, needing fact-check) and
+# parse_manifest_forum_deferred() (the "Deferred to PM Briefs" table — articles that
+# cannot be written without PM input). This guarantees the briefs match the manifest.
 # ─────────────────────────────────────────────────────────────────────────────
-
-FORUM_NEW_CRITICAL = [
-    # (rank, filename, topic_summary, owning_pm, fact_check_needed)
-    (1,  "Beast-Mode-Window-Functions.mdx",
-         "RANK/DENSE_RANK, LAG/LEAD, SUM(SUM(x)) OVER running totals, Top N + Others; 'can't filter by window function' limitation and workarounds",
-         "Phil Fuchs",
-         "Confirm window function behavior; verify 'filter limitation' is still accurate and not a known roadmap item; review worked examples"),
-    (6,  "Workflows-Write-Data-Back.mdx",
-         "Append / Multiline Append / AppDB write from Workflows; dynamic row handling",
-         "Ryan Despain",
-         "Confirm Append vs Multiline Append semantics; AppDB write path; any limits on dynamic rows"),
-    (7,  "Activity-Log-Event-Reference.mdx",
-         "All Activity Log event types defined: VIEWED vs EXPORTED vs DOWNLOADED; DomoStats field mapping",
-         "Dan Brinton",
-         "Verify the full event type list is current; confirm DomoStats field names and mapping; check for any recently added event types"),
-    (9,  "Restore-a-Deleted-Dashboard.mdx",
-         "No self-service restore; contact support path; prevention via snapshot/copy",
-         "Chris Wright",
-         "Confirm no self-service restore exists; verify current support escalation path; check if Admin tools added recovery options"),
-    (11, "Beast-Mode-for-Spreadsheet-Users.mdx",
-         "IF→CASE, SUMIF→SUM(CASE), VLOOKUP→ETL join translation guide; no stacked IF, no volatile functions",
-         "Phil Fuchs",
-         "Verify translation examples are accurate; confirm 'no stacked IF' limitation; review function mapping completeness"),
-]
-
-FORUM_NEW_HIGH = [
-    # (rank, filename, topic_summary, owning_pm)
-    (13,  "Workflows-Package-Administration.mdx",
-          "Domo Users / DataSet package functions: assign roles, manage owners, set attributes via Workflows",
-          "Ryan Despain"),
-    (14,  "Dataset-Column-Rename-Impact.mdx",
-          "Renaming a dataset/dataflow column silently breaks card filters, sorts, and downstream references — safe rename procedure",
-          "Jordan Jensen"),
-    (17,  "Embed-Domo-in-Third-Party-Platforms.mdx",
-          "Confluence, NetSuite, HubSpot, SharePoint, Salesforce embed methods and iframe constraints",
-          "Mamta Bolaki"),
-    (21,  "Filter-Funnel-and-PDP-Shield-Icons.mdx",
-          "Hiding/showing the filter funnel and PDP shield on cards; page-variable behavior; Admin setting",
-          "Ryan Despain"),
-    (22,  "Filtering-on-Null-and-Empty-Values.mdx",
-          "NULL vs empty string; IS NULL filter; NOT IN behavior; Beast Mode IFNULL workarounds",
-          "Phil Fuchs"),
-    (25,  "Card-Refresh-Timing-After-Dataset-Update.mdx",
-          "How long cards take to reflect dataset changes; cache warm-up; force-refresh approach",
-          "Chris Wright"),
-    (26,  "DomoStats-vs-Governance-Datasets-Connector.mdx",
-          "When to use DomoStats connector vs Domo Governance Datasets connector; field-level reference; deprecation status",
-          "Dan Brinton"),
-    (27,  "Trigger-Workbench-from-External-Scripts.mdx",
-          "`wb.exe` CLI command syntax; triggering a Workbench job from Task Scheduler or CI scripts",
-          "Tasleema Lallmamode"),
-    (28,  "Embedded-Dashboard-Unfiltered-Data-Flash.mdx",
-          "Why embedded/public-share dashboards briefly show unfiltered data on load; SSO and PDP timing fix",
-          "Mamta Bolaki"),
-    (32,  "Connecting-Unsupported-Data-Sources.mdx",
-          "No native connector options: JSON No Code, HTTP connector, SFTP, Workbench ODBC, custom connector builder",
-          "Tasleema Lallmamode"),
-    (33,  "Zero-Fill-Missing-Date-Gaps-in-Charts.mdx",
-          "Date densification in Magic ETL; zero-filling time series; empty pivot rows; calendar join pattern",
-          "Andrea Henderson"),
-    (44,  "Dataset-Archived-Lifecycle-State.mdx",
-          "What the 'archived/not accessed' state means; how it blocks AI Readiness lineage; how to reactivate",
-          "Jordan Jensen"),
-    (47,  "Troubleshoot-Cards-Not-Updating.mdx",
-          "Cards showing stale data after dataset refresh; color rules not applying; cache and permission causes",
-          "Chris Wright"),
-    (49,  "Period-over-Period-Calculations.mdx",
-          "Prev week / prev month / prior year / year-boundary calculations in Beast Mode and Magic ETL; worked examples",
-          "Phil Fuchs"),
-    (50,  "Write-Data-from-Pro-Code-Apps-to-AppDB.mdx",
-          "Writing back to AppDB collections from DDX Bricks / Pro-Code apps; sync to dataset; schema requirements",
-          "Khushboo"),
-    (55,  "Incremental-Ingestion-and-Lastvalue.mdx",
-          "`lastvalue` parameter default, behavior, and edge cases; late-arriving and deleted source record handling",
-          "Tasleema Lallmamode"),
-    (56,  "Dataset-Column-Character-Limits.mdx",
-          "~1,024 char text column limit; truncation of base64 images, JSON payloads, LLM output; workarounds",
-          "Jordan Jensen"),
-    (57,  "Pivot-Table-Census-Calendar-Join.mdx",
-          "Date-range / calendar join pattern for length-of-visit / census modeling",
-          "Andrea Henderson"),
-    (61,  "Plot-Two-Date-Columns-on-One-Axis.mdx",
-          "Data reshaping in Magic ETL to plot two date columns on a shared time axis",
-          "Andrea Henderson"),
-    (62,  "Data-Allocation-Split-Credit-in-ETL.mdx",
-          "Reproducing proportional allocation / split-credit mapping in Magic ETL",
-          "Andrea Henderson"),
-    (64,  "Request-Access-Behavior.mdx",
-          "How 'Request Access' and 'Request More Access' buttons work; who receives the request; admin configuration",
-          "Dan Brinton"),
-    (66,  "Troubleshoot-Office-PowerPoint-Add-In.mdx",
-          "Connection failures, authentication errors, stale refresh; installation prerequisites",
-          "Khushboo"),
-    (69,  "Dashboard-Editor-Unresponsive-Multi-Select-Filter.mdx",
-          "Dashboard editor hangs caused by misconfigured multi-select filter card; diagnosis and fix",
-          "Chris Wright"),
-    (71,  "Drill-to-Final-Data-Security.mdx",
-          "What 'Drill to Final Data' exposes; detecting it is enabled; securing the master dataset",
-          "Ryan Despain"),
-    (77,  "Time-Interval-Bucketing-and-Dedup.mdx",
-          "Assigning records to time buckets; deduplication within a window; Beast Mode vs Magic ETL approach",
-          "Phil Fuchs"),
-    (81,  "Schedule-Enterprise-Dataset-Copy.mdx",
-          "Configuring a specific run time for Enterprise Dataset Copy jobs (not just 'run now')",
-          "Jordan Jensen"),
-    (82,  "Manage-Dataset-Error-Alerts.mdx",
-          "Turning off / bulk-removing 'Error Loading Data' alerts after archiving or deleting datasets",
-          "Jordan Jensen"),
-    (83,  "Host-Images-for-Domo-Apps.mdx",
-          "data-files URL pattern for storing and referencing internal images in Domo Apps and ETL",
-          "Khushboo"),
-    (84,  "GA4-BigQuery-Daily-Table-Nested-Data.mdx",
-          "GA4 connector daily-table sprawl; unnesting `event_params`; BigQuery date-partitioned table approach",
-          "Tasleema Lallmamode"),
-    (86,  "Find-Domo-Version-and-Tool-Versions.mdx",
-          "Where to find the Domo instance build number; Workbench version; plugin / add-in version",
-          "Dan Brinton"),
-    (89,  "Retrieve-Dataset-Source-Query-via-API.mdx",
-          "API call to get the underlying connection/query for a dataset; connector metadata endpoints",
-          "Ken Boyer"),
-    (91,  "Remove-Bad-Rows-from-a-Dataset.mdx",
-          "CLI full-replace artifact cleanup; removing a single erroneous row; append-mode dataset corrections",
-          "Jordan Jensen"),
-    (99,  "Domo-API-Changelog.mdx",
-          "No published changelog for Domo APIs; versioning policy; how to track changes via DomoStats/release notes",
-          "Ken Boyer"),
-    (100, "App-Studio-Performance-with-Large-Datasets.mdx",
-          "Load time causes; dataset size thresholds; optimization patterns (pre-aggregation, DataSet Views)",
-          "Khushboo"),
-    (103, "ETL-Credits-and-Consumption-Model.mdx",
-          "Legacy ETL vs consumption credits; what counts as a 'manual run' vs 'significant change'; billing implications",
-          "Andrea Henderson"),
-    (107, "Multi-Language-Dashboards.mdx",
-          "Dynamic language switching on dashboards; localization patterns; Beast Mode locale functions",
-          "Chris Wright"),
-    (109, "Custom-Card-Visuals-with-HTML-and-Bricks.mdx",
-          "HTML card techniques; DDX Brick custom visuals; profile pictures, ERP-style detail panels",
-          "Khushboo"),
-]
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -704,12 +558,159 @@ def load_forum_gaps(path: Path) -> list:
     return data.get("gaps", [])
 
 
+def _extract_table_rows(text: str, start_marker: str, end_marker: str, expected_cols: int) -> list:
+    """
+    Return the data rows of the first pipe table between start_marker and
+    end_marker. Header and separator rows are dropped. Each row is normalized
+    to exactly `expected_cols` cells: extra cells (e.g. a stray '|' inside a
+    note) are merged back into the last column; short rows are skipped.
+    """
+    start = text.find(start_marker)
+    if start == -1:
+        return []
+    search_from = start + len(start_marker)
+    end = text.find(end_marker, search_from) if end_marker else -1
+    if end == -1:
+        end = len(text)
+    segment = text[start:end]
+
+    rows = []
+    for line in segment.splitlines():
+        line = line.strip()
+        if not line.startswith("|"):
+            continue
+        cells = [c.strip() for c in line.strip("|").split("|")]
+        # Separator row (all dashes)?
+        if all(set(c) <= {"-", ":"} and c for c in cells):
+            continue
+        if len(cells) < expected_cols:
+            continue
+        if len(cells) > expected_cols:
+            head = cells[: expected_cols - 1]
+            tail = " | ".join(cells[expected_cols - 1:])
+            cells = head + [tail]
+        rows.append(cells)
+    return rows
+
+
+def _rank_from(text: str) -> int:
+    """Pull a leading rank number out of strings like '#26 / n/a' or '26'."""
+    m = re.search(r"\d+", text or "")
+    return int(m.group(0)) if m else 9999
+
+
+def parse_manifest_forum_written(manifest_text: str) -> list:
+    """
+    Parse the 'Phase 3a-Forum — Net-New Articles' table (articles already
+    drafted). Returns list of dicts:
+      {rank, filename, title, pm, notes, has_pm_input}
+    These need PM fact-check, NOT creation.
+    """
+    rows = _extract_table_rows(
+        manifest_text,
+        "## Phase 3a-Forum — Net-New Articles",
+        "### Phase 3a-Forum — Deferred to PM Briefs",
+        expected_cols=8,
+    )
+    out = []
+    for cells in rows:
+        filename, title, disposition, pm, rank_score, _screens, _gates, notes = cells[:8]
+        if filename.lower() in ("filename", ""):
+            continue
+        filename = filename.strip("`")
+        out.append({
+            "rank": _rank_from(rank_score),
+            "filename": filename,
+            "title": title,
+            "pm": pm,
+            "notes": notes,
+            "has_pm_input": "[pm-input]" in notes,
+        })
+    return out
+
+
+def parse_manifest_forum_deferred(manifest_text: str) -> list:
+    """
+    Parse the 'Phase 3a-Forum — Deferred to PM Briefs' table (articles NOT
+    written — the KB lacks source material). Returns list of dicts:
+      {rank, filename, pm, what}
+    These cannot be written without PM input.
+    """
+    rows = _extract_table_rows(
+        manifest_text,
+        "### Phase 3a-Forum — Deferred to PM Briefs",
+        "\n---\n",
+        expected_cols=4,
+    )
+    out = []
+    for cells in rows:
+        rank, filename, pm, what = cells[:4]
+        if rank.lower() in ("rank", ""):
+            continue
+        out.append({
+            "rank": _rank_from(rank),
+            "filename": filename.strip("`"),
+            "pm": pm,
+            "what": what,
+        })
+    return out
+
+
+# Matches a whole embedded pm-input comment: {/* [pm-input] Name — ask... */}
+_PM_INPUT_RE = re.compile(r"\{/\*\s*\[pm-input\]\s*(.*?)\*/\}", re.DOTALL)
+# Splits "Name — ask" (em-dash or colon separator) into (name, ask).
+_PM_INPUT_SPLIT = re.compile(r"\s*(.+?)\s*[—:]\s*(.*)", re.DOTALL)
+
+
+def scan_article_pm_inputs(article_dir: Path) -> list:
+    """
+    Scan every article .mdx for embedded {/* [pm-input] Name — ask */} markers.
+    Returns list of dicts: {filename, pm, ask}. This is the authoritative source
+    for open placeholders in drafted articles — it can never drift from the files.
+    """
+    out = []
+    if not article_dir.exists():
+        print(f"  WARNING: {article_dir} not found — article pm-input scan skipped")
+        return out
+    for path in sorted(article_dir.glob("*.mdx")):
+        try:
+            content = path.read_text(encoding="utf-8")
+        except (OSError, UnicodeDecodeError):
+            continue
+        if "[pm-input]" not in content:
+            continue
+        for m in _PM_INPUT_RE.finditer(content):
+            inner = m.group(1).strip()
+            sm = _PM_INPUT_SPLIT.match(inner)
+            if not sm:
+                continue
+            pm = sm.group(1).strip()
+            ask = re.sub(r"\s+", " ", sm.group(2)).strip()
+            out.append({"filename": path.name, "pm": pm, "ask": ask})
+    return out
+
+
+def pm_cell_matches(cell: str, pm_name: str) -> bool:
+    """
+    True if pm_name is named in a manifest PM cell. Handles parenthetical
+    suffixes ('Ken Boyer (CLI/APIs)') and shared cells ('Phil Fuchs / Andrea
+    Henderson') by stripping '(...)' and splitting on '/'.
+    """
+    cleaned = re.sub(r"\([^)]*\)", "", cell)
+    parts = [p.strip() for p in cleaned.split("/")]
+    return pm_name in parts
+
+
 # ─────────────────────────────────────────────────────────────────────────────
 # BRIEF GENERATION
 # ─────────────────────────────────────────────────────────────────────────────
 
-def generate_brief(pm_name: str, pm_ownership: dict, all_gaps: list) -> str:
-    """Generate a markdown review brief for one PM."""
+def generate_brief(pm_name: str, pm_ownership: dict, all_gaps: list, forum: dict) -> str:
+    """Generate a markdown review brief for one PM.
+
+    `forum` carries the manifest-derived Phase 3a-Forum data:
+      {"written": [...], "deferred": [...], "checkpoints": [...]}
+    """
     features = sorted(pm_ownership.get("features", set()))
     articles = pm_ownership.get("articles", [])
     article_count = len(articles)
@@ -796,25 +797,40 @@ def generate_brief(pm_name: str, pm_ownership: dict, all_gaps: list) -> str:
 
     lines += ["---", ""]
 
-    # ── Section 3: Gap Articles — Meeting Required ─────────────────────────────
+    # ── Section 3: New Forum-Gap Articles + Open Placeholders ──────────────────
     pm_input = [(fn, title, what) for fn, title, pm, what in PHASE3A_PM_ARTICLES if pm == pm_name]
-    pm_forum_critical_new = [(r, fn, summary, fc) for r, fn, summary, pm, fc in FORUM_NEW_CRITICAL if pm == pm_name]
-    pm_forum_high_new = [(r, fn, summary) for r, fn, summary, pm in FORUM_NEW_HIGH if pm == pm_name]
-    pm_checkpoints = ARTICLE_CHECKPOINTS.get(pm_name, [])
+    # Written forum articles (drafted; need fact-check) — matched on manifest PM cell.
+    pm_forum_written = sorted(
+        [w for w in forum["written"] if pm_cell_matches(w["pm"], pm_name)],
+        key=lambda w: w["rank"],
+    )
+    # Deferred forum articles (not written; need PM input to begin).
+    pm_forum_deferred = sorted(
+        [d for d in forum["deferred"] if pm_cell_matches(d["pm"], pm_name)],
+        key=lambda d: d["rank"],
+    )
+    # Open [pm-input] placeholders: embedded article markers (scanned) + manifest flags.
+    pm_checkpoints = [(c["filename"], c["ask"]) for c in forum["checkpoints"]
+                      if c["pm"] == pm_name]
+    pm_checkpoints += [(scope, ask) for scope, ask in MANIFEST_PM_INPUT_FLAGS.get(pm_name, [])]
 
     lines += [
-        "## 3. Gap Articles — Information-Gathering Meeting Required",
+        "## 3. New Forum-Gap Articles and Open Placeholders",
         "",
-        "These articles **cannot be written without your input**. A short dedicated meeting",
-        "(30 min each, or async written response) is needed before work can begin.",
+        "New articles in your area from the community-forum gap analysis (and the original",
+        "restructure plan). Some are **already drafted and need your fact-check**; others",
+        "**cannot be written until you supply information**. The two are separated below so",
+        "it's clear which is which.",
         "",
     ]
 
-    has_gaps = pm_input or pm_forum_critical_new or pm_forum_high_new or pm_checkpoints
+    has_gaps = pm_input or pm_forum_written or pm_forum_deferred or pm_checkpoints
 
     if pm_input:
         lines += [
             "### 3a. PM Input Articles (from original restructure plan)",
+            "",
+            "Not yet written — each needs a short info-gathering conversation before drafting.",
             "",
             "| Article | What You Need to Provide |",
             "|---------|--------------------------|",
@@ -823,38 +839,41 @@ def generate_brief(pm_name: str, pm_ownership: dict, all_gaps: list) -> str:
             lines.append(f"| `{fn}` — *{title}* | {what} |")
         lines += [""]
 
-    if pm_forum_critical_new:
+    if pm_forum_written:
         lines += [
-            "### 3b. Critical Forum-Gap New Articles",
+            "### 3b. Forum-Gap Articles Already Drafted — Fact-Check Required",
             "",
-            "These topics were the most-requested missing knowledge in the community forums",
-            "(Critical priority). Each needs a new article and your input to ensure accuracy.",
+            "These articles have been **written** in response to the highest-demand community",
+            "forum gaps. Please read each draft and verify accuracy. A ⚠️ flag means the draft",
+            "also contains an open `[pm-input]` placeholder — see Section 3d for the exact ask.",
             "",
-            "| Rank | Filename | Topic | Fact-Check Info Needed From You |",
-            "|------|----------|-------|--------------------------------|",
+            "| Rank | Article | What Was Synthesized / What to Verify |",
+            "|------|---------|---------------------------------------|",
         ]
-        for rank, fn, summary, fc in pm_forum_critical_new:
-            lines.append(f"| {rank} | `{fn}` | {summary} | {fc} |")
+        for w in pm_forum_written:
+            flag = " ⚠️" if w["has_pm_input"] else ""
+            title = w["title"] or w["filename"]
+            lines.append(f"| {w['rank']} | `{w['filename']}` — *{title}*{flag} | {w['notes']} |")
         lines += [""]
 
-    if pm_forum_high_new:
+    if pm_forum_deferred:
         lines += [
-            "### 3c. High Priority Forum-Gap New Articles",
+            "### 3c. Forum-Gap Articles Awaiting Your Input — Cannot Be Written Yet",
             "",
-            "These topics were High-priority missing knowledge in the community forums.",
-            "AI can draft these from existing documentation, but your review is needed",
-            "before publishing.",
+            "These forum gaps **cannot be written without your input** — the KB has no source",
+            "material and the mechanics are Domo-proprietary. A short dedicated meeting (or an",
+            "async written answer) is needed before drafting can begin.",
             "",
-            "| Rank | Filename | Topic |",
-            "|------|----------|-------|",
+            "| Rank | Intended Article | What You Need to Supply |",
+            "|------|------------------|-------------------------|",
         ]
-        for rank, fn, summary in pm_forum_high_new:
-            lines.append(f"| {rank} | `{fn}` | {summary} |")
+        for d in pm_forum_deferred:
+            lines.append(f"| {d['rank']} | `{d['filename']}` | {d['what']} |")
         lines += [""]
 
     if not has_gaps:
         lines += [
-            "_No dedicated info-gathering articles are currently assigned to your area._",
+            "_No new forum-gap articles are currently assigned to your area._",
             "",
         ]
 
@@ -862,19 +881,20 @@ def generate_brief(pm_name: str, pm_ownership: dict, all_gaps: list) -> str:
         lines += [
             "### 3d. Open Article Placeholders — Your Answer Required",
             "",
-            "The articles below have already been drafted but contain `[pm-input]` placeholders",
-            "where specific information from you is needed before the content can be finalized.",
-            "Each item is a checkbox — check it off once you've provided the answer.",
+            "The items below are open `[pm-input]` placeholders where specific information from",
+            "you is needed before the content can be finalized. Each is a checkbox — check it",
+            "off once you've provided the answer.",
             "",
         ]
-        for fn, ask, effort in pm_checkpoints:
+        for fn, ask in pm_checkpoints:
             lines += [
-                f"- [ ] **`{fn}`** _(est. {effort})_",
+                f"- [ ] **`{fn}`**",
                 f"  {ask}",
                 "",
             ]
 
     lines += ["---", ""]
+
 
     # ── Section 4: Support Gap Integration Changes ─────────────────────────────
     pm_retirements = [(batch, count, action, notes)
@@ -994,20 +1014,25 @@ def generate_brief(pm_name: str, pm_ownership: dict, all_gaps: list) -> str:
         lines.append(f"| {action_num} | Read and fact-check remaining {len(pm_phase3a) - 5} Phase 3a articles | Fact-check | ~30 min each |")
         action_num += 1
 
-    # PM input articles
+    # PM input articles (original plan — not written)
     for fn, title, _ in pm_input:
         lines.append(f"| {action_num} | Provide input for `{fn}` | Info meeting | 30 min |")
         action_num += 1
 
-    # Critical new articles
-    for rank, fn, _, fc in pm_forum_critical_new:
-        lines.append(f"| {action_num} | Review/validate `{fn}` (Rank {rank} community request) | Fact-check | 20–30 min |")
+    # Written forum articles needing fact-check
+    for w in pm_forum_written:
+        lines.append(f"| {action_num} | Fact-check `{w['filename']}` (Rank {w['rank']} community request) | Fact-check | 20–30 min |")
         action_num += 1
 
-    # Open article placeholders (inline [pm-input] checkpoints)
-    for fn, ask, effort in pm_checkpoints:
+    # Deferred forum articles needing PM input to begin
+    for d in pm_forum_deferred:
+        lines.append(f"| {action_num} | Supply info to write `{d['filename']}` (Rank {d['rank']}) | Info meeting | 30 min |")
+        action_num += 1
+
+    # Open article placeholders (inline [pm-input] checkpoints + manifest flags)
+    for fn, ask in pm_checkpoints:
         short_ask = ask.split(".")[0][:80]
-        lines.append(f"| {action_num} | **Open placeholder in `{fn}`:** {short_ask} | **Answer required** | {effort} |")
+        lines.append(f"| {action_num} | **Open placeholder in `{fn}`:** {short_ask} | **Answer required** | 15–30 min |")
         action_num += 1
 
     # Critical update validations
@@ -1023,7 +1048,7 @@ def generate_brief(pm_name: str, pm_ownership: dict, all_gaps: list) -> str:
             lines.append(f"| {action_num} | Decision needed {d_num}: see Section 1 notes | Decision | 10 min |")
             action_num += 1
 
-    lines += ["", "---", "", f"_Generated by `scripts/build-pm-review-briefs.py` from RESTRUCTURE-IA-SPEC.md, _gaps_with_support.json, and RESTRUCTURE-PROGRESS.md._", ""]
+    lines += ["", "---", "", f"_Generated by `scripts/build-pm-review-briefs.py` from RESTRUCTURE-MANIFEST.md (Phase 3a-Forum written + deferred tables), Article-PM-Ownership-Reference.mdx, _gaps_with_support.json, and s/article/ [pm-input] markers._", ""]
 
     return "\n".join(lines)
 
@@ -1036,26 +1061,51 @@ def main():
     print("Loading data...")
     ownership = load_ownership_reference(OWNERSHIP_FILE)
     gaps = load_forum_gaps(GAPS_FILE)
+    manifest_text = MANIFEST_FILE.read_text(encoding="utf-8") if MANIFEST_FILE.exists() else ""
+    if not manifest_text:
+        print(f"  WARNING: {MANIFEST_FILE} not found — forum written/deferred tables will be empty")
+
+    forum = {
+        "written": parse_manifest_forum_written(manifest_text),
+        "deferred": parse_manifest_forum_deferred(manifest_text),
+        "checkpoints": scan_article_pm_inputs(ARTICLE_DIR),
+    }
+
     print(f"  Ownership reference: {sum(len(v['articles']) for v in ownership.values())} articles across {len(ownership)} PMs")
     print(f"  Forum gaps: {len(gaps)} gaps loaded")
+    print(f"  Manifest forum tables: {len(forum['written'])} written, {len(forum['deferred'])} deferred")
+    print(f"  Embedded [pm-input] markers: {len(forum['checkpoints'])} found in s/article/")
 
     OUTPUT_DIR.mkdir(exist_ok=True)
-    print(f"\nGenerating briefs in {OUTPUT_DIR.relative_to(REPO_ROOT)}/...")
 
-    # All PMs — union of ownership reference + hardcoded PM lists
-    all_pms_from_data = set(ownership.keys())
-    all_pms_hardcoded = set()
+    # Roster of PMs we generate a brief for — union of ownership reference,
+    # hardcoded Phase 3a lists, manifest PM-input flags, and scanned markers.
+    roster = set(ownership.keys())
     for _, _, _, pm, _, _ in PHASE3A_ARTICLES:
-        all_pms_hardcoded.add(pm)
+        roster.add(pm)
     for _, _, pm, _ in PHASE3A_PM_ARTICLES:
-        all_pms_hardcoded.add(pm)
-    for _, _, _, pm, _ in FORUM_NEW_CRITICAL:
-        all_pms_hardcoded.add(pm)
-    all_pms = sorted(all_pms_from_data | all_pms_hardcoded)
+        roster.add(pm)
+    roster.update(MANIFEST_PM_INPUT_FLAGS.keys())
+    for c in forum["checkpoints"]:
+        roster.add(c["pm"])
+
+    # Orphan detection: manifest forum rows whose PM cell matches no roster PM
+    # (e.g. "Domo University / Enablement (no listed PM)"). These would silently
+    # vanish from every brief, so surface them loudly.
+    orphans = []
+    for w in forum["written"]:
+        if not any(pm_cell_matches(w["pm"], pm) for pm in roster):
+            orphans.append(("written", w["rank"], w["filename"], w["pm"]))
+    for d in forum["deferred"]:
+        if not any(pm_cell_matches(d["pm"], pm) for pm in roster):
+            orphans.append(("deferred", d["rank"], d["filename"], d["pm"]))
+
+    all_pms = sorted(roster)
+    print(f"\nGenerating briefs in {OUTPUT_DIR.relative_to(REPO_ROOT)}/...")
 
     for pm_name in all_pms:
         pm_data = ownership.get(pm_name, {"features": set(), "articles": []})
-        brief = generate_brief(pm_name, pm_data, gaps)
+        brief = generate_brief(pm_name, pm_data, gaps, forum)
         safe_name = pm_name.replace(" ", "-").replace("/", "-").replace("(", "").replace(")", "")
         out_path = OUTPUT_DIR / f"{safe_name}.md"
         with open(out_path, "w", encoding="utf-8") as f:
@@ -1064,6 +1114,12 @@ def main():
         print(f"  ✓ {out_path.name}  ({article_count} articles)")
 
     print(f"\nDone — {len(all_pms)} briefs written to pm-review-briefs/")
+
+    if orphans:
+        print("\n  ⚠️  UNASSIGNED forum items — no roster PM matched, will NOT appear in any brief:")
+        for kind, rank, fn, pm in sorted(orphans, key=lambda o: o[1]):
+            print(f"      [{kind}] Rank {rank}  {fn}  — PM cell: '{pm}'")
+        print("      Fix the PM in RESTRUCTURE-MANIFEST.md or add them to the roster.")
 
 
 if __name__ == "__main__":

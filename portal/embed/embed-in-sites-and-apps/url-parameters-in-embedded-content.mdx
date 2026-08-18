@@ -8,6 +8,7 @@ Domo Everywhere supports three main types of URL parameters in embedded content:
 <ul>
   <li>Transparent Backgrounds </li>
   <li>Pfilters </li>
+  <li>PVariables </li>
   <li>AppData </li>
   <li>ViewId (App Studio Specific) </li>
 </ul>
@@ -79,33 +80,37 @@ example.domo.com/embed/pages/private/ABCDE
 The operands you can use when writing code with Pfilters are as follows. Note that the values always need square brackets for the array, even when only a single value is included.
 
 - IN
+- NOT_IN
 - CONTAINS
+- NOT_CONTAINS
 - EQUALS
 - NOT_EQUALS
 - GREATER_THAN
 - LESS_THAN
-- GREAT_THAN_EQUALS_TO
+- GREATER_THAN_EQUALS_TO
 - LESS_THAN_EQUALS_TO
 - BETWEEN
+- STARTS_WITH
+- ENDS_WITH
 
 ### Persistence of Pfilters across Pages
 
 Domo automatically creates Pfilters when you check Persist Filters in the embed dialog, as shown here:
 
 <Frame>
-  ![](/images/dev/stoplight.io/images/Screenshot-2023-11-09-at-12.02.05-PM.png>)
+  ![](/images/dev/stoplight.io/images/Screenshot-2023-11-09-at-12.02.05-PM.png)
 </Frame>
 
 You can then view the parameters by hovering over the content. (Card interactions must be turned on and set to External link for this to work). This is shown for the "QA pass rate by model" Card in the following example:
 
 <Frame>
-  ![](/images/dev/stoplight.io/images/Screenshot-2023-11-09-at-12.03.02-PM.png>)
+  ![](/images/dev/stoplight.io/images/Screenshot-2023-11-09-at-12.03.02-PM.png)
 </Frame>
 
 When viewers click those links, any parts of the story they had previously clicked will be passed along as Pfilters to the next Page. These filters can either be applied to single Cards or complete Pages (even if the Pages contain many Cards based on various DataSets).
 
 <Frame>
-  ![](/images/dev/stoplight.io/images/Screenshot-2023-11-09-at-12.04.56-PM.png>)
+  ![](/images/dev/stoplight.io/images/Screenshot-2023-11-09-at-12.04.56-PM.png)
 </Frame>
 
 ### Persistence of Pfilters across sessions
@@ -117,8 +122,88 @@ If you want Pfilters to expand beyond pages to also persist across sessions and 
 If a Pfilter is written incorrectly, the unfiltered version renders and a black error bar appears.
 
 <Frame>
-  ![](/images/dev/stoplight.io/images/Screenshot-2023-11-09-at-12.06.54-PM.png>)
+  ![](/images/dev/stoplight.io/images/Screenshot-2023-11-09-at-12.06.54-PM.png)
 </Frame>
+
+## PVariables
+
+---
+
+Variable controls are dashboard-level parameters that viewers can adjust to change what the charts show — things like "Target Year," "Exchange Rate," or "Department." The `pvariables` parameter lets you set their starting values via the URL.
+
+<Note>**Note:** Variable controls must already be configured on the dashboard. `pvariables` only sets the initial value of an existing control — it cannot create new controls.</Note>
+
+### Basic Format
+
+The `pvariables` parameter takes a JSON-encoded object keyed by variable control ID:
+
+```url
+?pvariables={"<variable_control_id>":{"parsedExpression":{"exprType":"<type>","value":<value>}}}
+```
+
+The `exprType` field specifies the data type:
+
+| exprType | Value type | Description |
+| --- | --- | --- |
+| NUMERIC_VALUE | number | Integer or decimal numeric variable |
+| STRING_VALUE | string | Text variable |
+
+<Note>**Note:** The wrapper key must be spelled exactly `parsedExpression`. Common typos like `parsedExpresion` or `parseExpression` cause the value to be silently ignored with no error shown.</Note>
+
+### Examples
+
+Single numeric variable:
+
+```url
+?pvariables={"111":{"parsedExpression":{"exprType":"NUMERIC_VALUE","value":20}}}
+```
+
+Single string variable:
+
+```url
+?pvariables={"111":{"parsedExpression":{"exprType":"STRING_VALUE","value":"West"}}}
+```
+
+Multiple variables:
+
+```url
+?pvariables={"1842":{"parsedExpression":{"exprType":"NUMERIC_VALUE","value":5031660}},"216560":{"parsedExpression":{"exprType":"NUMERIC_VALUE","value":2484860}}}
+```
+
+URL-encoded (recommended):
+
+```url
+?pvariables=%7B%221842%22%3A%7B%22parsedExpression%22%3A%7B%22exprType%22%3A%22NUMERIC_VALUE%22%2C%22value%22%3A5031660%7D%7D%7D
+```
+
+### Find a Variable Control ID
+
+Variable control IDs are numeric identifiers assigned when a variable control is created in Domo. To find them:
+
+1. Open the dashboard in Domo (not the embed view).
+2. Open your browser's developer tools (F12) and select the **Network** tab.
+3. Reload the page and look for a request to `/api/content/v3/pages/{pageId}/analyzer`.
+4. Open that response — each variable control is listed with its numeric `id` field under function which is under VariableControls.
+
+
+### Use PFilters and PVariables Together
+
+Both parameters can be included in the same URL, separated by `&`:
+
+```url
+?pvariables={"111":{"parsedExpression":{"exprType":"NUMERIC_VALUE","value":20}}}&pfilters=[{"column":"Region","operand":"IN","values":["West"]}]
+```
+
+In JavaScript:
+
+```javascript
+const filters = [{ "column": "Region", "dataType": "string", "operand": "IN", "values": ["West"] }];
+const variables = { "111": { "parsedExpression": { "exprType": "NUMERIC_VALUE", "value": 20 } } };
+
+const url = baseUrl
+  + `?pfilters=${encodeURIComponent(JSON.stringify(filters))}`
+  + `&pvariables=${encodeURIComponent(JSON.stringify(variables))}`;
+```
 
 ## AppData
 

@@ -2,7 +2,7 @@ openapi: 3.1.0
 info: {title: AI Services, description: 'Domo AI Services provide a consistent API
     to leverage Foundation Models to solve common problems such as natural language
     SQL generation (text-to-SQL), Summarization, Classification, Tool Calling and
-    others.', version: '2.3.3639_master'}
+    others.', version: '2.3.4147_master'}
 servers:
 - url: https://{subdomain}.domo.com
   variables:
@@ -80,7 +80,7 @@ paths:
                   value: {prompt: 'Write a 5 to 10 words summary of the following
                       text. ```...``` CONCISE SUMMARY:', output: 'Vibrant, densely
                       populated commercial and cultural hub in Northern California.',
-                    modelId: 'domo.domo_ai.domogpt-summarize-v1:anthropic'}
+                    modelId: 'domo.domo_ai.domogpt-small-v2.1:anthropic'}
       security:
       - domo-developer-token: []
   /api/ai/v1/text/sql:
@@ -146,7 +146,7 @@ paths:
                       # What are my total sales by region?
                     output: SELECT region, SUM(amount) AS total_sales FROM `Store
                       Sales` GROUP BY region
-                    modelId: domo.domo_ai.domogpt-medium-v1.2:anthropic
+                    modelId: domo.domo_ai.domogpt-medium-v2.2:anthropic
       security:
       - domo-developer-token: []
   /api/ai/v1/text/generation:
@@ -166,7 +166,7 @@ paths:
                 value: {input: 'Why is the sky blue?'}
               Non-default Model:
                 description: Text Generation request with DomoGPT Chat Small v1 model
-                value: {input: 'Why is the sky blue?', model: 'domo.domo_ai.domogpt-small-v1:anthropic'}
+                value: {input: 'Why is the sky blue?', model: 'domo.domo_ai.domogpt-small-v2.1:anthropic'}
               Prompt Template:
                 description: Text Generation request with custom prompt template.
                 value:
@@ -191,7 +191,7 @@ paths:
                 Text Generation Response:
                   description: Text Generation Response
                   value: {prompt: 'Why is the sky blue?', output: The sky is blue
-                      because of Rayleigh scattering., modelId: 'domo.domo_ai.domogpt-small-v1:anthropic'}
+                      because of Rayleigh scattering., modelId: 'domo.domo_ai.domogpt-small-v2.1:anthropic'}
       security:
       - domo-developer-token: []
   /api/ai/v1/text/beastmode:
@@ -256,7 +256,7 @@ paths:
                       # Generate a query to answer the following:
                       # Count distinct products
                     output: COUNT(DISTINCT `product`)
-                    modelId: domo.domo_ai.domogpt-medium-v1.2:anthropic
+                    modelId: domo.domo_ai.domogpt-medium-v2.2:anthropic
       security:
       - domo-developer-token: []
   /api/ai/v1/targeted-sentiment:
@@ -1292,14 +1292,15 @@ components:
           items:
             type: string
             enum: [EXPAND_SELECT_STAR, USE_DATA_SOURCE_ID_AS_TABLE_NAME, UNION_TO_UNION_ALL,
-              DISALLOW_COMMON_TABLE_EXPRESSIONS, DISALLOW_JOINS, DISALLOW_SUBQUERIES,
-              DISALLOW_UNIONS, VALIDATE_REFERENCES, VALIDATE_AGGREGATIONS, VALIDATE_FUNCTIONS]
+              REMOVE_UNNECESSARY_ALIASES, DERIVE_SELECT_ALIASES, DISALLOW_COMMON_TABLE_EXPRESSIONS,
+              DISALLOW_JOINS, DISALLOW_SUBQUERIES, DISALLOW_UNIONS, VALIDATE_REFERENCES,
+              VALIDATE_AGGREGATIONS, VALIDATE_FUNCTIONS]
           uniqueItems: true
         temperature: {type: number, format: double, description: Controls randomness
             in the model's output. Lower values make output more deterministic., maximum: 2,
           minimum: 0}
         maxTokens: {type: integer, format: int32, description: The maximum number
-            of tokens to generate in the response.}
+            of tokens to generate in the response., minimum: 0}
         reasoningConfig: {$ref: '#/components/schemas/ReasoningConfig', description: Configuration
             for reasoning behavior and effort level.}
       required: [input]
@@ -1430,7 +1431,7 @@ components:
               - {$ref: '#/components/schemas/NumberFunctionParameter'}
               - {$ref: '#/components/schemas/ObjectFunctionParameter'}
               - {$ref: '#/components/schemas/StringFunctionParameter'}
-      required: [description, type]
+      required: [description]
     NullFunctionParameter:
       allOf:
       - {$ref: '#/components/schemas/FunctionParameterObject'}
@@ -1718,8 +1719,16 @@ components:
         properties:
           text: {type: string, description: the reasoning/thinking text generated
               by the model}
-          signature: {type: string, description: optional signature for the reasoning
-              content}
+          signature:
+            type: string
+            description: |-
+              optional provider identifier/signature for the reasoning item
+                                (e.g. Anthropic thinking-block signature hash; OpenAI reasoning item id)
+          encryptedContent:
+            type: string
+            description: |-
+              optional opaque state blob that must be replayed to the provider
+                                       for stateless multi-turn (e.g. OpenAI <code>encrypted_content</code>)
       description: |-
         Reasoning (thinking) message content.
          Contains the model's internal reasoning process when extended thinking is enabled.
@@ -1764,12 +1773,10 @@ components:
           description: Additional model parameters (temperature, max_tokens, etc.)
         sessionId: {type: string, format: uuid, description: AI session ID for associating
             with existing session}
-        reasoningConfig: {$ref: '#/components/schemas/ReasoningConfig', description: Configuration
-            for reasoning behavior}
-        targetedSentiment: {type: boolean, description: Returns true if this is a
-            targeted sentiment request (has topics).}
         simpleSentiment: {type: boolean, description: Returns true if this is a simple
             sentiment request (no topics).}
+        targetedSentiment: {type: boolean, description: Returns true if this is a
+            targeted sentiment request (has topics).}
       required: [input]
     SentimentTopic:
       type: object
@@ -1799,6 +1806,11 @@ components:
           name: {type: string, description: the name of the tool to execute}
           toolCallId: {type: string, description: unique identifier for this tool
               call}
+          thoughtSignature:
+            type: string
+            description: |-
+              Thought signature associated with this function call request, if supported. If returned by model in initial
+               tool use request, should also be included in subsequent requests.
       description: Tool use request message content.
       required: [name, toolCallId, toolInput]
     ToolUseResultMessageContent:
@@ -2114,8 +2126,6 @@ components:
           description: Additional model parameters (temperature, max_tokens, etc.)
         sessionId: {type: string, format: uuid, description: AI session ID for associating
             with existing session}
-        reasoningConfig: {$ref: '#/components/schemas/ReasoningConfig', description: Configuration
-            for reasoning behavior}
       required: [input, outputStructure]
     ExtractDataResponse:
       type: object
@@ -2238,8 +2248,6 @@ components:
           description: Additional model parameters (temperature, max_tokens, etc.)
         sessionId: {type: string, format: uuid, description: AI session ID for associating
             with existing session}
-        reasoningConfig: {$ref: '#/components/schemas/ReasoningConfig', description: Configuration
-            for reasoning behavior}
       required: [classificationType, input, labels]
     ClassificationResponse:
       type: object

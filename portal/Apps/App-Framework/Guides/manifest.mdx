@@ -5,19 +5,20 @@ permalink: af407395c766b-the-manifest-file
 
 The manifest file is the configuration file used to provide meta-data about an App Design and the resources that it needs access to in Domo. The manifest file should be placed in the base directory of the App Design and should be named <strong>manifest.json</strong>.
 
-| Property          | Type            | Description                                                | Notes                                                                                                                                                                                                                                                          | Required | Guide                                                                                                |
-| ----------------- | --------------- | ---------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- | ---------------------------------------------------------------------------------------------------- |
-| `name`            | String          | The name of App Design                                     | An App Design can have many App Instances (Cards in Domo) - each App Instance has its own name.                                                                                                                                                                | Required |
-| `version`         | String          | The version of your App Design.                            |                                                                                                                                                                                                                                                                | Required |
-| `size`            | Object          | The size of your App.                                      | Object with `width` and `height` properties defined on a scale of 1-6                                                                                                                                                                                          | Required |
-| `fullpage`        | Boolean         | Allows the app to be viewed in full page mode.             |                                                                                                                                                                                                                                                                | Optional |
-| `datasetsMapping` | List of Objects | A list of Datasets that the App Design uses.               | Each object corresponds to one Dataset and should include an `alias`, `dataSetId`, and `fields` property. If the App Design doesn't use Datasets, `datasetsMapping` can be an empty list `[]`                                                                  | Required |
-| `collections`     | List of Objects | A list of AppDB collections that the App Design uses       | Each object corresponds to one AppDB collection and should include a `name`, `schema` (optional), and `syncEnabled` property. If your App Design leverages AppDB collections, you'll also need to setup a `proxyId` property in the manifest file.             | Optional | [AppDB API](/portal/API-Reference/app-framework-apis/AppDB-API)                                      |
-| `workflowMapping` | List of Objects | A list of Workflows that the App Design uses.              | Each object corresponds to one Workflow and should include an `alias` and `parameters` property. If your App Design leverages Workflows, you'll also need to setup a `proxyId` property in the manifest file.                                                  | Optional | [Hitting a Workflow from an App](/portal/Apps/App-Framework/Guides/hitting-a-workflow)               |
-| `packageMapping`  | List of Objects | A list of Code Engine packages that the App Design uses.   | Each object corresponds to one Code Engine package and should include an `alias`, `parameters` (if applicable), and `output` property. If your App Design leverages Code Engine packages, you'll also need to setup a `proxyId` property in the manifest file. | Optional | [Hitting Code Engine from an App](/portal/Apps/App-Framework/Guides/hitting-code-engine-from-an-app) |
-| `ignore`          | List            | Instructs the CLI to ignore certain files when publishing. | Accepts an array of glob patterns.                                                                                                                                                                                                                             | Optional |
-| `id`              | String          | This is a unique identifier for your App Design.           | It is added to the manifest automatically by the command line tool the first time you publish your design via `domo publish`.                                                                                                                                  | Required |
-| `proxyId`         | String          | This is an id of a card you want to impersonate.           | It is required if you want to be able to develop locally against Domo Workflows, Code Engine, or AppDB.                                                                                                                                                        | Optional | [Getting a proxyId](#getting-a-proxyid-advanced)                                                     |
+| Property          | Type            | Description                                                      | Notes                                                                                                                                                                                                                                                          | Required | Guide                                                                                                |
+| ----------------- | --------------- | ---------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- | ---------------------------------------------------------------------------------------------------- |
+| `name`            | String          | The name of App Design                                           | An App Design can have many App Instances (Cards in Domo) - each App Instance has its own name.                                                                                                                                                                | Required |                                                                                                      |
+| `version`         | String          | The version of your App Design.                                  |                                                                                                                                                                                                                                                                | Required |                                                                                                      |
+| `size`            | Object          | The size of your App.                                            | Object with `width` and `height` properties defined on a scale of 1-6                                                                                                                                                                                          | Required |                                                                                                      |
+| `fullpage`        | Boolean         | Allows the app to be viewed in full page mode.                   |                                                                                                                                                                                                                                                                | Optional |                                                                                                      |
+| `datasetsMapping` | List of Objects | A list of Datasets that the App Design uses.                     | Each object corresponds to one Dataset and should include an `alias`, `dataSetId`, and `fields` property. If the App Design doesn't use Datasets, `datasetsMapping` can be an empty list `[]`                                                                  | Required |                                                                                                      |
+| `collections`     | List of Objects | A list of AppDB collections that the App Design uses             | Each object corresponds to one AppDB collection and should include a `name`, `schema` (optional), and `syncEnabled` property. If your App Design leverages AppDB collections, you'll also need to setup a `proxyId` property in the manifest file.             | Optional | [AppDB API](/portal/API-Reference/app-framework-apis/AppDB-API)                                      |
+| `workflowMapping` | List of Objects | A list of Workflows that the App Design uses.                    | Each object corresponds to one Workflow and should include an `alias` and `parameters` property. If your App Design leverages Workflows, you'll also need to setup a `proxyId` property in the manifest file.                                                  | Optional | [Hitting a Workflow from an App](/portal/Apps/App-Framework/Guides/hitting-a-workflow)               |
+| `packageMapping`  | List of Objects | A list of Code Engine packages that the App Design uses.         | Each object corresponds to one Code Engine package and should include an `alias`, `parameters` (if applicable), and `output` property. If your App Design leverages Code Engine packages, you'll also need to setup a `proxyId` property in the manifest file. | Optional | [Hitting Code Engine from an App](/portal/Apps/App-Framework/Guides/hitting-code-engine-from-an-app) |
+| `ignore`          | List            | Instructs the CLI to ignore certain files when publishing.       | Accepts an array of glob patterns.                                                                                                                                                                                                                             | Optional |                                                                                                      |
+| `id`              | String          | This is a unique identifier for your App Design.                 | It is added to the manifest automatically by the command line tool the first time you publish your design via `domo publish`.                                                                                                                                  | Required |                                                                                                      |
+| `proxyId`         | String          | This is an id of a card you want to impersonate.                 | It is required if you want to be able to develop locally against Domo Workflows, Code Engine, or AppDB.                                                                                                                                                        | Optional | [Getting a proxyId](#getting-a-proxyid-advanced)                                                     |
+| `channels`        | Object          | Declares broadcast channels the app publishes and subscribes to. | Enables cross-app communication via App Broadcasting. Object with `publishes` and `subscribes` arrays.                                                                                                                                                         | Optional | [App Broadcasting](/portal/Apps/App-Framework/Guides/broadcasting)                                   |
 
 ### Example Manifest
 
@@ -106,6 +107,20 @@ Here is an example demonstrating a complete manifest file.
       ]
     }
   ],
+  "channels": {
+    "publishes": [
+      {
+        "name": "selection:changed",
+        "description": "Fires when the user selects a row"
+      }
+    ],
+    "subscribes": [
+      {
+        "name": "filter:region",
+        "description": "Applies a region filter"
+      }
+    ]
+  },
   "packageMapping": [
     {
       "alias": "awesomeFunction",
@@ -502,6 +517,51 @@ _Note_: If the `fields` property in a DataSet mapping is left empty (i.e. no fie
 #### columnName
 
 This is the actual name of the column in the DataSet that the field alias gets mapped to.
+
+### channels
+
+---
+
+The `channels` property declares the broadcast channels your app uses for cross-app communication via [App Broadcasting](/portal/Apps/App-Framework/Guides/broadcasting). Declarations document your app's inputs and outputs — and they do real work: in production, an app receives a channel only if that channel is listed under `subscribes`.
+
+```json
+"channels": {
+  "publishes": [
+    {
+      "name": "selection:changed",
+      "description": "Fires when the user selects a data point"
+    }
+  ],
+  "subscribes": [
+    {
+      "name": "filter:region",
+      "description": "Applies a region filter to the chart"
+    }
+  ]
+}
+```
+
+#### publishes
+
+An array of channels this app sends messages to. Each entry has:
+
+| Property      | Type   | Description                                                                   | Required |
+| ------------- | ------ | ----------------------------------------------------------------------------- | -------- |
+| `name`        | String | Channel name (exact string). Cannot start with `domo:`. Max 256 characters.   | Required |
+| `description` | String | Human-readable description of what this channel carries. Max 2048 characters. | Optional |
+
+#### subscribes
+
+An array of channels this app listens to. Each entry has:
+
+| Property      | Type   | Description                                                                       | Required |
+| ------------- | ------ | --------------------------------------------------------------------------------- | -------- |
+| `name`        | String | Channel name to subscribe to. Cannot start with `domo:`. Max 256 characters.      | Required |
+| `description` | String | Human-readable description of how this app uses the channel. Max 2048 characters. | Optional |
+
+<Note>
+**Note:** In production, an app receives a channel only if it is declared under `subscribes` — the host subscribes each app to its declared channels when it loads. Publishing is not restricted to declared channels, but declaring what you publish keeps your app's contract explicit. In the App Studio and Pro Code editors, publishing or subscribing to an undeclared channel logs a console warning. You can declare up to 100 channels per direction, names must be unique across `publishes` and `subscribes`, and the bus is fire-and-forget — it does not retain or replay values.
+</Note>
 
 ### Getting a proxyId (Advanced)
 

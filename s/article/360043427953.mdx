@@ -60,6 +60,29 @@ When running and previewing the data in a transform sometimes not all rows from 
 <Frame><img alt="" src="/images/kb/ka05w00000123jb-00N5w00000Ri7BU-0EM5w000005vOxN.png"/></Frame>
 Increase the number of rows being processed in the preview by selecting more than 10k rows in the DataFlow edit view.
 
+#### Why does my Magic ETL preview look correct, but the full DataFlow run returns different or missing results?
+
+The preview runs on a sample of your input data, not the full DataSet, so a full run can behave differently. Common causes:
+
+- **Sampled rows —** Preview reads only a limited number of rows per input, so values that appear later in the data are not represented. A filter or join that matches nothing in preview can still match on a full run, and the reverse. Learn more about [preview and testing limits](/s/article/000005150#preview-and-testing-limits).
+- **Null and empty values —** Comparison functions treat nulls as described in the Filter Rows behavior for [Magic ETL](/s/article/360047787514#notable-behavior-changes); nulls beyond the sampled rows can drop rows you expected to keep.
+- **JSON and text splits —** A **Split Column** or JSON parse can produce a different number of columns or rows at full volume than it does on the sample.
+- **Time zone on date filters —** Date and date/time operations run in the company time zone. A date filter that returns rows in preview can exclude them on a full run when the values sit near a day boundary.
+
+If the full run still differs after accounting for these, run the DataFlow to completion and inspect the output DataSet directly rather than relying on the preview.
+
+#### What does a "Not Runnable" error mean?
+
+A "Not Runnable" status means the DataFlow cannot execute as currently configured. Common causes are a tile missing a required input or configuration, an upstream input DataSet that is unavailable, or a tile that references a column that no longer exists. Open each tile that shows an error indicator, resolve the flagged configuration, then save and run.
+
+{/* [pm-input] Andrea Henderson — confirm the complete list of conditions that produce a "Not Runnable" error and the exact resolution steps. The triggers above are representative, synthesized from community forum reports, and need confirmation. */}
+
+#### My multi-output DataFlow finished successfully, but a card on one output is blank.
+
+A DataFlow with more than one output DataSet can report a "Successful" run as soon as its first output finishes indexing, while the remaining outputs are still being indexed. A card built on an output that is still indexing can briefly render blank or show stale data. Wait for every output to finish indexing, then refresh the card.
+
+{/* [pm-input] Andrea Henderson — confirm whether run status reflects all outputs finishing indexing or only the first, and the recommended way for a user to tell when every output has finished. */}
+
 #### Why is the Redshift preview data not in the order I specified in my ORDER BY clause?
 
 When Redshift processes a query that contains an ORDER BY clause, it does honor the specified order while processing the logic of that query. However, when it has finished running the query, it reorders the data to optimize the actual storage of the data. (Redshift stores data tables distributed across many nodes, and splits the data up according to its own storage optimization methods.) When Domo pulls up a preview of the data, it is loaded out of the table after being reordered and stored by Redshift. When working with Redshift, it's important to include an ORDER BY clause in every individual query that relies on that specific ordering of the data, *not* to rely on the order persisting from a prior transform.

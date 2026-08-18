@@ -211,6 +211,20 @@ Snowflake discontinued username/password authentication in November 2025. All 7 
 | `360057013754.mdx` | Snowflake Partition Connector | updated |
 | `360058757134.mdx` | Snowflake Managed Unload Connector | updated |
 
+### Phase 3b-Forum — Critical Update Targets (In Progress — 2026-08-18)
+
+Priority `rec=update` gaps from the community forum analysis. Text written self-sufficiently; no screenshot TODO markers (clean-article policy). Uncertain product mechanics logged as embedded `[pm-input]` markers, which surface automatically in the owning PM's Phase 4.5 brief (Section 3d) via the article scan.
+
+**Andrea Henderson — Magic ETL cluster (ranks 2, 3, 8):**
+
+| Filename | Title | Disposition | Gap Rank/Score | Change | `[pm-input]` |
+|----------|-------|-------------|----------------|--------|--------------|
+| `360047787514.mdx` | Behavior Changes and Feature Updates in Magic ETL | updated | #2 / 83.8 | Added **Editor Known Issues and Quick Fixes** section: save-failure fixes (close other tab; remove/re-add inputs), Group By validate-button error is display-only, cut-text reopen fix, dark pop-up text and formula-editor scroll rows with safe generic fixes | Andrea — confirm current status of the five issues (fixed vs. present) + confirmed fix for pop-up-text and formula-scroll rows |
+| `360043427953.mdx` | DataFlow and DataFusion Troubleshooting and FAQs | updated | #3 / 82.4 | Added three FAQ entries under DataFlows: preview-vs-full-run discrepancies (sampling, nulls, JSON/text splits, time zone), "Not Runnable" error causes, multi-output "Successful"-but-not-indexed behavior. Cross-links to `000005150#preview-and-testing-limits` and `360047787514#notable-behavior-changes` | Andrea — confirm full "Not Runnable" trigger list + whether run status reflects all outputs indexing or only the first |
+| `000005150.mdx` | Data Selection in Magic ETL | updated | #8 / 77.5 | Added **Preview and Testing Limits** section: preview samples each input rather than the full DataSet; use a filtered DataSet View as input to test. Links to `360046074774` (Manage DataSet Views). Home for rank 8 in place of the 15-line stub `360043427653` (per plan) | Andrea — confirm exact preview row-sampling limit (~400k reported) + that the filtered-view workaround is recommended |
+
+Remaining Critical targets (not yet done): rank 4 (App Studio, Khushboo), rank 5 + rank 10 (Beast Mode, Phil Fuchs), rank 12 (Workflows, Ryan Despain).
+
 ---
 
 ## Phase 4 — Archived / Legacy / Deleted Articles (Not Started)

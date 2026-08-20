@@ -49,6 +49,28 @@ Yes, in order to do this, please reach out to your account team for evaluation.
 
 Yes, Connectors allow for up to 1,500 columns in a DataSet.
 </Accordion>
+
+<Accordion title="How do connectors authenticate with a source that requires multi-factor authentication (MFA)?">
+
+Most Domo connectors authenticate to your source system with a single stored set of credentials (a service account) and run unattended on a schedule. Because no person is present to respond to an interactive MFA prompt when the connector runs, a connector generally cannot complete a login that requires interactive MFA at connection time.
+
+If your source enforces MFA, consider the following approaches:
+
+* Use a dedicated **service account** that is exempt from interactive MFA, if your source supports one.
+* Use an **app password** (a source-generated credential that bypasses the interactive MFA prompt) where the source offers one.
+* Use a connector that authenticates with **OAuth** for that source, where one is available.
+
+{/* [pm-input] Tasleema Lallmamode — confirm the recommended MFA guidance for connectors (service account vs. app password vs. OAuth) and whether any specific connectors can complete MFA directly. synthesized from community forum reports; needs confirmation. */}
+</Accordion>
+
+<Accordion title="Why didn't my DataSet empty when a Replace run returned zero rows?">
+
+When a connector run returns no rows, Domo does not overwrite the existing DataSet with an empty result — even when the update method is set to **Replace**. Retaining the previous data helps protect against a source or query problem silently wiping your DataSet. The existing data is kept until a run returns rows.
+
+If you need a zero-row run to actually clear the DataSet, a common workaround is to UNION a single sentinel (placeholder) row into your source query so the run always returns at least one row, then filter that row out downstream in a DataFlow or DataSet View.
+
+{/* [pm-input] Tasleema Lallmamode — confirm the zero-row no-wipe behavior under Replace, and whether any connector (for example, SQL Server) exposes a setting analogous to Workbench's "clear dataset if query returns zero rows." synthesized from community forum reports; needs confirmation. */}
+</Accordion>
 </AccordionGroup>
 
 ## Troubleshooting Specific Errors
@@ -69,6 +91,24 @@ Due to security concerns, Domo no longer permits uploading data using FTP. If ne
 <Accordion title="I've configured my Netsuite connection correctly as shown in Connecting to NetSuite Data in Domo, but I keep getting an 'Unexpected Error' message.">
 
 Check your Netsuite column names for invalid characters such as apostrophes, quotation marks, backslashes, etc.
+</Accordion>
+
+<Accordion title="My spreadsheet upload failed (unsupported file, macro-enabled workbook, or 'no data found').">
+
+When uploading a spreadsheet with a file connector, check the following:
+
+* **Macro-enabled workbooks (.xlsm) are not supported.** Save the workbook as a standard **.xlsx** file and upload that instead.
+* If you see a message that the file is not supported and to use a legacy connector, the file's format or version isn't handled by the current uploader. Re-save the file in a supported format (for example, **.xlsx** or **.csv**) and try again.
+* A **"no data found"** message usually means the sheet Domo read was empty or the data didn't start where expected. Confirm the correct sheet is selected, remove blank leading rows, and make sure the header row and its data are present.
+
+{/* [pm-input] Tasleema Lallmamode — confirm the supported spreadsheet formats for file upload, the .xlsm limitation and .xlsx workaround, and the exact wording/cause of the "File is not supported / use legacy connector" and "no data found" upload errors. synthesized from community forum reports; needs confirmation. */}
+</Accordion>
+
+<Accordion title="Dates from an Excel file pulled through the Box connector came in as numbers.">
+
+Excel stores dates internally as serial numbers. When the Box connector reads an Excel file, date cells can be ingested as those underlying numeric serial values rather than as formatted dates. To recover date typing, convert the numeric value back to a date in Magic ETL — add a formula/column that converts the Excel serial number to a date, then set the resulting column's type to Date.
+
+{/* [pm-input] Tasleema Lallmamode — confirm the Box connector Excel-date-to-numeric casting behavior and the exact recommended recovery (Excel serial-date epoch offset and the Magic ETL function to use). synthesized from community forum reports; needs confirmation. */}
 </Accordion>
 </AccordionGroup>
 

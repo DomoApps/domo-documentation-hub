@@ -84,6 +84,31 @@ SUM(SUM(`Total Sales`) FIXED (BY `Region`))
 ```
 
 <Frame><img alt="Use_Case__5_Percent_of_Total.png" src="/images/kb/ka05w00000123Rt-00N5w00000Ri7BU-0EM5w000005vODy.png"/></Frame>
+#### Use Case #6: Share of Total, Market Share, and Percent of Revenue
+
+FIXED functions are the recommended way to build share-of-total, market-share, and percent-of-revenue calculations. They let you hold a denominator constant at a chosen level of detail while the numerator continues to respond to the dimensions on your card.
+
+The following syntax returns each region's share of the grand total across the DataSet (a market-share pattern):
+
+```
+SUM(SUM(`Total Sales`) FIXED (BY `Region`))
+/
+SUM(SUM(`Total Sales`) FIXED ())
+```
+
+To express each row's value as a percent of the overall total (for example, percent of total revenue) regardless of how the card is grouped, divide the row value by a FIXED grand total:
+
+```
+SUM(`Total Sales`)
+/
+SUM(SUM(`Total Sales`) FIXED ())
+```
+
+<Note>
+  **Note:** These calculations return a ratio, not a pre-formatted percentage. Set the field's format to percent in the card's value-formatting options to display it as a percentage.
+
+</Note>
+
 ## Applying Filter Logic
 
 The following example use cases specify how the calculation is affected by filters applied to the visualization.
@@ -135,6 +160,15 @@ The following gif shows sales by state, region, and country for various states i
 We select both the 'California' pill and the 'Apparel' pill to demonstrate what happens to the visualizations when we use state and category filters at the same time. Note that in the chart on the left, Region Sales and US Sales remain unchanged by the category filter for apparel. In the chart on the right, Region Sales and US Sales are using a FIXED calculation with the Filter Deny argument to prevent any state filters and are allowing the category filter to display Apparel sales for each geographical area.
 
 <Frame><img alt="Filter_Deny.gif" src="/images/kb/ka05w00000123Rt-00N5w00000Ri7BU-0EM5w000005vOE0.gif"/></Frame>
+## Tips and Common Pitfalls
+
+Keep the following in mind when writing share-of-total and other FIXED calculations:
+
+* **Filtering out a row also shrinks the FIXED denominator.** When a card or Dashboard filter removes rows, a FIXED expression respects that filter by default, so a share-of-total denominator shrinks along with the filtered data and the percentages no longer reflect the original total. To keep the denominator constant, add `FILTER NONE` to ignore all filters, or `FILTER DENY` on the specific field you are filtering. See [Applying Filter Logic](#applying-filter-logic), above.
+* **Place FIXED inside an aggregate.** FIXED must appear inside an aggregate wrapper, immediately after the inner aggregated expression—for example, `SUM(SUM(...) FIXED (BY ...))`. Writing `FIXED` at the very start of the calculation returns a syntax error.
+
+{/* [pm-input] Phil Fuchs — confirm the recommended FIXED pattern for replacing COUNT(DISTINCT ...) / cross-row distinct aggregation, and whether it is officially supported. Provenance: synthesized from community forum reports; needs confirmation. */}
+
 ## Frequently Asked Questions
 
 <AccordionGroup>

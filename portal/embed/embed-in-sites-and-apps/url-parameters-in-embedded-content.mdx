@@ -120,6 +120,10 @@ If a Pfilter is written incorrectly, the unfiltered version renders and a black 
   ![](/images/dev/stoplight.io/images/Screenshot-2023-11-09-at-12.06.54-PM.png>)
 </Frame>
 
+<Warning>
+**Warning: Pfilters are not a security boundary.** Because Pfilters live in the URL, a viewer can read, edit, or remove them and see the unfiltered data the embed has access to. Use them only for exploration and convenience — never to restrict which rows a viewer is allowed to see. For enforced per-user data restriction, apply the filter server-side with [Programmatic Filters](/portal/embed/embed-in-sites-and-apps/programmatic-filtering#programmatic-filters-vs-client-side-pfilters-security).
+</Warning>
+
 ## AppData
 
 ---
@@ -145,3 +149,25 @@ To find these view ids, when opening an embedded page, looking at the network tr
 ```html
 public.domo.com/embed/pages/abcde?viewId=835972594
 ```
+
+## Passing Filters and Parameters into App Studio Bricks
+
+---
+
+App Studio pages can contain **bricks** (custom-code apps, including blank bricks). Understanding how each URL parameter reaches a brick prevents the most common embed problems.
+
+**Pfilters and app filters** apply at the *page/dashboard* level. Any card or brick whose underlying DataSet has a column matching a Pfilter's `column` will be filtered on load. A brick that does not read from a matching DataSet column simply won't be affected.
+
+**Why a Pfilter can break a brick:** Pfilters are interpreted as column-level filter objects (`column` / `operand` / `values`). If a brick expects the value to be a plain configuration input rather than a column filter — or the `column` doesn't exist on the brick's data — the filter can fail to resolve, and the brick may render unfiltered with the black error bar or not render as intended. Only pass a value as a Pfilter when it maps to a real DataSet column the brick queries.
+
+**Passing arbitrary (non-column) parameters:** For values that are *not* a DataSet column filter — a selected location, a mode toggle, a deep-link value — use the [`appData`](#appdata) parameter instead of a Pfilter. `appData` is passed straight through to the app for the brick's code to parse and act on, with no column-matching requirement. Spaces are encoded as `+`:
+
+```html
+public.domo.com/embed/pages/abcde?appData=Salt+Lake+City
+```
+
+<Warning>
+**Warning:** Pfilters and `appData` in the URL are client-side and visible to the viewer. Do not use them to restrict which rows a brick can access — enforce per-user data restriction server-side with [Programmatic Filters](/portal/embed/embed-in-sites-and-apps/programmatic-filtering#programmatic-filters-vs-client-side-pfilters-security).
+</Warning>
+
+{/* [pm-input] Embed/Developer Docs (confirm owner) — confirm the exact failure mode when a Pfilter column does not map to a brick's DataSet (unfiltered render vs. non-render vs. error bar), and confirm the recommended split between Pfilters (column filters) and appData (arbitrary brick inputs) for App Studio bricks and blank bricks. <provenance: synthesized from community forum reports; needs confirmation.> */}

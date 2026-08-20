@@ -90,3 +90,50 @@ Most calculations use one of the following general formats:
 - While you can combine some functions in a calculation, you *cannot* stack numerical functions. For example, SUM(MIN()) is invalid.
 - Do *not* mix data types of values you put in a transformed column.  
   For example, in a CASE function, do not store "Yes" (string) and "0" (number) in the same column.
+
+---
+
+## Aggregate Values in a Group By Tile, Not the Formula Tile
+
+The Add Formula tile evaluates each row on its own, so it cannot total or average values across rows. Aggregate functions such as SUM, AVG, COUNT, and MIN/MAX belong in the [Group By tile](/s/article/360044876094) instead of the Add Formula tile.
+
+### Compute a Ratio of Two Sums
+
+To divide one total by another—for example, a margin percentage or conversion rate—perform both sums inside the same aggregation so they share one context. In the Group By tile's formula option, write the division directly:
+
+```
+SUM(`Profit`) / SUM(`Revenue`)
+```
+
+Because both SUM functions run in the same Group By, the result is the ratio of the group totals rather than a row-by-row division.
+
+### Why a Card Beast Mode Ratio Differs in Magic ETL
+
+A ratio Beast Mode that works on a card can return 0 or a blank value when the same expression is pasted into an Add Formula tile. A card's Beast Mode aggregates across all rows in the visualization, while the formula tile evaluates one row at a time and has no aggregate context. Move the calculation into a Group By tile (as shown above) to reproduce the card result.
+
+### Group By Formula Column Order
+
+Columns created with the formula option in a Group By tile are added in the order you create them and cannot be reordered inside the tile. To change the output order, add a Select Columns tile downstream and arrange the columns there.
+
+---
+
+## Fail a DataFlow on Bad Input (Data Validation)
+
+You can build a data sanity check directly into a formula with the `ERROR` function, which stops the DataFlow and returns the message you supply. Combine it with a CASE statement so the DataFlow fails only when a row violates a rule:
+
+```
+CASE
+  WHEN `Amount` < 0 THEN ERROR('Negative Amount found — check the source data')
+  ELSE `Amount`
+END
+```
+
+When every row passes the condition, the column returns its normal value and the DataFlow runs as usual. When any row matches the failing condition, the ERROR function halts the DataFlow so the bad data is never written to the output DataSet.
+
+Pair this pattern with failure notifications so the right people are alerted when a check fails. See [Configuring Notifications for Failed DataFlows](/s/article/360042923154).
+
+<Note>
+  **Note:** Because the Add Formula tile evaluates one row at a time, an empty (zero-row) input has no rows for the formula to test, so a row-level ERROR check will not fire on an empty DataSet on its own.
+</Note>
+
+{/* [pm-input] Andrea Henderson — confirm the supported pattern for intentionally failing a DataFlow when the input returns zero rows (e.g. a Group By count row feeding an ERROR formula). synthesized from community forum reports; needs confirmation. */}

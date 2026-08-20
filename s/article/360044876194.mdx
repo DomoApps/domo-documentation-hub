@@ -180,6 +180,29 @@ This setting is optional and is not needed for the **Join Data** tile to functio
 
 Selecting one of the options validates the constraint at the time the join attempts to execute in the DataFlow. If the constraint is violated (for example, multiple values are in the right table and join to the same key on the left when the relationship is set as one-to-one), then you receive an error, and the DataFlow is terminated.
 
+Each option enforces a different expectation about how join-key values relate between the two tables:
+
+| Relationship Type | What It Enforces |
+| --- | --- |
+| Many to Many (Not Restricted) | No constraint is enforced. Any number of rows on either side can share the same join key. This is the default. |
+| Many to One | Multiple rows in the left table can match the same row in the right table, but each left-table row matches at most one right-table row. |
+| One to Many | Each left-table row can match multiple right-table rows, but each right-table row matches at most one left-table row. |
+| One to One | Each join key matches at most one row in each table. |
+
+Leave the setting at **Many to Many (Not Restricted)** if you do not need the integrity check.
+
+{/* [pm-input] Andrea Henderson — confirm the current enforcement status of Relationship Type constraints. Community reports describe a period where the asymmetric constraints (One-to-Many / Many-to-One) were reversed and enforcement was paused. synthesized from community forum reports; needs confirmation. */}
+
+### Troubleshoot a Join
+
+Use the following guidance when a join does not return the columns or rows you expect.
+
+**A column is missing from the join field list.** The dropdowns in the join criteria only list columns that reach the Join Data tile. If a column was dropped by an upstream Select Columns tile, or is restricted by Personalized Data Permissions (PDP) on the input DataSet, it will not appear as a join field. Add the column back in the upstream tile so it flows into the join.
+
+**The join key is not matching.** The columns you join on must share the same data type. A text key will not match a numeric key even when the values look identical, and differences such as zero-padding (for example, `007` versus `7`) prevent a match. Cast one side to match the other with a Set Column Type or formula tile upstream, and confirm both keys are formatted the same way. For more on preparing join keys, see [Join DataSets by Adding a Unique Key Column](/s/article/360043427933).
+
+**A Left Outer join still shows only matched rows on a card.** A Left Outer join keeps every row from the left table, but the right-table columns are null for rows that did not match. On a card, a filter on a right-table field—or a series or aggregation that excludes nulls—can hide those unmatched rows so the result looks like an inner join. Check the card's filters and fields, and wrap right-table columns in IFNULL in a downstream formula tile to give unmatched rows a default value.
+
 ## Split Join Tile (Limited Release)
 
 <Warning>

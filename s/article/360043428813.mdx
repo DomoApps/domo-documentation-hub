@@ -167,3 +167,13 @@ In this case, upon drilling, a user would see color rules applied as follows:
 <table class="mt-responsive-table" data-aura-rendered-by="33:209;a"><thead><tr><th colspan="1" rowspan="1"> Drill Level </th><th colspan="1" rowspan="1"> Color Rules </th></tr></thead><tbody><tr><td colspan="1" rowspan="1"><p> Top-level card </p></td><td colspan="1" rowspan="1"><p> X then Y </p></td></tr><tr><td colspan="1" rowspan="1"><p> Drill 1 </p></td><td colspan="1" rowspan="1"><p> X then Y </p></td></tr><tr><td colspan="1" rowspan="1"><p> Drill 2 </p></td><td colspan="1" rowspan="1"><p> A then B </p></td></tr><tr><td colspan="1" rowspan="1"><p> Drill 3 </p></td><td colspan="1" rowspan="1"><p> A, B, C, then D </p></td></tr><tr><td colspan="1" rowspan="1"><p> Drill 4 </p></td><td colspan="1" rowspan="1"><p> A, B, C, then D </p></td></tr></tbody></table>
 
 For more information about drilldown, see [Drilling into Data](/s/article/360042923994 "Adding Drill Path to Your Chart").
+
+## Limitations and Workarounds
+
+Keep the following limitations in mind when working with color rules:
+
+* **Color rules evaluate a single column.** A rule's condition is evaluated against the values in the column you select; it cannot reference the value of a *different* column. To color one column based on another column's value, first combine the logic into one column—for example, with a Beast Mode calculation or a DataFlow-derived column—then set the color rule on that column.
+* **Coloring is applied per column, not per row.** In tables, heatmap and color-rule shading are applied down each column, so there is no native per-row heatmap that compares values across a row. To approximate a per-row heatmap, normalize the values in Magic ETL (for example, into a shared scale) before charting.
+* **Scope: all cards vs. this card only.** When you save a rule, you choose **Apply to All Cards** (applies to every card built on the DataSet) or **Apply to Only this Card**. To change or clear a rule on a single card without affecting other cards, edit or remove the rule in that card's **Color Rules** dialog and save with **Apply to Only this Card**.
+
+{/* [pm-input] Chris Wright — confirm the following synthesized limitations/workarounds: (1) a color rule cannot reference another column's value; (2) there is no native per-row heatmap and the recommended workaround is ETL normalization (and/or an HTML-table Beast Mode with CONCAT + inline color, or emoji/unicode indicators); (3) drill-path color follow-through requires the colored column to be present in the drill view. synthesized from community forum reports; needs confirmation. */}

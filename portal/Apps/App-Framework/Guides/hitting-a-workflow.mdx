@@ -120,3 +120,15 @@ Finally, choose your workflow, then wire up the inputs.
 ![image.png](/images/dev/stoplight.io/images/image-96.png)
 
 Once you're done, click "Save and Finish" and you should now be able to start your workflow from your app.
+
+### Limitation: Public Embed Cannot Trigger Workflows
+
+---
+
+<Warning>
+**Warning:** A **publicly** embedded app runs in an anonymous context — there is no authenticated Domo user behind the request. Because starting a workflow (`domo.post('/domo/workflow/v1/models/{alias}/start', ...)`) and other write actions require an authenticated identity, these calls will fail from a public embed. Triggering workflows from an app is supported only when the app runs authenticated (inside the Domo instance, or in a **private/authenticated** embed).
+</Warning>
+
+If you need an externally facing, publicly embedded app to kick off a process, route the request through an external service you control instead: have the app call your own backend, and have that backend authenticate to Domo (for example, with a service account and the API) to start the workflow on the anonymous viewer's behalf.
+
+{/* [pm-input] Embed/Developer Docs (confirm owner) — confirm the precise set of actions blocked in a public/anonymous embed (workflow start, AppDB writes, other authenticated POST/PUT calls) and the recommended external-service/service-account pattern for triggering a workflow from a public embed. <provenance: synthesized from community forum reports; needs confirmation.> */}

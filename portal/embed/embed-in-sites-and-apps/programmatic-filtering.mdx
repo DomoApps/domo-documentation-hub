@@ -320,3 +320,33 @@ In the [JavaScript example code](/portal/embed/embed-in-sites-and-apps/code-exam
   <Frame>
     ![](/images/dev/web-assets.domo.com/blog/wp-content/uploads/2022/08/LinkingAcrossEmbedded7.png)
   </Frame>
+
+### Programmatic Filters vs. Client-Side pfilters (Security)
+
+---
+
+Programmatic Filters and [pfilters](/portal/embed/embed-in-sites-and-apps/url-parameters-in-embedded-content#pfilters) both use the same `column` / `operand` / `values` pattern, but they differ in one critical way: **where the filter is applied and whether the viewer can change it.**
+
+| | Programmatic Filters | pfilters (and JS API filters) |
+| --- | --- | --- |
+| Where applied | Server-side, before the embed token is issued | Client-side, in the URL or via the embed API |
+| Viewer can see / change | No — baked into the signed embed token | Yes — visible in the URL and editable by inspecting the page |
+| Use for | Enforced row-level security | Exploration and convenience filters only |
+
+<Warning>
+**Warning: pfilters are not a security boundary.** Because pfilters live in the URL (or are passed through the client-side JS API), a viewer can read them, edit them, or remove them entirely and see the unfiltered data the embed has access to. Never rely on pfilters to restrict which rows a viewer is allowed to see. For any per-user data restriction, apply the filter server-side with Programmatic Filters so it is enforced inside the signed embed token before the content ever reaches the browser.
+</Warning>
+
+For the full layered comparison of PDP, Programmatic Filters, JS API filters, pfilters, and in-product filters, see [Filtering Options](/portal/embed/embed-in-sites-and-apps/filtering-options).
+
+### PDP Inheritance When Querying Datasets via API
+
+---
+
+Programmatic Filters personalize what a viewer sees in an *embedded card or dashboard*. They do not, by themselves, change what rows a *direct DataSet API query* returns. When you query a dataset through the API using the service account's credentials, the request is authorized as that service account (the client id), so Personalized Data Permissions (PDP) policies are evaluated against the service account — not against the individual embed viewer.
+
+<Warning>
+**Warning:** If you query a PDP-governed dataset via the DataSet API and then hand the results to individual viewers, every viewer receives the rows visible to the service account, not the subset their own PDP policy would allow. To keep per-user restriction, either apply the equivalent Programmatic Filter (or an explicit filter) to each request, or render the data through the embed flow rather than a raw dataset query.
+</Warning>
+
+{/* [pm-input] Embed/Developer Docs (confirm owner) — confirm whether PDP policies can be inherited per requesting embed viewer when querying a dataset through the API (rather than being evaluated against the service-account client id), and document the exact access/permission requirements for the /cards/embed/auth flow. <provenance: synthesized from community forum reports; needs confirmation.> */}

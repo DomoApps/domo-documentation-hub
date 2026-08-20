@@ -53,3 +53,53 @@ async function syncCollection(collectionId) {
 ```
 
 4. Call the new Code Engine function in the Workflow with the collection id
+
+## How AppDB Sync Works
+
+---
+
+When a collection has `syncEnabled` set to `true`, Domo mirrors the collection's documents into a companion Domo DataSet so the data can be used in cards, dataflows, and other analytics. The manifest's `collections` entry is where `syncEnabled` and the DataSet `schema` are first declared — see the [manifest reference](/portal/Apps/App-Framework/Guides/manifest) and the [AppDB API](/portal/API-Reference/app-framework-apis/AppDB-API) for the collection and document endpoints.
+
+Key behaviors to know:
+
+- **Sync is on or off, not interval-tunable.** A collection either does not sync at all (`syncEnabled: false`) or syncs on Domo's standard cadence (approximately every 15 minutes). There is no setting to specify a custom interval, which is why the credit-saving recipe above toggles `syncEnabled` on and off around a forced sync.
+- **`syncEnabled` is a property of the collection**, not of an individual document. Toggle it with a `PUT` to `/api/datastores/v1/collections/{collectionId}` (see the code example above).
+- **A forced sync is a `POST` to the export endpoint:** `POST /api/datastores/v1/export/{datastoreId}`. Note this uses the collection's `datastoreId` (retrieved from the collection object), not the collection id.
+
+{/* [pm-input] Embed/Developer Docs (confirm owner) — confirm whether AppDB now exposes distinct "Scheduled" vs "API Update" sync modes and how each is selected/controlled, and whether the ~15-minute cadence still applies to both. <provenance: synthesized from community forum reports; needs confirmation.> */}
+
+## Force a Sync On Demand
+
+---
+
+To push a collection's current documents to its DataSet immediately instead of waiting for the next scheduled sync, send an empty `POST` to the export endpoint with the collection's `datastoreId`:
+
+```js
+await codeengine.sendRequest(
+  'post',
+  `/api/datastores/v1/export/${datastoreId}`,
+  '',
+);
+```
+
+The `datastoreId` is returned on the collection object (`GET /api/datastores/v1/collections/{collectionId}`). If `syncEnabled` is `false` for the collection, enable it (via the `PUT` shown above) before forcing the sync, or the export will have no synced DataSet to write to.
+
+## Troubleshooting: Dataset Isn't Syncing
+
+---
+
+If a collection's DataSet appears stuck or is not receiving updates, check the following:
+
+- **`syncEnabled` is `false`.** A collection created without a `schema` in the manifest, or one that was toggled off (for example by the credit-saving recipe above), will not sync until it is re-enabled.
+- **Owner permissions.** Collections won't sync if the owner lacks permission on the target DataSet. If a user is removed from Domo, their collection stops syncing, and the new owner must have both collection ownership and the appropriate admin permissions. See [AppDB API](/portal/API-Reference/app-framework-apis/AppDB-API).
+- **Waiting on the cadence.** After a document write, allow up to the ~15-minute sync window before the DataSet reflects the change, or force a sync as described above.
+- **Date formatting.** Documents whose fields map to `DATE` or `DATETIME` columns must be formatted as `YYYY-MM-DD` or `YYYY-MM-DDTHH:MM:SSZ` to sync successfully.
+
+### Writing Documents: PUT vs. POST
+
+When writing documents, use `POST` to create a new document in a collection and `PUT` to update an existing document by id:
+
+- **Create:** `POST /domo/datastores/v1/collections/{collectionName}/documents/`
+- **Update:** `PUT /domo/datastores/v1/collections/{collectionName}/documents/{documentId}`
+
+The `/api/datastores/v1/export/{datastoreId}` endpoint is only for forcing a collection-to-DataSet sync — it is not a document-write endpoint. Full request and response examples for creating, updating, querying, and deleting documents are in the [AppDB API reference](/portal/API-Reference/app-framework-apis/AppDB-API).

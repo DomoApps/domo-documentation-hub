@@ -112,6 +112,14 @@ The demo video below shows how the events are displayed with specific references
 
 **Warning:** If setting **overrideFilters=true**, filters will not load up **UNTIL** the parent communicates a filter state using the **/v1/filters/apply** event. Even if it is an empty filter state, the parent must communicate it to the embedded App Studio App.
 
+### Filters and bricks in App Studio
+
+**Definition:** When an App Studio page contains a brick (custom-code app, including a blank brick), page-level filters — whether applied by Pfilters, the JS API `/v1/filters/apply` event, or Programmatic Filters — reach the brick the same way they reach any card: a filter is matched against the brick's underlying DataSet by column name. A filter whose column does not exist on the brick's data has no effect on that brick.
+
+**Use Case:** Pass values that map to a real DataSet column as filters. For values that are *not* a column filter (a configuration input, a selected mode, a deep-link value), pass them as `appData` so the brick's code can parse them directly, rather than forcing them through a column filter. See [Passing Filters and Parameters into App Studio Bricks](/portal/embed/embed-in-sites-and-apps/url-parameters-in-embedded-content#passing-filters-and-parameters-into-app-studio-bricks).
+
+**Warning:** A value pushed as a Pfilter/JS API filter but not matching a column the brick queries can leave the brick unfiltered (with the black error bar) instead of applying as intended. Keep column filters and arbitrary brick inputs on separate channels.
+
 ## DOMO INTERACTIONS
 
 ### Page filters

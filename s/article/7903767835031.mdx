@@ -227,6 +227,52 @@ If you modify a Dashboard Variable Control and open a card with that Variable in
 Variables do not display in the dashboard Filters bar by default. If you add a Dashboard Variable Control and modify it (move the slider bar, for example), the Variable then displays in the Filters bar alongside other Filters and reflects the modified value.
 
 <Frame><img alt="Screen_Shot_2022-10-06_at_11.50.02_PM.png" src="/images/kb/ka0Vq0000008ZWr-00N5w00000Ri7BU-0EM5w000005vXlC.png"/></Frame>
+## Variable Scope and Limitations
+
+A Variable's definition is global to your instance, but its effect on any given card is scoped by where the Variable is used.
+
+### Which Cards a Variable Affects
+
+A Variable affects only the cards whose Beast Mode references it. Because a Variable must be used inside a Beast Mode to function (see the [Intro](#intro)), adding a Dashboard Variable Control does not change every card on a dashboard—only the cards that use that Variable in a Beast Mode respond when you modify the control. Cards that do not reference the Variable are unaffected.
+
+The Variable's *definition* (name, data type, and default value) is shared everywhere, so editing the default value propagates to every Beast Mode in your instance that uses the Variable, across DataSets and cards. The *control* does not propagate the same way; see [Default Control and Other Users](#default-control) and the [Controls](#controls) section for the control-vs-definition model.
+
+{/* [pm-input] Phil Fuchs — confirm whether variable logic must be removed from a Beast Mode before its associated control can be removed, and the exact behavior/error path when promoting an app that uses variables from dev to prod. Provenance: synthesized from community forum reports; needs confirmation. */}
+
+### Reference a Variable's Value in Labels and Text
+
+A Variable's selected value drives the results of any Beast Mode that references it, and those results flow into the card wherever the calculated field is used (as values, calculated columns, or a summary number). Displaying the Variable's selected value itself as dynamic label text—in the card title, axis labels, legends, or column headers—is a separate capability from the Variable control and is not something the control provides on its own.
+
+{/* [pm-input] Phil Fuchs — confirm the current scope for surfacing a variable's selected value as dynamic text: which card elements (title, axis labels, legends, column headers) can reference it today, and whether formatting can follow the selected metric. Provenance: synthesized from community forum reports; needs confirmation. */}
+
+## Build a Variable-Driven Toggle
+
+You can use a Variable to let viewers switch what a card shows—for example, toggling a card between month-to-date and year-to-date, or between two metrics—without building separate cards.
+
+1. Create a String Variable (for example, `Metric View`) with a dropdown [Default Control](#default-control) that offers the choices you want to toggle between, such as `MTD` and `YTD`.
+2. In a Beast Mode on the card, write a `CASE` statement that returns the appropriate measure based on the Variable's value:
+
+   ```
+   CASE `Metric View`
+     WHEN 'MTD' THEN <your month-to-date measure>
+     WHEN 'YTD' THEN <your year-to-date measure>
+   END
+   ```
+3. Add the calculated field to the card, then add the control to the dashboard as a [Dashboard Variable Control](#dashboard-variable-controls).
+
+To toggle which rows appear rather than which measure displays, write a Beast Mode that returns `'Yes'` or `'No'` based on the Variable, then apply that Beast Mode as a card filter set to `Yes`:
+
+```
+CASE WHEN <row condition referencing the Variable> THEN 'Yes' ELSE 'No' END
+```
+
+<Note>
+  **Note:** A Variable cannot change a column's data type or number format. To switch formatting (currency, percent, or plain number) based on a selection, build a formatted-label Beast Mode that returns text—for example, multiply a percent by 100, round it, and `CONCAT` the unit symbol—rather than expecting the Variable to reformat the value. Keep a separate raw-value Beast Mode when you also need the numeric value for sorting or charting.
+
+</Note>
+
+For related time-comparison patterns, see [Sample Beast Mode Calculations: Period-over-Period Transforms](/s/article/360043430133).
+
 ## Variables and Governance
 
 Who can create, edit, and use Variables?

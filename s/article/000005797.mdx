@@ -112,6 +112,12 @@ Shapes with parallel logic don't require any more configuration. When a workflow
 
 Shapes with parallel logic can accept multiple incoming flows. You can use a shape to combine multiple flows into a single flow. When the workflow reaches a shape with parallel logic, it waits for all incoming flows to reach that shape before moving forward.
 
+<Note>
+  **Ending a single branch:** A shape that combines parallel flows waits for *all* incoming flows before continuing. Ending only one parallel branch early—while the other branches keep running—is a distinct pattern.
+
+  {/* [pm-input] Ryan Despain — confirm the supported way to terminate a single parallel branch without ending the other active branches (for example, routing that branch to its own End step vs. an unsupported scenario). Synthesized from community forum reports; needs confirmation. */}
+</Note>
+
 ### Email
 
 Adding an email User Task enables the workflow to automatically send an email to configured recipients. Recipients can respond to the email by using the options embedded in the email body, which display as buttons.
@@ -141,6 +147,21 @@ As you map your parameters for email and form User Tasks or any Code Function, y
 </Note>
 
 <Frame><img alt="Screenshot 2024-09-20 at 3.22.24 PM.png" src="/images/kb/ka0Vq000000Dteb-00N5w00000Ri7BU-0EMVq000002pjun.jpg"/></Frame>
+
+### Send Email and Notification Functions
+
+The [Email](#email) User Task above sends an *in-app* email to Domo users and waits for a button response. When a workflow needs to send an outbound email or notification instead, you add a send-email/notification [custom function](#custom-function) to a shape and map its parameters like any other function. Use the [String Builder](#use-string-builder) to assemble the message body from custom text and variables.
+
+The following behaviors of the outbound email/notification function are frequently asked about. Because these details are not yet confirmed for this reference, they are flagged for PM verification rather than described definitively:
+
+{/* [pm-input] Ryan Despain — confirm what the attachments field of the Send Email/Notification function expects (Domo Files API file IDs), whether attachments are passed as a List(Number) of file IDs, and how to attach multiple files. Synthesized from community forum reports; needs confirmation. */}
+
+{/* [pm-input] Ryan Despain — confirm whether the email body supports HTML, and any limitation on rendering hyperlinks (href) in the delivered email. Synthesized from community forum reports; needs confirmation. */}
+
+{/* [pm-input] Ryan Despain — confirm the sender/From and Reply-To behavior (whether these are governed by the global Brand Kit SMTP configuration and therefore not per-message) and whether a CC field is supported. Synthesized from community forum reports; needs confirmation. */}
+
+{/* [pm-input] Ryan Despain — confirm the supported recipient inputs (single Person vs. Person List variable, plain email addresses for non-Domo-user recipients, and recipients sourced from a DataSet column) and how to map a query-result object so that dynamic body fields populate instead of returning null. Synthesized from community forum reports; needs confirmation. */}
+
 ### General Task
 
 When you choose a general task, you can choose a queue, assign the form to a user, and use the **Select a Form** option to create or add a new form. Learn more in the [Forms](/s/article/000005171#forms-in-workflows) documentation.

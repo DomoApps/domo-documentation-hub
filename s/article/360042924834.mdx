@@ -255,3 +255,20 @@ The Analyzer currently includes options only for a single series when building p
    - Prior Year: ``(CASE WHEN `Year Offset` = -1 THEN `Amount` END)``
 
 For more information about DataFlows, see [Data Transformation](/s/topic/0TO5w000000ZamzGAC).
+
+## Period-over-Period Card Limitations
+
+Keep the following constraints in mind when deciding whether the native period-over-period chart fits your comparison:
+
+- **Single series only.** A period-over-period chart accepts one x-axis (date) column and one y-axis (value) column — you can't add a separate series column. For a workaround using DataFlows and Beast Mode, see [Multiple series in period-over-period charts](#multiple-series-in-period-over-period-charts) above.
+- **Comparison window.** Under **Compare to**, you can select from the four most recent instances of a period (for example, the four months prior to the current month). Comparisons outside that window aren't available from the date filter.
+- **No drilling.** Drilling on period-over-period charts isn't supported, and because drill-path cards default to "All Time," a period-over-period chart can't be selected within a drill path.
+- **No export.** Period-over-period charts can't be exported.
+
+## Beast Mode Alternatives for Flexible Comparisons
+
+When you need a comparison the native card can't produce — such as a month-over-month percent-change line, a side-by-side tabular year-over-year layout, or current-year/prior-year measures on the same card — build the comparison with Beast Mode calculations instead. For sample calculations, see [Sample Beast Mode Calculations: Period-over-Period Transforms](/s/article/360043430133 "Sample Beast Mode Calculations: Period-over-Period Transforms").
+
+<Note>
+  **Note:** When you build these comparisons in Beast Mode, avoid hardcoding a specific year (for example, ``YEAR(`DateColumn`) = '2025'``). A hardcoded year prevents the card from responding to the native **Card date range** (Choose Date) filter, so the comparison won't roll forward as time passes or react to the date picker. Use expressions relative to the current date — such as `CURRENT_DATE()` and `YEAR(CURRENT_DATE())` — so the calculation stays filter-aware.
+</Note>

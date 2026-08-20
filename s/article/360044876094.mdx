@@ -70,6 +70,24 @@ Follow these steps to configure the Group By tile:
 | Combine strings separated by , | Combines all of the text values in the column, separating them with commas. | Text |
 | Combine distinct strings separated by , | Combines all of the DISTINCT text values in the column, separating them with commas. | Text |
 
+#### Combine String Values (GROUP_CONCAT)
+
+The **Combine strings separated by ,** and **Combine distinct strings separated by ,** aggregation types concatenate the text values in each group into a single comma-separated value. Like the underlying `GROUP_CONCAT` function, they skip null values, and a group with no matching rows returns null.
+
+To combine only unique values, choose the **Combine distinct strings separated by ,** aggregation type. To use a separator other than a comma—or to build the concatenation as part of a larger calculation—add a formula in the Group By tile and call `GROUP_CONCAT` directly, specifying the separator:
+
+```
+GROUP_CONCAT(`Product` SEPARATOR ', ')
+```
+
+For the full function definition, see [Supported Functions in Magic ETL Reference Guide](/s/article/360044289573).
+
+{/* [pm-input] Andrea Henderson — confirm whether GROUP_CONCAT(DISTINCT ...) is supported inside a Group By tile formula. The Supported Functions reference notes DISTINCT/ORDER BY are not supported in Magic ETL v2, while the SQL Expressions reference lists [DISTINCT]. synthesized from community forum reports and conflicting repo references; needs confirmation. */}
+
+<Note>
+  **Note:** Combining values across rows and returning a cross-row distinct result are functions of the Group By tile, not of a card Beast Mode. A Beast Mode cannot concatenate or return a distinct sum across rows—use the Group By tile for those results.
+</Note>
+
 ### Use Group By in Magic ETL (video)
 
 ## Rank & Window Tile

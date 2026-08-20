@@ -249,6 +249,112 @@ Priority `rec=update` gaps from the community forum analysis. Text written self-
 
 ---
 
+### Phase 3b-Forum — High Update Targets (Complete — 2026-08-20)
+
+All 61 High `rec=update` forum gaps closed via 10 parallel subagents in 2 waves, clustered by PM; one file per agent (no write collisions); cross-links consolidated in a main-session follow-up pass. **45 files updated** (39 `s/article` + 6 `portal` docs), **71 new `[pm-input]` markers**. No screenshots added (clean-article policy; no applicable source shots). Two ranks (42, 93) were re-routed to their correct home articles after agents found the scored target mismatched. Change detail by rank was sourced from `_gaps_with_support.json`.
+
+**Phil Fuchs — Beast Mode / PoP / PDP / Variables:**
+
+| Filename | Ranks | Change | `[pm-input]` |
+|----------|-------|--------|--------------|
+| `7903767835031.mdx` | 29, 78, 87 | Variable scope (which cards a variable affects), reference value in labels/text, build a variable-driven toggle | 2 |
+| `4408174643607.mdx` | 38 | FIXED share-of-total use case + Tips/Common Pitfalls (filter-shrinks-denominator; FIXED must sit inside an aggregate) | 1 |
+| `360042925474.mdx` | 34 | Merged Beast Modes when moving a card to a new DataSet | 1 |
+| `360042925494.mdx` | 39 | STR_TO_DATE/DATE_FORMAT mask matching; custom week start/week-ending label; BM-vs-ETL availability. **Fixed pre-existing stale link** (specifier article → `360043429953`) | 0 |
+| `360043430053.mdx` | 73, 80 | FAQs: sum/aggregate a boolean column; AVG-of-CASE lower-than-expected. Updated "percent of total" answer to add FIXED | 1 |
+| `360043430153.mdx` | 30, 67 | Troubleshooting: column-does-not-exist, COUNT vs SUM of CASE, CASE evaluation order, syntax checklist, HTML-encoded chars | 1 |
+| `360042924834.mdx` | 16 | PoP card limitations + Beast Mode alternatives (don't hardcode `YEAR()`) | 0 |
+| `360042934614.mdx` | 79 | PDP-does-not-restrict-Admins Warning; auto-share-on-enable flagged | 1 |
+
+**Andrea Henderson — Magic ETL / AutoML:**
+
+| Filename | Ranks | Change | `[pm-input]` |
+|----------|-------|--------|--------------|
+| `360044258533.mdx` | 51, 101 | Aggregate in a Group By tile (not Formula tile) ratios/order; Fail-a-DataFlow-on-bad-input (`ERROR()`) validation | 1 |
+| `360044876094.mdx` | 52 | GROUP_CONCAT string combine (null-skip, SEPARATOR) | 1 |
+| `360044876194.mdx` | 20, 106 | Relationship Type definition table; Troubleshoot a Join | 1 |
+| `360043427653.mdx` | 31 | Larger Grid and canvas display options | 1 |
+| `000005809.mdx` | 35 | Recursion / recursive-CTE not supported + workarounds | 1 |
+| `360043427953.mdx` | 23, 24 | Saved-but-Incomplete status, disconnected tile, engine errors; output-DataSet-deleted, historical correction in append | 3 |
+
+**Chris Wright — Charting / Analyzer:**
+
+| Filename | Ranks | Change | `[pm-input]` |
+|----------|-------|--------|--------------|
+| `360042923914.mdx` | 70 | Multi-select page filters use OR logic (workarounds) | 1 |
+| `360042924034.mdx` | 93 | Re-routed: tracking marker only — content added to Notebook Card articles (target mismatch) | 1 |
+| `360042925374.mdx` | 54 | Row display limits note | 0 |
+| `360043428813.mdx` | 68 | Color Rules Limitations and Workarounds | 1 |
+| `360043429293.mdx` | 85 | Gauge: stop abbreviation; value+target+% needs a multi-value gauge | 1 |
+| `360043429473.mdx` | 60 | Pivot Table Limitations and Workarounds | 1 |
+| `360043429573.mdx` | 74 | "Which Table Type Should I Use?" decision guide | 1 |
+| `360043430233.mdx` | 93 (re-route home) | Formatting Support and Limitations (card-type matrix, summary-number font, export) | 2 |
+
+**Ryan Despain — Workflows / Governance Toolkit / Projects & Tasks:**
+
+| Filename | Ranks | Change | `[pm-input]` |
+|----------|-------|--------|--------------|
+| `000005171.mdx` | 53 | Multi-select answers stored in one delimited cell + split workaround | 1 |
+| `000005179.mdx` | 43, 65 | Pass app context into a workflow; Trigger limitations | 2 |
+| `000005797.mdx` | 48 (+65) | Send Email and Notification Functions; end-a-single-branch note | 5 |
+| `000005865.mdx` | 92 | AI Agent best practices (knowledge vs query results; model selection) | 1 |
+| `360043437773.mdx` | 75 | Scheduled Reports Current Limitations | 1 |
+| `6814561223959.mdx` | 15 | Data Types, Leading Zeros, and Views | 2 |
+| `360042925874.mdx` | 42 (re-route home) | Create or Update Tasks Programmatically (no native Workflows action; Code Engine + API) | 1 |
+
+**Khushboo — App Studio:**
+
+| Filename | Ranks | Change | `[pm-input]` |
+|----------|-------|--------|--------------|
+| `000005295.mdx` | 40, 63, 72, 76, 94, 97, 110 | Share an App (app-level only); Design the Mobile Layout; Known Editor Behaviors; Filter Behavior and Limitations; Tabs Tips and Limitations | 15 |
+| `000005829.mdx` | 46 | Report Builder FAQs (recipient filters, frequencies, PDF/PPT export, change propagation) | 2 |
+
+**Tasleema Lallmamode — Connectors:**
+
+| Filename | Ranks | Change | `[pm-input]` |
+|----------|-------|--------|--------------|
+| `360042926294.mdx` | 36, 41, 59, 102 | MFA auth; zero-row Replace no-wipe; spreadsheet upload failures; Box Excel-date-as-number | 4 |
+| `360042929154.mdx` | 108 | Adobe 1.4 (Deprecated) → recreate-on-v2 migration note (kept minimal) | 1 |
+| `360042932974.mdx` | 37 | Federated unfiltered/materialization query FAQ | 1 |
+
+**Cross-product (per-file PM):**
+
+| Filename | Ranks | PM | Change | `[pm-input]` |
+|----------|-------|----|--------|--------------|
+| `360042934594.mdx` | 19, 45 | Dan Brinton | Activity Log actions/objects; card-view reconcile | 2 |
+| `360043439293.mdx` | 18 | Dan Brinton | DataFlow trigger/schedule not exposed | 1 |
+| `360045120554.mdx` | 105 | Mamta Bolaki | Dataset names/descriptions/visibility for subscribers | 1 |
+| `4403367344023.mdx` | 95 | Mamta Bolaki | Sandbox Best Practices | 1 |
+| `000005561.mdx` | 88, 104 | Ken Boyer | AI Readiness: synonym-save FAQ; subscriber metadata carryover | 2 |
+| `Configure-Data-Freshness-and-Caching-in-Cloud-Integrations.mdx` | 90 | Jordan Jensen | Manual refresh; move DataSet View across CA connections | 2 |
+
+**Embed / Developer docs (`portal/`, owner TBD):**
+
+| Filename | Ranks | Change | `[pm-input]` |
+|----------|-------|--------|--------------|
+| `workflow-appdb-sync.mdx` | 96 | AppDB sync mechanics, force-sync, troubleshooting, PUT vs POST | 1 |
+| `programmatic-filtering.mdx` | 98 | Programmatic filters vs client-side pfilters (security); PDP inheritance | 1 |
+| `url-parameters-in-embedded-content.mdx` | 58, 98 | Passing filters/params into App Studio Bricks; pfilter security Warning | 1 |
+| `filtering-options.mdx` | 58 | Filters and bricks in App Studio | 0 |
+| `hitting-a-workflow.mdx` | 58 | Public embed cannot trigger workflows | 1 |
+| `domo-js-v5.mdx` | 58 | `filterContainer()` empty-array clearing difference (App State) | 1 |
+
+**Cross-links added in the main-session follow-up pass:**
+- `360042925494.mdx` — fixed stale specifier link (`360043430153` → `360043429953`)
+- `360042923154.mdx` — reciprocal Tip linking the `360044258533` data-validation section
+
+**Deferred secondary / other-file items (optional enhancements — each rank's PRIMARY target is addressed; logged for a later pass):**
+- rank 54 → tooltip-field cap + average-line-with-series in general chart-properties/chart-type articles
+- rank 60 → dynamic-pivot ETL guidance in `360044951294` (Magic ETL Pivot tile)
+- rank 74 → Flex Table period-over-period config in `360043429073`
+- rank 79 → "Unshare App does not unshare cards" in App Studio sharing (`000005295`)
+- rank 16 → additional filter-respecting PoP Beast Mode samples in `360043430133`
+- rank 65 → Workflow Start Form Brick (`000005372`) refresh; rank 75 → Dashboard export note (`360043437893`, SharePoint/auth images); rank 92 → summarize-and-email how-to content in `000005369`
+- rank 108 → consolidated connector-retirements article (net-new) + `360042929174` / SharePoint / Facebook pages; rank 41 → SQL Server zero-row behavior; rank 59/102 → dedicated file-upload & Box connector articles
+- rank 96 → reciprocal link on the AppDB-API doc
+
+---
+
 ## Phase 4 — Archived / Legacy / Deleted Articles (Not Started)
 
 Rows will be added here as articles are retired. No article may be deleted or archived without an entry here.

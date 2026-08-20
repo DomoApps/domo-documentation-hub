@@ -148,6 +148,18 @@ When creating a new app with a similar configuration, you can duplicate an exist
 
 Your new app displays in Apps Home by alphabetical title.
 
+## Share an App
+
+To share an app, open it and select <img src="/images/kb/ka0Vq000000C3gT-00N5w00000Ri7BU-0EM5w000006wBJ2-1.jpg" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}} /> **Distribute** in the app's [main navigation](#view-an-app). You can share the app with users and groups in your Domo instance, or enter an email address to invite a new user, and you can send an email notification of the shared app. To control which rows of data each viewer sees, apply [Personalized Data Permissions (PDP)](/s/article/360042934614) to the underlying DataSets.
+
+### App Sharing Is App-Level Only
+
+Sharing in App Studio applies to the entire app. There is currently no way to share or hide individual pages with different users or groups, and personalized data permissions cannot be scoped to a single app page. Every user who has access to an app can open all of its visible pages.
+
+When different audiences need different pages, the supported approach is to build a separate app for each audience and share each app with the appropriate users or groups. You can [duplicate an app](#duplicate-an-app) to reuse a common structure as a starting point.
+
+{/* [pm-input] Khushboo — confirm that App Studio sharing is app-level only (no per-page or per-group page visibility, and no per-page PDP), and that the recommended workaround is separate apps per audience. Synthesized from community forum reports; needs confirmation. */}
+
 ## Embed an App
 
 <Warning>
@@ -321,6 +333,20 @@ To add or modify your app's pages and navigation:
 
    <Frame>![](/images/kb/app-studio-enhancements-screenshot-11.png)</Frame>
 
+### Design the Mobile Layout
+
+App Studio maintains a mobile layout that is separate from the desktop layout. Use the **Desktop/Mobile toggle** in the [main navigation](#main-navigation) to switch between the two views while editing. Because the layouts are independent, you can tailor the mobile experience—rearranging, resizing, and hiding elements—without changing how the app looks on desktop.
+
+{/* [pm-input] Khushboo — confirm that the App Studio mobile layout is independent of the desktop layout (element position, size, and visibility can be set separately per view) and that desktop edits do not overwrite the mobile layout. Synthesized from community forum reports; needs confirmation. */}
+
+When an app uses [tabs](#add-tabs), you can size the cards within each tab for the mobile view. Be aware that resizing a card inside one tab can apply the same sizing to the corresponding cards in the other tabs, so review every tab after you adjust card sizes on mobile.
+
+{/* [pm-input] Khushboo — confirm the per-tab card-sizing behavior on mobile: whether resizing a card in one tab propagates that size to cards in other tabs, and the supported way to give a card a different size on a specific tab. Synthesized from community forum reports; needs confirmation. */}
+
+On mobile, pages follow the order set in [Pages and navigation](#pages-and-navigation). If the mobile order does not match the desktop order, confirm the page order in the **Order** tab and save the app again.
+
+{/* [pm-input] Khushboo — confirm how tab and page order is determined on mobile (whether it follows the desktop Order tab) and whether there is a known issue in which mobile tab order can differ from desktop. Synthesized from community forum reports; needs confirmation. */}
+
 ### Left Navigation and Side Panel
 
 From the left navigation, you can go to the following sections:
@@ -480,6 +506,28 @@ The save interface is located in the top-right corner of the editor and provides
 
 <Note>**Note:** The Undo and Redo features work only on the page you are currently on and restart when you move to a new page within the app. Any changes you make to other pages take effect once you save your progress.</Note>
 
+### Known Editor Behaviors and Troubleshooting
+
+Keep the following editor behaviors in mind while building an app.
+
+- **Save and Close returns to view mode.** Selecting **Save and Close** commits your changes and exits the editor to View Mode. To keep working after you save, select **Save** instead. See [Use Advanced Saving Options](#use-advanced-saving-options-in-app-studio).
+
+- **App background vs. page background.** An app has an overall background set in the [App theme](/s/article/000005543), and each page has its own background set under [Format Page](#format-page). A page background is drawn on top of the app background, so setting a page background color can cover the app background on that page. To let the app background show through, clear or remove the page background.
+
+{/* [pm-input] Khushboo — confirm the interaction between the app-level background (App theme) and a page-level background (Format Page): that a page background paints over the app background and there is no transparency option to let the app background show through. Synthesized from community forum reports; needs confirmation. */}
+
+- **Conditional-formatting Apply-To may show blank column names.** When you configure conditional formatting on a card inside the app editor, the **Apply to** column list can display blank. As a workaround, edit the card on a traditional dashboard in Analyzer, configure the conditional formatting there, then return to the app.
+
+{/* [pm-input] Khushboo — confirm the conditional-formatting "Apply to" blank-column-list behavior when editing a card inside App Studio, and that the supported workaround is to edit the card on a traditional dashboard in Analyzer. Synthesized from community forum reports; needs confirmation. */}
+
+- **Multiple people editing the same app.** Before several people edit the same app at the same time, coordinate who is working on which pages. Concurrent edits to the same content can overwrite one another when saved.
+
+{/* [pm-input] Khushboo — confirm the current concurrent-editing behavior in App Studio: whether multiple users can safely edit the same app (or different pages of the same app) at once, and what happens to conflicting changes when each person saves. Synthesized from community forum reports; needs confirmation. */}
+
+- **Recreate a page if the layout becomes corrupted.** If a page's layout stops behaving correctly and cannot be repaired by editing the affected elements, the reliable fix is to rebuild the page—add a new [app page](#add-an-app-page) and re-add the content—rather than continue troubleshooting the damaged layout.
+
+{/* [pm-input] Khushboo — confirm that rebuilding a page is the recommended recovery step for a corrupted App Studio page layout, and whether a support-assisted repair path exists. Synthesized from community forum reports; needs confirmation. */}
+
 ### Configure Persistent Filters
 
 You can configure persistent filters in the **Filter** **Options** tab of the **App Configuration** section. Making a filter persistent means that when app users turn on the filter, it takes effect across all app pages using some or all columns in a DataSet. You can also configure other elements, like Variables and date filters, to persist throughout the app.
@@ -529,6 +577,28 @@ You can confirm whether a filter persists by going to the [Controls](#view-an-ap
 <Frame>
   <img alt="globe icon.jpg" src="/images/kb/ka0Vq000000C3gT-00N5w00000Ri7BU-0EMVq000001dDo1.jpg" />
 </Frame>
+
+### Filter Behavior and Limitations
+
+Keep the following behaviors in mind when you work with filters and controls in an app.
+
+- **Clear Filters does not reset persistent filters.** Clearing filters—whether with a **Clear filters** button action or **Clear All** in [Controls](#view-an-app)—removes standard page filters, but it does not reset [persistent filters](#configure-persistent-filters), persisted date ranges, or persisted Variable controls. To change a persisted value, adjust that filter or control directly rather than clearing filters.
+
+- **Allow filtering is all or nothing.** In a card's [Filter Exceptions](#filter-exceptions-tab) tab, **Allow filtering** subjects the card to either all page filters or none of them. There is no way through this setting to allow only some filter columns to affect a single card.
+
+{/* [pm-input] Khushboo — confirm that a card's Filter Exceptions "Allow filtering" setting is all-or-nothing (there is no way to allow only specific filter columns to affect one card while ignoring others). Synthesized from community forum reports; needs confirmation. */}
+
+- **A filter can appear applied without affecting cards.** Occasionally a filter shows as selected in Controls but does not change the cards on the page. If this happens, clear and re-apply the filter, and confirm the affected cards allow filtering in their [Filter Exceptions](#filter-exceptions-tab).
+
+{/* [pm-input] Khushboo — confirm the reported behavior in which a filter selection persists visually in Controls but does not apply to cards, and the correct resolution. Synthesized from community forum reports; needs confirmation. */}
+
+- **Limit which fields app viewers can filter on.** App viewers add filters from **Controls** > **Add Filter**, which draws from the columns on the app's DataSets.
+
+{/* [pm-input] Khushboo — confirm whether and how an app owner can limit which columns appear in Controls > Add Filter for viewers (for example, through a Filter Options setting or a per-DataSet configuration). Synthesized from community forum reports; needs confirmation. */}
+
+- **Set a relative default date filter.** To give app viewers a default date range that stays relative (such as the last 30 days), open [Controls](#view-an-app), add a date range, and save it as the default Filter View for the app so every viewer opens with that range applied.
+
+{/* [pm-input] Khushboo — confirm the supported method for a dynamic/relative default date filter in App Studio (Filter Views with a relative range, and any Beast Mode approach), and the reported limitation that a dropdown filter card cannot supply a relative default date. Synthesized from community forum reports; needs confirmation. */}
 
 # <img src="/images/kb/ka0Vq000000C3gT-00N5w00000Ri7BU-0EM5w000006wDB5.jpg" style={{width: 40, height: 40, display: 'inline', verticalAlign: 'start', margin: '0'}} /> Pages and Navigation
 
@@ -953,6 +1023,26 @@ You cannot undo a deletion.
   <Frame>
     <img alt="delete tab element.jpg" src="/images/kb/ka0Vq000000C3gT-00N5w00000Ri7BU-0EM5w000006wC0u.jpg" />
   </Frame>
+
+#### Tabs Tips and Limitations
+
+Keep the following in mind when you build with tabs.
+
+- **Nest components inside the tab, not just over it.** When you add cards and other elements to a tab, drag each one onto the blue line that appears inside the tab so it is technically nested in the tab and not merely positioned on top of it. Elements that only look like they are inside a tab can cause the app to fail to save.
+
+- **Tabs share a height.** A Tabs element sizes to the tallest tab, so a tall tab adds empty space to shorter tabs. To balance the height, add a [Spacer](#add-a-spacer) to the shorter tabs. This spacer adjustment applies to the desktop layout and does not carry over to the mobile view. (As noted above, the Tabs layout also will not resize smaller if the last item in any tab is at its minimum height.)
+
+{/* [pm-input] Khushboo — confirm the tab nesting/save behavior (improperly nested components causing save failures) and the shared-height behavior with the Spacer workaround, including that the spacer workaround does not carry over to mobile. Synthesized from community forum reports; needs confirmation. */}
+
+- **You cannot copy a tab's layout to another tab.** Each tab's layout is built independently; there is no option to copy one tab's arrangement of elements into another tab.
+
+- **You cannot link directly to a tab.** A [Page Drill](#page-drill) or button action can open an app page, but it cannot open a specific tab within a page. Use separate pages when you need a direct link to specific content.
+
+{/* [pm-input] Khushboo — confirm the current limitations that a tab layout cannot be copied to another tab and that no navigation action (Page Drill or button) can deep-link to a specific tab within a page. Synthesized from community forum reports; needs confirmation. */}
+
+- **There is no collapsible or accordion element.** App Studio does not include a collapsible or accordion section. To keep long pages manageable, split content across [tabs](#add-tabs) or additional [app pages](#add-an-app-page).
+
+{/* [pm-input] Khushboo — confirm that App Studio has no accordion/collapsible-section element today and that tabs or additional pages are the recommended alternative for long pages. Synthesized from community forum reports; needs confirmation. */}
 
 ### Add a Domo App
 

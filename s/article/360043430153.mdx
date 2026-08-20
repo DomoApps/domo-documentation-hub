@@ -103,3 +103,51 @@ Many times, strings will leave unwanted spaces at the end or beginning of the va
 For example, if the `Zipcode` column contains values that have white space, such as '12345   '. Knowing white space exists in your values is extremely important if you are, for example, using the `COUNT()` function. `COUNT()` will count the number of characters in a string, including white space. By using the `trim()` function first, you ensure that you count only the number of valid characters in your `Zipcode` values.
   
 `` COUNT(TRIM(`Zipcode`)) ``
+
+## "A Column in the Calculation Does Not Exist"
+
+This error usually means a string literal was left unquoted, so Beast Mode is trying to read it as a column name. Wrap string values in single quotes so they aren't interpreted as columns:
+
+```
+CASE WHEN `Status` = Won THEN 1 ELSE 0 END      -- error: Won is read as a column
+CASE WHEN `Status` = 'Won' THEN 1 ELSE 0 END    -- correct: 'Won' is a string value
+```
+
+The same error appears when a calculation references a column that isn't in the DataSet powering the card — for example, a mistyped column name, or a shared Beast Mode that expects a column the current DataSet doesn't have.
+
+## COUNT vs. SUM of a CASE Statement
+
+Both `COUNT` and `SUM` can aggregate a `CASE`, but they behave differently:
+
+- `COUNT(CASE WHEN ... THEN 1 END)` counts the rows that match the condition. Non-matching rows return `NULL` (there is no `ELSE`), and `COUNT` ignores `NULL`, so only matching rows are counted.
+- `SUM(CASE WHEN ... THEN 1 ELSE 0 END)` adds up the 1s, which also totals the matching rows. Here the `ELSE 0` is required so every row contributes a numeric value.
+
+Avoid mixing the two patterns. `COUNT(CASE WHEN ... THEN 1 ELSE 0 END)` counts *every* row — both the 1s and the 0s — which is a common cause of inflated counts.
+
+## CASE Evaluation Order
+
+A `CASE` statement evaluates its `WHEN` conditions from top to bottom and stops at the first one that is true. Order your conditions from most specific to most general so that a broad condition doesn't capture rows before a narrower one can. For example, place a `> 90` bucket before a `> 50` bucket; otherwise every value above 90 is caught by the `> 50` condition first.
+
+## Syntax Error Checklist
+
+If you see the message "This calculation contained a syntax error," check the following:
+
+- Column names are wrapped in backticks: `` `column` ``.
+- String values are wrapped in single quotes: `'text'`.
+- Numeric values have no quotes.
+- Every `CASE` has matching `CASE`, `WHEN`, `THEN`, and `END` keywords, with a `THEN` for each `WHEN`.
+- Aggregations wrap the entire expression rather than sitting inside the `CASE` — for example, `SUM(CASE ... END)`, not `CASE ... THEN SUM(...) END`.
+
+## HTML-Encoded Characters in Text Values
+
+Text imported from web sources sometimes contains HTML-encoded characters — for example, an ampersand stored as `&amp;` instead of `&`, or an apostrophe stored as `&#39;` instead of `'`. These encoded values can display inconsistently: a table cell might show the raw code (`AT&amp;T`) while a chart tooltip shows the decoded character (`AT&T`), or the reverse.
+
+The most reliable fix is to normalize the values upstream in Magic ETL, before they reach the card, using `REPLACE` in a formula tile to swap the encoded string for the character you want:
+
+```
+REPLACE(`Company`, '&amp;', '&')
+```
+
+You can stack multiple `REPLACE` calls to handle several encoded characters. Because normalizing in Magic ETL writes the corrected value back into the DataSet, every card, table cell, and tooltip then reads the same clean text.
+
+{/* [pm-input] Phil Fuchs — Confirm the reported table-cell vs. chart-tooltip rendering discrepancy for HTML-encoded characters, and that a card-level Beast Mode REPLACE may correct the value in table cells but not in chart tooltips (so normalizing in Magic ETL is the recommended fix). Synthesized from community forum reports; needs confirmation. */}

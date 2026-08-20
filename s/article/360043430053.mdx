@@ -139,10 +139,12 @@ For more information about summary numbers, see [Configuring Your Chart Summary 
 
 **Can I do "percent of total" functions in Beast Mode?**
 
-No, but you can insert a data label into your chart that contains the percent of total value by doing the following:
+Yes. There are two approaches:
 
-1. In Analyzer, open **Chart Properties**.
-2. In **Data Label Settings**, enter `%_PERCENT_OF_TOTAL` in the **Text** field.
+- **Beast Mode FIXED functions (recommended).** A FIXED function lets you compute a denominator that ignores the current row's grouping, so you can build share-of-total, percent-of-revenue, and market-share calculations directly in Beast Mode. For syntax and worked examples, see [Beast Mode FIXED Functions](/s/article/4408174643607 "Beast Mode FIXED Functions").
+- **Percent-of-total data label.** If you only need to display the percent of total as a chart label (rather than calculate it), insert a data label:
+  1. In Analyzer, open **Chart Properties**.
+  2. In **Data Label Settings**, enter `%_PERCENT_OF_TOTAL` in the **Text** field.
 
 **Why can't I put Beast Mode calculations in the Filter field?**
 
@@ -237,6 +239,32 @@ SUM(CASE
 
   END)
 ```
+
+**How do I sum or aggregate a true/false (boolean) column?**
+
+Many boolean columns arrive from a connector as *strings* (`'true'`/`'false'`, or `'Y'`/`'N'`), so a plain `SUM` won't add them up. Convert the values to `1` and `0` with a `CASE`, then wrap it in `SUM`:
+
+```
+SUM(CASE WHEN `flag` = 'true' THEN 1 ELSE 0 END)
+```
+
+To aggregate as a logical OR — return `1` for a group if *any* row in it is true — use `MAX` instead of `SUM`:
+
+```
+MAX(CASE WHEN `flag` = 'true' THEN 1 ELSE 0 END)
+```
+
+{/* [pm-input] Phil Fuchs — Confirm whether SUM() on a natively boolean-typed column (not a string) counts the true values directly in Beast Mode (i.e., whether Domo treats a boolean true as 1). Synthesized from community forum reports; needs confirmation. */}
+
+**Why is the AVG of my CASE statement lower than I expect?**
+
+If you average a `CASE` statement that ends in `ELSE 0`, every non-matching row contributes a `0` to the average and drags the result down. To average only the rows that match your condition, omit the `ELSE` so non-matching rows return `NULL` — `AVG` ignores `NULL` values:
+
+```
+AVG(CASE WHEN `Status` = 'Won' THEN `Deal_Size` END)
+```
+
+With `ELSE 0`, the zeros are counted in the denominator; without it, only the flagged rows are.
 
 **Why do I see a warning that my calculation "uses both aggregated and non-aggregated columns"?**
 

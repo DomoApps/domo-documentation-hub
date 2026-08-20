@@ -6,29 +6,27 @@ file at the start of any restructure work to orient themselves before doing anyt
 
 **Plan document:** `KB-RESTRUCTURE-PLAN.md`
 **Disposition log:** `RESTRUCTURE-MANIFEST.md` — running record of what happened to every article; updated throughout all phases; Phase 9 converts it to the final audit report
-**Last updated:** 2026-08-20 (Phase 3b-Forum Critical batch COMPLETE — all 7 Critical `rec=update` gaps done; Beast Mode ranks 5/10 in main session, App Studio rank 4 + Workflows rank 12 via parallel agents)
+**Last updated:** 2026-08-20 (Phase 3b-Forum Critical AND High batches COMPLETE — all 68 Critical+High `rec=update` forum gaps done; High batch via 10 parallel agents in 2 waves)
 
 ---
 
 ## Current Status
 
-**Active phase:** Phase 3b-Forum (High update targets) — starting
+**Active phase:** Phase 3b-Forum COMPLETE → next is Phase 3b (general ~200-article upgrade pass) or Phase 3c/4
 **Blocked on:** 8 human decisions (see Phase 2 Decision Required table in `RESTRUCTURE-IA-SPEC.md`)
 
 ### ▶ Where we left off (2026-08-20) — pick up here next session
 
-**Phase 3b-Forum Critical batch (7 gaps) — ✅ COMPLETE.** All 7 Critical `rec=update` forum gaps are done. Full per-article change detail is in `RESTRUCTURE-MANIFEST.md` › Phase 3b-Forum.
+**Phase 3b-Forum is COMPLETE** — all 68 Critical + High `rec=update` forum gaps done. Full per-article detail in `RESTRUCTURE-MANIFEST.md` › Phase 3b-Forum.
 
-- ✅ **Andrea Henderson — Magic ETL (ranks 2, 3, 8)** — committed `ed05fac9`. `360047787514`, `360043427953`, `000005150`. 4 `[pm-input]`.
-- ✅ **Phil Fuchs — Beast Mode (ranks 5, 10)** — rank 5 → `360043430133` (Rolling/Cumulative N-Month Totals; Month-filter-breaks-YTD best practice; leap-year MTD-LY note). rank 10 → `000005559` (editor "aggregated and non-aggregated columns" warning: non-blocking, safe-to-ignore vs. duplicate-row risk, resolution). Cross-links added from `360043430153` (Troubleshooting) and `360043430053` (FAQs). 2 `[pm-input]`.
-- ✅ **Khushboo — App Studio (rank 4)** — `000005295` (Manage Cards behind an App: orphans, Move/Copy + info-panel absence, Admin > Cards cleanup, Governance connector locate). 4 `[pm-input]`.
-- ✅ **Ryan Despain — Workflows (rank 12)** — `000005171` (Forms: links/HTML in questions, group-task History-tab identifier, review/approve pattern) + `000005172` (Monitor Queues: update-content-access error, column customization, default-email control). 7 `[pm-input]`.
+- ✅ **Critical batch (7 gaps)** — committed (`ed05fac9` Andrea; `939202b6` Khushboo/Phil/Ryan). 13 `[pm-input]`.
+- ✅ **High batch (61 gaps)** — done via 10 parallel agents in 2 waves, clustered by PM (one file per agent, no collisions). **45 files updated** (39 `s/article` + 6 `portal`), **71 new `[pm-input]` markers**. Ranks 42 and 93 re-routed to correct home articles (scored targets were mismatched). Cross-links + a stale-link fix done in a main-session follow-up. **NOT yet committed as of this writing** (unless a later commit line says otherwise).
 
-**Batch total:** 13 `[pm-input]` markers across 7 articles → auto-flow to owning PMs' Phase 4.5 briefs. No screenshots added (clean-article policy; no applicable source shots).
+**Deferred (optional) secondary/other-file enhancements** are logged at the end of the Phase 3b-Forum High section in `RESTRUCTURE-MANIFEST.md` — each rank's PRIMARY target is addressed; these are "could also" cross-references (e.g. rank 60 dynamic-pivot in the ETL Pivot tile, rank 108 connector-retirements article). Not blockers.
 
-**NEXT: Phase 3b-Forum High targets** — 61 `rec=update` gaps (ranked list below). Then the broader Phase 3b ~200-article upgrade pass.
+**NEXT:** Phase 3b general **~200-article upgrade pass** (not started) — the broad bulk edit, separate from forum gaps. Or move to Phase 3c (main-branch sync) / Phase 4 (consolidation & retirement). All 266 Medium/Low forum gaps also feed the 3b bulk pass.
 
-**Also open (non-blocking):** rank-146 `Domo-Certification-Exam-Logistics.mdx` has no roster PM — the PM-brief script flags it as UNASSIGNED on every run; needs a human ownership decision before Phase 4.5.
+**Also open (non-blocking):** rank-146 `Domo-Certification-Exam-Logistics.mdx` has no roster PM — flagged UNASSIGNED on every PM-brief run; needs a human ownership decision before Phase 4.5.
 
 ---
 
@@ -52,7 +50,7 @@ file at the start of any restructure work to orient themselves before doing anyt
 | **3a-PM: PM Input Articles (4)** | ➡️ Moved to Phase 4.5 PM briefs | [pm-input] items in per-PM meeting briefs; see PM Input section below |
 | **3a-Forum: Forum-Driven New Articles (~57)** | ✅ Writing pass complete (2026-08-04) | All 57 triaged: 14 written, 43 deferred to PM briefs (undocumented mechanics). See Forum Gap Analysis section + `RESTRUCTURE-MANIFEST.md` |
 | **3b: Article Upgrades (~200)** | 🔲 Not started | Bulk agent edit pass |
-| **3b-Forum: Forum-Driven Article Updates (Critical+High, ~68)** | 🔄 Critical batch complete (2026-08-20); High targets next | All 7 Critical done: Andrea ranks 2,3,8 (committed); Khushboo rank 4; Phil ranks 5,10; Ryan rank 12. 13 `[pm-input]` across 7 articles. Next: 61 High `rec=update` targets. |
+| **3b-Forum: Forum-Driven Article Updates (Critical+High, ~68)** | ✅ Complete (2026-08-20) | All 68 done: Critical 7 (committed), High 61 (10 parallel agents, 2 waves). 45 files, ~84 total `[pm-input]` across the phase. Ranks 42/93 re-routed to correct homes. |
 | **3c: Main Branch Content Sync** | 🔲 Not started | Runs after 3b/3b-Forum; cherry-pick new articles + factual updates from main; see Phase 3c section below |
 | **4: Consolidation, Retirement & Archive** | 🔲 Not started | Duplicates, lifecycle classification; see Product Lifecycle Standards below |
 | **4.5: PM Review System** | 🔧 Built — run after Phase 4 | Script ready: `scripts/build-pm-review-briefs.py`; generates per-PM task checklists + meeting briefs |

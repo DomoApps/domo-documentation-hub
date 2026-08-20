@@ -33,7 +33,20 @@ You can use Beast Mode to transform the date format of a column into another col
 
 `)`
 
-For more information, see [Date Format Specifier Characters in Beast Mode.](/s/article/360043430153)
+For more information, see [Date Format Specifier Characters in Beast Mode.](/s/article/360043429953)
+
+## Match STR_TO_DATE and DATE_FORMAT Masks to the Source String
+
+`STR_TO_DATE` parses a string into a date, and `DATE_FORMAT` renders a date as a string. In both, the format mask must match the source string exactly, character for character. If any literal in the mask—a comma, a space, a dash, or a slash—does not appear in the source in the same position, the function returns null instead of a date.
+
+Watch for these common mismatches:
+
+* **Separators and literal characters.** Include every comma, space, and punctuation mark that appears in the source. For example, `Jan 5, 2025` needs the mask `'%b %e, %Y'` (with the comma), while `Jan 5 2025` needs `'%b %e %Y'` (without it).
+* **Zero-padded vs. single-digit days.** Use `%d` for zero-padded days (`05`) and `%e` for space- or non-padded days (`5`). Using `%d` against a single-digit day can fail to parse.
+* **Abbreviated vs. full month names.** Use `%b` for abbreviated months (`Jan`) and `%M` for full month names (`January`).
+* **Two-digit vs. four-digit years.** Use `%y` for two-digit years (`25`) and `%Y` for four-digit years (`2025`).
+
+For the full list of specifiers, see [Date Format Specifier Characters for Beast Mode](/s/article/360043429953).
 
 ## Week Numbers to Dates
 
@@ -258,6 +271,30 @@ Then create a calculation to filter dates:
 Use the following code to create a calculation that aggregates your data weekly. To change the week start day, add a value between 1 and 6 in place of x. Note that WEEKDAY() function is not supported in Beast Mode. If it is used, it is replaced with the functionality of DAYOFWEEK(). You can specify additional formatting using DATE\_FORMAT().
 
 `` SUBDATE(`Date`, DAYOFWEEK(`Date`)+X) ``
+
+## Set a Custom Week Start and Week-Ending Label
+
+The samples in [Week Numbers to Dates](#week-numbers-to-dates), above, return the Sunday that begins each week. To start weeks on a different day, adjust the offset.
+
+To return the **Monday** that begins each week (weeks running Monday–Sunday):
+
+`` SUBDATE(`Date`, MOD(DAYOFWEEK(`Date`) + 5, 7)) ``
+
+`DAYOFWEEK()` returns 1 for Sunday through 7 for Saturday, so the `MOD()` expression maps any day back to its Monday, including Sundays.
+
+To return the **Saturday** that ends a Sunday-start week, take the week's Sunday and add six days:
+
+`` ADDDATE(SUBDATE(`Date`, DAYOFWEEK(`Date`) - 1), 6) ``
+
+To build a sortable Year-Week label (for example, `2025-W03`), use ISO year and ISO week specifiers so the text sorts chronologically:
+
+`` DATE_FORMAT(`Date`, '%x-W%v') ``
+
+## Beast Mode vs. Magic ETL Function Availability
+
+Not every date function behaves the same in Beast Mode as it does in a Magic ETL formula or SQL tile. For example, `WEEKDAY()` is not supported in Beast Mode and is replaced with `DAYOFWEEK()` (see [Week Starting on Day X](#week-starting-on-day-x), above). If a calculation returns null or an error, validate it in the editor and confirm the function and specifiers are supported in that context.
+
+For supported format specifiers, see [Date Format Specifier Characters for Beast Mode](/s/article/360043429953). For date handling in Magic ETL, see [SQL Expressions in Magic ETL | Reference](/s/article/000005809).
 
 ## Graphing by Day of Week
 

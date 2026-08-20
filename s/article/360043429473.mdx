@@ -370,3 +370,14 @@ The sales manager completes their Pivot Table by adding two more columns. They d
   
 <Frame><img alt="5.png" src="/images/kb/ka0Vq0000005oVd-00N5w00000Ri7BU-0EM5w000005vP54.png"/></Frame>
 At this point, the sales manager can make various adjustments to the Pivot Table to make it more readable and useful to viewers. They could set color rules to draw attention to values in a certain range, change the sort and aggregation type for certain columns, highlight total and subtotal rows and columns, add a Drill Path, and much more. For more information about these customizations, see the section about [Customizing Pivot Tables](#CustomizingPivotTables) above.
+
+## Pivot Table Limitations and Workarounds
+
+Keep the following in mind when building Pivot Tables:
+
+* **Values populate the inner data pane, not a row axis.** Columns you drag into the **Values** region appear as the intersecting cells of the table. You cannot rotate a measure so that it displays down the left side as a row grouping—only dimension columns in the **Rows** region form the row groupings.
+* **Beast Mode calculations are row-level.** Beast Mode measures are computed row by row, while totals and subtotals are computed across the whole grouping (subtotals) or DataSet (totals). As a result, a Beast Mode measure cannot create a new calculated total or subtotal row, and a Beast Mode result in a total/subtotal cell may not equal the sum of the rows above it. This is expected behavior—see the Beast Mode note under [Table Charts](/s/article/360043429573#configure-total-and-subtotal-options-for-individual-columns).
+* **Suppress single-item subtotals.** To hide subtotal rows for groupings that contain only one item, select the **Subtotals** > **Suppress Single Item Subtotals** property (described under [Subtotals Properties](#subtotals-properties) above).
+* **Dynamic pivoting is not native to Magic ETL.** Pivoting on column values that are unknown or change over time (a "dynamic pivot") is not supported by the Magic ETL Pivot tile, which requires you to specify the output columns. To pivot on unknown values, use a MySQL DataFlow or an R/Python scripting tile. Learn more about the [Magic ETL Pivot tile](/s/article/360044951294).
+
+{/* [pm-input] Chris Wright — confirm the following synthesized limitations: (1) measures in the Values region cannot be displayed as rows (values are columns only); (2) Beast Mode cannot produce new calculated pivot total/subtotal rows; (3) dynamic (unknown-column) pivoting requires a MySQL DataFlow or R/Python scripting tile rather than the native Magic ETL Pivot tile; (4) whether there is a supported way to hide empty columns in a Pivot Table. synthesized from community forum reports; needs confirmation. */}

@@ -83,6 +83,49 @@ A DataFlow with more than one output DataSet can report a "Successful" run as so
 
 {/* [pm-input] Andrea Henderson — confirm whether run status reflects all outputs finishing indexing or only the first, and the recommended way for a user to tell when every output has finished. */}
 
+#### What does a "Saved but Incomplete" status mean?
+
+"Saved but Incomplete" means the DataFlow was saved, but its current configuration is not complete enough to run to completion — so it can still open and preview individual tiles while failing the overall run. The most common cause is a tile that is not fully connected into the flow or is missing a required input or setting. Resolve the flagged tiles (see below), then save and run again.
+
+#### A tile shows an orange warning icon, or my DataFlow won't run because of a disconnected tile
+
+An orange warning icon on a tile indicates a configuration problem that does not prevent the DataFlow from being saved but can prevent a successful run — for example, a referenced column that is no longer available or a setting that needs attention.
+
+A disconnected (orphan) tile — one that is not linked into a path that leads to an output tile — can block execution. To locate disconnected tiles:
+
+* Look for tiles that have no connector line joining them to the rest of the flow, or that carry a warning icon.
+* Trace each branch back from every output tile. Any tile that is not part of a path ending in an output is disconnected.
+* Remove the disconnected tile, or connect it into the flow, then save and run again.
+
+#### How do I interpret engine errors such as "Query runtime limit exceeded" or a data export failure?
+
+Some run failures come from the underlying processing engine rather than from a specific tile:
+
+* **"Query runtime limit exceeded" —** A step in the DataFlow ran longer than the allowed execution window. Reduce the volume of data processed, simplify or split complex transforms, and follow the guidance in [Optimizing an SQL DataFlow](/s/article/360042923014).
+* **A data export failure —** The DataFlow finished processing but failed while writing or indexing its output. Re-run the DataFlow; if the failure recurs, reduce the output size or complexity and contact Domo Support with the execution details.
+
+{/* [pm-input] Andrea Henderson — confirm the exact meaning and resolution of the "Saved but Incomplete" status, that disconnected/orphan tiles block execution and how the UI flags them (orange warning icon), and the precise wording and cause of the engine-level errors ("Query runtime limit exceeded" and the data export failure). Synthesized from community forum reports; needs confirmation. */}
+
+#### Why do I get an "output DataSet deleted" error when the DataSet still exists?
+
+This error can be misleading: it often means you are not the owner of the output DataSet, not that the DataSet has actually been deleted. Editing and running a Magic ETL DataFlow requires appropriate access to its output DataSet, so if the output is owned by someone else and is not shared with you at the needed access level, the DataFlow can report the output as unavailable or deleted.
+
+To resolve this, have the output DataSet's owner grant you access (or transfer ownership), then reopen the DataFlow. A related symptom: when you cannot access the output DataSet, the **Start** button on the DataFlow's **Overview** tab may be unavailable even though the DataFlow is otherwise valid.
+
+{/* [pm-input] Andrea Henderson — confirm that the "output DataSet deleted" error indicates the user is not the output owner (rather than an actual deletion), how output-DataSet ownership relates to DataFlow edit/run access, and the Start-button-unavailable behavior on the Overview tab. Synthesized from community forum reports; needs confirmation. */}
+
+#### How do I correct historical data in an append-based DataFlow without breaking the pipeline?
+
+Append pipelines add new rows on each run and do not reprocess existing history, so a one-time correction to past data cannot be made by re-running the append DataFlow alone. Common approaches for a one-time historical fix:
+
+* **Correct the output in a Domo Jupyter Workspace** by loading the output DataSet into a dataframe, replacing the affected values, and writing the corrected data back.
+* **Update the affected rows through the Domo API.**
+* **Build a temporary corrective DataFlow** that reads the output, applies the fix, writes the corrected result, and is removed once the history is corrected.
+
+Choose the approach that matches how the output is consumed downstream, and verify the corrected output before resuming the normal append schedule.
+
+{/* [pm-input] Andrea Henderson — confirm the recommended patterns for one-time historical corrections in append pipelines (Jupyter dataframe replace, API update, temporary corrective DataFlow). Synthesized from community forum reports; needs confirmation. */}
+
 #### Why is the Redshift preview data not in the order I specified in my ORDER BY clause?
 
 When Redshift processes a query that contains an ORDER BY clause, it does honor the specified order while processing the logic of that query. However, when it has finished running the query, it reorders the data to optimize the actual storage of the data. (Redshift stores data tables distributed across many nodes, and splits the data up according to its own storage optimization methods.) When Domo pulls up a preview of the data, it is loaded out of the table after being reordered and stored by Redshift. When working with Redshift, it's important to include an ORDER BY clause in every individual query that relies on that specific ordering of the data, *not* to rely on the order persisting from a prior transform.

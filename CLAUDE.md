@@ -213,6 +213,8 @@ All scripts live in `scripts/`. They are optional dev-quality tools — non-tech
 | `build-localization-glossary.py` | Regenerate the deterministic localization glossaries (`localization/glossary/{es,fr,de,ja}.csv`) from the style guide, the branded-terms CSV, and the JA XTM TM. Preserves `retrospective:*`/`manual*` rows. `--report` prints the JA mining report. See the `localize` skill. |
 | `check-glossary.py` | Deterministic glossary-compliance checker: `python3 scripts/check-glossary.py <english.mdx> <translated.mdx> <lang>`. Flags keep-in-English terms that went missing and translated terms whose approved rendering is absent. Used by the `localize` QA step. |
 | `remark-domo-style.mjs` | Remark lint plugin enforcing Domo style rules (optional; runs via `yarn lint`). |
+| `fetch-jira-context.py` | Pull release context for the `product-release-notes` skill: given a CSV of master epics/betas (or `--keys`), fetch each epic's Jira description + linked Confluence PRD body, flatten to text, and (with `--download-images`) save Jira/Confluence images. Reuses `.env` Jira creds. `--test` verifies connectivity. |
+| `archive-current-release-notes.py` | Archive the outgoing `Current-Release-Notes.mdx` for the `product-release-notes` skill: derive its month/year, copy to `s/article/{Month}-{Year}-Release.mdx` retitled `"{Year} Release {N} \| {Month}"`, and append to the English 2025-2026 nav subgroup. `--dry-run` to preview. |
 
 ## Style Standards
 
@@ -252,6 +254,7 @@ This activates a `post-merge` hook that warns you when a `git pull` leaves track
 |migrate-html|Migrate a single HTML article to a repo-ready MDX file: convert with pandoc, apply Domo style rules, save to `s/article/`, and register in `docs.json`|
 |release-feature-links|Match every feature in a PMM release copy to a KB article and produce link sentences for the shared PMM Word doc or `Current-Release-Notes.mdx`|
 |release-notes|Generate user-friendly internal release notes by diffing the latest git tag against the previous tag|
+|product-release-notes|Draft the public-facing product **feature-release** Release Notes into `Current-Release-Notes.mdx`: archive the outgoing notes (numbered file + nav), ingest a context folder (internal-notes Word docs + master-epics/beta CSV), pull each epic's Jira description + Confluence PRD, draft in house style, fact-check against the sources, and commit on approval. Excludes PR + localization. Uses `scripts/archive-current-release-notes.py` and `scripts/fetch-jira-context.py`; house style in the skill's `release-notes-style.md`|
 |mintlify-preview-workflow|Working on `.github/workflows/mint-preview.yml` — the Mintlify preview deployment GitHub Action|
 |openapi-sync-workflow|Working on the OpenAPI sync GitHub Action (`sync-api-docs.yml`) — YAML detection, sync scripts, or `docs.json` nav-generation integration|
 |connector-review|Manage the connector PR/Jira review lifecycle: run the dashboard, post follow-ups on stale tickets, merge approved PRs, post release-date comments, close Jira tickets, and handle publish/migration requests from Arun|

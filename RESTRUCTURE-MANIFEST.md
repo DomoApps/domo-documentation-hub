@@ -211,7 +211,7 @@ Snowflake discontinued username/password authentication in November 2025. All 7 
 | `360057013754.mdx` | Snowflake Partition Connector | updated |
 | `360058757134.mdx` | Snowflake Managed Unload Connector | updated |
 
-### Phase 3b-Forum — Critical Update Targets (In Progress — 2026-08-18)
+### Phase 3b-Forum — Critical Update Targets (Complete — 2026-08-20)
 
 Priority `rec=update` gaps from the community forum analysis. Text written self-sufficiently; no screenshot TODO markers (clean-article policy). Uncertain product mechanics logged as embedded `[pm-input]` markers, which surface automatically in the owning PM's Phase 4.5 brief (Section 3d) via the article scan.
 
@@ -223,7 +223,29 @@ Priority `rec=update` gaps from the community forum analysis. Text written self-
 | `360043427953.mdx` | DataFlow and DataFusion Troubleshooting and FAQs | updated | #3 / 82.4 | Added three FAQ entries under DataFlows: preview-vs-full-run discrepancies (sampling, nulls, JSON/text splits, time zone), "Not Runnable" error causes, multi-output "Successful"-but-not-indexed behavior. Cross-links to `000005150#preview-and-testing-limits` and `360047787514#notable-behavior-changes` | Andrea — confirm full "Not Runnable" trigger list + whether run status reflects all outputs indexing or only the first |
 | `000005150.mdx` | Data Selection in Magic ETL | updated | #8 / 77.5 | Added **Preview and Testing Limits** section: preview samples each input rather than the full DataSet; use a filtered DataSet View as input to test. Links to `360046074774` (Manage DataSet Views). Home for rank 8 in place of the 15-line stub `360043427653` (per plan) | Andrea — confirm exact preview row-sampling limit (~400k reported) + that the filtered-view workaround is recommended |
 
-Remaining Critical targets (not yet done): rank 4 (App Studio, Khushboo), rank 5 + rank 10 (Beast Mode, Phil Fuchs), rank 12 (Workflows, Ryan Despain).
+**Phil Fuchs — Beast Mode cluster (ranks 5, 10):**
+
+| Filename | Title | Disposition | Gap Rank/Score | Change | `[pm-input]` |
+|----------|-------|-------------|----------------|--------|--------------|
+| `360043430133.mdx` | Sample Beast Mode Calculations: Period-over-Period Transforms | updated | #5 / 79.0 | Added **Rolling and Cumulative N-Month Totals** (trailing-window `CASE`+`SUM` pattern; true rolling/cumulative *series* needs a DataFlow because Beast Mode has no cross-row window functions; links the FAQ rolling-average example) and **Best Practice: A Month or Date Filter Can Break YTD Calculations** (a date filter strips history before aggregation; use a date-range/variable control or pre-aggregate in Magic ETL). Added a leap-year `<Note>` after the MTD table (align MTD-LY on `DAYOFMONTH`, not `DAYOFYEAR`; handle Feb 29). | Phil — confirm whether a native window-function capability / dedicated window-functions article is planned to link for the rolling/cumulative-series case |
+| `000005559.mdx` | Use Non-aggregated Columns in Aggregated Beast Modes | updated | #10 / 76.1 | Added **Understand the "Aggregated and Non-aggregated Columns" Warning** section (non-blocking warning vs. blocking error; when safe to ignore vs. duplicate-row risk; resolution paths) and reframed the Support-only intro. | Phil — confirm exact current warning wording and that it is non-blocking (still saves/renders) |
+| `360043430153.mdx` | Troubleshooting Beast Mode Calculations | updated (cross-link) | #10 / 76.1 | Added a short **"Aggregated and Non-aggregated Columns" Warning** entry linking to `000005559` for the full treatment | — |
+| `360043430053.mdx` | Beast Mode FAQs | updated (cross-link) | #10 / 76.1 | Added a FAQ entry on the warning, cross-linking `000005559` | — |
+
+**Khushboo — App Studio (rank 4):**
+
+| Filename | Title | Disposition | Gap Rank/Score | Change | `[pm-input]` |
+|----------|-------|-------------|----------------|--------|--------------|
+| `000005295.mdx` | App Studio \| Overview | updated | #4 / 79.6 | Added **Manage Cards behind an App** section: orphan behavior on app delete, App pages absent from the card Move/Copy menu + info panel, **Delete Orphaned Cards** (`More > Admin > Cards` + grant requirement), and **Locate Orphaned Cards with the Governance Connector**. Existing orphan `<Warning>` reused, not duplicated. | Khushboo (4) — (1) no combined app+cards delete; (2) App pages absent from Move/Copy & card info panel; (3) exact Admin > Cards delete action + App-page filter; (4) whether the Governance Datasets connector maps cards to App Studio pages |
+
+**Ryan Despain — Workflows (rank 12):**
+
+| Filename | Title | Disposition | Gap Rank/Score | Change | `[pm-input]` |
+|----------|-------|-------------|----------------|--------|--------------|
+| `000005171.mdx` | Forms | updated | #12 / 75.4 | Added **Add Links or HTML to Question Text** subsection, a group-task **History-tab** identifier `<Note>`, and a **Review and Approve Form Submissions** section (Task Center review; App Studio read-only table + Brick write-back; bulk approve; secure public PII form Bricks). | Ryan (4) — link/HTML rendering in questions; read-only-table + Brick write-back pattern; native bulk-approval availability; securing public PII form Bricks |
+| `000005172.mdx` | Monitor Queues in Task Center | updated | #12 / 75.4 | Added **Resolve "Assignee Does Not Have Update Content Access to Queue"** (grant Update Content access), **Customize Task List Columns**, and a turn-off-default-task-email `<Note>`. | Ryan (3) — default-email governance; exact error string + resolution; Task List column-customization mechanics |
+
+**Critical batch complete (2026-08-20):** all 7 Critical `rec=update` forum gaps are done — ranks 2, 3, 8 (Andrea, committed `ed05fac9`); rank 4 (Khushboo); ranks 5, 10 (Phil Fuchs); rank 12 (Ryan Despain). 13 `[pm-input]` markers embedded across 7 articles (Phil 2, Khushboo 4, Ryan 7) → auto-flow to the owning PMs' Phase 4.5 briefs. Next: Phase 3b-Forum High targets (61 `rec=update`, ranked list in `RESTRUCTURE-PROGRESS.md`).
 
 ---
 

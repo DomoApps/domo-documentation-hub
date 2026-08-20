@@ -61,6 +61,39 @@ END
 
 You can use variations of the above filters to limit the range in whatever way makes the most sense to you and your audience.
 
+## Rolling and Cumulative N-Month Totals
+
+The period-over-period patterns in this article compare discrete periods (this month vs. last month, this year vs. last year). A different need is a *rolling* or *cumulative* total — for example, a trailing 12-month sum that moves forward each month, or a running year-to-date total that accumulates through the year.
+
+A single **trailing-window total** — for example, "sales in the last 12 months" as one summary number — can be built in Beast Mode with a `CASE` filter that keeps only the rows inside the window, wrapped in an aggregate:
+
+```
+SUM(
+  CASE
+    WHEN `Date_Field` >= DATE_SUB(CURRENT_DATE(), INTERVAL 12 MONTH)
+    THEN `Amount`
+    ELSE 0
+  END
+)
+```
+
+Change `12 MONTH` to any interval you need, such as `3 MONTH`, `4 WEEK`, or `90 DAY`.
+
+A true **rolling or cumulative *series*** — a separate rolling value plotted at every point on the axis, such as a moving average or a running total that resets each year — cannot be produced in Beast Mode, because Beast Mode has no window functions that read across other rows. Instead, pre-aggregate the rolling or cumulative value in a Magic ETL or SQL DataFlow so that each row already carries it, then chart that column. For a worked DataFlow example, see the rolling-average calculation in [Beast Mode FAQs](/s/article/360043430053 "Beast Mode FAQs").
+
+{/* [pm-input] Phil Fuchs — confirm whether a native window-function capability, or a dedicated window-functions KB article, is planned for Beast Mode; if so, link it here for the rolling/cumulative-series case. Synthesized from recurring community requests for rolling 12-month and running-total calculations; the "no window functions in Beast Mode" limitation is confirmed by the Beast Mode FAQs rolling-average answer. */}
+
+## Best Practice: A Month or Date Filter Can Break YTD Calculations
+
+Year-to-date (and other *-to-date) calculations need the full history of the period in order to sum — a YTD total for the current month depends on every prior month back to January. If you apply a **Month** filter, or any date filter, to the card, the filter removes rows outside the selected range *before* the Beast Mode aggregates them. The calculation no longer has the earlier-period rows it needs, and the YTD value collapses to just the filtered range.
+
+This is the same reason a Beast Mode calculation can't be used in the Analyzer filter field: Analyzer filtering is row-level on the DataSet and runs before aggregation. For more detail, see [Beast Mode FAQs](/s/article/360043430053 "Beast Mode FAQs").
+
+To let viewers choose a period without stripping the history the calculation depends on:
+
+- **Use a date range or variable control** instead of a hard Month filter, and build the period boundaries into the `CASE` logic (as in the filtering examples above) so the calculation still sees every row.
+- **Pre-aggregate in Magic ETL**, writing a YTD value onto each row in a DataFlow so the card can display or filter the pre-computed YTD column directly. See [Prepare](/s/topic/0TO5w000000ZamzGAC "Prepare").
+
 ## Calculating Week-over-Week Change
 
 Use the following code to create a calculation that shows week-over-week change. The following example includes 4 weeks prior (aligned on days), and 52 weeks prior (aligned on days). Change the values to the time periods you want.
@@ -218,6 +251,10 @@ To create monthly year-over-year calculations, refer to the following table:
 To create month-to-date year-over-year calculations, refer to the following table:
 
 <table class="mt-responsive-table" data-aura-rendered-by="33:202;a"><thead><tr><th colspan="1" rowspan="1"> Type </th><th colspan="1" rowspan="1"> Calculation </th></tr><tr><td colspan="1" rowspan="1"> Multiple Series - Current Year </td><td colspan="1" rowspan="1"><code> Case when (month(`Datefield`) = month(curdate()) and year(`Datefield`) = year(curdate()) and DAYOFMONTH(`Datefield`) &lt;= DAYOFMONTH(curdate())) then 'This Year' end </code></td></tr><tr><td colspan="1" rowspan="1"> Multiple Series - Previous Year </td><td colspan="1" rowspan="1"><code> Case when (month(`Datefield`) = month(curdate()) and year(`Datefield`) = year(date_sub(curdate(), interval 1 year)) and DAYOFMONTH(`Datefield`) &lt;= DAYOFMONTH(curdate())) then 'Last Year' end </code></td></tr><tr><td colspan="1" rowspan="1"> Multiple Series - Same Series </td><td colspan="1" rowspan="1"><code> Case when (month(`Datefield`) = month(curdate()) and year(`Datefield`) = year(curdate()) and DAYOFMONTH(`Datefield`) &lt;= DAYOFMONTH(curdate())) then 'This Year' when (month(`Datefield`) = month(curdate()) and year(`Datefield`) = year(date_sub(curdate(), interval 1 year)) and DAYOFMONTH(`Datefield`) &lt;= DAYOFMONTH(curdate())) then Last Year' End </code></td></tr><tr><td colspan="1" rowspan="1"> Ratio: % change between the two using the formula (C/P) - 1 </td><td colspan="1" rowspan="1"><p><code> (Case when (month(`Datefield`) = month(curdate()) and year(`Datefield`) = year(curdate()) and DAYOFMONTH(`Datefield`) &lt;= DAYOFMONTH(curdate())) then `Amountfield` end / Case when (month(`Datefield`) = month(curdate()) and year(`Datefield`) = year(date_sub(curdate(), interval 1 year)) and DAYOFMONTH(`Datefield`) &lt;= DAYOFMONTH(curdate())) then `Amountfield` end) -1 </code></p><div class="mdx-embed"><Note><p><b> Note: </b> Can also be done using (C-P)/P but this takes more code. </p></Note></div></td></tr></thead></table>
+
+<Note>
+  **Note:** Month-to-date comparisons that align on `DAYOFMONTH` handle most cases, but any *-to-date comparison that aligns the prior year on `DAYOFYEAR` drifts by one day after February 29 in a leap year, because the day-of-year numbers stop lining up between a leap year and a common year. When comparing month-to-date to the same period last year across a leap year, align on year, month, and `DAYOFMONTH` rather than `DAYOFYEAR`, and decide explicitly how to treat February 29, which has no prior-year counterpart.
+</Note>
 
 #### YOY: Week Comparison
 

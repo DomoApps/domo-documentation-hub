@@ -238,6 +238,10 @@ SUM(CASE
   END)
 ```
 
+**Why do I see a warning that my calculation "uses both aggregated and non-aggregated columns"?**
+
+This appears when a calculation mixes an aggregated expression (such as `SUM()` or `COUNT()`) with a row-level column. It is a **warning, not a blocking error** — the calculation still saves and the card still renders. It is safe to ignore when the non-aggregated column resolves to a single value per group on the card, but it can signal duplicated rows or `*****` pivot errors when that column takes more than one value within a displayed group. For worked examples and fixes, see [Use Non-aggregated Columns in Aggregated Beast Modes](/s/article/000005559 "Use Non-aggregated Columns in Aggregated Beast Modes").
+
 **How can I aggregate a Beast Mode calculation to make it available as my Summary Number?**
 
 Users commonly attempt to use a Beast Mode calculation containing a `CASE` statement as a Summary Number. For a value to be used as a Summary Number, that value must have a *numeric* data type. So if a calculation contains *only* a `CASE` statement, it will be seen by Domo as a *string* data type rather than a numeric data type.

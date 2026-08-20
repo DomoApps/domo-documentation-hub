@@ -241,6 +241,12 @@ In this example, the placeholder text says "Please enter your name."
 
 </Note>
 
+#### Add Links or HTML to Question Text
+
+Forms are built to capture responses, so question text, question descriptions, and Title/Description questions are intended for plain, readable prompts rather than rich formatting. If you need to give form users a clickable reference link, the most reliable approach is to place the link where it renders dependably—such as a text element on the same App Studio page or the task description in Workflows—rather than embedding a URL or HTML markup inside a question.
+
+{/* [pm-input] Ryan Despain — confirm whether a clickable URL or raw HTML placed in form question text, a question description, or a Title/Description question renders as a live link or formatted content, or as literal text, and which question types (if any) support links. Synthesized from community forum reports; needs confirmation. */}
+
 #### Choose a Question Type
 
 For each question, choose a question type from the dropdown. The question type determines how the form displays to users.
@@ -406,6 +412,10 @@ There are two ways to add new Task Identifiers: choosing variables from the form
 
 </Note>
 
+<Note>
+  **Identify who completed a group-assigned task:** When a task is assigned to a group, any member of the group can complete it. Task Identifiers label the task itself, not the person who submitted it. To see which member completed a group-assigned task, open the task in [Task Center](/s/article/000005172) and check the **History** tab, which records the person who made each update, including the submission.
+</Note>
+
 ### Inputs/Outputs Catalog
 
 In your Workflows form, selecting <img src="/images/kb/ka0Vq0000002n9V-00N5w00000Ri7BU-0EMVq000002jrwf.jpg" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/> **View** i **nputs/outputs** opens the **Inputs/Outputs Catalo** **g** modal, which contains the form's contract (or designated inputs and outputs).
@@ -453,3 +463,33 @@ If using external mapping, the catalog contains a third option— **Use External
 When you enable **Accepts Input** for these question types, a mapping is required to have one or more values (depending on the field type) pre-selected when the form renders to an end user.
 
 You can use the Preview feature to see how the form behaves at runtime.
+
+## Review and Approve Form Submissions
+
+After users submit a form, you can review and act on the responses in a few ways, depending on where the form runs.
+
+### Review Submissions in Task Center
+
+When a form is used in a Workflows User Task, each submission becomes a task in the queue you assigned. Reviewers open Task Center to view, edit, and submit (approve) those tasks. Learn more in [Monitor Queues in Task Center](/s/article/000005172).
+
+### Review Submissions in an App Studio Table
+
+You can build a review experience in App Studio by pairing the form's response DataSet with a table:
+
+* Add a [table element](/s/article/000005681) to an App Studio page and point it at the form's response DataSet to display submissions.
+* An App Studio table element is read only. Viewers can see and filter submissions, but they cannot edit, approve, or write changes back to the DataSet from the table itself.
+* To let reviewers edit or approve a submission inline, add a [Brick](/s/article/4423762260375) that writes the change back to the DataSet. The read-only table alone cannot perform write-back.
+
+{/* [pm-input] Ryan Despain — confirm the supported pattern for reviewing/approving form submissions in a table: that an App Studio table element is read only and that inline edit/approve/write-back requires a Brick (rather than a native table action). Synthesized from community forum reports; needs confirmation. */}
+
+### Approve Submissions in Bulk
+
+Reviewers approve form-based tasks one at a time by opening each task in Task Center and submitting it. For high-volume approvals, a Brick can be built to update multiple submissions programmatically.
+
+{/* [pm-input] Ryan Despain — confirm whether bulk approval of form submissions or tasks is supported natively, and if so where it lives (for example, multi-select in the Task Center task list) versus requiring a Brick-based approach. Synthesized from community forum reports; needs confirmation. */}
+
+### Secure Publicly Embedded Forms
+
+When you publish a form as a Brick and embed it publicly (outside of Domo), treat any personally identifiable information (PII) it collects as sensitive. As a best practice, limit the fields a public form collects, avoid exposing the response DataSet through the same public context, and review your embed configuration before sharing the link. Learn more about [embedding content outside of Domo](/s/article/360043437993).
+
+{/* [pm-input] Ryan Despain — confirm the recommended controls for securing a publicly embedded, PII-collecting form Brick (for example, embed token or domain restrictions, response DataSet access, and any Domo-side guardrails). Synthesized from community forum reports; needs confirmation. */}

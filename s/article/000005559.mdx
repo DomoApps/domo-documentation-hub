@@ -5,9 +5,23 @@ excerpt: "Use GROUP BY and SQL techniques to combine non-aggregated columns with
 
 ## Intro
 
-This guide introduces using non-aggregated columns in aggregated Beast Modes. When applying non-aggregated columns to aggregated Beast Modes, it is best to have a basic to mid-level understanding of SQL and access to [Domo Support <i className="icon-arrow-square-out sm" aria-hidden="true" />](https://domo-support.domo.com/s/).
+This guide explains how to use non-aggregated columns in aggregated Beast Modes: what the in-editor **"aggregated and non-aggregated columns"** warning means, when it is safe to ignore and when it signals a problem, and the `GROUP BY` and SQL techniques behind the behavior. A basic to mid-level understanding of SQL helps when working through the advanced examples; for complex cases, [Domo Support <i className="icon-arrow-square-out sm" aria-hidden="true" />](https://domo-support.domo.com/s/) can assist.
 
 ---
+
+## Understand the "Aggregated and Non-aggregated Columns" Warning
+
+When a Beast Mode combines an aggregated expression — such as `SUM()`, `COUNT()`, or `AVG()` — with a row-level (non-aggregated) column or value in the same calculation, the editor displays the message **"This calculation uses both aggregated and non-aggregated columns."**
+
+This is a **warning, not a blocking error.** The calculation still saves, and the card still renders. Domo groups the query by the non-aggregated column automatically (this is the `GROUP BY` behavior described in the next section). The warning is prompting you to confirm that that grouping produces the rows you expect.
+
+**When it is safe to ignore:** the non-aggregated column resolves to a single value within each group displayed on the card — for example, the value is constant per group, or the column you're grouping by is the same one referenced in the calculation. In these cases the result is correct and you can proceed.
+
+**When it signals a real problem:** the non-aggregated column takes *more than one* value within a group shown on the card. The query then returns multiple rows per group, which causes duplicated or inflated rows, blank cells, `*****` pivot errors, and grand totals or subtotals that re-evaluate the `CASE` statement instead of summing the underlying rows. The [Aggregations Using Non-Aggregated Columns](#aggregations-using-non-aggregated-columns) and [Grand Total and Sub-total Rows on Tables](#grand-total-and-sub-total-rows-on-tables) sections below walk through exactly this failure and its fix.
+
+**How to resolve it:** aggregate the row-level piece so the whole formula is aggregated (wrap it in `SUM`, `MIN`, or `MAX` as appropriate), add the non-aggregated column to the card's grouping so each row is uniquely defined, or pre-aggregate the value in a Magic ETL or SQL DataFlow.
+
+{/* [pm-input] Phil Fuchs — confirm the exact current wording of the editor warning and that it is non-blocking (the Beast Mode still saves and the card still renders). Synthesized from recurring community forum reports where users read the message as a blocking error; wording and behavior need confirmation against the current release. */}
 
 ## Use the GROUP BY Function
 

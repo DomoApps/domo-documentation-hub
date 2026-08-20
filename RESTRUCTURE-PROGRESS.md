@@ -6,27 +6,27 @@ file at the start of any restructure work to orient themselves before doing anyt
 
 **Plan document:** `KB-RESTRUCTURE-PLAN.md`
 **Disposition log:** `RESTRUCTURE-MANIFEST.md` — running record of what happened to every article; updated throughout all phases; Phase 9 converts it to the final audit report
-**Last updated:** 2026-08-18 (PM-brief script refactored to read the manifest as source of truth; Phase 3b-Forum started — Andrea Henderson's Magic ETL Critical cluster complete)
+**Last updated:** 2026-08-20 (Phase 3b-Forum Critical batch COMPLETE — all 7 Critical `rec=update` gaps done; Beast Mode ranks 5/10 in main session, App Studio rank 4 + Workflows rank 12 via parallel agents)
 
 ---
 
 ## Current Status
 
-**Active phase:** Phase 3b-Forum (Critical update targets) — in progress
+**Active phase:** Phase 3b-Forum (High update targets) — starting
 **Blocked on:** 8 human decisions (see Phase 2 Decision Required table in `RESTRUCTURE-IA-SPEC.md`)
 
-### ▶ Where we left off (2026-08-18) — pick up here next session
+### ▶ Where we left off (2026-08-20) — pick up here next session
 
-**Phase 3b-Forum Critical batch (7 gaps) — 3 of 7 done.** Working the 7 Critical `rec=update` forum gaps, clustered by PM. Full scope + per-article change detail is in `RESTRUCTURE-MANIFEST.md` › Phase 3b-Forum. Look up gap detail by rank in `_gaps_with_support.json`.
+**Phase 3b-Forum Critical batch (7 gaps) — ✅ COMPLETE.** All 7 Critical `rec=update` forum gaps are done. Full per-article change detail is in `RESTRUCTURE-MANIFEST.md` › Phase 3b-Forum.
 
-- ✅ **Andrea Henderson — Magic ETL (ranks 2, 3, 8)** — complete, committed. `360047787514` (editor known-issues), `360043427953` (preview-vs-run / Not Runnable / multi-output FAQs), `000005150` (preview + testing limits). 4 `[pm-input]` markers embedded → auto-flow to Andrea's brief.
-- 🔲 **Phil Fuchs — Beast Mode (ranks 5, 10)** — NEXT. Rank 5 → `360043430133` (Period-over-Period): add rolling/cumulative N-month section, "Month filter breaks YTD" gotcha, leap-year MTD-LY note. Rank 10 → `000005559` (Non-aggregated Columns): document the in-editor "aggregated and non-aggregated columns" **warning** (non-blocking; when safe to ignore vs. duplicate-row risk) + beginner worked examples; cross-link from `360043430153` (Troubleshooting Beast Mode Calculations).
-- 🔲 **Khushboo — App Studio (rank 4)** — `000005295` (App Studio Overview): deleting app ≠ deletes cards (orphans); App pages absent from Move/Copy + info panel; **Admin > Cards** cleanup workaround.
-- 🔲 **Ryan Despain — Workflows (rank 12)** — `000005171` (Forms) + `000005172` (Monitor Queues in Task Center): queue "update content access" error, Task Identifiers, bulk approve, clickable URLs, native approve-in-table limits, default-email control.
+- ✅ **Andrea Henderson — Magic ETL (ranks 2, 3, 8)** — committed `ed05fac9`. `360047787514`, `360043427953`, `000005150`. 4 `[pm-input]`.
+- ✅ **Phil Fuchs — Beast Mode (ranks 5, 10)** — rank 5 → `360043430133` (Rolling/Cumulative N-Month Totals; Month-filter-breaks-YTD best practice; leap-year MTD-LY note). rank 10 → `000005559` (editor "aggregated and non-aggregated columns" warning: non-blocking, safe-to-ignore vs. duplicate-row risk, resolution). Cross-links added from `360043430153` (Troubleshooting) and `360043430053` (FAQs). 2 `[pm-input]`.
+- ✅ **Khushboo — App Studio (rank 4)** — `000005295` (Manage Cards behind an App: orphans, Move/Copy + info-panel absence, Admin > Cards cleanup, Governance connector locate). 4 `[pm-input]`.
+- ✅ **Ryan Despain — Workflows (rank 12)** — `000005171` (Forms: links/HTML in questions, group-task History-tab identifier, review/approve pattern) + `000005172` (Monitor Queues: update-content-access error, column customization, default-email control). 7 `[pm-input]`.
 
-**Locked decisions for this batch:** rank 8 lives in `000005150` (not the 15-line stub `360043427653`); screenshots follow clean-article policy (self-sufficient text, no TODO markers); synthesize what's supported and flag the rest as `[pm-input]`.
+**Batch total:** 13 `[pm-input]` markers across 7 articles → auto-flow to owning PMs' Phase 4.5 briefs. No screenshots added (clean-article policy; no applicable source shots).
 
-**After the 7 Critical:** Phase 3b-Forum High targets (61 `rec=update`, ranked list in this doc) + the broader Phase 3b ~200-article upgrade pass.
+**NEXT: Phase 3b-Forum High targets** — 61 `rec=update` gaps (ranked list below). Then the broader Phase 3b ~200-article upgrade pass.
 
 **Also open (non-blocking):** rank-146 `Domo-Certification-Exam-Logistics.mdx` has no roster PM — the PM-brief script flags it as UNASSIGNED on every run; needs a human ownership decision before Phase 4.5.
 
@@ -52,7 +52,7 @@ file at the start of any restructure work to orient themselves before doing anyt
 | **3a-PM: PM Input Articles (4)** | ➡️ Moved to Phase 4.5 PM briefs | [pm-input] items in per-PM meeting briefs; see PM Input section below |
 | **3a-Forum: Forum-Driven New Articles (~57)** | ✅ Writing pass complete (2026-08-04) | All 57 triaged: 14 written, 43 deferred to PM briefs (undocumented mechanics). See Forum Gap Analysis section + `RESTRUCTURE-MANIFEST.md` |
 | **3b: Article Upgrades (~200)** | 🔲 Not started | Bulk agent edit pass |
-| **3b-Forum: Forum-Driven Article Updates (Critical+High, ~68)** | 🔄 In progress (2026-08-18) | Critical batch (7): Andrea's Magic ETL cluster (ranks 2,3,8) done; Phil/Khushboo/Ryan remaining. Then High targets. |
+| **3b-Forum: Forum-Driven Article Updates (Critical+High, ~68)** | 🔄 Critical batch complete (2026-08-20); High targets next | All 7 Critical done: Andrea ranks 2,3,8 (committed); Khushboo rank 4; Phil ranks 5,10; Ryan rank 12. 13 `[pm-input]` across 7 articles. Next: 61 High `rec=update` targets. |
 | **3c: Main Branch Content Sync** | 🔲 Not started | Runs after 3b/3b-Forum; cherry-pick new articles + factual updates from main; see Phase 3c section below |
 | **4: Consolidation, Retirement & Archive** | 🔲 Not started | Duplicates, lifecycle classification; see Product Lifecycle Standards below |
 | **4.5: PM Review System** | 🔧 Built — run after Phase 4 | Script ready: `scripts/build-pm-review-briefs.py`; generates per-PM task checklists + meeting briefs |

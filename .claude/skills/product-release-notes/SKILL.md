@@ -132,6 +132,17 @@ git commit -m "Add <Month> <Year> release notes and archive <prev month> notes"
 
 End with the co-author trailer required by repo convention. Do **not** open a PR and do **not** localize — both are out of scope. Remind the user that merged is not published (KB publishing cadence) and that they can run `localize` when ready.
 
+### Step 11 — Offer to delete the context folder
+
+Once the draft is approved and committed, ask the user whether they want to delete the context folder they supplied (it was only needed to draft this release). Only if they say **yes**, remove it. The folder is committed to the repo, so remove it as a tracked deletion and commit that on the same branch:
+
+```bash
+git rm -r "<folder>"
+git commit -m "Remove <Month> <Year> release-notes context folder"
+```
+
+End the removal commit with the co-author trailer too. If the user says no, leave the folder in place. (The `scripts/reports/release-context/` scratch dir is gitignored and can be left as-is either way.)
+
 ---
 
 ## Notes

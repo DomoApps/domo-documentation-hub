@@ -409,6 +409,24 @@ These articles require product-level narrative that isn't reliably derivable fro
 
 ---
 
+## Phase 3c: Main Branch Content Sync
+
+**Goal:** Bring new articles and factual updates that landed on `main` after the branch cut into the restructure branch — without reverting any restructure rewrite. This is **NOT** a `git merge` of main (that would restore pre-restructure structure).
+
+**Two syncs, by design:**
+- **Sync #1 — during the content phases**, while filenames on both branches still match numeric IDs, so reconciliation is filename-based and conflicts are minimal. (Executed 2026-08-20; see `RESTRUCTURE-PROGRESS.md` › Phase 3c and `RESTRUCTURE-MANIFEST.md` › Phase 3c.)
+- **Sync #2 — immediately before the final merge**, after Phase 6 has renamed most files to slugs. Because filenames no longer match, sync #2 depends on the parity system below.
+
+**Parity system (for sync #2, post-rename).** The immutable key is the **numeric KB article ID** — `main` never renames, so it uses this ID forever. Two sources translate an ID to its current restructure location and disposition:
+1. **Frontmatter ID stamp** — see **Phase 6.0**. HARD DEPENDENCY: the stamp must run *before* Phase 6 renames anything, or the parity system breaks. Once stamped, identity lives inside the file and survives any rename.
+2. **Disposition map from `RESTRUCTURE-MANIFEST.md`** — every article's fate (renamed / merged / split / archived / deleted, source→target) routes each `main` change to the right target(s).
+
+**Sync #2 procedure:** `git diff <sync#1-point>..origin/main` → resolve each changed numeric ID via the frontmatter stamp + manifest map → **renamed/kept** = 3-way apply to the new file; **merged/split** = route to target(s) + human review; **archived/deleted** = surface for a human call; **main-added** = import + place in nav. The delta is only what `main` changed since sync #1, so it stays small and fast.
+
+Full step-by-step procedure and the sync #1 execution log live in `RESTRUCTURE-PROGRESS.md` › Phase 3c.
+
+---
+
 ## Phase 4: Consolidation & Retirement
 
 **Goal:** Reduce noise; merge overlapping content; archive legacy material.
@@ -551,6 +569,12 @@ These portal→KB links are the highest-priority targets for adding the reverse 
 ## Phase 6: Rename to Slugs (Migration Script)
 
 **Goal:** Replace 1,575 opaque ID-based filenames with human-readable slugs derived from the `title` field.
+
+### 6.0 Prerequisite — Stamp Numeric IDs into Frontmatter (REQUIRED before any rename)
+
+**Before renaming a single file**, stamp each article's original numeric KB ID into its frontmatter (e.g. `legacy_id: "000005874"`). The current filename stem *is* the ID, so this is a deterministic bulk pass over `s/article/`.
+
+This is a **hard dependency for the second main-branch sync (Phase 3c, sync #2)**. `main` never renames its files, so after this rename `main`'s changes can only be matched to our renamed files by the numeric ID. If the ID lives *only* in the filename, renaming destroys the one key that links a `main` change to its restructure counterpart. With the ID in frontmatter, identity survives the rename and a grep resolves any numeric ID to its current slug file. **Do not run the rename script until this pass is complete and committed.** See Phase 3c for the full parity system.
 
 ### 6.1 Rename Script
 
@@ -706,6 +730,7 @@ Articles not appearing in nav after rebuild: add to a `_uncategorized` holding g
 | 3a: Net-New Articles (~26 synthesizable) | Human (main session) via `new-kb-article` / `new-overview-article` + `add-to-nav` | 2–3 weeks | ~26 new `.mdx` files |
 | 3a-PM: PM Input Articles (4) | PM provides narrative → Human writes | Async; unblock in parallel | 4 new `.mdx` files |
 | 3b: Article Upgrades (~200) | Agent (batch) via `update-kb-article` | 2–3 days | ~200 articles upgraded with intros + next steps |
+| 3c: Main Branch Content Sync (runs twice) | Human + Agent | Sync #1: ~1 day; sync #2: pre-merge | Synced new/updated articles; numeric-ID parity (frontmatter stamp + manifest map) |
 | 4: Consolidation & Retirement | Human + Agent | 1 week | Merged/retired articles, merge decision log |
 | 5: Interlinking | Agent (batch) | 2–3 days | Next Steps + Related Articles on all articles |
 | 6: Rename to Slugs | Script + human review | 1–2 days | Renamed files, `rename-mapping.json`, `redirects.json` |

@@ -3,7 +3,7 @@ title: Handling Data Updates
 permalink: 2a14dd34496e7-handling-data-updates
 ---
 
-This is an example of a simple app that leverages the `domo.onDataUpdate` function to manage how the app responds to updates made to the underlying dataset. Without this function, the app would be reloaded each time that underlying data was updated, which could lead to a bad user experience if the app refreshed in the middle of a user interaction. This is particularly painful with SPA apps where the user may have navigated to a sub route in the app and then get kicked back to the main route because the data refreshed.
+This is an example of a simple app that leverages the [`domo.onDataUpdated`](/portal/Apps/App-Framework/Tools/domo-js#domo-ondataupdated-callback) function to manage how the app responds to updates made to the underlying DataSet. Without this function, the app would be reloaded each time that underlying data was updated, which could lead to a bad user experience if the app refreshed in the middle of a user interaction. This is particularly painful with SPA apps where the user may have navigated to a sub route in the app and then get kicked back to the main route because the data refreshed.
 
 ### Getting Started
 
@@ -11,32 +11,34 @@ This is an example of a simple app that leverages the `domo.onDataUpdate` functi
 
 #### **Sample Data**
 
-Load the contents of this [sample data](/images/dev/s3.amazonaws.com/development.domo.com/wp-content/uploads/2017/06/27151228/galatic-sales-sample.csv) into a new Domo Webform and note the new ID.
+Copy the table below and paste it into a new Domo Webform, then note the DataSet ID.
+
+{/* HTML table with headers as a plain <tr> (not <thead>) so that selecting and copying the table includes the header row. Browsers omit <thead> from clipboard selection. */}
+<table>
+  <tbody>
+    <tr><td><strong>name</strong></td><td><strong>email</strong></td><td><strong>total</strong></td></tr>
+    <tr><td>Alice Johnson</td><td>alice.johnson@example.com</td><td>8240</td></tr>
+    <tr><td>Bob Martinez</td><td>bob.martinez@example.com</td><td>5130</td></tr>
+    <tr><td>Carol White</td><td>carol.white@example.com</td><td>9870</td></tr>
+    <tr><td>David Kim</td><td>david.kim@example.com</td><td>4560</td></tr>
+    <tr><td>Eva Rossi</td><td>eva.rossi@example.com</td><td>7810</td></tr>
+    <tr><td>Frank Nguyen</td><td>frank.nguyen@example.com</td><td>3290</td></tr>
+    <tr><td>Grace Chen</td><td>grace.chen@example.com</td><td>6450</td></tr>
+    <tr><td>Henry Okafor</td><td>henry.okafor@example.com</td><td>11200</td></tr>
+  </tbody>
+</table>
 
 #### **domo init**
 
 Run the `domo init` command.
 
-- design name: onDataUpdate
+- design name: live-data-demo
 - select a starter: hello world
 - would you like to connect to any datasets?: Yes
-- dataset id: the Id of the dataset you just created
+- dataset id: the Id of the DataSet you just created
 - dataset alias: sales
 - add another dataset? No
 
-#### **Update field mapping in manifest.json**
-
-```json
-{
-  ...
-  "fields": [
-    { "alias": "name", "columnName": "Name" },
-    { "alias": "email", "columnName": "Email" },
-    { "alias": "total", "columnName": "Total" }
-  ]
-  ...
-}
-```
 
 #### **index.html**
 
@@ -56,7 +58,7 @@ Replace the `index.html` content with the following:
     <h4># Data Fetches</h4>
     <div id="updateCount">0</div>
 
-    {/* domo.js optional utils */}
+    <!-- domo.js optional utils -->
     <script src="https://unpkg.com/ryuu.js"></script>
     <script src="app.js"></script>
   </body>
@@ -65,54 +67,62 @@ Replace the `index.html` content with the following:
 
 #### **Publish**
 
-Add a `thumbnail.png` and then publish your design.
+**Add a thumbnail**
+
+Download the sample below and place it in your project root as `thumbnail.png`. The file must be exactly 300×300 pixels.
+
+<a href="/images/thumbnail.png" download="thumbnail.png">Download thumbnail.png (300×300)</a>
+
+**Publish**
+
+```bash
+domo publish
+```
 
 ### Development
 
 ---
 
-Start the local development server: `domo dev`. We'll be making a few changes to the `app.js` file. Replace the current contents with the following:
+We'll be making a few changes to the `app.js` file. Replace the current contents with the following:
 
 ```js
-(function (domo) {
-  var COUNTER = 0;
-  var TOTAL = 0;
+let counter = 0;
+let total = 0;
 
-  // main function to fetch data from domo
-  function getData(alias) {
-    COUNTER += 1;
-    domo.get('/data/v1/' + alias + '?sum=total').then(function (data) {
-      TOTAL = data[0].total;
-      updateUI();
-    });
-  }
+function getData(alias) {
+  counter += 1;
+  domo.get(`/data/v1/${alias}?sum=total`).then((data) => {
+    total = data[0].total;
+    updateUI();
+  });
+}
 
-  // add variables to UI
-  function updateUI() {
-    var totalEl = document.getElementById('total');
-    var counterEl = document.getElementById('updateCount');
+function updateUI() {
+  document.getElementById('total').innerHTML = total;
+  document.getElementById('updateCount').innerHTML = counter;
+}
 
-    totalEl.innerHTML = TOTAL.toString();
-    counterEl.innerHTML = COUNTER.toString();
-  }
-
-  // initial fetch
-  console.info('App Ready...');
-  getData('sales');
-})(domo);
+getData('sales');
 ```
 
-In its current state, the `COUNTER` variable would never increment. It would always show as `1` because the app would always do a full refresh each time the data updated. Go ahead and try it. Publish the design in its current state, deploy a new app, and then in a new tab update a row in the Webform dataset.
+In its current state, the `counter` variable would never increment. It would always show as `1` because the app would always do a full refresh each time the data updated.
 
-#### Adding `domo.onDataUpdate()`
+Publish the design, create a new app card using that design, and then in a new tab update a row in the Webform DataSet — watch the app card to see it reload.
 
-See how the app did a full page reload after the dataset was updated and the counter remained at `1`? Now we'll add an event listener to add more control over how our app behaves on data updates. Add the following function inside your script.
+![App card reloading after a DataSet update](/images/card-reloading.gif)
+
+#### Adding `domo.onDataUpdated()`
+
+See how the app did a full page reload after the DataSet was updated and the counter remained at `1`? Now we'll add a [`domo.onDataUpdated()`](/portal/Apps/App-Framework/Tools/domo-js#domo-ondataupdated-callback) event listener to take control of how our app responds to data updates. Add the following function inside your script.
 
 ```js
-domo.onDataUpdate(function (alias) {
-  console.info('domo.onDataUpdate: ', new Date().getTime());
-  getData(alias);
-});
+domo.onDataUpdated(getData);
 ```
 
-Publish again and now this time, each time you update the dataset your app should update the counter.
+<Warning>
+  **Deprecated method name:** `domo.onDataUpdate()` (without the trailing `d`) was the v4 API and no longer exists in current versions of ryuu.js. Use `domo.onDataUpdated()`.
+</Warning>
+
+Publish again, then refresh the card page to pick up the new code. Now each time you update the DataSet your app should update the counter instead of reloading.
+
+![Handling data updates without a page reload](/images/handling-data.gif)

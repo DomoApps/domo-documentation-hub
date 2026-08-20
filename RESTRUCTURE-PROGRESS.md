@@ -51,7 +51,7 @@ file at the start of any restructure work to orient themselves before doing anyt
 | **3a-Forum: Forum-Driven New Articles (~57)** | ✅ Writing pass complete (2026-08-04) | All 57 triaged: 14 written, 43 deferred to PM briefs (undocumented mechanics). See Forum Gap Analysis section + `RESTRUCTURE-MANIFEST.md` |
 | **3b: Article Upgrades (~200)** | 🔲 Not started | Bulk agent edit pass |
 | **3b-Forum: Forum-Driven Article Updates (Critical+High, ~68)** | ✅ Complete (2026-08-20) | All 68 done: Critical 7 (committed), High 61 (10 parallel agents, 2 waves). 45 files, ~84 total `[pm-input]` across the phase. Ranks 42/93 re-routed to correct homes. |
-| **3c: Main Branch Content Sync** | 🔲 Not started | Runs after 3b/3b-Forum; cherry-pick new articles + factual updates from main; see Phase 3c section below |
+| **3c: Main Branch Content Sync** | 🔄 Sync #1 complete (2026-08-20); sync #2 pre-merge | Sync #1: 15 new + 68 edits + 12 portal + 72 images + 1 snippet from main; 5 conflicts resolved; 1 deletion mirrored; 1 case-rename; 14 new articles into nav (1 deprecated held). Sync #2 uses the numeric-ID parity system. |
 | **4: Consolidation, Retirement & Archive** | 🔲 Not started | Duplicates, lifecycle classification; see Product Lifecycle Standards below |
 | **4.5: PM Review System** | 🔧 Built — run after Phase 4 | Script ready: `scripts/build-pm-review-briefs.py`; generates per-PM task checklists + meeting briefs |
 | **4.6: Lifecycle Status Application** | 🔲 Not started | Bulk-add `status: "active"` to all articles; apply PM-confirmed non-Active states; move Legacy/Sunset to Archive group; remove Retired from nav |
@@ -670,6 +670,27 @@ Log each synced file with disposition `main-sync` so the Phase 9 audit can accou
 - Articles on `main` may have been added with numeric filenames (e.g., `000042925394.mdx`). These should be cherry-picked as-is now and renamed during Phase 6 along with everything else.
 - New articles on `main` that fall into a Phase 3a/3b topic area (gap already addressed by the restructure) should be reviewed: if the restructure's new article already covers the content, the main-branch article is a duplicate candidate for Phase 4 consolidation.
 - If `docs.json` on `main` has nav changes: extract only the new article registrations (not the nav structure), since the restructure's nav structure is the one being built.
+
+### Two-sync strategy + parity system (decided 2026-08-20)
+
+Main keeps moving while the restructure runs, so Phase 3c happens **twice**:
+
+- **Sync #1 — now (2026-08-20).** Clear the accumulated backlog while filenames on both branches still match (numeric IDs), so reconciliation is filename-based and conflicts are minimal.
+- **Sync #2 — immediately before the final merge**, per decision. By then Phase 6 will have **renamed most files** (numeric ID → human slug), so filename-based matching no longer works. Sync #2 relies on the **parity system** below.
+
+**Parity system (for sync #2, post-rename):** the immutable key is the **numeric KB article ID** (today's filename stem; `main` never renames, so it uses this ID forever). Two sources translate an ID to its current restructure location and disposition:
+
+1. **Frontmatter ID stamp — HARD DEPENDENCY, must run BEFORE Phase 6.** Before any file is renamed, stamp each article's original numeric ID into its frontmatter (e.g. `legacy_id: "000005874"`). The filename stem *is* the ID, so this is a trivial deterministic bulk pass. After this, identity lives *inside* the file and survives any rename — a grep finds "which file is 000005874" regardless of its new slug. **If Phase 6 renames files without this stamp first, the parity system breaks.** Add this as a Phase 6 prerequisite step.
+2. **Manifest disposition map.** `RESTRUCTURE-MANIFEST.md` records every article's fate (renamed / merged / split / archived / deleted) with source→target. Generate a machine-readable map from it to *route* each main change, not just locate it.
+
+**Sync #2 procedure:** `git diff <sync#1-point>..origin/main` → main's changed/added/deleted files by numeric ID → resolve each via frontmatter ID + manifest map → renamed/kept = 3-way apply; merged/split = route to target(s) + human review; archived/deleted = surface for human call; main-added = import + nav. Delta is only what main changed since sync #1, so it stays small.
+
+### Sync #1 execution log (2026-08-20)
+
+Divergence base: `a4dd80c2` (2026-07-14). Main delta since: 432 commits; **87 `s/article`** (15 new, ~68 clean edits, 2 conflicts, 1 delete, 1 case-rename), 16 `portal`, 80 `images/kb`, 1 `snippets`, `docs.json`.
+- **2 true conflicts** (main + restructure both changed): `000005179.mdx` (Manage Workflows — edited in High batch), `360043437093.mdx` → 3-way merge.
+- **1 delete** `000005946.mdx`; **1 case-rename** `Microsoft-Sharepoint-Connector` → `Microsoft-SharePoint-Connector` (macOS case-collision hazard — handle with `git mv`/explicit checkout).
+- 15 new articles need import + nav placement in the 11-pillar IA.
 
 ---
 

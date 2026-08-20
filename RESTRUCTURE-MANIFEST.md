@@ -355,6 +355,25 @@ All 61 High `rec=update` forum gaps closed via 10 parallel subagents in 2 waves,
 
 ---
 
+## Phase 3c — Main Branch Content Sync (Sync #1 complete — 2026-08-20)
+
+First of two syncs (see `RESTRUCTURE-PROGRESS.md` › Phase 3c for the two-sync + parity strategy). Divergence base `a4dd80c2` (2026-07-14); 432 commits on main since.
+
+**Brought in from main (take-main's-version):** 15 new articles + 68 clean edits to `s/article`, 12 `portal`, 72 `images/kb`, 1 snippet.
+
+**15 new articles** — 14 placed in the 11-pillar IA; **`000003928` (Azure Data Lake Store Connector — Deprecated) intentionally HELD from nav** as a Phase 4 defunct-connector retirement candidate. Placements: connectors → Connector Library alphabetical buckets (Apollo.io, Brivo, `360043432753` BEA → A-B; GoTo Phone, `4407975319959` BigQuery Rakuten, Humanity, `000005552` Jira OnPrem → G-K; OpenAI Ads Manager, Personio_v2 → L-P; `1500010166282` Snowflake OAuth Unload → Q-S); AI-Chat-v2 + Bring-Your-Own-Model → Domo AI; Understand-Jupyter-Workspace-Consumption → Jupyter Workspaces; Use-Email-Code-Engine-Functions → Code Engine.
+
+**5 conflicts (main + restructure both changed):**
+- `000005179.mdx`, `360043437093.mdx`, `programmatic-filtering.mdx` → clean 3-way merge (ours + main).
+- `workflow-appdb-sync.mdx`, `url-parameters-in-embedded-content.mdx` → **prefer-main** (user decision): took main's newer version, **dropping our High-batch rank 96 / rank 58 additions** there. ⚠️ Those two forum-gap additions are superseded by main's content; re-verify at Phase 4.5 whether the `[pm-input]` items they carried are still needed.
+
+**Deletion:** `000005946.mdx` "DataSet Fields" — mirrored main's deletion (file removed + docs.json nav entry removed).
+**Case-rename:** `Microsoft-Sharepoint-Connector` → `Microsoft-SharePoint-Connector` (git-tracked rename + docs.json ref updated).
+
+Sync #2 (right before merge, post-Phase-6) will reconcile everything main changes after this point via the numeric-ID parity system.
+
+---
+
 ## Phase 4 — Archived / Legacy / Deleted Articles (Not Started)
 
 Rows will be added here as articles are retired. No article may be deleted or archived without an entry here.

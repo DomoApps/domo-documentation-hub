@@ -92,9 +92,11 @@ python3 scripts/fetch-jira-context.py --csv "<folder>/<epics>.csv" \
   --out scripts/reports/release-context --download-images
 ```
 
-Read `scripts/reports/release-context/_manifest.md`, then each `DOMO-*.md`. Each file has the epic summary, description, linked Confluence links, and the PRD body text. Note which items the CSV flags as **Beta programs** vs GA features (that determines section placement). If the CSV's GA-vs-beta column is ambiguous, ask the user.
+Read `scripts/reports/release-context/_manifest.md`, then each `DOMO-*.md`. Each file has the epic summary, description, linked Confluence links, and the PRD body text. The script pulls a PRD three ways: a **linked Confluence page** (via the epic's remote links — including the page id stored in the link's `globalId` — and any `/wiki/` URL in the description), its body flattened to text under `## PRD (Confluence)`; and a **PRD attached as a file** (`.pdf`/`.docx`/etc.), downloaded to `scripts/reports/release-context/media/` and listed under `## PRD / document attachments`. The PRD is more accurate and better-phrased than the epic description — prefer it. For a file PRD, convert `.docx` with pandoc (`pandoc <file>.docx -o <file>.md`) or Read the `.pdf` directly before drafting.
 
-If a key fails (HTTP 4xx) or a PRD isn't found, note it and rely on the internal-notes blurb + epic description; don't invent detail.
+Note which items the CSV flags as **Beta programs** vs GA features (that determines section placement). If the CSV's GA-vs-beta column is ambiguous, ask the user.
+
+If a key fails (HTTP 4xx) or no PRD is found, note it and rely on the internal-notes blurb + epic description; don't invent detail.
 
 ### Step 6 — Draft into Current-Release-Notes.mdx
 

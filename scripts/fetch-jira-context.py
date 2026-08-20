@@ -274,6 +274,47 @@ def download_issue_images(issue, out_dir, prefix):
     return saved
 
 
+# Document attachments that may BE a PRD (uploaded to the epic as a file rather
+# than linked as a Confluence page). Downloaded so the skill can convert (.docx
+# via pandoc) or Read (.pdf) them directly.
+DOC_EXTS = (".pdf", ".doc", ".docx", ".ppt", ".pptx", ".txt", ".md", ".rtf", ".odt")
+
+
+def download_issue_docs(issue, out_dir, prefix):
+    saved = []
+    for att in issue.get("fields", {}).get("attachment", []) or []:
+        fname = att.get("filename", "")
+        mime = str(att.get("mimeType", "")).lower()
+        is_doc = fname.lower().endswith(DOC_EXTS) or any(
+            t in mime for t in ("pdf", "word", "presentation", "text", "document")
+        )
+        if not is_doc:
+            continue
+        url = att.get("content", "")
+        if not url:
+            continue
+        name = re.sub(r"[^A-Za-z0-9._-]", "_", fname or "doc")
+        dest = out_dir / f"{prefix}__jira__{name}"
+        try:
+            dest.write_bytes(_get(url, raw=True))
+            saved.append(dest.name)
+        except Exception:
+            pass
+    return saved
+
+
+def page_ids_from_remote_links(remote):
+    """Confluence links in Jira Cloud often carry the page id only in the remote
+    link's globalId (appId=...&pageId=123456), not in a /pages/123456/ URL."""
+    ids = []
+    for rl in remote:
+        gid = rl.get("globalId", "") or ""
+        m = re.search(r"pageId=(\d+)", gid)
+        if m:
+            ids.append(m.group(1))
+    return ids
+
+
 # ── CSV key extraction ──────────────────────────────────────────────────────────
 
 def keys_from_csv(csv_path):
@@ -303,7 +344,7 @@ def keys_from_csv(csv_path):
 
 # ── Main ───────────────────────────────────────────────────────────────────────
 
-def render_epic_md(key, issue, remote_links, prd_pages, images):
+def render_epic_md(key, issue, remote_links, prd_pages, images, docs):
     f = issue.get("fields", {})
     summary = f.get("summary", "")
     status = (f.get("status") or {}).get("name", "")
@@ -334,6 +375,15 @@ def render_epic_md(key, issue, remote_links, prd_pages, images):
         lines.append(f"## PRD (Confluence): {pg['title']}  \n{JIRA_BASE}/wiki/pages/viewpage.action?pageId={pg['id']}")
         lines.append("")
         lines.append(pg["text"] or "_(empty page body)_")
+        lines.append("")
+    if docs:
+        lines.append("## PRD / document attachments (in scripts output media/)")
+        lines.append("")
+        lines.append("_These files are attached to the epic and may be the PRD. "
+                     "Convert `.docx` with pandoc, or Read `.pdf` directly, before drafting._")
+        lines.append("")
+        for d in docs:
+            lines.append(f"- {d}")
         lines.append("")
     if images:
         lines.append("## Downloaded images (in scripts output media/)")
@@ -376,8 +426,7 @@ def main():
     out_dir = Path(args.out)
     out_dir.mkdir(parents=True, exist_ok=True)
     media_dir = out_dir / "media"
-    if args.download_images:
-        media_dir.mkdir(exist_ok=True)
+    media_dir.mkdir(exist_ok=True)
 
     manifest = ["# Release context manifest", "", f"Fetched {len(pairs)} epic(s) into `{out_dir}`.", ""]
     print(f"Fetching {len(pairs)} epic(s)…")
@@ -393,11 +442,14 @@ def main():
             manifest.append(f"- ❌ {key} — {type(e).__name__}")
             continue
 
-        # discover Confluence pages: remote links + urls inside the description
+        # discover Confluence pages: remote links (object.url + globalId pageId)
+        # + urls inside the description
         remote = fetch_remote_links(key)
         urls = [rl.get("object", {}).get("url", "") for rl in remote]
         collect_urls_from_adf(issue.get("fields", {}).get("description"), urls)
-        page_ids = confluence_page_ids(urls)
+        page_ids = confluence_page_ids(urls) + page_ids_from_remote_links(remote)
+        # de-dup, preserve order
+        seen_pid, page_ids = set(), [p for p in page_ids if not (p in seen_pid or seen_pid.add(p))]
 
         prd_pages = []
         for pid in page_ids:
@@ -405,24 +457,33 @@ def main():
             if pg:
                 prd_pages.append(pg)
 
+        # PRD document attachments on the epic (uploaded file rather than a
+        # linked Confluence page) are always downloaded — they're core context.
+        docs = download_issue_docs(issue, media_dir, key)
+
         images = []
         if args.download_images:
             images += download_issue_images(issue, media_dir, key)
             for pid in page_ids:
                 images += fetch_confluence_attachments(pid, media_dir, key)
 
-        md = render_epic_md(key, issue, remote, prd_pages, images)
+        md = render_epic_md(key, issue, remote, prd_pages, images, docs)
         (out_dir / f"{key}.md").write_text(md, encoding="utf-8")
         summary = issue.get("fields", {}).get("summary", "")
-        prd_note = f", {len(prd_pages)} PRD page(s)" if prd_pages else ", no PRD found"
+        if prd_pages:
+            prd_note = f", {len(prd_pages)} PRD page(s)"
+        elif docs:
+            prd_note = f", {len(docs)} PRD doc attachment(s)"
+        else:
+            prd_note = ", no PRD found"
         img_note = f", {len(images)} image(s)" if images else ""
-        print(f"  ✅ {key}: {summary[:60]}{prd_note}{img_note}")
-        manifest.append(f"- ✅ [{key}]({key}.md) — {summary}{prd_note}{img_note}")
+        print(f"  OK  {key}: {summary[:60]}{prd_note}{img_note}")
+        manifest.append(f"- OK [{key}]({key}.md) — {summary}{prd_note}{img_note}")
 
     (out_dir / "_manifest.md").write_text("\n".join(manifest) + "\n", encoding="utf-8")
     print(f"\nWrote per-epic context to {out_dir}/ (see _manifest.md).")
-    if args.download_images:
-        print(f"Downloaded images to {media_dir}/ (review, rename, and copy chosen ones into images/kb/).")
+    print(f"Any PRD doc attachments / images are in {media_dir}/ "
+          "(convert .docx with pandoc or Read .pdf; copy chosen screenshots into images/kb/).")
 
 
 if __name__ == "__main__":

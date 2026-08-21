@@ -21,13 +21,15 @@ filesystem checker reports those generated pages as missing while also missing
 real bugs like image paths whose case differs from the file on disk (fine on a
 case-insensitive macOS working copy, 404 once published).
 
-One class the CLI cannot see, so it is checked separately: a *bare* link target
-(no leading "/", no "./") that also resolves from the site root. The CLI
-resolves bare targets against the root and is satisfied; a browser resolves them
-against the current page. So `](s/article/123)` written in portal/.../Guides/ is
-accepted by the CLI and 404s in production. Diffing cannot help — the finding
-never appears in either scan. (A bare target that is missing at the root too is
-reported by the CLI normally.)
+Bare link targets (no leading "/", no "./") are checked separately, because the
+CLI is wrong about them in both directions. It resolves a bare target from the
+site root, while a published page carries no trailing slash and Mintlify leaves
+a bare href alone, so a browser resolves it from the folder the page sits in.
+`](s/article/123)` written in portal/.../Guides/ therefore satisfies the CLI and
+404s in production, and `](user-management)` written beside user-management.mdx
+works in production while the CLI calls it broken. Diffing cannot fix either,
+so bare targets are read out of the changed files directly and judged on whether
+they land on a page in the same folder.
 
 Usage:
   scripts/check-broken-links.py --base origin/main   # gate: new findings only
@@ -212,16 +214,50 @@ def changed_mdx(base: str) -> list[str]:
     return [p for p in out.splitlines() if p.strip()]
 
 
+def resolves_beside(source: str, target: str) -> bool:
+    """True when a bare target names a real page in the source's own folder.
+
+    Published pages carry no trailing slash and Mintlify leaves a bare href
+    alone, so a browser resolves it against the source's directory. Landing on
+    a sibling therefore works — which is why some bare links are fine in
+    production and must not be reported as 404s.
+    """
+    rel = target.split("#", 1)[0].split("?", 1)[0]
+    if not rel:
+        return False
+    beside = os.path.normpath(os.path.join(os.path.dirname(source), rel))
+    return any(os.path.exists(beside + ext) for ext in ("", ".mdx", ".md"))
+
+
 def check_bare_paths(files: list[str]) -> int:
+    """Report bare-path links. Fails only on the ones that are broken today.
+
+    The CLI is wrong about bare paths in both directions — it resolves them
+    from the site root, so it stays silent when the target exists there (a real
+    404 in the browser) and complains when it does not (a link that works). So
+    neither the report nor its diff can be relied on here.
+    """
     found = [(f, ln, t) for f in files for ln, t in bare_path_links(f)]
-    if not found:
-        return 0
-    print(f"\n{len(found)} internal link(s) missing a leading slash. A bare path "
-          f"resolves against the current page's directory once published, not "
-          f"the site root, so these 404 — and the link checker cannot see them:\n")
-    for f, ln, t in found:
-        print(f"  {f}:{ln}  ({t})  ->  (/{t})")
-    return 1
+    broken = [x for x in found if not resolves_beside(x[0], x[2])]
+    fragile = [x for x in found if x not in broken]
+
+    if broken:
+        print(f"\n{len(broken)} internal link(s) missing a leading slash. A bare "
+              f"path is resolved from the folder its article sits in, not the site "
+              f"root, so these point at pages that do not exist — and the link "
+              f"checker cannot see them:\n")
+        for f, ln, t in broken:
+            print(f"  {f}:{ln}  ({t})  ->  (/{t})")
+
+    if fragile:
+        print(f"\n{len(fragile)} internal link(s) missing a leading slash that "
+              f"happen to name a page in the same folder. These work as published, "
+              f"so they are not failing the build, but they break as soon as "
+              f"either article moves:\n")
+        for f, ln, t in fragile:
+            print(f"  {f}:{ln}  ({t})")
+
+    return 1 if broken else 0
 
 
 # --- entry point -----------------------------------------------------------

@@ -9,7 +9,9 @@ not exist or reports a target that was never written.
 """
 
 import collections
+import contextlib
 import importlib.util
+import io
 import os
 import pathlib
 import sys
@@ -217,11 +219,46 @@ check("whitespace after the opening paren is ignored",
       bare("[x](  s/article/5)\n"), [(1, "s/article/5")])
 
 
+# --- classifying a bare path: broken now, or merely fragile? ----------------
+#
+# A bare path is resolved from the folder its article sits in. When the target
+# happens to name a file in that same folder the published link works, so the
+# check must not call it a 404; when it does not, the link is genuinely broken.
+
+print("\n== bare-path classification ==")
+
+_SITE = pathlib.Path(tempfile.mkdtemp())
+(_SITE / "portal/Governance").mkdir(parents=True)
+(_SITE / "s/article").mkdir(parents=True)
+(_SITE / "portal/Governance/user-management.mdx").write_text("x\n", encoding="utf-8")
+_SIBLING = _SITE / "portal/Governance/overview.mdx"
+_SIBLING.write_text("See [Users](user-management).\n", encoding="utf-8")
+_ROOTISH = _SITE / "portal/Governance/security.mdx"
+_ROOTISH.write_text("See [Adding](s/article/360042926274).\n", encoding="utf-8")
+
+
+def bare_exit(*paths):
+    out = io.StringIO()
+    with contextlib.redirect_stdout(out):
+        rc = lc.check_bare_paths([str(p) for p in paths])
+    return rc, out.getvalue()
+
+_rc, _out = bare_exit(_SIBLING)
+check("a bare path naming a sibling file does not fail the build", _rc, 0)
+check("...and is not described as a 404", "404" in _out, False)
+check("...but is still reported", "user-management" in _out, True)
+
+_rc, _out = bare_exit(_ROOTISH)
+check("a bare path naming nothing in its folder fails the build", _rc, 1)
+
+_rc, _out = bare_exit(_SIBLING, _ROOTISH)
+check("a broken bare path fails even when a fragile one is present", _rc, 1)
+
+check("no bare paths at all passes", bare_exit()[0], 0)
+
 # --- argument handling --------------------------------------------------
 
 print("\n== arguments ==")
-import contextlib   # noqa: E402
-import io           # noqa: E402
 
 
 def cli(*argv):

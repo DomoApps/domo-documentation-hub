@@ -24,12 +24,12 @@ This section includes content and page design standards for creating Knowledge B
 
 Every article must include an `excerpt` field in its YAML frontmatter, directly below the `title`. The excerpt is a single sentence summarizing what the article covers — think of it as the "what's in this file" hint for future writers, PMs scanning the repo, and AI tools that need quick, accurate context without parsing the full article body. A well-written excerpt vastly improves how AI tools use the article in context and significantly boosts search engine optimization, since both rely on a concise, accurate summary to surface the article appropriately.
 
-```mdx
+````mdx
 ---
 title: "Create and Use Data Models"
 excerpt: "Define relationships between DataSets once and reuse them across Domo for consistent metrics and faster analysis."
 ---
-```
+````
 
 Keep the excerpt to a single sentence and use the same terminology as the article body, so the summary stays accurate as the article evolves.
 
@@ -183,7 +183,7 @@ You can say "Contact your Domo account team" for betas, or if they need further 
 
 Use the file path only — no need for the full URL. Do not include the `.mdx` extension in the path.
 
-Always start the path with a slash, so it means the same thing from every page. Without one, the path is read from the current article's folder, and often cause more problems than they're worth.
+Always start the path with a slash, so it means the same thing from every page. Paths without one are read from the current article's folder, and often cause more problems than they're worth.
 
 **Correct:** `[Article Title](/s/article/Article-Title)`
 
@@ -213,7 +213,7 @@ Block-level screenshots should be wrapped in a `<Frame>` component. Frame styles
 
 Do not add explicit `width` or `height` styles to the `<img>`, since they override Frame's auto-sizing and often distort the image. **If a screenshot needs to render smaller than the column width, crop the source image rather than scaling it down with inline styles**.
 
-For inline glyphs and small UI fragments that flow with surrounding text, use the icon font or a native inline `<img>` instead. See _Icons_ and _Inline images_ below.
+For inline glyphs and small UI fragments that flow with surrounding text, use the icon font or a native inline `<img>` instead. See *Icons* and *Inline images* below.
 
 ## Icons
 
@@ -256,23 +256,23 @@ Treat this as a last resort. Whenever the icon sits inside normal prose, the rew
 
 ### Icons Not Included in the Font
 
-Domo's icon font is large but not exhaustive. If the UI element you're trying to depict isn't represented in the font, fall back to a regular inline image — see _Inline images_ below for how to format it. Just remember that the font version is preferred whenever a matching icon exists.
+Domo's icon font is large but not exhaustive. If the UI element you're trying to depict isn't represented in the font, fall back to a regular inline image — see *Inline images* below for how to format it. Just remember that the font version is preferred whenever a matching icon exists.
 
-One special case: if what you need is a third-party brand logo — AWS, OpenAI, Anthropic, GitHub, and the like — don't reach for an uploaded image right away. Those usually have a _coded_ option too. See _Brand and Third-Party Logos_ below.
+One special case: if what you need is a third-party brand logo — AWS, OpenAI, Anthropic, GitHub, and the like — don't reach for an uploaded image right away. Those usually have a *coded* option too. See *Brand and Third-Party Logos* below.
 
 ### Brand and Third-Party Logos
 
-Company and product logos aren't part of the Domo icon font, but you usually don't need to upload an image for them either — and you shouldn't if you can avoid it. A logo saved as an image is almost always a solid-color mark, so it vanishes against a dark background. Prefer a _coded_ icon that inherits the surrounding text color, the same way the Domo icon font does, so it stays visible in both light and dark mode.
+Company and product logos aren't part of the Domo icon font, but you usually don't need to upload an image for them either — and you shouldn't if you can avoid it. A logo saved as an image is almost always a solid-color mark, so it vanishes against a dark background. Prefer a *coded* icon that inherits the surrounding text color, the same way the Domo icon font does, so it stays visible in both light and dark mode.
 
 There are two ways to do this. Try them in order:
 
-1. **Font Awesome brand icon.** Most major company logos are built into Font Awesome's _brands_ set, which is available in every article. Reference one with the `<Icon>` component and `iconType="brands"`:
+1. **Font Awesome brand icon.** Most major company logos are built into Font Awesome's *brands* set, which is available in every article. Reference one with the `<Icon>` component and `iconType="brands"`:
 
    ```mdx
    See the [OpenAI guide](https://platform.openai.com/docs/guides/text) <Icon icon="openai" iconType="brands" aria-hidden="true" />.
    ```
 
-   The icon name is the brand's slug — `aws`, `openai`, `github`, and so on. Browse the set at [Font Awesome Brands](https://fontawesome.com/search?f=brands). This is the one case where `<Icon>` is the right tool: it's pulling a font glyph, not loading an uploaded image, so the dark-mode problem described under _Inline images_ doesn't apply.
+   The icon name is the brand's slug — `aws`, `openai`, `github`, and so on. Browse the set at [Font Awesome Brands](https://fontawesome.com/search?f=brands). This is the one case where `<Icon>` is the right tool: it's pulling a font glyph, not loading an uploaded image, so the dark-mode problem described under *Inline images* doesn't apply.
 
 2. **Inline SVG with `fill="currentColor"`.** A few brands — Anthropic is one — aren't in the free Font Awesome set. For those, paste the logo's SVG straight into the article and set `fill="currentColor"` so it picks up the text color. Vector logo libraries such as [Simple Icons](https://simpleicons.org) provide ready-to-paste paths:
 
@@ -280,11 +280,11 @@ There are two ways to do this. Try them in order:
    See the [Anthropic guide](https://docs.anthropic.com) <svg aria-hidden="true" viewBox="0 0 24 24" fill="currentColor" style={{height: '1.1em', width: '1.1em', display: 'inline', verticalAlign: '-0.15em', margin: '0'}}><path d="M17.3041 3.541h-3.6718l6.696 16.918H24Zm-10.6082 0L0 20.459h3.7442l1.3693-3.5527h7.0052l1.3693 3.5528h3.7442L10.5363 3.5409Zm-.3712 10.2232 2.2914-5.9456 2.2914 5.9456Z" /></svg>.
    ```
 
-   This is raw inline SVG, _not_ the `<Icon>` component pointing at an uploaded file. The `fill="currentColor"` is what makes it adapt to the theme, which is why the dark-mode caveat under _Inline images_ doesn't apply here either.
+   This is raw inline SVG, *not* the `<Icon>` component pointing at an uploaded file. The `fill="currentColor"` is what makes it adapt to the theme, which is why the dark-mode caveat under *Inline images* doesn't apply here either.
 
-Only fall back to an uploaded image (see _Inline images_) if a logo exists in neither place and you can't get its SVG — and if you do, pick a version that's legible on both light and dark backgrounds.
+Only fall back to an uploaded image (see *Inline images*) if a logo exists in neither place and you can't get its SVG — and if you do, pick a version that's legible on both light and dark backgrounds.
 
-For accessibility, follow the same rule as _Always Pair an Icon with a Text Label_: when the logo sits next to text that already names the brand — a link reading "OpenAI," for example — hide the icon from screen readers with `aria-hidden="true"` so it isn't announced twice. Reserve `role="img"` with `aria-label` for a logo that stands completely alone with nothing else naming it.
+For accessibility, follow the same rule as *Always Pair an Icon with a Text Label*: when the logo sits next to text that already names the brand — a link reading "OpenAI," for example — hide the icon from screen readers with `aria-hidden="true"` so it isn't announced twice. Reserve `role="img"` with `aria-label` for a logo that stands completely alone with nothing else naming it.
 
 ### Legacy Icons (`legacy-icon-*`)
 
@@ -303,21 +303,12 @@ In Workbench, select <i className="legacy-icon-database sm" aria-hidden="true" /
 
 Plenty of older articles still use uploaded images for icons that now exist in the font. We're swapping these over to the font version gradually. The rule of thumb: if you're already in an article making other edits and you notice image-based icons, take a moment to convert them.
 
-One subtlety to watch for: if the article describes the current Domo UI but an old screenshot shows a legacy-style icon, the screenshot itself is out of date. In that case, migrate to the standard `icon-*` (Phosphor) version, _not_ `legacy-icon-*` — the goal is to match what users see today. Save `legacy-icon-*` for surfaces that genuinely still ship the old icons, like release notes and Workbench.
+One subtlety to watch for: if the article describes the current Domo UI but an old screenshot shows a legacy-style icon, the screenshot itself is out of date. In that case, migrate to the standard `icon-*` (Phosphor) version, *not* `legacy-icon-*` — the goal is to match what users see today. Save `legacy-icon-*` for surfaces that genuinely still ship the old icons, like release notes and Workbench.
 
-For reference, the previous code for inline "icons" looks like this:
+For reference, the previous code for inline "icons" looks like this: 
 
 ```mdx
-<img
-  src="/images/kb/worksheets-icon-1.png"
-  style={{
-    width: 20,
-    height: 20,
-    display: "inline",
-    verticalAlign: "start",
-    margin: "0",
-  }}
-/>
+<img src="/images/kb/worksheets-icon-1.png" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/>
 ```
 
 ## Inline Images
@@ -325,16 +316,7 @@ For reference, the previous code for inline "icons" looks like this:
 Sometimes you need to show a small piece of the UI — a tiny button, a badge, a glyph — that isn't available in the icon font. In those cases, use a regular image, but with a small bit of inline styling so the image sits naturally inside the sentence instead of jumping to its own line:
 
 ```mdx
-<img
-  src="/images/kb/example-glyph.png"
-  alt="Example glyph"
-  style={{
-    height: "1.2em",
-    display: "inline",
-    verticalAlign: "start",
-    margin: "0",
-  }}
-/>
+<img src="/images/kb/example-glyph.png" alt="Example glyph" style={{height: '1.2em', display: 'inline', verticalAlign: 'start', margin: '0'}}/>
 ```
 
 The `height` value controls how big the image appears relative to the surrounding text. Use these defaults:
@@ -405,7 +387,7 @@ The component handles sizing automatically: Domo's embed runtime sends a `postMe
 Add the import directly below the frontmatter (alongside any other imports):
 
 ```mdx
-import { DomoEmbed } from "/snippets/DomoEmbed.mdx";
+import { DomoEmbed } from '/snippets/DomoEmbed.mdx';
 ```
 
 Then place the component wherever the embed should appear:
@@ -422,19 +404,11 @@ Three props are available:
 | `width`         | No       | `"100%"` | CSS width of the iframe.                            |
 | `initialHeight` | No       | `"600"`  | Starting height in pixels before auto-resize fires. |
 
-<Note>
-  **Note:** The Domo instance that hosts the embed must allow your documentation
-  domain in its embed allowlist. If the iframe appears blank, check the source
-  instance's CSP / embed allowlist settings.
-</Note>
+<Note>**Note:** The Domo instance that hosts the embed must allow your documentation domain in its embed allowlist. If the iframe appears blank, check the source instance's CSP / embed allowlist settings.</Note>
 
 ### Live Example
 
-<DomoEmbed
-  src="https://embed.domo.com/cards/G8mM0"
-  width="600"
-  initialHeight="600"
-/>
+<DomoEmbed src="https://embed.domo.com/cards/G8mM0" width="600" initialHeight="600" />
 
 Source card: [modocorp.domo.com/kpis/details/1429774452](https://modocorp.domo.com/kpis/details/1429774452)
 
@@ -463,7 +437,7 @@ The standard beta Note is stored once as a reusable snippet at `/snippets/BetaNo
 Add this import line once, on its own line directly below the frontmatter (the closing `---`):
 
 ```mdx
-import { BetaNote } from "/snippets/BetaNote.mdx";
+import { BetaNote } from '/snippets/BetaNote.mdx';
 ```
 
 Then write this wherever the beta Note should appear:
@@ -484,18 +458,18 @@ The snippet renders a Note about enabling beta features, with links to enable be
 
 For articles in Spanish, French, German, or Japanese, import and use the language-specific named export from the same snippet file. Both `<LangBetaNote />` (feature-level) and `<LangBetaNote generic />` (release-notes roundup) work identically to their English equivalents.
 
-| Language | Import name  | Component usage                             |
-| -------- | ------------ | ------------------------------------------- |
-| English  | `BetaNote`   | `<BetaNote />` / `<BetaNote generic />`     |
-| Spanish  | `BetaNoteEs` | `<BetaNoteEs />` / `<BetaNoteEs generic />` |
-| French   | `BetaNoteFr` | `<BetaNoteFr />` / `<BetaNoteFr generic />` |
-| German   | `BetaNoteDe` | `<BetaNoteDe />` / `<BetaNoteDe generic />` |
-| Japanese | `BetaNoteJa` | `<BetaNoteJa />` / `<BetaNoteJa generic />` |
+| Language | Import name | Component usage |
+| -------- | ----------- | --------------- |
+| English  | `BetaNote`    | `<BetaNote />` / `<BetaNote generic />` |
+| Spanish  | `BetaNoteEs`  | `<BetaNoteEs />` / `<BetaNoteEs generic />` |
+| French   | `BetaNoteFr`  | `<BetaNoteFr />` / `<BetaNoteFr generic />` |
+| German   | `BetaNoteDe`  | `<BetaNoteDe />` / `<BetaNoteDe generic />` |
+| Japanese | `BetaNoteJa`  | `<BetaNoteJa />` / `<BetaNoteJa generic />` |
 
 Example import for a Spanish article:
 
 ```mdx
-import { BetaNoteEs } from "/snippets/BetaNote.mdx";
+import { BetaNoteEs } from '/snippets/BetaNote.mdx';
 ```
 
 Example usage (Spanish, release-notes roundup above a list of beta features):
@@ -521,7 +495,7 @@ tag: "Beta"
 sidebarTitle: "MCP Server"
 ---
 
-import { BetaNote } from "/snippets/BetaNote.mdx";
+import { BetaNote } from '/snippets/BetaNote.mdx';
 
 <BetaNote />
 
@@ -562,7 +536,7 @@ When only a section of an otherwise-GA article covers a beta feature:
 title: "..."
 ---
 
-import { BetaNote } from "/snippets/BetaNote.mdx";
+import { BetaNote } from '/snippets/BetaNote.mdx';
 
 ...
 
@@ -586,6 +560,8 @@ Use the `<Tooltip>` component to display hover text over a word or phrase. The `
   Hover over me
 </Tooltip>
 ```
+
+
 
 ## Tables
 
@@ -660,7 +636,7 @@ Also place data rows inside `<tbody>`. If the data rows are left inside `<thead>
 
 **Images in table cells**
 
-Do not use `<Frame>` inside table cells — its block-level chrome and auto-sizing fight the cell width and break the layout. Use a native inline `<img>` (see _Inline images_) instead, regardless of the image size. If a screenshot is too large to read at inline sizes, link out to a separate article or place the screenshot outside the table.
+Do not use `<Frame>` inside table cells — its block-level chrome and auto-sizing fight the cell width and break the layout. Use a native inline `<img>` (see *Inline images*) instead, regardless of the image size. If a screenshot is too large to read at inline sizes, link out to a separate article or place the screenshot outside the table.
 
 ## Code
 
@@ -686,7 +662,7 @@ Use this sparingly. Hidden comments accumulate over time and clutter the reposit
 | --------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
 | Bold            | Use bold when referring to static interface elements such as fields, menus, static menu options (in other words, those not dynamically populated based on user settings or selections), buttons and icons, and the like. If referring to a series of items to select, separate items with “>” and do not bold the >. | Select **Admin Settings** > **Security** > **Whitelist**.                                                                   |
 | Italics         | Use italics when referring to variables that users will fill in with their own data.                                                                                                                                                                                                                                 | Enter the URL as _mydomo_.domo.com, in which _mydomo_ refers to your company Domo instance.                                 |
-| Quotation Marks | Use quotation marks to reference on-screen text not used specifically as an interface element. Also used to reference DataSet columns and ETL actions.                                                                                                                                                               | Select the orange button to the right of the text reading "Select here to save your progress."                              |
+| Quotation Marks | Use quotation marks to reference on-screen text not used specifically as an interface element. Also used to reference DataSet columns and ETL actions.                                                                                                                                                               | Select the orange button to the right of the text reading "Select here to save your progress."                               |
 | Code Style      | Use a Code style to set apart code snippets on their own line.                                                                                                                                                                                                                                                       | Enter the file path of the Microsoft Word file you want to import on the SFTP server. For example: `/home/user/MyFile.docx` |
 
 **Punctuation and bold: two exceptions**

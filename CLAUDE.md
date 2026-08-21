@@ -212,7 +212,9 @@ All scripts live in `scripts/`. They are optional dev-quality tools — non-tech
 | `update_kb_articles.py` | Entry point for the bulk Salesforce CSV import pipeline. |
 | `build-localization-glossary.py` | Regenerate the deterministic localization glossaries (`localization/glossary/{es,fr,de,ja}.csv`) from the style guide, the branded-terms CSV, and the JA XTM TM. Preserves `retrospective:*`/`manual*` rows. `--report` prints the JA mining report. See the `localize` skill. |
 | `check-glossary.py` | Deterministic glossary-compliance checker: `python3 scripts/check-glossary.py <english.mdx> <translated.mdx> <lang>`. Flags keep-in-English terms that went missing and translated terms whose approved rendering is absent. Used by the `localize` QA step. |
-| `remark-domo-style.mjs` | Remark lint plugin enforcing Domo style rules (optional; runs via `yarn lint`). |
+| `remark-domo-style.mjs` | Remark lint plugin enforcing Domo style rules (optional; runs via `yarn check`). |
+| `check-broken-links.py` | Gate broken links. `--base origin/main` fails on links broken *by* the branch (scans the whole project at both refs and diffs, since most broken links are pre-existing). `--all` lists everything; passing file paths checks just those. Needs `PUPPETEER_SKIP_DOWNLOAD=1 npm install -g mint`. Rationale and caveats are in the script's docstring. |
+| `test-check-broken-links.py` | Tests for `check-broken-links.py`: `python3 scripts/test-check-broken-links.py`. No framework to install; exits 0 when green. Run it after touching the report parser or the bare-path regex — a parser mistake there fails silently, mis-attributing a finding rather than erroring. |
 
 ## Style Standards
 

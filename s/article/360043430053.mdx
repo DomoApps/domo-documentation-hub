@@ -119,6 +119,41 @@ END
 
 Use a `DATEDIFF` function then subtract 2 for every week.
 
+**How do I calculate a duration in hours and minutes (HH:MM)?**
+
+Convert each time to seconds with `TIME_TO_SEC`, subtract, then convert the result back to a time value with `SEC_TO_TIME`:
+
+```
+SEC_TO_TIME(TIME_TO_SEC(`End_Time`) - TIME_TO_SEC(`Start_Time`))
+```
+
+<Note>
+  **Note:** `SEC_TO_TIME` is limited to 24 hours. If a duration can exceed 24 hours, it overflows and loops back to 0. For longer durations, calculate decimal hours instead (below).
+
+</Note>
+
+**How do I calculate elapsed time as decimal hours?**
+
+Subtract the two timestamps as UNIX time (seconds) and divide by 3,600:
+
+```
+(UNIX_TIMESTAMP(`End_Time`) - UNIX_TIMESTAMP(`Start_Time`)) / 3600
+```
+
+Divide by 60 instead for elapsed minutes.
+
+**Why is my total elapsed time too high when I sum a DATEDIFF (or duration) calculation?**
+
+If the same duration value repeats across several rows (for example, one duration per ticket spread over many line-item rows), summing it multiplies the duration by the number of rows. Collapse the duplicates to a single value per group with `MIN` or `MAX` before aggregating:
+
+```
+MAX(DATEDIFF(`Closed_Date`, `Opened_Date`))
+```
+
+Because every row in the group holds the same difference, `MIN` and `MAX` both return that one value instead of adding it repeatedly.
+
+{/* [pm-input] Phil Fuchs — confirm whether TIMESTAMPDIFF is supported in Beast Mode (it is not currently in the Functions Reference), and the recommended pattern for excluding business hours (not just weekend days) from an elapsed-time calculation. Synthesized from community forum reports; needs confirmation. */}
+
 **How do I filter data so the summary number matches the value displayed in the card?**
 
 Say you have a map card of the United States that calculates the sales amount broken out by state, and the summary number shows the total sales amount. However, the total sales amount in the card legend for the United States is lower than the summary number amount. The reason the sales amount in the Summary Number is larger is because the summary number takes into account all sales amounts regardless of country, and the card legend only shows the sales amounts for the United States. For this scenario, you will need to create a Beast Mode calculation that filters out the non-United States sales amounts.
@@ -400,6 +435,20 @@ WHEN iFNULL(`value2`,0) = 0 THEN 0
 ELSE `value1` / `value2`
 
 END
+```
+
+**How do I calculate a ratio or divide one column by another?**
+
+Aggregate the numerator and denominator *before* you divide—wrap each side in `SUM()` and divide the sums:
+
+```
+SUM(`Numerator`) / SUM(`Denominator`)
+```
+
+Do **not** divide at the row level and then aggregate (for example `` SUM(`a` / `b`) `` or a bare `` `a` / `b` ``). Row-level division calculates a separate ratio for every record, so the aggregated result becomes the sum or average of those per-row ratios—which does not equal the ratio of the totals and often returns a wrong (or `0`) value. Surround each column name with backticks. To protect against a `NULL` or zero denominator, combine this with the divide-by-zero guard shown in the previous answer. To display the result as a percentage, format the field as a percent in the card's value-formatting options, or multiply by 100:
+
+```
+SUM(`Numerator`) / SUM(`Denominator`) * 100
 ```
 
 **How do I create conditional summing?**

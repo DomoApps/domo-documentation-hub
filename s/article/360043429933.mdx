@@ -5,7 +5,7 @@ excerpt: "Reference guide to functions supported in Beast Mode calculations, wit
 
 ## Intro
 
-This reference guide describes supported functions in Beast Mode.
+Beast Mode calculations use a **MySQL-like SQL dialect**, so most standard MySQL functions and syntax conventions apply—for example, column names are wrapped in backticks (`` `column` ``) and string literals use single quotes (`'text'`). This reference guide describes supported functions in Beast Mode.
 
 ---
 
@@ -483,6 +483,19 @@ Learn how to [use aggregate functions in Summary Numbers](#apply-a-calculation-t
   </tbody>
 </table>
 
+<Note>
+  **Note: Absolute-Value Totals per Group.** To show the absolute value of an *aggregated* result—rather than the sum of per-row absolute values—apply `ABS()` to the aggregate. For example, to get the absolute value of net variance (`Budget − Actual`) for each category on a card grouped by category:
+  <br/><br/>
+  `` ABS(SUM(`Budget` - `Actual`)) ``
+  <br/><br/>
+  To hold that per-category total constant regardless of how the card is grouped, combine `ABS()` with a [FIXED function](/s/article/4408174643607 "Beast Mode FIXED Functions"), which requires two aggregations:
+  <br/><br/>
+  `` ABS(SUM(SUM(`Budget` - `Actual`) FIXED (BY `Category`))) ``
+
+</Note>
+
+{/* [pm-input] Phil Fuchs — confirm current ABS() semantics with aggregated / FIXED expressions; community reports indicate the behavior changed mid-2025. Synthesized from community forum reports; needs confirmation. */}
+
 ### Logical Functions
 
 <table
@@ -670,6 +683,13 @@ Learn how to [use aggregate functions in Summary Numbers](#apply-a-calculation-t
     </tr>
   </tbody>
 </table>
+
+<Note>
+  **Note:** The `IN` operator is convenient for short value lists, but very large lists (hundreds or thousands of values) make a calculation slow, hard to maintain, and can exceed practical expression-length limits. For large value sets, join your data against a lookup DataSet in [Magic ETL](/s/topic/0TO5w000000ZamzGAC "Prepare") and filter on the matched result instead, or break the list into a few smaller `OR`-separated conditions.
+
+</Note>
+
+{/* [pm-input] Phil Fuchs — confirm the practical maximum length / value count for a Beast Mode IN-list (or overall expression), if one is enforced. Synthesized from community forum reports; needs confirmation. */}
 
 **Video - Case Statement Overview**
 
@@ -908,6 +928,34 @@ Learn how to [use aggregate functions in Summary Numbers](#apply-a-calculation-t
     </tr>
   </tbody>
 </table>
+
+### Format Numbers Within Concatenated Strings
+
+Beast Mode does not have a dedicated number-formatting function, so when you build a label that mixes text and a number with `CONCAT`, format the number inline using the functions above. Common patterns:
+
+- **Percent.** Multiply the ratio by 100, round it, and append a percent sign:
+  <br/>
+  `` CONCAT(ROUND(`Rate` * 100, 1), '%') ``
+- **Currency.** Prefix the value with a currency symbol after rounding to two decimals:
+  <br/>
+  `` CONCAT('$', ROUND(`Amount`, 2)) ``
+- **Abbreviation (K / M / B).** Divide by the appropriate power of ten inside a `CASE` and append the unit:
+
+```
+CASE
+  WHEN `Amount` >= 1000000000 THEN CONCAT(ROUND(`Amount` / 1000000000, 1), 'B')
+  WHEN `Amount` >= 1000000 THEN CONCAT(ROUND(`Amount` / 1000000, 1), 'M')
+  WHEN `Amount` >= 1000 THEN CONCAT(ROUND(`Amount` / 1000, 1), 'K')
+  ELSE CONCAT(`Amount`, '')
+END
+```
+
+<Note>
+  **Note:** These patterns operate on row-level values. If the label is displayed on an aggregated chart, wrap the numeric portion in the matching aggregate (for example, `SUM()`) so the formatted value reflects the aggregated total.
+
+</Note>
+
+{/* [pm-input] Phil Fuchs — confirm whether Beast Mode supports a thousands-separator / grouping function (such as MySQL FORMAT()) for inserting commas into numbers inside concatenated strings, and the exact supported syntax. Synthesized from community forum reports; needs confirmation. */}
 
 ### Date and Time Functions
 
@@ -2076,6 +2124,26 @@ Learn how to [use aggregate functions in Summary Numbers](#apply-a-calculation-t
     </tr>
     <tr>
       <td colspan="1" rowspan="1">
+        <code> WEEKOFYEAR </code>
+      </td>
+      <td colspan="1" rowspan="1">
+        <p>
+          {" "}
+          Returns the week of the year (1–53) for each value in a date/time
+          column. Used in the week-based period-over-period comparisons in{" "}
+          <a href="/s/article/360043430133" target="_self">
+            {" "}
+            Sample Period-over-Period Transforms{" "}
+          </a>
+          .{" "}
+        </p>
+      </td>
+      <td colspan="1" rowspan="1">
+        <code> WEEKOFYEAR(`DateCol`) </code>
+      </td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1">
         <p>
           <code> YEAR </code>
         </p>
@@ -2125,6 +2193,13 @@ Learn how to [use aggregate functions in Summary Numbers](#apply-a-calculation-t
     </tr>
   </tbody>
 </table>
+
+<Note>
+  **Note: Week Numbering.** `WEEK` and `YEARWEEK` do not follow the ISO-8601 week standard by default. Control the week frame with the `mode` argument—use mode `11` for a Sunday–Saturday week or mode `22` for a Monday–Sunday week.
+
+</Note>
+
+{/* [pm-input] Phil Fuchs — confirm (1) the default week-start / mode for WEEK, YEARWEEK, and WEEKOFYEAR in Beast Mode and whether WEEKOFYEAR follows ISO-8601, and (2) the reported week-numbering discrepancy between Magic ETL and Beast Mode. Synthesized from community forum reports; needs confirmation. */}
 
 ## Apply a Calculation to a Summary Number
 

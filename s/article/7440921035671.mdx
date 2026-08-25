@@ -138,6 +138,23 @@ Follow these steps to resolve the "Error Starting Kernel" issue:
 4. Select
    **Restore Kernel**.
 
+## Input Dataset Not Found
+
+If a notebook returns an error such as "Input dataset with id ... not found" when reading data, the DataSet you are referencing is not attached to the workspace as an input, or you do not have access to it.
+
+Follow these steps to resolve the issue:
+
+1. Confirm the DataSet is added to the workspace. From the Jupyter Workspaces list, select
+   <img src="/images/kb/ka0Vq0000005UQT-00N5w00000Ri7BU-0EM5w000005vNtu.png" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/> **Wrench** > **Edit** for the workspace, then verify the DataSet appears under **Input DataSets**. If it is missing, select **Add Input DataSet**, choose the DataSet, and select **Save Workspace**. See [Reading Data](/s/article/36004740075#reading-data) for details.
+2. Confirm you are reading the DataSet by the correct name or ID. The name or ID passed to `read_dataframe` must match an input DataSet on the workspace.
+3. Confirm you have access to the DataSet in Domo. Workspace access does not grant DataSet access — you must have permission to the underlying DataSet. Input and Output DataSets are shared with workspace Co-Owners, but other shared users need their own access to the DataSet.
+
+## Account Credential Access Errors
+
+If `get_account_property_value` returns a 404 even though the account exists and is attached to the workspace, the account's connector most likely does not allow reading unencrypted credential values.
+
+To resolve the issue, edit the account (in **Data** > **Accounts**) and, when creating or editing it, expand **show advanced options** and enable **Allow authorized users to access unencrypted credentials**. This option is hidden under advanced options and is off by default for many connectors. After enabling it, retry the call from your notebook.
+
 ## Scheduled Execution Failures
 
 If a Jupyter DataFlow created from a Jupyter Workspace notebook fails to execute successfully, it may be due to one of the following reasons:
@@ -161,3 +178,14 @@ Follow these steps to resolve the execution failure:
    * stderr
 
    <Frame><img alt="mceclip5.png" src="/images/kb/ka0Vq0000005UQT-00N5w00000Ri7BU-0EM5w000005vNtw.png"/></Frame>
+
+### "Edit in Jupyter" Opens a Blank or Wrong Notebook
+
+When you schedule a notebook, Domo creates a Jupyter DataFlow that is linked to the source `.ipynb` file in your workspace. Selecting **Edit in Jupyter** from the DataFlow's Details view opens that source notebook.
+
+If the source notebook has been renamed, moved, or deleted, the DataFlow can no longer locate the original file, so **Edit in Jupyter** may open a blank notebook or a notebook that does not match the code that ran.
+
+Follow these steps to locate and repair the code behind a failing scheduled job:
+
+1. Open the workspace and check the `recent_executions` directory for the last run's `output.ipynb`, `stdout`, and `stderr` files to see the code and error output that actually executed.
+2. If the source file was renamed or moved, restore it to the original name and path the DataFlow expects, or re-create the schedule from the current notebook so the DataFlow links to the correct source file. See [Schedule a Notebook](/s/article/36004740075#schedule-a-notebook).

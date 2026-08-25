@@ -199,6 +199,12 @@ You can cause a Task to be created when an Alert is triggered. You can choose th
 5. Select the desired Task owner in the **Owner** menu.
 6. Click **Next**to move onto the next step in the wizard.
 
+<Note>**Note:** To create a Task from an Alert, you must select a valid Project in the **Project** menu — one that exists and that you have access to. If the Project you need doesn't exist yet, [create it](/s/article/360043430333) first. When the Alert triggers, the Task is created in that Project and assigned to the owner you selected.</Note>
+
+**Troubleshooting:** If an Alert fires but no Task appears, verify that the Project you selected still exists and that you (the Alert owner) still have access to add Tasks to it, then re-save the Alert action.
+
+{/* [pm-input] Dan Brinton — Confirm the exact prerequisites and failure conditions for Alert-triggered Task creation: the Project role/membership the Alert owner needs (owner vs. member) to add Tasks, and the specific reasons a Task can silently fail to be created when an Alert fires. Synthesized from community forum reports; needs confirmation. */}
+
 ### Scheduled Report Action
 
 You can configure an alert to send a Scheduled Report when the alert triggers by attaching an action**.**You can attach an existing Scheduled Report and share it with people and groups within your organization.
@@ -272,6 +278,17 @@ The user or group is removed from the shared list and no longer receives Notific
 4. Click **Share**.
 
 The Alert is shared in the selected conversations. Any users following those conversations will now receive notifications any time the Alert is triggered.
+
+## Alert Reliability and Limitations
+
+Keep the following in mind when you build DataSet Alerts:
+
+- **Build alerts on a stored DataSet.** Domo evaluates DataSet Alerts against the data stored for the DataSet. Row Alerts are not supported on Views (or on Fusions, Appends, Upserts, Federated DataSets, or DataSets with more than 1M rows). For reliable alerting on data that comes from a View, set the Alert on the underlying stored DataSet — such as the output DataSet of the DataFlow that feeds the View — rather than on the View itself.
+- **One notification per trigger.** When an Alert enters a triggered state, Domo sends a single notification for that trigger. If one evaluation matches multiple rows, those rows are reported together in that one notification rather than as a separate alert per row.
+
+{/* [pm-input] Dan Brinton — Confirm how numeric column formatting and exponential/scientific display affect threshold evaluation — specifically whether the Alert evaluates the underlying stored numeric value rather than the formatted or exponentially displayed value. Synthesized from community forum reports; needs confirmation. */}
+
+{/* [pm-input] Dan Brinton — Confirm how an attached Scheduled/Triggered Report resolves the actual triggered value versus the "Current alert value" placeholder in the report body. Synthesized from community forum reports; needs confirmation. */}
 
 ## Save an Alert
 

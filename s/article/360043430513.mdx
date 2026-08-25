@@ -90,6 +90,8 @@ After configuring your webhook action, you can test it by clicking **Send Test**
 Attaching a task action allows you to create a task and add it to an existing project inside Domo Projects & Tasks, choosing an owner for the new task. Your customized message from step 2 above becomes the task name.   
 As soon as the Alert threshold is reached, the new task is added and assigned to the configured owner. Learn more about [Projects and Tasks](https://domo-support.domo.com/s/topic/0TO5w000000Zao5GAC/projects-and-tasks?language=en_US).
 
+<Note>**Note:** To create a task, select a valid project you have access to when you configure the action. If an Alert fires but no task appears, verify that the selected project still exists and that you still have access to add tasks to it.</Note>
+
 <Frame>![Screenshot](/images/kb/0EMVq000007MWRp.jpg)</Frame>
 
 ### Step 3: Share the Alert
@@ -180,6 +182,15 @@ The **Keep sending Notifications while in a triggered state** checkbox appears o
 ### Determine Whether to Honor Filters
 
 If filters have been set on this card on either the dashboard or card level, an option appears allowing you to toggle whether those Filters are honored in the Alert. If you uncheck the box, the Alert will be applied to the unfiltered version of the card. You can select **Show filters** option to see the currently applied Filters.  
+
+## Alert Condition Patterns and Limitations
+
+A Card Alert evaluates a single metric on the card. Keep the following patterns and limitations in mind when you set one up:
+
+- **Alerts require an alertable metric.** You build a Card Alert on a metric such as the card's Summary Number. Some chart types only support Alerts on a Summary Number, so if the card has no Summary Number, you cannot create an Alert on it. Add a Summary Number to the card (or use a chart type that supports one) before creating the Alert.
+- **Filtered cards.** If Page or Card filters are applied to the card, you choose whether the Alert honors those filters or evaluates the unfiltered card. See [Determine Whether to Honor Filters](#determine-whether-to-honor-filters) above.
+- **Percent-change and two-dimension comparisons.** A single Card Alert compares one metric against one condition. To alert on a pattern the standard conditions don't express directly — such as a percentage change between two values or a comparison across two dimensions — create a [Beast Mode](/s/article/360043429913) calculation that outputs a flag (for example, `1` when the condition is met and `0` otherwise), surface that flag as the card's Summary Number (for example, as a count or sum of the flag), and set the Alert to trigger on that value.
+- **Multiple metrics in one message.** A Card Alert message can reference only the single metric the Alert is built on. To send a notification that combines several metrics in one body, attach a [Workflows](/s/article/000005331) action or a [Scheduled Report](/s/article/360043437773) action to the Alert instead.
 
 ## Save an Alert
 

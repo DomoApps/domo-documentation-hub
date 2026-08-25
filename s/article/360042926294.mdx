@@ -110,6 +110,51 @@ Excel stores dates internally as serial numbers. When the Box connector reads an
 
 {/* [pm-input] Tasleema Lallmamode — confirm the Box connector Excel-date-to-numeric casting behavior and the exact recommended recovery (Excel serial-date epoch offset and the Magic ETL function to use). synthesized from community forum reports; needs confirmation. */}
 </Accordion>
+
+<Accordion title="My connector failed with a vague message like 'Domo is ready but…' or 'Failed to execute import successfully.'">
+
+These are generic wrapper messages Domo shows when a connector run does not complete. They rarely name the real problem on their own — the underlying cause is usually in the response the source API returned (an authentication failure, a bad parameter, a rate limit, or a source-side outage). To find it, read the underlying API error (see "How can I see the underlying API error behind a connector failure?" below), then correct the configuration or credentials the source is rejecting.
+
+{/* [pm-input] Tasleema Lallmamode — confirm the specific causes and recommended fixes for the generic connector messages "Domo is ready but…" and "Failed to execute import successfully." synthesized from community forum reports; needs confirmation. */}
+</Accordion>
+
+<Accordion title="I get the error 'Indexing failed: Empty primary key.'">
+
+This error occurs when the DataSet is indexed on an upsert or merge key and one or more rows have an empty (null or blank) value in a key column. Every row must have a non-empty value in each key column. Check the source data or query for rows with a missing key value, and either populate the key or filter those rows out before the data is imported.
+
+{/* [pm-input] Tasleema Lallmamode — confirm the exact cause of "Indexing failed: Empty primary key" and the recommended fix (which merge/upsert key configuration triggers it and how to resolve empty key values). synthesized from community forum reports; needs confirmation. */}
+</Accordion>
+
+<Accordion title="I get an error that the schema has too many columns (maximum 1,500).">
+
+Connectors allow up to **1,500 columns** in a DataSet. If a run fails because the schema exceeds this limit, reduce the number of columns the source returns — select only the fields, reports, or objects you need instead of pulling everything, or split the data across more than one DataSet. Removing unused columns downstream does not help; the limit applies to what the connector brings in.
+</Accordion>
+
+<Accordion title="How can I see the underlying API error behind a connector failure?">
+
+When a connector shows a generic failure, the source system's own error is often visible in your browser's developer tools:
+
+1. Open your browser's developer tools (usually **F12**, or right-click and select **Inspect**) and select the **Network** tab.
+2. Reproduce the action that fails — for example, run or validate the connector.
+3. Find the failed request (often shown in red, or with a 4xx/5xx status).
+4. Select it and review the **Response** (and **Headers**) to see the exact error message and status the source API returned.
+
+Use that message to identify the real cause — for example, an expired token (401), a permissions problem (403), a bad parameter (400), or a rate limit (429).
+</Accordion>
+
+<Accordion title="An OAuth-based connector suddenly returns zero rows or stopped pulling data.">
+
+OAuth connections rely on an access token that is periodically renewed with a stored refresh token. If the refresh token expires or is revoked — for example, because the granting user changed their password, lost access, or the source's token lifetime elapsed — the connection can stop returning data, sometimes without a hard failure. To restore it, re-authorize the account: go to the **Accounts** tab in the Data Center, open the affected connector account, and reconnect (sign in again through the source's OAuth screen). For more information about managing accounts, see [Managing User Accounts for Connectors](/s/article/360042926054).
+
+{/* [pm-input] Tasleema Lallmamode — confirm OAuth token-expiry behavior (silent zero-row jobs vs. hard failure) and the exact re-authorization steps in the Accounts tab. synthesized from community forum reports; needs confirmation. */}
+</Accordion>
+
+<Accordion title="A Google connector is blocked by our Google Workspace admin settings.">
+
+If your organization uses Google Workspace, an administrator may need to trust or approve the Domo app before it can connect, even when the individual user's credentials are correct. This is the same root cause behind Google Sheets connections that fail for managed accounts. Ask your Google Workspace administrator to approve/trust the Domo app in the Google Admin console's app-access controls, then reconnect the account.
+
+{/* [pm-input] Tasleema Lallmamode — confirm the exact Google Workspace Admin console path to trust/approve the Domo app (for example, Security > API controls > App access control) and which Google connectors it applies to. synthesized from community forum reports; needs confirmation. */}
+</Accordion>
 </AccordionGroup>
 
 ## Connector Best Practices

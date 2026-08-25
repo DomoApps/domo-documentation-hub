@@ -117,6 +117,25 @@ Columns created with the formula option in a Group By tile are added in the orde
 
 ---
 
+## Change a Single Value in a DataSet
+
+DataSets in Domo are not directly cell-editable—you cannot open a DataSet and overwrite an individual value the way you would in a spreadsheet. Instead, change values as part of a DataFlow so the transformation is repeatable each time the data refreshes.
+
+To rewrite specific values, use the Add Formula tile with a CASE statement that returns the new value when a row matches your condition and leaves every other row unchanged:
+
+```
+CASE
+  WHEN `Status` = 'closed' THEN 'Closed'
+  ELSE `Status`
+END
+```
+
+To overwrite the original column, enter its exact name as the output column name (see the **Output Column Name** row in the table above); otherwise, the result is written to a new column.
+
+{/* [pm-input] Andrea Henderson — confirm whether DataSet Forms (interactive data entry that writes back to a DataSet) is a supported way for end users to change individual DataSet values, and the correct feature name and article to reference. Synthesized from community forum reports; needs confirmation. */}
+
+---
+
 ## Fail a DataFlow on Bad Input (Data Validation)
 
 You can build a data sanity check directly into a formula with the `ERROR` function, which stops the DataFlow and returns the message you supply. Combine it with a CASE statement so the DataFlow fails only when a row violates a rule:

@@ -34,6 +34,17 @@ The JSON No Code Connector supports the following mechanisms to authenticate to 
 2. API Key - Use this option if you have to pass a single String as an authenticator to the API, either as a parameter or as a header field.
 3. No authentication - Use this option if the API you are connecting does not require authentication to call the endpoints, or if you are uploading a file in JSON format.
 
+### Authenticating with a Bearer Token
+
+Many REST APIs authenticate with a bearer token supplied in an `Authorization` header (for example, `Authorization: Bearer <your_token>`). The JSON No Code Connector does not have a dedicated "Bearer" authentication option; supply the token as a header instead:
+
+1. Set the authentication mechanism to **API Key** (or, if the endpoint needs no other credentials, **No authentication**).
+2. In the _Data Selection_ pane, select **_+ADD HEADER_**.
+3. Set the header _Key_ to `Authorization`.
+4. Set the header _Value_ to `Bearer ` followed by your token — for example, `Bearer eyJhbGc...`.
+
+The value is sent verbatim, so include the word `Bearer` and the single space exactly as your API documentation specifies. If your API expects the credential in a differently named header (for example, `X-API-Key`), use that header name as the _Key_ and omit the `Bearer` prefix.
+
 ## Configuring the authentication method in the JSON No Code OAuth connector
 
 The JSON No Code OAuth connector supports 2-legged and 3-legged standard OAuth implementations.
@@ -449,6 +460,26 @@ This option is available to be used with all request types.  This option allows 
 
 The connector will return all the data available for that endpoint in the Data Preview section.
 
+## Configuring Pagination
+
+Most APIs return large result sets one "page" at a time and tell you how to request the next page. Configure how the connector walks through those pages in the **Pagination** setting. The available options are:
+
+* **No Paging** — the endpoint returns all results in a single response.
+* **Get next URL from results** — the response contains a full URL for the next page, which the connector follows until no next URL is returned.
+* **Get next page token from results** — the response contains a token (cursor) for the next page, which the connector sends on the following request.
+* **Offset by records** — the connector increments a record offset on each call (for example, `offset=0`, `offset=100`, and so on).
+* **Offset by pages** — the connector increments a page number on each call (for example, `page=1`, `page=2`, and so on).
+
+### Walk Through Cursor-Based (Next-Page-Token) Pagination
+
+Cursor-based APIs return a token in each response that you pass back to fetch the next page, and stop when the response no longer contains a token. To configure it:
+
+1. Set **Pagination** to **Get next page token from results**.
+2. Tell the connector where the token is in the response body, and how to send it on the next request (typically as a query parameter such as `cursor`, `next`, or `page_token`).
+3. Run the connector. It repeats the call, substituting the latest token each time, until the response returns no token.
+
+{/* [pm-input] Tasleema Lallmamode — confirm the exact JSON No Code UI field labels for cursor pagination: where the user specifies the token's location in the response (JSON path) and the "Add as a parameter" option that sends the token on the next request. Synthesized from community forum reports; needs confirmation. */}
+
 ## Advanced Settings
 
 The Advanced Settings section of the connector allows you to configure additional requirements by the API.  The below table provides some guidelines on the options available, but you must check your API documentation to determine if any options apply.
@@ -552,6 +583,29 @@ If you select _Dynamic URL_ or the _Dynamic Parameters_ option, and if you selec
 <Frame>
   <img src="/images/kb/ka0Vq00000007MT-00N5w00000Ri7BU-0EMVq0000009NDV.jpg" />
 </Frame>
+
+## Translating a Working Postman or curl Request
+
+If you already have a request that works in Postman or as a `curl` command, you can map each part of it to a field in the connector. For a GET request such as:
+
+```bash
+curl "https://api.example.com/v2/orders?status=open&limit=100" \
+  -H "Authorization: Bearer eyJhbGc..." \
+  -H "Accept: application/json"
+```
+
+map the pieces as follows:
+
+| Part of the request                                     | Where it goes in the connector                                                                                                                                                         |
+| ------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| HTTP method (`GET`)                                     | Set the HTTP method to **GET**.                                                                                                                                                        |
+| Base URL and path (`https://api.example.com/v2/orders`) | Enter as the _JSON File URL_.                                                                                                                                                          |
+| Query parameters (`status=open`, `limit=100`)           | Keep them on the URL for a _Single URL_ request, or add them with _Add Parameter_ for static values. Use _Dynamic Parameters_ if you need to loop a parameter through multiple values. |
+| Each `-H` header (`Authorization`, `Accept`)            | Add one header per line with **_+ADD HEADER_**, using the header name as the _Key_ and its value as the _Value_.                                                                       |
+| Bearer token or API key in a header                     | See [Authenticating with a Bearer Token](#authenticating-with-a-bearer-token) above.                                                                                                   |
+| Request body (`-d '{...}'`, typically on POST)          | Use the _Add Body_ option to supply the static payload.                                                                                                                                |
+
+Confirm the result in the URL Preview Pane before saving. Note that the preview hides authorization headers such as API keys and tokens, so an absent token in the preview does not mean it is missing from the request.
 
 ## Known Limitations
 

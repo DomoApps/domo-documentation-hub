@@ -116,9 +116,31 @@ When you delete a job, the DataSets in the destination instance are not deleted.
 
 </Warning>
 
+## Understand Cross-Instance Virtual DataSets
+
+A Virtual DataSet links a materialized DataSet in a **source** instance to a **destination** instance. The source instance owns the original DataSet and defines a [job](#create-a-job) that shares it, using a [DataSet Copy Account](#create-dataset-copy-account) that holds an access token and URL for the destination instance. The destination instance receives a virtual DataSet that mirrors the source in real time—new rows and schema changes propagate automatically, with no further action needed after the job is created.
+
+Because the token in the DataSet Copy Account belongs to the destination instance, the sharing is configured from the source side and points outward to the destination. This is what enables patterns like sharing production data into a UAT, dev, or testing instance (often alongside [Domo Sandbox](/s/article/4403367344023)).
+
+### Virtual DataSets vs. a Second Workbench Job
+
+* **Virtual DataSets** share an already-materialized DataSet from one Domo instance to another. The data is ingested once (in the source instance) and mirrored to the destination, so the two instances stay in sync without re-querying the original data source.
+* **A second Workbench job** re-extracts data from the original source system directly into the second instance. Use this when the second instance needs its own independent ingestion—for example, different scheduling, transforms, or credentials—rather than a mirror of the source instance's DataSet.
+
+{/* [pm-input] Ryan Despain — confirm how to identify the source instance of a Virtual DataSet from the destination side (the exact UI indicator or DataSet detail), and confirm the recommended guidance for choosing Virtual DataSets vs. a second Workbench job. Synthesized from community forum reports; needs confirmation. */}
+
 ## Troubleshooting
 
 If no data displays in the DataSet in the destination instance, make sure that PDP is enabled in the parent instance.
+
+Work through these additional checks when data stops flowing or a Virtual DataSet won't create:
+
+* **Confirm the source DataSet is still materialized.** Only materialized DataSets can be virtualized—federated DataSets cannot. If the source DataSet was converted to a federated connection, the virtual link no longer works.
+* **Check the DataSet Copy Account token.** The token stored in the [DataSet Copy Account](#create-dataset-copy-account) must belong to a valid user on the destination instance and must not be expired. An expired or revoked token stops updates and can cause create failures. Virtual DataSets are created by the user the token was generated for.
+* **Confirm required grants.** Creating and updating jobs requires the [required grants](#required-grants); a non-admin can only share DataSets they own or co-own.
+* **Confirm PDP is configured on the source.** Sharing requires PDP to be enabled on the source DataSet with a policy in place (the default All Rows policy is acceptable). Without it, the destination DataSet can show no data.
+
+{/* [pm-input] Ryan Despain — confirm the diagnostic steps and expected behavior for cross-instance scenarios where the source and destination are fully separated (instance separation), including what to check when data stops after a separation and any additional Virtual DataSet create-failure causes beyond token, grants, PDP, and materialization. Synthesized from community forum reports; needs confirmation. */}
 
 ## FAQ
 

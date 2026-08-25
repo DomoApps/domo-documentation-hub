@@ -111,6 +111,15 @@ There is no limit.
 </Accordion>
 </AccordionGroup>
 
+## Why My Data Doesn't Match GA4
+
+It is normal for figures pulled through the connector to differ somewhat from what you see in the GA4 web interface. The directionality and trends should match even when the exact totals do not. The most common causes, and how to reduce the gap:
+
+* **Sampling.** The Google Analytics Data API can return sampled data for large or high-cardinality queries. By default, Domo unsamples data by breaking each request into smaller date intervals until Google returns unsampled results (see **Allow Sampled Data** under **Advanced Settings**). If you turn on **Allow Sampled Data**, Domo sends the query as-is and Google may return sampled figures, which will differ from the platform. Leave **Allow Sampled Data** off when you need totals to line up as closely as possible.
+* **Date grain and format.** Compare like-for-like. Match the date range, date grain (day vs. week vs. month), and time zone of your connector report to the GA4 report you are comparing against. GA4 reports in the property's configured time zone, so a mismatch in time zone or grain shifts events across day boundaries and changes daily totals.
+* **Filter and report type.** Pull the same properties, report type, dimensions, and filters that the GA4 report uses. Comparing a broad, granular export to a pre-aggregated GA4 standard report is not a like-for-like comparison, and the numbers will not match.
+* **Unique and de-duplicated metrics.** Metrics such as active users, total users, and sessions are de-duplicated by Google and are not additive. If you break these metrics out by a high-cardinality dimension and then sum the rows, the total will be higher than GA4's de-duplicated figure. To reconcile, query the unique metric at the same aggregation level GA4 uses rather than summing a granular export. For user metrics queried without a date dimension, Google recommends allowing sampled data.
+
 ## Troubleshooting
 
 * Check user permission settings if you are having trouble gaining access to data.

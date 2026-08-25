@@ -342,6 +342,12 @@ function getDataSetMetadata(dataSetId) {
 
 Notice that we are making the request without any credentials like we have to do when making external calls with the axios library. Every `sendRequest` call is intercepted by the Code Engine service and injected with the credentials of the authenticated user who is making the request.
 
+<Note>
+  **DataSet functions and tags:** Because `sendRequest` calls Domo's product APIs with the current user's credentials, you can build DataSet operations—reading metadata (as in the example above), managing tags, and similar tasks—by calling the corresponding DataSet API endpoint. For the full list of available libraries and `codeengine` functions, see the [JavaScript Libraries reference](/portal/Automate-Actions/Code-Engine/javascript-libraries).
+
+  {/* [pm-input] Ryan Despain — provide/confirm canonical signatures and examples for the DataSet library functions (for example, GetMetadata and CreateDatasetTag), and confirm the tag behavior: whether setting tags overwrites all existing tags with no native extend/remove option, and the exact function or endpoint used. Synthesized from community forum reports; needs confirmation. */}
+</Note>
+
 ### codeengine.getAccount
 
 This is an example function that we have built into the Twilio package that leverages the `getAccount` method from `codeengine` library. The key is this code block:
@@ -411,6 +417,12 @@ Choosing the `Account` type opens the **Edit Parameter** modal where you can cho
 <Frame><img alt="Screenshot 2024-11-08 at 2.53.14 PM (1).png" src="/images/kb/ka0Vq00000089Kf-00N5w00000Ri7BU-0EMVq000004rkjy.jpg"/></Frame>
 
 Select **Save**. Your input is now an account strictly using the data provider you chose. When running the function in Code Engine or a workflow, the input must be from the same data provider.
+
+<Note>
+  **If an account doesn't appear in the selection dropdown:** When you run a function that takes an **Account** input, the dropdown lists the accounts available to you for the chosen data provider. An account can appear in the instance **Accounts** panel yet not be selectable in the function's dropdown.
+
+  {/* [pm-input] Ryan Despain — confirm the visibility rule for accounts in the Code Engine account-input dropdown: specifically why a shared, read-only service account can appear in the Accounts panel but not be selectable in the function dropdown (for example, a required account-share permission level), and the recommended fix. Synthesized from community forum reports; needs confirmation. */}
+</Note>
 
 ### codeengine.axios
 

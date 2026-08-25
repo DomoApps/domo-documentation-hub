@@ -118,6 +118,14 @@ A DataSet View built on a Cloud Integration connection remains associated with t
 {/* [pm-input] Jordan Jensen — Confirm that a DataSet View built on a Cloud Amplifier connection cannot be remapped to a different Cloud Amplifier connection (unlike standard connectors, which is useful for DEV/PROD moves), and that remapping support is a tracked feature request. synthesized from community forum reports; needs confirmation. */}
 </Accordion>
 
+<Accordion title="Why doesn't my Cloud Integration DataSet show run history, an accurate last-run time, or a row count?">
+Cloud Integration DataSets are queried live from your cloud warehouse rather than ingested into Domo on a schedule, so they don't produce the run-by-run execution history that scheduled connector or Magic ETL DataSets do. Instead of reporting a last-run time from an ingestion job, Domo reflects data currency through the scheduled freshness checks described above: when a check detects that the source data has changed, connected cards, alerts, and DataFlows pick up the new data on their next load.
+
+Row counts and last-updated timestamps are available for table-backed DataSets but not for DataSets backed by a database View, because external warehouses don't expose those values for Views the way they do for tables. For more detail, see [Cloud Integrations Overview](/s/article/4412849158167).
+
+{/* [pm-input] Jordan Jensen — Confirm whether the DataSet History tab is intentionally absent (or hidden) for Cloud Integration (Cloud Amplifier) DataSets, and whether full run-history metadata support is a tracked feature request. Synthesized from community forum reports; needs confirmation. */}
+</Accordion>
+
 </AccordionGroup>
 
 ### Caching
@@ -139,6 +147,12 @@ No. When you view a card, Domo first checks for a cached result. If one exists, 
 
 <Accordion title="Is the warehouse queried when someone edits a card?">
 Yes. When building or editing a card in Analyzer, each change triggers a new query if **Auto Preview** is enabled.
+</Accordion>
+
+<Accordion title="Does opening a page with many cards query the warehouse once per card?">
+Yes. Each card issues its own query, so opening a page—including an Overview page—that contains many cards built on a Cloud Integration can send one query per card to your cloud warehouse on first load. Caching mitigates this: once a card's result is cached, reopening the page returns the cached result instead of re-querying the warehouse until the Cache Duration (TTL) expires. To reduce warehouse load, enable caching and set a TTL that suits your freshness needs, and limit the number of live-source cards on frequently viewed pages.
+
+{/* [pm-input] Jordan Jensen — Confirm whether a dedicated control to pause or cap per-card queries against a live Cloud Amplifier source (beyond caching/TTL) exists or is a tracked feature request. Synthesized from community forum reports; needs confirmation. */}
 </Accordion>
 
 <Accordion title="How long are card query results cached?">

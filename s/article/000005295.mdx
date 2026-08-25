@@ -67,6 +67,20 @@ Apps Home also has a search tool to locate an app and the **+** **Create App** o
   <img alt="create app and search.jpg" src="/images/kb/ka0Vq000000C3gT-00N5w00000Ri7BU-0EM5w000006wAw8.jpg" />
 </Frame>
 
+### Organize Apps in Apps Home
+
+Apps Home lists apps by title in alphabetical order and does not currently support user-created folders or tags for grouping apps. To surface the apps you use most, favorite an app from the **Details** panel—favorited apps appear under the **Favorited** tab—and use the search tool to find a specific app by title.
+
+<Note>
+  **Note:** App titles are truncated in the Apps Home tile view, so a long title may not display in full. Give apps concise, front-loaded titles so they stay distinguishable when shortened.
+</Note>
+
+<Note>
+  **Note:** The **Last Updated** value shown for an app reflects when the app or its layout was last edited, not when the underlying DataSets last refreshed. To check data recency, look at the DataSet refresh time on the card or DataSet itself.
+</Note>
+
+{/* [pm-input] Khushboo — confirm the current Apps Home organization options (alphabetical-by-title ordering, favorites, no folder/tag grouping), the exact app-title truncation length in the tile view (community reports cite roughly 20 characters), and that the "Last Updated" timestamp reflects app/layout edit time rather than dataset refresh (and whether it can be hidden). Document the folder-structure feature here once it releases. Synthesized from community forum reports; needs confirmation. */}
+
 ## View an App
 
 From Apps Home, you can select an app to open it. Inside the app viewer, the [main navigation](#main-navigation) contains the following items.
@@ -528,6 +542,12 @@ Keep the following editor behaviors in mind while building an app.
 
 {/* [pm-input] Khushboo — confirm that rebuilding a page is the recommended recovery step for a corrupted App Studio page layout, and whether a support-assisted repair path exists. Synthesized from community forum reports; needs confirmation. */}
 
+- **Roll back to an earlier version with Sandbox.** App Studio does not keep a built-in version history, but you can use [Domo Sandbox](/s/article/4403367344023) as a version-control and rollback path for apps—commit an app to a Sandbox repository, then restore an earlier version if a change needs to be reverted. Undo and redo within a single editing session are available in the editor header (see [Undo/Redo Changes](#undoredo-changes)).
+
+- **Stuck in full-screen or wide mode.** If the editor or app viewer becomes stuck in full-screen or an oversized width, clear your browser cache and close any other open sessions of the same app, then reopen it.
+
+{/* [pm-input] Khushboo — confirm that Domo Sandbox is the supported versioning/rollback path for App Studio apps and the basic commit/restore steps, and confirm the resolution for an app stuck in full-screen/wide mode (clear cache, close other sessions). Synthesized from community forum reports; needs confirmation. */}
+
 ### Configure Persistent Filters
 
 You can configure persistent filters in the **Filter** **Options** tab of the **App Configuration** section. Making a filter persistent means that when app users turn on the filter, it takes effect across all app pages using some or all columns in a DataSet. You can also configure other elements, like Variables and date filters, to persist throughout the app.
@@ -599,6 +619,10 @@ Keep the following behaviors in mind when you work with filters and controls in 
 - **Set a relative default date filter.** To give app viewers a default date range that stays relative (such as the last 30 days), open [Controls](#view-an-app), add a date range, and save it as the default Filter View for the app so every viewer opens with that range applied.
 
 {/* [pm-input] Khushboo — confirm the supported method for a dynamic/relative default date filter in App Studio (Filter Views with a relative range, and any Beast Mode approach), and the reported limitation that a dropdown filter card cannot supply a relative default date. Synthesized from community forum reports; needs confirmation. */}
+
+- **Manage many filters with layout, not just filter controls.** When a page needs numerous filters, adding an on-page filter control for each one is a manual, one-at-a-time process—there is no bulk "add all filters" action. To keep the page uncluttered, let viewers add filters from the [Controls](#view-an-app) menu, or group on-page filter controls inside a [Tabs](#add-tabs) element or [layout container](#choose-a-layout) so they can be shown and hidden as a set.
+
+{/* [pm-input] Khushboo — confirm that on-page filter controls must be added one at a time (no bulk-add action) and that grouping them in a Tabs or layout container is the recommended pattern for many-filter pages. The bulk-add action and independent on-page legend-visibility control are feature requests. Synthesized from community forum reports; needs confirmation. */}
 
 # <img src="/images/kb/ka0Vq000000C3gT-00N5w00000Ri7BU-0EM5w000006wDB5.jpg" style={{width: 40, height: 40, display: 'inline', verticalAlign: 'start', margin: '0'}} /> Pages and Navigation
 
@@ -813,6 +837,20 @@ When showing, the **Home** button always displays at the far left (top orientati
 <Frame>
   <img alt="reorder nav buttons.jpg" src="/images/kb/ka0Vq000000C3gT-00N5w00000Ri7BU-0EMVq000000Jccf.jpg" />
 </Frame>
+
+#### Navigation Behavior and Limitations
+
+Keep the following current behaviors in mind when you configure app navigation.
+
+- **Nav-bar buttons should use icons.** The Domo navigation buttons (**Home**, **Controls**, **Share**, and **Details**) are designed to display as icons. A button that has a text label but no icon can appear invisible until a viewer hovers over it, so assign an icon to every nav button you keep visible.
+
+- **The Home button can be hidden but not relabeled.** You can show or hide the **Home** button under **Navigation**, but its label and destination ([Apps Home](#apps-home)) cannot be changed. As noted above, hiding **Home** means viewers must use the browser back button to return to previous pages.
+
+- **Only built-in icons are available.** Navigation buttons and page icons can be set only from Domo's built-in icon set; uploading a custom icon image is not supported.
+
+- **Suppress app and system navigation in embeds.** Use the **Show Navigation** and **Show System Navigation** options under [Pages and navigation](#use-the-left-navigation-toolbar) to control the app's own navigation and the surrounding Domo system navigation. See [Embed an App](#embed-an-app) for embedded-app behavior.
+
+{/* [pm-input] Khushboo — confirm the current App Studio navigation behaviors: that text-only nav buttons appear invisible until hovered (icons recommended), that the Home button can be hidden but not relabeled or repointed, that only built-in icons are available (no custom icon upload), the exact controls for hiding app vs. system/Domo navigation in embedded apps and Domo Everywhere, the known logo/nav shift or flash-on-load behavior, and how mobile vs. desktop navigation and filter settings currently differ. Remaining requests (custom icon upload, secondary nav) are feature requests. Synthesized from community forum reports; needs confirmation. */}
 
 ### Page Drill
 
@@ -1092,6 +1130,10 @@ In the **Actions** tab, use the **Select interaction type** dropdown to define w
   The option to **Clear filters** with a button is not available in an embedded App Studio app. See [Embed an App](#embed-an-app) to learn more.
 </Note>
 
+<Note>
+  **Note:** Filter Views are created and managed from the [Controls](#view-an-app) menu, not as a button action. There is currently no button interaction type that applies a saved Filter View.
+</Note>
+
 <Frame>
   <img alt="Screenshot 2024-10-30 at 3.01.33 PM.png" src="/images/kb/ka0Vq000000C3gT-00N5w00000Ri7BU-0EMVq000003XaFv.jpg" />
 </Frame>
@@ -1116,6 +1158,16 @@ If you need to update the card that displays when a button is clicked:
 
 2. Search for and select a different card. Save the card and save your app changes.
 
+#### Open a Form in a Pop-Up
+
+A **Button** can open a Form in a pop-up window, the same way it can [open a card in a pop-up](#open-a-card-in-a-pop-up). Only Button components can open a Form as a pop-up—text and image elements cannot trigger a pop-up form. If you need a form pop-up from another element, build it with a [Domo Brick](/s/article/000005864) or Pro-Code approach.
+
+<Note>
+  **Note:** Filter selections on the page are not passed into a form opened as a pop-up. If the form needs the page's current filter context, add the form inline on the page instead of opening it as a pop-up.
+</Note>
+
+{/* [pm-input] Khushboo — confirm that only Button components (not text or image elements) can open a Form as a pop-up, that button icons are limited to the built-in Domo set, and that page filter selections are not passed into a popup-opened form (whereas an inline form receives them). The Brick/Pro-Code workaround for a pop-up from other elements needs confirmation. Synthesized from community forum reports; needs confirmation. */}
+
 #### Writeback Capability
 
 If you need to push data to a third-party application, you can add a writeback connector into your app and push data with the click of a button.
@@ -1135,6 +1187,19 @@ Dragging a **Text** element onto the canvas displays the Notebook Card toolbar o
 In the configuration panel, select <img src="/images/kb/ka0Vq000000C3gT-00N5w00000Ri7BU-0EMVq000000J8mf.jpg" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}} /> **Edit** to edit the card content or <img src="/images/kb/ka0Vq000000C3gT-00N5w00000Ri7BU-0EMVq000000J8oH.jpg" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}} /> **Close** to close the notebook.
 
 The panel has three tabs: [Settings](#settings-tab), [Actions](#actions-tab), and [Filter Exceptions](#filter-exceptions-tab).
+
+#### Show a "Last Updated" Value with Dynamic Text
+
+To display a "last updated" date—or any other dynamic value—in a text element, store the value as a field on the DataSet, then surface it with [Smart Text](/s/article/4529227357975):
+
+1. Add the value as a column on the DataSet (for example, a `Last Updated` column populated by the dataflow or connector that refreshes the data).
+2. In the Notebook Card's title or description, insert that field with Smart Text so it updates automatically each time the data refreshes.
+
+Alternatively, use a summary number card whose Beast Mode combines label text with the date field, then place that card in the app:
+
+```
+CONCAT('Last updated: ', MAX(`Last Updated`))
+```
 
 #### Settings Tab
 
@@ -1330,6 +1395,12 @@ Select a table on the canvas to begin, then follow one of the options below to f
 
 <Frame>![](/images/kb/app-studio-enhancements-screenshot-30.png)</Frame>
 
+**Fit Columns to Card Width**
+
+Drag the edge of a column header to resize a column; App Studio saves the adjustment. To keep a table readable as the card resizes, set the app page to a responsive [page width](#format-page) and size the columns so the table fills the card rather than overflowing it.
+
+{/* [pm-input] Khushboo — confirm the supported settings for fitting table columns to card width and wrapping cell text on resize (responsive/auto-fit column sizing and a text-wrap toggle) in App Studio table cards. Only manual column resizing by dragging the header edge is documented today. Synthesized from community forum reports; needs confirmation. */}
+
 #### Group By Function
 
 The **Group By** function reorganizes table data by grouping rows with the same column values, making it easier to analyze related information.
@@ -1454,6 +1525,21 @@ Apply logic to your data without leaving the canvas.
 
    A new column containing the function's results is added to the table.
    <Frame>![](/images/kb/worksheets-screenshot-26.png)</Frame>
+
+### Edit Data in Editable and Linked Tables (Beta)
+
+App Studio supports two spreadsheet-style table elements, available from the **Tables** menu in the [left navigation toolbar](#use-the-left-navigation-toolbar):
+
+- **Editable Table —** A spreadsheet-like table where you can enter data directly, add columns and rows, create calculated columns, copy and paste, and filter.
+- **Linked Tables —** Combine existing Domo data with new columns you add for use cases such as financial forecasting and budgeting.
+
+<Note>
+  **Note:** Calculated columns in an Editable Table can be edited only from the formula editor bar. This prevents unintended changes from actions like double-clicking, copy-pasting, or dragging to fill.
+</Note>
+
+Editing data in an Editable or Linked Table cell writes to the underlying content, so an app viewer needs edit access to that content in addition to access to the app.
+
+{/* [pm-input] Khushboo — confirm the exact permission required to edit data in Editable/Linked Table cells within a published App Studio app (community reports indicate the viewer also needs the Edit Cards grant, coupling table-cell editing to card-edit permission), and document the current Linked Tables column capabilities and limitations. Column-type and cell-validation controls are feature requests. Synthesized from community forum reports; needs confirmation. */}
 
 ### Add a Queue
 

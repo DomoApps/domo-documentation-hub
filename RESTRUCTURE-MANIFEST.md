@@ -355,6 +355,37 @@ All 61 High `rec=update` forum gaps closed via 10 parallel subagents in 2 waves,
 
 ---
 
+## Phase 3b general — Forum-Gap Update Pass (Medium/Low `rec=update`) — In Progress
+
+The broad bulk pass over the 236 Medium/Low `rec=update` forum gaps from `_gaps_with_support.json`. Clustered by owning PM into 35 agent tasks (≤5 files / ≤9 gaps each), run in waves via parallel sub-agents. **209 gaps active**; **27 deferred** (portal/-only targets — out of restructure scope — or dead targets; logged in `scripts/reports/phase3b_clusters/_DEFERRED.md`). Cluster inputs, shared agent instructions, and live wave status live under `scripts/reports/phase3b_clusters/`. Each gap addition is written fully where synthesizable from existing KB; undocumented specifics become `{/* [pm-input] PM — … */}` markers that auto-flow to the owning PM's Phase 4.5 brief.
+
+### Wave 1 (Complete — 9 clusters, 1 per major PM — validation wave)
+
+36 articles updated; **53 new `[pm-input]` markers**; docs.json untouched; no new files. Verified: 0 stray TODO/FIXME, all markers well-formed (PM + em-dash), all JSX block tags balanced.
+
+| Cluster (PM) | Files | Gaps addressed | Skipped |
+|---|---|---|---|
+| Andrea Henderson __1 | 4 | 252, 308, 279, 164 | 181 (target mismatch) |
+| Tasleema Lallmamode __1 | 5 | 170, 134, 218, 315, 131, 337 | — |
+| Khushboo __2 (App Studio Overview) | 1 | 140, 143, 177, 242, 243, 253, 257, 259, 281, 288, 355 | — |
+| Chris Wright __1 | 5 | 171, 335, 132, 196, 338, 263, 235 | — |
+| Ken Boyer __1 | 4 | 225, 245, 147, 322, 328, 349, 206, 313 | — |
+| Ryan Despain __1 | 4 | 129, 183, 264, 342, 348, 186, 241, 261 | 231 (target mismatch) |
+| Jordan Jensen __1 | 4 | 346, 307, 318, 341, 361 | 314 (target mismatch) |
+| Dan Brinton __1 | 5 | 294, 247, 137, 345, 324, 267 | — |
+| Phil Fuchs __2 | 5 | 317, 326, 130, 155, 176, 246, 154, 192, 250 | — |
+
+**Gap-data mismatches found (source `existing_related_articles` mislinked — correct at Phase 6/gap-data cleanup, and do not re-route blindly in later waves):**
+- rank 181 (dataset lineage replication) → belongs in `360042923134` (Copying a DataFlow), not the unique-key-join article.
+- rank 225 (AI Chat custom roles) → correct roles article is `360043438973` (Manage User Roles and Grants); the linked `360042922974` is "Restrict Access to a SQL DataFlow."
+- rank 231 (Dataset Views join limits) → belongs in `360046074774` (Dataset Views), not the Virtual DataSets article.
+- rank 235 (Worksheets vs Projects & Tasks) → referenced `000005502` is "Manage AI Models and Projects," not a Projects & Tasks article.
+- rank 314 (Campaigns re-subscribe) → belongs in the Campaigns App User Guide `360042933494`, not the date-format reference.
+
+Waves 2–4 (remaining 26 clusters) pending.
+
+---
+
 ## Phase 3c — Main Branch Content Sync (Sync #1 complete — 2026-08-20)
 
 First of two syncs (see `RESTRUCTURE-PROGRESS.md` › Phase 3c for the two-sync + parity strategy). Divergence base `a4dd80c2` (2026-07-14); 432 commits on main since.

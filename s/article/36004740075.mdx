@@ -35,6 +35,10 @@ To use the [File Share](#file-sharing) feature of Jupyter Workspaces, you need o
 
 To start using Jupyter, a Jupyter Admin must enable the feature for your instance. Admins can follow the steps below:
 
+<Note>**Note:** Jupyter Workspaces is a premium feature that must first be provisioned for your instance. If the **Jupyter** feature does not appear in your **Admin** > **Features** menu, contact your Domo account team to request that it be enabled.
+
+{/* [pm-input] Ken Boyer — Confirm the enablement-request process for non-standard or student instances, where Jupyter Workspaces may not be provisioned by default. Synthesized from community forum reports; needs confirmation. */}</Note>
+
 1. In the navigation header, go to **More** > **Admin**.
 
 2. In the **Features** menu, select**Jupyter**. 
@@ -221,6 +225,8 @@ The **Delete Test?** modal displays.
 4. Confirm that you wish to delete the workspace by selecting the **Delete** button.
 
 The workspace is deleted. This action cannot be undone.
+
+<Warning>**Warning:** Deleting a workspace is permanent. There is no backup, and deleted workspaces and their notebooks cannot be recovered. Download or push any notebooks you want to keep before deleting.</Warning>
 
 ## File Sharing
 
@@ -595,6 +601,11 @@ Use the following commands to update a DataSet:
 
 <Note>**Note:** If no update\_method is provided, the default functionality is a REPLACE method. If you want to change the update\_method back to REPLACE from another method, you need to explicitly set the update\_method to REPLACE, and Jupyter overrides the last set method. When performing a UPSERT update\_method, the data cannot have duplicate values in the `update\_key` column, or the UPSERT fails.</Note>
 
+<Note>**Note:** Some pandas data types are not always written back to a Domo DataSet with the type you expect. If a column lands with an unexpected type or empty values, cast it to a string with `df['column'] = df['column'].astype(str)` before calling `write_dataframe`, or correct the column type in a downstream Magic ETL using a **Set Column Type** (Alter Columns) tile.
+
+{/* [pm-input] Ken Boyer — Confirm the current write_dataframe type-handling behavior reported by users since 2023–2024: boolean columns landing as empty integer columns and Python date/datetime columns not writing correctly. Confirm whether astype(str) plus a downstream ETL input-type fix is the recommended workaround or whether a fix has shipped. Synthesized from community forum reports; needs confirmation. */}
+</Note>
+
 For information on which update method to use, see our[DataSet Update Methods](http://domo-support.domo.com/s/article/360043430733?language=en_US) article.
 
 ### Use Accounts
@@ -627,6 +638,8 @@ The workspace has a third-party account set up. Keys and values can now be read 
 See the example below, where 'S3Account' is the account being referenced:
 
 <Frame>![Screen_Shot_2022-10-17_at_4.03.43_PM.png](/images/kb/0EM5w000005vXkT.png)</Frame>
+
+<Note>**Note:** To read credential values with `get_account_property_value`, the account's connector must allow it. When creating or editing the account, expand **show advanced options** and enable **Allow authorized users to access unencrypted credentials**. If this option is unchecked, `get_account_property_value` can return a 404 even though the account exists and is attached to the workspace. See the [Jupyter Troubleshooting Guide](/s/article/7440921035671) for more detail.</Note>
 
 ### Install and Use Libraries
 
@@ -698,6 +711,32 @@ Domo supports integrating and maintaining git repositories within the Jupyter Wo
 
 <Accordion title="The minimum Python version available is 3.9, what is Domo's policy of depreciating supported versions?">
 At this time, we have no plans to deprecate any of our Python versions.
+</Accordion>
+
+<Accordion title="What R version and kernels are available?">
+Jupyter Workspaces offers Python and R kernels, which you select when you [create a workspace](#create-a-workspace). You can install additional packages from a workspace terminal — see [Install and Use Libraries](#install-and-use-libraries).
+
+{/* [pm-input] Ken Boyer — Confirm the current R version shipped in Jupyter Workspaces (community reports cite R 4.1) and the list of supported/pre-installed kernels and packages. Synthesized from community forum reports; needs confirmation. */}
+</Accordion>
+
+<Accordion title="How do I search my workspace files for a code string?">
+There is no cross-workspace search, but you can search the files within a running workspace from a notebook cell or terminal using standard Python. For example, walk the workspace directory and print files that contain a given string:
+
+```python
+import os
+
+search_term = "read_dataframe"
+for root, dirs, files in os.walk("."):
+    for name in files:
+        if name.endswith((".ipynb", ".py")):
+            path = os.path.join(root, name)
+            try:
+                with open(path, encoding="utf-8") as f:
+                    if search_term in f.read():
+                        print(path)
+            except (UnicodeDecodeError, OSError):
+                pass
+```
 </Accordion>
 
 <Accordion title="There are four categories of workspace available, each with the same four CPUs. What will be the configuration of each category in production?">

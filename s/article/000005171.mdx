@@ -19,6 +19,12 @@ Domo Forms allows you to create, edit, and manage reusable forms inside Domo pro
   **Important:** Forms only exist within a single app or a single version of a workflow. You can copy a form from another app or workflow version that you have access to, or use a form multiple times in the same app/same workflow version, but you cannot use the same form across apps, workflows, or workflow versions.
 </Warning>
 
+<Note>
+  **Forms vs. the legacy Form Builder:** This article covers Domo Forms in App Studio and Workflows, which is the current, recommended way to collect user input inside Domo. It is separate from the older **Form Builder** and **Form Viewer** experience. If you are building a new form, use Forms in App Studio or Workflows as described here.
+
+  {/* [pm-input] Ryan Despain — confirm the current status of the legacy Form Builder/Form Viewer (deprecated vs. still supported), the recommended migration path from it to App Studio/Advanced Forms, and the cause of the "Form not found" error and reports of Form Builder forms disappearing. Synthesized from community forum reports; needs confirmation. */}
+</Note>
+
 ---
 
 ## Grants & Permissions
@@ -170,6 +176,12 @@ In the form configuration panel for apps, you can hide the form title and descri
 
 Under **Response DataSet**, you can open the DataSet where your form responses are recorded.
 
+<Note>
+  **Forms add new rows; they don't edit existing ones:** Each form submission writes a new row to the response DataSet. Forms don't edit or update rows submitted earlier—there is no in-place record editing from the form itself. To let users review and change previously submitted data, pair the response DataSet with a [table element](/s/article/000005681) and a [Brick](/s/article/4423762260375) that writes the change back, as described in [Review Submissions in an App Studio Table](#review-submissions-in-an-app-studio-table).
+
+  {/* [pm-input] Ryan Despain — confirm (1) whether editable/linked tables that allow in-place editing of form-backed rows are on the roadmap, and (2) the current behavior when two or more forms target the same output/response DataSet (whether this is supported and whether it recently changed). Synthesized from community forum reports; needs confirmation. */}
+</Note>
+
 <Frame><img alt="form config apps.jpg" src="/images/kb/ka0Vq0000002n9V-00N5w00000Ri7BU-0EMVq000002jr5R.jpg"/></Frame>
 
 #### Configure Form — Workflows
@@ -287,6 +299,12 @@ In the following example, a question with a **Duration** type allows you to conf
 
 <Frame><img alt="duration type.jpg" src="/images/kb/ka0Vq0000002n9V-00N5w00000Ri7BU-0EMVq000002Wi4n.jpg"/></Frame>
 
+<Note>
+  **Date and time inputs:** A **Date/Time** question presents form users with a standard date and time picker. Date questions collect a single date or date-and-time value; they don't currently support restricting the picker to a range or excluding specific dates such as weekends or holidays. If you need to enforce which dates a user can select, the reliable approach is to validate the submitted value downstream—for example, in a Magic ETL DataFlow or a Workflow step—rather than in the form itself.
+
+  {/* [pm-input] Ryan Despain — confirm whether Form Date/Time inputs can constrain selectable dates (a min/max range, or excluding weekends/holidays), and whether the App Studio Pro-Code Editor provides a supported workaround to restrict date selection. Synthesized from community forum reports; needs confirmation. */}
+</Note>
+
 ##### Define List Options
 
 For Single Choice and Multiple Choice question types, you can either define the options manually or with a DataSet. In forms in workflows, you can also define the list options with variables.
@@ -294,6 +312,10 @@ For Single Choice and Multiple Choice question types, you can either define the 
 In the **List Options** dropdown, select **Dataset defined**. Then choose a DataSet and a column within that DataSet.
 
 <Frame><img alt="dataset defined.jpg" src="/images/kb/ka0Vq0000002n9V-00N5w00000Ri7BU-0EMVq000002WipZ.jpg"/></Frame>
+
+<Tip>
+  **Control which options appear and their order:** With **Dataset defined** list options, the choices come directly from the values in the DataSet column you select, in the order they appear in that DataSet. To limit the available choices or set a specific order, build a dedicated DataSet—for example, with a [Magic ETL DataFlow](/s/article/360055259234)—that contains only the values you want, pre-filtered and pre-sorted, and point the question's list options at that DataSet's column.
+</Tip>
 
 In Workflows, you can also choose **Variable defined** list options.
 
@@ -309,6 +331,8 @@ Learn more about [Inputs/Outputs Catalog](#inputsoutputs-catalog) below.
   <Frame><img alt="Screenshot 2024-09-03 at 3.01.19 PM.png" src="/images/kb/ka0Vq0000002n9V-00N5w00000Ri7BU-0EMVq000002WjaM.jpg"/></Frame>
 
 </Note>
+
+{/* [pm-input] Ryan Despain — confirm whether a form submission can capture the current app page filter/slicer context (for example, writing the active filter values into the response DataSet), or whether filters only affect which options a question displays. Synthesized from community forum reports; needs confirmation. */}
 
 #### Assign a Data Type
 
@@ -499,3 +523,13 @@ Reviewers approve form-based tasks one at a time by opening each task in Task Ce
 When you publish a form as a Brick and embed it publicly (outside of Domo), treat any personally identifiable information (PII) it collects as sensitive. As a best practice, limit the fields a public form collects, avoid exposing the response DataSet through the same public context, and review your embed configuration before sharing the link. Learn more about [embedding content outside of Domo](/s/article/360043437993).
 
 {/* [pm-input] Ryan Despain — confirm the recommended controls for securing a publicly embedded, PII-collecting form Brick (for example, embed token or domain restrictions, response DataSet access, and any Domo-side guardrails). Synthesized from community forum reports; needs confirmation. */}
+
+## Troubleshoot Form Loading and Submission Errors
+
+If a form shows **Error loading form**, or a submission fails with **Failed to submit form**, work through the checks below.
+
+* **Confirm access to the app or workflow.** Forms in App Studio apps and workflows are shared automatically with the people who can access the app or workflow, so first verify the user can open the app or workflow that contains the form.
+* **Check response DataSet access.** A form reads from and writes to its response DataSet. If a participant can open the app but the form fails to load or submit, confirm whether the response DataSet is accessible to that user.
+* **Inspect the browser network activity.** To narrow down where a failure occurs, open your browser's developer tools, go to the **Network** tab, reproduce the error, and look for the failed request and its response. The failing request and any permission or DataSet error it returns help pinpoint whether the problem is access, data, or configuration.
+
+{/* [pm-input] Ryan Despain — confirm whether the form's underlying response/output DataSet must be explicitly shared with all participant users for the form to load and accept submissions, or whether app/workflow sharing alone is sufficient (community reports conflict with the current "automatically shared" statement). Also confirm the exact error strings "Error loading form" and "Failed to submit form." Synthesized from community forum reports; needs confirmation. */}

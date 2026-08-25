@@ -81,6 +81,25 @@ Change `12 MONTH` to any interval you need, such as `3 MONTH`, `4 WEEK`, or `90 
 
 A true **rolling or cumulative *series*** — a separate rolling value plotted at every point on the axis, such as a moving average or a running total that resets each year — cannot be produced in Beast Mode, because Beast Mode has no window functions that read across other rows. Instead, pre-aggregate the rolling or cumulative value in a Magic ETL or SQL DataFlow so that each row already carries it, then chart that column. For a worked DataFlow example, see the rolling-average calculation in [Beast Mode FAQs](/s/article/360043430053 "Beast Mode FAQs").
 
+### Exclude Today from a Rolling Range
+
+A rolling range that ends on `CURRENT_DATE()` includes today, which is usually a partial, still-changing day. To drop the current date from the window, add a `CASE` filter that flags today as `No` and every other date as `Yes`, then filter the card to `Yes`:
+
+`` CASE WHEN `Date_Field` = CURRENT_DATE() THEN 'No' ELSE 'Yes' END ``
+
+You can also exclude today directly inside a trailing-window total by adding a `Date_Field < CURRENT_DATE()` condition to the `CASE`, so the current day never enters the sum:
+
+```
+SUM(
+  CASE
+    WHEN `Date_Field` >= DATE_SUB(CURRENT_DATE(), INTERVAL 12 MONTH)
+     AND `Date_Field` < CURRENT_DATE()
+    THEN `Amount`
+    ELSE 0
+  END
+)
+```
+
 {/* [pm-input] Phil Fuchs — confirm whether a native window-function capability, or a dedicated window-functions KB article, is planned for Beast Mode; if so, link it here for the rolling/cumulative-series case. Synthesized from recurring community requests for rolling 12-month and running-total calculations; the "no window functions in Beast Mode" limitation is confirmed by the Beast Mode FAQs rolling-average answer. */}
 
 ## Best Practice: A Month or Date Filter Can Break YTD Calculations

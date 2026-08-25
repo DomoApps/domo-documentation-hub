@@ -187,6 +187,8 @@ Owners can be individual Domo users or other groups, in which case all members o
   membership, they can add themselves to that group if desired.
 </Note>
 
+<Note>**Note:** A group's ability to own an object depends on the object type. Groups can be assigned as owners of Dashboards, Cards, and other groups (see [Group Types](#group-types)). {/* [pm-input] Dan Brinton — Confirm which objects support group ownership versus individual ownership only—specifically whether datasets can be group-owned while DataFlows cannot—and confirm that a content certification request goes to an individual owner only (group members and admins can't approve on the group's behalf), along with any co-owner workaround. Certification-specific behavior belongs in Certify Cards and DataSets (/s/article/360043430613). Synthesized from community forum reports; needs confirmation. */}</Note>
+
 ## Group Types
 
 There are a number of different group types available in Domo, described below.
@@ -212,6 +214,18 @@ For example, you can create a dynamic group for the Marketing department with a 
 You can't base membership in a dynamic group on membership in another dynamic, open, or ad hoc group. Likewise, a dynamic group can't be the owner of another group. However, you can base dynamic group policies on user attributes or on membership in a closed, system, or directory group.
 
 To support governance controls, dynamic group policies can reference only _Managed_ user attributes. Managed attributes can't be set by end users—they can be set only through SSO, SCIM, or by users with the required admin-level permissions. Learn how to [set up managed attributes](/s/article/000005164).
+
+#### How Membership Criteria Work
+
+Keep the following in mind when you build or troubleshoot dynamic group criteria:
+
+- **Only Managed attributes appear as criteria.** The **Add criteria** list shows only _Managed_ user attributes that exist in your instance. If an attribute you expect isn't listed, confirm that it has been created, marked **Managed**, and populated on the relevant users. Learn how to [create and manage attributes](/s/article/000005164).
+- **Criteria match on selected values, not partial text.** You build a rule by selecting specific attribute _values_ from a list. There is no "contains" or partial-text (LIKE) matching—a user is included only when their attribute value exactly matches one of the values you select.
+- **Combine rules with Any or All.** Choose **Any** to include users who meet at least one rule (an OR condition) or **All** to require every rule (an AND condition), as described in [Create a Group](#create-a-group).
+
+To group users by a property that isn't available as a Managed attribute, create a custom **Managed** attribute, populate it through SSO, SCIM, or an admin with the required grant, and then reference that attribute in your criteria.
+
+{/* [pm-input] Dan Brinton — Confirm the following dynamic-group criteria behaviors: (1) that leaving a criterion blank or set to a space produces a group that includes every user in the instance; (2) that a user's role and email address are not available as native membership criteria, so the custom Managed attribute workaround above is the supported way to group by role. Synthesized from community forum reports; needs confirmation. */}
 
 ### Directory Groups
 

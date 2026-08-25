@@ -139,6 +139,10 @@ Remove a column by selecting the <img src="/images/kb/ka0Vq0000000RMn-00N5w00000
 To remove multiple columns at the same time, select the checkboxes for the columns you want to remove and select **Delete**.
 
 <Frame><img alt="bulk removal columns.jpg" src="/images/kb/ka0Vq00000081QL-00N5w00000Ri7BU-0EMVq000000CxkH.jpg"/></Frame>
+
+<Tip>
+  **Tip:** To trim a wide DataSet down to a small subset of columns, delete the columns you don't need. For a very wide DataSet, it can be faster to select all columns, bulk-delete them, and then re-add only the few you want from the [Add Column](#add-columns) panel. If you intend to continue in SQL instead, note that switching to the [Advanced SQL Editor](#advanced-sql-editor) discards the visual configuration of the View.
+</Tip>
 ### Perform Joins
 
 To join DataSets in Views Explorer, toggle the DataSet side of the left panel.
@@ -321,6 +325,18 @@ The AI translates your query into SQL and adds it to the SQL editor.
 You can add more DataSets by selecting **+ DataSet**. This instructs the AI Assistant to find the information you need by joining the additional DataSets to the main DataSet.
 
 <Frame><img alt="add dataset.jpg" src="/images/kb/ka0Vq00000081QL-00N5w00000Ri7BU-0EMVq000000DnSj.jpg"/></Frame>
+
+### SQL Editor Limitations and Troubleshooting
+
+Keep the following in mind when you use the Advanced SQL Editor:
+
+* **Switching to the SQL Editor discards your visual view configuration.** When you open the SQL Editor, Domo warns that you are losing your existing view properties—the filters, groups, joins, and other settings you built in the visual Views Explorer. Confirm the switch only when you are ready to work in SQL.
+* **List columns by name instead of using `SELECT *`.** Naming the exact columns you want makes the query easier to validate and avoids ambiguous or duplicate column names when you join or union DataSets.
+* **Use `UNION ALL` unless you specifically need to remove duplicates.** `UNION` compares every column across the combined result and drops duplicate rows, which is slower and can hide rows you expected to keep. `UNION ALL` keeps every row from each query and is the right choice when you know the inputs don't overlap.
+* **Return a valid result set before saving.** A query that can't be processed produces a generic error (for example, "Unable to save" or a message about an issue during processing) rather than a specific SQL message. If you hit one, simplify the query: select named columns, confirm every referenced column and DataSet name exists, and add clauses back one at a time to isolate the problem.
+
+{/* [pm-input] Phil Fuchs — confirm the SQL Editor switch is one-directional: that once a View uses the SQL Editor you cannot return to the visual Views Explorer builder for that View, and that calculated/Beast Mode columns must then be created in SQL. Also confirm the specific conditions that trigger the generic "Unable to save"/"issue during processing" error. Synthesized from community forum reports; needs confirmation. */}
+
 ## FAQ
 
 <AccordionGroup>

@@ -52,3 +52,11 @@ The Beast Mode calculations to use to create these buckets in the above example 
 `` CASE WHEN avg(`Amount`) < 30000 THEN avg(`Amount`) END ``
 
 The last step in this example is accomplished by going into the Chart Properties and changing the colors to Green and Red so these match the new series.
+
+### Use Case #3
+
+My data has inconsistent values for the same thing—for example, `US`, `U.S.`, and `United States` all appear as separate values, which splits what should be one group across several bars. The strategy is to use a `CASE` statement to reclassify each set of related values into a single standardized label, then group on the new bucket. The Beast Mode calculation to create this bucket would look like this:
+
+`` CASE WHEN `Country` IN ('US', 'U.S.', 'USA', 'United States') THEN 'United States' WHEN `Country` IN ('UK', 'U.K.', 'United Kingdom') THEN 'United Kingdom' ELSE `Country` END ``
+
+Ending with `` ELSE `Country` `` keeps any value you haven't explicitly listed as-is, so only the variants you name are consolidated.

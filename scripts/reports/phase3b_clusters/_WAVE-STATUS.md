@@ -15,8 +15,12 @@ Clusters: Tasleema__1, Chris__1, Andrea__1, Phil__2, Dan__1, Ryan__1, Jordan__1,
 Tasleema__2/3/4/5, Chris__2/3/4, Andrea__2/3/4. Verified clean (docs.json, tags, markers).
 Mislinks: 193→360042931954; 234-wb→360042932414; false-claim in 201 (per 000004968).
 
-## Wave 3 — pending (9)
-Phil-Fuchs__1, __3, __4; Dan-Brinton__2, __3; Ryan-Despain__2, __3; Chris-Wright__5, __6
+## Wave 3 — COMPLETE (committed) — 9 clusters, 27 files, 38 [pm-input] markers
+Phil__1/3/4, Dan__2/3, Ryan__2/3, Chris__5/6. Chris__5 = 0 edits (all 4 gaps mislinked to Tables).
+Verified clean. Re-route backlog captured in manifest (Phase 3b general section).
+
+## Wave 5 (re-route cleanup) — pending
+Real gaps skipped for target mismatch, now routed to correct KB homes. See manifest re-route backlog.
 
 ## Wave 4 — pending (7)
 Jordan-Jensen__2; Khushboo__1, __3; Ken-Boyer__2; Mamta-Bolaki__1; Beth-Saenz__1; no-PM-listed__1

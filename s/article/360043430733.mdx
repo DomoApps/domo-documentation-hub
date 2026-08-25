@@ -87,3 +87,12 @@ For Partition to work correctly, you need to make sure that incoming data partit
 This graphic illustrates Partition—incoming data fully replaces each partition where data has been updated or is appended at the bottom of the DataSet.
 
 <Frame><img alt="partition graphic.jpg" src="/images/kb/ka0Vq0000002DkL-00N5w00000Ri7BU-0EM5w000006vuj3.jpg"/></Frame>
+## Update Methods and the DataSet API
+
+Not every update method is available in every tool. When you load data through the public **DataSet API** import endpoint, only **Replace** and **Append** are available: the `updateMethod` parameter accepts `REPLACE` or `APPEND` and defaults to `REPLACE`. The DataSet API has no row-level update or delete operation—you cannot change or remove individual rows through it. To modify existing rows, either Replace the full DataSet or use one of the upsert-style methods below through a tool that supports it.
+
+To get merge (upsert) or partition behavior:
+
+* **Merge (Upsert)** and **Partition** are supported in various parts of the Domo product, such as connectors, Domo Workbench, and Domo APIs. See [Merge (Upsert)](#merge-upsert) and [Partition](#partition) above.
+* The **Domo Command Line Interface (CLI)** supports upsert (update) keys and partitioned uploads, which give you merge- and partition-style updates from a file or script. See [Domo CLI (Command Line Interface) Tool](/s/article/360043437733).
+* A **staging DataSet processed by a DataFlow** is another common pattern: land raw data with Append or Replace, then use a Magic ETL or SQL DataFlow to produce the final, de-duplicated or merged DataSet.

@@ -179,6 +179,47 @@ Follow these steps to generate an access token:
    **Generate**.
 8. Copy the code to use.
 
+## Custom Query Examples
+
+The **Custom Query** watcher checks each selected DataSet against a query you supply and flags the DataSet when the query returns one or more rows. Write the query so that it returns only the rows you consider a problem: if the result set is empty, the check passes; if it returns any rows, DataSet Watchdog sends an alert.
+
+Keep these constraints in mind:
+
+* **Referenced columns must exist in every selected DataSet —** The query runs separately against each DataSet you select, so every column named in the query must exist in each of those DataSets. If a column is missing, the check fails for that DataSet. For this reason, scope a Custom Query to a single DataSet or to a set of DataSets that share the same schema.
+* **One watcher type per job —** As with all watcher types, you can select only one watcher type per job.
+
+The following examples show the kind of conditions a Custom Query can check. Each returns the rows that should trigger an alert:
+
+* Flag any row with a non-positive value in a numeric column:
+
+  ```sql
+  SELECT * FROM <dataset> WHERE revenue <= 0
+  ```
+
+* Flag rows where two columns disagree (for example, a stored total that does not match a recomputed total):
+
+  ```sql
+  SELECT * FROM <dataset> WHERE order_total <> quantity * unit_price
+  ```
+
+* Flag rows missing a required identifier:
+
+  ```sql
+  SELECT * FROM <dataset> WHERE customer_id IS NULL OR customer_id = ''
+  ```
+
+{/* [pm-input] Ryan Despain — confirm the exact Custom Query format and SQL dialect for DataSet Watchdog: whether the query must be a full SELECT with a table reference (and what to use for the table name) or only a condition, the SQL dialect (community reports indicate MySQL-style syntax), and how comments and backticks are handled. Synthesized from community forum reports; needs confirmation. */}
+
+## Behavior and Limits
+
+Keep the following behaviors and limits in mind when you configure DataSet Watchdog jobs:
+
+* **Run frequency —** Jobs created in the DataSet Watchdog UI run automatically one time per hour while they are Enabled. There is no setting to change how often a UI-created job runs. A Disabled job does not run unless you run it manually.
+* **Alert frequency —** Because an Enabled job re-checks its entities every hour and sends an email whenever it finds something unexpected, a condition that stays unresolved can produce a new alert on each hourly run. To reduce repeated alerts, resolve the underlying issue, scope the job to only your most critical entities, or Disable the job while you investigate.
+* **Configuration DataSet size —** Only 100 rows are supported per configuration DataSet (see [Configuration DataSet](#configuration-dataset-optional)).
+
+{/* [pm-input] Ryan Despain — confirm the execution/metrics-log retention and display limits (how many past runs are kept and shown in a job's execution log) and the scheduling behavior that determines which hour of the day an hourly job runs. Synthesized from community forum reports; needs confirmation. */}
+
 ## Notes
 
 * You can only select one watcher type per job, but you can select multiple DataSets and/or DataFlows per job, depending on the watcher type selected.

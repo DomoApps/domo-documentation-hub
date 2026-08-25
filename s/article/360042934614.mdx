@@ -973,4 +973,25 @@ This report shows how PDP column policies map to DataSet columns. Only mapped po
   allow Alerts on DataSets where PDP column policies have been enabled.
 </Accordion>
 
+<Accordion title="Why isn't PDP applying to a user (they can still see all the data)?">
+  The most common cause is that the user has data access that PDP can't restrict. Users with the Admin role—along with DataSet owners, co-owners, and anyone whose Domo role includes the **Manage DataSet** grant—always see all rows and unmasked columns, regardless of any policy. You cannot use PDP to hide data from these users. To limit what a specific person sees, give them a role that does not include those grants and then apply PDP.
+
+  Two other common causes:
+
+  - **PDP isn't enabled.** Saving a policy does not activate it. You must toggle **Enable PDP — Row Filtering** (or **Enable PDP - Column Masking**) on for the DataSet. See [Enable PDP](#enable-pdp).
+  - **A value doesn't match.** A row policy only filters rows whose column value matches the policy value, so a mismatch can leave a user seeing more or less than expected. Hidden characters are a frequent culprit—see the question below.
+</Accordion>
+
+<Accordion title="A row policy value looks correct but still isn't matching—why?">
+  Row policies match on the value stored in the column, so invisible characters can silently break a match. Leading or trailing spaces, tabs, and carriage returns or line breaks (often introduced when data is copied in from another system) make a value like `West ` fail to match the policy value `West`, even though they look identical on screen. The **Data** tab does not reveal these hidden characters.
+
+  To fix this, clean the column before you build the policy: remove leading and trailing whitespace and strip any stray carriage returns or line breaks—for example, with a `TRIM` (and, for line breaks, a `REPLACE`) in a Magic ETL text transform or a Beast Mode calculation on the source. Then rebuild the policy against the cleaned values. This is separate from the **Ignore case** option, which only affects uppercase/lowercase sensitivity.
+</Accordion>
+
+<Accordion title="Does PDP apply to App Studio apps?">
+  PDP is enforced at the DataSet level, so it applies to anything powered by or associated with a PDP-controlled DataSet throughout Domo. Cards built on a PDP-controlled DataSet and surfaced in an App Studio app carry their PDP policies with them, and the same Admin, owner/co-owner, and **Manage DataSet** bypass described above applies to those viewers.
+
+  {/* [pm-input] Phil Fuchs — Confirm whether PDP row and column policies are enforced across all the ways an App Studio app reads a PDP-controlled DataSet (for example, app variables, filters, and any direct DataSet queries), and document any App Studio-specific exceptions. Synthesized from community forum reports; needs confirmation. */}
+</Accordion>
+
 </AccordionGroup>

@@ -13,6 +13,20 @@ For example, let's say you're an accounts payable manager, and your DataSet incl
 
 ---
 
+## Where to Create a Beast Mode: DataSet View vs. Analyzer
+
+You can write Beast Mode calculations in more than one place, and where you create one affects what it can do and where it is available:
+
+* **In Analyzer** (this article), the calculation is a **calculated field tied to the card**. Analyzer is aggregation-oriented: the card supplies the grouping, so a Beast Mode here can use aggregate functions such as `SUM` and `AVG` to produce chart-level values. Optionally checking **Save calculation to DataSet** makes it reusable by other cards built on the same DataSet.
+* **In a DataSet View**, you add a **calculated column** through the **Calculated Column Editor** (select **Create Calculated Column**). A DataSet View calculation is row-level: it computes a value for every row and saves it as a new column on the view, which is then available to every card built on that view. See [Manage DataSet Views](/s/article/360046074774).
+
+Both use Beast Mode functions, so the calculation language is largely the same. Choose based on context:
+
+* Create the calculation **in Analyzer** when it applies to one card, or when it needs to aggregate for a chart (for example, a `SUM`- or `CASE`-based measure).
+* Create it **as a DataSet View calculated column** when the value is a row-level transform you want computed once and reused across many cards, or when you need it available as data for further preparation.
+
+---
+
 ## Access the Beast Mode Editor
 
 You can access the Beast Mode Editor from inside Analyzer by selecting **Create Calculated Field** in the **DataSet** tool.
@@ -132,6 +146,10 @@ Most calculations use one of the following general formats:
   [Add a Drill Path to Your Chart](/s/article/360042924094).
 * You can drag and drop a column name from the DataSet Fields tab to your calculation.
 * Using any calculations that use processing-intensive functions such as `COUNT (DISTINCT)` or `SUM (DISTINCT)` slows down the visualization performance of cards that are built off of large DataSets. This also happens with complex case statements that are over 30 lines of code. If you have to build these functions into a large DataSet, we recommend you do it in a DataFlow to optimize visualization performance.
+
+<Note>
+  **Note:** A Beast Mode adds a calculated *column* or *field*—it evaluates each row and cannot create a new summary row. To add a calculated *row*, such as a Net Income line derived from other account rows (for example, Revenue minus Expenses), either union the computed row into the data in a Magic ETL DataFlow or use a table's built-in grand total or subtotal row rather than a Beast Mode.
+</Note>
 
 The [Beast Mode category](https://domo-support.domo.com/s/topic/0TO5w000000ZanAGAS/beast-mode?language=en_US) in the Knowledge Base contains various examples of sample calculations, separated into [basic transforms](/s/article/360043430073), [card element transforms](/s/article/360043430093), [date transforms](/s/article/360042925494), [mathematical transforms](/s/article/360042925514), [period-over-period transforms](/s/article/360043430133), and [miscellaneous transforms](/s/article/360043430113).
 

@@ -409,6 +409,28 @@ Waves 2–4 (remaining 26 clusters) pending.
 
 Waves 3–4 (remaining 16 clusters) pending.
 
+### Wave 3 (Complete — 9 clusters: Phil ×3, Dan ×2, Ryan ×2, Chris ×2)
+
+27 articles updated; **38 new `[pm-input]` markers**; docs.json untouched; no new files. Verified: 0 stray TODO/FIXME, markers well-formed, JSX tags balanced. Two pre-existing bugs fixed in `000005492` (malformed `<Note>` swallowing a list step; "once per week" → "once per day").
+
+| Cluster (PM) | Gaps addressed | Skipped / redirected |
+|---|---|---|
+| Phil __1 | 224, 112, 284, 133 | 323 → `360043429473`; 339 → `What-is-Magic-ETL` (`000005559` unedited) |
+| Phil __3 | 271, 347, 198, 293, 296 | 125 (unverifiable, deferred as marker); 135 → `360043428253` |
+| Phil __4 | 289, 202, 223 | 289 join/granularity half → `4405337525783` |
+| Dan __2 | 162, 226, 156, 175, 168, 321 | 200 → SSO `360042934374`; false claim in 321 not asserted |
+| Dan __3 | 254, 290 | 157 → `360043439313` (DomoStats Projects/Tasks) |
+| Ryan __2 | 210, 205, 216, 126, 343, 128, 190, 298 | 126 pieces → `000005369`/`000005171` |
+| Ryan __3 | 119, 199, 302, 145, 230, 266, 336 | 165 → portal Code Engine; 269 already covered |
+| Chris __5 | — (0 edits) | 115, 120, 178 → `360043429793`; 356 → `360043437813` (all mislinked to Tables) |
+| Chris __6 | 237, 153, 141, 184, 305, 185, 236, 270 | `360043439893` (release-notes archive) not edited |
+
+**Gap 198 (DataFusion → Magic ETL/DataSet Views migration) written** — supports the planned DataFusion Phase 4 archival guidance.
+
+**Re-route backlog (real gaps skipped for target mismatch, correct KB home identified — to be run as a cleanup wave so none are dropped):** 181→`360042923134`, 231→`360046074774`, 314→`360042933494`, 193→`360042931954`, 157→`360043439313`, 289-join→`4405337525783`, 115/120/178→`360043429793`, 356→`360043437813`, 323→`360043429473`, 339→`What-is-Magic-ETL`, 135→`360043428253`, 200→`360042934374`, 234-writeback→`360042932414`. (165 → portal = out of scope, added to `_DEFERRED.md`.)
+
+Wave 4 (remaining 7 clusters) pending, then the re-route cleanup wave.
+
 ---
 
 ## Phase 3c — Main Branch Content Sync (Sync #1 complete — 2026-08-20)

@@ -21,7 +21,11 @@ Pivot Tables, on the other hand, allow you to display data using both rows and c
 </Warning>
 
 <Warning>
-  **Important:** If you see the message— **Warning: Multiple results encountered for the same location** in your Pivot Table displaying as \*\*\*\*\*—check that the values are aggregated for your Beast Mode CASE statements.
+  **Important:** If you see the message **Warning: Multiple results encountered for the same location**—with cells in your Pivot Table displaying as \*\*\*\*\*—more than one record exists for the same row-and-column combination, so Domo cannot resolve a single value for that cell.
+
+  This most often happens when a value is not aggregated at the cell's level of detail—for example, an unaggregated or `FIXED` Beast Mode calculation, or a Beast Mode `CASE` statement whose result is not wrapped in an aggregate. It can also occur when a pill filter leaves more than one qualifying record per cell.
+
+  To resolve it, make sure each measure resolves to a single value per row-and-column combination: aggregate the values used in your Beast Mode `CASE` statements, wrap the calculation in an aggregate such as `SUM()`, `MAX()`, or `MIN()`, and add enough row or column groupings (or adjust your filters) so that each cell maps to exactly one record.
 
 </Warning>
 
@@ -379,5 +383,16 @@ Keep the following in mind when building Pivot Tables:
 * **Beast Mode calculations are row-level.** Beast Mode measures are computed row by row, while totals and subtotals are computed across the whole grouping (subtotals) or DataSet (totals). As a result, a Beast Mode measure cannot create a new calculated total or subtotal row, and a Beast Mode result in a total/subtotal cell may not equal the sum of the rows above it. This is expected behavior—see the Beast Mode note under [Table Charts](/s/article/360043429573#configure-total-and-subtotal-options-for-individual-columns).
 * **Suppress single-item subtotals.** To hide subtotal rows for groupings that contain only one item, select the **Subtotals** > **Suppress Single Item Subtotals** property (described under [Subtotals Properties](#subtotals-properties) above).
 * **Dynamic pivoting is not native to Magic ETL.** Pivoting on column values that are unknown or change over time (a "dynamic pivot") is not supported by the Magic ETL Pivot tile, which requires you to specify the output columns. To pivot on unknown values, use a MySQL DataFlow or an R/Python scripting tile. Learn more about the [Magic ETL Pivot tile](/s/article/360044951294).
+* **No bulk edit to swap a value column across cards.** There is no native way to replace a measure in the **Values** region across multiple Pivot Table cards at once. Each card must be edited individually in Analyzer.
 
 {/* [pm-input] Chris Wright — confirm the following synthesized limitations: (1) measures in the Values region cannot be displayed as rows (values are columns only); (2) Beast Mode cannot produce new calculated pivot total/subtotal rows; (3) dynamic (unknown-column) pivoting requires a MySQL DataFlow or R/Python scripting tile rather than the native Magic ETL Pivot tile; (4) whether there is a supported way to hide empty columns in a Pivot Table. synthesized from community forum reports; needs confirmation. */}
+
+## Frequently Asked Questions
+
+<AccordionGroup>
+  <Accordion title="How Do I Build Trailing-Twelve-Month (TTM) or Annualized Columns?">
+    A Pivot Table has no built-in trailing-twelve-month or annualized layout. Build the rolling window in your data first, then pivot on it: in Magic ETL, add a column that indexes each row's month relative to the reporting period (for example, a month-offset or period-index column), then use that index—or a Beast Mode calculation that references it—as the **Columns** grouping so each TTM or annualized bucket becomes its own Pivot Table column. For details on the pivot step, see the [Magic ETL Pivot tile](/s/article/360044951294).
+
+    {/* [pm-input] Chris Wright — confirm and document the exact recipe for TTM/annualized financial columns in a Pivot Table (the Magic ETL month-index calculation and the Beast Mode expression that maps rows into trailing-twelve-month or annualized buckets). Synthesized from community forum reports; needs confirmation. */}
+  </Accordion>
+</AccordionGroup>

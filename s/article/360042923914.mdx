@@ -368,6 +368,13 @@ Follow these steps to delete a Filter View:
    While all viewers can now see the Filter View, some viewers may not be able to view all the data.
      
    <Frame><img alt="share with everyone.jpg" src="/images/kb/ka0Vq00000044BV-00N5w00000Ri7BU-0EMVq000003TsmT.jpg"/></Frame>
+
+<Note>
+  **Note:** Filter View sharing is all-or-nothing—you can share a Filter View with **everyone** who can see the dashboard or keep it private (shared with no one). There is no native option to share a Filter View with only specific users or groups. Sharing also requires that you be the dashboard owner or have the Manage All Cards, Pages, and Apps (App Studio) or Edit Pages grant enabled (or, on an unlocked dashboard, a system role of Editor or higher).
+</Note>
+
+{/* [pm-input] Chris Wright — confirm whether sharing a dashboard URL or bookmark with a specific Filter View applied reliably targets that view for the recipient (a workaround for the lack of per-user or per-group Filter View sharing). Synthesized from community forum reports; needs confirmation. */}
+
 ---
 
 Learn about [Managing Custom Roles](/s/article/360043438973 "Managing Custom Roles").
@@ -541,5 +548,51 @@ You can clear filters from a Date Selector Card by hovering over the card and se
   [Date Selector Cards](/s/article/360042924474)
 * Explore
   [chart properties](https://domo-support.domo.com/s/topic/0TO5w000000ZaodGAC/chart-properties?language=en_US)
+
+---
+
+## Filter Behavior and Limitations
+
+Page Filters, Filter Views, and Filter Cards share a few behaviors that are easy to miss. Keep the following in mind when a filter does not behave the way you expect.
+
+### How Filters Resolve Across DataSets
+
+Page Filters act on the DataSet columns behind your cards and match those columns **by name**. A filter changes a card only when that card's DataSet contains a column with the same name as the filtered column.
+
+* Cards powered by *different* DataSets are filtered together only when those DataSets share an identically named column. If a column name appears in more than one DataSet, you can scope the filter to specific DataSets in the [Apply Page Filters](#apply-page-filters) dialog; if you do not, the columns from the DataSet powering the most cards on the dashboard are used.
+* To filter two DataSets whose key fields have *different* names (for example, `customer_id` in one and `Account ID` in another), rename one of them so the names match. You can do this without changing the source data by renaming the column in a [DataSet View](/s/article/4402058407191 "Manage DataSet Views") used by that card.
+* Page Filters match on selected **literal values**. For string columns you choose the values to include or exclude with **In** or **Not In**; there is no substring or "contains" operator, and no way to require that a single row match *all* of the selected values within one column (see the multi-select note under [Apply Page Filters](#apply-page-filters)). To filter on a text pattern or a multi-condition rule, create a Beast Mode calculation that returns a single indicator value and add a Page Filter on that calculated column.
+
+{/* [pm-input] Chris Wright — confirm (1) whether a Beast Mode calculation created only in Analyzer on a single card is unavailable as a Page Filter column unless it is saved to the DataSet, and (2) the reported limit that a table card can be controlled by only one Page Filter at a time. Synthesized from community forum reports; needs confirmation. */}
+
+### Making a Column Non-Filterable
+
+There is no per-column setting that removes a DataSet column from filtering—every column in a card's DataSet appears in the **Add Filter** list. To keep a column out of that list, rename it in a [DataSet View](/s/article/4402058407191 "Manage DataSet Views") used by that card so it no longer matches the shared name.
+
+{/* [pm-input] Chris Wright — confirm the current behavior and label of the per-card "Change Filter Exceptions" / "Allow global date" setting (whether an individual card can be exempted from a global date filter, and how), and whether, with interaction filters on, clicking a chart element now also self-filters the clicked card (a reported release-behavior change). Synthesized from community forum reports; needs confirmation. */}
+
+### Default Filter Views Are Not Enforced
+
+A default Filter View loads the first time someone visits a dashboard, but it does not lock the dashboard to that filter. Viewers can still change the filters and save their own Filter Views (see [Filter Views](#filter-views)), so a Filter View can *pre-select* a value but cannot *require* it. If a viewer must never see data outside a subset, restrict the data upstream with [Personalized Data Permissions (PDP)](/s/article/360042934614 "Personalized Data Permissions (PDP)") or by filtering the DataSet itself rather than relying on a Filter View.
+
+### Applying One Filter to Many Existing Cards
+
+A Page Filter applies to every qualifying card on the dashboard at once, but there is no native "bulk quick filter" that pushes a saved card-level filter onto many existing cards. Hiding the filter bar does not remove filters for other users, and turning off Page Filters does not persist a filter to cards for all viewers (see [Hide Page Filters](#hide-page-filters)). To apply the same fixed filter to many cards for all viewers, either add a Page Filter and save it as a shared [Filter View](#filter-views), or set the filter while editing each card.
+
+### Date Selector or Global Date Filter Not Filtering Cards
+
+If a date picker, [Dynamic Date Range Filter](#apply-dynamic-date-range-filters), or [Date Selector Card](#date-selector-cards) is not filtering the cards you expect, check the following:
+
+* **Allow global date filters** is enabled in the [Filter options](#filter-options) modal. When this option is off, cards are excluded from the dashboard's global and dynamic date filters.
+* The card does not have **Hide Date on Card Details** enabled, and its **Graph By** is not set to **None** in Analyzer—[Dynamic Date Range Filters](#apply-dynamic-date-range-filters) do not apply in either case.
+* The filter and each target card use a true date-type column, and—across different DataSets—those date columns share the same name.
+
+{/* [pm-input] Chris Wright — confirm the reported behavior change that a dashboard's date selector now requires "Allow global date filters" to be enabled to filter cards, when it previously worked without it. Synthesized from community forum reports; needs confirmation. */}
+
+### Flexible Date-Range Selection
+
+To adjust the date window across a whole dashboard, use the global [Dynamic Date Range Filter](#apply-dynamic-date-range-filters), which offers preset ranges, period-to-date options, previous and future periods, and a custom range. [Date Selector Cards](#date-selector-cards) and [Range Selector Cards](#range-selector-cards) filter at the card level instead.
+
+{/* [pm-input] Chris Wright — confirm whether a manual start/end date-entry range picker and a period-over-period configuration surfaced as a dashboard-level control are available natively, and document the recommended variable/App (Brick) approach for a custom start/end date-range control if one is supported. Synthesized from community forum reports; needs confirmation. */}
 
 ---

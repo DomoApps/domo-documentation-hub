@@ -11,6 +11,20 @@ Domo includes two different methods of combining data using DataFusions—"Add C
 
 <Note>**Note:** If any DataSets in a DataFusion are out of date, the DataFusion itself will show as being out of date. When DataSets with PDP policies are used as input (parent) DataSets in a DataFusion, those policies are incorporated in the output DataSets as well. You cannot apply policies to output DataSets from DataFusions; you must apply them to the input (parent) DataSets. For more information, see [PDP and DataFlows/DataFusion](/s/article/360042934614).</Note>
 
+## Migrate to Magic ETL or DataSet Views
+
+DataFusion is deprecated. Rebuild an existing DataFusion in Magic ETL or a DataSet View, depending on the combine method you used:
+
+- **Add Columns (matching/joining DataSets)** — recreate the combine with the **Join Data** tile in a [Magic ETL DataFlow](/s/article/360055259234), or as a join in a [DataSet View](/s/article/360046074774). Both let you match DataSets on one or more key columns and choose the join type.
+- **Add Rows (appending DataSets)** — recreate the combine with the **Append Rows** tile in Magic ETL, or as a union in a [DataSet View](/s/article/360046074774).
+
+A rebuilt combine produces a **new** output DataSet with a new DataSet ID; it does not overwrite the original DataFusion output. Any downstream DataFlow, card, or view that reads the old DataFusion output keeps pointing at the old DataSet until you repoint it. To migrate without breaking downstream content:
+
+1. Rebuild the combine in Magic ETL or a DataSet View and run it so the new output DataSet is populated.
+2. Update each downstream DataFlow to use the new DataSet as its input in place of the DataFusion output.
+3. Repoint or rebuild any cards or views that were built directly on the DataFusion output.
+4. After you confirm downstream content reads from the new output, retire the old DataFusion.
+
 ## Combining DataSets using the Combine Columns method
 
 In this method, you select two or more DataSets, each of which contains at least one column that matches a column or data type in one of the others. You then combine all of the DataSets into a single DataSet by matching similar columns. This method is equivalent to using a JOIN in SQL.

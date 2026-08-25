@@ -7,6 +7,10 @@ excerpt: "Use the PDP Automation tool in the Governance Toolkit to configure Dat
 
 PDP Automation allows a user to configure a DataSet that outlines what PDP should look like for DataSet(s). Each job can run on a schedule and when the configuration DataSet updates.
 
+<Note>
+**Note:** PDP Automation configures **row-filter** policies (which rows each user or group can see). It does not automate **column policies** (column masking); those must be configured manually on each DataSet. Learn more about [column policies](/s/article/360042934614).
+</Note>
+
 ---
 
 ## Access the Toolkit
@@ -186,6 +190,8 @@ To use custom attributes in Dynamic PDP policies, the following must be true:
 
 In this example, the custom attribute key is "store" and displays in the `Value` column.
 
+{/* [pm-input] Ryan Despain — confirm whether the attribute key entered in the `Value` column is case-sensitive (must match the Key exactly as defined on the Attributes page). Synthesized from community forum reports; needs confirmation. */}
+
 <Frame><img alt="store in value.jpg" src="/images/kb/ka0Vq00000044g9-00N5w00000Ri7BU-0EMVq000003WBhl.jpg"/></Frame>
 Finally, add a new column to the configuration file called `is\_dynamic.` The value must be set to "true".
   
@@ -202,6 +208,19 @@ To add multiple filters, set the 'policy\_name' & 'user\_group' to the same valu
 </Warning>
 
 <Frame><img alt="MultipleFilters.png" src="/images/kb/ka0Vq00000044g9-00N5w00000Ri7BU-0EM5w000005vNoo.png"/></Frame>
+
+## Assign One User Multiple Values
+
+To give a single user or group access to more than one value of the same attribute, enter all of the values in the `value` column of that policy row, separated by a pipe (`|`). Keep the `target_ds`, `policy_name`, `policy_column`, and `user_group` the same across that user's row so the values all apply to one policy.
+
+For example, to give `jsmith@example.com` access to the `West`, `East`, and `Central` regions on a single policy, set that user's `policy_column` to `region` and set the `value` column of that row to:
+
+```
+West|East|Central
+```
+
+The user then has access to rows where `region` is `West`, `East`, or `Central`.
+
 ## Remote Instance Configuration
 
 Remote instance configuration allows you to be in one Domo instance and configure PDP for other instances to which you have access. To configure PDP remotely, you need a [configuration DataSet](#configuration-dataset), which is described previously in this article. You also need a [Domo Access Token account](#configure-domo-access-token-account) configured with either a [Domo Access token](#generate-access-token) or with a username and password for the remote instance.

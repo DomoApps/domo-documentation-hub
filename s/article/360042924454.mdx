@@ -150,6 +150,18 @@ The following code sample shows a portion of an SVG file with grouping included.
 <Frame><img alt="custommaps_code_with_groups.png" src="/images/kb/ka0Vq0000000kCX-00N5w00000Ri7BU-0EM5w000005vPAa.png"/></Frame>
 To access the full code sample so you can start building USA region maps, click here: [usa\_regions.svg](https://domosoftware.sharepoint.com/:u:/s/CS-Edu-PublicFiles/EZ0h8Ybs6glEnYdZVrLT9XcBeT2uYcJSRur6IqGyw1JxCA?e=WTzD8S "usa_regions.svg"). Remember that you can customize regions as desired just by cutting and pasting \<path> tags for states into the appropriate group. For example, this file places Oklahoma into the "Southwest" group, but if you wanted to move it into "Midwest," you could do so just by copying and pasting into the group with the id of "Midwest." You can also add or delete groups as necessary.
 
+#### Set a Static Fill Before Upload
+
+Every element that carries the `id`, `name`, or `data-name` attribute described above is a *targetable* element—Domo colors it from your DataSet values when you build the card. Any element you do **not** want tied to a DataSet value (a background shape, a legend swatch, a border, or a decorative region) should be given a static color in the SVG before you upload it.
+
+`fill` is a supported style tag (see [Supported style tags](#supported-style-tags)), so you can set a static fill in any of the three supported ways—an inline `fill` attribute on the element, a `fill` declaration in the element's `style` attribute, or a `fill` rule in CSS embedded in the SVG. For example, `fill="#CCCCCC"` renders that element in light gray regardless of the data.
+
+<Note>
+  **Note:** A static fill is honored only for elements that are not matched to a DataSet value. When an element's `id`/`name`/`data-name` matches a row in your DataSet, the card's color rules and the chart's "No Data" color take precedence over the fill you set in the SVG. To keep an element a fixed color, make sure its identifier does not also appear in the region column you drag onto the chart.
+</Note>
+
+{/* [pm-input] Chris Wright — confirm the exact precedence between a static SVG fill, the card color rules, and the chart's "No Data" color for a matched-but-unvalued region (does "No Data" override an SVG static fill, or vice versa?). Synthesized from community forum reports; needs confirmation. */}
+
 ### Adding custom charts to Domo
 
 Once you have acquired the chart you want to add to your Domo instance—and edited the XML if necessary—the next step is to upload it to your Domo. You can do this in either of the following locations:
@@ -191,6 +203,13 @@ The chart is now available in the **Custom Charts** dropdown in the Chart Picker
 After you upload your chart to Domo, you can build a card from it in Analyzer just as you would any country map. For instructions about building country maps, see [Country Map](/s/article/360043429033 "Country Map"). Note that these instructions hold true for any custom chart you upload into Domo, whether or not it is a geographical map.
 
 Chart properties for custom charts are the same as those used in most geographical maps. For a list of these properties, see [Properties for Maps](/s/article/360043429853 "Properties for Maps").
+
+#### Map Non-Geographic or Mismatched Data to a Map
+
+A custom map colors a region only when a value in your region column exactly matches that element's `id`, `name`, or `data-name` in the SVG (see the [Note](#understanding-svg-file-structure) about matching priority). Two common situations break that match, and both are solved in your DataSet rather than in the SVG:
+
+* **A value that isn't a geography.** To shade regions by a category that has no place name of its own (a sales team, a product line, a status), map each category to a region the SVG already contains. Write a Beast Mode that returns the matching region `name`/`id` for each row—for example, `CASE WHEN Team = 'North Sales' THEN 'Utah' ... END`—and drag that calculated field into the region field instead of the raw column.
+* **A geography-level mismatch.** County-level rows will not color a state-level SVG, because the SVG contains only state elements to match against. Either aggregate the rows up to the level the SVG uses (roll county rows up to their state in a dataflow, or with a group-by Beast Mode) so the values match the state identifiers, or upload an SVG whose elements are at the county level. See [Map Charts](/s/article/360043428933 "Map Charts") for the built-in county option.
 
 ### Adding drill path to custom charts
 

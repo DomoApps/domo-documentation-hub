@@ -902,3 +902,41 @@ This reference guide gives examples of the available functions that can be used 
 ## System Functions
 
 <table data-aura-rendered-by="33:208;a" width="100%"><thead><tr><td class="wysiwyg-text-align-center" colspan="1" rowspan="1"><p><b> Function Name </b></p></td><td class="wysiwyg-text-align-center" colspan="1" rowspan="1"><p><b> Description </b></p></td><td class="wysiwyg-text-align-center" colspan="1" rowspan="1"><p><b> Example </b></p></td></tr></thead><tbody><tr><td colspan="1" rowspan="1"><p> DX_ACTION_ID </p></td><td colspan="1" rowspan="1"><p> The system ID of the action executing the statement. This is different from @@DX_ACTION_NAME. </p></td><td colspan="1" rowspan="1"><p> @@DX_ACTION_ID </p></td></tr><tr><td colspan="1" rowspan="1"><p> DX_ACTION_NAME </p></td><td colspan="1" rowspan="1"><p> The user-provided name of the action executing the statement. This is different from @@DX_ACTION_ID. </p></td><td colspan="1" rowspan="1"><p> @@DX_ACTION_NAME </p></td></tr><tr><td colspan="1" rowspan="1"><p> DX_DATAFLOW_ID </p></td><td colspan="1" rowspan="1"><p> The numeric ID of the DataFlow executing the statement, or NULL if the statement is not being executed by a saved DataFlow. This is different from @@DX_DATAFLOW_NAME. </p></td><td colspan="1" rowspan="1"><p> @@DX_DATAFLOW_ID </p></td></tr><tr><td colspan="1" rowspan="1"><p> DX_DATAFLOW_NAME </p></td><td colspan="1" rowspan="1"><p> The user-provided name of the DataFlow executing the statement, or NULL if the statement is not being executed by a DataFlow. This is different from @@DX_DATAFLOW_ID. </p></td><td colspan="1" rowspan="1"><p> @@DX_DATAFLOW_NAME </p></td></tr><tr><td colspan="1" rowspan="1"><p> DX_ENGINE </p></td><td colspan="1" rowspan="1"><p> The execution engine, e.g. MAGIC. </p></td><td colspan="1" rowspan="1"><p> @@DX_ENGINE </p></td></tr><tr><td colspan="1" rowspan="1"><p> DX_EXECUTION_ID </p></td><td colspan="1" rowspan="1"><p> The numeric ID of the current DataFlow execution, or null if the statement is not being executed as part of a DataFlow execution. Note that these IDs are not sequential for a given DataFlow, but are guaranteed to be larger than the IDs of executions started earlier. </p></td><td colspan="1" rowspan="1"><p> @@DX_EXECUTION_ID </p></td></tr><tr><td colspan="1" rowspan="1"><p> DX_IS_PREVIEW </p></td><td colspan="1" rowspan="1"><p> TRUE if the statement is being executed as part of a DataFlow preview, otherwise FALSE. </p></td><td colspan="1" rowspan="1"><p> @@DX_IS_PREVIEW </p></td></tr></tbody></table>
+
+## Function Behavior Notes
+
+The Magic ETL Formula Editor and Beast Mode share much of the same function library, but a few functions behave differently between the two, and some functions are available in only one. Keep the following in mind when you move a calculation between Magic ETL and Beast Mode.
+
+### Time Zone Handling
+
+Date and time functions are evaluated using the time zone configured for the execution context. You can set this in the Magic action settings, the DataFlow settings, or the customer setting; the `@@TZ` and `@@SYSTEM_TZ` debugging functions (see the Date and Time Functions table above) return the time zone in effect. Because the result depends on that setting, the same expression can return different values in different contexts.
+
+To convert a datetime from one zone to another, use `CONVERT_TZ(dt, from_tz, to_tz)`, which is available in both Magic ETL and Beast Mode.
+
+{/* [pm-input] Andrea Henderson — confirm the exact default-time-zone behavior of NOW()/CURRENT_TIME()/CURRENT_TIMESTAMP() (community reports they return UTC) and the exact support status of CONVERT_TZ() across contexts (Beast Mode, Magic ETL, SQL DataFlow, connector SQL), since the community received conflicting answers. Synthesized from community forum reports; needs confirmation. */}
+
+### ROUND() Rounding Mode
+
+In Magic ETL, `ROUND()` follows the rounding mode described in the [Numeric Functions](#numeric-functions) table above: for a fixed-decimal argument it rounds an equidistant value to the nearest even neighbor (so both 1.5 and 2.5 round to 2), while for a floating-decimal argument it rounds an equidistant value up (1.5 to 2, 2.5 to 3). Beast Mode may round equidistant values differently, so verify results if you copy a `ROUND()` calculation between the two.
+
+{/* [pm-input] Andrea Henderson — confirm Beast Mode's exact ROUND() rounding mode for equidistant values so the ETL-vs-Beast-Mode difference can be stated precisely. Synthesized from community forum reports; needs confirmation. */}
+
+### HOUR() on Elapsed-Time Text Over 24 Hours
+
+`HOUR()` is designed to return the hour component of a time value, in the range 0 to 23. It is not intended to read an elapsed-duration string whose hours exceed 24 (for example, `170:15`). To pull the total hours out of an elapsed-time string, split the string on the colon and calculate the value yourself—for example, take the portion before the colon as hours and the portion after as minutes, then compute `hours * 60 + minutes` for total minutes (or divide back out for total hours).
+
+{/* [pm-input] Andrea Henderson — confirm the ETL-vs-Beast-Mode difference for HOUR() on elapsed-time strings over 24 hours (community reports that '170:15' errors in Magic ETL but returns 170 in Beast Mode). Synthesized from community forum reports; needs confirmation. */}
+
+### STR_TO_DATE() Format Tokens
+
+`STR_TO_DATE(str, format)` is the inverse of `DATE_FORMAT()` and accepts the same format tokens listed in the Date and Time Functions table above. If a short-form token does not parse a particular value—for example, a short month-name token against your source text—map the abbreviation to its full month name upstream and parse with the full-month token `%M` instead.
+
+{/* [pm-input] Andrea Henderson — confirm whether STR_TO_DATE() reliably parses the short month-name token %b (community reports needing to map to full month names and use %M as a workaround). Synthesized from community forum reports; needs confirmation. */}
+
+### Geographic Distance (Magic ETL Only)
+
+Magic ETL provides `DISTANCE(lat0, lon0, lat1, lon1)` and its synonym `DISTANCEV()` (both use Vincenty's formulae) to calculate the distance in kilometers between two latitude/longitude points—see the [Numeric Functions](#numeric-functions) table above. These functions are available in the Magic ETL Formula tile but not in Beast Mode, so perform distance and other geographic math in a Magic ETL Formula tile rather than in a Beast Mode calculation.
+
+### Count Category Occurrences
+
+To count how many times each value of a category appears, use a Group By tile: group on the category column and add an aggregation of `COUNT` (for example, `COUNT(expr)`). Each output row then holds a category value and the number of rows that had it.

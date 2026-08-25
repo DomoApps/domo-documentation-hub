@@ -78,3 +78,25 @@ Example: Assigning a category to the animal name based on the first letter of th
 Example: Categorizing rows based on salary amount
 
 <table class="mt-responsive-table" data-aura-rendered-by="33:208;a"><thead><tr><th colspan="1" rowspan="1"> In MySQL... </th><th colspan="1" rowspan="1"> In Magic ETL... </th><th colspan="1" rowspan="1"> Before </th><th colspan="1" rowspan="1"> After </th></tr><tr><td colspan="1" rowspan="1"><code> (CASE WHEN `salary`  50000 THEN '\$50,000' <br/> WHEN `salary`  100000 THEN '\$50,000 - \$99,999' <br/> WHEN `salary`  150000 THEN '\$100,000 - \$149,999' <br/> WHEN `salary`  200000 THEN '\$150,000 - \$199,999' <br/> ELSE \$200,000' END) AS salary_bucket </code></td><td colspan="1" rowspan="1"> Use the "Filter Rows" tile to separate into distinct groups based on store number, use "Add Constants" to add a category to each group, then use "Append Rows" to stitch the rows back together. </td><td colspan="1" rowspan="1"> salary = \$45,000 </td><td colspan="1" rowspan="1"> salary = \$45,000 | salary_bucket = '$50,000' </td></tr></thead></table>
+
+## Converting Nulls or Empty Strings to a Default Value
+
+Example: Replacing null or blank values in a numeric column with `0`
+
+<table class="mt-responsive-table"><thead><tr><th colspan="1" rowspan="1"> In MySQL... </th><th colspan="1" rowspan="1"> In Magic ETL... </th><th colspan="1" rowspan="1"> Before </th><th colspan="1" rowspan="1"> After </th></tr><tr><td colspan="1" rowspan="1"><code> COALESCE(NULLIF(TRIM(`amount`), ''), 0) AS amount_clean </code></td><td colspan="1" rowspan="1"> Use the <b>Value Mapper</b> tile to map empty values to <code>0</code>, or use an <b>Add Formula</b> tile with <code>COALESCE(NULLIF(TRIM(`amount`), ''), 0)</code>. </td><td colspan="1" rowspan="1"> '' (empty) or NULL </td><td colspan="1" rowspan="1"> 0 </td></tr></thead></table>
+
+<Note>
+  **Note:** A `CASE` expression alone often misses these values. A comparison such as `WHEN amount = '' THEN 0` does not catch true nulls, because any comparison with `NULL` evaluates to unknown rather than true, and it does not catch whitespace-only values such as `' '`. Wrapping the column in `NULLIF(TRIM(...), '')` first collapses blank and whitespace-only strings to `NULL`, and `COALESCE(..., 0)` then substitutes the default. If you use `CASE`, add an explicit `WHEN amount IS NULL` branch and `TRIM` the value.
+</Note>
+
+## Casting Currency or Formatted Numbers to a Numeric Type
+
+Example: Converting a formatted currency string such as `($1,234.50)` to a numeric value
+
+A numeric cast (using the **Set Column Type** or **Alter Columns** tile) fails or returns null when the string contains non-numeric characters—such as a currency symbol (`$`), thousands separators (`,`), or accounting-style parentheses. Strip those characters first, then cast.
+
+<table class="mt-responsive-table"><thead><tr><th colspan="1" rowspan="1"> In MySQL... </th><th colspan="1" rowspan="1"> In Magic ETL... </th><th colspan="1" rowspan="1"> Before </th><th colspan="1" rowspan="1"> After </th></tr><tr><td colspan="1" rowspan="1"><code> CAST(REPLACE(REPLACE(`amount`, '\$', ''), ',', '') AS DECIMAL(10,2)) AS amount_numeric </code></td><td colspan="1" rowspan="1"> Use <b>Replace Text</b> tiles to remove the <code>\$</code> and <code>,</code> characters, then use the <b>Set Column Type</b> or <b>Alter Columns</b> tile to cast the cleaned column to a numeric type. </td><td colspan="1" rowspan="1"> \$1,234.50 </td><td colspan="1" rowspan="1"> 1234.50 </td></tr></thead></table>
+
+<Note>
+  **Note:** Accounting formats wrap negative numbers in parentheses—for example, `(\$1,234.50)` means `-1234.50`. Parentheses can't be cast to a number, so before casting, use a **Replace Text** tile (or a regular expression) to detect a surrounding pair of parentheses and convert it to a leading minus sign, then remove the remaining parentheses.
+</Note>

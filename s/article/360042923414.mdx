@@ -85,3 +85,19 @@ Enter the following input code:
 `[ ORDER BY order_list ]`
 
 `)`
+
+## Keep All Rows That Tie on a Date
+
+A `ROW_NUMBER()` filter assigns a unique number to every row, so filtering to row number 1 keeps exactly one row per group and silently drops ties. When several rows share the same latest date — for example, multiple plans that share the most recent `EFFDT` — use one of these approaches to keep all of them:
+
+* **Rank instead of numbering.** In RedShift, use `RANK()` in place of `ROW_NUMBER()`. `RANK()` gives tied rows the same rank, so filtering to rank 1 keeps every row on the latest date:
+
+  `RANK() OVER (PARTITION BY plan_id ORDER BY EFFDT DESC)`
+
+* **Compare to the group maximum.** Compute the latest date per group and keep the rows that match it — for example, aggregate `MAX(EFFDT)` grouped by the same key, join that back to the data, and keep rows where `EFFDT` equals that maximum.
+
+Add every column that defines the group to the `PARTITION BY` list. The partition, not the row order, is what determines which rows are compared.
+
+## Rank on a Change in Value
+
+To restart the count whenever a value changes, name that value explicitly as the partition (RedShift) or as the comparison column (MySQL). The windowed examples above rely on the `PARTITION BY` column — or, in MySQL, on the `@PriorRecordName` comparison together with the `ORDER BY` clause — to detect the change. Sort order alone is not enough: without an explicit grouping column, the query has no way to know where one group ends and the next begins, so include the grouping column in both the comparison and the `ORDER BY`.

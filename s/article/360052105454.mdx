@@ -22,6 +22,12 @@ To connect to your JSON No Code OAuth account and create a DataSet, you must add
 * Refresh Token Url
 * Scopes
 
+<Note>
+**Note:** This connector authenticates using **OAuth 2.0** flows (for example, authorization code or client credentials — set by the **OAuth Type** / `grant_type` your API expects). It is not designed to perform a JWT-based login or JWT token refresh. If your API requires signing and exchanging a JWT to obtain a token, this connector cannot complete that handshake on its own.
+
+{/* [pm-input] Tasleema Lallmamode — confirm which OAuth 2.0 grant types the JSON No Code OAuth connector supports and that JWT-bearer login/refresh is not supported (this is also tracked as a feature request). Synthesized from community forum reports; needs confirmation. */}
+</Note>
+
 ## Connecting to your custom data with the JSON No Code OAuth Connector
 
 This section enumerates the options in the **Credentials** and **Details** panes in the JSON No Code OAuth Connector page. For detailed information on configuring the Data Selection, refer to the [Connecting with the JSON No Code and JSON No Code OAuth connectors](https://domo-support.domo.com/s/article/000005360?language=en_US "Connecting with the JSON No Code and JSON No Code OAuth connectors") article. The components of the other panes in this page, **Scheduling** and **Name & Describe Your DataSet,** are universal across most connector types and are discussed in great detail in [Adding a DataSet Using a Connector](https://domo-support.domo.com/s/article/360042926274?language=en_US "Adding a DataSet Using a Connector").
@@ -74,13 +80,21 @@ In this pane, you specify the server/SFTP site to connect to, the name of the JS
 
 #### Pagination
 
-Select how to paginate the data:
+Most APIs return large result sets across multiple pages, so you usually need to configure paging to retrieve every record rather than only the first page. Select the option that matches how your API paginates:
 
-* No Paging
-* Get next URL from results
-* Get next page token from results
-* Offset by records
-* Offset by pages
+| Paging option                    | When to use it                                                                                               |
+| -------------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| No Paging                        | The endpoint returns all records in a single response.                                                       |
+| Get next URL from results        | Cursor-style APIs that return a full URL to the next page in the response body (for example, a `next` link). |
+| Get next page token from results | Cursor/token-style APIs that return a token (for example, `nextPageToken`) you pass into the next request.   |
+| Offset by records                | The API pages by a record offset (for example, `offset`/`start` plus a page size).                           |
+| Offset by pages                  | The API pages by an incrementing page number (for example, `page=1`, `page=2`).                              |
+
+Configure the parameter names and starting values to match your API's documentation. For token- and next-URL-based paging, make sure the field you point Domo at actually contains the next token or URL; for offset- and page-based paging, confirm the page-size and offset/page parameters are the ones your API expects.
+
+If a run hangs or never finishes while paging, the connector is usually not receiving a signal to stop — it keeps requesting pages. Confirm that the API returns an empty next-token/next-URL (or an empty page of results) when there is no more data, and that the offset or page parameter is incrementing as expected so the run reaches the end of the data.
+
+{/* [pm-input] Tasleema Lallmamode — confirm the exact stop conditions the JSON No Code OAuth connector uses for each paging method and the recommended fix when a paged run hangs or loops. Synthesized from community forum reports; needs confirmation. */}
 
 #### Parsing
 

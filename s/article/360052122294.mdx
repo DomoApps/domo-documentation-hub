@@ -39,5 +39,38 @@ Partitioning provides the following advantages:
 Domo supports **Date partitioning**.
 
 </Accordion>
+
+<Accordion title="How does the partition update method differ from Append, Replace, and Merge?">
+
+Each connector update method handles incoming data differently:
+
+- **Replace** removes all existing data in the DataSet and loads an entirely new batch. It is the most straightforward way to keep the DataSet in sync with the current state of the source.
+- **Append** adds all incoming data to the existing DataSet without checking whether a record already exists. Because it does not evaluate same-key updates, Append can create duplicate records if the same rows are pulled again.
+- **Merge** (also called **Upsert**) uses a Merge Key to decide, row by row, whether an incoming record is new or an update: if the key matches an existing row, the incoming record replaces it; if not, the record is appended.
+- **Partition** replaces or appends data one **entire partition** at a time (grouped by the Partition Key) rather than one record at a time, which is what makes it efficient for large tables.
+
+For a full comparison of these methods, their use cases, and their limitations, see [DataSet Update Methods](/s/article/360043430733).
+
+</Accordion>
+
+<Accordion title="What does the 'Append' option do on a Partition connector?">
+
+On a Partition connector, the update option applies at the partition level, not the row level. When an incoming partition matches an existing partition (by Partition Key), that whole partition is replaced; partitions that don't already exist are appended.
+
+Because Domo swaps data a full partition at a time, each incoming partition must contain **all** records for that partition — even records that haven't changed. If an incoming partition is missing records, replacing the existing partition can drop that data.
+
+</Accordion>
+
+<Accordion title="How do I detect records that were hard-deleted at the source?">
+
+Whether source deletions are reflected in your DataSet depends on the update method:
+
+- **Replace** naturally reflects hard-deletes, because it discards the existing data and reloads the current source state — a record deleted at the source simply doesn't come back.
+- **Append**, **Merge**, and **Partition** do not remove records that no longer exist at the source. Append and Merge never delete existing rows, and Partition only rewrites partitions that are present in the incoming data, so a hard-deleted record persists until its partition is reloaded.
+
+To identify records that were deleted at the source while using Append or Merge, a common approach is to periodically capture the full set of current source keys (for example, with a Replace DataSet) and compare it against your accumulating DataSet in a DataFlow to flag keys that are no longer present.
+
+{/* [pm-input] Tasleema Lallmamode — confirm the recommended, supported pattern for detecting hard-deleted source records with Append/Merge/Partition connectors (for example, a periodic full-key Replace DataSet compared in a DataFlow). Synthesized from community forum reports; needs confirmation. */}
+</Accordion>
 </AccordionGroup>
 

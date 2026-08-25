@@ -17,6 +17,27 @@ DataFlows (both SQL and Magic ETL) cannot append data natively like Connectors. 
 
 <Warning>**Important:** If a recursive DataFlow is edited incorrectly, you could lose ALL historical data. To avoid this any time you are editing, create an additional DataSet that is a copy of your historical DataSet. This DataSet will remain static. If anything happens to your historical DataSet, you will have a backup from before you began editing.</Warning>
 
+## Output Dataset Targeting Rules
+
+Keep these rules in mind when deciding where a Magic ETL DataFlow writes its output:
+
+- **An output can equal an input only in a recursive DataFlow.** Pointing an output DataSet back at one of the flow's own input DataSets is exactly the recursive pattern described in this article. Outside of that pattern, reusing an input as an output isn't supported.
+- **You can't natively retarget an output to an arbitrary existing DataSet.** Magic ETL writes each output to the DataSet it created for that output tile. There's no native option in the editor to redirect an output to write into a different, pre-existing DataSet.
+
+{/* [pm-input] Andrea Henderson — confirm the CLI workaround community members reference for remapping a Magic ETL output to an existing DataSet ID (reported as list-dataflow / update-dataflow commands in the Domo CLI). These commands are not currently documented in the Domo CLI article, so confirm the exact command names, parameters, and whether this is supported before documenting or linking a procedure. Synthesized from community forum reports; needs confirmation. */}
+
+## Choosing a Snapshot Approach
+
+There are several ways to keep a history of your data over time. Use this comparison to choose the one that fits your needs:
+
+| Approach                                                         | How it works                                                                                                                                                                                                                           | Use when                                                                                                                                    |
+| ---------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| Recursive DataFlow                                               | The DataFlow feeds its own output back in as an input and appends new rows on each run, maintaining the full history inside one Magic ETL DataFlow (described in this article).                                                        | You want history maintained within a single DataFlow and control over how new rows are matched and appended.                                |
+| [DataSet Copy connector](/s/article/360043436533) in Append mode | On a schedule, the connector copies a source DataSet into a separate DataSet whose update mode is set to **Append**, stamping each run with meta columns—including **Batch Last Run**—so every snapshot is time-stamped automatically. | You want to snapshot a DataSet on a schedule without editing the source DataFlow, and you want an automatic run timestamp on each snapshot. |
+| Date spine / calendar join                                       | You join your data to a generated date (calendar) dimension so there is a continuous row per date.                                                                                                                                     | You need a complete, gap-free row per date regardless of whether the source produced data for that date.                                    |
+
+To keep current and historical data together, combine your current DataSet with the historical (snapshot) DataSet using an **Append Rows (Union)** tile. For a worked example of appending year-to-date data into a historical archive, see [Archiving Historical Data Using a DataFlow](/s/article/360043428073).
+
 ### To create a recursive DataFlow in Magic ETL:
 
 1. Create and run a Magic ETL DataFlow. <img alt="1.png" src="/images/kb/0EM5w000005vOu3.png" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/> 2. Once the DataFlow has finished running, load the output DataSet as an input DataSet.  

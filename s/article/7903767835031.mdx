@@ -245,6 +245,19 @@ A Variable's selected value drives the results of any Beast Mode that references
 
 {/* [pm-input] Phil Fuchs — confirm the current scope for surfacing a variable's selected value as dynamic text: which card elements (title, axis labels, legends, column headers) can reference it today, and whether formatting can follow the selected metric. Provenance: synthesized from community forum reports; needs confirmation. */}
 
+One place teams try to surface a Variable's value is the card title, using [Smart Text](/s/article/4529227357975). Community reports indicate that a Variable referenced in a card title renders only when a *non-default* value is selected—while the Variable is at its default value, the title falls back to the static title text rather than showing the value.
+
+{/* [pm-input] Chris Wright — confirm the Smart Text card-title behavior for variables: does a variable token in a card title render only when a non-default value is selected (falling back to static text at the default value), and is that the intended behavior? Synthesized from community forum reports; needs confirmation. */}
+
+### Current Limitations of Variable Values and Controls
+
+A control's values are entered manually when you create or edit the Variable—they are static and are not populated from a DataSet field. A few consequences are worth planning around:
+
+* **Values can't be reordered in place.** Choices display in the order you add them; to change the order, remove the values and re-add them in the order you want.
+* **Options aren't dataset-driven.** A control's choices can't be bound to a DataSet column, so when the underlying list changes you re-enter the values by hand. Some teams generate the distinct list of values externally (for example, with a Workflow or a CodeEngine function) and paste those values into the control, but the control itself still holds a static, manually entered list.
+* **Date defaults are static.** A Date Variable's default is a fixed date set when the Variable is created; there is no dynamic "today"/current-date default. If you need a card to open on the latest data, drive the date range with a Quick Filter default such as **Month to Date** instead of a Variable, or flag the most-recent date in a Magic ETL dataflow (compare each row's date to `MAX(date)`) and filter on that flag.
+* **No dedicated Variable Manager.** There is no separate Variable Manager UI, and control choices can't be sorted or individually formatted. To see and manage every Variable in the instance, use the **Variables** tab in the [Beast Mode Editor](#variables-and-the-beast-mode-editor) and the DomoStats **Variables** reports (see [DomoStats Reports](#domostats-reports)).
+
 ## Build a Variable-Driven Toggle
 
 You can use a Variable to let viewers switch what a card shows—for example, toggling a card between month-to-date and year-to-date, or between two metrics—without building separate cards.
@@ -270,6 +283,26 @@ CASE WHEN <row condition referencing the Variable> THEN 'Yes' ELSE 'No' END
   **Note:** A Variable cannot change a column's data type or number format. To switch formatting (currency, percent, or plain number) based on a selection, build a formatted-label Beast Mode that returns text—for example, multiply a percent by 100, round it, and `CONCAT` the unit symbol—rather than expecting the Variable to reformat the value. Keep a separate raw-value Beast Mode when you also need the numeric value for sorting or charting.
 
 </Note>
+
+The same toggle pattern can switch a series or an axis: point the Beast Mode you drag onto the Y-axis (or the series/color field) at whichever measure the Variable's value selects.
+
+### Build an "All" Option
+
+Domo does not yet offer a native "select all" choice in a slicer or Variable control, so build the combined option with a Variable plus a Beast Mode include/exclude filter.
+
+1. Create a String Variable (for example, `Region Filter`) with a [Default Control](#default-control)—pills, radio buttons, or a dropdown—whose choices are your individual values **plus** an `All` choice.
+2. Write a Beast Mode that returns `Include` when either `All` is selected or the row matches the selected value, and `Exclude` otherwise:
+
+   ```
+   CASE
+     WHEN `Region Filter` = 'All' THEN 'Include'
+     WHEN `Region Filter` = `Region` THEN 'Include'
+     ELSE 'Exclude'
+   END
+   ```
+3. Apply that Beast Mode as a **card filter** set to `Include`, and save it on each card that needs the option rather than as a shared slicer—that keeps the include/exclude logic with the card so it behaves consistently on a dashboard.
+
+If a single column holds several delimited values (for example, `"US, CA, MX"`) and you want a control to list each value on its own, that is a data-shaping task, not a Variable task: split the column into rows in an ETL first (see [Split Multi-Value Fields into Rows](/s/article/Split-Multi-Value-Fields-into-Rows)). A native "Select All" control in filters and slicers is an open feature request.
 
 For related time-comparison patterns, see [Sample Beast Mode Calculations: Period-over-Period Transforms](/s/article/360043430133).
 
@@ -350,6 +383,13 @@ No. Variables are not supported in publication groups.
 Yes. Domo Bricks can listen to and support Variables.
 
 <iframe allowfullscreen="allowfullscreen" frameborder="1" height="315" src="https://www.youtube.com/embed/jZBPXQ_AHpY" title="YouTube video player" width="560"></iframe>
+
+</Accordion>
+<Accordion title="Can I switch between a fiscal and standard calendar with a Variable?">
+
+  
+There is no built-in setting that exposes the calendar type itself as a Variable, but you can build the toggle. In a dataflow, add both a standard-calendar field and a fiscal-calendar field (fiscal period, fiscal year, and so on) to your DataSet. Then create a String Variable—for example, `Calendar` with the choices `Standard` and `Fiscal`—and use a `CASE` in your date Beast Modes to pick which set of calendar fields the card groups on, following the [Build a Variable-Driven Toggle](#build-a-variable-driven-toggle) pattern. A native fiscal/standard calendar toggle is a feature request.
+  
 
 </Accordion>
 <Accordion title="Variables Use Cases and Feature Walkthrough (video)">

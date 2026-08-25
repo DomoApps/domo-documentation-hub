@@ -162,6 +162,38 @@ In this pane you create an SQL query to retrieve data from NetSuite database tab
 
 For information about the remaining sections of the connector interface, including how to configure scheduling, retry, and update options, see [Adding a DataSet Using a Data Connector](/s/article/360042926274).
 
+### Discovering Available Tables and Columns
+
+SuiteAnalytics Connect exposes its own system catalog, so you can query it to find the tables and columns you have access to before writing a data query. Enter these in the **Query** field:
+
+* List every table available to your role:
+
+  ```sql
+  SELECT * FROM OA_TABLES
+  ```
+
+* List the columns for those tables:
+
+  ```sql
+  SELECT * FROM OA_COLUMNS
+  ```
+
+Use the results to confirm the exact table and column names to reference in your query. Names differ between the older NetSuite.com schema and the NetSuite2.com schema, so a table or field name that worked previously may be named differently in NetSuite2.com.
+
+{/* [pm-input] Tasleema Lallmamode — confirm whether an official NetSuite.com-to-NetSuite2.com table/column mapping reference exists that we can link to. Synthesized from community forum reports; needs confirmation. */}
+
+### Writing Date Filters
+
+When you filter by a date in a `WHERE` clause, the date literal must match the date format configured for your NetSuite instance. Standard SQL date functions such as `YEAR()`, `EXTRACT()`, and `TO_DATE()` do not work as expected against NetSuite2.com and can cause the query to fail or return no rows. Format the date value to match your instance instead of wrapping columns in these functions.
+
+{/* [pm-input] Tasleema Lallmamode — confirm the exact date literal format SuiteAnalytics Connect / NetSuite2.com expects in WHERE clauses and provide a working example query. Synthesized from community forum reports; needs confirmation. */}
+
+<Note>
+**Note:** SuiteAnalytics Connect supports the **Upsert** update method, which updates existing rows with restated data and inserts new rows on each run.
+
+{/* [pm-input] Tasleema Lallmamode — confirm that Upsert support has shipped for the SuiteAnalytics Connect connector and note any version/date or configuration requirement. Synthesized from community forum reports; needs confirmation. */}
+</Note>
+
 ## Troubleshooting
 
 - You can find field IDs in NetSuite by clicking on a given label. For example, if you have a field whose label was changed from "Category" to "Class," you can navigate to a customer record and click on the "Class" label. You should see “Category” as the field ID within a pop-up.

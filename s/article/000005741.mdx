@@ -23,6 +23,10 @@ To learn how to use tiles in DataFlows, see [Create a Magic ETL DataFlow](/s/art
 
 The AI Forecasting tile allows you to predict future data points based on patterns or trends in your data by leveraging Domo's Forecasting Universal Model. After saving your forecast in an output DataSet, you can view the DataSet in Analyzer to visualize your forecast in a Forecasting Chart.
 
+<Note>
+  **Note:** The AI Forecasting tile relies on the Forecasting Universal Model, which your Domo account team must enable for your instance. Until it is enabled, the AI Forecasting tile does not appear under **AI Services**. To request enablement, contact your Domo account team. Learn more about the [Forecasting Universal Model](/s/article/000005567).
+</Note>
+
 Access the AI Forecasting tile under **AI Services** in the Magic ETL interface.
 
 <Frame>![ai services.jpg](/images/kb/0EMVq000004Eehe.jpg)</Frame>
@@ -182,6 +186,16 @@ Select **Save and Run** to run the DataFlow and ensure that all granularity colu
   the AI Forecasting tile
   configuration](#configure-your-ai-forecasting-tile-to-match-its-input-granularity).
 </Warning>
+
+### Troubleshoot AI Forecasting Tile Run Failures
+
+The AI Forecasting tile has strict input requirements, so a DataFlow can appear correct—or succeed against a data preview—yet fail on a full **Save and Run** when the complete dataset contains values the tile can't process. If your forecast fails to run, check the data feeding the tile for these common causes:
+
+- **Nulls in the date or value column.** Every row passed to the tile must have a value in both the selected **Date Column** and **Value Column**. Filter out or fill null rows before the tile. For recipes that convert nulls or empty strings to a value, see [Data Cleaning Operations Using SQL and Magic ETL DataFlows](/s/article/360042923234).
+- **Inconsistent formatting or data types.** The **Date Column** must be a true date or time-stamp data type, and the **Value Column** must be an integer, floating decimal, or fixed decimal. Use an **Alter Columns** tile to cast the columns so that no string or mixed-format values reach the tile.
+- **Granularity that doesn't match the configuration.** The data feeding the tile must be at the granularity you selected in the tile (daily, weekly, monthly, quarterly, or yearly), with one row per interval. See [Convert Input Granularity](#convert-input-granularity).
+
+{/* [pm-input] Andrea Henderson — confirm the exact reason an AI Forecasting DataFlow can succeed in Preview but fail on a full run (community reports point to Preview processing only a subset of rows while the full run encounters nulls/inconsistent formatting across the complete dataset). Synthesized from community forum reports; needs confirmation. */}
 
 ## AI Model Inference Tile
 

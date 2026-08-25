@@ -77,6 +77,21 @@ You can configure the Filter Rows tile by following these steps:
 
 <Tip>**Tip:** You can preview the data transformed by a tile by running a preview, clicking the tile in the canvas, then clicking the **Preview** tab.</Tip>
 
+## Common Filter Patterns
+
+The following patterns solve filtering problems that come up often in Magic ETL.
+
+**Filter against a list of values.** For a short list, add a Formula Rule with the `IN` or `NOT IN` operator — for example, `NOT IN ('A', 'B', 'C')` to drop those values, or `IN (1, 3, 7, 9)` to keep them. When the list is long or already lives in another DataSet, it is usually easier to keep the values in a reference DataSet and use a **Join** tile as the filter: an inner join to the reference DataSet keeps only the rows whose key matches (the equivalent of `IN`) and avoids hard-coding a large list into a formula.
+
+**Remove future or past dates.** Compare the date column directly to the current date with a Formula Rule. Wrap the column in `DATE()` so the comparison ignores any time component:
+
+* `DATE(order_date) < CURRENT_DATE()` keeps only past dates (drops today and the future).
+* `DATE(order_date) >= CURRENT_DATE()` keeps today and future dates.
+
+<Tip>**Tip:** To set a date filter without using the date-picker calendar, add a Formula Rule and compare the date column directly, as shown above. For more on filter formulas, see [Writing a Filter Formula in Magic ETL](/s/article/360044296573).</Tip>
+
+{/* [pm-input] Andrea Henderson — confirm the date-picker calendar shortcut in the Filter Rows tile: clicking the month/year header to jump to a month, year, and decade selection view. Synthesized from community forum reports; needs confirmation. */}
+
 ## Split Filter Tile (Limited Release)
 
 <Warning>**Important:** The Split Filter tile is currently only available for Magic ETL on Snowflake or Databricks. It is targeted for general release by the end of 2025.</Warning>

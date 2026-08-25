@@ -79,6 +79,13 @@ The following table describes the configuration options available when choosing 
 
 <table class="mt-responsive-table" data-aura-rendered-by="33:195;a"><thead><tr><th colspan="1" rowspan="1"><p> Option </p></th><th colspan="1" rowspan="1"><p> Description </p></th></tr></thead><tbody><tr><td colspan="1" rowspan="1"><p> Which Salesforce Object Would You Like to Use? </p></td><td colspan="1" rowspan="1"><p> Select the Salesforce object you want to import into Domo. </p></td></tr><tr><td colspan="1" rowspan="1"><p> What Fields Would You Like to Retrieve? </p></td><td colspan="1" rowspan="1"><p> Select all the fields you want to retrieve. You can select as many fields as you want. You can drill down on an object to show the fields under that object, or you can search for a specific field using the <b> Search </b> box. </p></td></tr><tr><td colspan="1" rowspan="1"><p> Would You Like to Filter by Date? </p></td><td colspan="1" rowspan="1"><p> Select a date filtering option. A number of options is available, including the creation date, last activity date, last viewed date, etc. </p></td></tr><tr><td colspan="1" rowspan="1"><p> What Relationships Would You Like to Include? </p></td><td colspan="1" rowspan="1"><p> Select all relationships you want to include in your DataSet. </p></td></tr><tr><td colspan="1" rowspan="1"><p> Column Name Styles </p></td><td colspan="1" rowspan="1"><p> Select whether to use Salesforce internal names or labels as the column names in the DataSet. </p></td></tr><tr><td colspan="1" rowspan="1"><p> Retrieve All Fields </p></td><td colspan="1" rowspan="1"><p> Select whether new fields will be automatically retrieved from Salesforce if all the fields under a parent object are selected. </p></td></tr><tr><td colspan="1" rowspan="1"><p> Type of Records to Retrieve </p></td><td colspan="1" rowspan="1"><p> Specify whether you want to import all records (including deleted records) or active fields only. </p></td></tr><tr><td colspan="1" rowspan="1"><p> Reset Schema? </p></td><td colspan="1" rowspan="1"><p> Specify whether you want your DataSet columns to be reset when a query or field selection is modified. </p></td></tr></tbody></table>
 
+<Note>
+**Note:** The **Column Name Styles** option controls only how columns are *named* in the DataSet — either the Salesforce internal API name or the field label. It does not change the *values* inside a picklist field. By default the connector returns the stored API value for a picklist, not its display label. If you need the display labels, map them after import (for example, with a Beast Mode `CASE` statement or a lookup DataSet).
+
+{/* [pm-input] Tasleema Lallmamode — confirm whether the Salesforce Advanced connector offers any built-in option to return picklist display labels instead of API values. Synthesized from community forum reports; needs confirmation. */}
+</Note>
+
+
 #### Query
 
 Use this option to pull Salesforce data into Domo by inputting a query.
@@ -92,6 +99,12 @@ Use this option to pull Salesforce data into Domo by inputting a query.
 #### Sharing Rules Settings
 
 This option is locked to reduce the risk of error when creating reports.
+
+#### Choosing Between REST and Bulk Retrieval
+
+**Browse Objects and Fields** and **Query** retrieve data through Salesforce's REST query API (`/query`), which is best for real-time and small-to-moderate extracts. For high-volume objects, Salesforce's Bulk API is more efficient because it processes large result sets asynchronously in batches rather than paging through synchronous REST calls.
+
+{/* [pm-input] Tasleema Lallmamode — confirm the exact UI labels and behavior for the connector's REST vs. Bulk API data-selection tiles (community forum reports refer to a "Browse Object" / REST tile and a "Browse in Bulk" / Bulk API tile), including the row-volume threshold or limits that make Bulk the better choice. Synthesized from community forum reports; needs confirmation. */}
 
 ### Other Panes
 

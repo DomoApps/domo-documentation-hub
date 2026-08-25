@@ -14,6 +14,22 @@ excerpt: "Domo's Snowflake Connector used username and password authentication, 
 
 Snowflake discontinued username and password authentication in November 2025. If your Snowflake DataSets stopped refreshing, follow the migration walkthrough video to move to an OAuth-based alternative: [Migration walkthrough video](https://youtu.be/rlG_uNZwl_U).
 
+The retirement affects every Domo connector variant that authenticated to Snowflake with a username and password, not only the connector on this page. Any DataSet built on one of these connectors stops refreshing after the cutover and must be moved to an authentication method Snowflake still supports.
+
+{/* [pm-input] Tasleema Lallmamode — confirm the full list of affected Snowflake connector variants (reported: Snowflake, Snowflake Unload, Snowflake Unload V2, Snowflake Managed Unload, Snowflake High Bandwidth, Snowflake Partition, Snowflake Writeback) and the recommended replacement (OAuth vs. Key Pair) for each. Synthesized from community forum reports; needs confirmation. */}
+
+**To migrate a Snowflake DataSet off username/password authentication,**
+
+1. Identify the DataSets that use a username/password Snowflake connector. These are the DataSets that began failing after the November 2025 cutover.
+2. Choose a replacement connector:
+
+   * Use an OAuth-based connector — [Snowflake OAuth Connector](/s/article/360061552054), [Snowflake Enterprise OAuth Connector](/s/article/000005534), or [Cloud Integrations](/s/article/4402322966807) — when you want to authenticate interactively or through your identity provider.
+   * Use the [Snowflake Key Pair Authentication Connector](/s/article/360042931854) for unattended, service-account access that does not rely on an interactive login.
+3. Create a new account for the replacement connector and authenticate with the new method.
+4. Repoint each affected DataSet at the new connector account, keeping the same query, warehouse, database, and schema so the DataSet schema stays consistent.
+5. Verify the new connection by running the DataSet manually and confirming a successful run in the Data Center. Once runs succeed, your existing update schedule resumes normally.
+
+
 ## Intro
 
 Snowflake is data warehouse that makes it easy to bring together all your data and make it available to all of the users and systems that need to analyze it. You can use Domo's Snowflake connector to retrieve data from a specified warehouse, database, and database schema by inputting an SQL query. For more information about the Snowflake API, go to [https://docs.snowflake.net/manuals](https://docs.snowflake.net/manuals).

@@ -122,6 +122,14 @@ Follow these steps to configure the Pivot tile:
 
       </Tip>
 
+## Common Pivot Pitfalls
+
+Keep the following in mind when the Pivot tile produces unexpected row counts or totals:
+
+* **Pre-aggregate to the grain you want before pivoting.** The Pivot tile groups its output by the row-identifier column(s) you choose in step 2. Any column you do not include in that identifier is collapsed into the pivoted rows, which can merge rows you meant to keep separate and shift totals. If your input is more granular than the grain you want after the pivot, add a **Group By** tile first to aggregate the data to that grain, then pivot.
+* **A row-identifier column is required.** Step 2 asks for the column(s) that identify a row, and the tile uses those values to decide which rows share an output row. If your data has no natural identifier — for example, when you want every input row to collapse into a single output row — add a constant column first (an **Add Formula** tile that returns the same value for every row) and use it as the row identifier.
+* **Extra identifier columns change the totals.** Because the identifier defines the grain, adding or removing a column in step 2 changes how rows are grouped, which changes the values in the pivoted columns. Include exactly the columns that define the grain you want.
+
 ## Unpivot Tile
 
 <Frame><img src="/images/kb/ka0Vq0000001kYf-00N5w00000Ri7BU-0EM5w000005vNj4.png" /></Frame>
@@ -163,6 +171,13 @@ For example, the Unpivot tile converts data in this pivoted format...
         **Tip:** You can preview the data transformed by a tile by running a preview, clicking the tile in the canvas, then clicking the **Preview** tab.
 
       </Tip>
+
+## Reshape Wide Data for Charting
+
+Most Domo chart types expect data in "long" format: one column for the category (such as the year or the metric name) and one column for the value. When your years or metrics are stored as separate columns — a column per year, or a column per metric — you cannot add several columns to a single chart axis. Reshape the data first:
+
+* Use the **Dynamic Unpivot** tile (or the **Unpivot** tile if the number of columns is fixed) to turn those columns into a single category column and a single value column. The [Dynamic Unpivot Tile](#dynamic-unpivot-tile) section above walks through this.
+* A pivot table card is the exception: it can display multiple value columns at once, so it can consume wide data without reshaping.
 
 ## What it Means to Pivot a Table (video)
 

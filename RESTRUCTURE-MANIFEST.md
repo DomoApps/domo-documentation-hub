@@ -384,6 +384,31 @@ The broad bulk pass over the 236 Medium/Low `rec=update` forum gaps from `_gaps_
 
 Waves 2–4 (remaining 26 clusters) pending.
 
+### Wave 2 (Complete — 10 clusters: Tasleema ×4, Chris ×3, Andrea ×3)
+
+45 articles updated; **45 new `[pm-input]` markers**; docs.json untouched; no new files. Verified: 0 stray TODO/FIXME, all markers well-formed, all JSX block tags balanced.
+
+| Cluster (PM) | Gaps addressed | Skipped / redirected |
+|---|---|---|
+| Tasleema __2 | 187, 255, 151, 240 | 193 → Email connector `360042931954`; 187/255 pieces → `000005503`/`000005146`/`360042931894` |
+| Tasleema __3 | 333, 189, 116, 331, 229, 234 | 234 writeback piece → `360042932414` |
+| Tasleema __4 | 113, 291, 350, 280, 238, 201, 357 | 319 (already covered); 357 auth-lifetime piece → WB server/admin article |
+| Tasleema __5 | 228, 173, 232, 295, 149 | — |
+| Chris __2 | 213, 306, 354, 219, 194 | 213 multi-value/2-color pieces → Multi-Value/Comparison card articles |
+| Chris __3 | 222, 123, 138, 150, 180, 260, 233, 195 | 195 card-title styling piece → Chart Properties article |
+| Chris __4 | 351, 334, 256, 360, 220, 277 | — |
+| Andrea __2 | 221, 251, 249, 286, 188, 217, 309 | 309 Part B (dynamic pivot schema) → `360045485833` |
+| Andrea __3 | 283, 208, 203, 258, 310, 191, 332 | — |
+| Andrea __4 | 174, 182, 197, 204, 265, 272, 212 | — |
+
+**Additional gap-data issues found in Wave 2:**
+- rank 193 (Email connector regex/encoding) mislinked to a Pinterest connector file → correct home `360042931954`.
+- rank 201 gap text contains a **false claim** ("partitioning is Workbench-only, not Magic ETL") — contradicted by `000004968` (Partition is a Magic ETL BigQuery output method); agent correctly did not assert it.
+- rank 116 (Snowflake migration) expanded here on the base Snowflake Connector — complementary to the earlier urgent Snowflake auth fix (Snowflake Connector + Unload V2), not a duplicate.
+- Pre-existing KB tension surfaced (flag for Phil Fuchs at 4.5): some Beast Mode FAQs state "no window functions," while the Critical-batch `Beast-Mode-Window-Functions.mdx` documents them.
+
+Waves 3–4 (remaining 16 clusters) pending.
+
 ---
 
 ## Phase 3c — Main Branch Content Sync (Sync #1 complete — 2026-08-20)

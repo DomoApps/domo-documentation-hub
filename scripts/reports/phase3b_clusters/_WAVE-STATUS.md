@@ -11,8 +11,9 @@ All verified: 0 stray TODO/FIXME, markers well-formed, JSX tags balanced, docs.j
 Skips (target mismatch, logged in manifest): rank 181, 231, 314. Gap-data mislinks: 181, 225, 231, 235, 314.
 Clusters: Tasleema__1, Chris__1, Andrea__1, Phil__2, Dan__1, Ryan__1, Jordan__1, Ken__1, Khushboo__2.
 
-## Wave 2 — pending (10)
-Tasleema-Lallmamode__2, __3, __4, __5; Chris-Wright__2, __3, __4; Andrea-Henderson__2, __3, __4
+## Wave 2 — COMPLETE (committed) — 10 clusters, 45 files, 45 [pm-input] markers
+Tasleema__2/3/4/5, Chris__2/3/4, Andrea__2/3/4. Verified clean (docs.json, tags, markers).
+Mislinks: 193→360042931954; 234-wb→360042932414; false-claim in 201 (per 000004968).
 
 ## Wave 3 — pending (9)
 Phil-Fuchs__1, __3, __4; Dan-Brinton__2, __3; Ryan-Despain__2, __3; Chris-Wright__5, __6

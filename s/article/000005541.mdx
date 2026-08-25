@@ -74,6 +74,15 @@ Follow the steps below to configure partitioning as the update method for your D
      **Tip:** Learn how to [add subset processing to your DataFlow](/s/article/000005150).
    </Tip>
 
+### Partition Notes and Limitations
+
+Keep the following behaviors in mind when you set up or maintain a partitioned output DataSet:
+
+* **Use a single partition column.** The **Partition name column** dropdown accepts one column only. To partition on more than one attribute (for example, store ID and date), concatenate those columns into a single key column in an upstream tile and select that combined column as the partition name. See [Partition Best Practices](#partition-best-practices) above for an example.
+* **Start from a fresh output DataSet when you switch to Partition.** The configuration steps above assume a brand-new output DataSet. If you change an output DataSet that was previously loaded with Replace (or another method) to use Partition, the data already in the DataSet was not organized into partitions and can be retained alongside the new partitioned data, which duplicates rows. To avoid this, point the Partition output at a new, empty DataSet and let it rebuild.
+  {/* [pm-input] Andrea Henderson — confirm the exact behavior when an existing Replace/Append DataSet is switched to Partition (community reports that pre-existing rows are retained under a null/empty partition and that row counts double). Synthesized from community forum reports; needs confirmation. */}
+* **Existing partitions are not reprocessed retroactively.** A partitioned execution only replaces partitions whose names appear in the incoming data; partitions that are not present in the current run are left untouched. As a result, if you change an upstream formula, only partitions that are reprocessed on a later run pick up the new logic—previously written partitions keep their earlier values until the incoming data includes those partition names again. To apply a logic change across all history, rebuild the DataSet from a fresh, empty output.
+
 ## Upsert
 
 Upsert allows you to update rows in your output DataSet without reprocessing the full DataSet based on a unique row-level key. The graphic below demonstrates replacing and appending data with Upsert.

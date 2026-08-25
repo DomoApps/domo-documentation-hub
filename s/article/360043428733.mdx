@@ -99,6 +99,16 @@ In the following example, both the category and series data are sorted alphabeti
 <Frame><img alt="" src="/images/kb/ka05w00000123km-00N5w00000Ri7BU-0EM5m000005vOzJ.png"/></Frame>
 When doing a multiple sort, you should only sort on values present in the card (x-axis, y-axis, and series). If you are sorting based on the x- or y-axis and series, the series should come first.
 
+#### Top N and Ranking in Grouped and Nested Charts
+
+When a bar chart contains series data, how a limit or ranking is applied depends on whether you rank across the whole chart or within each group.
+
+* **Create a Top N chart with chart properties.** For a nested or grouped bar chart, combine two chart properties: select **Sort on Totals** so categories are ranked by the sum of all their series, and set **Maximum Bars** (found under **Chart Properties** > **Trellis/Tiered Date Settings**) to the number of groups you want to keep. Together these produce a "Top 10"-style chart that shows only the highest-ranking groups. For more information about the **Maximum Bars** property, see [Properties Available for Most Charts](/s/article/360043429793 "Properties Available for Most Charts").
+* **Top N *within* each group must be pre-computed.** Domo's chart sorts rank categories as a whole; there is no built-in chart setting that keeps the top N items *within each partition* (for example, the top 3 products per region in a single chart). To do this, pre-compute the ranking in Magic ETL using the **Rank & Window** tile, which lets you rank a value column and specify a partition column so ranking restarts for each group. Filter to the ranks you want, then chart the result. See [Magic ETL Tiles: Aggregate](/s/article/360044876094 "Magic ETL Tiles: Aggregate").
+* **Ranking does not aggregate in table totals.** Analytics (window) functions such as RANK are not supported in the total or subtotal rows of Mega and Pivot Tables, so a ranking column does not roll up correctly in those rows. See [Properties for Tables](/s/article/360042925374 "Properties for Tables").
+
+{/* [pm-input] Chris Wright — confirm two community-reported specifics: (1) that a Top N / row limit applied to a grouped bar chart takes effect after the series split, so it ranks per-series rather than across the whole chart; and (2) the exact RANK() OVER(ORDER BY SUM(...)) Beast Mode sort/filter workaround, given that existing KB states Beast Mode does not support window functions. Synthesized from community forum reports; needs confirmation. */}
+
 #### Sorting in pie charts
 
 In pie charts, slices are automatically arranged from highest to lowest value. By default you *cannot* use the **Sorting** box to change the order in which slices appear. However, if you check the **Unsorted Data** box in **Chart Properties**, you can use the **Sorting** box to change the sort order.

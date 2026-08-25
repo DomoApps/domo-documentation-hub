@@ -147,3 +147,23 @@ You are now ready to execute the DataSet Job, thereby creating an ODBC DataSet i
 * [Combining DataSets](/s/article/360043437193 "Combining DataSets in Workbench 4")
 * [Applying filters to columns](/s/article/360042932814 "Filtering Columns in Workbench 4")
 * [Setting impersonation](/s/article/360043437173) (which causes Workbench to run the job as an Active Directory user).
+
+## FAQ
+
+<AccordionGroup>
+
+<Accordion title="How Does Domo Handle High-Precision Numbers from an ODBC Source?">
+When Workbench uploads numeric columns, Domo stores them using its numeric column types (such as LONG for whole numbers and DECIMAL or DOUBLE for values with a fractional part). Values with more digits than a numeric type can hold may be rounded or lose precision. If you need to preserve every digit of a very large or high-precision value—for example, long account numbers or IDs—cast the column to text in your query so it uploads as a string instead of a number:
+
+```sql
+SELECT CAST(account_id AS VARCHAR(50)) AS account_id FROM accounts
+```
+
+{/* [pm-input] Tasleema Lallmamode — confirm the maximum precision/digit limits for Domo's LONG, DOUBLE, and DECIMAL data types so the exact thresholds can be documented here. Synthesized from community forum reports; needs confirmation. */}
+</Accordion>
+
+<Accordion title="Can I Connect to DB2 or Other Non-Microsoft Databases through ODBC?">
+Yes. Select **ODBC Connection Provider** as the transport type and connect through the ODBC driver for your database. Windows includes drivers for MSSQL and other Microsoft products by default; for a non-Microsoft database such as DB2, Oracle, MySQL, PostgreSQL, MongoDB, or SAP HANA, obtain and install the appropriate ODBC driver first, then reference it in the **Driver** field (Connection Builder) or in your connection string.
+</Accordion>
+
+</AccordionGroup>

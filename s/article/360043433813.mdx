@@ -21,6 +21,12 @@ To pull in DomoStats DataSets using this Connector, you must have the Admin defa
 
 This section enumerates the options in the **Details** pane in the DomoStats Connector page. The components of the other panes in this page, **Scheduling** and **Name & Describe Your DataSet**, are universal across most Connector types and are discussed in greater length in [Adding a DataSet Using a Data Connector](/s/article/360042926274).
 
+<Note>
+  **Note:** DomoStats DataSet update schedules are configured in the **Scheduling** pane, described in [Adding a DataSet Using a Data Connector](/s/article/360042926274). If the connector's built-in scheduling doesn't offer the frequency you need, you can trigger a DataSet refresh on your own cadence — for example, with a Workflows timer trigger or the Domo API.
+
+  {/* [pm-input] Tasleema Lallmamode — confirm whether the DomoStats connector supports only basic scheduling (no advanced/hourly custom schedule) while the Domo Governance Datasets connector supports advanced scheduling, and confirm the supported refresh workaround (Workflows timer trigger vs. external API/Lambda). Synthesized from community forum reports; needs confirmation. */}
+</Note>
+
 ### Details Pane
 
 This pane contains a single **Report** menu from which to select your desired DomoStats DataSet. See the list of available reports below.
@@ -143,6 +149,12 @@ This pane contains a single **Report** menu from which to select your desired Do
 | Workspace Folder                                 | Returns the folder structure within each Workspace.                                                                                                                                                                                                                                                                                                                                                                                                    |
 | Workspace Member                                 | Returns the members of each Workspace and their role.                                                                                                                                                                                                                                                                                                                                                                                                  |
 
+<Note>
+  **Note:** Reports labeled *(Legacy)* — such as **Cards (Legacy)**, **Cards and Datasets (Legacy)**, and **Pages (Legacy)** — are retained only for backward compatibility. Use their current equivalents instead (for example, the **Cards**, **Card Datasource**, and **Card Permissions** reports).
+
+  **To look up the owner of a card,** note that the current **Cards** report does not include an owner column. Use the **Card Permissions** report and filter for rows where `accessLevel` is `OWNER`, then join the owning `entityId` to the **People** report to resolve the owner's name.
+</Note>
+
 ### Other Panes
 
 For information about the remaining sections of the connector interface, including how to configure scheduling, retry, and update options, see [Adding a DataSet Using a Data Connector](/s/article/360042926274).
@@ -230,6 +242,14 @@ This section provides field-by-field descriptions for specific DomoStats report 
 | Client_ID             | The identifier of the client application that generated the event.                                                                                                             |
 | \_BATCH_ID\_          | The identifier for the batch.                                                                                                                                                  |
 | \_BATCH_LAST_RUN\_    | The date and time when the batch was last run.                                                                                                                                 |
+
+<Note>
+  **Note:** The Activity Log report does not include a **Description** field for the object that was acted on. To retrieve an object's description, use the report specific to that object type — for example, the **Cards** report includes a card `Description` field. Join it to the Activity Log on the object's ID.
+</Note>
+
+<Note>
+  **Note:** The Activity Log captures the object each action was performed on (`Object_Type`, `Object_ID`), but a card-view event records only the card — not the dashboard or page the card was viewed on. To approximate which page a card was viewed on, join card-view (or card-load) events to page-view events for the same user by matching their `Event_Time` timestamps within a short window.
+</Note>
 
 ### AI Chat Sessions
 

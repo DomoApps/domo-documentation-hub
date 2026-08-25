@@ -70,3 +70,23 @@ If it's five minutes, then there is a good chance that the execution query time 
 <Note>
 **Note:** There may be additional points of configuration for query timeout in your ODBC driver settings.
 </Note>
+
+## Additional Errors and Resolutions
+
+The following errors can occur in Workbench and are not specific to a single version.
+
+### "Error Converting Value {null} to Type System.Boolean"
+
+This error appears when a column is being written to a Boolean (true/false) type but the source data contains a null or empty value that cannot be converted to true or false. To resolve it, make sure the source column returns a value that maps cleanly to a Boolean, or handle nulls in your query before the data reaches Workbench—for example, by substituting a default value with your database's null-handling function (such as `COALESCE` or `ISNULL`).
+
+{/* [pm-input] Tasleema Lallmamode — confirm the recommended fix for the "Error converting value {null} to type System.Boolean" error (e.g., changing the column data type in Workbench vs. handling nulls in the query). Synthesized from community forum reports; needs confirmation. */}
+
+### Job Succeeds but Uploads an Empty DataSet
+
+A job can report success while sending zero rows to Domo. This usually means the query returned no rows rather than that the job failed. Common causes include a query whose filter excludes every row and replacement variables that narrow the result set—for example, a `!{lastvalue:...}!` variable whose stored value is already at or above the maximum in the source, so the `WHERE` clause matches nothing on the next run. Run the query directly against your data source and review the job logs and any replacement-variable values to confirm the query returns the rows you expect.
+
+### "No Agents Found Matching Computer Name"
+
+This error can appear when Domo cannot match a running job to a registered Workbench agent for the current machine—commonly after reinstalling Workbench, renaming the machine, or restoring jobs on a new computer, which can leave the account's agent registration out of sync. A common workaround is to remove the affected Domo account from Workbench and add it again, which re-registers the agent for the current machine.
+
+{/* [pm-input] Tasleema Lallmamode — confirm the cause and the canonical fix for the "No agents found matching computer name" error (the delete-and-re-add-account workaround). Synthesized from community forum reports; needs confirmation. */}

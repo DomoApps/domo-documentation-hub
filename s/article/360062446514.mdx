@@ -155,6 +155,15 @@ If you choose to block all schema changes, you will not see the Protect option f
 
 <Frame><img alt="10.png" src="/images/kb/ka0Vq0000001Rsb-00N5w00000Ri7BU-0EM5w000005vPTV.png"/></Frame>
 
+## Best Practices for Large Incremental Loads
+
+Partitioning is well suited to large, incrementally growing DataSets because Workbench rewrites only the affected partitions (for example, a single day or month) rather than reloading the entire DataSet on every run. Keep the following in mind when choosing an update method for a large DataSet:
+
+* **Use Partition for time-based incremental refreshes.** When new or corrected data always falls within a date grain (day, month, or year), select the **Partition** update method so each run rewrites only the changed partitions. This avoids the cost of a full **Replace** and the row duplication a plain **Append** can introduce when the same source rows are read more than once.
+* **Match the method to how the source changes.** Use **Replace** when the source is fully reloaded each run, **Append** when the source only ever adds new rows, and **Partition** when you need to refresh specific date ranges within a large history.
+* **Choose the update method before you create the job.** You cannot change a job's update method after it is created — you can only change the DataSet name (see the [FAQ](#faq) below). To move a large DataSet to a different method, create a new job that targets the same DataSet and select the method you want.
+* **Expect a schema check when you switch methods.** Because a method change requires a new job, Workbench re-evaluates the DataSet schema on the first run. Review your [schema protection setting](#use-schema-protection) first so the switch doesn't unexpectedly add, change, or drop columns.
+
 ## Prevent Data Corruption with Partitions
 
 Any change to the data type of the partition key could result in corrupted data. Please avoid making any changes to the partition key after the DataSet has been created.

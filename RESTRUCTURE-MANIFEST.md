@@ -463,6 +463,21 @@ Re-homed ranks: 115/120/178 → `360043429793`; 115-pie → `360042925314`; 323 
 
 ---
 
+## Phase 3b general — Structural Intro Sweep (COMPLETE — 2026-08-26)
+
+Mechanical pass to add/normalize the `## Intro` section (standard "This article explains…" format) + `---` rule on articles that lacked one. Detection + clustering rig: `scripts/reports/detect_intro_gaps.py` → `scripts/reports/build_intro_sweep_clusters.py` → 20 collision-free clusters → 3 waves of parallel agents (`intro_sweep_clusters/_AGENT-INSTRUCTIONS.md`). Verified per wave (## Intro + --- present, balanced JSX, no artifacts, well-formed `[pm-input]`); committed per wave (`1b442ac7`, `dca9f80f`, `cd07b8a2`).
+
+**Scope resolution.** Raw detection found 264 articles without a `## Intro` heading. After excluding **63 release-notes/roundups** (not how-tos), **30 retirement-bound** (Workbench 4 ×20, DataFusion, CourseBuilder, PopChart, old Magic ETL — flagged for Phase 4), and **33 connector-library** articles (separate reference template), the sweep target was **135**.
+
+**Result: 133 normalized, 2 skipped, 9 grant-gap `[pm-input]` markers.**
+- **Skipped (2):** `000005371` (HipChat) and `360043437633` (Sage 300) — third-party connector reference pages caught by agents. Implementation/setup guides (SAP BW, QuickBooks-in-Workbench, SharePoint OAuth) were processed, not skipped, per the carve-out.
+- **Grant-gap `[pm-input]` markers (9):** added where an admin/governance/config feature plainly gated on a grant but had no `## Required Grants` section. Routed to owning PM: **Chris Wright ×4** (opening Analyzer, company pages, deleting Cards, restricting Card edit), **Phil Fuchs ×2** (deleting DataSets, executing DataSets), **Andrea Henderson** (changing DataFlow ownership), **Dan Brinton** (enabling SSO with Okta), and **1 PM-unassigned** — `360042934454` (adding/managing user licenses) has no roster PM; **needs an ownership decision before Phase 4.5** (same class as rank-146). These flow to the Phase 4.5 briefs.
+- Two stray leading `---` artifacts (a SAML article + one other) cleaned up during normalization. No screenshots, Related Articles, or Next Steps added (Phase 5). No docs.json or new-file changes.
+
+**Required Grants were NOT synthesized** in this pass — canonical per-feature grant wording can't be derived mechanically. The 9 markers surface the gaps for PMs; filling them is a separate effort.
+
+---
+
 ## Phase 3c — Main Branch Content Sync (Sync #1 complete — 2026-08-20)
 
 First of two syncs (see `RESTRUCTURE-PROGRESS.md` › Phase 3c for the two-sync + parity strategy). Divergence base `a4dd80c2` (2026-07-14); 432 commits on main since.

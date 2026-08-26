@@ -19,8 +19,12 @@ Mislinks: 193→360042931954; 234-wb→360042932414; false-claim in 201 (per 000
 Phil__1/3/4, Dan__2/3, Ryan__2/3, Chris__5/6. Chris__5 = 0 edits (all 4 gaps mislinked to Tables).
 Verified clean. Re-route backlog captured in manifest (Phase 3b general section).
 
-## Wave 5 (re-route cleanup) — pending
-Real gaps skipped for target mismatch, now routed to correct KB homes. See manifest re-route backlog.
+## Wave 5 (re-route cleanup) — COMPLETE (committing) — 4 clusters, 17 files, 21 [pm-input] markers
+reroute__1-charting, __2-data-etl, __3-connectors-gov, __4-embed-office. Verified clean.
+All mislinked gaps re-homed. Net-new backlog (no existing home): gap 148, gap 303.
+
+=== FORUM-GAP PASS COMPLETE (5 waves, 39 agent tasks) ===
+Remaining Phase 3b general: structural intro/prereq pass (~200) + 15 Medium rec=new net-new articles.
 
 ## Wave 4 — COMPLETE (committed) — 7 clusters, 9 files, 15 [pm-input] markers
 Jordan__2, Khushboo__1/__3, Ken__2, Mamta__1, Beth__1, no-PM-listed__1. Verified clean.

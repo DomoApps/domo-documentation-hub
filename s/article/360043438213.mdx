@@ -38,6 +38,19 @@ A typical SAML login works like this:
 
 </Note>
 
+## Understand the Two SSO Certificates
+
+SAML SSO involves two separate x.509 digital certificates. Confusing them is a common source of login failures, especially around certificate expiration.
+
+* **The certificate under Information your IdP may need** is provided by Domo. You download it from your Domo SSO settings and upload it to your IdP. When **Sign Authentication Requests** is enabled, Domo uses this certificate to sign the SAML request it sends to your IdP during login (the `<ds:X509Certificate>` value described in [Interpret a SAML Request](#interpret-a-saml-request)).
+* **The certificate under Information from your IdP** is provided by your IdP. You upload it to your Domo SSO settings, and Domo uses it to validate the SAML response returned by your IdP (the `<ds:X509Certificate>` value described in [Interpret a SAML Response](#interpret-a-saml-response)).
+
+<Note>
+**Note:** Only SAML configurations that have **Sign Authentication Requests** enabled rely on the request-signing certificate. SSO configured with OIDC, and SAML configured without signed authentication requests, are not affected by the expiration of that certificate.
+</Note>
+
+{/* [pm-input] Dan Brinton — confirm which certificate's expiration affects SAML auth-request signing (the "Information your IdP may need" certificate) and the exact remediation the customer must perform (for example, regenerate the certificate in Domo and re-upload it to the IdP). Synthesized from community forum reports; needs confirmation. */}
+
 ## Basic Troubleshooting
 
 Before proceeding to advanced troubleshooting in the next sections, review these common causes of failed SAML logins:

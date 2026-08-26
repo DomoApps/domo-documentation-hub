@@ -87,3 +87,36 @@ Context Sensitive Chart Properties are available on any chart element that can b
 ## Full Size Settings
 
 <table border="1" cellpadding="1" cellspacing="1" data-aura-rendered-by="33:209;a"><thead><tr><th colspan="1" rowspan="1"><p> Property </p></th><th colspan="1" rowspan="1"><p> Description </p></th><th colspan="1" rowspan="1"><p> Example </p></th></tr></thead><tbody><tr><td colspan="1" rowspan="1"><p> Full Size Settings </p></td><td colspan="1" rowspan="1"><p> Allows you to set custom sizing on tables in the card view when the "Full Size" option is selected—anywhere from 1 to 6 card sizes in both width and height. For more information about card sizing, see <a href="/s/article/360042923594" target="_blank" title="Changing the Size of Cards in a Page"> Changing the Size of Cards in a Page </a>. </p><p> The first table in the example at right shows a table in the card view that has been set to a 4-card width by a 1-card height. The second table has been set to a 3-card width by a 3-card height. </p></td><td colspan="1" rowspan="1"><p><a class="thumb" href="/s/article/360043429793" target="_blank" title="@api/deki/files/4718/table_card_resize_rn.png"><img alt="table_card_resize_rn.png" src="/images/kb/ka05w00000129v8-00N5w00000Ri7BU-0EM5w000005vOm4.png"/></a></p></td></tr></tbody></table>
+
+## Show a Top-N Chart and Manage Label Crowding
+
+Use these existing Chart Properties to control how many items appear and to keep labels readable:
+
+- **Limit items to a top-N group.** For a bar chart split into a trellis, set **Trellis/Tiered Date Settings** > **Maximum Bars** together with the **Sort on Totals** property to show only the highest-value bars in each group (a "Top 10"-style chart). For Pie, Donut, and Tree Map charts, use **Maximum Slices Before Other** or **Maximum Items Before Other** to keep the top items and roll the remainder into a single "Other" item—see [Properties for Pie-Type Charts](/s/article/360042925314).
+- **Reduce data-label crowding.** In **Data Label Settings**, use **Rotate** to turn labels 90 degrees and **Allow Overlap** to control whether labels still appear when they collide.
+- **Reduce category-label crowding.** In **Category Scale**, use **Label Interval** to show only every *n*th label and **Max Length Label** to shorten long labels.
+
+Native bar charts do not scroll to reveal additional bars. To show a large number of categories, split the chart into groups with **Trellis/Tiered Date Settings**, or use a horizontal-bar visualization from the App Store.
+
+{/* [pm-input] Chris Wright — confirm the recommended way to display more categories than fit on a native (non-scrolling) bar chart, including the exact App Store horizontal-bar Brick to use. Synthesized from community forum reports; needs confirmation. */}
+
+Chart Properties do not include a native option for dynamic column headers that change with the underlying data. To achieve this, reshape the data upstream—unpivoting (pivot-longer) columns into rows in an ETL DataFlow so the header values become a single category field the chart can read.
+
+{/* [pm-input] Chris Wright — confirm the supported ETL pattern (pivot-longer / unpivot) for driving dynamic column headers in a chart, and whether any native chart setting exists. Synthesized from community forum reports; needs confirmation. */}
+
+## Configure Date and Time-Scale Behavior
+
+By default, when a supported chart (such as a Line or Bar chart) uses date data, Domo applies a time scale that groups the data by an appropriate date grain and shows gaps for periods that have no data. To display date values exactly as they appear in your DataSet instead—using individual dates and your **Date Output Format** setting, with no gaps for empty periods—select **Category Scale** > **Never Use Time Scale**.
+
+For multi-level and trellised date axes, use the **Trellis/Tiered Date Settings** category (for example, **Tiered Date Levels** for up to three date tiers).
+
+{/* [pm-input] Chris Wright — confirm and document the following date-axis behaviors reported by community users: (1) the dashboard/card time-scale control (Default vs. Day) and how it relates to Never Use Time Scale; (2) why DATE fields are coerced to datetime on the axis and using DATE()/DATE_FORMAT in Beast Mode to force a pure date; (3) how Graph By interacts with filtering to produce wrong-date results; (4) filtering out the incomplete current month, and why an ELSE 0 in Beast Mode creates spurious zero points versus returning NULL; (5) adding a vertical divider line between actual and forecast data; (6) Tiered/Trellis Date Settings limits with custom fiscal calendars and on bullet charts. Synthesized from community forum reports; needs confirmation. */}
+
+## Add Goal, Target, and Average Lines
+
+- **Static goal or target line.** Use the **Scale Marker** category. Set **Type** to **Line**, set **Value Type** to **Manual**, and enter the target in the **Value** field. You can rename the marker with **Text**, choose which axis it applies to with **Scale**, and adjust **Color**, **Width**, and **Style**. To draw a shaded target band instead of a single line, set **Type** to **Range**.
+- **Average or median reference line.** Use **Grid Lines** > **Calculated Line** and select **Average** or **Median** to add a reference line calculated from the chart's data.
+
+For a goal that varies by row or by category (a dynamic target), a single static Scale Marker value is not sufficient; build the target as a Beast Mode measure and plot it as its own series.
+
+{/* [pm-input] Chris Wright — confirm the supported approach for a dynamic/per-row goal or target line built with Beast Mode (including projecting toward a variable target and rendering multiple actual-vs-target progress bars with dynamic color), and document the reported gotcha that a Calculated Line average will not render once an additional series is configured on the chart. Synthesized from community forum reports; needs confirmation. */}

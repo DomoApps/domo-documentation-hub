@@ -178,6 +178,18 @@ This can be done using filters and/or aggregations. The extent to which a DataSe
 
 By default when a DataSet passes into an ETL process, all the columns are copied from Vault into the ETL engine, whether those columns are actually necessary in the process or not. MySQL DataFlows can be configured to select only specific columns to be copied into the ETL engine. This isn't possible with Magic ETL, but Views can be used to subset only the necessary columns and then that view output can be read into a Magic ETL v2 process as an input.
 
+### Combine DataSets of Differing Granularity
+
+When two DataSets describe the same entities at different levels of granularity—for example, one row per transaction in one DataSet and one row per day in another—join them only after bringing both to a common granularity. Aggregating the finer-grained DataSet up to the coarser level before the join prevents the row-count inflation and mixed-attribution problems described in the common pitfalls above, and it keeps the data that enters a DataFlow small.
+
+The recommended pattern is to aggregate first with a DataSet View, then join in Magic ETL:
+
+1. Create a [DataSet View](/s/article/360046074774) on the finer-grained DataSet that groups and aggregates it up to the granularity you need (for example, sum sales to one row per region per day).
+2. Use that View as the input to a Magic ETL DataFlow.
+3. Join the aggregated View to the other DataSet in Magic ETL on the shared key.
+
+Because the View has already reduced the finer set to the join granularity, the DataFlow reads far fewer rows than it would if it aggregated and joined the raw data in a single process.
+
 ### Avoid single-threading through a single DataFlow or DataSet
 
 Domo users sometimes design their data environments with too much focus on creating a single pipeline or DataSet to support all (or too many) use cases. There are at least two reasons such designs may not be optimal: first, they increase the number of users and Cards reliant upon a DataSet, and in extreme cases that can lead to Card- and Page-rendering performance problems; second, such designs typically result in more complex processes and larger DataSets, both of which can result in excessive processing times. Rather than creating a single data pipeline and a single output DataSet “to rule them all”, consider creating processes and output DataSets that are designed for specific end use cases. This approach will generally allow a greater degree of row- and column-reduction. It also allows data processing to be conducted in parallel rather than in series. Such architectures are also optimized for Card-rendering performance, which is especially important with very large DataSets and/or large numbers of concurrent users.

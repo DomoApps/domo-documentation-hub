@@ -447,9 +447,17 @@ Wave 4 (remaining 7 clusters) pending, then the re-route cleanup wave.
 
 **All 35 original clusters complete.** Additional re-route candidates found in Wave 4: 179-YouTube→`360043438473`, 121→`000005143`, 353→`360042932994`. Net-new backlog (no existing home, needs authored article): gap 148 (App Studio card-actions), gap 303 (portal Forms rich text — out of scope).
 
-### Phase 3b general — Wave 5 (re-route cleanup) pending
+### Phase 3b general — Wave 5 (re-route cleanup) — COMPLETE
 
-Real gaps skipped by Waves 1–4 for target mismatch, re-homed to their correct KB articles (verified to exist), grouped into collision-free clusters. See `scripts/reports/phase3b_clusters/reroute__*.md`. Covers ranks: 115, 120, 178 (→`360043429793`); 115-pie (→`360042925314`); 323 (→`360043429473`); 356 (→`360043437813`); 135 (→`360043428253`); 181 (→`360042923134`); 289-join (→`4405337525783`); 339 (→`What-is-Magic-ETL`); 231 (→`360046074774`); 157 (→`360043439313`); 193 (→`360042931954`); 314 (→`360042933494`); 234-wb (→`360042932414`); 200 (→`360043438213`); 179-YouTube (→`360043438473`); 353 (→`360042932994`); 121 (→`000005143`).
+17 articles updated; **21 new `[pm-input]` markers**; docs.json untouched; no new files. Verified clean. Real gaps that Waves 1–4 skipped for target mismatch, re-homed to their correct KB articles (6 targets were shared with earlier waves — only new content added, prior additions left intact). Also fixed a broken Move-Dashboards step-by-step in `360043428253` (corrupted numbering, missing step, un-framed screenshot).
+
+Re-homed ranks: 115/120/178 → `360043429793`; 115-pie → `360042925314`; 323 → `360043429473`; 356 → `360043437813`; 135 → `360043428253`; 181 → `360042923134`; 289-join → `4405337525783`; 339 → `What-is-Magic-ETL`; 231 → `360046074774`; 157 → `360043439313`; 193 → `360042931954`; 314 → `360042933494`; 234-wb → `360042932414`; 200 → `360043438213`; 179-YouTube → `360043438473`; 353 → `360042932994`; 121 → `000005143`.
+
+**Net-new backlog (no existing KB home — needs an authored article, out of scope for this Edit-only pass):** gap 148 (App Studio card-actions: Set Variable, Open in Pop-Up zoom, hover-text override, drill-down); gap 303 (rich text / inline hyperlinks in Domo Forms → portal Forms, out of restructure scope).
+
+### Phase 3b general — Forum-Gap Pass SUMMARY (Medium/Low `rec=update`)
+
+5 waves, 39 agent tasks (35 PM clusters + 4 re-route). **~134 distinct articles updated; ~172 `[pm-input]` markers** added (all auto-flow to owning PMs' Phase 4.5 briefs). 236 Medium/Low update gaps triaged: the large majority addressed in-article; 27 deferred as out-of-scope (`_DEFERRED.md`); 2 (148, 303) sent to net-new backlog. Agents caught ~4 factually false claims in the gap data (not asserted) and fixed 3 pre-existing article bugs. Remaining Phase 3b work: the ~200-article **structural intro/prerequisites** upgrade pass (separate from forum gaps) and the 15 Medium `rec=new` net-new articles (main-session authoring).
 
 ---
 

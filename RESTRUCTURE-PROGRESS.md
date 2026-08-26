@@ -17,6 +17,17 @@ file at the start of any restructure work to orient themselves before doing anyt
 
 ### ▶ Where we left off (2026-08-25) — pick up here next session
 
+**▶▶ RESUME TOMORROW — read this first.**
+- **State:** branch `update/fullRestructure`, all work **committed AND pushed** (through `0ff8bda5`, origin up to date). Working tree clean.
+- **Just finished:** Phase 3b general **forum-gap pass** (all 236 Medium/Low `rec=update` gaps). Nothing is mid-flight — no half-done wave, no uncommitted edits.
+- **First action tomorrow:** decide the next chunk (three options below), then go. No cleanup or reconciliation needed before starting.
+  1. **15 Medium `rec=new` net-new articles** (ranks 114–299) — *recommended first*: bounded, concrete, finishes the "new articles" story. Main-session authoring (sub-agents can't create files — [[project_subagent_write_block]]). List: rank 114 Dynamic-Dropdowns-in-Table-Cards, 117 Split-Multi-Value-Fields-into-Rows (⚠ verify not already written in 3a-Forum), 118 Editor-Dataset-Access-Scope, 127 Alert-on-Stuck-Dataset-Refresh, 139 Choose-How-to-Share-Outside-Domo (⚠ check 3a-Forum), 142 Choose-a-Cloud-Data-Warehouse, 144 AI-Chat-API-Session-ID, 146 Domo-Certification-Exam-Logistics (no roster PM — see open item), 152 Find-Which-Dashboard-a-Card-Lives-On (⚠ check 3a-Forum), 159 Extract-Data-from-PDFs-with-Domo-AI, 161 Private-Embed-Token-Validation-Errors, 172 Export-Domo-Data-to-Reports (⚠ check 3a-Forum), 209 Workspaces-and-Folder-Organization, 244 Dataset-Level-Date-and-Fiscal-Calendar-Defaults, 299 Handle-Source-Schema-Drift-in-Connectors. (Some of these overlap Phase 3a-Forum "written" titles — dedupe against `RESTRUCTURE-MANIFEST.md` before authoring.)
+  2. **Structural intro/prereq sweep (~200 articles)** — mechanical: add a concept intro (from `excerpt`) + prerequisites to articles lacking them. Lowest value, fuzziest target; consider script-assisting the "which articles lack an intro" detection first. NO interlinking (that's Phase 5).
+  3. **Advance to Phase 4** (Consolidation & Retirement) — retirement batches are pre-scoped (Workbench 4, DataFusion, old Magic ETL tiles, defunct connectors, CourseBuilder); see Phase 4 section + Support KB Audit.
+- **How the forum-gap pass was run (reuse this rig for the structural sweep):** `scripts/reports/phase3b_build_clusters.py` clusters gaps by PM into `scripts/reports/phase3b_clusters/*.md`; `_AGENT-INSTRUCTIONS.md` is the shared agent prompt; launch parallel general-purpose agents (one per cluster, ≤5 files / ≤9 gaps, collision-free); verify each wave with `scripts/reports/check_tag_balance.py` + the stray-marker/`[pm-input]`-format greps; commit per wave. Full recipe in `_WAVE-STATUS.md`.
+
+---
+
 **Phase 3b general FORUM-GAP PASS is COMPLETE.** All 236 Medium/Low `rec=update` community-forum gaps triaged via 5 waves of parallel sub-agents (35 PM clusters + 4 re-route clusters = 39 agent tasks). Full per-wave/per-cluster detail in `RESTRUCTURE-MANIFEST.md` › Phase 3b general; live tracking in `scripts/reports/phase3b_clusters/_WAVE-STATUS.md`.
 
 - **~134 distinct articles updated**, **~172 new `[pm-input]` markers** (auto-flow to owning PMs' Phase 4.5 briefs — this is the main yield).

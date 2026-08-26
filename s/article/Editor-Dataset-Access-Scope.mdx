@@ -1,0 +1,65 @@
+---
+title: "Understand Dataset Access from Shared Cards and Dashboards"
+excerpt: "How sharing a card or dashboard grants access to the underlying DataSet, how Editors and Participants differ, and how PDP and drill controls limit what viewers reach."
+status: "active"
+---
+
+## Intro
+
+This article explains how DataSet access is granted when you share a card or dashboard, how Editors and Participants differ in what they can see, how Personalized Data Permissions (PDP) and drill controls limit what a viewer can reach, and the sharing patterns that keep sensitive data protected.
+
+---
+
+## Sharing a Card Grants Access to Its DataSet
+
+When you share a card with a user or group, access to the DataSet(s) powering the card is granted to that user or group. In other words, if you share a card with someone, that person is able to view the card *and* the DataSet it is powered from.
+
+This implicit grant is the single most important thing to understand about sharing: sharing a visualization is also sharing its data.
+
+## How Editors and Participants Differ
+
+What a recipient can do with that implicit access depends on their system role.
+
+- **Participant** — has read-only access to cards and dashboards but **no** access to the DataSets that power them. Sharing a DataSet with a Participant does not let them open it in the Data Center.
+- **Editor** — has broader access to content shared with them, including the ability to build and edit.
+
+Before sharing, confirm the recipients can actually view the shared DataSets given their role and grants. See [Best Practices for Sharing Content in Domo](/s/article/360042935354).
+
+{/* [pm-input] Phil Fuchs — confirm the exact dataset-access scope an Editor receives from a shared card: does the implicit grant give the Editor edit/build access to the underlying DataSet, or view access only? Document the precise scope once confirmed. */}
+
+## How PDP Travels with a Shared Card
+
+Personalized Data Permissions follow the DataSet, so they apply wherever a card powered by that DataSet is shared. Row policies limit which rows a user sees; column policies mask specified columns. Owners, co-owners, administrators, and users with the appropriate DataSet grant see unmasked data, and a PDP badge indicates when policies are active. See [Personalized Data Permissions (PDP)](/s/article/360042934614) for the full policy and masking model.
+
+## Limit What Viewers Can Reach
+
+Beyond PDP, you can keep viewers from drilling down to the raw data behind a card. In the drill path settings, select **Prevent drilling to final data grid view** to stop drilling to the bottom (data) layer. See [Add a Drill Path to Your Chart](/s/article/360042924094).
+
+{/* [pm-input] Phil Fuchs — confirm whether a viewer-facing "Go To DataSet" control exists on shared cards and, if so, which roles/grants expose it and how to disable it. No current KB article documents such a control; add a section once confirmed. */}
+
+## Recommended Patterns
+
+- **Share a DataFlow output or DataSet view, not the raw source.** Build a curated view or ETL output and share that, so recipients never receive access to the underlying source DataSet. See [Restrict Access to a SQL DataFlow](/s/article/360042922974).
+- **Separate viewer and editor accounts** where a person needs to consume content in one context but build in another, so implicit grants don't over-expose data.
+- **Apply PDP on the shared DataSet** rather than relying on card-level controls alone.
+
+## FAQ
+
+<AccordionGroup>
+
+<Accordion title="If I share only a card, can the recipient open its DataSet in the Data Center?">
+  It depends on their role. Sharing the card grants access to the powering DataSet, but a Participant still cannot open the DataSet in the Data Center because Participants have no DataSet access. A role with DataSet access can.
+</Accordion>
+
+<Accordion title="Does PDP still apply if I share the card publicly or embed it?">
+  PDP is tied to the DataSet and the viewing user's identity, so it applies wherever the card is viewed by an identified user. Review the PDP article for how policies behave in embed and public-share contexts before exposing sensitive data.
+</Accordion>
+
+</AccordionGroup>
+
+## Related Articles
+
+- [Sharing and Removing Access to Cards and Dashboards](/s/article/360042932994)
+- [Best Practices for Sharing Content in Domo](/s/article/360042935354)
+- [Personalized Data Permissions (PDP)](/s/article/360042934614)
+- [Restrict Access to a SQL DataFlow](/s/article/360042922974)

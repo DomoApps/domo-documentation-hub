@@ -1,0 +1,61 @@
+---
+title: "Handle Changing Source Headers and Date Formats in Magic ETL"
+excerpt: "Keep DataFlows running when a source changes its column headers, adds or drops columns, or sends dates in inconsistent formats."
+status: "active"
+---
+
+## Intro
+
+This article explains how to keep a Magic ETL DataFlow running when its source data drifts—when a connector's column headers change, columns are added or removed, or dates arrive in inconsistent formats. Two techniques cover most cases: importing without relying on the source headers and assigning columns by position, and parsing unpredictable date strings with a single formula function.
+
+---
+
+## Understand Why Schema Drift Breaks a DataFlow
+
+Downstream tiles, cards, filters, and Beast Modes reference columns by name. When a source renames a header, the tiles that referenced the old name no longer find it, and the DataFlow either errors or silently drops the affected logic. Inconsistent date formats cause a related problem: a column that parses cleanly one day fails to parse the next, leaving nulls where dates should be.
+
+The goal in both cases is to stop depending on the exact shape the source sends and normalize it early in the DataFlow.
+
+## Import Without Headers and Assign Columns by Position
+
+When a source's header text is unreliable but the column *order* is stable, ignore the incoming headers and name the columns yourself by position.
+
+For file-based connectors (such as SFTP), the file-import settings let you control how headers are read:
+
+- Select **Use Start Row Scheme** to specify the header, data, and footer row numbers explicitly with **Header Start Row** and **Data Start Row**.
+- For a file that has no header row at all, select **Generate Header Row** to generate one automatically. This checkbox appears only when the file type is TXT or CSV.
+
+Once the data is in Magic ETL, use the **Select Columns** tile to pin the schema. The Select Columns tile lets you select which columns to add to the output, reorder columns, and rename column headings. Rename each positional column to the stable name your downstream tiles expect, and reorder them with the handle beside each column name. Because the tile defines the exact set and order of columns leaving it, added or renamed source columns no longer disturb the tiles that follow.
+
+<Tip>**Tip:** Place the Select Columns tile immediately after the input tile so every downstream tile works from the normalized schema, not the raw source.</Tip>
+
+## Parse Inconsistent Dates with FUZZY_PARSE_DATE
+
+When a date column arrives in more than one format, use the `FUZZY_PARSE_DATE` function in a Magic ETL **Formula** tile. It attempts to interpret a date from a string without requiring you to specify the incoming format:
+
+```
+FUZZY_PARSE_DATE(str)
+```
+
+Add a Formula tile after the input, create a new output column, and set its value to `FUZZY_PARSE_DATE([your_date_column])`. This tolerates mixed inputs that a fixed-format parser would reject. `FUZZY_PARSE_DATE` is a TIME-category expression; see [Magic ETL SQL Expressions](/s/article/000005809) for the full function list and syntax.
+
+## FAQ
+
+<AccordionGroup>
+
+<Accordion title="What if the source changes column order, not just names?">
+  Positional assignment assumes the order is stable. If a source can reorder or insert columns unpredictably, import without headers is not enough on its own—map the incoming columns to your expected names in a Select Columns tile and validate the result, or split the schema by file type before it reaches the DataFlow.
+</Accordion>
+
+<Accordion title="FUZZY_PARSE_DATE still returns nulls for some rows—why?">
+  A null means the function could not recognize a date in that string. Inspect the raw values that failed; they usually contain extra text, a two-digit year that is ambiguous, or a non-date value. Clean those with a Text tile before the Formula tile, or handle them as a separate branch.
+</Accordion>
+
+</AccordionGroup>
+
+## Related Articles
+
+- [Magic ETL Tiles: Utility](/s/article/360044876874)
+- [Magic ETL Tiles: Text](/s/article/360045402873)
+- [Magic ETL Tiles: Dates and Numbers](/s/article/360045402313)
+- [Magic ETL SQL Expressions](/s/article/000005809)

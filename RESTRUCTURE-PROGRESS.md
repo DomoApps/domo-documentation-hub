@@ -6,7 +6,7 @@ file at the start of any restructure work to orient themselves before doing anyt
 
 **Plan document:** `KB-RESTRUCTURE-PLAN.md`
 **Disposition log:** `RESTRUCTURE-MANIFEST.md` — running record of what happened to every article; updated throughout all phases; Phase 9 converts it to the final audit report
-**Last updated:** 2026-08-25 (Phase 3b general **forum-gap pass COMPLETE** — all 236 Medium/Low `rec=update` gaps triaged via 5 waves / 39 parallel agent tasks; ~134 articles updated, ~172 `[pm-input]` markers; committed `b628279c`→`2f15cfbf`)
+**Last updated:** 2026-08-26 (Phase 3b general **15 Medium `rec=new` net-new triaged + cleared**: coverage research → 4 written & in nav [299, 114, 118, 159], 5 confirmed DEFER→PM briefs [127, 142, 146, 209, 244], 2 flagged OUT-OF-SCOPE/portal [144, 161]. 4 others [117/139/152/172] were already written 2026-08-04.)
 
 ---
 
@@ -15,14 +15,14 @@ file at the start of any restructure work to orient themselves before doing anyt
 **Active phase:** Phase 3b general — forum-gap pass COMPLETE → remaining 3b work: structural intro/prereq pass + 15 Medium `rec=new` net-new articles; or advance to Phase 4
 **Blocked on:** 8 human decisions (see Phase 2 Decision Required table in `RESTRUCTURE-IA-SPEC.md`)
 
-### ▶ Where we left off (2026-08-25) — pick up here next session
+### ▶ Where we left off (2026-08-26) — pick up here next session
 
 **▶▶ RESUME TOMORROW — read this first.**
-- **State:** branch `update/fullRestructure`, all work **committed AND pushed** (through `0ff8bda5`, origin up to date). Working tree clean.
-- **Just finished:** Phase 3b general **forum-gap pass** (all 236 Medium/Low `rec=update` gaps). Nothing is mid-flight — no half-done wave, no uncommitted edits.
-- **First action tomorrow:** decide the next chunk (three options below), then go. No cleanup or reconciliation needed before starting.
-  1. **15 Medium `rec=new` net-new articles** (ranks 114–299) — *recommended first*: bounded, concrete, finishes the "new articles" story. Main-session authoring (sub-agents can't create files — [[project_subagent_write_block]]). List: rank 114 Dynamic-Dropdowns-in-Table-Cards, 117 Split-Multi-Value-Fields-into-Rows (⚠ verify not already written in 3a-Forum), 118 Editor-Dataset-Access-Scope, 127 Alert-on-Stuck-Dataset-Refresh, 139 Choose-How-to-Share-Outside-Domo (⚠ check 3a-Forum), 142 Choose-a-Cloud-Data-Warehouse, 144 AI-Chat-API-Session-ID, 146 Domo-Certification-Exam-Logistics (no roster PM — see open item), 152 Find-Which-Dashboard-a-Card-Lives-On (⚠ check 3a-Forum), 159 Extract-Data-from-PDFs-with-Domo-AI, 161 Private-Embed-Token-Validation-Errors, 172 Export-Domo-Data-to-Reports (⚠ check 3a-Forum), 209 Workspaces-and-Folder-Organization, 244 Dataset-Level-Date-and-Fiscal-Calendar-Defaults, 299 Handle-Source-Schema-Drift-in-Connectors. (Some of these overlap Phase 3a-Forum "written" titles — dedupe against `RESTRUCTURE-MANIFEST.md` before authoring.)
-  2. **Structural intro/prereq sweep (~200 articles)** — mechanical: add a concept intro (from `excerpt`) + prerequisites to articles lacking them. Lowest value, fuzziest target; consider script-assisting the "which articles lack an intro" detection first. NO interlinking (that's Phase 5).
+- **State:** branch `update/fullRestructure`. Forum-gap pass committed+pushed through `0ff8bda5`. The 2026-08-26 net-new work (4 new articles + docs.json + manifest/tracker edits) is **NOT yet committed** — working tree has uncommitted changes. Commit before starting new work.
+- **Just finished:** Triaged and cleared the **15 Medium `rec=new` net-new articles**. Coverage-researched all 15 (4 parallel agents): **4 written + in nav** (`Handle-Source-Schema-Drift-in-Connectors` 299 clean; `Dynamic-Dropdowns-in-Table-Cards` 114 → 1 `[pm-input]` Chris Wright; `Editor-Dataset-Access-Scope` 118 → 2 `[pm-input]` Phil Fuchs; `Extract-Data-from-PDFs-with-Domo-AI` 159 → 2 `[pm-input]` Ken Boyer). **5 confirmed DEFER** (127, 142, 146, 209, 244) stay in the manifest deferred table. **2 DROPPED as out-of-scope** (144, 161 — Developer Portal; restructure does not touch `portal/`). (117/139/152/172 were already written 2026-08-04.) Gates run: fact-check (all 19 internal links resolve; claims verified) + style; screenshots omitted (self-sufficient text — no source-screenshot pull).
+- **First action tomorrow:** commit the uncommitted net-new work, then decide the next chunk (options below), then go.
+  1. **Structural intro/prereq sweep (~200 articles)** — the remaining Phase 3b general item: add a concept intro (from `excerpt`) + prerequisites to articles lacking them. Fuzzy target; consider script-assisting the "which articles lack an intro" detection first. NO interlinking (that's Phase 5).
+  2. **Net-new leftover:** gap 148 (App Studio card-actions) — not part of the 15; verify still wanted.
   3. **Advance to Phase 4** (Consolidation & Retirement) — retirement batches are pre-scoped (Workbench 4, DataFusion, old Magic ETL tiles, defunct connectors, CourseBuilder); see Phase 4 section + Support KB Audit.
 - **How the forum-gap pass was run (reuse this rig for the structural sweep):** `scripts/reports/phase3b_build_clusters.py` clusters gaps by PM into `scripts/reports/phase3b_clusters/*.md`; `_AGENT-INSTRUCTIONS.md` is the shared agent prompt; launch parallel general-purpose agents (one per cluster, ≤5 files / ≤9 gaps, collision-free); verify each wave with `scripts/reports/check_tag_balance.py` + the stray-marker/`[pm-input]`-format greps; commit per wave. Full recipe in `_WAVE-STATUS.md`.
 
@@ -37,12 +37,12 @@ file at the start of any restructure work to orient themselves before doing anyt
 
 **NEXT (remaining Phase 3b general, not started):**
 1. **Structural intro/prerequisites upgrade pass (~200 articles)** — the mechanical sweep: add a concept intro (from `excerpt`) + prerequisites to articles lacking them. Separate from forum gaps. (NOTE: interlinking/Next Steps/Related is Phase 5, not here.)
-2. **15 Medium `rec=new` net-new articles** (ranks 114–299) — main-session authoring (sub-agent write block).
+2. ~~**15 Medium `rec=new` net-new articles**~~ — **DONE 2026-08-26.** Triaged: 4 written (299, 114, 118, 159), 5 DEFER→PM briefs (127, 142, 146, 209, 244), 2 DROPPED as out-of-scope/portal (144, 161), 4 already-written earlier (117/139/152/172). See `RESTRUCTURE-MANIFEST.md` written + deferred tables.
 3. **Net-new backlog from the forum pass:** gap 148 (App Studio card-actions article), gap 303 (portal Forms rich text — out of scope).
 
 Or advance to **Phase 4** (Consolidation & Retirement). All 266 Medium/Low forum gaps have now been consumed by the 3b pass.
 
-**Also open (non-blocking):** rank-146 `Domo-Certification-Exam-Logistics.mdx` has no roster PM — needs a human ownership decision before Phase 4.5.
+**Also open (non-blocking):** rank-146 `Domo-Certification-Exam-Logistics.mdx` has no roster PM — needs a human ownership decision before Phase 4.5. (Gaps 144 and 161 were dropped 2026-08-26 as out-of-scope Developer Portal topics.)
 
 ---
 
@@ -65,7 +65,7 @@ Or advance to **Phase 4** (Consolidation & Retirement). All 266 Medium/Low forum
 | **3a: Net-New Articles (~29)** | ✅ Complete (2026-07-14) | 29 articles written; all registered in docs.json; MCP group fixed |
 | **3a-PM: PM Input Articles (4)** | ➡️ Moved to Phase 4.5 PM briefs | [pm-input] items in per-PM meeting briefs; see PM Input section below |
 | **3a-Forum: Forum-Driven New Articles (~57)** | ✅ Writing pass complete (2026-08-04) | All 57 triaged: 14 written, 43 deferred to PM briefs (undocumented mechanics). See Forum Gap Analysis section + `RESTRUCTURE-MANIFEST.md` |
-| **3b: Article Upgrades (~200)** | 🔄 Forum-gap portion COMPLETE (2026-08-25) | Medium/Low forum gaps done (5 waves, ~134 articles, ~172 `[pm-input]`). Remaining: structural intro/prereq sweep (~200) + 15 Medium `rec=new` net-new |
+| **3b: Article Upgrades (~200)** | 🔄 Forum-gap portion + 15 Medium net-new COMPLETE | Medium/Low forum gaps done (5 waves, ~134 articles, ~172 `[pm-input]`). 15 Medium `rec=new` triaged 2026-08-26 (4 written, 5 defer, 2 out-of-scope). Remaining: structural intro/prereq sweep (~200) |
 | **3b-Forum: Forum-Driven Article Updates (Critical+High, ~68)** | ✅ Complete (2026-08-20) | All 68 done: Critical 7 (committed), High 61 (10 parallel agents, 2 waves). 45 files, ~84 total `[pm-input]` across the phase. Ranks 42/93 re-routed to correct homes. |
 | **3c: Main Branch Content Sync** | 🔄 Sync #1 complete (2026-08-20); sync #2 pre-merge | Sync #1: 15 new + 68 edits + 12 portal + 72 images + 1 snippet from main; 5 conflicts resolved; 1 deletion mirrored; 1 case-rename; 14 new articles into nav (1 deprecated held). Sync #2 uses the numeric-ID parity system. |
 | **4: Consolidation, Retirement & Archive** | 🔲 Not started | Duplicates, lifecycle classification; see Product Lifecycle Standards below |

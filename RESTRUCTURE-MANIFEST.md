@@ -431,6 +431,26 @@ Waves 3–4 (remaining 16 clusters) pending.
 
 Wave 4 (remaining 7 clusters) pending, then the re-route cleanup wave.
 
+### Wave 4 (Complete — 7 clusters: Jordan, Khushboo ×2, Ken, Mamta, Beth, release-notes)
+
+9 articles updated; **15 new `[pm-input]` markers**; docs.json untouched; no new files. Verified clean.
+
+| Cluster (PM) | Gaps addressed | Skipped / redirected |
+|---|---|---|
+| Jordan __2 | 207, 179 | 179 YouTube-format piece → `360043438473` (caught contradicted `/embed/` claim) |
+| Khushboo __1 | 304 (item 2) | 304 item 1 → `000005295` (covered); 148 → net-new App Studio card-actions article (no existing home) |
+| Khushboo __3 | 278, 111 | 121 → Office Add-In User Guide `000005143` |
+| Ken __2 | 359, 167, 301 | — (Data Models article) |
+| Mamta __1 | 320, 124, 160, 166, 275, 311 | 303 → portal Forms (out of scope); 353 → `360042932994` |
+| Beth __1 | 215, 274 | 274 Functions-Ref/FAQ pieces → `360043429933`/`360043430053` (largely covered here) |
+| release-notes (`no-PM-listed`) | 227 (marker only — process/editorial gap, no visible edit) | — |
+
+**All 35 original clusters complete.** Additional re-route candidates found in Wave 4: 179-YouTube→`360043438473`, 121→`000005143`, 353→`360042932994`. Net-new backlog (no existing home, needs authored article): gap 148 (App Studio card-actions), gap 303 (portal Forms rich text — out of scope).
+
+### Phase 3b general — Wave 5 (re-route cleanup) pending
+
+Real gaps skipped by Waves 1–4 for target mismatch, re-homed to their correct KB articles (verified to exist), grouped into collision-free clusters. See `scripts/reports/phase3b_clusters/reroute__*.md`. Covers ranks: 115, 120, 178 (→`360043429793`); 115-pie (→`360042925314`); 323 (→`360043429473`); 356 (→`360043437813`); 135 (→`360043428253`); 181 (→`360042923134`); 289-join (→`4405337525783`); 339 (→`What-is-Magic-ETL`); 231 (→`360046074774`); 157 (→`360043439313`); 193 (→`360042931954`); 314 (→`360042933494`); 234-wb (→`360042932414`); 200 (→`360043438213`); 179-YouTube (→`360043438473`); 353 (→`360042932994`); 121 (→`000005143`).
+
 ---
 
 ## Phase 3c — Main Branch Content Sync (Sync #1 complete — 2026-08-20)

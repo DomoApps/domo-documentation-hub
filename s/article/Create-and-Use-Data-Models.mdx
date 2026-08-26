@@ -13,6 +13,8 @@ tag: "Beta"
 
 ## Intro
 
+Data Models is Domo's semantic layer offering. Instead of recreating the same joins in DataFlow after DataFlow—or duplicating the same calculated columns across many DataSets—you define the relationships between your DataSets once in a central model and reuse that model everywhere in Domo. This keeps metrics consistent and speeds up analysis. Data Models is found under **Features** > **Data Models** in the **Semantic Layer** section of the navigation menu.
+
 This article explains how to create a Data Model, add DataSets to the canvas, define relationships between DataSets, configure schema metadata, and use a Data Model as a data source in Analyzer.
 
 ---
@@ -262,6 +264,17 @@ After a Data Model is created, it is available as a data source in Analyzer—ju
 <Note>**Note:** Because joins happen at query time, card performance may vary depending on the size of the underlying DataSets and the complexity of the relationships in the model.</Note>
 
 
+## Beta Limitations and Known Issues
+
+Data Models is a beta feature, so some capabilities available for other Domo assets are not yet supported and a few errors are still being resolved. Keep the following limitations in mind:
+
+- **All tables must share one warehouse.** Every table in a model must come from the same warehouse—you cannot combine Domo DataSets and Snowflake tables in a single model. Within that warehouse, you can still relate DataSets from disparate source systems through shared keys.
+- **Joins are resolved at query time.** Because relationships are evaluated when a card runs, performance depends on the size of the underlying DataSets and the complexity of the model's relationships.
+
+**Deploy a Model Across Environments**
+
+{/* [pm-input] Ken Boyer — Confirm the deployment limitations reported for Data Models: models cannot be promoted through a repository or Sandbox and are not selectable in data-source mapping, so a model must be recreated manually in each development, test, and production environment. Deployment support is tracked as a feature request. Synthesized from community forum reports; needs confirmation. */}
+
 ## Troubleshoot
 
 <AccordionGroup>
@@ -276,6 +289,16 @@ After a Data Model is created, it is available as a data source in Analyzer—ju
 
 <Accordion title="I can't find my Snowflake table when adding DataSets.">
   Confirm that your Snowflake Cloud Integration is connected and authenticated in your Domo instance. Snowflake tables are available in the DataSet picker only after a successful connection is established.
+</Accordion>
+
+<Accordion title="I get a Bad Request error when working with a Data Model.">
+  The Bad Request error is a known issue in the current beta.
+  {/* [pm-input] Ken Boyer — Confirm the trigger conditions and any workaround for the "Bad Request" error affecting Data Models. Synthesized from community forum reports; needs confirmation. */}
+</Accordion>
+
+<Accordion title="Filtering by a date field or configuring a summary number returns an error in Analyzer.">
+  Using a date field from a Data Model to filter, or to configure a summary number or Graph By, is a known limitation in the current beta.
+  {/* [pm-input] Ken Boyer — Confirm the Analyzer date-field errors reported for Data Models (filter-by-date and summary number / Graph By) and document how to set up date fields in the model so they work in Analyzer. Synthesized from community forum reports; needs confirmation. */}
 </Accordion>
 
 </AccordionGroup>

@@ -22,8 +22,9 @@ Verified clean. Re-route backlog captured in manifest (Phase 3b general section)
 ## Wave 5 (re-route cleanup) — pending
 Real gaps skipped for target mismatch, now routed to correct KB homes. See manifest re-route backlog.
 
-## Wave 4 — pending (7)
-Jordan-Jensen__2; Khushboo__1, __3; Ken-Boyer__2; Mamta-Bolaki__1; Beth-Saenz__1; no-PM-listed__1
+## Wave 4 — COMPLETE (committed) — 7 clusters, 9 files, 15 [pm-input] markers
+Jordan__2, Khushboo__1/__3, Ken__2, Mamta__1, Beth__1, no-PM-listed__1. Verified clean.
+ALL 35 ORIGINAL CLUSTERS DONE. Re-route candidates added: 179→360043438473, 121→000005143, 353→360042932994.
 
 ## Notes
 - After each wave: aggregate agent reports → RESTRUCTURE-MANIFEST.md (Phase 3b section),

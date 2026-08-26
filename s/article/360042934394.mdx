@@ -131,6 +131,12 @@ Since Domo expects that all input DATETIME values are in UTC, note the following
   
 <Note>**Note:** If a DATETIME column is brought into Domo as a string data type rather than a DATETIME, it is not converted based on the time zone settings.</Note>
 
+### Cloud Integrations and Cloud Amplifier
+
+Data brought in through Cloud Integrations (Cloud Amplifier) follows the same UTC assumption as any other source. Domo treats incoming DATETIME and timestamp values as UTC and applies the [company time zone](#company-time-zone) offset on that basis whenever the values are rendered or used in a calculation. If the source values aren't actually in UTC, visualizations show the shifted result described in [Defined Company Time Zone vs. Undefined Company Time Zone](#defined-company-time-zone-vs-undefined-company-time-zone).
+
+{/* [pm-input] Beth Saenz — Confirm how Snowflake TIMESTAMP_NTZ vs. TIMESTAMP_TZ (and TIMESTAMP_LTZ) values are interpreted on ingestion through Cloud Integrations/Cloud Amplifier, and whether a per-connection time zone shift exists or is a planned feature request. Synthesized from community forum reports; needs confirmation. */}
+
 ### DataFlows and Transforms
 
 DataFlows operate on the raw data values stored in the database, not on converted values. You receive different calculated results when grouping values with a DATETIME field in a DataFlow (raw values) compared to doing the same grouping on a card with the converted values.
@@ -146,6 +152,8 @@ Dynamic date and time value functions in DataFlows and calculations are unaffect
   - `SYSDATE()`
 
 <Tip>**Tip:** You can use the `SUBDATE` or `ADDDATE` functions in Beast Modes to adjust these values as needed. See the [Beast Mode Functions Reference Guide](/s/article/360043429933) for more information.</Tip>
+
+<Note>**Note:** Because these functions always return UTC and ignore the company time zone, a fixed hour offset (for example, `DATE_SUB(..., INTERVAL 5 HOUR)`) drifts by an hour whenever Daylight Saving Time starts or ends. It also means a value evaluated in the evening can roll over to the next calendar day relative to your local time. For a shift that stays correct year-round, use the [DST-aware calculation](#adjust-calculations-for-daylight-saving-time) below.</Note>
 
 #### Transform Time Zones with a Calculation or DataFlow
 

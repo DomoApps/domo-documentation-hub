@@ -18,7 +18,7 @@ file at the start of any restructure work to orient themselves before doing anyt
 ### ▶ Where we left off (2026-08-26) — pick up here next session
 
 **▶▶ RESUME TOMORROW — read this first.**
-- **State:** branch `update/fullRestructure`. Everything committed. **Phase 3b general is fully COMPLETE.** (Push status: intro-sweep commits `1b442ac7`/`dca9f80f`/`cd07b8a2` + this tracker/manifest commit — confirm `git push` ran.)
+- **State:** branch `update/fullRestructure`. **All work committed AND pushed** — HEAD = `origin/update/fullRestructure` = `d50e6310`, working tree clean. **Phase 3b general is fully COMPLETE.**
 - **Just finished:** the **structural intro sweep** — the last Phase 3b item. 133 articles normalized to `## Intro` + `---` (standard "This article explains…" format) across 3 waves of parallel agents (20 collision-free clusters). 2 connector pages skipped (HipChat, Sage 300); 9 grant-gap `[pm-input]` markers added. Full detail: `RESTRUCTURE-MANIFEST.md` › Phase 3b general — Structural Intro Sweep. Rig lives in `scripts/reports/intro_sweep_clusters/`.
 - **First action tomorrow:** Phase 3b is done — choose the next phase:
   1. **Phase 4 — Consolidation, Retirement & Archive** (recommended next; it's what most PM sign-offs are about). Retirement batches pre-scoped: Workbench 4 (→ Legacy), DataFusion / old Magic ETL tiles / defunct connectors (→ Retired), CourseBuilder (pending D10), plus 22 exact-duplicate connector merges and the `DataFusion-Migration-Guide.mdx`. See Phase 4 section + Support KB Audit.

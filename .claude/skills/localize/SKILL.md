@@ -5,22 +5,63 @@ description: "localize an article, translate an article into Spanish French Germ
 argument-hint: "article filename or path (e.g., s/article/March-2026-Release.mdx)"
 ---
 
-Localize a Domo KB article into Spanish, French, and German.
+Localize a Domo KB article into Spanish, French, German, and Japanese, using a deterministic
+term glossary and learning from human translator corrections over time.
 
 The user has provided: $ARGUMENTS
 
 ---
 
-## CRITICAL: Read the Localization Style Guide First
+## Step 0: Retrospective — learn from merged corrections first
 
-**Before doing anything else — before identifying the article, before asking any questions, before writing a single translated word — read `Localization-Style-Guide.mdx` in full from the root of the repository.**
+**This is the automatic first action every time this skill runs.** Before anything else — before
+reading the style guide, identifying the article, or asking the article-type questions — ask the
+user this single question and act on the answer:
+
+> **Would you like to run a translation retrospective first? After articles are localized here they
+> are human-corrected in a CAT tool and returned as merged PRs; a retrospective folds those
+> corrections into the deterministic glossaries so this translation benefits from them. If yes,
+> which merged PR(s) should I analyze? If no, I'll continue with the localization.**
+
+- **If the user names PR(s):** invoke the `localization-retrospective` skill, passing those PR
+  number(s) as its arguments. Let it run to completion (it updates `localization/glossary/<lang>.csv`),
+  then continue to the style guide below so this run uses the freshly updated glossary.
+- **If the user declines** (no / skip / "just translate"): do not invoke the retrospective; continue
+  directly to the style guide below.
+
+Do not skip asking. It won't be needed every run — especially early, before the Japanese correction
+loop has produced any merged PRs — but the question is how this skill always begins, so the user is
+reminded of the learning loop and can feed corrections back the moment they exist.
+
+---
+
+## CRITICAL: Read the Localization Style Guide and load the glossary
+
+**After Step 0 — and before identifying the article, asking any questions, or writing a single
+translated word — read the style guide in full and load the deterministic glossary.**
 
 ```bash
-# Confirm the file exists and read it
-cat Localization-Style-Guide.mdx
+# Authoritative prose style guide (tone, register, MDX rules, per-language conventions)
+cat localization/Localization-Style-Guide.mdx
+
+# Deterministic term glossary for each target language (English term -> fixed translation,
+# plus keep-in-English rules). This is the terminology source of truth for this run.
+cat localization/glossary/<lang>.csv   # es | fr | de | ja
 ```
 
-The style guide is the authoritative reference for every translation decision in this skill. Do not rely on memory or general translation knowledge. Every term, header, and convention must follow what is documented there.
+**Background documents** (read/consult as needed — do not rely on memory or general translation
+knowledge):
+
+- `localization/Localization-Style-Guide.mdx` — authoritative style/convention reference.
+- `localization/glossary/{es,fr,de,ja}.csv` — deterministic term glossaries (apply exactly).
+- `localization/sources/Domo_BrandedTerms_PMMupdates_092425 1.csv` — PMM branded-terms glossary
+  (what stays in English vs. what is OK to translate); already folded into the glossaries.
+- `localization/sources/JA-XTM-TM.csv` — raw XTM Japanese translation memory (gitignored, ~97 MB);
+  consult for Japanese phrasing precedent when the glossary doesn't settle a term.
+
+The glossary is the deterministic layer: every term it lists must be rendered exactly as specified
+(keep-in-English terms untouched; translated terms rendered per the `translation` column, choosing
+the row whose `context` matches). The style guide governs everything the glossary does not.
 
 ---
 
@@ -121,7 +162,7 @@ The localized Release Notes tab names are:
 cat s/article/Current-Release-Notes.mdx
 ```
 
-**2. Translate into each target language** following all rules in `Localization-Style-Guide.mdx`.
+**2. Translate into each target language** following all rules in `localization/Localization-Style-Guide.mdx` and applying the deterministic glossary `localization/glossary/<lang>.csv`.
 
 Key reminders for Current Release Notes translation:
 - Translate the `title:` and `excerpt:` frontmatter fields
@@ -129,7 +170,7 @@ Key reminders for Current Release Notes translation:
 - Translate "## New Features and Enhancements" to the language-specific header (see style guide)
 - Preserve all `<Frame>`, `<BetaNote />`, `import` statements, and MDX components unchanged
 - For images: check whether localized image versions exist in `/images/kb/{lang}/`; if they exist, use the localized path; if not, use the English image path as-is
-- Apply all language-specific term translations from the style guide glossary
+- Apply all deterministic term renderings from `localization/glossary/<lang>.csv` (keep-in-English terms untouched; translated terms rendered exactly, matching the `context` row)
 
 **3. Write the translated content to the pre-existing localized Current Release Notes files** — replacing the content that was just archived:
 
@@ -165,11 +206,11 @@ cat s/article/FILENAME.mdx
 
 ### 2. Translate into each target language
 
-Following all rules in `Localization-Style-Guide.mdx`:
+Following all rules in `localization/Localization-Style-Guide.mdx` and applying the deterministic glossary `localization/glossary/<lang>.csv`:
 
 - Translate the `title:` and `excerpt:` frontmatter fields
 - Translate all prose, headings, list items, and callout body text
-- Apply language-specific term translations from the style guide glossary
+- Apply the deterministic term renderings from `localization/glossary/<lang>.csv` (keep-in-English terms untouched; translated terms rendered exactly, matching the `context` row)
 - For images: check whether localized images exist; if they exist, use the localized path; if not, use the English image path as-is
 - Internal links: always keep as English paths (`/s/article/...`) — do not prefix with a language code
 - Preserve all MDX components, code blocks, import statements, and formatting exactly — **with two exceptions: BetaNote and legacy TOC blocks** (see below)
@@ -193,6 +234,25 @@ ja/s/article/FILENAME.mdx
 ```
 
 (Write only the files for the requested target languages.)
+
+### 3b. Snapshot the AI output (all languages)
+
+Immediately after writing the translated files — for **every** language you just produced, not only
+Japanese — snapshot each one so the `localization-retrospective` skill can later diff human
+corrections against what you originally generated. This is the record of the AI's pre-correction
+output; it is gitignored and never published.
+
+```bash
+SHA=$(git rev-parse --short HEAD)
+for LANG in <langs you wrote>; do
+  DEST="localization/retrospective/.snapshots/$SHA/$LANG"
+  mkdir -p "$DEST"
+  cp "$LANG/s/article/FILENAME.mdx" "$DEST/"
+done
+```
+
+Snapshot the exact bytes you wrote, before any later formatting-fix pass. Do this for the Current
+Release Notes flow too (snapshot each overwritten `{lang}/s/article/Current-Release-Notes.mdx`).
 
 ### 4. Add each localized file to docs.json navigation
 
@@ -224,7 +284,21 @@ python3 -c "import json; json.load(open('docs.json')); print('docs.json is valid
 
 ## Step 4: Quality Review
 
-After writing all translations and before reporting to the user, review every translated file you just wrote against `Localization-Style-Guide.mdx`. This is a mandatory quality checkpoint — catch anything that was hallucinated, mis-applied, or accidentally skipped.
+After writing all translations and before reporting to the user, review every translated file you just wrote against `localization/Localization-Style-Guide.mdx` and the deterministic glossary. This is a mandatory quality checkpoint — catch anything that was hallucinated, mis-applied, or accidentally skipped.
+
+### Deterministic glossary check (run first, per language)
+
+Run the glossary checker on each English-source / translated-file pair:
+
+```bash
+python3 scripts/check-glossary.py s/article/FILENAME.mdx <lang>/s/article/FILENAME.mdx <lang>
+```
+
+It flags keep-in-English terms that went missing from the translation and source terms whose
+approved rendering is absent. The findings are heuristic — confirm each against context (multi-context
+terms like `Table` legitimately use a different approved rendering, and some terms simply don't
+appear). Fix every genuine violation in the translated file before continuing to the manual checks
+below.
 
 Work through the following checklist for each language. Revise the file in place if you find an issue; do not just note the issue and move on.
 
@@ -280,8 +354,9 @@ Tell the user:
 1. **Files created or updated** — list each new or modified file path
 2. **Navigation entries added** — list each `docs.json` insertion (language, tab, group, position)
 3. **Archived files** (Current Release Notes flow only) — what was archived, where, and any languages where the archive was skipped because it already existed
-4. **Quality review findings** — briefly note any issues that were found and fixed during the quality checkpoint; if none, say "Quality review passed — no issues found."
+4. **Quality review findings** — briefly note any issues that were found and fixed during the quality checkpoint, including glossary-checker findings; if none, say "Quality review passed — no issues found."
 5. **docs.json validation** — confirm it passed or report the error
+6. **Retrospective & snapshots** — note whether a retrospective ran in Step 0 (and what it learned, if anything), and confirm the AI output was snapshotted to `localization/retrospective/.snapshots/<sha>/` for future retrospectives.
 
 ---
 

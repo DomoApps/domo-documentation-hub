@@ -31,14 +31,18 @@
 
   NOTE: The embed URL must come from a Domo instance that allows embedding on this domain.
   If the iframe appears blank, check the source instance's CSP / embed allowlist settings.
+
+  REACT GLOBALS
+  -------------
+  React.useRef and React.useEffect are called without an import because Mintlify's MDX
+  runtime provides React as a global. Importing from "react" triggers a build warning:
+  "Invalid import path react — only local imports are supported." Do not add the import back.
 */}
 
-import { useEffect, useRef } from "react";
-
 export const DomoEmbed = ({ src, width = "100%", initialHeight = "600" }) => {
-  const iframeRef = useRef(null);
+  const iframeRef = React.useRef(null);
 
-  useEffect(() => {
+  React.useEffect(() => {
     function handleMessage(event) {
       if (
         iframeRef.current &&

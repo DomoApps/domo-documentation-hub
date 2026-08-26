@@ -33,8 +33,14 @@ The BigQuery service account must have the following roles.
 
 **Read-only integration**
 
-- Roles: BigQuery Data Viewer
-- No additional permissions are required for read-only access.
+- Roles:
+    - BigQuery Data Viewer
+    - BigQuery Job User
+    - Service Account Token Creator (only if using WIF)
+- Additional permissions:
+    - `bigquery.jobs.create`
+
+<Note>**Note:** BigQuery Job User is required for a read-only integration, not only for writeback. When you create the integration, Domo validates the connection by running a query, and BigQuery runs every query inside a job—so the service account must be able to create jobs. Grant these roles on the project you enter as the **Project ID**.</Note>
 
 **Writeback and native transform**
 
@@ -150,7 +156,8 @@ The name can be changed later.
 1. Enter a name to identify the BigQuery service account in Domo.
 The name can be changed later.
 
-2. Enter the **Project ID** where you created your service account.
+2. Enter the **Project ID** of the project you want Domo to run queries in.
+Domo runs every query as a BigQuery job in this project, and BigQuery bills the job there, so the service account must hold the BigQuery Job User role on it. This is usually the project that contains your service account and your data. See [Roles and Permissions](#roles-and-permissions).
 
 3. Upload the JSON configuration file you downloaded from the Google Cloud Console.
 
@@ -298,3 +305,22 @@ No, spaces are not allowed in table names.
 </Accordion>
 
 </AccordionGroup>
+
+## Troubleshoot
+
+### Resolve a Job Creation Permission Error
+
+When you create the integration, Domo returns this error if the service account cannot create jobs in the project you entered as the **Project ID**:
+
+```text
+Access Denied: Project project-id: User does not have bigquery.jobs.create permission in project project-id.
+```
+
+Grant the service account the BigQuery Job User role on that project, then create the integration again. See [Roles and Permissions](#roles-and-permissions).
+
+Two things to check if you already granted the role:
+
+- **Confirm you granted it on the right project.** BigQuery checks this permission in the project that runs the query, which is the project you enter as the **Project ID**—not a project that only stores the data.
+- **Confirm the role is on the service account Domo uses.** If you authenticate with Workload Identity Federation, Domo impersonates the service account named in your JSON configuration file, and that service account needs the role.
+
+If your security policy does not allow the service account to hold job-creation rights permanently, you can grant BigQuery Job User, create the integration, and then revoke the role. The integration continues to read data, but automated data freshness checks stop working, because those also run queries.

@@ -1,0 +1,68 @@
+---
+title: "Understand Jupyter Workspace Consumption"
+excerpt: "This article explains how Domo calculates consumption credits for Jupyter Workspaces and offers best practices for managing usage."
+---
+
+This article explains how consumption credits are calculated for Jupyter Workspaces so you can manage usage effectively.
+
+---
+
+## Understand the Consumption Model
+
+Jupyter Workspace consumption works differently from many other Domo features. Rather than a simple credit-per-run model, Jupyter consumption is based on three factors:
+
+- The tier of your workspace
+- How long the workspace runs
+- Whether your notebook writes data back to a DataSet
+
+<Tip>**Tip:** Review the Jupyter Workspaces credit chart in the [Consumption Supplemental Terms <i className="icon-arrow-square-out sm" aria-hidden="true" />](https://www.domo.com/consumption-terms) to see the exact credit rate for each tier.</Tip>
+
+## Understand Workspace Tiers
+
+The number of credits charged increases as the Jupyter tier increases. Larger tiers provide more memory and compute resources, so the right tier for your workspace depends on what you're trying to accomplish. A smaller tier may be perfectly adequate for a lightweight data processing job, while a larger job may require additional memory or compute.
+
+## Understand Runtime Billing
+
+Jupyter consumption is charged for each five-minute interval that a workspace runs, and usage is rounded up to the next five-minute interval. The longer a workspace remains running, the more credits it consumes.
+
+| Workspace Runtime | Credits Charged For |
+| ----------------- | -------------------- |
+| Two minutes       | Five minutes          |
+| Seven minutes     | Ten minutes           |
+
+You can see the status of each workspace in Jupyter Workspaces. A workspace that shows as running is actively consuming credits, and it continues to consume credits until it is stopped.
+
+<Note>**Note:** Stop your workspace when you're finished working. If you leave a workspace running after you're done, it continues consuming credits even though you're no longer actively using it.</Note>
+
+## Set a Workspace Timeout
+
+Timeout is a setting you configure when you set up a workspace. It specifies how long the workspace can remain inactive before it automatically stops. In this case, inactivity refers to inactivity from the user in the Jupyter interface. Timeout provides a safety net in case someone forgets to stop their workspace.
+
+The default timeout is eight hours, but you should choose a timeout that makes sense for the type of work being done in that workspace. The goal is to give yourself enough time to work while preventing a workspace from continuing to run unnecessarily.
+
+<Tip>**Tip:** See [Create a Workspace](/s/article/36004740075#create-a-workspace) in the Jupyter Workspaces article for steps on configuring the Timeout field.</Tip>
+
+## Understand DataSet Write Credits
+
+Each time your Jupyter notebook writes data to a DataSet, there is an additional one-credit charge. For example, if your notebook calls an external API, processes the data, and then writes the results to a DataSet, your total consumption includes the credits for the amount of time the workspace ran, plus one additional credit for the DataSet write.
+
+In many cases, if you need to write data to a DataSet, you only need to write once at the end of your process. However, a notebook may need to write to multiple DataSets. Each write carries its own additional credit cost, so it's worth being intentional about how often your notebook writes data.
+
+## Understand Consumption for Scheduled DataFlows
+
+The consumption model is the same when a Jupyter notebook is scheduled to run as a DataFlow. When the scheduled notebook runs, the workspace starts, the notebook executes, and then the workspace stops. You're charged based on the time the workspace ran, using the tier you selected, plus any additional credits for DataSet writes.
+
+## Follow Best Practices for Managing Jupyter Consumption
+
+- **Stop your workspace when you're finished working —** This prevents you from continuing to accrue consumption credits after you're done.
+- **Set a reasonable Timeout —** Choose a value appropriate for the work being performed to give you a safety net if you forget to stop the workspace.
+- **Minimize DataSet writes —** When possible, perform your processing and make a single write at the end of the notebook rather than making multiple writes throughout the process.
+- **Start with a lower Jupyter tier —** You can always increase the tier later if you run into memory or compute limitations. Starting smaller can help you find the right level of resources for the job without using more credits than necessary.
+
+Jupyter consumption is driven primarily by three things: the tier of your workspace, how long it runs, and the number of times your notebook writes to DataSets. Understanding those three factors helps you choose the right resources, avoid unnecessary consumption, and make the most of Jupyter Workspaces in Domo.
+
+## Related Articles
+
+- [Jupyter Workspaces](/s/article/36004740075)
+- [What Are Consumption Credits and How Do They Work?](/s/article/000005280)
+- [Credit Monitoring](/s/article/000005326)

@@ -20,11 +20,15 @@ excerpt: "Running log of what happened to every article during the KB restructur
 | `new` | Net-new article created; did not previously exist |
 | `same-regrouped` | Existing article unchanged in content; moved to a new nav group |
 | `updated` | Existing article with material content changes |
-| `split` | Source article broken into multiple new articles; original to be deleted or archived |
-| `merged-into` | Article's content merged into another article; original to be deleted or archived |
-| `archived` | Article retained but moved to Archive nav group; `archived: true` frontmatter added |
-| `legacy` | Article retained in its pillar; `legacy: true` + `tag: "Legacy"` added; PM sign-off required |
-| `deleted` | Article removed; its content exists elsewhere (merged or rewritten into another article) |
+| `split` | Source article broken into multiple new articles; original to be deleted or retired |
+| `merged-into` | Article's content merged into another article; original to be deleted |
+| `deprecated` | Lifecycle state. Stays in its normal pillar group. `status: "deprecated"` + `tag: "Deprecated"` + `<DeprecatedNote />`. PM sign-off required |
+| `legacy` | Lifecycle state. Moved to the Archive group. `status: "legacy"` + `tag: "Legacy"` + `<LegacyNote />`. PM sign-off required |
+| `sunset` | Lifecycle state. Moved to the Archive group. `status: "sunset"` + `tag: "Sunset"` + `sunset_date:` + `<SunsetNote />`. PM sign-off required |
+| `retired` | Lifecycle state. Removed from nav entirely; file kept in repo for reference. `status: "retired"`; no callout. PM sign-off required |
+| `deleted` | Article removed from repo; its content exists elsewhere (merged or rewritten into another article) |
+
+_Superseded 2026-07-16: the two-state `archived` disposition is replaced by the five-state lifecycle above (`deprecated` / `legacy` / `sunset` / `retired`). Older rows written before this date may still read `archived`._
 
 ---
 
@@ -510,6 +514,31 @@ Rows will be added here as articles are retired. No article may be deleted or ar
 | Old Magic ETL tile articles (15) | Various | `archived` | 1 article to keep (`Create a Recursive/Snapshot Old Magic ETL DataFlow`) |
 | Defunct-service connectors (111) | Various | `archived` | Verified via Support KB Audit |
 | CourseBuilder articles (16) | Various | `archived` (pending D10) | Awaiting PM confirmation |
+
+_Note: `archived` above is the old two-state term. Per-article retirement rows below use the five-state vocabulary (`legacy` / `retired`)._
+
+### Connector Merges — Executed 2026-08-28
+
+22 exact-title connector pairs were content-reviewed (not treated as mechanical stubs). **14 were genuine duplicates and were merged/deleted** (below). The remaining 8 were found to be *distinct* connectors sharing a title (different product surface, auth method, or connector generation) and were **deferred** to a separate disambiguation task — see the deferred list at the end of this section. All 14 deletions had their inbound links repointed to the keeper and their `docs.json` nav entry removed.
+
+| Deleted File | Title | Disposition | Merged Into | Notes |
+|--------------|-------|-------------|-------------|-------|
+| `000005477.mdx` | Snowflake Enterprise OAuth Connector | deleted | `000005534.mdx` | Keeper is superset (adds OAuth Configuration field + FAQ) |
+| `000005766.mdx` | Campaigner Connector | deleted | `360042926534.mdx` | Keeper is strict superset |
+| `360042929614.mdx` | LiveChat Connector | deleted | `360057014874.mdx` | Delete file was older gen (username/API key); keeper is V3 |
+| `360052122814.mdx` | IBM DB2 Partition Connector | deleted | `8656674995991.mdx` | Only conceptual intro unique; keeper far richer |
+| `360043436233.mdx` | Oracle Database Connector | deleted | `1500012178021.mdx` | Tie-breaker: kept Service Name (current) over SID (legacy) |
+| `360043434333.mdx` | SugarCRM Connector | deleted | `360042929654.mdx` | Tie-breaker: keeper is superset (Version, Joining Table, Expand List) |
+| `000005355.mdx` | Microsoft SQL Server Connector | merged-into | `360043436173.mdx` | Folded: Query Type + Query Parameter (incremental) |
+| `000005521.mdx` | PostgreSQL Connector | merged-into | `360043436273.mdx` | Folded: Incremental Pull field |
+| `000005538.mdx` | Box Advanced Connector | merged-into | `360043436473.mdx` | Folded: Zip search fields + Preview/Format/Advanced Options section |
+| `000005515.mdx` | Amazon S3 Connector | merged-into | `360043436393.mdx` | Folded: ZIP/Excel/parsing Details fields (3-file cluster) |
+| `000006094.mdx` | Sansan Connector | merged-into | `5366610360983.mdx` | Folded: report list (keeper's report menu was empty) |
+| `000005426.mdx` | Adaptive Insights Connector | merged-into | `360042930154.mdx` | Folded: 3 dimension/level Details fields |
+| `000006053.mdx` | Azure Data Lake Storage Gen2 Using AAD WriteBack Connector | merged-into | `Azure-Data-Lake-Storage-Gen2-Using-AAD-WriteBack-Connector.mdx` | Folded: app-registration creation steps |
+| `7695619925271.mdx` | Microsoft SQL Server Writeback Connector | merged-into | `360043437013.mdx` | Folded: NVARCHAR/Unicode + new-table caveat |
+
+**Deferred — 8 non-duplicates (NOT deleted; separate disambiguation/retitle task):** `000005402` Magento (OAuth 1.0a variant), `SFTP-Connector` (SFTP for Domo Documents), `Amazon-S3-Connector` (S3 for Domo Documents), `000005651` Amazon Kendra (query flavor), `360042930294` WordPress (self-hosted), `GitHub-Connector` (GitHub→Documents token). Plus **keeper/delete backwards** — keep the current connector, route the deprecated old gen into the retirement batch for PM sign-off: LinkedIn (`000005834` current vs `360043434493` V1) and Google Ads (`1500011202222` current vs `360060270674` legacy AdWords).
 
 ---
 

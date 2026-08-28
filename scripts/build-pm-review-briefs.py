@@ -38,6 +38,7 @@ GAPS_FILE = REPO_ROOT / "_gaps_with_support.json"
 MANIFEST_FILE = REPO_ROOT / "RESTRUCTURE-MANIFEST.md"
 ARTICLE_DIR = REPO_ROOT / "s" / "article"
 OUTPUT_DIR = REPO_ROOT / "pm-review-briefs"
+TASKS_FILE = REPO_ROOT / "RESTRUCTURE-TASKS.md"
 
 # Features excluded from PM briefs entirely — their articles are outside
 # the scope of the restructure and require no PM review action.
@@ -398,6 +399,17 @@ PHASE4_URGENT_FIXES = [
     # (area, pm, urgency_note)
     ("Snowflake Connector + Snowflake Unload V2", "Tasleema Lallmamode",
      "DONE (Phase 3b, 2026-07-15). Snowflake retired key-pair/password auth Nov 2025; 7 Snowflake connector articles were updated (retirement language, Warning callouts, migration-section rewrite). Flagged here for your awareness/verification."),
+]
+
+# Open architectural decisions with a clear PM owner (D1/D9 resolved; others in
+# RESTRUCTURE-PROGRESS.md have no clear single owner and are omitted here).
+# (decision_id, pm, question)
+DECISIONS = [
+    ("D2",  "Ryan Despain", "Projects & Tasks (10 articles) — still an active feature, or archive in favor of Workflows?"),
+    ("D4",  "Chris Wright", "'Build Your First Dashboard' — move from Getting Started to Analyze & Visualize > Dashboards & Pages?"),
+    ("D5",  "Dan Brinton",  "'Introduction to Domo' (000005874) — keep as a deep-dive companion to the new 'What is Domo?', or retire?"),
+    ("D6",  "Ken Boyer",    "Develop & Integrate scope — KB how-tos, or primarily a link-out to developer.domo.com?"),
+    ("D10", "Khushboo",     "CourseBuilder — confirm it is fully retired from the product (gates the 9-article retirement batch)."),
 ]
 
 
@@ -1061,6 +1073,161 @@ def generate_brief(pm_name: str, pm_ownership: dict, all_gaps: list, forum: dict
 # MAIN
 # ─────────────────────────────────────────────────────────────────────────────
 
+def pm_pillars(pm_ownership: dict) -> list:
+    """Derive the Pillar labels a PM touches, from their owned features."""
+    pil = set()
+    for feat in pm_ownership.get("features", set()):
+        p = FEATURE_PILLAR.get(feat, "")
+        if p.startswith("Pillar"):
+            pil.add(p.split(":")[0].strip())
+
+    def _key(s):
+        parts = s.split()
+        return int(parts[1]) if len(parts) > 1 and parts[1].isdigit() else 99
+
+    return sorted(pil, key=_key)
+
+
+def collect_pm_tasks(pm_name: str, all_gaps: list, forum: dict) -> dict:
+    """Gather every typed task for one PM (reuses the same filters as the briefs)."""
+    tasks = {"fact-check": [], "pm-input": [], "legacy": [], "retired": [], "update": [], "decision": []}
+
+    # [fact-check] — Phase 3a synthesized articles
+    for fn, title, _pillar, pm, _src, fc in PHASE3A_ARTICLES:
+        if pm == pm_name:
+            tasks["fact-check"].append((f"`{fn}` — *{title}*", fc))
+    # [fact-check] — forum-gap articles already drafted
+    for w in sorted([w for w in forum["written"] if pm_cell_matches(w["pm"], pm_name)],
+                    key=lambda w: w["rank"]):
+        flag = " ⚠️ (open [pm-input])" if w.get("has_pm_input") else ""
+        tasks["fact-check"].append((f"`{w['filename']}` (rank {w['rank']}){flag}", w["notes"]))
+
+    # [pm-input] — original-plan PM articles
+    for fn, title, pm, what in PHASE3A_PM_ARTICLES:
+        if pm == pm_name:
+            tasks["pm-input"].append((f"`{fn}` — *{title}*", what))
+    # [pm-input] — deferred forum articles
+    for d in sorted([d for d in forum["deferred"] if pm_cell_matches(d["pm"], pm_name)],
+                    key=lambda d: d["rank"]):
+        tasks["pm-input"].append((f"`{d['filename']}` (rank {d['rank']})", d["what"]))
+    # [pm-input] — scanned inline article markers + manifest-level flags
+    for c in forum["checkpoints"]:
+        if c["pm"] == pm_name:
+            tasks["pm-input"].append((f"`{c['filename']}`", c["ask"]))
+    for scope, ask in MANIFEST_PM_INPUT_FLAGS.get(pm_name, []):
+        tasks["pm-input"].append((scope, ask))
+
+    # [legacy]/[retired] — Phase 4 retirement batches (staged for 4.6)
+    for batch, pm, count, action, notes in PHASE4_RETIREMENTS:
+        if pm == pm_name:
+            key = "legacy" if "Legacy" in action else "retired"
+            tasks[key].append((f"{batch} ({count})", f"{action}. {notes}"))
+
+    # [update] — critical forum update targets + urgent fixes
+    for rank, area, addition, pm, fc in FORUM_UPDATE_CRITICAL:
+        if pm == pm_name:
+            tasks["update"].append((f"{area} (rank {rank})", f"{addition} — verify: {fc}"))
+    for area, pm, note in PHASE4_URGENT_FIXES:
+        if pm == pm_name:
+            tasks["update"].append((area, note))
+
+    # [decision] — open architectural decisions owned by this PM
+    for did, pm, q in DECISIONS:
+        if pm == pm_name:
+            tasks["decision"].append((did, q))
+
+    return tasks
+
+
+def build_tasks_aggregate(all_pms: list, ownership: dict, all_gaps: list, forum: dict) -> str:
+    """Build the cross-PM master task checklist written to RESTRUCTURE-TASKS.md."""
+    from datetime import date
+    TYPE_ORDER = ["fact-check", "pm-input", "legacy", "retired", "update", "decision"]
+
+    # High-priority forum update targets (long tail) — counted per PM, not enumerated.
+    high_update_counts = defaultdict(int)
+    for g in all_gaps:
+        if g.get("recommendation") == "update" and g.get("priority") == "High":
+            high_update_counts[area_to_pm(g.get("domo_area", ""))] += 1
+
+    per_pm = {pm: collect_pm_tasks(pm, all_gaps, forum) for pm in all_pms}
+
+    lines = [
+        "---",
+        'title: "KB Restructure — Phase 4.5 Master Task Checklist"',
+        'excerpt: "Cross-PM rollup of every open restructure task (fact-check, pm-input, legacy/retired, update, decision), generated from the manifest + ownership data. Working document for PM review and post-review execution."',
+        "---",
+        "",
+        "# KB Restructure — Phase 4.5 Master Task Checklist",
+        "",
+        "**Generated by** `scripts/build-pm-review-briefs.py` — do not hand-edit; re-run the script to refresh.",
+        f"**Generated:** {date.today().isoformat()}",
+        "",
+        "Every task is one discrete change, tagged by type and grouped under its owning PM (with the",
+        "pillar(s) that PM touches). Companion to the per-PM briefs in `pm-review-briefs/`. Query it by",
+        'PM ("how many tasks for Phil Fuchs?") or by tag.',
+        "",
+        "**Type tags:** `[fact-check]` verify a drafted/synthesized article · `[pm-input]` article needs PM",
+        "information before it can be finalized/written · `[legacy]`/`[retired]` lifecycle batch staged for",
+        "Phase 4.6 (needs PM sign-off) · `[update]` existing article needs a material addition · `[decision]`",
+        "open architectural decision.",
+        "",
+        "## Summary — Open Tasks by PM",
+        "",
+        "| PM | Pillars | fact-check | pm-input | legacy | retired | update | decision | Total | +High-update |",
+        "|----|---------|-----------:|---------:|-------:|--------:|-------:|---------:|------:|-------------:|",
+    ]
+    grand = defaultdict(int)
+    for pm in all_pms:
+        t = per_pm[pm]
+        counts = {k: len(t[k]) for k in TYPE_ORDER}
+        total = sum(counts.values())
+        for k in TYPE_ORDER:
+            grand[k] += counts[k]
+        grand["total"] += total
+        pillars = ", ".join(p.replace("Pillar ", "P") for p in pm_pillars(ownership.get(pm, {}))) or "—"
+        hi = high_update_counts.get(pm, 0)
+        lines.append(
+            f"| {pm} | {pillars} | {counts['fact-check']} | {counts['pm-input']} | "
+            f"{counts['legacy']} | {counts['retired']} | {counts['update']} | {counts['decision']} | "
+            f"**{total}** | {hi or ''} |"
+        )
+    lines.append(
+        f"| **TOTAL** | | {grand['fact-check']} | {grand['pm-input']} | {grand['legacy']} | "
+        f"{grand['retired']} | {grand['update']} | {grand['decision']} | **{grand['total']}** | "
+        f"{sum(high_update_counts.values())} |"
+    )
+    lines += ["", "---", ""]
+
+    for pm in all_pms:
+        t = per_pm[pm]
+        total = sum(len(t[k]) for k in TYPE_ORDER)
+        pillars = ", ".join(pm_pillars(ownership.get(pm, {}))) or "(no pillar mapping)"
+        lines += [f"## {pm} — {pillars}", ""]
+        hi = high_update_counts.get(pm, 0)
+        if total == 0 and not hi:
+            lines += ["_No open tasks._", "", "---", ""]
+            continue
+        for k in TYPE_ORDER:
+            if not t[k]:
+                continue
+            lines += [f"### [{k}] ({len(t[k])})", ""]
+            for label, desc in t[k]:
+                lines.append(f"- [ ] **{label}** — {desc}")
+            lines += [""]
+        if hi:
+            lines += [
+                f"### [update] — High-priority forum targets ({hi})",
+                "",
+                f"- [ ] {hi} High-priority forum-gap update targets in this area — itemized in "
+                f"`pm-review-briefs/{pm.replace(' ', '-')}.md` § 4b (summarized here to keep the list actionable).",
+                "",
+            ]
+        lines += ["---", ""]
+
+    return "\n".join(lines) + "\n"
+
+
 def main():
     print("Loading data...")
     ownership = load_ownership_reference(OWNERSHIP_FILE)
@@ -1118,6 +1285,11 @@ def main():
         print(f"  ✓ {out_path.name}  ({article_count} articles)")
 
     print(f"\nDone — {len(all_pms)} briefs written to pm-review-briefs/")
+
+    # Cross-PM master task checklist
+    tasks_md = build_tasks_aggregate(all_pms, ownership, gaps, forum)
+    TASKS_FILE.write_text(tasks_md, encoding="utf-8")
+    print(f"  ✓ {TASKS_FILE.relative_to(REPO_ROOT)} written (aggregate task checklist)")
 
     if orphans:
         print("\n  ⚠️  UNASSIGNED forum items — no roster PM matched, will NOT appear in any brief:")

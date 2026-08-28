@@ -12,7 +12,7 @@ file at the start of any restructure work to orient themselves before doing anyt
 
 ## Current Status
 
-**Active phase:** Phase 4 **EXECUTED** (2026-08-28) → next is the Phase 4.5 PM-brief generation (update `build-pm-review-briefs.py` PHASE4_* data + run), then PM review
+**Active phase:** Phase 4 executed + **Phase 4.5 briefs GENERATED** (2026-08-28) → next is holding the PM review meetings, then Phase 4.6 (lifecycle application)
 **Blocked on:** 8 human decisions (see Phase 2 Decision Required table in `RESTRUCTURE-IA-SPEC.md`); D10 (CourseBuilder) is a PM-confirm item in the retirement staging
 
 ### ▶ Where we left off (2026-08-28) — pick up here next session
@@ -25,10 +25,12 @@ file at the start of any restructure work to orient themselves before doing anyt
   3. **`DataFusion-Migration-Guide.mdx`** — written, navved (Magic ETL group), quality-gated.
   4. **Retirement batches staged for 4.6** — Workbench 4 (36→legacy), DataFusion (4), old Magic ETL (7, keep `360043428113`), CourseBuilder (9, pending D10), pre-2022 RN (42), defunct connectors (12 named + Google Ads legacy; 185-EN superset → Tasleema). Enumerated in the manifest. **No status stamping/nav removal yet — that's 4.6, post-PM.**
   5. Manifest disposition vocab reconciled to five-state; 3 lifecycle snippets verified pre-existing (no recreate).
-- **First actions next session (path to PM review — Phase 4.5):**
-  1. Update `scripts/build-pm-review-briefs.py` PHASE4_* (and other non-forum) data to reflect what actually shipped, then run it → per-PM briefs + `RESTRUCTURE-TASKS.md`.
-  2. Resolve the 2 open ownership items (`Domo-Certification-Exam-Logistics.mdx`, `360042934454.mdx`) so the briefs generate cleanly.
-  3. Optionally run the deferred connector-disambiguation task (can also be a Phase 6 rename item).
+- **First actions next session (Phase 4.5 briefs are GENERATED — now run the meetings):**
+  1. ✅ DONE — `build-pm-review-briefs.py` refreshed with real Phase 4 data + `build_tasks_aggregate()` added; run produces 14 per-PM briefs (`pm-review-briefs/`, gitignored) + `RESTRUCTURE-TASKS.md` (tracked; 387 tasks). Re-run anytime to refresh.
+  2. ✅ DONE — ownership resolved: user-licenses `360042934454` → Dan Brinton; certification rank 146 → Jordan Jensen; forum gaps 144/161 re-homed → Ken Boyer. No UNASSIGNED warnings remain.
+  3. **Hold the PM review meetings.** Tasleema's brief is huge (1,077 articles) — chunk it. Retirement batches need lifecycle sign-off; D10 (CourseBuilder) and D2/D4/D5/D6 decisions are in the briefs + `RESTRUCTURE-TASKS.md`.
+  4. Then Phase 4.6 (apply confirmed lifecycle states) → Phase 5.
+  5. Still open: the deferred connector-disambiguation task (8 non-duplicates; can fold into Phase 6 renames).
 - **Not needed yet:** Phase 3c sync #2 (pre-final-merge only).
 
 ---

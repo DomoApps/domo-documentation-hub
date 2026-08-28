@@ -112,15 +112,17 @@ FEATURE_PILLAR = {
 STRUCTURAL_NOTES = {
     "Tasleema Lallmamode": [
         "**CDW merge:** Cloud Data Warehouses (104 articles) are no longer a top-level section — they are now a sub-group inside the Connector Library. Writeback Connectors (55 articles) are similarly integrated into the library alongside read connectors rather than living in a standalone section.",
-        "**Workbench consolidation:** Workbench 4 (37 articles) is moving to Archive (D1 confirmed). Workbench 5.1 gets a clearly-labeled Legacy sub-group.",
-        "**Defunct-service connectors (111):** Articles for services that no longer exist (LinkedIn API v1, Pinterest, StumbleUpon, etc.) are Phase 4 retirement candidates.",
+        "**Workbench consolidation:** Workbench 4 (36 EN articles) → Legacy (D1 confirmed); moves to the Archive group with a `<LegacyNote/>` in Phase 4.6. Workbench 5.1 gets a clearly-labeled Legacy sub-group.",
+        "**Connector merges DONE (2026-08-28):** 14 exact-title duplicate connectors were merged/deleted — keeper kept, unique fields folded in, nav entries and inbound links fixed. See RESTRUCTURE-MANIFEST.md › Connector Merges.",
+        "**8 title-collisions were NOT duplicates (deferred, need retitling):** distinct connectors sharing a title — Documents-surface (SFTP, Amazon S3, GitHub), variants (WordPress self-hosted, Magento OAuth, Kendra query). For **LinkedIn** and **Google Ads**, the *current* connector was retained on review; the *deprecated* generation (LinkedIn V1, legacy AdWords) is now a Retired candidate.",
+        "**Defunct-service connectors:** 12 named dead-service articles + the Deprecate superset (185 EN) are Retired candidates (staged for 4.6) — confirm the true dead set.",
     ],
     "Andrea Henderson": [
-        "**DataFusion retirement:** All 11 DataFusion articles are being archived in Phase 4. A `DataFusion-Migration-Guide.mdx` needs to be written (pointing users to Magic ETL equivalents) before or alongside the archival.",
-        "**Old Magic ETL tile articles (15):** 15 articles about the old Magic ETL tile interface are being archived. 1 article (`Create a Recursive/Snapshot Old Magic ETL DataFlow`) is explicitly kept.",
+        "**DataFusion retirement:** The 4 EN DataFusion articles are staged for Retired in Phase 4.6. Replacement SHIPPED: `DataFusion-Migration-Guide.mdx` (points users to Magic ETL equivalents) — please fact-check it for accuracy.",
+        "**Old Magic ETL tile articles (7):** 7 EN old-tile-interface articles staged for Retired. 1 article (`360043428113` Create a Recursive/Snapshot Old Magic ETL DataFlow) is explicitly kept.",
     ],
     "Khushboo": [
-        "**CourseBuilder (16 articles):** Support KB Audit flags CourseBuilder as retired/removed from Domo Appstore. Pending D10: confirm with you whether to archive all 16 before Phase 7 nav rebuild.",
+        "**CourseBuilder (9 EN articles):** Support KB Audit flags CourseBuilder as retired/removed from Domo Appstore. Staged for Retired in Phase 4.6. Pending D10: confirm CourseBuilder is gone from the product before the nav rebuild.",
     ],
     "Chris Wright": [
         "**'Build Your First Dashboard' (D4):** This tutorial currently lives in Getting Started. It should move to Analyze & Visualize > Dashboards & Pages. Confirm before moving.",
@@ -378,22 +380,24 @@ FORUM_UPDATE_CRITICAL = [
 
 PHASE4_RETIREMENTS = [
     # (batch, pm, count, action, notes)
-    ("Workbench 4 articles", "Tasleema Lallmamode", 37, "Archive",
-     "D1 confirmed. 37 EOL articles for an end-of-life product version."),
-    ("DataFusion articles", "Andrea Henderson", 11, "Archive",
-     "DataFusion discontinued. 6 Deprecate + 5 Mark as Legacy. Must add `DataFusion-Migration-Guide.mdx` pointing users to Magic ETL equivalents before or alongside archival."),
-    ("Old Magic ETL tile articles", "Andrea Henderson", 15, "Archive (1 Keep)",
-     "15 articles to Archive. Exception: `Create a Recursive/Snapshot Old Magic ETL DataFlow` — keep this one."),
-    ("Defunct-service connectors", "Tasleema Lallmamode", 111, "Archive / remove from nav",
-     "111 verified dead-service articles (LinkedIn API v1, Pinterest, StumbleUpon, Simply Measured, IBM Coremetrics, GetThere, Moz, Snowflake Writeback, DCM via Google Cloud Storage, etc.)."),
-    ("CourseBuilder articles", "Khushboo", 16, "Archive (pending D10)",
-     "Support Audit flags CourseBuilder as retired from Domo Appstore. 16 articles (3 Deprecate, 5 Legacy, 4 Needs Review, 4 pending). Confirm with PM; archive all 16 if confirmed retired."),
+    # Status 2026-08-28: classified + STAGED for Phase 4.6 (status stamping + nav
+    # moves happen after PM sign-off). Counts are verified English s/article/ files.
+    ("Workbench 4 articles", "Tasleema Lallmamode", 36, "→ Legacy (staged for 4.6)",
+     "D1 confirmed. 36 EN articles for an end-of-life product version. Confirm Legacy: feature still runs at some sites, WB5 is the replacement, no announced removal date."),
+    ("DataFusion articles", "Andrea Henderson", 4, "→ Retired (staged for 4.6)",
+     "DataFusion discontinued. 4 EN articles. Replacement SHIPPED: `DataFusion-Migration-Guide.mdx` (Magic ETL equivalents) — please also fact-check that guide for accuracy. Confirm Retired: feature gone from product."),
+    ("Old Magic ETL tile articles", "Andrea Henderson", 7, "→ Retired (1 Keep; staged for 4.6)",
+     "7 EN tile-interface articles → Retired. KEEP exception: `360043428113` (Create a Recursive/Snapshot Old Magic ETL DataFlow). Confirm the old tile UI is fully replaced/inaccessible."),
+    ("Defunct-service connectors", "Tasleema Lallmamode", "12 named + superset", "→ Retired (staged for 4.6)",
+     "12 verified dead-service articles named (LinkedIn API v1, Pinterest x2, StumbleUpon, Simply Measured, Salesforce Desk, IBM Coremetrics, GetThere, Moz, Adobe Analytics Adv Legacy, DCM via GCS, Azure Data Lake Store) + legacy Google Ads/AdWords reroute. The Category=Data Connection + Deprecate superset (185 EN) is attached for you to confirm which are truly dead."),
+    ("CourseBuilder articles", "Khushboo", 9, "→ Retired (pending D10; staged for 4.6)",
+     "Support Audit flags CourseBuilder as retired from Domo Appstore. 9 EN articles. D10: confirm CourseBuilder is gone from the product; retire all if confirmed."),
 ]
 
 PHASE4_URGENT_FIXES = [
     # (area, pm, urgency_note)
     ("Snowflake Connector + Snowflake Unload V2", "Tasleema Lallmamode",
-     "URGENT — FIX NOW. Snowflake retired key-pair/password authentication November 2025. These articles actively mislead customers who are actively failing connections. Fix with `update-kb-article` before Phase 4 begins."),
+     "DONE (Phase 3b, 2026-07-15). Snowflake retired key-pair/password auth Nov 2025; 7 Snowflake connector articles were updated (retirement language, Warning callouts, migration-section rewrite). Flagged here for your awareness/verification."),
 ]
 
 

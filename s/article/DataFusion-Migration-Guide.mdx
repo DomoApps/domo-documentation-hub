@@ -1,0 +1,81 @@
+---
+title: "Migrate from DataFusion to Magic ETL"
+excerpt: "DataFusion is retired. Rebuild your Add Columns and Add Rows combines in Magic ETL or DataSet Views, then repoint downstream content without breaking it."
+---
+
+## Intro
+
+This article explains how to move data combines built with the retired **DataFusion** (also called **Blend**) into **Magic ETL** or **DataSet Views**. It maps each DataFusion combine method to its current replacement, walks through rebuilding a combine without breaking downstream content, and carries forward the performance practices that still apply.
+
+DataFusion combined DataSets in two ways — **Add Columns** (matching DataSets on shared columns, equivalent to a SQL `JOIN`) and **Add Rows** (stacking DataSets that share the same schema, equivalent to a SQL `UNION ALL`). Both are now rebuilt with a [Magic ETL DataFlow](/s/article/360055259234) or a [DataSet View](/s/article/360046074774).
+
+---
+
+## DataFusion Replacements at a Glance
+
+| DataFusion combine | What it did | Rebuild with |
+| --- | --- | --- |
+| **Add Columns** | Matched two or more DataSets on shared key columns (SQL `JOIN`) | **Join Data** tile in [Magic ETL](/s/article/360055259234), or a join in a [DataSet View](/s/article/360046074774) |
+| **Add Rows** | Appended DataSets with identical schemas (SQL `UNION ALL`) | **Append Rows** tile in [Magic ETL](/s/article/360055259234), or a union in a [DataSet View](/s/article/360046074774) |
+
+**When to use which:** rebuild in a **DataSet View** for a lightweight, virtual combine that does not materialize a new stored DataSet; rebuild in **Magic ETL** when you also need to transform, clean, or calculate on the combined data, or when downstream content expects a stored output DataSet.
+
+## Choose Magic ETL or a DataSet View
+
+- **Magic ETL** produces a new **stored** output DataSet and lets you add transforms (filter, group, calculate, split) in the same flow. Choose it when the DataFusion fed a pipeline that did more than combine, or when a downstream DataFlow reads a physical DataSet.
+- **DataSet Views** produce a **virtual** combined DataSet defined by a join or union, without a full stored copy. Choose it for a simple combine that only needs to power cards.
+
+## Rebuild an Add Columns (Join) DataFusion
+
+1. Create a [Magic ETL DataFlow](/s/article/360055259234) and add an **Input DataSet** tile for each DataSet the DataFusion combined.
+2. Add a **Join Data** tile. Set the same key columns the DataFusion matched on, and choose the join type (left outer or inner) that matches the original combine.
+3. (Optional) Exclude duplicate key columns and rename columns downstream of the join, replacing the column options you set in the DataFusion editor.
+4. Add an **Output DataSet** tile, then run the DataFlow to populate the new output.
+
+Alternatively, create a join in a [DataSet View](/s/article/360046074774) when you do not need additional transforms.
+
+## Rebuild an Add Rows (Append) DataFusion
+
+1. Confirm every DataSet you are combining has **identical column headings and matching data types** — the same requirement DataFusion enforced for Add Rows.
+2. In a [Magic ETL DataFlow](/s/article/360055259234), add an **Input DataSet** tile for each DataSet, then add an **Append Rows** tile to stack them.
+3. Add an **Output DataSet** tile and run the DataFlow.
+
+Alternatively, create a union in a [DataSet View](/s/article/360046074774).
+
+## Migrate Without Breaking Downstream Content
+
+A rebuilt combine produces a **new** output DataSet with a new DataSet ID — it does not overwrite the original DataFusion output. Any DataFlow, card, or view that reads the old DataFusion output keeps pointing at it until you repoint it. Migrate in this order so nothing breaks:
+
+1. Rebuild the combine in Magic ETL or a DataSet View and run it so the new output DataSet is populated.
+2. Update each downstream DataFlow to read the new DataSet in place of the DataFusion output.
+3. Repoint or rebuild any cards or views that were built directly on the DataFusion output.
+4. After you confirm every downstream item reads from the new output, retire the old DataFusion.
+
+<Note>**Note:** If the source DataFusion used input DataSets governed by [Personalized Data Permissions (PDP)](/s/article/360042934614), reapply those policies to the input DataSets of the rebuilt flow. As with DataFusion, you apply PDP to input DataSets, not to the combined output.</Note>
+
+## Carry Over DataFusion Performance Practices
+
+The tuning that made DataFusions faster maps directly to Magic ETL joins:
+
+- **Join on numeric columns.** Joining on strings is the least performant; joining on integers is best. If you must combine on a text field, add or reuse a numeric identifier and join on that.
+- **Keep inputs small.** Trim columns and rows you do not need before the join, and combine only the DataSets a card actually requires rather than one large all-purpose combine.
+- **Simplify calculations.** Build Beast Mode and calculated fields on numeric or date columns rather than large `CASE` statements over strings, and precompute values upstream where you can.
+
+For deeper tuning of SQL-based pipelines, see [Optimizing a SQL DataFlow](/s/article/360042923014).
+
+## FAQ
+
+<AccordionGroup>
+  <Accordion title="Do I have to migrate my DataFusions?">
+    Yes. DataFusion is retired and is no longer the recommended way to combine data. Existing DataFusions should be rebuilt in Magic ETL or DataSet Views so they continue to receive support and updates.
+  </Accordion>
+  <Accordion title="Will rebuilding overwrite my existing DataFusion output?">
+    No. A rebuilt combine creates a new output DataSet with a new DataSet ID. Repoint downstream DataFlows, cards, and views to the new output, then retire the old DataFusion once you confirm nothing still reads from it.
+  </Accordion>
+  <Accordion title="My DataFusion showed a 'Cannot load required dependency' error. Will Magic ETL avoid that?">
+    That error came from a schema change or deletion in one of the DataFusion inputs — DataFusions did not adapt to schema changes automatically. When you rebuild in Magic ETL, a **Join Data** tile flags column changes in its configuration so you can correct the mapping rather than silently failing.
+  </Accordion>
+  <Accordion title="Which is faster for a large combine, Magic ETL or a DataSet View?">
+    For a simple combine that only powers cards, a DataSet View avoids materializing a stored DataSet and is lightweight. For very large or transform-heavy combines, Magic ETL gives you more control over join order, column pruning, and calculations — apply the performance practices above to keep it fast.
+  </Accordion>
+</AccordionGroup>

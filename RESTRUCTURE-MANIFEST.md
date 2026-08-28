@@ -517,6 +517,12 @@ Rows will be added here as articles are retired. No article may be deleted or ar
 
 _Note: `archived` above is the old two-state term. Per-article retirement rows below use the five-state vocabulary (`legacy` / `retired`)._
 
+### Net-New (Phase 4)
+
+| Filename | Title | Disposition | Source Articles | Screenshot Status | Notes |
+|----------|-------|-------------|-----------------|-------------------|-------|
+| `DataFusion-Migration-Guide.mdx` | Migrate from DataFusion to Magic ETL | new | `360043428293`, `360043428313`, `360043427953`, `360043428333` | n/a | Forum gap rank 198. Conceptual/procedural migration guide; step screenshots live in linked Magic ETL / DataSet View articles. Registered in Magic ETL nav group. |
+
 ### Connector Merges — Executed 2026-08-28
 
 22 exact-title connector pairs were content-reviewed (not treated as mechanical stubs). **14 were genuine duplicates and were merged/deleted** (below). The remaining 8 were found to be *distinct* connectors sharing a title (different product surface, auth method, or connector generation) and were **deferred** to a separate disambiguation task — see the deferred list at the end of this section. All 14 deletions had their inbound links repointed to the keeper and their `docs.json` nav entry removed.

@@ -501,21 +501,22 @@ Sync #2 (right before merge, post-Phase-6) will reconcile everything main change
 
 ---
 
-## Phase 4 — Archived / Legacy / Deleted Articles (Not Started)
+## Phase 4 — Consolidation, Retirement & Archive (In Progress — 2026-08-28)
 
-Rows will be added here as articles are retired. No article may be deleted or archived without an entry here.
+Connector merges and the DataFusion migration guide are **executed** (see subsections below). Retirement batches are **classified and staged** here for Phase 4.6 — lifecycle status stamping, callout insertion, and nav removal happen in Phase 4.6 *after PM sign-off*. No article may be deleted or retired without an entry here.
 
-**Known batches pending Phase 4 (pre-logged):**
+**Batch summary (five-state; counts are verified English `s/article/` files):**
 
-| Source Filename | Title | Planned Disposition | Notes |
-|-----------------|-------|---------------------|-------|
-| Workbench 4 articles (37) | Various | `archived` | D1 confirmed; add rows when Phase 4 executes |
-| DataFusion articles (11) | Various | `archived` | Confirmed discontinued |
-| Old Magic ETL tile articles (15) | Various | `archived` | 1 article to keep (`Create a Recursive/Snapshot Old Magic ETL DataFlow`) |
-| Defunct-service connectors (111) | Various | `archived` | Verified via Support KB Audit |
-| CourseBuilder articles (16) | Various | `archived` (pending D10) | Awaiting PM confirmation |
+| Batch | Count (EN) | Planned Disposition | Status |
+|-------|-----------|---------------------|--------|
+| Workbench 4 articles | 36 | `legacy` | Staged for 4.6 (D1 confirmed) |
+| DataFusion articles | 4 | `retired` | Staged for 4.6 (migration guide shipped) |
+| Old Magic ETL tile articles | 7 (+1 keep) | `retired` | Staged for 4.6; keep `360043428113` |
+| Defunct-service connectors | 12 named + superset | `retired` | Named staged; superset to Tasleema for confirmation |
+| CourseBuilder articles | 9 | `retired` | Staged for 4.6, **pending D10** PM confirm |
+| Pre-2022 release notes | 42 | `retired` | Staged for 4.6 |
 
-_Note: `archived` above is the old two-state term. Per-article retirement rows below use the five-state vocabulary (`legacy` / `retired`)._
+_Localized (ja/de/es/fr) counterparts are handled in Phase 6/7, per the English-only restructure scope._
 
 ### Net-New (Phase 4)
 
@@ -545,6 +546,23 @@ _Note: `archived` above is the old two-state term. Per-article retirement rows b
 | `7695619925271.mdx` | Microsoft SQL Server Writeback Connector | merged-into | `360043437013.mdx` | Folded: NVARCHAR/Unicode + new-table caveat |
 
 **Deferred — 8 non-duplicates (NOT deleted; separate disambiguation/retitle task):** `000005402` Magento (OAuth 1.0a variant), `SFTP-Connector` (SFTP for Domo Documents), `Amazon-S3-Connector` (S3 for Domo Documents), `000005651` Amazon Kendra (query flavor), `360042930294` WordPress (self-hosted), `GitHub-Connector` (GitHub→Documents token). Plus **keeper/delete backwards** — keep the current connector, route the deprecated old gen into the retirement batch for PM sign-off: LinkedIn (`000005834` current vs `360043434493` V1) and Google Ads (`1500011202222` current vs `360060270674` legacy AdWords).
+
+### Retirement Batches — Staged for Phase 4.6 (2026-08-28)
+
+Every file below is a retirement candidate **staged for PM sign-off in Phase 4.5**; status stamping + nav changes execute in Phase 4.6. Enumerated by numeric ID so Phase 9 can account for each. English-only (localized counterparts: Phase 6/7).
+
+**Workbench 4 → `legacy` (36; D1 confirmed):**
+`360047416513, 360046861014, 360047499333, 360046860074, 360046860134, 360047499793, 360046860414, 360046860474, 360047496273, 360046861474, 360046856414, 360046857074, 360046864074, 360047496013, 360047411473, 360046864274, 360043437453, 360046856934, 360047494393, 360047504553, 360046773094, 360047403773, 360046761214, 360047400113, 360047406653, 360046762634, 360046763254, 360047416773, 360046864794, 360047496473, 360047501293, 360046864914, 360046772834, 360047504673, 360046860834, 7561566413463`
+
+**DataFusion → `retired` (4):** `360043428293, 360043428313, 360043427953, 360043428333` (migration guide `DataFusion-Migration-Guide.mdx` shipped as replacement)
+
+**Old Magic ETL tiles → `retired` (7; KEEP `360043428113`):** `360043427713, 360042922814, 360043427353, 360043427373, 360043427733, 360043427753, 4405652887191`
+
+**CourseBuilder → `retired` (9; PENDING D10):** `360042935694, 360042935714, 360043438473, 360043438493, 360043440333, 360043440393, 360042935674, 360043440353, 360043440373`
+
+**Pre-2022 release notes → `retired` (42):** `360048116854, 360048116074, 360042936134, 360043439573, 360042936254, 360042934794, 360043439553, 360042936174, 360042936294, 360042934934, 360043439613, 360043439593, 360043440713, 360042936214, 360043440673, 360043440653, 360042936274, 360042934814, 360042934774, 360042936194, 360042936234, 360043440733, 360043439913, 360043439693, 360042935234, 360042935214, 360043439853, 360042935034, 360042935014, 360043439713, 360042934994, 360042934974, 360043439873, 360043439893, 360043440793, 360043440693, 360042934834, 360055244114, 360061873754, 4403173731863, 4409045382935, 4425111066903`
+
+**Defunct-service connectors → `retired`:** verified named (12): `360043434493` (LinkedIn V1), `360042929914` (Pinterest), `360042929934` (Pinterest Enterprise), `360042930034` (StumbleUpon), `360042927314` (Simply Measured), `360043434313` (Salesforce Desk), `360043433893` (IBM Digital Analytics), `360042928134` (GetThere), `360043431633` (Moz), `360043433593` (Adobe Analytics Advanced Legacy), `360042926694` (DCM via GCS), `000003928` (Azure Data Lake Store — already held from nav in 3c). Plus **backwards-pair reroute:** `360060270674` (legacy Google Ads/AdWords) → `retired` (current `1500011202222` stays active). The full **Category=Data Connection + Deprecate superset (185 EN)** is attached to Tasleema Lallmamode's PM brief to confirm which are truly dead — the named 12 + 2 are the confirmed subset; the rest require PM judgment.
 
 ---
 

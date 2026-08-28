@@ -6,24 +6,30 @@ file at the start of any restructure work to orient themselves before doing anyt
 
 **Plan document:** `KB-RESTRUCTURE-PLAN.md`
 **Disposition log:** `RESTRUCTURE-MANIFEST.md` — running record of what happened to every article; updated throughout all phases; Phase 9 converts it to the final audit report
-**Last updated:** 2026-08-26 (**Phase 3b general COMPLETE** — structural intro sweep done: 133 articles normalized to `## Intro` + `---` across 3 waves / 20 clusters, 2 connector pages skipped, 9 grant-gap `[pm-input]` markers; committed `1b442ac7`, `dca9f80f`, `cd07b8a2`. Earlier today: 15 Medium `rec=new` triaged — 4 written, 5 defer, 2 dropped.)
+**Last updated:** 2026-08-28 (**Phase 4 executed** — 14 exact-title duplicate connectors merged/deleted (`74e92a42`), `DataFusion-Migration-Guide.mdx` written + navved (`c730bac5`), all retirement batches classified + staged for 4.6 (`bbad7cbe`), manifest disposition vocab reconciled to five-state, 3 lifecycle snippets verified pre-existing. **8 title-collisions found NOT to be duplicates → deferred to a connector-disambiguation task.** Next: run the PM-brief script → Phase 4.5.)
 
 ---
 
 ## Current Status
 
-**Active phase:** Phase 3b general **COMPLETE** → next is Phase 3c sync #2 (pre-merge) or advance to Phase 4 (Consolidation & Retirement)
-**Blocked on:** 8 human decisions (see Phase 2 Decision Required table in `RESTRUCTURE-IA-SPEC.md`)
+**Active phase:** Phase 4 **EXECUTED** (2026-08-28) → next is the Phase 4.5 PM-brief generation (update `build-pm-review-briefs.py` PHASE4_* data + run), then PM review
+**Blocked on:** 8 human decisions (see Phase 2 Decision Required table in `RESTRUCTURE-IA-SPEC.md`); D10 (CourseBuilder) is a PM-confirm item in the retirement staging
 
-### ▶ Where we left off (2026-08-26) — pick up here next session
+### ▶ Where we left off (2026-08-28) — pick up here next session
 
-**▶▶ RESUME TOMORROW — read this first.**
-- **State:** branch `update/fullRestructure`. **All work committed AND pushed** — HEAD = `origin/update/fullRestructure` = `d50e6310`, working tree clean. **Phase 3b general is fully COMPLETE.**
-- **Just finished:** the **structural intro sweep** — the last Phase 3b item. 133 articles normalized to `## Intro` + `---` (standard "This article explains…" format) across 3 waves of parallel agents (20 collision-free clusters). 2 connector pages skipped (HipChat, Sage 300); 9 grant-gap `[pm-input]` markers added. Full detail: `RESTRUCTURE-MANIFEST.md` › Phase 3b general — Structural Intro Sweep. Rig lives in `scripts/reports/intro_sweep_clusters/`.
-- **First action tomorrow:** Phase 3b is done — choose the next phase:
-  1. **Phase 4 — Consolidation, Retirement & Archive** (recommended next; it's what most PM sign-offs are about). Retirement batches pre-scoped: Workbench 4 (→ Legacy), DataFusion / old Magic ETL tiles / defunct connectors (→ Retired), CourseBuilder (pending D10), plus 22 exact-duplicate connector merges and the `DataFusion-Migration-Guide.mdx`. See Phase 4 section + Support KB Audit.
-  2. **Phase 3c sync #2** — only when approaching the final merge (post-rename; uses the numeric-ID parity system). Not needed yet.
-- **Path to PM review (Phase 4.5):** finish Phase 4, then update `build-pm-review-briefs.py`'s non-forum phase data and run it to generate per-PM briefs + `RESTRUCTURE-TASKS.md`.
+**▶▶ RESUME — read this first.**
+- **State:** branch `update/fullRestructure`. **Phase 4 work committed, NOT yet pushed** — `74e92a42` (merges), `c730bac5` (migration guide), `bbad7cbe` (retirement staging). Working tree otherwise clean.
+- **Phase 4 executed:**
+  1. **Connector consolidation** — content-reviewed all 22 exact-title pairs; **14 genuine duplicates merged/deleted** (8 fold-first + 6 clean, incl. Oracle/SugarCRM tie-breakers). Inbound links repointed, nav entries removed, manifest logged.
+  2. **8 non-duplicates DEFERRED** — title collisions that are actually distinct connectors (Documents-surface: SFTP/S3/GitHub; variants: WordPress self-hosted, Magento OAuth, Kendra query; **backwards keepers: LinkedIn V1 + Google Ads legacy**). Logged in `RESTRUCTURE-MANIFEST.md` › Connector Merges. **➡️ Needs a dedicated disambiguation/retitle task.**
+  3. **`DataFusion-Migration-Guide.mdx`** — written, navved (Magic ETL group), quality-gated.
+  4. **Retirement batches staged for 4.6** — Workbench 4 (36→legacy), DataFusion (4), old Magic ETL (7, keep `360043428113`), CourseBuilder (9, pending D10), pre-2022 RN (42), defunct connectors (12 named + Google Ads legacy; 185-EN superset → Tasleema). Enumerated in the manifest. **No status stamping/nav removal yet — that's 4.6, post-PM.**
+  5. Manifest disposition vocab reconciled to five-state; 3 lifecycle snippets verified pre-existing (no recreate).
+- **First actions next session (path to PM review — Phase 4.5):**
+  1. Update `scripts/build-pm-review-briefs.py` PHASE4_* (and other non-forum) data to reflect what actually shipped, then run it → per-PM briefs + `RESTRUCTURE-TASKS.md`.
+  2. Resolve the 2 open ownership items (`Domo-Certification-Exam-Logistics.mdx`, `360042934454.mdx`) so the briefs generate cleanly.
+  3. Optionally run the deferred connector-disambiguation task (can also be a Phase 6 rename item).
+- **Not needed yet:** Phase 3c sync #2 (pre-final-merge only).
 
 ---
 
@@ -68,7 +74,7 @@ Next: advance to **Phase 4** (Consolidation & Retirement), or Phase 3c sync #2 w
 | **3b: Article Upgrades (~200)** | ✅ COMPLETE (2026-08-26) | Forum-gap pass (~134 articles) + 15 Medium net-new (4 written/5 defer/2 dropped) + structural intro sweep (133 normalized, 9 grant-gap `[pm-input]`). All sub-items done. |
 | **3b-Forum: Forum-Driven Article Updates (Critical+High, ~68)** | ✅ Complete (2026-08-20) | All 68 done: Critical 7 (committed), High 61 (10 parallel agents, 2 waves). 45 files, ~84 total `[pm-input]` across the phase. Ranks 42/93 re-routed to correct homes. |
 | **3c: Main Branch Content Sync** | 🔄 Sync #1 complete (2026-08-20); sync #2 pre-merge | Sync #1: 15 new + 68 edits + 12 portal + 72 images + 1 snippet from main; 5 conflicts resolved; 1 deletion mirrored; 1 case-rename; 14 new articles into nav (1 deprecated held). Sync #2 uses the numeric-ID parity system. |
-| **4: Consolidation, Retirement & Archive** | 🔲 Not started | Duplicates, lifecycle classification; see Product Lifecycle Standards below |
+| **4: Consolidation, Retirement & Archive** | ✅ Executed (2026-08-28) | 14 exact-title duplicate connectors merged/deleted; `DataFusion-Migration-Guide.mdx` written; retirement batches classified + staged for 4.6; disposition vocab reconciled to five-state. **8 non-duplicate title-collisions deferred** to a connector-disambiguation task. |
 | **4.5: PM Review System** | 🔧 Built — run after Phase 4 | Script ready: `scripts/build-pm-review-briefs.py`; generates per-PM task checklists + meeting briefs |
 | **4.6: Lifecycle Status Application** | 🔲 Not started | Bulk-add `status: "active"` to all articles; apply PM-confirmed non-Active states; move Legacy/Sunset to Archive group; remove Retired from nav |
 | **5: Interlinking** | 🔲 Not started | Next Steps + Related Articles bulk pass — runs after PM sign-off |

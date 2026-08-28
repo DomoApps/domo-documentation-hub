@@ -330,11 +330,37 @@ These decisions don't block Phase 3a article writing — they only block the nav
 
 ## Phase 4.5 — PM Review System
 
-**Status:** Built — run after Phase 4 is complete, before Phase 5 begins
-**Script:** `scripts/build-pm-review-briefs.py`
-**Output:** `pm-review-briefs/<PM-Name>.md` + `RESTRUCTURE-TASKS.md` — generated on demand
+**Status:** Built + generated (2026-08-28) — runs after Phase 4, before Phase 5
+**Script:** `scripts/build-pm-review-briefs.py` (one run produces everything below)
+**Outputs:**
+- `pm-review-briefs/<PM>.md` — per-PM meeting brief (gitignored; regenerable)
+- `pm-review-briefs/pm-review-docs/<PM>.docx` — Word copy of each brief, for sending to PMs (gitignored)
+- `RESTRUCTURE-TASKS.md` — cross-PM master checklist; the **live "how much is left" dashboard** (tracked)
+- `PM-REVIEW-STATUS.md` — the **hand-maintained workflow ledger**; seeded once, never overwritten (tracked)
 
 Phase 4.5 is the human sign-off gate. All content work (Phases 3a–4) is complete before this runs. PMs review every change made to their product area and either sign off, provide fact-check corrections, or schedule follow-up meetings for remaining information gaps. No interlinking, renaming, or nav rebuild happens until this phase is complete.
+
+### The operating loop — when/how to use each artifact
+
+The three tracked/generated artifacts have distinct jobs; use them together:
+
+| Artifact | Owner | Job |
+|----------|-------|-----|
+| Per-PM brief (`.docx`/`.md`) | Claude generates | What each PM reviews. Send them the `.docx`. |
+| `RESTRUCTURE-TASKS.md` | Claude generates (drift-proof) | Live burndown of open work by PM + type. Re-run the script for fresh counts. |
+| `PM-REVIEW-STATUS.md` | **Jared hand-maintains** | Where each PM is in the workflow (brief sent → responses in → signed off → done). |
+
+**The flow is: PMs → Jared → Claude → markers/ledger → dashboard → Jared.** No one edits the branch except Claude (plus the occasional technical-PM PR); PMs are validators/information-sources, not editors — this avoids branch contention with active restructure work, MDX breakage, and the "confirmed-fine fact-check produces no diff" tracking hole.
+
+Step by step:
+1. **Generate** — run `python3 scripts/build-pm-review-briefs.py`. Produces all four outputs above. Safe to re-run anytime; it refreshes briefs/tasks/docx and leaves `PM-REVIEW-STATUS.md` untouched.
+2. **Send** — hand each PM their `pm-review-docs/<PM>.docx`. Mark **Brief sent** in `PM-REVIEW-STATUS.md`.
+3. **Collect** — PM returns answers (annotated docx, email, or meeting). Mark **Responses in**. Big/complex reviews (Tasleema = 1,077 articles) and all `[decision]`/lifecycle items are best done in a live meeting.
+4. **Apply** — hand the answers to Claude. Claude edits articles, fills/removes `[pm-input]` markers, applies corrections, records decisions, and reports what it changed.
+5. **Track** — mark **Fact-checks applied / `[pm-input]` cleared / Lifecycle signed off / Decisions resolved** in the ledger as each completes. Re-run the script to confirm the PM's open counts in `RESTRUCTURE-TASKS.md` are dropping.
+6. **Close** — when a PM's ledger row is all **done** (and their `RESTRUCTURE-TASKS.md` counts are 0), that PM is finished. **When every PM row is Done → Phase 4.5 is complete → proceed to Phase 4.6** (apply confirmed lifecycle states).
+
+**Progress check any time:** ask Claude "where are we?" — it re-runs the script and reads the ledger to report per-PM counts and workflow state. The `[pm-input]` markers embedded in the articles are the authoritative open-item source; they can never drift from the files.
 
 ### What the system generates
 
@@ -386,7 +412,7 @@ python3 scripts/build-pm-review-briefs.py
 
 Before running, update the script's hardcoded phase data to reflect what was actually completed vs. planned in Phases 3–4. The brief and task list should show real completed changes, not plans.
 
-**Note (2026-08-18):** Phase 3a-Forum data is no longer hardcoded in the script. `build-pm-review-briefs.py` now reads the **`RESTRUCTURE-MANIFEST.md`** Phase 3a-Forum *written* and *deferred* tables as its source of truth, and scans `s/article/*.mdx` for embedded `{/* [pm-input] … */}` markers to build the per-PM checkpoint (3d) list. To change which forum articles a PM sees, edit the manifest tables — not the script. Only the non-forum data (`PHASE3A_ARTICLES`, `PHASE3A_PM_ARTICLES`, `FORUM_UPDATE_CRITICAL`, `PHASE4_*`, `MANIFEST_PM_INPUT_FLAGS`) remains in-script. The script prints an **UNASSIGNED** warning for any manifest forum row whose PM cell matches no roster PM (currently rank 146 `Domo-Certification-Exam-Logistics.mdx` — "Domo University / Enablement", no product PM; needs a human ownership decision before Phase 4.5).
+**Note (2026-08-18, updated 2026-08-28):** Phase 3a-Forum data is no longer hardcoded in the script. `build-pm-review-briefs.py` now reads the **`RESTRUCTURE-MANIFEST.md`** Phase 3a-Forum *written* and *deferred* tables as its source of truth, and scans `s/article/*.mdx` for embedded `{/* [pm-input] … */}` markers to build the per-PM checkpoint (3d) list. To change which forum articles a PM sees, edit the manifest tables — not the script. Only the non-forum data (`PHASE3A_ARTICLES`, `PHASE3A_PM_ARTICLES`, `FORUM_UPDATE_CRITICAL`, `PHASE4_*`, `DECISIONS`, `MANIFEST_PM_INPUT_FLAGS`) remains in-script. The script prints an **UNASSIGNED** warning for any manifest forum row whose PM cell matches no roster PM. **All ownership is currently resolved** (rank 146 → Jordan Jensen; `360042934454` → Dan Brinton; ranks 144/161 → Ken Boyer) — a clean run shows no UNASSIGNED warnings.
 
 ### PM roster
 

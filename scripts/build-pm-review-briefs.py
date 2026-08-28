@@ -9,7 +9,9 @@ Reads:
                                           deferred article tables — source of truth)
   - s/article/*.mdx                      (scanned for embedded [pm-input] markers)
 
-Outputs one .md file per PM in pm-review-briefs/.
+Outputs one .md file per PM in pm-review-briefs/, a cross-PM RESTRUCTURE-TASKS.md
+aggregate, and a Word .docx copy of each brief in pm-review-briefs/pm-review-docs/
+(the .docx step is skipped with a note if pandoc is not installed).
 
 The Phase 3a-Forum data (which new articles were written vs. deferred, and which
 drafted articles still carry open [pm-input] placeholders) is NOT hardcoded here —
@@ -29,6 +31,8 @@ Usage:
 import json
 import re
 import os
+import shutil
+import subprocess
 from collections import defaultdict
 from pathlib import Path
 
@@ -38,6 +42,7 @@ GAPS_FILE = REPO_ROOT / "_gaps_with_support.json"
 MANIFEST_FILE = REPO_ROOT / "RESTRUCTURE-MANIFEST.md"
 ARTICLE_DIR = REPO_ROOT / "s" / "article"
 OUTPUT_DIR = REPO_ROOT / "pm-review-briefs"
+DOCS_DIR = OUTPUT_DIR / "pm-review-docs"
 TASKS_FILE = REPO_ROOT / "RESTRUCTURE-TASKS.md"
 
 # Features excluded from PM briefs entirely — their articles are outside
@@ -1228,6 +1233,35 @@ def build_tasks_aggregate(all_pms: list, ownership: dict, all_gaps: list, forum:
     return "\n".join(lines) + "\n"
 
 
+def write_docx_copies(brief_paths: list) -> None:
+    """Write a Word .docx copy of each markdown brief into pm-review-briefs/pm-review-docs/.
+
+    Uses pandoc (GitHub-flavored markdown so tables + task-list checkboxes render as
+    rich content). If pandoc is not installed the step is skipped with a note — the
+    markdown briefs are the primary artifact and are unaffected.
+    """
+    pandoc = shutil.which("pandoc")
+    if not pandoc:
+        print("\n  ⚠️  pandoc not found — skipping .docx copies. Install pandoc "
+              "(https://pandoc.org/installing.html) to enable them; the markdown "
+              "briefs are unaffected.")
+        return
+    DOCS_DIR.mkdir(parents=True, exist_ok=True)
+    ok = 0
+    for md_path in brief_paths:
+        docx_path = DOCS_DIR / (md_path.stem + ".docx")
+        try:
+            subprocess.run(
+                [pandoc, str(md_path), "-f", "gfm", "-o", str(docx_path)],
+                check=True, capture_output=True, text=True,
+            )
+            ok += 1
+        except subprocess.CalledProcessError as e:
+            print(f"  ✗ .docx failed for {md_path.name}: {e.stderr.strip()}")
+    print(f"  ✓ {ok}/{len(brief_paths)} .docx copies written to "
+          f"{DOCS_DIR.relative_to(REPO_ROOT)}/")
+
+
 def main():
     print("Loading data...")
     ownership = load_ownership_reference(OWNERSHIP_FILE)
@@ -1274,6 +1308,7 @@ def main():
     all_pms = sorted(roster)
     print(f"\nGenerating briefs in {OUTPUT_DIR.relative_to(REPO_ROOT)}/...")
 
+    brief_paths = []
     for pm_name in all_pms:
         pm_data = ownership.get(pm_name, {"features": set(), "articles": []})
         brief = generate_brief(pm_name, pm_data, gaps, forum)
@@ -1281,6 +1316,7 @@ def main():
         out_path = OUTPUT_DIR / f"{safe_name}.md"
         with open(out_path, "w", encoding="utf-8") as f:
             f.write(brief)
+        brief_paths.append(out_path)
         article_count = len(pm_data["articles"])
         print(f"  ✓ {out_path.name}  ({article_count} articles)")
 
@@ -1290,6 +1326,9 @@ def main():
     tasks_md = build_tasks_aggregate(all_pms, ownership, gaps, forum)
     TASKS_FILE.write_text(tasks_md, encoding="utf-8")
     print(f"  ✓ {TASKS_FILE.relative_to(REPO_ROOT)} written (aggregate task checklist)")
+
+    # Word .docx copies of each brief (skipped with a note if pandoc is missing)
+    write_docx_copies(brief_paths)
 
     if orphans:
         print("\n  ⚠️  UNASSIGNED forum items — no roster PM matched, will NOT appear in any brief:")

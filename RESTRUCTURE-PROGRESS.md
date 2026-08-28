@@ -6,31 +6,34 @@ file at the start of any restructure work to orient themselves before doing anyt
 
 **Plan document:** `KB-RESTRUCTURE-PLAN.md`
 **Disposition log:** `RESTRUCTURE-MANIFEST.md` — running record of what happened to every article; updated throughout all phases; Phase 9 converts it to the final audit report
-**Last updated:** 2026-08-28 (**Phase 4 executed** — 14 exact-title duplicate connectors merged/deleted (`74e92a42`), `DataFusion-Migration-Guide.mdx` written + navved (`c730bac5`), all retirement batches classified + staged for 4.6 (`bbad7cbe`), manifest disposition vocab reconciled to five-state, 3 lifecycle snippets verified pre-existing. **8 title-collisions found NOT to be duplicates → deferred to a connector-disambiguation task.** Next: run the PM-brief script → Phase 4.5.)
+**Last updated:** 2026-08-28 (**Phase 4 executed + Phase 4.5 tooling complete — all committed AND pushed**, HEAD `007f6b51` = `origin/update/fullRestructure`, tree clean). Phase 4: 14 duplicate connectors merged/deleted (`74e92a42`), `DataFusion-Migration-Guide.mdx` (`c730bac5`), retirement batches staged for 4.6 (`bbad7cbe`), disposition vocab reconciled to five-state; 8 title-collision non-duplicates deferred. Phase 4.5: `build-pm-review-briefs.py` now generates 14 per-PM briefs + `.docx` copies + `RESTRUCTURE-TASKS.md` (387-task dashboard) + `PM-REVIEW-STATUS.md` (workflow ledger, seed-once); all ownership resolved. **Next: begin the PM review loop (see Phase 4.5 › "The operating loop"), then Phase 4.6.**
 
 ---
 
 ## Current Status
 
-**Active phase:** Phase 4 executed + **Phase 4.5 briefs GENERATED** (2026-08-28) → next is holding the PM review meetings, then Phase 4.6 (lifecycle application)
+**Active phase:** Phase 4 executed + **Phase 4.5 tooling complete & briefs generated** (2026-08-28) → next is running the PM review loop (send briefs, collect answers, Claude applies), then Phase 4.6 (lifecycle application)
 **Blocked on:** 8 human decisions (see Phase 2 Decision Required table in `RESTRUCTURE-IA-SPEC.md`); D10 (CourseBuilder) is a PM-confirm item in the retirement staging
 
-### ▶ Where we left off (2026-08-28) — pick up here next session
+### ▶ Where we left off (2026-08-28) — pick up here next week
 
 **▶▶ RESUME — read this first.**
-- **State:** branch `update/fullRestructure`. **Phase 4 work committed, NOT yet pushed** — `74e92a42` (merges), `c730bac5` (migration guide), `bbad7cbe` (retirement staging). Working tree otherwise clean.
+- **State:** branch `update/fullRestructure`, **HEAD `007f6b51` = origin, working tree clean, everything pushed.** Today's 8 commits: `74e92a42`, `c730bac5`, `bbad7cbe`, `f280a1ae` (Phase 4) + `e92e69d1`, `9462e7be`, `f549e929`, `007f6b51` (Phase 4.5 tooling).
 - **Phase 4 executed:**
   1. **Connector consolidation** — content-reviewed all 22 exact-title pairs; **14 genuine duplicates merged/deleted** (8 fold-first + 6 clean, incl. Oracle/SugarCRM tie-breakers). Inbound links repointed, nav entries removed, manifest logged.
-  2. **8 non-duplicates DEFERRED** — title collisions that are actually distinct connectors (Documents-surface: SFTP/S3/GitHub; variants: WordPress self-hosted, Magento OAuth, Kendra query; **backwards keepers: LinkedIn V1 + Google Ads legacy**). Logged in `RESTRUCTURE-MANIFEST.md` › Connector Merges. **➡️ Needs a dedicated disambiguation/retitle task.**
+  2. **8 non-duplicates DEFERRED** — title collisions that are actually distinct connectors (Documents-surface: SFTP/S3/GitHub; variants: WordPress self-hosted, Magento OAuth, Kendra query; **backwards keepers: LinkedIn V1 + Google Ads legacy**). Logged in `RESTRUCTURE-MANIFEST.md` › Connector Merges. **➡️ Needs a dedicated disambiguation/retitle task (can fold into Phase 6 renames).**
   3. **`DataFusion-Migration-Guide.mdx`** — written, navved (Magic ETL group), quality-gated.
   4. **Retirement batches staged for 4.6** — Workbench 4 (36→legacy), DataFusion (4), old Magic ETL (7, keep `360043428113`), CourseBuilder (9, pending D10), pre-2022 RN (42), defunct connectors (12 named + Google Ads legacy; 185-EN superset → Tasleema). Enumerated in the manifest. **No status stamping/nav removal yet — that's 4.6, post-PM.**
   5. Manifest disposition vocab reconciled to five-state; 3 lifecycle snippets verified pre-existing (no recreate).
-- **First actions next session (Phase 4.5 briefs are GENERATED — now run the meetings):**
-  1. ✅ DONE — `build-pm-review-briefs.py` refreshed with real Phase 4 data + `build_tasks_aggregate()` added; run produces 14 per-PM briefs (`pm-review-briefs/`, gitignored) + `RESTRUCTURE-TASKS.md` (tracked; 387 tasks). Re-run anytime to refresh.
-  2. ✅ DONE — ownership resolved: user-licenses `360042934454` → Dan Brinton; certification rank 146 → Jordan Jensen; forum gaps 144/161 re-homed → Ken Boyer. No UNASSIGNED warnings remain.
-  3. **Hold the PM review meetings.** Tasleema's brief is huge (1,077 articles) — chunk it. Retirement batches need lifecycle sign-off; D10 (CourseBuilder) and D2/D4/D5/D6 decisions are in the briefs + `RESTRUCTURE-TASKS.md`.
-  4. Then Phase 4.6 (apply confirmed lifecycle states) → Phase 5.
-  5. Still open: the deferred connector-disambiguation task (8 non-duplicates; can fold into Phase 6 renames).
+- **Phase 4.5 tooling — DONE (all committed & pushed):**
+  - `build-pm-review-briefs.py` refreshed with real Phase 4 data; one run now emits **per-PM briefs** (`pm-review-briefs/*.md`, gitignored) + **`.docx` copies** (`pm-review-briefs/pm-review-docs/`, gitignored) + **`RESTRUCTURE-TASKS.md`** (tracked; live 387-task dashboard) + **`PM-REVIEW-STATUS.md`** (tracked; hand-maintained workflow ledger, seeded once and never overwritten).
+  - Ownership fully resolved: `360042934454`→Dan Brinton; cert rank 146→Jordan Jensen; forum gaps 144/161→Ken Boyer. Clean run = no UNASSIGNED warnings.
+- **▶ FIRST ACTION NEXT WEEK — begin the PM review loop** (full spec: Phase 4.5 › "The operating loop"):
+  1. Re-run `python3 scripts/build-pm-review-briefs.py` to refresh briefs/docx (leaves the ledger untouched).
+  2. Send each PM their `pm-review-briefs/pm-review-docs/<PM>.docx`; mark **Brief sent** in `PM-REVIEW-STATUS.md`.
+  3. As answers come back, hand them to Claude → Claude edits articles, burns `[pm-input]` markers, records decisions/lifecycle sign-offs; update the ledger cells.
+  4. Tasleema's brief is huge (1,077 articles) — chunk it. `[decision]` items D2/D4/D5/D6/D10 and lifecycle sign-offs are in the briefs + `RESTRUCTURE-TASKS.md`.
+  5. When every ledger row is Done → **Phase 4.6** (apply confirmed lifecycle states) → Phase 5.
 - **Not needed yet:** Phase 3c sync #2 (pre-final-merge only).
 
 ---

@@ -154,6 +154,12 @@ Common parents: **Magic ETL Enhancements**, **Workflows Updates / Workflows Enha
 Some entries are standard announcements rather than a single feature — include them when present in the internal notes even if they have no epic:
 
 - **Model Deprecation Notice / Deprecated Models** — bullet the models entering deprecation, state the availability-until date (verbatim from the source), then bullet the recommended replacements. See both examples for exact shape.
+- **Feature or product deprecation notice** — when a feature, editor, connector, or capability (not an AI model) is being retired, add a `### {Feature Name} Deprecation` entry (Title Case, sorted alphabetically by heading text). Write it as prose in the same plainspoken tone as the model notices — 1–3 short paragraphs, no `<Frame>`, and **no bold "What's Changing / What's Not Changing / Recommended Action" sub-labels** (that generic enterprise-SaaS format is not Domo's voice; fold the same information into prose):
+  1. Lead with the effective date stated **verbatim** from the source ("Starting {Month DD, YYYY}, …") and say plainly what is being discontinued and who it affects. Never compute or infer the date.
+  2. State what is **not** changing — e.g. existing artifacts keep running and stay accessible; only the authoring/editing experience is removed; adjacent tools are unaffected.
+  3. Close with the recommended migration path in the customer's terms, and a `Learn more` link to the replacement's KB article when a published one exists (omit the link otherwise).
+
+  See the **Mason App Editor Deprecation** entry (September 2026) for the model.
 - **Domo AI Models Updates** — new model versions and their key improvements as bullets.
 
 Place these alphabetically among the `###` entries like any other feature.

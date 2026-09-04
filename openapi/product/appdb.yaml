@@ -77,7 +77,7 @@ components:
         content:
           type: object
           additionalProperties: true
-          description: "Arbitrary JSON content of the document. If omitted, the document is created with an empty content object."
+          description: "Arbitrary JSON content of the document. If the request body has no `content` key, its top-level fields are wrapped as the content automatically. For example, `{\"username\": \"Bill\"}` is stored as `{\"content\": {\"username\": \"Bill\"}}`."
 
     #========= RESPONSE SCHEMAS =========
     Document:
@@ -1161,7 +1161,10 @@ paths:
     post:
       summary: Create Document (v1, Deprecated)
       deprecated: true
-      description: "**Deprecated.** Use the v2 Create Document endpoint instead. Add a new document to a specified collection."
+      description: |-
+        **Deprecated.** Use the v2 Create Document endpoint instead. Add a new document to a specified collection.
+
+        The request body accepts either the wrapped form `{"content": {...}}` or a flat object. A flat payload is stored under the `content` key automatically.
       tags:
         - App DB API (Product)
       parameters:
@@ -1226,7 +1229,10 @@ paths:
     put:
       summary: Update Document (v1, Deprecated)
       deprecated: true
-      description: "**Deprecated.** Use the v2 Update Document endpoint instead. Modify an existing document in a collection."
+      description: |-
+        **Deprecated.** Use the v2 Update Document endpoint instead. Modify an existing document in a collection.
+
+        The request body accepts either the wrapped form `{"content": {...}}` or a flat object. A flat payload is stored under the `content` key automatically.
       tags:
         - App DB API (Product)
       parameters:
@@ -1626,7 +1632,10 @@ paths:
           $ref: '#/components/responses/CollectionNotFound'
     post:
       summary: Create Document
-      description: Add a new document to a specified collection.
+      description: |-
+        Add a new document to a specified collection.
+
+        The request body accepts either the wrapped form `{"content": {...}}` or a flat object. A flat payload is stored under the `content` key automatically.
       tags:
         - App DB API (Product)
       parameters:
@@ -1711,7 +1720,10 @@ paths:
 
     put:
       summary: Replace Document
-      description: "Replaces an existing document in a collection — the entire `content` object is overwritten with whatever you send. To update individual fields without replacing the whole document, use the Partially Update Documents endpoint instead."
+      description: |-
+        Replaces an existing document in a collection — the entire `content` object is overwritten with whatever you send. To update individual fields without replacing the whole document, use the Partially Update Documents endpoint instead.
+
+        The request body accepts either the wrapped form `{"content": {...}}` or a flat object. A flat payload is stored under the `content` key automatically.
       tags:
         - App DB API (Product)
       parameters:
@@ -1819,7 +1831,10 @@ paths:
   /api/datastores/v2/collections/{collectionId}/documents/bulk:
     post:
       summary: Bulk Create Documents
-      description: "Add multiple documents to a collection in a single request. Each document is limited to 2 MB."
+      description: |-
+        Add multiple documents to a collection in a single request. Each document is limited to 2 MB.
+
+        Each entry accepts either the wrapped form `{"content": {...}}` or a flat object. A flat entry is stored under the `content` key automatically.
       tags:
         - App DB API (Product)
       parameters:
@@ -1857,7 +1872,10 @@ paths:
           $ref: '#/components/responses/CollectionNotFound'
     put:
       summary: Bulk Upsert Documents
-      description: "Insert or update multiple documents in a single request. Documents with a matching `id` are updated; documents without a matching `id` are created. Each document is limited to 2 MB."
+      description: |-
+        Insert or update multiple documents in a single request. Documents with a matching `id` are updated; documents without a matching `id` are created. Each document is limited to 2 MB.
+
+        To update an existing document, send its `id` alongside a `content` object. An entry with no `content` key is always treated as a new document: its top-level fields are wrapped under the `content` key automatically, and a top-level `id` is wrapped in with them rather than used to match an existing document. Use the wrapped `{"id": "...", "content": {...}}` form whenever you intend to update.
       tags:
         - App DB API (Product)
       parameters:

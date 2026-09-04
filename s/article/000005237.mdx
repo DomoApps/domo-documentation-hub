@@ -25,7 +25,24 @@ For more information, see [Managing User Roles and Grants](/s/article/3600434389
 **Create a service account in Google Cloud Console.** Choose one of the following authentication methods:
 
 - **Option 1 —** Key file. Create a BigQuery service account, grant the required roles and permissions (see [Roles and Permissions](#roles-and-permissions) below), add a key to the service account, and download the JSON key file for authentication.
-- **Option 2 —** Workload Identity Federation (WIF). Open a Domo support ticket to request BigQuery integration using WIF, specifying the provider type (AWS or OIDC). Domo provides an Account ID for AWS or an Issuer URL and Allowed Audiences for OIDC. Create a Workload Identity Pool in Google Cloud IAM, add a provider using the details from Domo Support, and update the mapping to point `assertion.sub` to `google.subject`. Create a BigQuery service account, grant the required roles and permissions, including Workload Identity User (see [Roles and Permissions](#roles-and-permissions) below), and download the JSON configuration file from the Connected Service Accounts panel. When exporting the configuration, use the audience provided by Domo Support.
+- **Option 2 —** Workload Identity Federation (WIF). Domo supplies the federation details; you build the trust in Google Cloud from them. See [Set Up Workload Identity Federation](#set-up-workload-identity-federation) below.
+
+### Set Up Workload Identity Federation
+
+Domo owns one side of this trust relationship, so the provider type and the audience are values Domo Support gives you. You do not choose them.
+
+1. Open a Domo support ticket requesting BigQuery integration using WIF.
+Domo Support confirms which provider type applies to your instance and returns the values you need: an Account ID for AWS, or an Issuer URL and Allowed Audiences for OIDC. Which type applies depends on how your Domo instance is hosted, so request it rather than selecting one.
+
+2. Create a Workload Identity Pool in Google Cloud IAM, and add a provider using the details from Domo Support.
+Update the attribute mapping to point `assertion.sub` to `google.subject`.
+
+3. Create a BigQuery service account and grant the required roles and permissions, including Workload Identity User.
+See [Roles and Permissions](#roles-and-permissions). Grant Workload Identity User **on the service account itself**, with the workload identity pool principal as the member—not at the project level.
+
+4. Download the JSON configuration file from the **Connected Service Accounts** panel, using the audience Domo Support provided.
+
+<Warning>**Important:** Use the audience from Domo Support exactly as given. Domo can only request tokens for an audience it owns, so a configuration exported with a different audience fails when Domo tries to authenticate, and the resulting error does not name the audience as the cause. If you no longer have the value, ask Domo Support for it rather than substituting your own.</Warning>
 
 ### Roles and Permissions
 
@@ -324,3 +341,19 @@ Two things to check if you already granted the role:
 - **Confirm the role is on the service account Domo uses.** If you authenticate with Workload Identity Federation, Domo impersonates the service account named in your JSON configuration file, and that service account needs the role.
 
 If your security policy does not allow the service account to hold job-creation rights permanently, you can grant BigQuery Job User, create the integration, and then revoke the role. The integration continues to read data, but automated data freshness checks stop working, because those also run queries.
+
+### Resolve an Authentication Error When Using WIF
+
+If you authenticate with Workload Identity Federation, these errors mean Domo could not obtain a token to act as your service account:
+
+```text
+Error getting subject token from metadata server: 400 Bad Request
+Unable to refresh sourceCredentials
+Error requesting access token
+```
+
+Check these in order:
+
+- **The audience matches the one Domo Support provided.** The first two errors above usually mean the JSON configuration was exported with a different audience. Domo can only request tokens for an audience it owns. See [Set Up Workload Identity Federation](#set-up-workload-identity-federation).
+- **Workload Identity User is granted on the service account.** `Error requesting access token`, reported by Google as `iam.serviceAccounts.getAccessToken` denied, means the workload identity pool principal cannot impersonate the service account. Grant Workload Identity User or Service Account Token Creator on the service account, with the pool principal as the member.
+- **Use the Google Cloud troubleshooter.** Google includes an IAM Policy Troubleshooter link in the denial, which shows which principal was denied and which binding is missing. Ask Domo Support for the link from your failed attempt if you cannot find it in your own audit logs.

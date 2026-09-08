@@ -46,7 +46,7 @@ Different users have different jobs to be done. A data consumer's first question
 The KB should tell this story in order, for each user role:
 
 ```
-What is Domo? → First Login → Bring In Data → Manage Data → Prepare & Transform Data →
+What is Domo? → First Login → Integrate Data → Manage Data → Prepare & Transform Data →
 Analyze & Visualize → Share & Act → Build & Automate →
 Govern & Administer → Go Deeper (AI, Dev, Advanced)
 ```
@@ -83,7 +83,7 @@ Within the current restructure, actively surface AI-first options in other pilla
 | Share & Collaborate | AI Chat surfaced from dashboards | Hub article |
 | Develop & Integrate | AI Service Layer API; MCP connector (`Connect-AI-Tools-to-Domo-Using-MCP.mdx`) | Hub article + API overview |
 | Administer & Govern | AI Readiness (DataSet prep for AI); AI governance settings | Hub article + DataSet management how-tos |
-| Connect & Bring In Data | AI-assisted connector troubleshooting (where available) | Hub article only — don't force it |
+| Connect & Integrate Data | AI-assisted connector troubleshooting (where available) | Hub article only — don't force it |
 
 **Rules for this phase:**
 - Only add an AI callout if the feature is GA and the KB article for it already exists in the AI & Data Science pillar.
@@ -207,7 +207,7 @@ Classification heuristics (from title + excerpt):
 |---|--------|--------------------------|--------------------------|
 | 1 | Getting Started | 1 | 10 → expand to ~25 |
 | 2 | Core Concepts | 0 | 0 → create ~15 |
-| 3 | Connect & Bring In Data | 60+ | ~900 (connectors + Workbench) |
+| 3 | Connect & Integrate Data | 60+ | ~900 (connectors + Workbench) |
 | 4 | Manage Data | 0 | 0 → create ~3 + pull from Prepare & Transform (pending D9) |
 | 5 | Prepare & Transform Data | 8 | ~80 (or ~50 pending D9) |
 | 6 | Analyze & Visualize | 25 | ~200 |
@@ -246,10 +246,10 @@ Every pillar follows this hub-and-spoke pattern in the nav:
 
 Connectors are a reference library — they don't need full story treatment per article but need a proper hub and category organization.
 
-**Proposed structure for "Connect & Bring In Data":**
+**Proposed structure for "Connect & Integrate Data":**
 
 ```
-Connect & Bring In Data
+Connect & Integrate Data
 ├── Overview: Connecting Your Data to Domo        ← new hub (frames read + write)
 ├── What is a Connector?                          ← new explanation
 ├── Getting Started: Connect Your First DataSet   ← new tutorial
@@ -277,7 +277,7 @@ Connect & Bring In Data
 
 ### 2.3a Read/Write Framing Convention
 
-**This applies to all articles in the Connect & Bring In Data pillar.**
+**This applies to all articles in the Connect & Integrate Data pillar.**
 
 The pillar covers both directions of data movement. Authors must treat read and write as a pair — not as separate concerns, with write as an afterthought.
 
@@ -357,7 +357,7 @@ All 8 hub articles use the `new-overview-article` skill, which is designed exact
 
 | # | Article | Source content |
 |---|---------|---------------|
-| 16 | `Connect-and-Bring-In-Data-Overview.mdx` | All connector, Workbench, and writeback articles |
+| 16 | `Connect-and-Integrate-Data-Overview.mdx` | All connector, Workbench, and writeback articles |
 | 17 | `Prepare-and-Transform-Data-Overview.mdx` | Magic ETL, DataFlows, Data Models, DataSet unions articles |
 | 18 | `Analyze-and-Visualize-Overview.mdx` | Analyzer, chart types, Beast Mode, KPI card articles |
 | 19 | `Build-Apps-and-Automate-Overview.mdx` | App Studio, Workflows, Forms, Code Engine articles |
@@ -541,7 +541,7 @@ These portal→KB links are the highest-priority targets for adding the reverse 
 
 | KB Pillar | Primary Developer Portal targets | Link direction note |
 |-----------|----------------------------------|---------------------|
-| Connect & Bring In Data | `portal/Connectors/` — Custom Connectors, Writeback Connectors, API Connections, Federated Queries | KB connector setup articles → Portal for API/programmatic data ingestion |
+| Connect & Integrate Data | `portal/Connectors/` — Custom Connectors, Writeback Connectors, API Connections, Federated Queries | KB connector setup articles → Portal for API/programmatic data ingestion |
 | Prepare & Transform Data | `portal/data-science/scripting-tiles`, `portal/data-science/jupyter` | KB DataFlow and ETL articles → Portal for scripting-based prep |
 | Analyze & Visualize | `portal/API-Reference/Product-APIs/` — Cards API, Beast Modes API | KB card/Beast Mode articles → Portal for programmatic card management |
 | Build Apps & Automate | `portal/Apps/`, `portal/Automate-Actions/` — App Framework, Workflows API | KB App Studio + Workflows articles → Portal for pro-code and API-driven automation |

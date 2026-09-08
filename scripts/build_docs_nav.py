@@ -32,7 +32,7 @@ DOCS_JSON = "docs.json"
 # Pillar display order (Archive always last)
 PILLAR_ORDER = [
     "Getting Started",
-    "Connect & Bring In Data",
+    "Connect & Integrate Data",
     "Manage Data",
     "Prepare & Transform Data",
     "Analyze & Visualize",

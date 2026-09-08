@@ -130,8 +130,8 @@ OVERRIDES = {
     "360043437693.mdx": ("Develop & Integrate", "APIs & SDKs", None),# Domo ODBC Data Driver
     "360043437733.mdx": ("Develop & Integrate", "APIs & SDKs", None),# Domo CLI (Command Line Interface) Tool
 
-    # Cloud integration migration guide → Connect & Bring In Data
-    "000005675.mdx": ("Connect & Bring In Data", "Cloud Data Warehouses", None), # Migrate from Federated to Cloud Integrations
+    # Cloud integration migration guide → Connect & Integrate Data
+    "000005675.mdx": ("Connect & Integrate Data", "Cloud Data Warehouses", None), # Migrate from Federated to Cloud Integrations
 
     # Visualization articles → Analyze & Visualize
     "4402058407191.mdx": ("Analyze & Visualize", "Analyzer", None), # Analyzer and DataSet Views Integration
@@ -177,36 +177,36 @@ def assign_pillar(entry: dict) -> tuple[str, str, str | None]:
     if "getting started" in nav and "connect" not in nav:
         return ("Getting Started", "Getting Started", None)
 
-    # 6. Connect & Bring In Data
+    # 6. Connect & Integrate Data
     if "connect & integrate" in nav or "connect" in nav and "integrate" in nav:
         # Cloud data warehouses
         if "cloud data warehouse" in nav:
             dw = _extract_dw_name(nav)
-            return ("Connect & Bring In Data", "Cloud Data Warehouses", dw)
+            return ("Connect & Integrate Data", "Cloud Data Warehouses", dw)
         # Workbench
         if "workbench" in nav or "workbench" in title:
             if "workbench 5.1" in title or "workbench 5.1" in nav:
-                return ("Connect & Bring In Data", "Workbench", "Workbench 5.1 (Legacy)")
+                return ("Connect & Integrate Data", "Workbench", "Workbench 5.1 (Legacy)")
             if "workbench 4" in title or "workbench 4" in nav:
                 return ("Archive", "Legacy Workbench", None)
-            return ("Connect & Bring In Data", "Workbench", None)
+            return ("Connect & Integrate Data", "Workbench", None)
         # Writeback
         if "writeback" in title or "writeback" in nav:
-            return ("Connect & Bring In Data", "Writeback Connectors", None)
+            return ("Connect & Integrate Data", "Writeback Connectors", None)
         # File / JSON connectors
         if "file and json" in nav:
-            return ("Connect & Bring In Data", "Connector Library", "Files & APIs")
+            return ("Connect & Integrate Data", "Connector Library", "Files & APIs")
         # Data provider A-Z
         if "data provider" in nav:
             letter_group = _extract_letter_group(nav)
-            return ("Connect & Bring In Data", "Connector Library", letter_group)
+            return ("Connect & Integrate Data", "Connector Library", letter_group)
         # General connector info
         if "general connector" in nav:
-            return ("Connect & Bring In Data", "How Connectors Work", None)
+            return ("Connect & Integrate Data", "How Connectors Work", None)
         # Unstructured Data
         if "unstructured" in nav:
             return ("AI & Data Science", "Unstructured Data", None)
-        return ("Connect & Bring In Data", "Connector Library", None)
+        return ("Connect & Integrate Data", "Connector Library", None)
 
     # 7. Analyze & Visualize — check BEFORE Transform & Manage because
     #    "Card and Dashboard Management" contains "manage"
@@ -234,7 +234,7 @@ def assign_pillar(entry: dict) -> tuple[str, str, str | None]:
         if "dataset" in nav or "dataset" in title:
             return ("Prepare & Transform Data", "DataSet Management", None)
         if "workbench" in nav or "workbench" in title:
-            return ("Connect & Bring In Data", "Workbench", None)
+            return ("Connect & Integrate Data", "Workbench", None)
         if "dashboard" in title or "card" in title or "page" in title:
             return ("Analyze & Visualize", "Dashboards & Pages", None)
         return ("Prepare & Transform Data", "DataSet Management", None)
@@ -396,7 +396,7 @@ def assign_pillar(entry: dict) -> tuple[str, str, str | None]:
 
     # 14. Fallback: try to infer from title/type
     if dtype == "connector":
-        return ("Connect & Bring In Data", "Connector Library", None)
+        return ("Connect & Integrate Data", "Connector Library", None)
     if "alert" in title:
         return ("Share & Collaborate", "Alerts", None)
     if "dashboard" in title or "page" in title:

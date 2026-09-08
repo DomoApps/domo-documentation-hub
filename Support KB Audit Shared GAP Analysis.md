@@ -114,7 +114,7 @@ These gaps appear in both initiatives. The Audit supplies the specific hit list;
 
 ### 1.7 Cloud Amplifier / Data Warehouse Terminology and Navigation Confusion
 
-**Restructure:** The Connect & Bring In Data pillar restructure establishes Cloud Amplifier as the recommended path for CDW connections and adds a Cloud Data Warehouses Overview hub article.
+**Restructure:** The Connect & Integrate Data pillar restructure establishes Cloud Amplifier as the recommended path for CDW connections and adds a Cloud Data Warehouses Overview hub article.
 
 **Audit:** 12 Data Warehouse articles flagged as needing review, with consistent issue: *"The article references 'Cloud Amplifier' terminology and UI paths like 'Data Warehouse' and 'Add new cloud' that may no longer match the current interface."* Specific articles: `Cloud Integrations (Cloud Amplifier) Troubleshooting`, `Domo on Amazon Redshift`, `Add Databricks Tables to Domo`, `Migrate from Federated to Cloud Amplifier`, `Non-queryable DataSets`.
 

@@ -66,7 +66,7 @@ All 31 articles below are net-new (`new` disposition). Written in the main sessi
 | `What-is-an-Alert.mdx` | What Is an Alert? | new | Alerts Overview + alert articles | included | 1 screenshot (Alert Me card option); wrong grant removed |
 | `Share-and-Collaborate-Overview.mdx` | Share and Collaborate Overview | new | Sharing/Buzz/Publications articles | included | 1 screenshot (Scheduled Reports nav); grant fix applied |
 | `What-is-a-Connector.mdx` | What Is a Connector? | n/a | General Connector Info (12 articles) | n/a | No applicable hero screenshot in source articles; FAQ Merge/Upsert fix applied |
-| `Connect-and-Bring-In-Data-Overview.mdx` | Connect and Bring In Data Overview | new | All connector articles | included | 1 screenshot (Cloud Integrations panel); Azure name fix applied |
+| `Connect-and-Integrate-Data-Overview.mdx` | Connect and Integrate Data Overview | new | All connector articles | included | 1 screenshot (Cloud Integrations panel); Azure name fix applied |
 | `What-is-Workbench.mdx` | What Is Workbench? | new | Workbench 5.2 overview articles | included | 1 screenshot (Workbench Home tab) |
 | `Manage-Data-Overview.mdx` | Manage Data Overview | new | DataSet articles, Data Center context | included | 1 screenshot (DataSets list view) |
 | `What-is-the-Data-Center.mdx` | What Is the Data Center? | new | DataSet management articles | included | 1 screenshot (Data Center main view) |
@@ -108,7 +108,7 @@ All 31 articles below are net-new (`new` disposition). Written in the main sessi
 - `Analyze-and-Visualize-Overview.mdx` — duplicate/misattributed Chart Types link removed
 - `What-is-an-Alert.mdx` — removed "Can Create DataSets" grant (not required for DataSet alerts)
 - `What-is-a-Connector.mdx` — Merge/Upsert update method missing from FAQ; added
-- `Connect-and-Bring-In-Data-Overview.mdx` — "Azure Synapse" → "Azure SQL Database"
+- `Connect-and-Integrate-Data-Overview.mdx` — "Azure Synapse" → "Azure SQL Database"
 - `Domo-Sandbox-Overview.mdx` — grants completely wrong; replaced with correct Administer Sandbox + Manage Repositories
 - `Security-and-Permissions-Overview.mdx` — PDP description missing column-level policies
 - `Build-Apps-and-Automate-Overview.mdx` — Code Engine grant "Manage All Company Settings" → "Manage Code Engine Packages"

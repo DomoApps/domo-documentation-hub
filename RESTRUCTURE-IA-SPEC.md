@@ -15,7 +15,7 @@ Counts in parentheses are existing articles moving to that location.
 | Pillar | Existing articles | New articles needed | Priority |
 |--------|-------------------|---------------------|----------|
 | Getting Started | 35 | 5 (3 role-based + 2 concept) | 🔴 Critical |
-| Connect & Bring In Data | 1,057 | 4 (hub + 3 concept) | 🟡 Medium |
+| Connect & Integrate Data | 1,057 | 4 (hub + 3 concept) | 🟡 Medium |
 | Manage Data | 20 *(D9 resolved 2026-07-14)* | 1 (hub) | 🔴 Critical |
 | Prepare & Transform Data | 75 *(D9 resolved 2026-07-14)* | 4 (hub + 3 concept) | 🔴 Critical |
 | Analyze & Visualize | 232 | 4 (hub + 3 concept) | 🔴 Critical |
@@ -39,7 +39,7 @@ The Developer Portal (`portal/` directory) is the technical documentation layer 
 
 **Rule:** Wherever a KB how-to touches a capability that has an API or developer-depth equivalent in the portal, add a developer callout pointing to the relevant portal page. The portal already links to the KB in ~45 places; those existing links are the starting map for adding the reverse direction.
 
-Key KB pillars with the most portal cross-link surface area: Develop & Integrate (primary bridge), Build Apps & Automate, AI & Data Science, Connect & Bring In Data, Administer & Govern.
+Key KB pillars with the most portal cross-link surface area: Develop & Integrate (primary bridge), Build Apps & Automate, AI & Data Science, Connect & Integrate Data, Administer & Govern.
 
 See **Phase 5.5** of `KB-RESTRUCTURE-PLAN.md` for the full execution spec and agent task definition.
 
@@ -113,12 +113,12 @@ Getting Started
 
 ---
 
-## Pillar 2: Connect & Bring In Data
+## Pillar 2: Connect & Integrate Data
 
 **Story:** You have data somewhere else. Here's how to get it into Domo — and, where needed, how to write data back to source systems — from the simplest connector to on-premises systems and cloud warehouses.
 
 ```
-Connect & Bring In Data
+Connect & Integrate Data
 ├── [NEW] Overview: Connecting Your Data to Domo     ← hub article (establishes read + write framing)
 ├── [NEW] What is a Connector?                        ← synthesize from General Connector Info
 ├── [NEW] Getting Started: Connect Your First DataSet ← synthesize from connector setup articles
@@ -206,7 +206,7 @@ Manage Data (20 existing + 3 new)
 - 5 pipeline articles stayed in Prepare & Transform (DataSet Update Methods, Edit/Perf DataFusion ×2, Enterprise Stacker, Advanced Tools Launch Center)
 - PDP → Administer & Govern > Governance
 - Domo CLI + ODBC → Develop & Integrate > APIs & SDKs
-- Migrate from Federated to Cloud → Connect & Bring In Data > Cloud Data Warehouses
+- Migrate from Federated to Cloud → Connect & Integrate Data > Cloud Data Warehouses
 - Analyzer+DataSet Views, Understanding Chart Data → Analyze & Visualize > Analyzer
 
 ---
@@ -632,7 +632,7 @@ Listed in priority order. All synthesizable without PM input unless marked [PM].
 | 12 | `Analyze-and-Visualize-Overview.mdx` | All Analyzer/chart/dashboard articles (hub) |
 | 13 | `What-is-an-Alert.mdx` | Alerts Overview, alert articles |
 | 14 | `What-is-a-Connector.mdx` | General Connector Info (12 articles) |
-| 15 | `Connect-and-Bring-In-Data-Overview.mdx` | All connector/Workbench articles (hub); frames read + write directions |
+| 15 | `Connect-and-Integrate-Data-Overview.mdx` | All connector/Workbench articles (hub); frames read + write directions |
 | 16 | `Manage-Data-Overview.mdx` | DataSet articles, Data Center articles (hub) |
 | 17 | `What-is-the-Data-Center.mdx` | Connector how-tos (implicit Data Center context), DataSet management articles |
 | 18 | `Find-and-Manage-Your-DataSets.mdx` | DataSet management, sharing, workspace/favorites articles |

@@ -45,10 +45,10 @@ def token_overlap(a: str, b: str) -> float:
 
 # Map nav breadcrumb fragments → pillar name
 PILLAR_MAP = [
-    ("connect", "Connect & Bring In Data"),
-    ("cloud data warehouse", "Connect & Bring In Data"),
-    ("workbench", "Connect & Bring In Data"),
-    ("data provider", "Connect & Bring In Data"),
+    ("connect", "Connect & Integrate Data"),
+    ("cloud data warehouse", "Connect & Integrate Data"),
+    ("workbench", "Connect & Integrate Data"),
+    ("data provider", "Connect & Integrate Data"),
     ("transform", "Prepare & Transform Data"),
     ("magic etl", "Prepare & Transform Data"),
     ("dataflow", "Prepare & Transform Data"),

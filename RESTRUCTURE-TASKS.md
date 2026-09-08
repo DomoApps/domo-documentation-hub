@@ -570,7 +570,7 @@ _No open tasks._
 ### [fact-check] (4)
 
 - [ ] **`What-is-a-Connector.mdx` — *What is a Connector?*** — Connector concept, OAuth vs API key auth, scheduling, update methods
-- [ ] **`Connect-and-Bring-In-Data-Overview.mdx` — *Connect & Bring In Data Overview*** — Read + write framing accuracy, Cloud Amplifier as recommended CDW path, connector types
+- [ ] **`Connect-and-Integrate-Data-Overview.mdx` — *Connect & Integrate Data Overview*** — Read + write framing accuracy, Cloud Amplifier as recommended CDW path, connector types
 - [ ] **`What-is-Workbench.mdx` — *What is Workbench?*** — Workbench capabilities, read + write paths, current version support status
 - [ ] **`Connect-Unsupported-Data-Sources.mdx` (rank 32)** — Decision hub synthesized from 360042926294; links to JSON No Code, Workbench, Jupyter, custom connector
 

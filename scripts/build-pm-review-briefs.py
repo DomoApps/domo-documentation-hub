@@ -251,7 +251,7 @@ PHASE3A_ARTICLES = [
      "What is a Connector?", "Pillar 2", "Tasleema Lallmamode",
      "General Connector Info (12 articles)",
      "Connector concept, OAuth vs API key auth, scheduling, update methods"),
-    ("Connect-and-Bring-In-Data-Overview.mdx",
+    ("Connect-and-Integrate-Data-Overview.mdx",
      "Connect & Integrate Data Overview", "Pillar 2", "Tasleema Lallmamode",
      "All connector / Workbench articles",
      "Read + write framing accuracy, Cloud Amplifier as recommended CDW path, connector types"),

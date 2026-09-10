@@ -40,6 +40,13 @@ Learn more about [<link text>](https://www.domo.com/docs/s/article/<slug-or-id>)
 ### <Beta feature A>
 ...
 
+## Resolved Issues
+
+### <Area or Feature Name>
+
+<1–2 sentence description of the issue and that it is fixed>
+...
+
 ## Support
 
 Domo provides education, community answers, and technical support.
@@ -54,7 +61,7 @@ Domo provides education, community answers, and technical support.
 
 Invariants:
 
-- Only three top-level (`##`) sections, in this order: **New Features and Enhancements**, **Beta Features**, **Support**. If a release has no beta programs, omit the Beta Features section entirely (do not leave an empty heading).
+- Only three top-level (`##`) sections, in this order: **New Features and Enhancements**, **Beta Features**, **Support**. If a release has no beta programs, omit the Beta Features section entirely (do not leave an empty heading). An optional **Resolved Issues** section may appear between Beta Features and Support (see §11).
 - The `import { BetaNote } ...` line and the standalone `---` divider directly under it are always present, even when there are no betas (they cost nothing and keep files uniform).
 - The **Support** block is fixed boilerplate — copy it verbatim, including the trailing spaces shown above. Never reword it.
 
@@ -166,7 +173,21 @@ Place these alphabetically among the `###` entries like any other feature.
 
 ---
 
-## 9. Screenshots — naming and placement
+## 9. Resolved Issues section (optional)
+
+Some releases fix customer-facing defects that ship alongside the new features. When the internal notes or epics include such fixes, you may add a single **Resolved Issues** section. It is optional — omit it entirely when there are no customer-facing fixes to report (do not leave an empty heading).
+
+- **Heading:** exactly `## Resolved Issues`. This is Domo's chosen wording — it matches the enterprise-analytics norm (Tableau, Zoom) and reads more professionally than "Bugs" or "Bug Fixes." Do not rename it per-release.
+- **Placement:** between **Beta Features** and **Support** — always the last content section before the fixed Support boilerplate.
+- **Entries:** one `### <Area or Feature Name>` per fix (Title Case; area-first phrasing is fine, e.g. "Data Model Schema Mapping on BigQuery and Databricks"), followed by 1–2 short sentences: what could go wrong, then that it is now fixed. No `<Frame>`, no "Learn more" line. Order alphabetically by heading like every other section.
+- **Only genuine, customer-facing fixes belong here.** Exclude anything a customer can't observe: internal re-platforms or refactors, work hidden behind a feature switch, and epics that are still in Backlog / not shipped in this release. If in doubt whether an item is customer-visible, ask rather than guess — the same §7 rule against exposing internal artifacts and "feature switch" mechanics applies.
+- **Voice:** same as §7 — plainspoken, present tense, benefit-first ("could be slow and, in some cases, report an inaccurate count. … is now faster and more accurate."). Never expose Jira keys, engine internals (STS credentials, ICE, UTLs), squad/PM names, or codenames.
+
+See the **September 2026** Resolved Issues section for the model.
+
+---
+
+## 10. Screenshots — naming and placement
 
 - Save to `images/kb/`. Name descriptively in lowercase; the recent Release Notes convention is **snake_case** (`queue_notification_controls.png`, `report_builder_pdf.png`); kebab-case (`app-studio-editor.png`) also appears in older files — prefer snake_case for new work and stay consistent within a release.
 - One image → one feature; name it after the feature/sub-feature.
@@ -176,7 +197,7 @@ Place these alphabetically among the `###` entries like any other feature.
 
 ---
 
-## 10. Quick checklist before handoff
+## 11. Quick checklist before handoff
 
 - [ ] Title + excerpt match the conventions in §2.
 - [ ] `import { BetaNote }` + `---` divider present.
@@ -184,5 +205,6 @@ Place these alphabetically among the `###` entries like any other feature.
 - [ ] Every feature has a body; screenshots wrapped in `<Frame>`; every referenced image exists in `images/kb/`.
 - [ ] No placeholders, TODOs, broken links, or invented "Learn more" links.
 - [ ] Beta section (if any) opens with `<BetaNote generic />`.
+- [ ] Resolved Issues section (if any) sits between Beta Features and Support; only genuine customer-facing fixes; no internal/feature-switched/unshipped items (§9).
 - [ ] Support block is the verbatim boilerplate.
 - [ ] Every factual claim traces to the internal notes, epic, or PRD (see fact-check step in `SKILL.md`).

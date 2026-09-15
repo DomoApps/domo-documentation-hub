@@ -37,11 +37,51 @@ After the Article Intake Summary is confirmed, ask the following questions befor
 
 1. **Release status:** What is the release status of the feature(s) covered in this article? For each distinct feature or section, is it GA (generally available) or beta? If mixed, which parts are beta?
 2. **Planned branch cut date:** What is the planned **branch cut date** for this release? This is the internal branch name (NOT the feature release date).
-3. **Feature switch date:** (Ask only if the article is tied to a GA release.) On what date do customers see the feature? This determines the branch name and the base branch (see **Step 8**). Do not try to derive it from the branch cut date; if the user doesn't know it, tell them the article can't be routed to a GA branch until they get it from the PM or release checklist.
+3. **Feature switch date:** (Ask only if the article is tied to a GA release.) On what date do customers see the feature? This determines the branch name and the base branch (see **Step 10**). Do not try to derive it from the branch cut date; if the user doesn't know it, tell them the article can't be routed to a GA branch until they get it from the PM or release checklist.
 
 ---
 
-## Step 4: Read the style guide and article template
+## Step 4: Decide how to handle screenshots and icons
+
+Ask the user up front how they want to handle screenshots for this article, and whether it will use any UI icons, before you draft. (If the `kb-intake` Article Intake Summary already captured this, confirm it rather than re-asking.)
+
+### Screenshots
+
+Offer these options with AskUserQuestion:
+
+1. **User provides screenshots** — the user will supply the image files. They must be committed to `images/kb/` on the same branch *before* the article references them (see `CLAUDE.md` › **MDX Content Conventions**). Ask for the exact filenames and reference them with the syntax below.
+2. **Reuse existing screenshots** — pull applicable screenshots that already exist in the repo or in the source material, preserving their original `alt` text.
+3. **No screenshots** — text only.
+4. **Insert placeholders (opt-in only)** — leave `{/* SCREENSHOT: <what the image should show> */}` markers where a human will capture images later. **Only do this if the user explicitly chooses it.** The default is clean articles with no TODO or placeholder markers.
+
+Whichever option is chosen, write every step so the text is self-sufficient — a reader can complete the task without ever seeing a screenshot. Screenshots are supplemental, never load-bearing.
+
+**Screenshot coding reference** (from `Domo-KB-Style-Guide.mdx` › **Screenshots** and **Inline Images**):
+
+- **Block screenshot:** wrap in `<Frame>` with a native `<img>` and descriptive `alt`; no inline `width`/`height` (they override Frame's auto-sizing). Image files live in `images/kb/` and are referenced by a root-relative path:
+
+  ```mdx
+  <Frame>
+    <img src="/images/kb/example.png" alt="Descriptive alt text" />
+  </Frame>
+  ```
+
+- **Never** put a `<Frame>` inside a table cell — use an inline `<img>` there.
+
+### Icons
+
+Ask whether the article will show any UI icons or third-party logos. If yes, code them as follows (see `Domo-KB-Style-Guide.mdx` › **Icons** and **Brand and Third-Party Logos**):
+
+- **Current Domo UI glyph** — the Domo icon font (Phosphor): `<i className="icon-{name}" aria-hidden="true" />`. Add a size class such as `sm`, or `style={{fontSize: 24}}` only if one icon looks visibly wrong. Browse names at [Domo Icons](https://git.empdev.domo.com/pages/Development/DomoIcons/#!/icons/phosphor).
+- **Legacy UI glyph** — `<i className="legacy-icon-{name}" aria-hidden="true" />`. Same glyph set, older styling. Use **only** for release notes describing the pre-refresh UI and legacy apps such as Workbench.
+- **Third-party brand logo** (AWS, OpenAI, GitHub, …) — Font Awesome brands: `<Icon icon="{slug}" iconType="brands" aria-hidden="true" />`. If the free FA set lacks it (e.g. Anthropic), inline `<svg fill="currentColor" …>` with a path from [Simple Icons](https://simpleicons.org). Never a monochrome `<img>` logo — it disappears in dark mode.
+- **Glyph genuinely not in the font** — fall back to an inline `<img>` with `style={{height: '1.2em', display: 'inline', verticalAlign: 'start', margin: '0'}}` (use `'2em'` for a header or table-cell row label).
+- **Accessibility** — always add `aria-hidden="true"` and name the icon in the surrounding prose ("select the gear icon `<i …/>`"). Reserve `role="img"` + `aria-label` for an icon that stands alone with no prose to name it.
+- **Do not** use the old inline-image icon pattern (`<img src="/images/kb/*-icon.png" style={{width: 20, height: 20, …}}/>`) for any glyph that exists in the font — that is the legacy pattern being phased out.
+
+---
+
+## Step 5: Read the style guide and article template
 
 Before writing, read both of these files:
 
@@ -50,7 +90,7 @@ Before writing, read both of these files:
 
 ---
 
-## Step 5: Write the article
+## Step 6: Write the article
 
 Once the Article Intake Summary, release information, style guide, and template are all loaded, create the MDX file. Do not ask for any information already answered.
 
@@ -82,12 +122,33 @@ The standard beta Note must be used verbatim — do not paraphrase or change the
 
 ---
 
-## Step 6: Style-guide revision pass
+## Step 7: Fact-check pass
 
-Drafting always introduces style drift. Before finalizing, do an explicit pass against the style guide and revise the article in place. **Do not skip this even if the draft looks right** — the most common misses (intro framing, imperative headings, unpadded tables, lowercase Domo terms, future tense) are easy to introduce and easy to miss without a deliberate re-read.
+Before the edit pass, and before considering the copy complete, verify every factual claim in the draft at least once against an authoritative source: the source material the user provided, the `kb-intake` Article Intake Summary, and the repo itself. This pass is about **accuracy**, not style — the style and template edit comes next.
 
-1. **Re-read `Domo-KB-Style-Guide.mdx` now, in full** — not from memory. You will have drifted from at least one rule while drafting.
-2. **Audit the article against this checklist** and fix every violation in both the EN file and the JA sibling, if you authored one:
+1. **Go claim by claim.** For each statement of fact — steps, behaviors, settings, defaults, names, values, URLs, limits — confirm it against the source material or existing repo content. Where the repo is the authority, search it and read the relevant article rather than trusting the draft:
+   ```bash
+   grep -rl "feature or setting name" s/article/ s/topic/
+   ```
+
+2. **Verify Prerequisites and Required Grants with special care.** These are the highest-risk sections and the most common source of factual errors:
+   - Confirm each prerequisite is real and actually required for the task.
+   - Confirm each grant name exists and gates the described action. Cross-check the canonical grant wording (`grep -rn "Grant Name —" s/article/`) and any related feature articles in the repo.
+   - If the source material and the intake summary don't establish the exact prerequisites and grants, **do not infer them — ask the user.**
+
+3. **When you can't confirm a claim, or you find an inaccuracy or a discrepancy, STOP and ask the user directly** for the missing or correct information before finalizing. Do not guess, approximate, or fill gaps with plausible-sounding content. Name exactly what you couldn't verify and what you need. If the source material and the intake summary conflict, surface the conflict and confirm which is authoritative (per Step 1, the intake summary wins unless the user says otherwise).
+
+The article is not complete until every factual claim is either confirmed against a source or explicitly confirmed by the user. **When in doubt, ask** — a paused draft beats a confidently wrong one.
+
+---
+
+## Step 8: Edit pass — style guide and template
+
+Drafting always introduces style drift. After the fact-check pass, do an explicit editing pass against **both** `Domo-KB-Style-Guide.mdx` **and** `New-Article-Template.mdx`, and revise the article in place. This pass catches every usage, style, grammar, and structural mistake. **Do not skip this even if the draft looks right** — the most common misses (intro framing, imperative headings, unpadded tables, lowercase Domo terms, future tense) are easy to introduce and easy to miss without a deliberate re-read.
+
+1. **Re-read `Domo-KB-Style-Guide.mdx` and `New-Article-Template.mdx` now, in full** — not from memory. You will have drifted from at least one rule while drafting. Confirm the article's structure and encoding match the template (frontmatter, section order, component syntax, code blocks, tables).
+2. **Proofread for plain grammar and usage** — spelling, subject-verb agreement, punctuation, and sentence clarity — in addition to the Domo-specific rules below. A factually correct article still isn't done if it reads poorly.
+3. **Audit the article against this checklist** and fix every violation in both the EN file and the JA sibling, if you authored one:
    - **Frontmatter** — `title` plus a single-sentence `excerpt`; never a `description` field.
    - **Intro** — opens with "This article explains…" or "This article covers…", states only what the article covers (not why it matters), and is immediately followed by a `---` horizontal rule.
    - **Headings** — imperative mood at every level (H2–H4); the structural labels (Intro, Required Grants, Prerequisites, FAQ, Troubleshoot, Related Articles) are exempt. Top-level sections are H2, subsections H3+.
@@ -99,12 +160,13 @@ Drafting always introduces style drift. Before finalizing, do an explicit pass a
    - **Voice and word choice** — present tense, not "will"; active voice; "after", not causal "once"; no "utilize"; spell out numbers under 10; "allowlist"/"blocklist"; "select", not "click"; Oxford comma; no exclamation points.
    - **Domo terms** — `DataSet`, `DataFlow`, `DataFusion`, `Beast Mode`, `Workbench`; `dashboard` lowercase except at the start of a sentence or with a type; never "Page" (use "dashboard"). Verify any product term against the **Domo-Specific Terms and Usage** table.
    - **Beta** — correct convention applied (frontmatter `tag` + verbatim Note for a whole-article beta; Badge + single verbatim Note for section-level).
-   - **Images** — block screenshots wrapped in `<Frame>` with a native `<img>` and descriptive `alt`, no inline `width`/`height`; inline glyphs use the icon font or the inline `<img>` style; never `<Frame>` inside a table cell.
-3. **Revise the article in place** to resolve every issue found, then re-run the table normalizer if you changed any tables.
+   - **Images** — block screenshots wrapped in `<Frame>` with a native `<img>` and descriptive `alt`, no inline `width`/`height`; never `<Frame>` inside a table cell. Verify any placeholders match what the user chose in Step 4 (none unless they opted in).
+   - **Icons** — current UI glyphs use the `icon-{name}` font; `legacy-icon-{name}` only for release-notes/Workbench surfaces; brand logos use Font Awesome brands or inline `<svg fill="currentColor">`; never the old inline-image icon pattern for a glyph that exists in the font. Each icon carries `aria-hidden="true"` and is named in the prose.
+4. **Revise the article in place** to resolve every issue found, then re-run the table normalizer if you changed any tables.
 
 ---
 
-## Step 7: Add the new article to navigation
+## Step 9: Add the new article to navigation
 
 A new article file does not appear on the site until it is registered in `docs.json`. As the final step, invoke the `add-to-nav` skill to place the article in the navigation — do not edit `docs.json` by hand:
 
@@ -124,12 +186,12 @@ python3 -c "import json; json.load(open('docs.json')); print('docs.json is valid
 
 1. Tell the user the file path of the new MDX article (`s/article/Article-Title-Here.mdx`).
 2. Confirm the article was added to `docs.json` navigation and state where it was placed.
-3. Note any sections left as placeholders (screenshots, specific grant names, etc.) that the user will need to fill in.
-4. State the branch name and PR base branch the article should use, per **Step 8**.
+3. Note any sections left as placeholders (screenshots, specific grant names, etc.) that the user will need to fill in — and any fact-check items you flagged in Step 7 that still need the user's confirmation.
+4. State the branch name and PR base branch the article should use, per **Step 10**.
 
 ---
 
-## Step 8: Branch and PR routing
+## Step 10: Branch and PR routing
 
 Tell the user which branch and base branch this article belongs on. Do not create the branch or open the PR unless they ask.
 
@@ -152,7 +214,7 @@ See `CLAUDE.md` › **Contribution Workflow** for the full convention.
 
 ---
 
-## Step 9: Offer localization
+## Step 11: Offer localization
 
 After delivering the output above, ask the user:
 

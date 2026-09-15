@@ -86,7 +86,7 @@ done
 
 If the inventory is large (more than ~30 candidate articles), spawn an `Explore` sub-agent with a prompt like: *"Find every article in `s/article/` and `s/topic/` whose title, excerpt, or body materially discusses `<Product>`. For each, return the file path, title, and a one-line summary of how it relates to `<Product>`. Skip articles that only mention `<Product>` in passing."*
 
-Save the resulting list — you'll group it in Step 6.
+Save the resulting list — you'll group it in Step 7.
 
 ---
 
@@ -127,7 +127,28 @@ Pay special attention to:
 
 ---
 
-## Step 6: Draft the article
+## Step 6: Decide how to handle screenshots and icons
+
+Overviews are link-rich entry points, so they carry **no screenshots by default** — the deep how-to articles hold those. The one exception is a single optional hero screenshot of the product UI directly under the Intro, if it genuinely helps orient a new reader. Overviews *do* commonly use inline UI icons (for example in the **Access** section).
+
+Before drafting, confirm with the user:
+
+1. **Hero screenshot?** Ask whether they want the one optional hero screenshot. If yes, it must be committed to `images/kb/` on the same branch before the article references it (see `CLAUDE.md` › **MDX Content Conventions**), coded as a block screenshot (below). If no, skip it — that is the default.
+2. **Placeholders are opt-in only.** Do not leave `{/* SCREENSHOT: … */}` markers unless the user explicitly asks for them. The default is a clean article with no TODO or placeholder markers.
+3. **Icons?** Confirm whether the **Access** section and link clusters reference any UI icons, and code them per the reference below.
+
+**Coding reference** (from `Domo-KB-Style-Guide.mdx` › **Screenshots**, **Icons**, **Brand and Third-Party Logos**):
+
+- **Block (hero) screenshot:** `<Frame><img src="/images/kb/example.png" alt="Descriptive alt text" /></Frame>` — no inline `width`/`height`; never inside a table cell.
+- **Current Domo UI glyph:** `<i className="icon-{name}" aria-hidden="true" />` (Phosphor font). Browse names at [Domo Icons](https://git.empdev.domo.com/pages/Development/DomoIcons/#!/icons/phosphor).
+- **Legacy UI glyph:** `<i className="legacy-icon-{name}" aria-hidden="true" />` — only for release-notes/Workbench surfaces.
+- **Third-party brand logo:** Font Awesome brands `<Icon icon="{slug}" iconType="brands" aria-hidden="true" />`, or inline `<svg fill="currentColor" …>` when the free FA set lacks it. Never a monochrome `<img>` logo — it disappears in dark mode.
+- **Glyph not in the font:** inline `<img>` with `style={{height: '1.2em', display: 'inline', verticalAlign: 'start', margin: '0'}}`.
+- **Accessibility:** always add `aria-hidden="true"` and name the icon in the prose; reserve `role="img"` + `aria-label` for an icon that stands alone.
+
+---
+
+## Step 7: Draft the article
 
 Create `s/article/<Product>-Overview.mdx` (title-case filename, hyphen-separated, no `.mdx` collisions). The structure below is the canonical Overview shape — it is what the existing modern overviews (`Cloud Integrations Overview`, `App Studio | Overview`, `Variables | Overview`, plus the recently authored `Analyzer Overview` and `DomoStats Overview`) all converge on, and it differs from a generic how-to.
 
@@ -234,12 +255,25 @@ For a step-by-step walkthrough, see [Opening <Product>](/s/article/...).
 
 ---
 
-## Step 7: Style-guide revision pass
+## Step 8: Fact-check pass
 
-Drafting always introduces style drift. Before verifying links or finalizing, do an explicit pass against the style guide and revise the article in place. **Do not skip this even if the draft looks right** — the most common misses (intro framing, imperative cluster headings, unpadded tables, lowercase Domo terms, future tense) are easy to introduce and easy to miss without a deliberate re-read.
+Before the edit pass, and before considering the Overview complete, verify every factual claim at least once against an authoritative source: what the user told you in Step 1, the style-guide treatment from Step 4, and the repo itself. This pass is about **accuracy**; link-target verification happens next in Step 10. Overviews carry fewer procedural claims than how-tos, but the two they do carry are high-risk:
 
-1. **Re-read `Domo-KB-Style-Guide.mdx` now, in full** — not from memory. Step 5's "pay special attention to" list is a primer, not a substitute for the re-read.
-2. **Audit the Overview against this checklist** and fix every violation:
+1. **Required Grants and any prerequisites.** Confirm every grant named in the Required Grants section actually exists and gates the described action. Cross-check the canonical grant wording (`grep -rn "Grant Name —" s/article/`) and the product's deep articles. If you can't establish the exact grants from the repo, **do not infer them — ask the user.**
+2. **The access path.** Confirm the ways to open or reach the product in the **Access** section are real and current. Check the product's "Opening X" article if one exists, or ask the user.
+3. **Conceptual claims and use cases.** Confirm the Intro's definition, sub-parts, and "what you can do" claims match how the product actually works — read the deep articles rather than trusting the draft.
+
+**When you can't confirm a claim, or you find an inaccuracy or a discrepancy, STOP and ask the user directly** before finalizing. Do not guess or fill gaps with plausible-sounding content. The Overview is not complete until every factual claim is either confirmed against a source or explicitly confirmed by the user. **When in doubt, ask.**
+
+---
+
+## Step 9: Edit pass — style guide and template
+
+Drafting always introduces style drift. After the fact-check pass, and before verifying links or finalizing, do an explicit editing pass against **both** `Domo-KB-Style-Guide.mdx` **and** `New-Article-Template.mdx`, and revise the article in place. This pass catches every usage, style, grammar, and structural mistake. **Do not skip this even if the draft looks right** — the most common misses (intro framing, imperative cluster headings, unpadded tables, lowercase Domo terms, future tense) are easy to introduce and easy to miss without a deliberate re-read.
+
+1. **Re-read `Domo-KB-Style-Guide.mdx` and `New-Article-Template.mdx` now, in full** — not from memory. Step 5's "pay special attention to" list is a primer, not a substitute for the re-read.
+2. **Proofread for plain grammar and usage** — spelling, agreement, punctuation, and clarity — alongside the Domo-specific rules below.
+3. **Audit the Overview against this checklist** and fix every violation:
    - **Frontmatter** — `title` plus a single-sentence `excerpt`; never a `description` field.
    - **Intro** — opens with "This article explains…" / "This article covers…", states only what the Overview covers, and is followed by a `---` horizontal rule.
    - **Headings** — imperative mood at every level (link-cluster headings included — "Build Cards", not "Building Cards"; "Manage Access", not "Management"); structural labels (Intro, Required Grants, FAQ, Related Articles) are exempt. Top-level sections H2, subsections H3+.
@@ -251,14 +285,15 @@ Drafting always introduces style drift. Before verifying links or finalizing, do
    - **Voice and word choice** — present tense, not "will"; active voice; "after", not causal "once"; no "utilize"; spell out numbers under 10; "allowlist"/"blocklist"; "select", not "click"; Oxford comma; no exclamation points.
    - **Domo terms** — apply the Step 4 treatment for the product name consistently, plus `DataSet`, `DataFlow`, `DataFusion`, `Beast Mode`, `Workbench`; `dashboard` lowercase except at the start of a sentence or with a type; never "Page". Verify against the **Domo-Specific Terms and Usage** table.
    - **Beta** — correct convention applied (frontmatter `tag` + verbatim Note for a whole-article beta; Badge + single verbatim Note for section-level).
-   - **Images** — if you included the optional hero screenshot, it is wrapped in `<Frame>` with a native `<img>` and descriptive `alt`, no inline `width`/`height`; never `<Frame>` inside a table cell.
-3. **Revise the Overview in place** to resolve every issue found, then re-run the table normalizer if you changed any tables.
+   - **Images** — if you included the optional hero screenshot, it is wrapped in `<Frame>` with a native `<img>` and descriptive `alt`, no inline `width`/`height`; never `<Frame>` inside a table cell. No placeholders unless the user opted in at Step 6.
+   - **Icons** — current UI glyphs use the `icon-{name}` font; `legacy-icon-{name}` only for release-notes/Workbench surfaces; brand logos use Font Awesome brands or inline `<svg fill="currentColor">`; never the old inline-image icon pattern for a glyph that exists in the font. Each icon carries `aria-hidden="true"` and is named in the prose.
+4. **Revise the Overview in place** to resolve every issue found, then re-run the table normalizer if you changed any tables.
 
 ---
 
-## Step 8: Verify every internal link
+## Step 10: Verify every internal link
 
-Each `/s/article/<slug>` link must resolve to an article whose title matches what the link text claims. This is the second-biggest failure mode for Overview drafts.
+Each `/s/article/<slug>` link must resolve to an article whose title matches what the link text claims. This is the second-biggest failure mode for Overview drafts, and it completes the fact-check begun in Step 8.
 
 For each link, confirm the target exists and the title matches:
 
@@ -285,7 +320,7 @@ Fix every mismatch before finalizing. If a referenced article truly does not exi
 
 ---
 
-## Step 9: Handle the legacy collision (if Step 2 selected "New file + rename legacy")
+## Step 11: Handle the legacy collision (if Step 2 selected "New file + rename legacy")
 
 If Step 2 chose to rename the legacy article (option 2), do it now:
 
@@ -303,7 +338,7 @@ If Step 2 chose to rename the legacy article (option 2), do it now:
 
 ---
 
-## Step 10: Add the new article to navigation
+## Step 12: Add the new article to navigation
 
 Invoke the `add-to-nav` skill with:
 
@@ -327,7 +362,7 @@ node -e "JSON.parse(require('fs').readFileSync('docs.json', 'utf8')); console.lo
 
 ---
 
-## Step 11: Output
+## Step 13: Output
 
 Tell the user:
 
@@ -335,12 +370,13 @@ Tell the user:
 2. **Legacy collision handling:** what was done with any collision (replaced, renamed, or sidestepped).
 3. **JA work deferred:** the JA Overview translation has not been written; the JA sibling of any renamed legacy article was updated for parity.
 4. **Nav placement:** where the new article was added in `docs.json` (and any restructure performed).
-5. **Verification:** all internal links resolved to the correct target articles, and `docs.json` is valid JSON.
-6. **Local preview:** suggest `mintlify dev` to confirm the rendered Overview reads the way the user expects.
+5. **Verification:** every factual claim was confirmed against a source or with the user (Step 8), all internal links resolved to the correct target articles (Step 10), and `docs.json` is valid JSON.
+6. **Open items:** any fact-check items you flagged in Step 8 that still need the user's confirmation.
+7. **Local preview:** suggest `mintlify dev` to confirm the rendered Overview reads the way the user expects.
 
 ---
 
-## Step 12: Offer localization
+## Step 14: Offer localization
 
 After delivering the output above, ask the user:
 

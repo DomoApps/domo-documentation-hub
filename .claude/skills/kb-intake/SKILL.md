@@ -41,8 +41,16 @@ Work through these dimensions, but let the conversation flow naturally — you d
 
 **Scope and structure**
 - What tasks does this article need to cover? (Create? Configure? Troubleshoot? All of the above?)
-- Are there prerequisites — other features, settings, or grants — the user needs before starting?
 - Are there multiple paths to accomplish the goal? Which is the simplest?
+
+**Prerequisites and required grants (get these exactly right)**
+- What must be true *before* the reader starts — other features enabled, settings configured, licenses, roles?
+- Exactly which grants gate this task, and what is each grant's name? These are the single most error-prone part of a KB article, so pin them down precisely.
+- Probe for certainty: does the user *know* these, or are they guessing? If they're unsure of a prerequisite or a grant name, say so plainly and mark it as something the writer must confirm against the repo or with the PM before drafting — never let a guessed grant slip through as fact.
+
+**Screenshots and icons**
+- How does the user want to handle screenshots for this article — will they provide their own (committed to `images/kb/`), reuse existing/source screenshots, go text-only, or (only if they explicitly ask) leave placeholders for a human to fill later? The default is a clean article with no placeholder markers.
+- Will the article show any UI icons or third-party logos? (These are coded with the Domo icon font or Font Awesome brands, not uploaded images — the drafting skill handles the mechanics; here you just capture whether icons are in play.)
 
 **Detail and nuance**
 - Are there edge cases, optional steps, or conditional behaviors the reader should know about?
@@ -56,9 +64,14 @@ Work through these dimensions, but let the conversation flow naturally — you d
 You have enough to write the article when you know:
 - [ ] Who the target persona is and what they need
 - [ ] The single most important takeaway
-- [ ] The required grants or prerequisites
+- [ ] The required grants or prerequisites — with each one either confirmed or explicitly flagged as needing verification
 - [ ] The main task(s) in logical order
 - [ ] At least one edge case, gotcha, or FAQ-worthy question
+- [ ] How the user wants to handle screenshots (and whether icons are in play)
+
+## A note on accuracy
+
+Your job in intake is to *surface* what the writer needs, not to fill gaps with plausible-sounding facts. If the user doesn't know a prerequisite, a grant name, an exact value, or a behavior, do not invent it and do not smooth over the uncertainty — record it as an open question the writer must resolve (against the repo, with the PM, or by asking the user again) before the article can be called complete. A confidently wrong intake summary produces a confidently wrong article. When in doubt, ask.
 
 ---
 
@@ -77,7 +90,9 @@ When the conversation is complete, present a summary in this format:
 
 **Most important takeaway:** [one sentence]
 
-**Prerequisites / Required grants:** [list]
+**Prerequisites / Required grants:** [list each one, and mark any that the user was unsure of as "(unconfirmed — verify before drafting)"]
+
+**Screenshot & icon handling:** [how the user wants screenshots handled — provide / reuse existing / text-only / placeholders (opt-in); and whether the article uses UI icons or third-party logos]
 
 **Tasks to cover (in order):**
 1. [task]
@@ -98,6 +113,9 @@ When the conversation is complete, present a summary in this format:
 
 **Out of scope:**
 - [anything explicitly excluded]
+
+**Open questions / must confirm before drafting:**
+- [every fact the user was unsure of — especially prerequisites and grant names — that the writer must verify against the repo, with the PM, or by asking the user, before the article is complete]
 
 **Notes for the writer:** [anything else that came up that doesn't fit above]
 

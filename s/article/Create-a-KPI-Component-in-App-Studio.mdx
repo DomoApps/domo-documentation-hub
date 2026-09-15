@@ -1,0 +1,104 @@
+---
+title: "Create a KPI Component in App Studio"
+excerpt: "Add a KPI component from a template and configure each metric with a column, aggregation, filter, and formatting."
+tag: "Beta"
+---
+
+import { BetaNote } from '/snippets/BetaNote.mdx';
+
+<BetaNote />
+
+## Intro
+
+This article explains how to add a KPI component from a template and configure a metric with an aggregation, date range, filter, and formatting.
+
+To group and aggregate data in other app components, see [Group and Aggregate Data in App Components](/s/article/Group-and-Aggregate-Data-in-App-Components).
+
+---
+
+## Required Grants
+
+To access app components, the following grants must be enabled for your role:
+
+- **Edit App (App Studio) —** Allows you to edit App Studio pages within App Studio.
+- **Edit Cards —** Allows you to edit Cards in Domo.
+
+Learn more about [grants](/s/article/360043438973).
+
+## Add a KPI Component
+
+A KPI component displays one or more headline metrics—such as Total Revenue or Average Deal Size—computed directly from a DataSet column. You add a KPI component from a template, then power and configure each of its Number widgets.
+
+1. In the App Studio app editor, select **Components** in the left pane.
+
+   <Frame>![Selecting the KPI component in the Components pane.](/images/kb/kpi-select-component.png)</Frame>
+2. Select the **KPI** template.
+
+   <Frame>![The KPI templates in the Components pane.](/images/kb/kpi-choose-template.png)</Frame>
+3. Select one of the three KPI templates.
+4. Select the power icon and choose a DataSet to power the component.
+   Each template comes with Number widgets already in place, ready to point at your columns.
+
+The three templates arrange their metrics differently:
+
+| Template | Layout                                 | Use when                                                                        |
+| -------- | -------------------------------------- | ------------------------------------------------------------------------------- |
+| KPI 1    | Square grid of up to four peer metrics | You want several peer-level metrics and no single number should dominate.       |
+| KPI 2    | Hero metric left, grid right           | You want one headline metric to lead, followed by a supporting breakdown.       |
+| KPI 3    | Grid left, hero metric right           | You want the breakdown to build up to a total shown as the payoff on the right. |
+
+## Configure a KPI Metric
+
+Each metric is a Number widget that you configure in the right pane—column, aggregation, filter, and formatting. Configure each widget independently.
+
+1. Select a Number widget in the widgets pane.
+   The widget's options open in the right pane.
+
+   <Frame>![A Number widget in the widgets pane.](/images/kb/kpi-number-widget.png)</Frame>
+2. Select the **Column** that powers the metric, then choose the aggregation in the popover.
+
+   <Frame>![The Column and aggregation popover in the right pane.](/images/kb/kpi-column-aggregation.png)</Frame>
+3. Select an **Aggregation**:
+
+   | Aggregation    | Applies to              | Notes                        |
+   | -------------- | ----------------------- | ---------------------------- |
+   | Sum            | Numeric columns         | Default for numeric measures |
+   | Average        | Numeric columns         |                              |
+   | Count          | Any column              | Counts non-null values       |
+   | Min            | Numeric or date columns |                              |
+   | Max            | Numeric or date columns |                              |
+   | Distinct Count | Any column              | Counts unique values         |
+4. (Optional) Filter the metric:
+   - By date: select a date range, such as this week or this year.
+   - By column: add a column filter, such as Region _is_ North.
+
+   <Frame>![Filtering a KPI metric by date or by column in the right pane.](/images/kb/kpi-filter-metric.png)</Frame>
+5. Format the value. Set the display type (Currency, Number, or Percent), decimal places, thousands separator, and abbreviation (for example, 1.23K or 8.10B).
+6. (Optional) To reuse a metric, duplicate its widget from the right pane, then change the setting you want, such as the filter value.
+
+   <Frame>![Duplicating a KPI Number widget from the right pane.](/images/kb/kpi-widget-duplicate.png)</Frame>
+7. Save your app component.
+
+<Note>**Note:** Each widget's filter is independent, so the same measure can appear several ways in one component from a single DataSet—for example, one widget per region.</Note>
+
+## FAQ
+
+<AccordionGroup>
+
+<Accordion title="Do I need a Beast Mode calculation or a pre-aggregated DataSet to show a total?">
+No. A KPI component aggregates a column at query time, so you can display a total, average, or count without building a Beast Mode calculation or a separate aggregated DataSet.
+</Accordion>
+
+<Accordion title="Do data permissions apply to aggregated values?">
+Yes. Aggregations are computed only over the rows a viewer is permitted to see, so Personalized Data Permissions (PDP) policies apply. Two viewers with different PDP scopes can see different totals from the same metric definition. Learn how to apply a PDP policy to a DataSet in [Personalized Data Permissions (PDP)](/s/article/360042934614).
+</Accordion>
+
+<Accordion title="What happens when a metric returns no rows?">
+The metric displays a defined empty state rather than an error. Adjust the aggregation, filter, or date range to return data.
+</Accordion>
+
+<Accordion title="Can I color a KPI value based on its number?">
+Yes. Apply a rule to the value with conditional formatting. See [Apply Conditional Formatting and Conditional Rendering in App Components](/s/article/Apply-Conditional-Formatting-and-Conditional-Rendering-in-App-Components).
+</Accordion>
+
+</AccordionGroup>

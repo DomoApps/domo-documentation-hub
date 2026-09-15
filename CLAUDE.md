@@ -215,6 +215,7 @@ All scripts live in `scripts/`. They are optional dev-quality tools — non-tech
 | `remark-domo-style.mjs` | Remark lint plugin enforcing Domo style rules (optional; runs via `yarn check`). |
 | `check-broken-links.py` | Gate broken links. `--base origin/main` fails on links broken *by* the branch (scans the whole project at both refs and diffs, since most broken links are pre-existing). `--all` lists everything; passing file paths checks just those. Needs `PUPPETEER_SKIP_DOWNLOAD=1 npm install -g mint`. Rationale and caveats are in the script's docstring. |
 | `test-check-broken-links.py` | Tests for `check-broken-links.py`: `python3 scripts/test-check-broken-links.py`. No framework to install; exits 0 when green. Run it after touching the report parser or the bare-path regex — a parser mistake there fails silently, mis-attributing a finding rather than erroring. |
+| `mint-preview.sh` | Trigger a Mintlify preview deploy for a branch locally and print the `previewUrl`: `./scripts/mint-preview.sh [branch]` (defaults to the current branch). Wraps the same API call as `.github/workflows/mint-preview.yml`. Reads `MINTLIFY_KEY` / `MINTLIFY_PROJECT_ID` from the gitignored `.env`; requires a Pro/Enterprise plan and the branch pushed to `origin`. See the `generate-mint-preview-link` skill. |
 
 ## Style Standards
 
@@ -257,3 +258,4 @@ This activates a `post-merge` hook that warns you when a `git pull` leaves track
 |mintlify-preview-workflow|Working on `.github/workflows/mint-preview.yml` — the Mintlify preview deployment GitHub Action|
 |openapi-sync-workflow|Working on the OpenAPI sync GitHub Action (`sync-api-docs.yml`) — YAML detection, sync scripts, or `docs.json` nav-generation integration|
 |connector-review|Manage the connector PR/Jira review lifecycle: run the dashboard, post follow-ups on stale tickets, merge approved PRs, post release-date comments, close Jira tickets, and handle publish/migration requests from Arun|
+|generate-mint-preview-link|Generate a Mintlify preview link for a branch on demand: runs `scripts/mint-preview.sh`, which triggers the Mintlify preview API and returns the `previewUrl`. Use when someone wants a preview link locally without waiting for the PR automation|

@@ -610,7 +610,46 @@ def merge_pr(pr_number, branch_name, dry_run=False):
         print(f"    ⚠️  PR #{pr_number} has merge conflicts.")
         return setup_conflict_resolution(pr_number, branch_name, dry_run)
 
-    raise RuntimeError(f"Failed to merge PR #{pr_number}: {result.stderr.strip()}")
+    # `gh pr merge` uses GraphQL, which intermittently fails with an empty-body
+    # transient error (e.g. HTTP 499) even when the PR is mergeable. Fall back to
+    # the REST merge endpoint, which is unaffected, before giving up.
+    print(f"    ⚠️  `gh pr merge` failed ({result.stderr.strip() or 'no error body'}); "
+          f"retrying via REST API...")
+    return merge_pr_via_rest(pr_number, branch_name, dry_run)
+
+
+def merge_pr_via_rest(pr_number, branch_name, dry_run=False):
+    """Fallback merge via the REST endpoint (PUT /pulls/{n}/merge), which does not
+    share `gh pr merge`'s GraphQL transient-failure mode. Returns True on success,
+    False if conflicts need manual resolution."""
+    if dry_run:
+        print(f"    [dry-run] Would merge PR #{pr_number} via REST")
+        return True
+
+    result = subprocess.run(
+        ["gh", "api", "-X", "PUT",
+         f"repos/{REPO}/pulls/{pr_number}/merge",
+         "-f", "merge_method=merge"],
+        capture_output=True, text=True,
+    )
+    if result.returncode == 0:
+        try:
+            merged = json.loads(result.stdout).get("merged") is True
+        except (ValueError, AttributeError):
+            merged = False
+        if merged:
+            print(f"    ✓ Merged PR #{pr_number} (via REST API)")
+            return True
+        raise RuntimeError(
+            f"REST merge of PR #{pr_number} returned success but not merged: {result.stdout.strip()}")
+
+    combined = (result.stderr + result.stdout).lower()
+    # 405 "not mergeable" / 409 "head branch was modified" → treat as conflict.
+    if "not mergeable" in combined or "conflict" in combined or "modified" in combined:
+        print(f"    ⚠️  PR #{pr_number} has merge conflicts.")
+        return setup_conflict_resolution(pr_number, branch_name, dry_run)
+
+    raise RuntimeError(f"REST merge of PR #{pr_number} failed: {result.stderr.strip()}")
 
 
 def approve_pr_on_github(pr_number, body="Approving for merge.", dry_run=False):

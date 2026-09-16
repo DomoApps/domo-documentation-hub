@@ -7,7 +7,7 @@ argument-hint: "(optional) the release month + context folder name"
 
 # Product Feature-Release Release Notes
 
-Draft Domo's public-facing **feature-release** Release Notes into `s/article/Current-Release-Notes.mdx`, following the house style in **`release-notes-style.md`** (read it in full before drafting). This skill is for the customer-facing monthly feature release notes only — not the git-tag `release-notes` skill (`releaseNotes/`) and not the PMM link-wiring `release-feature-links` skill.
+Draft Domo's public-facing **feature-release** Release Notes into `s/article/Current-Release-Notes.mdx`, following the house style in **`release-notes-style.md`** (read it in full before drafting). This skill is for the customer-facing monthly feature release notes only — not the git-tag `release-notes` skill (`kb-release-notes/`) and not the PMM link-wiring `release-feature-links` skill.
 
 **Out of scope (do not do these):** opening a PR, localizing. Localization is run separately by the user with the `localize` skill after the English draft is approved.
 

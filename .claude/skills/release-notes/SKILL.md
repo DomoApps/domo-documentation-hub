@@ -1,6 +1,6 @@
 ---
 name: release-notes
-description: Generate user-friendly release notes by diffing the latest git tag against the previous tag and summarizing the changes. Use when the user asks to "generate release notes", "write release notes for the latest release", "summarize the latest release", or similar. Saves a shareable MDX file to `releaseNotes/` and a sanitized external version to `releaseNotesExternal/`.
+description: Generate user-friendly release notes by diffing the latest git tag against the previous tag and summarizing the changes. Use when the user asks to "generate release notes", "write release notes for the latest release", "summarize the latest release", or similar. Saves a shareable MDX file to `kb-release-notes/` and a sanitized external version to `kb-release-notes-external/`.
 ---
 
 # Release Notes Generator
@@ -19,11 +19,11 @@ The top tag is the **latest release**. The **base** for the diff is **not** simp
 
 **Finding the base tag:**
 
-1. List the files already in `releaseNotes/` to see which versions have notes:
+1. List the files already in `kb-release-notes/` to see which versions have notes:
    ```bash
-   ls releaseNotes/
+   ls kb-release-notes/
    ```
-2. The highest version with an existing release notes file is the base. For example, if `releaseNotes/` contains `v2.6.0.mdx` and the tags are `v2.7.0 → v2.6.2 → v2.6.1 → v2.6.0`, the diff range is `v2.6.0..v2.7.0` — spanning all three intervening patch tags.
+2. The highest version with an existing release notes file is the base. For example, if `kb-release-notes/` contains `v2.6.0.mdx` and the tags are `v2.7.0 → v2.6.2 → v2.6.1 → v2.6.0`, the diff range is `v2.6.0..v2.7.0` — spanning all three intervening patch tags.
 3. If every tag already has release notes (i.e., the previous tag is also the base), use the previous tag as normal.
 
 Confirm with the user only if the intended target is ambiguous (e.g. multiple tags on the same day, or the user mentions a specific version).
@@ -58,7 +58,7 @@ Every **net-new** article and every **substantially revised** article gets an in
 - `s/topic/`
 - `portal/`
 
-Explicitly **skip** `docs.json`, `images/`, `openapi/`, `.csv`, `releaseNotes/`, and the localized roots `de/`, `es/`, `fr/`, `ja/` (translations of existing English content — not separately linkable here).
+Explicitly **skip** `docs.json`, `images/`, `openapi/`, `.csv`, `kb-release-notes/`, and the localized roots `de/`, `es/`, `fr/`, `ja/` (translations of existing English content — not separately linkable here).
 
 **Net-new articles** = `A` status in `git diff --name-status`. Always linked.
 
@@ -100,7 +100,7 @@ Worked example (Cloud Integrations Overhaul, v2.4.0):
 
 ### 6. Write the file
 
-Save to `releaseNotes/v<version>.mdx`. The file is MDX so it renders cleanly when viewed in the repo or pasted into Mintlify, but it's also written to read well when copy/pasted into email or Slack — keep prose plain and avoid Mintlify-only components (no `<Frame>`, `<Note>`, `<Accordion>`, etc.).
+Save to `kb-release-notes/v<version>.mdx`. The file is MDX so it renders cleanly when viewed in the repo or pasted into Mintlify, but it's also written to read well when copy/pasted into email or Slack — keep prose plain and avoid Mintlify-only components (no `<Frame>`, `<Note>`, `<Accordion>`, etc.).
 
 Follow this structure:
 
@@ -142,7 +142,7 @@ Keep tone warm and appreciative.
 
 ### 7. Generate the external version
 
-After saving the internal file, produce a sanitized copy for external audiences (customers, partners, public-facing channels) and save it to `releaseNotesExternal/v<version>.mdx`.
+After saving the internal file, produce a sanitized copy for external audiences (customers, partners, public-facing channels) and save it to `kb-release-notes-external/v<version>.mdx`.
 
 **What to strip or omit:**
 
@@ -156,7 +156,7 @@ After saving the internal file, produce a sanitized copy for external audiences 
 
 **Title and intro:** Keep the same version number and framing. The title field does not need to change. Adjust the intro only if it references themes you've dropped.
 
-**File location:** `releaseNotesExternal/v<version>.mdx` — the `Write` tool creates the directory automatically.
+**File location:** `kb-release-notes-external/v<version>.mdx` — the `Write` tool creates the directory automatically.
 
 ### 8. Confirm
 
@@ -179,7 +179,7 @@ Once the user approves the generated notes, publish them without further prompti
 
 3. **Stage and commit both files:**
    ```bash
-   git add releaseNotes/v<X.Y.Z>.mdx releaseNotesExternal/v<X.Y.Z>.mdx
+   git add kb-release-notes/v<X.Y.Z>.mdx kb-release-notes-external/v<X.Y.Z>.mdx
    git commit -m "docs: add v<X.Y.Z> release notes (internal + external)
 
    Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>"
@@ -192,8 +192,8 @@ Once the user approves the generated notes, publish them without further prompti
      --title "docs: add v<X.Y.Z> release notes" \
      --body "$(cat <<'EOF'
    ## Summary
-   - Adds internal release notes to `releaseNotes/v<X.Y.Z>.mdx`
-   - Adds sanitized external release notes to `releaseNotesExternal/v<X.Y.Z>.mdx`
+   - Adds internal release notes to `kb-release-notes/v<X.Y.Z>.mdx`
+   - Adds sanitized external release notes to `kb-release-notes-external/v<X.Y.Z>.mdx`
 
    ## Test plan
    - [ ] Verify both files render correctly on the Mintlify preview
@@ -207,6 +207,6 @@ Once the user approves the generated notes, publish them without further prompti
 
 ## Notes
 
-- Always create `releaseNotes/` and `releaseNotesExternal/` if they don't exist — `Write` handles this automatically.
+- Always create `kb-release-notes/` and `kb-release-notes-external/` if they don't exist — `Write` handles this automatically.
 - Do **not** include internal ticket IDs (DOMO-XXXXXX) in either version unless the user asks; parenthetical attribution is fine in the internal version.
 - Do **not** commit either file unless the user asks.

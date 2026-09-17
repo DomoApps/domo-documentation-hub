@@ -105,20 +105,28 @@ Never derive the feature switch date from the branch cut date. Ask the user, the
 
 ### GA Release Workflow
 
-GA-tied documentation must go live in sync with the feature, never before. It does not go to `main` on the normal schedule:
+GA-tied documentation must go live in sync with the feature, never before. The `-ga-MM-DD-YYYY` branch suffix records the **feature switch date** (when customers see the feature) so the KB Administrator can time publication. Keep the suffix on any GA-tied branch — it is how the KB Administrator knows the availability date. **Never tell a contributor to drop the suffix just to base onto `main`.**
 
-- A dedicated GA branch exists for each release date, using a **spelled-out month**: `release-ga/may-20-2026`, `release-ga/sept-23-2026`
-- GA PRs base onto that `release-ga/*` branch, not `main`
-- They are reviewed and approved normally, then held; the KB Administrator merges the GA branch into `main` on the feature switch date, outside the normal release schedule
-- This mirrors how release-notes branches work: changes queue in the GA branch, get validated together, and ship as one merge
-
-Before opening a GA PR, confirm the target branch exists:
+There are two kinds of GA work, and they route differently. Before opening a GA PR, check whether a train branch exists for that date:
 
 ```bash
 git branch -r | grep release-ga
 ```
 
-If the branch for that date doesn't exist yet, say so, since the KB Administrator creates it. Don't fall back to basing on `main`.
+**On the company GA release train.** The monthly, company-wide GA (all of Domo's features switching together on one date, e.g. `release-ga/sept-23-2026`). A dedicated GA branch exists for each such date, using a **spelled-out month**: `release-ga/may-20-2026`, `release-ga/sept-23-2026`.
+
+- GA PRs base onto the matching `release-ga/*` branch, not `main`
+- They are reviewed and approved normally, then held; the KB Administrator merges the GA branch into `main` on the feature switch date, outside the normal release schedule
+- This mirrors how release-notes branches work: changes queue in the GA branch, get validated together, and ship as one merge
+- If a `release-ga/*` branch for that date doesn't exist yet, say so — the KB Administrator creates it. Don't fall back to basing on `main`.
+
+**Off-train standalone product GA.** A doc change tied to one product feature that reaches customers on its own date, outside the company-wide train. This is common — the `-ga-<date>` suffix on such a branch simply tells the KB Administrator when that piece of product is available so they can plan its publish date. There is no `release-ga/*` branch for these, and one should not be created.
+
+- Keep the `-ga-<date>` suffix; base the PR onto `main`
+- The KB Administrator holds the PR open and merges it on or after the `-ga-` date so it publishes in sync with the feature. The safety comes from the KB Administrator timing the merge, not from the base branch
+- Assign it to the KB Administrator and call out the GA date in the PR description
+
+When no `release-ga/*` branch exists for a `-ga-<date>` branch, don't assume which case it is: ask the contributor whether the work is part of the monthly company GA train or a standalone off-train product GA, then route accordingly.
 
 Signal GA intent in **both** the branch name and the PR description so the PR gets routed to the right base branch.
 

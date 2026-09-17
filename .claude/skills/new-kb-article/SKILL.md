@@ -210,6 +210,8 @@ git branch -r | grep release-ga
 
 If it doesn't exist, tell the user the Knowledge Base Administrator needs to create it. Do not tell them to base on `main` instead, because that would publish the article before the feature ships.
 
+The `-ga-<date>` suffix is a signal that the article is tied to a GA release, so it forces the GA base branch and blocks `main`. If a branch carries that suffix but the article is **not** tied to a release, the suffix itself is the mistake — don't send the user chasing a `release-ga/*` branch. Tell them to rename the branch to the routine form `first.last/short-description` (no `-ga-` suffix) and base onto `main`, and it publishes on the normal weekly schedule.
+
 See `CLAUDE.md` › **Contribution Workflow** for the full convention.
 
 ---

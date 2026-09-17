@@ -385,6 +385,8 @@ If it doesn't exist, tell the user the Knowledge Base Administrator needs to cre
 
 If the user is on a branch whose name contains `-ga-<date>` but whose PR bases onto `main`, flag it: the change would publish ahead of the feature.
 
+The `-ga-<date>` suffix is a signal that the work is tied to a GA release, so it forces the GA base branch and blocks `main`. If a branch carries that suffix but the change is **not** tied to a release (a routine edit, a clarification, a typo fix), the suffix itself is the mistake — don't send the user chasing a `release-ga/*` branch. Tell them to rename the branch to the routine form `first.last/short-description` (no `-ga-` suffix) and base onto `main`, and it publishes on the normal weekly schedule.
+
 See `CLAUDE.md` › **Contribution Workflow** for the full convention.
 
 ---

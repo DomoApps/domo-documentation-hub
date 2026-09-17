@@ -40,7 +40,7 @@ If there are no qualifying MDX files in the PR, tell the user and stop.
 
 Using the `headRefName` and `baseRefName` already returned above, verify the PR targets the right base. This is cheap to check here and expensive to catch after merge.
 
-- If `headRefName` contains `-ga-<date>` but `baseRefName` is `main`, flag it: GA-tied content merged to `main` publishes before the feature ships. It should base onto the `release-ga/*` branch for that date (spelled-out month, such as `release-ga/may-20-2026`). Confirm with `git branch -r | grep release-ga`.
+- If `headRefName` contains `-ga-<date>` and `baseRefName` is `main`, don't assume it's wrong — this is correct for an **off-train** standalone product GA, where the KB Administrator holds the PR and merges it on the `-ga-` date. It's only a mistake if the work belongs to the company-wide monthly GA train, in which case it should base onto the `release-ga/*` branch for that date (spelled-out month, such as `release-ga/sept-23-2026`; confirm with `git branch -r | grep release-ga`). If a matching `release-ga/*` branch exists, mention that the PR may belong on it; if none exists, note that main is expected for off-train GA and leave routing to the contributor. Never suggest dropping the `-ga-<date>` suffix. See `CLAUDE.md` › **GA Release Workflow**.
 - If `baseRefName` is a `release-ga/*` branch but `headRefName` has no GA date, mention it. Either the branch name is missing its date or the base is wrong.
 
 Report the mismatch and let the user decide whether to retarget the PR. Do not retarget it yourself, and do not let this block the style revision. Continue to Step 2 either way.

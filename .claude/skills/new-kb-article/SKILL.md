@@ -94,6 +94,14 @@ Before writing, read both of these files:
 
 Once the Article Intake Summary, release information, style guide, and template are all loaded, create the MDX file. Do not ask for any information already answered.
 
+**The drafting default — preserve the source's wording.** The Article Intake Summary, the user's own answers, any pasted notes or draft, and the original source material were written by people who know the feature; their word choice carries nuance about how the functionality actually behaves. Your default is to **keep their direct phrasing and word choice**, not to rewrite the content in your own words:
+
+- **Take the source text as-is** wherever it already works, and **reorganize** it into the article structure from `New-Article-Template.mdx`. Reordering and regrouping source sentences is expected; paraphrasing them for its own sake is not.
+- **Recast the framing, keep the wording.** House voice (present tense, active voice, imperative task headings, second person) is a style rule — shift grammatical framing into it where the source doesn't already match. But that is the *only* rewrite you make by default: swapping the author's precise term for a synonym, or restating a described behavior in looser words, is not allowed. Preserve the substance (specific verbs, named behaviors, qualifiers, terminology); recast the frame.
+- **Add text only where genuinely needed** for flow or structure — e.g., a missing one-sentence intro to the product, or a connective clause between two source passages. Don't pad, and don't invent capability detail.
+- **Revise wording only where it breaks a rule** — a `Domo-KB-Style-Guide.mdx` style/voice/term rule, or a `New-Article-Template.mdx` MDX/structure convention. Fidelity never overrides the style guide; it governs everything the style guide doesn't touch.
+- **If information is missing, ask the user** — never fill a gap with plausible-sounding content.
+
 Create a new MDX file in `s/article/` using the filename format `Article-Title-Here.mdx` (Title Case, hyphen-separated, no special characters).
 
 Follow the structure from `New-Article-Template.mdx` and apply all style rules from `Domo-KB-Style-Guide.mdx` exactly.
@@ -124,7 +132,7 @@ The standard beta Note must be used verbatim — do not paraphrase or change the
 
 ## Step 7: Fact-check pass
 
-Before the edit pass, and before considering the copy complete, verify every factual claim in the draft at least once against an authoritative source: the source material the user provided, the `kb-intake` Article Intake Summary, and the repo itself. This pass is about **accuracy**, not style — the style and template edit comes next.
+Before the edit pass, and before considering the copy complete, verify every factual claim in the draft at least once against an authoritative source: the source material the user provided, the `kb-intake` Article Intake Summary, and the repo itself. This pass is about **accuracy**, not style — the style and template edit comes next. When you correct an unsupported claim, prefer restoring the source's own wording over inventing a replacement.
 
 1. **Go claim by claim.** For each statement of fact — steps, behaviors, settings, defaults, names, values, URLs, limits — confirm it against the source material or existing repo content. Where the repo is the authority, search it and read the relevant article rather than trusting the draft:
    ```bash
@@ -144,7 +152,7 @@ The article is not complete until every factual claim is either confirmed agains
 
 ## Step 8: Edit pass — style guide and template
 
-Drafting always introduces style drift. After the fact-check pass, do an explicit editing pass against **both** `Domo-KB-Style-Guide.mdx` **and** `New-Article-Template.mdx`, and revise the article in place. This pass catches every usage, style, grammar, and structural mistake. **Do not skip this even if the draft looks right** — the most common misses (intro framing, imperative headings, unpadded tables, lowercase Domo terms, future tense) are easy to introduce and easy to miss without a deliberate re-read.
+Drafting always introduces style drift. After the fact-check pass, do an explicit editing pass against **both** `Domo-KB-Style-Guide.mdx` **and** `New-Article-Template.mdx`, and revise the article in place. This pass catches every usage, style, grammar, and structural mistake. As you fix style, keep the source's substantive wording intact — change only what a rule requires, exactly as at Step 6. **Do not skip this even if the draft looks right** — the most common misses (intro framing, imperative headings, unpadded tables, lowercase Domo terms, future tense) are easy to introduce and easy to miss without a deliberate re-read.
 
 1. **Re-read `Domo-KB-Style-Guide.mdx` and `New-Article-Template.mdx` now, in full** — not from memory. You will have drifted from at least one rule while drafting. Confirm the article's structure and encoding match the template (frontmatter, section order, component syntax, code blocks, tables).
 2. **Proofread for plain grammar and usage** — spelling, subject-verb agreement, punctuation, and sentence clarity — in addition to the Domo-specific rules below. A factually correct article still isn't done if it reads poorly.
@@ -163,6 +171,19 @@ Drafting always introduces style drift. After the fact-check pass, do an explici
    - **Images** — block screenshots wrapped in `<Frame>` with a native `<img>` and descriptive `alt`, no inline `width`/`height`; never `<Frame>` inside a table cell. Verify any placeholders match what the user chose in Step 4 (none unless they opted in).
    - **Icons** — current UI glyphs use the `icon-{name}` font; `legacy-icon-{name}` only for release-notes/Workbench surfaces; brand logos use Font Awesome brands or inline `<svg fill="currentColor">`; never the old inline-image icon pattern for a glyph that exists in the font. Each icon carries `aria-hidden="true"` and is named in the prose.
 4. **Revise the article in place** to resolve every issue found, then re-run the table normalizer if you changed any tables.
+
+---
+
+## Step 8.5: Align with the user on the copy (final approval)
+
+Now that the draft has been fact-checked (Step 7) and style-edited (Step 8), show the user exactly what you've written and get their approval on the copy — **every time**, no exceptions. This is the single point where the user reviews the words, and it comes *only after* the copy has been verified and styled — never before.
+
+- Present the finished article (a section-by-section view helps wherever you recast source wording for style).
+- Call out anything you **added** beyond the source, any place you **recast** source wording to satisfy the style guide, and any spot where you're **missing** information the source didn't supply.
+- **This is where any wording change the user or PM wants gets made.** Fold in their edits, then re-run the relevant parts of the fact-check (Step 7) and edit (Step 8) passes over anything you changed, so the final copy stays accurate and on-style.
+- If you need missing detail, ask for it now and fold in the answer — don't invent it.
+
+Only after the user approves the copy do you proceed to navigation and handoff.
 
 ---
 

@@ -104,7 +104,7 @@ If a key fails (HTTP 4xx) or no PRD is found, note it and rely on the internal-n
 
 - **Start from the source text.** Prefer the PRD's and internal blurb's own descriptions; reuse their specific verbs, named behaviors, qualifiers, and terminology. Reorganize their sentences into a release-notes entry (§4 of `release-notes-style.md`) — reordering and regrouping is expected; paraphrasing for its own sake is not.
 - **Recast the framing, keep the wording.** House voice (§7 — second person, present tense, benefit-first) is a style rule, so shift grammatical person, tense, and framing into it where the source doesn't already match. That is the *only* rewrite you make by default: swapping a PM's precise term for a synonym, or restating a described behavior in looser words, is not allowed. Preserve the substance; recast the frame.
-- **Add only what's needed** — a lead sentence an entry would otherwise lack, or a connective clause between two source passages. Don't invent capability detail; if something is missing, ask at Step 6.5.
+- **Add only what's needed** — a lead sentence an entry would otherwise lack, or a connective clause between two source passages. Don't invent capability detail; if something is missing, ask the user rather than filling the gap.
 - **Revise wording only to fix a rule** — a `release-notes-style.md` / style-guide voice, term, or structure rule, or the removal of an internal artifact (§7: never expose Jira keys, PRD jargon, codenames, squad/PM names, internal dates). Fidelity never overrides these rules; it governs everything they don't touch.
 
 Read `release-notes-style.md` in full, then overwrite `s/article/Current-Release-Notes.mdx` with the new draft:
@@ -116,17 +116,6 @@ Read `release-notes-style.md` in full, then overwrite `s/article/Current-Release
 - **"Learn more" links:** add `Learn more about [text](https://www.domo.com/docs/s/article/<slug-or-id>).` **only** when a real published KB article exists — verify with `grep -rl "title:.*<keyword>" s/article/`. Omit if none.
 - **Beta Features** section opens with `<BetaNote generic />`. Include standard non-feature sections (Model Deprecation Notice, Domo AI Models Updates) when present in the internal notes. End with the verbatim **Support** block.
 
-### Step 6.5 — Align with the user on the copy (before fact-checking)
-
-Before the fact-check pass, show the user exactly what you drafted and confirm you're aligned on the wording — **every time**, no exceptions. The point is that you and the user agree on the literal words before you spend effort verifying and polishing them.
-
-- Show the drafted entries (a concise per-feature before/after helps wherever you recast source wording for style).
-- Call out anything you **added** beyond the source, any place you **recast** source wording for house voice, and any feature where you're **missing** information the source didn't supply.
-- If you need missing detail, ask for it now and fold in the answer — don't invent it.
-- Only after the user confirms the copy do you run Step 7 (fact-check) and Step 8 (edit). Both of those preserve the agreed wording — they verify and style-correct; they don't re-paraphrase.
-
-This is distinct from the Step 9 handoff: Step 6.5 aligns on the *words*; Step 9 approves the *finished, fact-checked, styled* result.
-
 ### Step 7 — Fact-check pass (no hallucination)
 
 Go feature by feature and verify **every** claim, model name, capability, bullet, and date traces to the internal-notes blurb, the epic description, or the PRD in `scripts/reports/release-context/`. Cut or correct anything unsupported. When you correct an unsupported claim, prefer restoring the source's own wording over inventing a replacement — this pass fixes accuracy, not phrasing. Confirm each `<Frame>` path exists (`ls images/kb/<name>.png`) and each "Learn more" link resolves to a real article.
@@ -137,7 +126,7 @@ Read the whole draft top to bottom for clarity, house-style adherence (`release-
 
 ### Step 9 — Hand off for approval
 
-Show the user a concise summary (features covered, betas, images added, any epics/PRDs that failed to fetch, any features lacking a screenshot or KB link) and the diff. **Do not commit yet.** Wait for explicit approval.
+This is the single point where the user reviews the copy — only after the fact-check (Step 7) and edit (Step 8) passes, never before. Show the user a concise summary (features covered, betas, images added, any epics/PRDs that failed to fetch, any features lacking a screenshot or KB link) and the diff. **This is where any wording change the user or a PM wants gets made** — fold in their edits, then re-run the relevant parts of the fact-check and edit passes over anything you changed so the final copy stays accurate and on-style. **Do not commit yet.** Wait for explicit approval.
 
 ### Step 10 — Commit (only after approval)
 

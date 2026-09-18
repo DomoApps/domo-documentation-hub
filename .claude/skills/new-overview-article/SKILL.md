@@ -257,16 +257,6 @@ For a step-by-step walkthrough, see [Opening <Product>](/s/article/...).
 
 ---
 
-## Step 7.5: Align with the user on the draft (before fact-checking)
-
-Before the fact-check pass, show the user exactly what you've written and confirm you're aligned on the copy — **every time**, no exceptions. The point is that you and the user agree on the literal words before you spend effort verifying and polishing them.
-
-- Present the drafted Overview, flagging anything you **added** beyond what the user or the deep articles gave you, any place you **recast** source wording for style, and any spot where you're **missing** a definition, use case, or access path.
-- If you need missing detail, ask for it now and fold in the answer — don't invent it.
-- Only after the user confirms the copy do you run Step 8 (fact-check), Step 9 (edit), and Step 10 (link verification). Those passes preserve the agreed wording — they verify and style-correct; they don't re-paraphrase.
-
----
-
 ## Step 8: Fact-check pass
 
 Before the edit pass, and before considering the Overview complete, verify every factual claim at least once against an authoritative source: what the user told you in Step 1, the style-guide treatment from Step 4, and the repo itself. This pass is about **accuracy**; link-target verification happens next in Step 10. When you correct an unsupported claim, prefer restoring the source's own wording over inventing a replacement. Overviews carry fewer procedural claims than how-tos, but the two they do carry are high-risk:
@@ -329,6 +319,18 @@ Fix every mismatch before finalizing. If a referenced article truly does not exi
 
 - Drop the link and rewrite the surrounding text to not promise it.
 - Or note it as a follow-up gap and flag for the user.
+
+---
+
+## Step 10.5: Align with the user on the copy (final approval)
+
+Now that the Overview has been fact-checked (Step 8), style-edited (Step 9), and its links verified (Step 10), show the user exactly what you've written and get their approval on the copy — **every time**, no exceptions. This is the single point where the user reviews the words, and it comes *only after* the copy has been verified and styled — never before.
+
+- Present the finished Overview, flagging anything you **added** beyond what the user or the deep articles gave you, any place you **recast** source wording for style, and any spot where you're **missing** a definition, use case, or access path.
+- **This is where any wording change the user wants gets made.** Fold in their edits, then re-run the relevant fact-check (Step 8), edit (Step 9), and link (Step 10) checks over anything you changed, so the final copy stays accurate and on-style.
+- If you need missing detail, ask for it now and fold in the answer — don't invent it.
+
+Only after the user approves the copy do you handle the legacy collision, navigation, and output.
 
 ---
 

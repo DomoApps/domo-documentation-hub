@@ -100,7 +100,7 @@ Once the Article Intake Summary, release information, style guide, and template 
 - **Recast the framing, keep the wording.** House voice (present tense, active voice, imperative task headings, second person) is a style rule — shift grammatical framing into it where the source doesn't already match. But that is the *only* rewrite you make by default: swapping the author's precise term for a synonym, or restating a described behavior in looser words, is not allowed. Preserve the substance (specific verbs, named behaviors, qualifiers, terminology); recast the frame.
 - **Add text only where genuinely needed** for flow or structure — e.g., a missing one-sentence intro to the product, or a connective clause between two source passages. Don't pad, and don't invent capability detail.
 - **Revise wording only where it breaks a rule** — a `Domo-KB-Style-Guide.mdx` style/voice/term rule, or a `New-Article-Template.mdx` MDX/structure convention. Fidelity never overrides the style guide; it governs everything the style guide doesn't touch.
-- **If information is missing, ask the user** (see Step 6.5) — never fill a gap with plausible-sounding content.
+- **If information is missing, ask the user** — never fill a gap with plausible-sounding content.
 
 Create a new MDX file in `s/article/` using the filename format `Article-Title-Here.mdx` (Title Case, hyphen-separated, no special characters).
 
@@ -127,19 +127,6 @@ Use the release-status answer from Step 3 to decide which beta treatment, if any
 The `className` on the Badge is required and must be exactly `text-primary bg-primary/10 font-bold` — it matches the sidebar `tag` styling.
 
 The standard beta Note must be used verbatim — do not paraphrase or change the links. Copy it from the style guide.
-
----
-
-## Step 6.5: Align with the user on the draft (before fact-checking)
-
-Before the fact-check pass, show the user exactly what you've written and confirm you're aligned on the copy — **every time**, no exceptions. The point is that you and the user agree on the literal words before you spend effort verifying and polishing them.
-
-- Present the drafted article (a section-by-section before/after helps wherever you recast source wording for style).
-- Call out anything you **added** beyond the source, any place you **recast** source wording to satisfy the style guide, and any spot where you're **missing** information the source didn't supply.
-- If you need missing detail, ask for it now and fold in the answer — don't invent it.
-- Only after the user confirms the copy do you run Step 7 (fact-check) and Step 8 (edit). Both of those preserve the agreed wording — they verify and style-correct; they don't re-paraphrase.
-
-This is distinct from the final Output/handoff: Step 6.5 aligns on the *words*; the handoff delivers the *finished, fact-checked, styled* result.
 
 ---
 
@@ -184,6 +171,19 @@ Drafting always introduces style drift. After the fact-check pass, do an explici
    - **Images** — block screenshots wrapped in `<Frame>` with a native `<img>` and descriptive `alt`, no inline `width`/`height`; never `<Frame>` inside a table cell. Verify any placeholders match what the user chose in Step 4 (none unless they opted in).
    - **Icons** — current UI glyphs use the `icon-{name}` font; `legacy-icon-{name}` only for release-notes/Workbench surfaces; brand logos use Font Awesome brands or inline `<svg fill="currentColor">`; never the old inline-image icon pattern for a glyph that exists in the font. Each icon carries `aria-hidden="true"` and is named in the prose.
 4. **Revise the article in place** to resolve every issue found, then re-run the table normalizer if you changed any tables.
+
+---
+
+## Step 8.5: Align with the user on the copy (final approval)
+
+Now that the draft has been fact-checked (Step 7) and style-edited (Step 8), show the user exactly what you've written and get their approval on the copy — **every time**, no exceptions. This is the single point where the user reviews the words, and it comes *only after* the copy has been verified and styled — never before.
+
+- Present the finished article (a section-by-section view helps wherever you recast source wording for style).
+- Call out anything you **added** beyond the source, any place you **recast** source wording to satisfy the style guide, and any spot where you're **missing** information the source didn't supply.
+- **This is where any wording change the user or PM wants gets made.** Fold in their edits, then re-run the relevant parts of the fact-check (Step 7) and edit (Step 8) passes over anything you changed, so the final copy stays accurate and on-style.
+- If you need missing detail, ask for it now and fold in the answer — don't invent it.
+
+Only after the user approves the copy do you proceed to navigation and handoff.
 
 ---
 

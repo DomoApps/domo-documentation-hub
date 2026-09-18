@@ -278,17 +278,6 @@ The Badge `className` must be exactly `text-primary bg-primary/10 font-bold`. Th
 
 ---
 
-## Step 5.5: Align with the user on the written copy (before fact-checking)
-
-Before the fact-check pass, show the user exactly what you wrote and confirm you're aligned on the copy — **every time, even for a one-line change**. Step 3 approved the *plan*; this confirms the *literal words* you produced, before you spend effort verifying and polishing them.
-
-- Show the changed passage (a before/after of just what you touched is ideal for a small edit).
-- Call out anything you **added** beyond the source, any place you **recast** source wording for style, and any spot where you're **missing** information the change needs.
-- If you need missing detail, ask for it now and fold in the answer — don't invent it.
-- Only after the user confirms the copy do you run Step 6 (fact-check) and Step 8 (edit). Both preserve the agreed wording — they verify and style-correct; they don't re-paraphrase.
-
----
-
 ## Step 6: Fact-check pass
 
 Before the edit pass, and before considering the change complete, fact-check the content you added or rewrote against an authoritative source: the source material the user provided, what the user told you about the change, and the repo itself. Scope this to what you changed — you are not re-verifying the whole article — but every claim your edit introduces or alters must be confirmed at least once. When you correct an unsupported claim, prefer restoring the source's own wording over inventing a replacement.
@@ -355,6 +344,19 @@ Editing introduces style drift just as drafting does. After the fact-check pass 
    - **Images** — block screenshots wrapped in `<Frame>` with a native `<img>` and descriptive `alt`, no inline `width`/`height`; never `<Frame>` inside a table cell. No placeholders unless the user opted in at Step 4.
    - **Icons** — confirm the Step 7 upgrade landed: current-UI glyphs use the `icon-{name}` font, `legacy-icon-{name}` only for release-notes/Workbench, brand logos use Font Awesome brands or inline `<svg fill="currentColor">`, and no legacy image-based icon remains for a glyph that exists in the font. Each icon carries `aria-hidden="true"` and is named in the prose.
 4. **Revise in place.** Run `python3 scripts/pad_md_tables.py <file>` on any file whose tables you touched.
+
+---
+
+## Step 8.5: Align with the user on the written copy (final approval)
+
+Now that the change has been fact-checked (Step 6) and style-edited (Step 8), show the user exactly what you wrote and get their approval on the copy — **every time, even for a one-line change**. Step 3 approved the *plan*; this confirms the *literal words*, and it comes *only after* the copy has been verified and styled — never before.
+
+- Show the changed passage (a before/after of just what you touched is ideal for a small edit).
+- Call out anything you **added** beyond the source, any place you **recast** source wording for style, and any spot where you're **missing** information the change needs.
+- **This is where any wording change the user or PM wants gets made.** Fold in their edits, then re-run the fact-check (Step 6) and edit (Step 8) passes over anything you changed, so the final copy stays accurate and on-style.
+- If you need missing detail, ask for it now and fold in the answer — don't invent it.
+
+Only after the user approves the copy do you run Step 9 (verify) and Step 10 (output).
 
 ---
 

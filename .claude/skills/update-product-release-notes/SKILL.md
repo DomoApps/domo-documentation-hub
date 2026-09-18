@@ -93,16 +93,6 @@ Use `Edit` for targeted in-place changes (nomenclature, factual fixes, any user-
 
 If you changed a heading, confirm it doesn't disturb sort order (e.g. "New Chart **Improvements**" vs "New Chart **Types**" both sort under "New Chart", so position is unchanged). If any Markdown tables were touched, run `python3 scripts/pad_md_tables.py s/article/Current-Release-Notes.mdx`.
 
-### Step 5.5 — Align with the user on the copy (before verifying)
-
-Before the verify pass, show the user exactly what you wrote and confirm you're aligned on the copy — **every time**. This matters most for **lens-4 additions** (new entries you drafted) and any place you **recast** source wording; pure factual/nomenclature corrections that simply match the source can be summarized rather than quoted in full.
-
-- Show each new or recast passage, note anything you **added** beyond the source, and flag any feature where you're **missing** detail the source didn't supply.
-- If you need missing detail, ask now and fold in the answer — don't invent it.
-- Only after the user confirms the copy do you run Step 6 (verify). It preserves the agreed wording — it checks accuracy and style, it doesn't re-paraphrase.
-
-(Step 7 is still the final lens-organized handoff with the diff; Step 5.5 aligns on the *words*, Step 7 delivers the *finished* result.)
-
 ### Step 6 — Verify
 
 - Re-read the edited region(s) top to bottom for house-voice consistency and §10 checklist adherence.
@@ -113,7 +103,7 @@ Before the verify pass, show the user exactly what you wrote and confirm you're 
 
 ### Step 7 — Hand off (do NOT commit unless asked)
 
-Give the user a tight, lens-organized summary:
+This is the single point where the user reviews the copy — only after the verify pass (Step 6), never before. **This is where any wording change the user or a PM wants gets made** — fold in their edits, then re-verify anything you changed so the final copy stays accurate and on-style. Give the user a tight, lens-organized summary:
 - **Additions** applied (or "none — source is a subset already fully covered").
 - **Factual corrections** applied, each as source → old → new.
 - **Nomenclature changes** applied, each as before → after, and flag any where the source was internally inconsistent or where the source's term is arguably weaker than the article's (offer a one-line revert).

@@ -100,22 +100,40 @@ If a key fails (HTTP 4xx) or no PRD is found, note it and rely on the internal-n
 
 ### Step 6 — Draft into Current-Release-Notes.mdx
 
+**The drafting default — preserve the source's wording.** The internal-notes blurbs and the PRDs were written by the PMs who own these features; their word choice carries real nuance about what each feature does. Your default is to **keep their direct phrasing and word choice**, not to rewrite features in your own words:
+
+- **Start from the source text.** Prefer the PRD's and internal blurb's own descriptions; reuse their specific verbs, named behaviors, qualifiers, and terminology. Reorganize their sentences into a release-notes entry (§4 of `release-notes-style.md`) — reordering and regrouping is expected; paraphrasing for its own sake is not.
+- **Recast the framing, keep the wording.** House voice (§7 — second person, present tense, benefit-first) is a style rule, so shift grammatical person, tense, and framing into it where the source doesn't already match. That is the *only* rewrite you make by default: swapping a PM's precise term for a synonym, or restating a described behavior in looser words, is not allowed. Preserve the substance; recast the frame.
+- **Add only what's needed** — a lead sentence an entry would otherwise lack, or a connective clause between two source passages. Don't invent capability detail; if something is missing, ask at Step 6.5.
+- **Revise wording only to fix a rule** — a `release-notes-style.md` / style-guide voice, term, or structure rule, or the removal of an internal artifact (§7: never expose Jira keys, PRD jargon, codenames, squad/PM names, internal dates). Fidelity never overrides these rules; it governs everything they don't touch.
+
 Read `release-notes-style.md` in full, then overwrite `s/article/Current-Release-Notes.mdx` with the new draft:
 
 - **Title** `"{Month} {Year} Release Notes"` for the **new** release; keep the filename `Current-Release-Notes.mdx`.
 - Build the feature list from the CSV; write each as a `### ` entry (sub-features `#### ` under parents like *Magic ETL Enhancements* / *Workflows Updates*). Alphabetize by heading.
-- For each feature, synthesize the internal blurb + epic description + PRD into 1–3 benefit-first paragraphs (+ optional bullet list), in Domo house voice. **Never** expose Jira keys, PRD jargon, codenames, squad/PM names, or internal dates.
+- For each feature, build a 1–3 paragraph benefit-first entry (+ optional bullet list) from the internal blurb + epic description + PRD, following **the drafting default** above — keep the source's substantive wording and recast only the framing into house voice. **Never** expose Jira keys, PRD jargon, codenames, squad/PM names, or internal dates.
 - **Screenshots:** choose the best image per feature (from the Word-doc media, or a Jira/Confluence image in `scripts/reports/release-context/media/`). Copy it into `images/kb/` with a descriptive **snake_case** name, then embed on its own line as `<Frame>![](/images/kb/<name>.png)</Frame>`. Every referenced image must exist in `images/kb/` on this branch. Never leave a placeholder or TODO.
 - **"Learn more" links:** add `Learn more about [text](https://www.domo.com/docs/s/article/<slug-or-id>).` **only** when a real published KB article exists — verify with `grep -rl "title:.*<keyword>" s/article/`. Omit if none.
 - **Beta Features** section opens with `<BetaNote generic />`. Include standard non-feature sections (Model Deprecation Notice, Domo AI Models Updates) when present in the internal notes. End with the verbatim **Support** block.
 
+### Step 6.5 — Align with the user on the copy (before fact-checking)
+
+Before the fact-check pass, show the user exactly what you drafted and confirm you're aligned on the wording — **every time**, no exceptions. The point is that you and the user agree on the literal words before you spend effort verifying and polishing them.
+
+- Show the drafted entries (a concise per-feature before/after helps wherever you recast source wording for style).
+- Call out anything you **added** beyond the source, any place you **recast** source wording for house voice, and any feature where you're **missing** information the source didn't supply.
+- If you need missing detail, ask for it now and fold in the answer — don't invent it.
+- Only after the user confirms the copy do you run Step 7 (fact-check) and Step 8 (edit). Both of those preserve the agreed wording — they verify and style-correct; they don't re-paraphrase.
+
+This is distinct from the Step 9 handoff: Step 6.5 aligns on the *words*; Step 9 approves the *finished, fact-checked, styled* result.
+
 ### Step 7 — Fact-check pass (no hallucination)
 
-Go feature by feature and verify **every** claim, model name, capability, bullet, and date traces to the internal-notes blurb, the epic description, or the PRD in `scripts/reports/release-context/`. Cut or correct anything unsupported. Confirm each `<Frame>` path exists (`ls images/kb/<name>.png`) and each "Learn more" link resolves to a real article.
+Go feature by feature and verify **every** claim, model name, capability, bullet, and date traces to the internal-notes blurb, the epic description, or the PRD in `scripts/reports/release-context/`. Cut or correct anything unsupported. When you correct an unsupported claim, prefer restoring the source's own wording over inventing a replacement — this pass fixes accuracy, not phrasing. Confirm each `<Frame>` path exists (`ls images/kb/<name>.png`) and each "Learn more" link resolves to a real article.
 
 ### Step 8 — Edit pass
 
-Read the whole draft top to bottom for clarity, house-style adherence (`release-notes-style.md` §10 checklist), grammar, and consistent product naming. If any Markdown tables were added, run `python3 scripts/pad_md_tables.py s/article/Current-Release-Notes.mdx`. Re-confirm structure: title/excerpt, `import { BetaNote }` + `---`, alphabetized sections, Beta section, Support block.
+Read the whole draft top to bottom for clarity, house-style adherence (`release-notes-style.md` §10 checklist), grammar, and consistent product naming. As you fix style, keep the source's substantive wording intact — change only what a rule requires, exactly as at Step 6. If any Markdown tables were added, run `python3 scripts/pad_md_tables.py s/article/Current-Release-Notes.mdx`. Re-confirm structure: title/excerpt, `import { BetaNote }` + `---`, alphabetized sections, Beta section, Support block.
 
 ### Step 9 — Hand off for approval
 

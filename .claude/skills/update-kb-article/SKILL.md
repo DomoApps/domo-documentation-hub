@@ -21,6 +21,8 @@ The user has provided: $ARGUMENTS
 
 **Follow shared standards.** When writing or rewriting any article content — including merged or split articles — read `New-Article-Template.mdx` for document structure and encoding conventions, and `Domo-KB-Style-Guide.mdx` for voice, formatting, and terminology. Read both files before writing any content.
 
+**Preserve the source's wording.** When a change brings in new copy — the user's own words, pasted notes, a draft, or other source material — keep that direct phrasing and word choice by default rather than restating it; the author's terms carry nuance about how the functionality behaves. Take the source text as-is, fit it into the article, and revise wording only where a `Domo-KB-Style-Guide.mdx` or `New-Article-Template.mdx` rule requires it (recast grammatical framing — person, tense, active voice — into house style, but keep the author's substantive terminology). This compounds with *Be conservative about execution*: never rewrite more than the change requires, and never paraphrase source wording for its own sake. If information is missing, ask the user rather than inventing it.
+
 ---
 
 ## Step 1: Identify the article(s) and change type
@@ -47,7 +49,7 @@ Surface the owning PM and Feature to the user — useful for routing questions, 
 
 Then ask the user what type of change they need — or confirm it if already stated. The change types are:
 
-1. **Rename** — change the article title, filename, or both
+1. **Rename** — change the article title, filename, or both. By convention the title and filename match, so a title change normally renames the file too (and updates links + `docs.json`); state the rule and ask before keeping them separate. See Step 5 › *Renaming a title*.
 2. **Content update** — edit body text, callouts, or other prose
 3. **Image/screenshot swap** — replace one or more images, or swap a legacy image-based UI icon for the Domo icon font
 4. **Content removal** — delete a section, step, or block
@@ -168,9 +170,20 @@ Whichever option is chosen, keep step text self-sufficient — a reader can comp
 
 Make changes only for what the user has explicitly approved. Work through the change list one item at a time.
 
-### Renaming a title only (frontmatter, not filename)
+**Preserve source wording as you write.** For any copy you add or rewrite, follow the source-fidelity default: reuse the user's / source's direct phrasing and word choice, reorganize it to fit, add only what flow or structure needs, and change wording only where a style-guide or template rule requires (recast framing into house voice; keep substantive terminology). If the change needs information you don't have, ask the user — don't invent it. See **Core Principles** › *Preserve the source's wording*.
 
-Edit the `title:` field in the article's frontmatter. The filename and all links remain unchanged.
+### Renaming a title (and the filename-match convention)
+
+**Convention: an article's `title` and its filename should match.** A slug-named article's filename is the Title-Case, hyphen-separated form of its title (`Article Title Here` ↔ `Article-Title-Here.mdx`). So when a user changes the **title**, the default is to change the **filename to match** — which turns the edit into a full file rename: create the renamed file, delete the old one, update every inbound link (both root-relative and absolute forms — see *Renaming a file* below), and update the `docs.json` page entry.
+
+**Always state this rule, then ask** whether the user wants the title and filename to stay in sync or to diverge intentionally. Sometimes keeping them different is deliberate — do that only when the user confirms it. Use AskUserQuestion so the choice is explicit:
+
+- **Rename the file to match (default).** Full file-rename impact: new file, delete the old one, update all inbound links, update `docs.json`.
+- **Change the title only, keep the filename.** Only the `title:` frontmatter changes; the filename, all links, and the `docs.json` page path stay as they are.
+
+**Exception — numeric-ID filenames.** Legacy KB articles are named by numeric ID (`000005874.mdx`), which intentionally does **not** match the title. Never rename these to match a title change — edit the `title:` field only. The match convention applies to slug-named files.
+
+If the user chooses title-only, edit the `title:` field in the frontmatter; the filename and all links remain unchanged.
 
 ### Renaming a file
 
@@ -265,9 +278,20 @@ The Badge `className` must be exactly `text-primary bg-primary/10 font-bold`. Th
 
 ---
 
+## Step 5.5: Align with the user on the written copy (before fact-checking)
+
+Before the fact-check pass, show the user exactly what you wrote and confirm you're aligned on the copy — **every time, even for a one-line change**. Step 3 approved the *plan*; this confirms the *literal words* you produced, before you spend effort verifying and polishing them.
+
+- Show the changed passage (a before/after of just what you touched is ideal for a small edit).
+- Call out anything you **added** beyond the source, any place you **recast** source wording for style, and any spot where you're **missing** information the change needs.
+- If you need missing detail, ask for it now and fold in the answer — don't invent it.
+- Only after the user confirms the copy do you run Step 6 (fact-check) and Step 8 (edit). Both preserve the agreed wording — they verify and style-correct; they don't re-paraphrase.
+
+---
+
 ## Step 6: Fact-check pass
 
-Before the edit pass, and before considering the change complete, fact-check the content you added or rewrote against an authoritative source: the source material the user provided, what the user told you about the change, and the repo itself. Scope this to what you changed — you are not re-verifying the whole article — but every claim your edit introduces or alters must be confirmed at least once.
+Before the edit pass, and before considering the change complete, fact-check the content you added or rewrote against an authoritative source: the source material the user provided, what the user told you about the change, and the repo itself. Scope this to what you changed — you are not re-verifying the whole article — but every claim your edit introduces or alters must be confirmed at least once. When you correct an unsupported claim, prefer restoring the source's own wording over inventing a replacement.
 
 1. **Go claim by claim over the changed content.** For each statement of fact you added or modified — steps, behaviors, settings, defaults, names, values, URLs, limits — confirm it against the source or existing repo content. Where the repo is the authority, search it and read the relevant article rather than trusting your edit:
    ```bash
@@ -313,7 +337,7 @@ The change is not complete until every fact your edit introduces is confirmed ag
 
 ## Step 8: Edit pass — style guide and template
 
-Editing introduces style drift just as drafting does. After the fact-check pass (and the icon upgrade), do an explicit editing pass against **both** `Domo-KB-Style-Guide.mdx` **and** `New-Article-Template.mdx` over the content you changed, and revise it in place. This pass catches usage, style, grammar, and structural mistakes.
+Editing introduces style drift just as drafting does. After the fact-check pass (and the icon upgrade), do an explicit editing pass against **both** `Domo-KB-Style-Guide.mdx` **and** `New-Article-Template.mdx` over the content you changed, and revise it in place. This pass catches usage, style, grammar, and structural mistakes. As you fix style, keep the source's substantive wording intact — change only what a rule requires.
 
 1. **Re-read `Domo-KB-Style-Guide.mdx` and `New-Article-Template.mdx` now, in full** — not from memory. Confirm your changed content matches the template's structure and encoding conventions.
 2. **Proofread the changed content for plain grammar and usage** — spelling, agreement, punctuation, clarity — alongside the Domo-specific rules below.

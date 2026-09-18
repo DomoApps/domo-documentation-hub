@@ -152,6 +152,8 @@ Before drafting, confirm with the user:
 
 Create `s/article/<Product>-Overview.mdx` (title-case filename, hyphen-separated, no `.mdx` collisions). The structure below is the canonical Overview shape — it is what the existing modern overviews (`Cloud Integrations Overview`, `App Studio | Overview`, `Variables | Overview`, plus the recently authored `Analyzer Overview` and `DomoStats Overview`) all converge on, and it differs from a generic how-to.
 
+**The drafting default — preserve the source's wording.** Where the user gave you their own description of the product (Step 1) or you're reusing an existing article's `excerpt`/definition, **keep that direct phrasing and word choice** rather than restating it in your own words — the author's terms carry nuance about what the product is and does. Take the source text as-is and fit it into the Overview structure; **add** connective or framing text only where the structure needs it; and **revise wording only** to satisfy a `Domo-KB-Style-Guide.mdx` or `New-Article-Template.mdx` rule (recast grammatical framing into house voice, but keep the substantive terminology). If you're missing a definition, a use case, or an access path, **ask the user** — don't invent it. (An Overview is more structural than a how-to, so more connective text is normal here; the fidelity rule still governs every sentence you lift from a source.)
+
 ### Canonical Overview structure
 
 ```mdx
@@ -255,9 +257,19 @@ For a step-by-step walkthrough, see [Opening <Product>](/s/article/...).
 
 ---
 
+## Step 7.5: Align with the user on the draft (before fact-checking)
+
+Before the fact-check pass, show the user exactly what you've written and confirm you're aligned on the copy — **every time**, no exceptions. The point is that you and the user agree on the literal words before you spend effort verifying and polishing them.
+
+- Present the drafted Overview, flagging anything you **added** beyond what the user or the deep articles gave you, any place you **recast** source wording for style, and any spot where you're **missing** a definition, use case, or access path.
+- If you need missing detail, ask for it now and fold in the answer — don't invent it.
+- Only after the user confirms the copy do you run Step 8 (fact-check), Step 9 (edit), and Step 10 (link verification). Those passes preserve the agreed wording — they verify and style-correct; they don't re-paraphrase.
+
+---
+
 ## Step 8: Fact-check pass
 
-Before the edit pass, and before considering the Overview complete, verify every factual claim at least once against an authoritative source: what the user told you in Step 1, the style-guide treatment from Step 4, and the repo itself. This pass is about **accuracy**; link-target verification happens next in Step 10. Overviews carry fewer procedural claims than how-tos, but the two they do carry are high-risk:
+Before the edit pass, and before considering the Overview complete, verify every factual claim at least once against an authoritative source: what the user told you in Step 1, the style-guide treatment from Step 4, and the repo itself. This pass is about **accuracy**; link-target verification happens next in Step 10. When you correct an unsupported claim, prefer restoring the source's own wording over inventing a replacement. Overviews carry fewer procedural claims than how-tos, but the two they do carry are high-risk:
 
 1. **Required Grants and any prerequisites.** Confirm every grant named in the Required Grants section actually exists and gates the described action. Cross-check the canonical grant wording (`grep -rn "Grant Name —" s/article/`) and the product's deep articles. If you can't establish the exact grants from the repo, **do not infer them — ask the user.**
 2. **The access path.** Confirm the ways to open or reach the product in the **Access** section are real and current. Check the product's "Opening X" article if one exists, or ask the user.
@@ -269,7 +281,7 @@ Before the edit pass, and before considering the Overview complete, verify every
 
 ## Step 9: Edit pass — style guide and template
 
-Drafting always introduces style drift. After the fact-check pass, and before verifying links or finalizing, do an explicit editing pass against **both** `Domo-KB-Style-Guide.mdx` **and** `New-Article-Template.mdx`, and revise the article in place. This pass catches every usage, style, grammar, and structural mistake. **Do not skip this even if the draft looks right** — the most common misses (intro framing, imperative cluster headings, unpadded tables, lowercase Domo terms, future tense) are easy to introduce and easy to miss without a deliberate re-read.
+Drafting always introduces style drift. After the fact-check pass, and before verifying links or finalizing, do an explicit editing pass against **both** `Domo-KB-Style-Guide.mdx` **and** `New-Article-Template.mdx`, and revise the article in place. This pass catches every usage, style, grammar, and structural mistake. As you fix style, keep the source's substantive wording intact — change only what a rule requires, exactly as at Step 7. **Do not skip this even if the draft looks right** — the most common misses (intro framing, imperative cluster headings, unpadded tables, lowercase Domo terms, future tense) are easy to introduce and easy to miss without a deliberate re-read.
 
 1. **Re-read `Domo-KB-Style-Guide.mdx` and `New-Article-Template.mdx` now, in full** — not from memory. Step 5's "pay special attention to" list is a primer, not a substitute for the re-read.
 2. **Proofread for plain grammar and usage** — spelling, agreement, punctuation, and clarity — alongside the Domo-specific rules below.

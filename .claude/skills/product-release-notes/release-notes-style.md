@@ -153,6 +153,7 @@ Common parents: **Magic ETL Enhancements**, **Workflows Updates / Workflows Enha
 - **Consistent product naming.** Match how the product surfaces the name in-product and in existing KB articles.
 - **No internal artifacts.** Never expose Jira keys, epic titles, PRD jargon, squad/PM names, branch-cut dates, or "feature switch" mechanics.
 - **Dates:** state real, source-confirmed dates only (e.g. a model deprecation date from the internal notes). Never compute or infer a date.
+- **Preserve the source author's wording.** These voice rules recast *framing* (person, tense, active voice) — they are not a license to paraphrase. Keep the PM's substantive word choice from the internal notes and the PRD (specific verbs, named behaviors, qualifiers, terminology), and rewrite only what a rule here requires. See `SKILL.md` › Step 6 for the full drafting default.
 
 ---
 

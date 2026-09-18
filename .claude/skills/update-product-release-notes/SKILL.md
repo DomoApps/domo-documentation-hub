@@ -82,6 +82,7 @@ The mapping immediately reveals:
 Walk every mapped pair. For present features, compare the source blurb to the article body and classify each delta into lens 1/2/3. For missing features, draft a new entry (lens 4). Keep a running list of every change and every observation, tagged by lens, for the handoff.
 
 Guidance that recurs:
+- **Drafting new entries (lens 4) — preserve the source's wording.** Build each new entry from the source's own description: reuse its specific verbs, named behaviors, qualifiers, and terminology, reorganized into a house-voice entry (§4/§7 of the style guide). Recast only grammatical framing (person, tense, active voice); don't paraphrase the source's substance into looser words. Add only a lead sentence the entry would otherwise lack, and never invent capability detail — if the source is thin, note the gap rather than filling it. (This mirrors the source-fidelity default in `product-release-notes` Step 6; lens 3 already governs *existing* phrasing.)
 - **Screenshots:** only add one if the source supplies a genuine feature screenshot. Ignore decorative email banners/headers (check dimensions — a wide, short image like ~936×356 is almost always a banner). Real feature shots get copied into `images/kb/` with a snake_case name and embedded as `<Frame>![](/images/kb/<name>.png)</Frame>`. Never leave a placeholder/TODO.
 - **Placement (New vs Beta):** if the source doesn't clearly flag GA vs Beta, **do not move an existing entry between sections** — preserve the placement the prior draft chose. Only use an explicit Beta/GA signal from the source (usually the CSV) to place a *new* addition.
 - **Detail already in the article that the source doesn't mention** is NOT a discrepancy — the original draft may have sourced it from a Jira epic/PRD. Leave it unless the source actually contradicts it; note in the summary that it's beyond the current source and thus unverifiable from this source alone.
@@ -92,12 +93,23 @@ Use `Edit` for targeted in-place changes (nomenclature, factual fixes, any user-
 
 If you changed a heading, confirm it doesn't disturb sort order (e.g. "New Chart **Improvements**" vs "New Chart **Types**" both sort under "New Chart", so position is unchanged). If any Markdown tables were touched, run `python3 scripts/pad_md_tables.py s/article/Current-Release-Notes.mdx`.
 
+### Step 5.5 — Align with the user on the copy (before verifying)
+
+Before the verify pass, show the user exactly what you wrote and confirm you're aligned on the copy — **every time**. This matters most for **lens-4 additions** (new entries you drafted) and any place you **recast** source wording; pure factual/nomenclature corrections that simply match the source can be summarized rather than quoted in full.
+
+- Show each new or recast passage, note anything you **added** beyond the source, and flag any feature where you're **missing** detail the source didn't supply.
+- If you need missing detail, ask now and fold in the answer — don't invent it.
+- Only after the user confirms the copy do you run Step 6 (verify). It preserves the agreed wording — it checks accuracy and style, it doesn't re-paraphrase.
+
+(Step 7 is still the final lens-organized handoff with the diff; Step 5.5 aligns on the *words*, Step 7 delivers the *finished* result.)
+
 ### Step 6 — Verify
 
 - Re-read the edited region(s) top to bottom for house-voice consistency and §10 checklist adherence.
 - Every `<Frame>` path exists: `ls images/kb/<name>.png`.
 - Every `Learn more` link points at a real published article: `grep -rl "title:.*<keyword>" s/article/`.
 - Every applied factual/nomenclature change traces to the source.
+- Any wording you corrected restores the source's own phrasing rather than a fresh paraphrase.
 
 ### Step 7 — Hand off (do NOT commit unless asked)
 

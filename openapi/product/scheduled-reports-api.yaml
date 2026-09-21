@@ -32,6 +32,14 @@ components:
           type: string
         enabled:
           type: boolean
+        embedReport:
+          type: boolean
+        embedUrn:
+          type: string
+        expirationDate:
+          type: integer
+        startDate:
+          type: integer
         nextRunDate:
           type: integer
           description: Epoch milliseconds
@@ -39,52 +47,46 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/ReportScheduleRecipient'
+        unsubscribedRecipients:
+          type: array
+          items:
+            $ref: "#/components/schemas/ReportScheduleRecipient"
     ReportScheduleInfo:
       type: object
       properties:
-        title:
-          type: string
-        pageId:
+        reportViewId:
           type: integer
+        reportView:
+          type: boolean
+        viewType:
+          type: string
+          enum:
+          - EMAIL
+          - PDF
+          - PPT
+          - PDF_EMAIL
+        subject:
+          type: string
         viewId:
+          type: integer
+        active:
+          type: boolean
+        owner:
+          type: boolean
+        ownerId:
           type: integer
         schedule:
           $ref: '#/components/schemas/ReportSchedule'
         attachmentInclude:
           type: boolean
-    ReportScheduleItem:
-      type: object
-      properties:
-        id:
-          type: integer
-        reportViewId:
-          type: integer
-        pageId:
-          type: integer
-        title:
-          type: string
-        viewName:
-          type: string
-        type:
-          type: string
-        ownerId:
-          type: integer
-        embedViewId:
-          type: integer
-        owner:
-          type: boolean
-        cardCount:
-          type: integer
         recipientCount:
           type: integer
-        cardId:
-          type: integer
-        schedule:
-          $ref: '#/components/schemas/ReportSchedule'
     ReportRecipient:
       type: object
       properties:
         userId:
+          type: integer
+        groupId:
           type: integer
         displayName:
           type: string
@@ -99,23 +101,23 @@ components:
           enum: [EMAIL]
         value:
           type: string
-    ReportHistoryEntry:
+    ReportLogEntry:
       type: object
       properties:
         id:
           type: integer
         reportId:
           type: integer
+        reportTitleId:
+          type: integer
         reportTitle:
           type: string
         reportSubject:
           type: string
         startTime:
-          type: string
-          format: date-time
+          type: integer
         endTime:
-          type: string
-          format: date-time
+          type: integer
         automated:
           type: boolean
         cardCount:
@@ -126,8 +128,88 @@ components:
           type: integer
         emailSize:
           type: integer
+        usingLayout:
+          type: boolean
+        toe:
+          type: string
         status:
           type: string
+          enum:
+          - in_queue
+          - processing
+          - success
+          - failure
+        recipients:
+          type: array
+          items:
+            $ref: "#/components/schemas/ReportRecipient"
+        problems:
+          type: array
+          items:
+            $ref: "#/components/schemas/ReportProblem"
+    ReportProblem:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+          - unknown_minor_error
+          - unknown_major_error
+          - email_delivery_error
+          - invalid_email_address
+          - invalid_card_type
+          - cannot_render_card
+          - no_valid_cards
+        detail:
+          type: string
+        severity:
+          type: string
+    ExtendedReportLogEntry:
+      type: object
+      properties:
+        id:
+          type: integer
+        reportId:
+          type: integer
+        reportTitleId:
+          type: integer
+        reportTitle:
+          type: string
+        reportSubject:
+          type: string
+        startTime:
+          type: integer
+        endTime:
+          type: integer
+        automated:
+          type: boolean
+        cardCount:
+          type: integer
+        attachmentCount:
+          type: integer
+        attachmentSize:
+          type: integer
+        emailSize:
+          type: integer
+        usingLayout:
+          type: boolean
+        toe:
+          type: string
+        status:
+          type: string
+          enum:
+          - in_queue
+          - processing
+          - success
+          - failure
+        recipients:
+          type: array
+          items:
+            $ref: "#/components/schemas/ReportRecipient"
+        problems:
+          type: array
+          items:
+            $ref: "#/components/schemas/ReportProblem"
         ownerId:
           type: integer
         recipientCount:
@@ -138,10 +220,23 @@ components:
           type: integer
         resourceName:
           type: string
-        recipients:
-          type: array
-          items:
-            $ref: '#/components/schemas/ReportRecipient'
+    CreatedReport:
+      type: object
+      properties:
+        reportId:
+          type: integer
+        reportTitle:
+          type: string
+        ownerId:
+          type: integer
+        created:
+          type: integer
+        resourceType:
+          type: string
+        resourceId:
+          type: integer
+        resourceName:
+          type: string
     CardEmailData:
       type: object
       properties:
@@ -192,11 +287,20 @@ components:
           type: boolean
         status:
           type: string
+          enum:
+          - in_queue
+          - processing
+          - success
+          - failure
         includeTypeClause:
           type: boolean
         isAutomated:
           type: boolean
         includeScheduleIdClause:
+          type: boolean
+        scheduleId:
+          type: integer
+        automated:
           type: boolean
 security:
   - DomoDeveloperToken: []
@@ -206,7 +310,7 @@ paths:
       summary: List Report Schedules
       tags:
         - Scheduled Reports API
-      operationId: listReportSchedules
+      operationId: getReportSchedules
       parameters:
         - in: query
           name: filter
@@ -253,7 +357,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/ReportScheduleItem'
+                  $ref: '#/components/schemas/ReportScheduleInfo'
               examples:
                 example:
                   value:
@@ -315,7 +419,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ReportScheduleItem'
+                $ref: '#/components/schemas/ReportScheduleInfo'
               examples:
                 example:
                   value:
@@ -373,7 +477,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ReportScheduleItem'
+                $ref: '#/components/schemas/ReportScheduleInfo'
               examples:
                 example:
                   value:
@@ -428,7 +532,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ReportScheduleItem'
+                $ref: '#/components/schemas/ReportScheduleInfo'
               examples:
                 example:
                   value:
@@ -530,7 +634,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/ReportHistoryEntry'
+                  $ref: '#/components/schemas/ReportLogEntry'
         "403":
           description: Forbidden
         "409":
@@ -878,8 +982,7 @@ paths:
             application/json:
               schema:
                 type: array
-                items:
-                  type: object
+                $ref: "#/components/schemas/CreatedReport"
         "403":
           description: Forbidden
         "409":
@@ -949,7 +1052,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/ReportHistoryEntry'
+                  $ref: '#/components/schemas/ExtendedReportLogEntry'
         "403":
           description: Forbidden
         "409":
@@ -1034,7 +1137,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/ReportHistoryEntry'
+                  $ref: '#/components/schemas/ReportLogEntry'
         "403":
           description: Forbidden
         "409":

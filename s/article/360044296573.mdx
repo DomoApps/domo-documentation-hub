@@ -29,7 +29,17 @@ Null values are treated differently by the comparison functions. In SQL and Magi
 
 If after switching a flow from Magic ETL v1 to Magic ETL v2, it runs successfully, but the output seems to be missing rows, this change is a likely culprit. It can be especially surprising with the “is not equal to” function. It might seem like “column \<> 5” should only drop rows where column's value is 5, but in fact it will also drop rows where column is null, for the reason described above. The table below has additional examples of null behavior in **Filter Rows**.
 
-<table class="mt-responsive-table" data-aura-rendered-by="33:201;a"><thead><tr><th colspan="1" rowspan="1"><p> Test </p></th><th colspan="1" rowspan="1"><p> Evaluated Result </p></th><th colspan="1" rowspan="1"><p> Filter Effect </p></th></tr></thead><tbody><tr><td colspan="1" rowspan="1"> 4 &lt;&gt; 5 </td><td colspan="1" rowspan="1"> true </td><td colspan="1" rowspan="1"> keep </td></tr><tr><td colspan="1" rowspan="1"> 5 &lt;&gt; 5 </td><td colspan="1" rowspan="1"> false </td><td colspan="1" rowspan="1"> drop </td></tr><tr><td colspan="1" rowspan="1"> null &lt;&gt; 5 </td><td colspan="1" rowspan="1"> null </td><td colspan="1" rowspan="1"> drop </td></tr><tr><td colspan="1" rowspan="1"> null = null </td><td colspan="1" rowspan="1"> null </td><td colspan="1" rowspan="1"> drop </td></tr><tr><td colspan="1" rowspan="1"> null &lt;&gt; null </td><td colspan="1" rowspan="1"> null </td><td colspan="1" rowspan="1"> drop </td></tr><tr><td colspan="1" rowspan="1"> null is null </td><td colspan="1" rowspan="1"> true </td><td colspan="1" rowspan="1"> keep </td></tr><tr><td colspan="1" rowspan="1"> null is not null </td><td colspan="1" rowspan="1"> false </td><td colspan="1" rowspan="1"> drop </td></tr><tr><td colspan="1" rowspan="1"> 5 is not null </td><td colspan="1" rowspan="1"> true </td><td colspan="1" rowspan="1"> keep </td></tr><tr><td colspan="1" rowspan="1"> 5 is null </td><td colspan="1" rowspan="1"> false </td><td colspan="1" rowspan="1"> drop </td></tr></tbody></table>
+| Test               | Evaluated Result | Filter Effect |
+| ------------------ | ---------------- | ------------- |
+| `4 <> 5`           | true             | keep          |
+| `5 <> 5`           | false            | drop          |
+| `null <> 5`        | null             | drop          |
+| `null = null`      | null             | drop          |
+| `null <> null`     | null             | drop          |
+| `null is null`     | true             | keep          |
+| `null is not null` | false            | drop          |
+| `5 is not null`    | true             | keep          |
+| `5 is null`        | false            | drop          |
 
 To handle nulls in more complex ways, use the new formula system. The **Filter Rows** tile is one of three tiles (**Group By** and **Add Formula** being the other two) which supports formula evaluation. The `IFNULL()` function works particularly well for handling a null result from a filter expression. For example, if column “col” has null values, and we want to filter for rows whose value for “col” is not 5, preserving our nulls, we could write this expression: ``IFNULL(`col` <> 5, TRUE)``
 

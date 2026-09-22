@@ -19,6 +19,10 @@ The user has provided: $ARGUMENTS
 2. **`docs.json`** — nav group hierarchy used to infer which feature each article belongs to
 3. **Article frontmatter** — title and excerpt used as keyword fallback for articles not clearly placed by nav group
 
+The same run also regenerates **`.github/CODEOWNERS`** from the identical Feature→PM assignment, so the two files can't drift. See **Update CODEOWNERS** below.
+
+**The roster CSV is optional.** It's the source of truth when it's present in the repo root, but it's pasted in ad hoc and usually isn't in the working tree. When it's absent, the script recovers each Feature's PM from the **existing `Article-PM-Ownership-Reference.mdx`** instead. This is what lets you run the skill with no spreadsheet — to absorb newly added articles and assign each a PM by its product pillar/group (nav-group → Feature from the script's `NAV_FEATURE`/`KEYWORD_RULES`; Feature → PM from the reference). A new article whose Feature has no PM in the reference is flagged as `(no PM listed)`, never guessed. Drop the CSV in only when the roster itself changed (new PM, reassignment).
+
 ---
 
 ## Step 1: Identify what changed
@@ -31,6 +35,8 @@ Ask the user (or infer from `$ARGUMENTS`) which of these scenarios applies:
 4. **Manual correction** — a specific article was mis-assigned and the user wants to fix the mapping rule, not just patch the output
 
 For scenario 4, skip to [Manual correction](#manual-correction) below.
+
+**Scenario 2 needs no CSV.** If only new articles were added (no roster change), you don't need the squad CSV in the tree — the script recovers Feature→PM from the existing reference and assigns each new article a PM by its pillar/group. Only fetch/paste the CSV for scenarios 1 or 3 (the roster actually changed). Either way, the run regenerates both `Article-PM-Ownership-Reference.mdx` and `.github/CODEOWNERS`.
 
 ---
 
@@ -107,9 +113,11 @@ grep "Feature Name" 'Feature - Owning Squad, PM, Eng, UX.csv'
 python3 scripts/build-pm-ownership.py
 ```
 
-Review the stats output:
-- **"Features assigned that are NOT in CSV"** — should be empty. If any appear, either the feature name in the script doesn't exactly match the CSV, or the feature was removed from the CSV and needs a new mapping.
+One run writes **both** `Article-PM-Ownership-Reference.mdx` and `.github/CODEOWNERS`. Review the stats output:
+- **"Roster source"** — `CSV` when the spreadsheet was in the tree, `reference` when it fell back to the existing reference. Confirm this matches what you intended (a roster change must be run with the CSV present).
+- **"Features assigned that are NOT in the roster"** — should be empty in the CSV case. If any appear, either the feature name in the script doesn't exactly match the roster, the feature was removed, or (reference-fallback runs) the feature is newly triggered and has no PM in the reference yet — those articles land as `(no PM listed)`.
 - **Top feature assignments** — spot-check that the article counts per feature look plausible given what changed.
+- **CODEOWNERS line** — the articles-routed count, the **uncovered PMs** (own articles but no confirmed GitHub login), and the **no-PM** count. A PM that should route but shows as uncovered means their login is missing from `PM_GITHUB_LOGIN` (see **Update CODEOWNERS**).
 
 ---
 
@@ -166,12 +174,26 @@ If the user reports a specific mis-assignment (e.g. "article X should be Feature
 
 ---
 
+## Update CODEOWNERS
+
+`.github/CODEOWNERS` is **generated** by the same script — never hand-edit it. It routes review notifications: when a PR touches an article, GitHub requests a review from the owning PM. Each run rebuilds it from the same Feature→PM assignment as the reference, so the two stay in sync.
+
+The one manual input is the **PM → GitHub login** map, the `PM_GITHUB_LOGIN` dict near the top of `scripts/build-pm-ownership.py`. Only PMs listed there get routed; the article-to-PM assignment comes from the reference/CSV as usual.
+
+- **A PM shows up as "uncovered" in the stats** (owns articles but no login) — their articles aren't routed. Get their GitHub login and add a `'PM Name': '@login',` entry to `PM_GITHUB_LOGIN`, then re-run. The PM name must match the roster/reference spelling exactly.
+- **A PM's login changed** — update their value in `PM_GITHUB_LOGIN` and re-run.
+- **Articles with no PM** (`(no PM listed)`) are counted in the stats and omitted from routing — expected for PM-less features (e.g. Application Security). Nothing to do unless a PM should own them.
+
+The header comment block (the login table, the "Skipped PMs" list, and the no-PM count) is regenerated from the dict and the assignments each run — don't edit it by hand. Section order is alphabetical by PM. Review the CODEOWNERS diff before committing: new/changed article routes should match what you expect, and any route that disappears should trace to a deleted article or a feature reassignment (not a lost login).
+
+---
+
 ## Step 7: Commit
 
 After the user confirms the output looks correct:
 
 ```bash
-git add Article-PM-Ownership-Reference.mdx scripts/build-pm-ownership.py
+git add Article-PM-Ownership-Reference.mdx .github/CODEOWNERS scripts/build-pm-ownership.py
 ```
 
 Commit message format:

@@ -105,10 +105,14 @@ Do not modify any other part of `<Frame>`, `<img>`, or `<video>` components.
 
 ### Internal link translation
 
-**Always keep internal links as English paths.** Do not prefix `/s/article/` links with a language code. The vast majority of KB articles have no localized counterpart, and updating links to non-existent files breaks the site.
+**Prefer the localized target; fall back to English only as a last resort.** For every internal article link, check whether a localized version of the target exists at `{lang}/s/article/<slug>.mdx`:
 
-- Internal links: always keep as `/s/article/Article-Title` regardless of target language
-- External links (`https://...`): never modified
+- **If the localized target exists,** point the link at it using the **filepath form** `/{lang}/s/article/<slug>` (e.g. a link in a Japanese article → `/ja/s/article/000005741`). This applies whether the source link was a root-relative `/s/article/<slug>` path **or** a full external `https://www.domo.com/docs/s/article/<slug>` "Learn more" URL — convert both to the `/{lang}/s/article/<slug>` filepath.
+- **If no localized target exists,** keep the English path `/s/article/<slug>` (root-relative) or leave the external `https://www.domo.com/docs/...` URL unmodified. Linking to a non-existent localized file breaks the site, so English is the correct fallback — but only when there is genuinely no localized counterpart.
+- **Anchor fragments:** when converting a link that carries a `#anchor` fragment to a localized target, **drop the anchor** (link to the localized article top). The anchor was generated from the English headings and will not match the localized article's headings.
+- **External non-article links** (marketing pages, YouTube, `developer.domo.com`, etc.): never modified.
+
+To check existence deterministically, test `{lang}/s/article/<slug>.mdx` per link before deciding.
 
 ### Callout labels
 

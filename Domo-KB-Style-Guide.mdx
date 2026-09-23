@@ -527,7 +527,7 @@ When an entire multi-page section is in beta — typically an API reference that
 
 When only a section of an otherwise-GA article covers a beta feature:
 
-1. Append a Badge to the section heading: `<Badge className="text-primary bg-primary/10 font-bold">Beta</Badge>`. The `className` is required — it matches the styling of the sidebar `tag` badge so the two are visually consistent.
+1. Append a Badge to the section heading: `<Badge>Beta</Badge>`. Badges are styled automatically to match the sidebar `tag` badge, so don't add color or font classes.
 2. Add the `import { BetaNote } from '/snippets/BetaNote.mdx';` line directly below the frontmatter, then place `<BetaNote />` immediately under the **first** beta section in the article. Don't repeat it for additional beta sections in the same article — one Note per article is enough.
 3. Do not append `(Beta)` or `(BETA)` to the heading text.
 
@@ -540,16 +540,72 @@ import { BetaNote } from '/snippets/BetaNote.mdx';
 
 ...
 
-### PDP—Row Policies <Badge className="text-primary bg-primary/10 font-bold">Beta</Badge>
+## Classification Tile <Badge>Beta</Badge>
 
 <BetaNote />
 
-This report lists all PDP row policies by ID...
+The Classification tile categorizes text, images, or files into predefined classes...
 
-### PDP—Row Policy Conditions <Badge className="text-primary bg-primary/10 font-bold">Beta</Badge>
+## Sentiment Analysis Tile <Badge>Beta</Badge>
 
-This report shows the conditions that make up each row of the policy...
+The Sentiment Analysis tile classifies text as positive, negative, or neutral...
 ```
+
+## Feature-Gated Content
+
+Some content only applies when a feature is turned on for a customer's instance, such as a report, tile, or setting that is off by default. Mark each of these items with a badge, and explain the badges once in a single Note. Don't repeat a "contact your account team" Note in every section.
+
+Only mark content that is off by default. If a feature is on for most instances, don't badge it. If you aren't sure, ask the feature's product manager.
+
+### Badge Labels
+
+Use one of two labels:
+
+| Label | When to use it | Example |
+| ----- | -------------- | ------- |
+| `Feature: {Feature Name}` | The content depends on a product feature that customers know by name. | `<Badge>Feature: Domo Goals</Badge>` |
+| `On request` | The content is turned on individually by the Domo account team and has no product name a customer would recognize, such as a single report. | `<Badge>On request</Badge>` |
+
+For the feature name, use the name customers see in Domo, not an internal or engineering name.
+
+Badges are styled automatically, so don't add color or font classes to them.
+
+### Where to Place Badges
+
+**Under a heading:** Put the badge on its own line directly below the heading, not inside the heading. A badge inside the heading becomes part of the section's link address, which breaks links to that section and changes the address whenever the label changes. Beta badges are the exception and stay in the heading (see **Section-Level Beta Features**).
+
+```mdx
+### AI Chat Sessions
+
+<Badge>Feature: AI Services</Badge>
+
+| Field | Description |
+...
+```
+
+**In a table cell:** Put the badge on a new line after the item, and add `className="mt-2"` so it has space above it.
+
+```mdx
+| [AI Chat Sessions](#ai-chat-sessions) <br/> <Badge className="mt-2">Feature: AI Services</Badge> | Returns information about AI Chat sessions... |
+```
+
+### Explain the Badges Once
+
+Add one Note where the badges first appear in the article, such as directly above a table or under the first badged section. Mention only the badge types the article uses, and change "Reports" to fit the content (tiles, settings, and so on):
+
+```mdx
+<Note>
+  **Note:** Reports marked with a **Feature** badge are available only when that
+  feature is enabled for your instance. Reports marked **On request** are
+  available only after your Domo account team enables them. If one of these
+  reports doesn't appear in the **Report** menu and you want them to, contact
+  your Domo account team.
+</Note>
+```
+
+If a badged section also needs other information, keep a separate Note for that information only.
+
+If an entire article covers a feature that must be turned on, don't use badges. Say so once in the Intro and point readers to their Domo account team.
 
 ## Tooltips
 

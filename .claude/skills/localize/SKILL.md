@@ -111,12 +111,14 @@ For each target language, perform the following:
 **1. Read the existing localized Current Release Notes:**
 
 ```bash
-cat {es,fr,de}/s/article/Current-Release-Notes.mdx
+cat {es,fr,de,ja}/s/article/Current-Release-Notes.mdx
 ```
 
 **2. Determine the archive filename.**
 
 Look at the frontmatter `title` and content of the localized Current Release Notes to identify which release it contains. Compare against the English archived release notes to find the corresponding English archive file. Use the same filename as the English equivalent:
+
+> **Languages can lag on different releases.** Do not assume all four localized Current Release Notes hold the same release — check each one's `title`/content independently. A language that fell behind (e.g. its Current still holds an older release, or its release is already archived and the Current is a stale duplicate) must be reconciled to *its own* actual state: archive under the filename of the release it truly contains, skip archiving when that release is already archived, and backfill any releases it skipped before overwriting its Current with the new translation.
 
 ```bash
 # Find the corresponding English archive by title/content match
@@ -132,7 +134,7 @@ If you cannot confidently determine the correct archive filename, ask the user: 
 **3. Check whether the archive file already exists:**
 
 ```bash
-ls {es,fr,de}/s/article/ARCHIVE-FILENAME.mdx 2>/dev/null
+ls {es,fr,de,ja}/s/article/ARCHIVE-FILENAME.mdx 2>/dev/null
 ```
 
 If the archive file already exists for a given language, do **not** overwrite it. Skip the archiving step for that language and note this to the user.
@@ -178,6 +180,7 @@ Key reminders for Current Release Notes translation:
 es/s/article/Current-Release-Notes.mdx   ← overwrite with Spanish translation
 fr/s/article/Current-Release-Notes.mdx   ← overwrite with French translation
 de/s/article/Current-Release-Notes.mdx   ← overwrite with German translation
+ja/s/article/Current-Release-Notes.mdx   ← overwrite with Japanese translation
 ```
 
 These files already exist; use the Edit or Write tool to replace their content entirely.
@@ -212,7 +215,7 @@ Following all rules in `localization/Localization-Style-Guide.mdx` and applying 
 - Translate all prose, headings, list items, and callout body text
 - Apply the deterministic term renderings from `localization/glossary/<lang>.csv` (keep-in-English terms untouched; translated terms rendered exactly, matching the `context` row)
 - For images: check whether localized images exist; if they exist, use the localized path; if not, use the English image path as-is
-- Internal links: always keep as English paths (`/s/article/...`) — do not prefix with a language code
+- Internal links: prefer the localized target when one exists — if `{lang}/s/article/<slug>.mdx` exists, link to it in filepath form `/{lang}/s/article/<slug>` (converting both root-relative `/s/article/<slug>` paths and full external `https://www.domo.com/docs/s/article/<slug>` "Learn more" URLs, and dropping any `#anchor`); fall back to the English `/s/article/<slug>` (or the unmodified external URL) only when no localized target exists. See the style guide's **Internal link translation** section.
 - Preserve all MDX components, code blocks, import statements, and formatting exactly — **with two exceptions: BetaNote and legacy TOC blocks** (see below)
 - **Legacy TOC blocks:** Some older English articles were originally migrated with an old-format table-of-contents block immediately after frontmatter — a `---` horizontal rule, then `######` or `##` headings with bullet lists summarizing the article, then another `---`. These blocks have since been removed from English. If the English source article you are translating contains one, do NOT include it in the translation. If an existing localized version you are updating has one, remove it. The pattern to recognize: frontmatter `---` → blank line → `---` → section headings with bullets → `---` → actual content.
 - **BetaNote:** When the English source uses `import { BetaNote } from '/snippets/BetaNote.mdx';` and `<BetaNote />` or `<BetaNote generic />`, replace with the language-specific export from the same snippet file. The import path stays identical; only the named export and component name change:
@@ -311,7 +314,7 @@ Work through the following checklist for each language. Revise the file in place
 - [ ] **No content added or removed.** Verify that every section, heading, list item, and callout from the English source is present in the translation, with nothing extra added.
 - [ ] **MDX structure is intact.** Component names, attribute names (except translated `title=` on `<Accordion>` and descriptive `alt=`), import statements, code blocks, and inline code are all unchanged.
 - [ ] **Frontmatter is correct.** `title` and `excerpt` are translated. No fields were added or removed. `tag` fields (if present) are unchanged.
-- [ ] **Internal links are English paths.** No `/s/article/` link was prefixed with a language code.
+- [ ] **Internal links prefer the localized target.** For each internal article link, a localized target that exists (`{lang}/s/article/<slug>.mdx`) is linked in filepath form `/{lang}/s/article/<slug>` (anchor dropped); links with no localized target correctly stay English. No link points to a non-existent localized file.
 - [ ] **Blank lines before callouts.** Every `<Note>`, `<Warning>`, and `<Tip>` is preceded by a blank line in the MDX source.
 - [ ] **Screenshots remain in `<Frame>`.** All block-level images are still wrapped in `<Frame>`. No `<Frame>` was removed.
 - [ ] **Present tense throughout.** No sentence uses future tense (`will`) or conditional tense where the English source used present tense.

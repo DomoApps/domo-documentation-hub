@@ -1,6 +1,6 @@
 ---
-title: "Notas de la versión de mayo de 2026"
-excerpt: "Notas de la versión de mayo de 2026 que cubren Documentos de Domo, Domo Schema, autenticación OAuth M2M de Databricks y otras funciones y mejoras nuevas."
+title: "Notas de la versión de septiembre de 2026"
+excerpt: "Notas de la versión de septiembre de 2026 que cubren mejoras de Magic - Extracción, transformación y carga, App Components, App Studio, modelado de datos, automatización con tecnología MCP y otras funciones y mejoras nuevas."
 ---
 
 import { BetaNoteEs } from '/snippets/BetaNote.mdx';
@@ -9,229 +9,314 @@ import { BetaNoteEs } from '/snippets/BetaNote.mdx';
 
 ## Nuevas funciones y mejoras
 
-### Documentos de Domo
+### Mejoras de App Studio
 
-La herramienta Documentos de Domo extrae y recopila información estructurada de imágenes, documentos, transcripciones, reseñas de clientes y otros datos no estructurados para potenciar visualizaciones y productos de datos en Domo. Los documentos también le ayudan a automatizar procesos empresariales impulsados por documentos para agilizar su negocio.
+#### Visibilidad de la ubicación de la tarjeta
 
-<Frame>![](/images/kb/domo_documents.png)</Frame>
+El icono de información de los detalles de la tarjeta, que muestra dónde se encuentra una tarjeta, ahora también muestra las páginas de App Studio en las que existe la tarjeta. El icono de información también está disponible en el panel derecho, junto al nombre de la tarjeta.
 
-Obtenga más información sobre [Documentos de Domo](https://www.domo.com/docs/s/article/Documents).
+<Frame>![](/images/kb/app_studio_card_location.jpeg)</Frame>
 
+#### Mover y copiar tarjetas
 
-### Domo Schema
+La funcionalidad Mover/Copiar de los Tableros ahora está disponible en App Studio. Acceda a ella desde el menú de tres puntos del panel derecho para mover o copiar tarjetas entre páginas.
 
-Domo Schema le permite formatear campos, cambiar su orden e incluir descripciones de campo y etiquetas para los usuarios posteriores.
+<Frame>![](/images/kb/app_studio_move_copy_cards.jpeg)</Frame>
 
-También puede acceder y activar campos de IA, y agregar contexto y sinónimos en la pestaña Schema.
+### Indicador visual de DataSets archivados
 
-<Frame>![](/images/kb/domo_schema.png)</Frame>
+Domo optimiza el acceso a los datos archivando los DataSets que no han sido consultados por tarjetas o por Analyzer durante un período de tiempo. Los DataSets archivados no se eliminan, pero no se puede acceder a ellos hasta que se desarchivan. El aviso de estado archivado se ha hecho más prominente para que ya no sea fácil pasarlo por alto:
 
-Obtenga más información sobre la [gestión de Domo Schema](https://www.domo.com/docs/s/article/6814561223959).
+- La notificación ahora aparece en la parte superior de la pestaña Descripción general del DataSet
+- Utiliza el color rojo para llamar la atención y señalar que es posible que deba tomar medidas para acceder al DataSet
 
-### Mejoras en la autorización de Databricks
+Esta actualización reduce la confusión y aclara cuándo un DataSet está archivado y cómo desarchivarlo.
 
-Con la compatibilidad con OAuth 2.0 M2M, Domo utiliza el flujo de credenciales de cliente de OAuth para autenticar las conexiones de Databricks y Lakebase en nombre del servicio. Domo gestiona la generación de tokens de corta duración de forma automática, lo que significa que no se almacenan ni transmiten credenciales estáticas. Configure la conexión una vez usando un ID de cliente, un secreto de cliente y el nombre de host del área de trabajo, y asegúrese de que sus conexiones de Databricks funcionen sin problemas.
+<Frame>![](/images/kb/archived_datasets_indicator.png)</Frame>
 
-Los beneficios de esta mejora incluyen:
+### Autenticación de entidad de servicio de Active Directory para Azure SQL
 
-- Mayor postura de seguridad
-- Menor exposición de credenciales
-- Gestión de credenciales simplificada
+Las integraciones en la nube de Azure SQL ahora admiten la entidad de servicio de Active Directory como método de autenticación nativo. Anteriormente limitadas a la autenticación con nombre de usuario y contraseña, las conexiones de Azure SQL ahora pueden usar acceso de identidad basado en servicios, lo que proporciona coherencia en todas sus fuentes de datos de Azure y elimina la necesidad de credenciales de usuario compartidas.
 
-<Frame>![](/images/kb/databricks_lakebase_oauth.png)</Frame>
+Al crear o editar una integración en la nube de Azure SQL, seleccione Entidad de servicio de Active Directory como método de autenticación en la pantalla de configuración de la integración.
 
-Obtenga más información sobre la [compatibilidad OAuth 2.0 M2M de Domo para Databricks](https://www.domo.com/docs/s/article/Databricks-Using-OAuth-M2M-Authentication-Connector#databricks-using-oauth-m2m-authentication-connector).
+### Mejoras en la incrustación de tarjetas
 
+Las mejoras en la incrustación de tarjetas introducen actualizaciones en el marco de incrustación, ofreciendo una interfaz de usuario incrustada mejorada y capacidades de personalización ampliadas. Ahora puede habilitar o deshabilitar funciones como segmentos, filtros rápidos y variables, además de configurar parámetros como el color de fondo, el color de la línea de escala y el color del texto. Las tarjetas se renderizan con un dimensionamiento y escalado más limpios, y el desglose funciona como se espera con un botón de retroceso, rutas de navegación de filtros visibles y la tabla de datos final. Esto también agrega compatibilidad con las tarjetas de Notebook, más allá de los gráficos y las aplicaciones personalizadas.
 
-### Mejoras al tipo de tarjeta Flex Table
-
-Las Flex Tables se han actualizado para incluir varias opciones de configuración nuevas que las hacen más interactivas y centradas en resaltar los cambios en los valores de los datos. Estas actualizaciones incluyen:
-
-- Capacidad de cambiar los valores de ordenación en una Flex Table en una aplicación de App Studio
-- Nuevas opciones en la ordenación predeterminada para ordenar por el valor absoluto del cambio
-- Capacidad de usar abreviatura de escala para las etiquetas de datos
-- Flexibilidad sobre dónde mostrar las etiquetas de datos del gráfico (primero/último, mínimo/máximo, etc.)
-- Sección de configuración individual para cada columna en una Flex Table, incluida la capacidad de establecer texto al pasar el cursor y la adición de valor absoluto del cambio para las opciones de columna
-
-<Frame>![](/images/kb/flex_table_enhancements.png)</Frame>
+Las siguientes capturas de pantalla muestran la diferencia entre la experiencia de tarjeta incrustada anterior y la nueva.
 
 
+<Frame>![Card embedded using the older framework — no controls panel](/images/kb/card-embed-v2-example.png)</Frame>
 
-### Aviso de obsolescencia de modelos
+<Frame>![Card embedded using the new framework — Controls panel open with quick filters and variable selectors](/images/kb/card-embed-v2-with-controls.png)</Frame>
 
-Los siguientes modelos están entrando en el proceso de obsolescencia:
+El cuadro de diálogo de incrustación también refleja estos cambios. La nueva versión muestra opciones de visualización adicionales (segmentos, filtros rápidos, variables) y muestra tanto la nueva URL de incrustación como la URL que pronto quedará obsoleta, para que pueda identificar qué versión está en uso y migrar a la nueva experiencia de incrustación.
 
-- DomoGPT - Small v1, DomoGPT - Small v1.1
-- DomoGPT - Medium v1
-- OpenAI gpt-3.5-turbo
-- Domo Provided Databricks
-- Domo Provided Snowflake
+<Frame>![Domo Everywhere embed modal showing new display options, the new embed URL, and the deprecated URL marked for migration](/images/kb/card-embed-enhancements-modal.png)</Frame>
 
-Permanecerán disponibles para su uso hasta el 8 de julio de 2026, momento en que el modelo ya no será accesible. Recomendamos migrar su uso a los modelos más recientes disponibles:
+Aprenda más sobre las [mejoras en la incrustación de tarjetas](https://www.domo.com/docs/s/article/360043437993#card-embed-enhancements).
 
-- DomoGPT - Small v2.1
-- DomoGPT - Medium v2.2
-- OpenAI GPT-4o
-- Snowflake Claude Sonnet 4.6
-- Databricks Claude Sonnet 4.6
+<Warning>**Importante:** El marco de incrustación de tarjetas anterior quedará obsoleto el **31 de marzo de 2027**. Actualice todas las tarjetas incrustadas a la nueva URL antes de esa fecha.</Warning>
+
+Para obtener instrucciones de migración paso a paso para la incrustación pública, privada y programática, consulte [Migrar tarjetas incrustadas a la nueva URL de incrustación de tarjetas](/s/article/Migrate-Embedded-Cards-to-the-New-URL).
 
 
-### Icono de generación de texto de DataFlow en Magic - Extracción, transformación y carga
+### Visibilidad del uso y eliminación de paquetes de Code Engine
 
-El icono de generación de texto de IA de Magic - Extracción, transformación y carga aprovecha el poder de Domo AI para procesar campos de texto en sus datos. El icono le permite analizar y obtener mayor valor de la información previamente inaccesible en sus DataSets.
+Ahora puede ver dónde se utilizan los paquetes de Code Engine que ha implementado y eliminar los paquetes que ya no se referencian en ningún lugar de Domo.
 
-<Frame>![](/images/kb/text_generation_tile.png)</Frame>
+La visibilidad del uso le ofrece una vista clara y en tiempo real de cada aplicación personalizada y flujo de trabajo que hace referencia a un paquete, incluido un recuento de las referencias privadas a las que no puede acceder, para que siempre conozca el alcance total de un paquete antes de realizar un cambio. La eliminación segura le permite luego eliminar de forma permanente los paquetes implementados que ya no están en uso, lo que proporciona una vía de solución para los paquetes que se publicaron con información confidencial, como claves de API o credenciales.
 
+Los beneficios clave incluyen:
 
-### Actualizaciones de Flujos de trabajo
+- Visibilidad total del uso en aplicaciones personalizadas y flujos de trabajo antes de realizar cambios
+- Eliminación segura de paquetes implementados que ya no se referencian
+- Eliminación con medidas de protección que se bloquea siempre que exista algún uso, incluidas las referencias que no puede ver
+- Protección para los paquetes proporcionados por Domo, que no se pueden eliminar
 
-#### Controles de notificación de cola
+### Integración del creador de modelado de datos y la visualización
 
-La nueva configuración de notificación de cola de administrador en la página Gestionar colas del Centro de tareas permite a los administradores habilitar o deshabilitar las notificaciones para una cola específica. Cuando esta configuración está habilitada, puede personalizar sus preferencias de notificación personales para los eventos de tareas dentro de esa cola. Cuando está deshabilitada, todas las notificaciones de cola se desactivan.
+La experiencia de modelado de datos de Domo ahora está integrada en toda la capa de BI, para que pueda construir un modelo semántico una vez y usarlo en Analyzer, App Studio, los filtros de tarjetas, los filtros de página y los Tableros. La renderización de gráficos, el filtrado, la ordenación, los números de resumen y Beast Mode funcionan con el modelo.
 
-<Frame>![](/images/kb/queue_notification_controls.png)</Frame>
+Los modelos admiten DataSets de Magic - Extracción, transformación y carga, vistas de DataSet y DataSets de Snowflake, lo que le permite mostrar los datos del almacén en la experiencia de modelado en lugar de materializar tablas planas grandes y redundantes.
 
-Aprenda a [monitorear colas en el Centro de tareas de Domo](https://www.domo.com/docs/s/article/000005172#admin-notification-setting).
+### Escritura inversa de Databricks a instancias de Domo alojadas en Azure
 
+La escritura inversa de Databricks ahora es compatible con las instancias de Domo alojadas en Azure. Anteriormente disponible solo en instancias de Domo alojadas en AWS, la escritura inversa de Databricks ahora funciona independientemente de dónde esté alojada su instancia de Domo, para que los clientes con Domo alojado en Azure puedan escribir datos de vuelta en su entorno de Databricks —tanto para Azure como para AWS Databricks— sin cambiar su flujo de trabajo existente.
 
-#### Activación de eventos de flujo de trabajo: solicitud de acceso
+### Actualización de la autenticación heredada
 
-La nueva opción de activación basada en eventos de solicitud de acceso en los Flujos de trabajo le permite configurar sus flujos de trabajo para iniciarse cuando alguien solicita acceso a una Tarjeta, Página o Aplicación.
+Domo está actualizando la forma en que gestiona la autenticación de usuarios y retirando un token de inicio de sesión más antiguo denominado DA-SID. Esta es una mejora de seguridad interna, y la mayoría de los usuarios no notarán ningún cambio. Domo se pondrá en contacto directamente con cualquier cliente que deba tomar medidas.
 
-Esta función mejora la visibilidad de las solicitudes de acceso y los flujos de trabajo relacionados, lo que le permite crear flujos de trabajo personalizables adaptados a las necesidades de su organización.
+### Mejoras de Magic - Extracción, transformación y carga
 
-<Frame>![](/images/kb/access_request_config_modal.png)</Frame>
+<Note>**Nota:** Vea la repetición del [seminario web Magic: Reloaded](https://www.youtube.com/watch?v=ddYDlKo85Ic) para ver demostraciones de estas funciones.</Note>
 
+#### Icono de clasificación
 
-### Espacios de trabajo (móvil y web)
+El icono de clasificación con IA categoriza sus datos, incluidos texto, imágenes y archivos, en clases predefinidas, lo que le permite centrarse en sus entidades de clasificación en lugar de en los detalles de configuración.
 
-Los Espacios de trabajo, ahora disponibles en la web y en dispositivos móviles, proporcionan una ubicación centralizada para organizar objetos de Domo, como Tarjetas, Tableros, Aplicaciones, DataSets, DataFlows, Flujos de trabajo y Hojas de cálculo.
+Aprenda más sobre el [icono de clasificación en Magic ETL](https://www.domo.com/docs/s/article/000005741#classification-tile).
 
-Los Espacios de trabajo le permiten encontrar contenido relevante de manera más eficiente, admitir la organización específica de equipos y departamentos mediante carpetas y subcarpetas, y mejorar la experiencia de navegación tanto en plataformas web como móviles. Además, los Espacios de trabajo facilitan el control del uso compartido del contenido adecuado con las personas correctas y la revocación del acceso cuando sea necesario.
+#### Convertir a SQL
 
-<Frame>![](/images/kb/workspaces.png)</Frame>
+La opción Convertir a SQL le permite ver el SQL subyacente generado por las acciones de arrastrar y soltar en sus DataFlows. Puede personalizar y editar el SQL en cada icono, o extraer una acción como SQL para documentación o para usar la lógica en otro sistema. Ver el SQL detrás de sus DataFlows le ayuda a usted y a sus equipos de soporte a diagnosticar problemas, optimizar consultas y mejorar el rendimiento.
 
+#### Diseño de ventana personalizable
+
+Ahora puede personalizar la posición de las ventanas en su lienzo de creación de Magic ETL, incluidos el panel de acciones, el panel de configuración y la ventana de vista previa, y elegir si cada uno está fijado abierto o cerrado. Guarde y conserve sus diseños en todos los DataFlows para que Magic ETL se adapte a su forma de trabajar en diferentes pantallas.
+
+#### Modo oscuro
+
+El modo oscuro ahora está disponible en el lienzo de Magic ETL. Elija una apariencia predeterminada para su lienzo, incluida clara, oscura o heredar de la configuración de su sistema, lo que le da control sobre cómo ve y usa Magic ETL.
+
+#### Mapa de calor de los detalles de ejecución
+
+Al analizar las ejecuciones de un DataFlow, puede ser difícil saber qué acciones representan la mayor parte del tiempo de procesamiento, o dónde se están perdiendo o multiplicando las filas. Se ha agregado un mapa de calor y las métricas de telemetría correspondientes a la página de detalles de ejecución del DataFlow para que pueda solucionar problemas y comprender mejor las ejecuciones. Seleccione entre las opciones de telemetría, incluidas el impacto en el uso de recursos, las filas procesadas y las filas de salida, y vea la métrica de cada acción directamente en el gráfico de ejecución.
+
+<Frame>![](/images/kb/magic_etl_execution_heatmap.png)</Frame>
+
+#### Cargar versiones anteriores del DataFlow
+
+Ahora puede ver las versiones anteriores de un DataFlow sin tener que convertir primero una versión anterior en la versión actual. Abra una versión anterior para ver toda su lógica y configuración, y luego guárdela como una nueva versión o como un DataFlow completamente nuevo.
+
+#### Icono de SQL de varias instrucciones
+
+El icono de SQL de varias instrucciones le permite escribir varias instrucciones SQL en un solo icono en lugar de encadenar varios iconos de SQL, y crear múltiples salidas. Esto proporciona una sensación de mayor codificación y le permite crear tablas intersticiales como parte de un único script de SQL.
+
+#### Nuevos controles de navegación del lienzo
+
+Ahora puede elegir cómo navega por el lienzo de Magic ETL. Además del comportamiento original de navegación por desplazamiento, una nueva opción de navegación de clic y arrastre le permite hacer clic y arrastrar para moverse por el lienzo, de forma similar a otras herramientas basadas en lienzo. Establezca su preferencia en el menú Preferencias de usuario de Magic ETL.
+
+<Frame>![](/images/kb/magic_etl_canvas_navigation.png)</Frame>
+
+#### Configuración persistente a nivel de usuario
+
+Ahora puede conservar las preferencias a nivel de usuario en todos sus DataFlows de una instancia, incluidas la variante de la línea de cuadrícula, la apariencia (modo claro u oscuro), la actualización del diseño y si se muestran las "filas de salida" para las ejecuciones de vista previa.
+
+#### Recuento de filas en las vistas previas
+
+Cuando ejecuta una vista previa mientras crea un DataFlow, ahora puede ver el número de filas que genera cada acción, mostrado en los nodos de salida o cerca de ellos. Esto facilita el seguimiento de cómo afecta cada acción a sus datos y detectar problemas de calidad antes de crear el DataSet de salida.
+
+#### Mejoras del icono Seleccionar columnas
+
+El icono Seleccionar columnas se ha rediseñado para facilitar la reordenación y la gestión de columnas, con mejores opciones para reordenar columnas y grupos de columnas.
+
+#### Icono de análisis de sentimientos
+
+El icono de análisis de sentimientos clasifica automáticamente texto como reseñas, publicaciones en redes sociales y encuestas como positivo, negativo o neutral, para que pueda supervisar la reputación de la marca y actuar según los resultados.
+
+Aprenda más sobre el [icono de análisis de sentimientos en Magic ETL](https://www.domo.com/docs/s/article/000005741#sentiment-analysis-tile).
+
+### Retirada del editor de aplicaciones Mason
+
+A partir del 14 de octubre de 2026, la capacidad de crear y editar aplicaciones Mason ya no estará disponible en Domo. La creación de aplicaciones Mason, incluida la creación de nuevas aplicaciones Mason y la edición de las existentes, se descontinuará. Esto afecta a cualquier persona que actualmente cree o mantenga aplicaciones utilizando el marco Mason.
+
+Las aplicaciones Mason existentes seguirán ejecutándose y permanecerán accesibles para los usuarios finales; solo se elimina la experiencia de creación y edición. Por el momento, no se realizan cambios en otras herramientas de desarrollo de aplicaciones ni en el ecosistema más amplio de App Studio.
+
+Si actualmente desarrolla o mantiene aplicaciones Mason, le recomendamos que traslade su flujo de trabajo de desarrollo a Domo Apps (aplicaciones personalizadas).
+
+Aprenda más sobre la [creación de aplicaciones de Domo con el editor de código profesional](https://www.domo.com/docs/s/article/000005500).
+
+### Nuevas mejoras de gráficos en App Studio y Analyzer
+
+Tres nuevos tipos de gráficos y las barras redondeadas ofrecen a sus aplicaciones más formas de mostrar datos y un aspecto más moderno:
+
+- **Multi Progress Bar** da a cada categoría su propia fila, mostrando el valor real, el máximo y el objetivo en una sola línea
+- **Symbol Matrix** traza dos dimensiones en una cuadrícula, dimensionando y coloreando cada símbolo según el valor
+- **Ribbon Chart** conecta segmentos apilados entre categorías, para que los cambios en la participación y el rango se lean como movimiento
+
+Las barras ahora también admiten esquinas redondeadas para un aspecto más suave y moderno en toda su aplicación.
+
+<Frame>![](/images/kb/new_chart_improvements.png)</Frame>
+
+### Incorporación a la nueva navegación izquierda
+
+Domo ahora facilita el descubrimiento y la transición a la nueva navegación izquierda. Los administradores ven un banner dentro del producto que anuncia que la nueva navegación está disponible, con una opción Más información que abre la Configuración de navegación, donde puede habilitarla para todos los usuarios, solo para los administradores o para un grupo específico. La Configuración de navegación también incluye enlaces a documentación y otros recursos para ayudarle a planificar el cambio.
+
+Cuando un administrador activa la nueva navegación, cada usuario recibe la bienvenida la primera vez que inicia sesión con un breve mensaje y un video que presenta la nueva experiencia.
+
+Aprenda más sobre la [migración de usuarios a la nueva navegación izquierda](https://www.domo.com/docs/s/article/Migrate-Users-to-the-New-Left-Navigation).
+
+### Integraciones de solo lectura únicamente con OAuth
+
+Ahora puede crear de forma nativa una integración únicamente con OAuth que sea de solo lectura para cada motor que admita OAuth, incluidos Databricks, Snowflake y BigQuery. Las empresas que se estandarizan en OAuth pueden conectarse mediante la autenticación OAuth de usuario a máquina sin configurar otros tipos de credenciales.
+
+### Compatibilidad con pvariables para Tableros, App Studio y Embed
+
+Domo ahora admite pvariables en Tableros, App Studio y Embed. Pase un parámetro de URL de página para aplicar variables cuando se cargue la página, para que un enlace pueda abrirse con los valores de variable correctos ya establecidos.
+
+Aprenda más sobre las [variables en Domo](https://www.domo.com/docs/s/article/7903767835031).
+
+### Formato regional de fechas y números
+
+Domo ahora da formato a las fechas y los números según el estándar internacional CLDR, lo que garantiza un formato coherente en todos los navegadores y sistemas operativos.
+
+### Integración de la vista semántica
+
+Ahora puede registrar una vista semántica de Snowflake a través de la integración en la nube igual que cualquier otra tabla de Snowflake, para que las tablas, las relaciones, los sinónimos, las descripciones y las métricas que ya definió en Snowflake se incorporen a Domo sin reconstruir esa lógica de negocio manualmente.
+
+Domo importa la vista semántica como un modelo de datos de solo lectura, muestra sus metadatos en el esquema de Domo, asigna sus relaciones en el editor de modelos de datos y expone sus dimensiones, medidas y métricas derivadas en Analyzer y App Studio. Snowflake sigue siendo la fuente de verdad, para que las definiciones de las métricas se mantengan coherentes mientras los analistas construyen tarjetas de inmediato sin recrear el modelo.
+
+### Mejoras de los Flujos de trabajo
+
+#### Compatibilidad de la tarea de consulta de DataSet sin filas
+
+La tarea de consulta de DataSet ahora admite consultas que no devuelven resultados. Puede guardar configuraciones y generar parámetros de salida incluso cuando una consulta no devuelve filas, lo que facilita el diseño y la prueba de escenarios en los que se esperan conjuntos de resultados vacíos. Las tareas de consulta de DataSet ahora también se ejecutan correctamente en tiempo de ejecución cuando no se devuelven datos.
+
+#### Desencadenador de MCP
+
+El nuevo desencadenador de MCP ofrece a la IA una forma compatible, gobernada y diseñada específicamente para iniciar un flujo de trabajo directamente, en lugar de reutilizar desencadenadores diseñados para otros casos de uso. El desencadenador de MCP se habilita automáticamente cuando se implementa un flujo de trabajo, por lo que no se requiere configuración, y la página de detalles de ejecución del flujo de trabajo identifica cuándo un flujo de trabajo fue iniciado por la IA para una visibilidad clara de las ejecuciones iniciadas por la IA.
+
+Aprenda más sobre cómo [conectar herramientas de IA a Domo mediante MCP](https://www.domo.com/docs/s/article/Connect-AI-Tools-to-Domo-Using-MCP) y [gestionar los Flujos de trabajo](https://www.domo.com/docs/s/article/000005179).
+
+#### Control de versiones de las funciones de Code Engine
+
+Actualizar las versiones de las funciones de Code Engine en los Flujos de trabajo ahora es más fácil con la nueva opción Cambiar versión. Compare las entradas y las salidas entre su versión de función actual y la versión a la que desea cambiar antes de realizar el cambio, para que tenga una visibilidad clara de las diferencias de parámetros. Cuando las mismas entradas y salidas existen en ambas versiones, las asignaciones existentes se conservan automáticamente, lo que elimina la reasignación innecesaria.
+
+## Fast Follows - 1 de octubre
+
+### Actualizaciones de AI Chat
+
+AI Chat ahora puede gestionar preguntas complejas de varias partes y responder preguntas que abarcan varios DataSets. Aunque las uniones y las combinaciones entre DataSets aún no son compatibles; en su lugar, consulta cada DataSet de forma independiente y sintetiza los resultados. También admite un análisis más profundo y ahora funciona con Documents (datos no estructurados). Además, ahora admite visualizaciones, lo que le permite verlas y crearlas. Puede cargar archivos, pegar imágenes y usar @menciones para incluir conocimiento adicional. AI Chat ahora tiene acceso a la Base de conocimientos (KB), lo que amplía lo que puede lograr de forma conversacional en Domo.
+
+Aprenda más sobre [AI Chat](https://www.domo.com/docs/s/article/AI-Chat-v2).
+
+### Modelo de consumo de AI Chat
+
+AI Chat ahora se basa en el modelo de consumo de AI Pro de Domo para el uso de créditos, lo que alinea AI Chat con el mismo marco de consumo utilizado en todas las funciones de AI Pro de Domo.
+
+Aprenda más sobre [AI Chat](https://www.domo.com/docs/s/article/AI-Chat-v2).
 
 ## Funciones beta
 
 <BetaNoteEs generic />
 
-#### Pestaña de gestión de funciones adicionales
+### Webhook del registro de actividad
 
-Los administradores ahora pueden configurar conectores, Toolkits y otras funciones directamente desde su instancia con la Gestión avanzada de funciones en Instancias usando el modal Nueva plantilla de instancia. Úsela para habilitar o deshabilitar funciones disponibles para su organización y mantener la coherencia en todas las instancias gestionadas.
+Ahora puede transmitir un subconjunto de eventos del registro de actividad a un destino externo a través de un webhook, para que un sistema de su propiedad pueda recibir eventos de actividad a medida que ocurren.
 
-<Frame>![](/images/kb/advanced_feature_management.png)</Frame>
+Aprenda más sobre el [registro de actividad](https://www.domo.com/docs/s/article/360042934574).
 
-Obtenga más información sobre las [Plantillas de instancia para Domo Everywhere](https://www.domo.com/docs/s/article/000005786).
+### MCP Toolkits - Alerts y Workspaces
 
-### PDP de columna: compatibilidad con alertas
+La oferta MCP Toolkits - Alerts y Workspaces permite a los agentes de Domo AI gestionar Alertas y Espacios de trabajo en su nombre, para que pueda gestionarlos de forma conversacional a través de Domo AI. Las capacidades incluyen la creación, lectura, actualización y eliminación completas de Alertas y Espacios de trabajo; la gestión de conceptos relacionados como elementos, carpetas, suscriptores y uso compartido; y un comportamiento que tiene en cuenta los permisos, ya que cada herramienta respeta el acceso del usuario que la invoca a los recursos subyacentes.
 
-Las alertas ahora funcionan en DataSets donde está habilitado el PDP de columna, lo que permite aplicar el enmascaramiento según las políticas del destinatario de la alerta.
+Aprenda más sobre cómo [conectar herramientas de IA a Domo mediante MCP](https://www.domo.com/docs/s/article/Connect-AI-Tools-to-Domo-Using-MCP).
 
-El uso de columnas controladas por PDP en los criterios de evaluación de la alerta aplica restricciones a qué usuarios pueden suscribirse o recibir una alerta por diseño para proteger los datos confidenciales.
+### Transmisión de aplicaciones
 
-Obtenga más información sobre [PDP y Alertas](https://www.domo.com/docs/s/article/360042934634).
+La transmisión de aplicaciones permite que las aplicaciones personalizadas en la misma página de Domo se comuniquen entre sí en tiempo real, sin depender de los filtros de página ni de las variables. Las capacidades incluyen:
 
+- Las aplicaciones pueden publicar mensajes con nombre en un tema y suscribirse a los mensajes de otras aplicaciones de la página
+- Las aplicaciones de mapas pueden controlar las tarjetas de KPI
+- Los paneles de filtros pueden actualizar hasta tres gráficos a la vez
+- Las aplicaciones pueden declarar sus canales en el archivo manifest.json, y App Studio proporciona una interfaz de conexión visual para que los autores puedan conectar aplicaciones sin tocar el código
 
-### Detalles de ejecución del conector en la pestaña Historial
+Hay detalles adicionales y orientación sobre la implementación disponibles en la documentación para desarrolladores en developer.domo.com.
 
-El modal de Detalles de ejecución del conector proporciona más información sobre la ejecución de un conector, para que pueda resolver mejor algunas de las preguntas más comunes que surgen cuando un DataSet falla o tarda demasiado.
+### MCP Toolkits - Automation
 
-El modal proporciona información simple sobre si la versión del conector ha cambiado, cuántas filas se procesaron y cuánto tiempo tomó cada fase de la importación. Esta actualización reduce el tiempo que lleva resolver los problemas de la canalización de datos y le permite solucionar el problema usted mismo antes de contactar al soporte técnico.
+La nueva oferta MCP Toolkits - Automation permite a Domo AI crear, actualizar, gestionar y ejecutar de forma segura automatizaciones en todos sus servicios de automatización mediante lenguaje natural. Los kits de herramientas están disponibles en la AI Library, y todas las concesiones y los permisos existentes para esos servicios siguen aplicándose:
 
-<Frame>![](/images/kb/connector_execution_failed.png)</Frame>
-<Frame>![](/images/kb/connector_execution_pass.png)</Frame>
+- **MCP Toolkits - Workflows** cubre todo el ciclo de vida del flujo de trabajo
+- **MCP Toolkits - Code Engine** gestiona los paquetes de Code Engine
+- **MCP Toolkits - Queues (Task Center)** gestiona las colas de trabajo de Task Center
+- **MCP Toolkits - Forms** gestiona los formularios
 
+Aprenda más sobre cómo [conectar herramientas de IA a Domo mediante MCP](https://www.domo.com/docs/s/article/Connect-AI-Tools-to-Domo-Using-MCP).
 
-### Agente de IA: Biblioteca de IA
+### Case Statement Builder
 
-La Biblioteca de IA de Domo le permite gestionar soluciones de IA y proporciona un entorno centralizado para crear y gestionar agentes de IA que operan con sus datos de confianza y gobernados.
+El Case Statement Builder proporciona un creador guiado para casos de uso comunes de lógica condicional, para que ya no necesite saber DQL para construir lógica condicional. Al crear un campo calculado, elija el Rule Builder o Beast Mode simple; apile las reglas de arriba abajo en el Condition Builder; y vuelva a abrir las reglas guardadas en el creador en lugar de como SQL sin procesar. Cualquier cosa que el creador no pueda gestionar se puede convertir en un Beast Mode.
 
-Dentro de la Biblioteca de IA, puede aprovechar el Generador de agentes de IA de Domo para crear agentes personalizados o flujos de trabajo agénticos adaptados a casos de uso específicos.
+### Compatibilidad con Documents en Magic - Extracción, transformación y carga
 
-<Frame>![](/images/kb/conversational_agents.png)</Frame>
+Ahora puede incorporar datos de documentos no estructurados a un DataFlow de Magic ETL, procesarlos junto con sus otros datos y escribir los archivos resultantes de vuelta en una colección de documentos. Tres nuevos iconos en Documents lo hacen posible:
 
-Obtenga más información sobre los Agentes conversacionales en la [Biblioteca de IA de Domo](https://www.domo.com/docs/s/article/AI-Library).
+- **Collection Input** selecciona una colección de documentos como entrada de su ETL
+- **Document Read** lee los bytes de los archivos de una colección
+- **Document Write** escribe archivos en una colección de destino
 
+<Frame>![](/images/kb/etl_documents.png)</Frame>
 
-### Domo Essentials MCP
+Aprenda más sobre los [iconos de Documents en Magic ETL](https://www.domo.com/docs/s/article/Magic-ETL-Tiles-Documents).
 
-Domo Essentials MCP es nuestro servidor alojado que otorga a las herramientas de IA acceso seguro a su plataforma Domo para acciones como Consultar DataSet, Consultar documentos y Buscar en Domo.
+### MCP Toolkits - Domo Sandbox
 
-Ahora con Domo Essentials MCP, puede activar rápidamente acciones potentes impulsadas por la seguridad y el contexto de su instancia de Domo en vivo.
+La oferta MCP Toolkits - Domo Sandbox proporciona herramientas para gestionar los repositorios de Domo Sandbox, incluida la creación, confirmación, promoción, eliminación y gestión del uso compartido de repositorios, junto con la orquestación para vincular esas acciones. Estos kits de herramientas están disponibles en la AI Library.
 
-<Frame>![](/images/kb/domo_mcp.png)</Frame>
+Aprenda más sobre cómo [conectar herramientas de IA a Domo mediante MCP](https://www.domo.com/docs/s/article/Connect-AI-Tools-to-Domo-Using-MCP).
 
-Obtenga más información sobre [Domo Essentials MCP](https://www.domo.com/docs/s/article/Connect-AI-Tools-to-Domo-Using-MCP).
+### Compatibilidad con calendarios globales y fiscales
 
+Las integraciones en la nube ahora le permiten registrar su propia tabla de calendario para admitir tanto calendarios fiscales personalizados como calendarios estándar, para que las organizaciones con años fiscales no estándar obtengan informes precisos basados en fechas sin salir de su almacén de datos. Configúrelo de dos maneras:
 
-### Mejoras de Magic - Extracción, transformación y carga
+- **Generar un nuevo calendario** utilizando un asistente guiado que le orienta a través del tipo de calendario, el inicio del año fiscal, las fechas de validación y el rango de años
+- **Conectar un calendario existente** indicando a Domo una tabla de calendario que ya existe en su almacén
 
-#### Icono de clasificación
+Después de registrarse, las tarjetas y los informes de Analyzer utilizan el calendario para impulsar una agrupación de fechas precisa y comparaciones de período a período, incluida la compatibilidad con las estructuras fiscales 4-4-5, 4-5-4 y 5-4-4.
 
-El nuevo icono de clasificación de IA en Magic - Extracción, transformación y carga le permite categorizar sus datos, incluyendo texto, imágenes y archivos, en clases predefinidas.
+Aprenda más sobre la [configuración de calendarios fiscales y estándar para las integraciones en la nube](https://www.domo.com/docs/s/article/Fiscal-and-Standard-Calendar-Configuration-for-Cloud-Integrations).
 
-El icono de clasificación de IA le permite centrarse más en sus entidades de clasificación y menos en los detalles de configuración reales.
+## Problemas resueltos
 
-<Frame>![](/images/kb/classification_tile.png)</Frame>
+### Asignación de esquema del modelo de datos en BigQuery y Databricks
 
-Obtenga más información sobre los [Servicios de IA para iconos de Magic - Extracción, transformación y carga](https://www.domo.com/docs/s/article/000005741).
+Al consultar un modelo de datos en BigQuery o Databricks, la asignación de esquema podía cargarse de forma incorrecta. Los modelos de datos ahora resuelven el esquema correctamente en todos los motores compatibles.
 
+### Rendimiento del cálculo del linaje de datos
 
-#### Icono SQL de instrucciones múltiples
-
-El nuevo icono SQL de instrucciones múltiples le permite escribir múltiples instrucciones SQL en un solo icono y crear múltiples salidas.
-
-Esta funcionalidad proporciona una experiencia de mayor código y le permite crear tablas intermedias que pueden no tener ninguna salida asociada como parte del Script SQL total.
-
-<Frame>![](/images/kb/multi_statement_sql_tile.png)</Frame>
-
-
-#### Icono de análisis de sentimientos
-
-El nuevo icono de análisis de sentimientos le permite clasificar automáticamente texto como reseñas, publicaciones en redes sociales y encuestas como positivo, negativo o neutral. Esto le permite monitorear fácilmente la reputación de su marca en tiempo real, dándole tiempo para usar sus datos de salida para mejorar el servicio al cliente.
-
-<Frame>![](/images/kb/sentiment_analysis_tile.png)</Frame>
-
-Obtenga más información sobre los [Servicios de IA para iconos de Magic - Extracción, transformación y carga](https://www.domo.com/docs/s/article/000005741).
-
-
-### Report Builder PDF
-
-Report Builder ahora admite exportaciones en PDF. Con Report Builder PDF, puede crear informes desde cero, a partir de páginas de aplicaciones existentes o a partir de informes de correo electrónico existentes. Personalice encabezados y pies de página, incluyendo texto inteligente; cambie el tamaño, elimine y ajuste el contenido; y aplique filtros para crear diferentes vistas de informes para descargar.
-
-Cree informes en PDF de nivel ejecutivo con marca directamente desde el contenido de su aplicación con Report Builder PDF.
-
-<Frame>![](/images/kb/report_builder_pdf.png)</Frame>
-
-Obtenga más información sobre [Report Builder PDF en App Studio](https://www.domo.com/docs/s/article/000005829).
-
-
-### Componente Secciones en App Studio
-
-Las Secciones en App Studio son contenedores etiquetados que contienen una o más tarjetas. Las Secciones pueden expandirse o contraerse por parte de los espectadores, y los creadores de aplicaciones pueden agregar, nombrar, reordenar y eliminar secciones según sea necesario.
-
-Las Secciones son el reemplazo moderno de las Colecciones en las Páginas estándar de Domo.
-
-<Frame>![](/images/kb/sections_app_studio.png)</Frame>
-
-
-### Creación de token de acceso de autoservicio
-
-Los tokens de acceso en Domo ahora están gobernados por una nueva concesión: Crear tokens de acceso. Cualquier usuario con esta concesión puede crear un token de acceso para sí mismo sin necesidad de la intervención de un administrador. Esta actualización también elimina la capacidad de crear un token en nombre de otro usuario, incluidos los administradores, pero aún pueden ver todos los tokens en una instancia y eliminar cualquier token.
-
-<Frame>![](/images/kb/self_serve_access_token_create.png)</Frame>
-
-Obtenga más información sobre la creación y gestión de [Tokens de acceso de autoservicio en Domo](https://www.domo.com/docs/s/article/360042934494#self-serve-access-token-creation-beta).
-
+Recalcular cuántas tarjetas y otros artefactos posteriores alimenta un DataSet podía ser lento y, en algunos casos, informar de un recuento inexacto. El recálculo del linaje ahora es más rápido y preciso.
 
 ## Soporte
 
-Domo proporciona educación, respuestas de la comunidad y soporte técnico.
+Domo ofrece formación, respuestas de la comunidad y soporte técnico.
 
 - Busque un tema en el [Centro de ayuda](https://www.domo.com/domo-central/help).
-- Aprenda de [Domo University](https://www.domo.com/domo-central/university).
-- Busque aplicaciones de capacitación en el [Appstore](https://www.domo.com/appstore/).
+- Aprenda en la [Universidad Domo](https://www.domo.com/domo-central/university).
+- Busque aplicaciones de formación en el [Appstore](https://www.domo.com/appstore/).
 - Obtenga respuestas en los [Foros de la comunidad](https://community-forums.domo.com/main).
 - Contacte al soporte técnico enviando un ticket de ayuda en el [Portal de soporte de Domo](https://www.domo.com/login/customer-community).
-- Comuníquese con su equipo de cuentas de Domo.
+- Comuníquese con su equipo de cuenta de Domo.

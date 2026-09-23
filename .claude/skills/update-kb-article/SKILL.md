@@ -251,12 +251,12 @@ Invoke the `add-to-nav` skill. Do not attempt to edit `docs.json` directly for n
 Apply the convention defined in `Domo-KB-Style-Guide.mdx` › **Beta Features**. Read it before making changes. Summary:
 
 - **Mark a whole article as beta:** add `tag: "Beta"` to the frontmatter and insert the standard beta Note immediately after the frontmatter, above the Intro. Do not append `(Beta)` to the title.
-- **Mark a section as beta:** append `<Badge className="text-primary bg-primary/10 font-bold">Beta</Badge>` to the heading. If the article has no other beta sections, also place the standard beta Note under that section. If another section in the same article is already marked beta, do not add another Note — one Note per article.
+- **Mark a section as beta:** append `<Badge>Beta</Badge>` to the heading. If the article has no other beta sections, also place the standard beta Note under that section. If another section in the same article is already marked beta, do not add another Note — one Note per article.
 - **Promote beta to GA (whole article):** remove the `tag: "Beta"` line from frontmatter and remove the standard beta Note above the Intro.
 - **Promote beta to GA (section):** remove the Badge from the heading. If the Note immediately below this section was the article's single beta Note, decide where it should go: if other sections remain beta, move it under the first remaining beta section; if no beta sections remain, remove the Note.
 - **Convert legacy beta markers:** when you find `(Beta)` or `(BETA)` in titles or headings, ad-hoc beta notes, references to `betafeedback@domo.com` or `betadmin@domo.com`, or other legacy treatments, replace them with the current convention (tag + standard Note for whole-article betas; Badge + single standard Note for section-level betas). When updating cross-article links whose anchor text contained `(Beta)`, drop the parenthetical from the link text as well.
 
-The Badge `className` must be exactly `text-primary bg-primary/10 font-bold`. The standard beta Note must be used verbatim — copy it from the style guide.
+Don't add a `className` to the Badge; `style.css` styles every Badge. The standard beta Note must be used verbatim, so copy it from the style guide.
 
 ### Merge
 

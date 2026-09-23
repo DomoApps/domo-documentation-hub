@@ -121,10 +121,10 @@ Reuse the existing description verbatim (adjusting only to fit the em-dash forma
 Use the release-status answer from Step 3 to decide which beta treatment, if any, to apply. The full convention lives in `Domo-KB-Style-Guide.mdx` › **Beta Features** — read it before writing.
 
 - **Entire article is beta:** add `tag: "Beta"` to the frontmatter and place the standard beta Note immediately after the frontmatter, above the Intro. Do not append `(Beta)` to the title.
-- **Only certain sections are beta:** append `<Badge className="text-primary bg-primary/10 font-bold">Beta</Badge>` to each beta section's heading. Place the standard beta Note under the **first** beta section only — do not repeat it for subsequent beta sections in the same article. Do not append `(Beta)` to any heading.
+- **Only certain sections are beta:** append `<Badge>Beta</Badge>` to each beta section's heading. Place the standard beta Note under the **first** beta section only; do not repeat it for subsequent beta sections in the same article. Do not append `(Beta)` to any heading.
 - **Entire article is GA:** no beta tag, badge, or Note.
 
-The `className` on the Badge is required and must be exactly `text-primary bg-primary/10 font-bold` — it matches the sidebar `tag` styling.
+Don't add a `className` to the Badge. `style.css` styles every Badge to match the sidebar `tag`.
 
 The standard beta Note must be used verbatim — do not paraphrase or change the links. Copy it from the style guide.
 

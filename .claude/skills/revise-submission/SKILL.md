@@ -137,7 +137,7 @@ Verify every Domo product term against the **Domo-Specific Terms and Usage** tab
 
 ### Beta treatment
 - **Whole-article beta:** `tag: "Beta"` in frontmatter + standard verbatim beta Note above the Intro.
-- **Section-level beta:** `<Badge className="text-primary bg-primary/10 font-bold">Beta</Badge>` appended to the section heading + one standard beta Note under the first beta section only.
+- **Section-level beta:** `<Badge>Beta</Badge>` (no `className`) appended to the section heading + one standard beta Note under the first beta section only.
 - **GA:** no beta tag, badge, or Note.
 - Convert any legacy beta markers (`(Beta)` in titles, ad-hoc notes, `betafeedback@domo.com` references) to the current convention.
 

@@ -1,0 +1,99 @@
+---
+title: "Review Domo Security and Compliance Controls"
+excerpt: "Review how Domo encrypts data in transit, manages vulnerabilities, and retains security logs, and how to request Domo's SOC reports."
+---
+
+## Intro
+
+This article covers Domo's security certifications and SOC reports, how Domo encrypts data in transit and how to verify TLS on your instance, and how Domo manages vulnerabilities and retains security logs.
+
+---
+
+## Review Certifications and Audit Reports
+
+Domo maintains a broad set of security certifications and compliance attestations, including SOC 1, SOC 2, ISO/IEC 27001, ISO/IEC 27018, HIPAA, HITRUST, GDPR, and CCPA. For the current list, see Domo's [security page <i className="icon-arrow-square-out sm" aria-hidden="true" />](https://www.domo.com/platform/security). Domo holds both the ISO/IEC 27001 and ISO/IEC 27018 certificates for information security management; see the [press release <i className="icon-arrow-square-out sm" aria-hidden="true" />](https://www.domo.com/news/press/domo-achieves-iso-iec-27001-and-iso-iec-27018-certifications) for more information.
+
+To request Domo's SOC 1 or SOC 2 Type II report, contact your Domo account team. A signed NDA is required before Domo shares the reports.
+
+Domo does not distribute copies of its internal security policies. The controls are summarized in this article and verified in Domo's SOC 1 and SOC 2 Type II reports.
+
+## Review Encryption in Transit
+
+Domo's minimum supported TLS version for external customer communications is TLS 1.2. Domo also supports TLS 1.3 where the client and connection path support it. The TLS version is negotiated automatically when a session is established, so you do not configure or select a TLS version for your Domo instance.
+
+To protect data as it travels across untrusted networks, Domo uses secure protocols with a limited set of trusted ciphers. SSH and SFTP are supported, where appropriate, for the secure transfer of data, and Domo does not allow clear-text or unencrypted communication protocols.
+
+This minimum applies wherever Domo controls the configuration. It does not apply to connections you configure to be insecure, such as a connector set up with an insecure configuration, or insecure protocols used in an app, Code Engine, or Jupyter.
+
+### Verify TLS Support for Your Instance
+
+You can confirm the TLS support on your own Domo instance with a third-party scanner such as SSL Labs:
+
+1. Go to [SSL Labs Server Test <i className="icon-arrow-square-out sm" aria-hidden="true" />](https://www.ssllabs.com/ssltest/).
+
+2. Enter your instance hostname, for example _yourcompany_.domo.com.
+
+3. (Optional) Select **Do not show the results on the boards**.
+
+4. Select **Submit**.
+   The scan takes a few minutes to complete.
+
+5. In **Summary**, confirm the banner "This server supports TLS 1.3." To use the result as evidence, capture a screenshot that includes the address bar so the hostname is visible.
+
+{/* SCREENSHOT: SSL Labs Summary panel for domo.domo.com, cropped to include the browser address bar, showing the "This server supports TLS 1.3" banner. Save to /images/kb/Review-Domo-Security-and-Compliance-Controls-ssllabs.png with alt text "SSL Labs summary for domo.domo.com showing TLS 1.3 support". */}
+
+<Note>**Note:** A third-party scan tests the connection path it reaches, typically your instance's browser endpoint.</Note>
+
+## Review Vulnerability Management
+
+Domo maintains approved patch and vulnerability management standards that prioritize remediation by severity and exposure, scored using the Common Vulnerability Scoring System (CVSS).
+
+Domo performs internal and external vulnerability scanning, and its vulnerability management process is tested in Domo's SOC 2 Type II examination.
+
+Domo undergoes independent third-party penetration testing at least annually. The executive reports detailing the scope, any findings, and the status of each finding are made available to customers in Domo's Independent Security Reports (ISR).
+
+To report a security vulnerability in Domo, use Domo's responsible disclosure program. See Domo's [security page <i className="icon-arrow-square-out sm" aria-hidden="true" />](https://www.domo.com/platform/security).
+
+## Review Security Log Retention
+
+Domo retains system logs for one year. These logs track user activity and system events and record the date and time of each event and the objects affected. This control is tested in Domo's SOC 1 and SOC 2 Type II examinations.
+
+In your own instance, administrators can review a rolling one-year window of activity in the Admin Settings under **Governance** > **Activity log**. Viewing the Activity log requires an Admin role or a custom role with the **View Activity Logs** grant enabled. See [Activity Log](/s/article/360042934574).
+
+To keep activity history longer than the rolling one-year window, use the [DomoStats Activity Log report](/s/article/360043433813) or [send logs to your SIEM](/portal/shipping-logs-to-siem).
+
+## FAQ
+
+<AccordionGroup>
+
+<Accordion title="Can I require TLS 1.3 only for my instance?">
+  No. The TLS version is negotiated automatically and cannot be set for an individual instance.
+</Accordion>
+
+<Accordion title="Does the TLS 1.2 minimum apply to my connectors and custom code?">
+  The minimum applies wherever Domo controls the configuration. It does not apply to connections you configure to be insecure, such as a connector set up with an insecure configuration, or insecure protocols used in an app, Code Engine, or Jupyter.
+</Accordion>
+
+<Accordion title="How do I get Domo's SOC reports?">
+  Contact your Domo account team. A signed NDA is required before Domo shares its SOC 1 or SOC 2 Type II report.
+</Accordion>
+
+<Accordion title="Can I get a copy of Domo's security policies?">
+  No. Domo summarizes its controls in this article and in its SOC reports, and does not distribute copies of its internal security policies.
+</Accordion>
+
+<Accordion title="How often does Domo run penetration tests?">
+  Domo undergoes independent third-party penetration testing at least annually.
+</Accordion>
+
+</AccordionGroup>
+
+## Related Articles
+
+- [Activity Log](/s/article/360042934574)
+- [DomoStats Connector](/s/article/360043433813)
+- [Encrypting Data with Domo's Bring Your Own Key (BYOK)](/s/article/360043427593)
+- [Enable Multi-factor Authentication](/s/article/360043439193)
+- [Allowlist IP Addresses in Domo](/s/article/360043439173)
+- [Session Settings](/s/article/000005431)
+- [Domo Mobile Security](/s/article/360043428233)

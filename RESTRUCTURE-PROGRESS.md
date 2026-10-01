@@ -6,7 +6,7 @@ file at the start of any restructure work to orient themselves before doing anyt
 
 **Plan document:** `KB-RESTRUCTURE-PLAN.md`
 **Disposition log:** `RESTRUCTURE-MANIFEST.md` — running record of what happened to every article; updated throughout all phases; Phase 9 converts it to the final audit report
-**Last updated:** 2026-08-28 (**Phase 4 executed + Phase 4.5 tooling complete — all committed AND pushed**, HEAD `007f6b51` = `origin/update/fullRestructure`, tree clean). Phase 4: 14 duplicate connectors merged/deleted (`74e92a42`), `DataFusion-Migration-Guide.mdx` (`c730bac5`), retirement batches staged for 4.6 (`bbad7cbe`), disposition vocab reconciled to five-state; 8 title-collision non-duplicates deferred. Phase 4.5: `build-pm-review-briefs.py` now generates 14 per-PM briefs + `.docx` copies + `RESTRUCTURE-TASKS.md` (387-task dashboard) + `PM-REVIEW-STATUS.md` (workflow ledger, seed-once); all ownership resolved. **Next: begin the PM review loop (see Phase 4.5 › "The operating loop"), then Phase 4.6.**
+**Last updated:** 2026-09-30 — **Phase 4.5 interactive PM-review built + Phase 3c sync #2 done** (committed & pushed; HEAD `49d23a4f`). `pm-review` skill + `scripts/pm_review.py`; 12 per-PM branches; main content synced in (baseline `ad4cee86`, NOT a git merge); 23 new articles navved; 2 add/add synthesized to main's. See the 2026-09-30 resume block below. — _Prior:_ 2026-08-28 (**Phase 4 executed + Phase 4.5 tooling complete — all committed AND pushed**, HEAD `007f6b51` = `origin/update/fullRestructure`, tree clean). Phase 4: 14 duplicate connectors merged/deleted (`74e92a42`), `DataFusion-Migration-Guide.mdx` (`c730bac5`), retirement batches staged for 4.6 (`bbad7cbe`), disposition vocab reconciled to five-state; 8 title-collision non-duplicates deferred. Phase 4.5: `build-pm-review-briefs.py` now generates 14 per-PM briefs + `.docx` copies + `RESTRUCTURE-TASKS.md` (387-task dashboard) + `PM-REVIEW-STATUS.md` (workflow ledger, seed-once); all ownership resolved. **Next: begin the PM review loop (see Phase 4.5 › "The operating loop"), then Phase 4.6.**
 
 ---
 
@@ -15,10 +15,20 @@ file at the start of any restructure work to orient themselves before doing anyt
 **Active phase:** Phase 4 executed + **Phase 4.5 tooling complete & briefs generated** (2026-08-28) → next is running the PM review loop (send briefs, collect answers, Claude applies), then Phase 4.6 (lifecycle application)
 **Blocked on:** 8 human decisions (see Phase 2 Decision Required table in `RESTRUCTURE-IA-SPEC.md`); D10 (CourseBuilder) is a PM-confirm item in the retirement staging
 
-### ▶ Where we left off (2026-08-28) — pick up here next week
+### ▶ Where we left off (2026-09-30) — pick up here next session
 
 **▶▶ RESUME — read this first.**
-- **State:** branch `update/fullRestructure`, **HEAD `007f6b51` = origin, working tree clean, everything pushed.** Today's 8 commits: `74e92a42`, `c730bac5`, `bbad7cbe`, `f280a1ae` (Phase 4) + `e92e69d1`, `9462e7be`, `f549e929`, `007f6b51` (Phase 4.5 tooling).
+- **State:** branch `update/fullRestructure`, HEAD `49d23a4f` = origin, working tree clean (only untracked `localization/` scratch). 12 `restructure/pm/<slug>` branches all at the same tip, all pushed.
+- **Phase 4.5 interactive review is BUILT & LIVE.** `pm-review` skill (`.claude/skills/pm-review/SKILL.md`) + engine `scripts/pm_review.py` — per-PM branch, hybrid `[pm-input]`/`[reviewed]` markers + `pm-review-state/<slug>.json` ledger, resumable, gap-fill author/defer, `reconcile` gate. `check-baseline` → `ready: true`. Full design: `~/.claude/plans/shimmering-swimming-nygaard.md`.
+- **Phase 3c SYNC #2 DONE** (pulled early so PMs review current main content). Content sync, **NOT a git merge** — `docs.json`/structure preserved; baseline pinned `ad4cee86` (`pm-review-state/sync-baseline.json`). 89 clean applies + 19/21 conflicts resolved + 23 new + images/skills/localized/release-notes. The 2 add/add (`AI-Chat-v2`, `Apollo.io-Connector`) synthesized to main's superseding versions. **All 23 new articles nav-placed** in docs.json (MCP 11, App Studio 4, Connector Library 5, Magic ETL 1, Embed 1, release archives: May-2026-Release). ⚠️ **Apollo.io flag:** confirm the connector is OAuth-only now (main removed the Access-Token method; restore if still supported).
+- **▶ FIRST ACTION NEXT SESSION — run a PM's review:** `git checkout restructure/pm/<slug>` then `/pm-review <PM>` (or bare `/pm-review` — it infers from the branch). The skill walks their brief item-by-item with diffs; resumable. Start with a confirmed-login PM (Dan Brinton, Ken Boyer, Phil Fuchs, Ryan Despain, Jordan Jensen, Andrea Henderson, Mamta Bolaki). Tasleema's brief is huge (~1,077 articles) — chunk it.
+- **Gate to Phase 4.6:** after all PM branches merge back, run `pm_review.py reconcile --strict` + `rollup` + `deferred-report` on `update/fullRestructure`; `gate_clear: true` + every PM Done → Phase 4.6.
+- **Still open:** the 8-connector disambiguation task (fold into Phase 6); the 2 non-PM pseudo-briefs (Release-Management, no-PM-listed) have no branch by design; a Phase 3c **sync #3** may run pre-final-merge if main moves materially; localized content sync beyond this pass is Phase 6.
+
+### ▶ Prior session (2026-08-28)
+
+**▶▶ RESUME (historical).**
+- **State:** branch `update/fullRestructure`, **HEAD `007f6b51` = origin, working tree clean, everything pushed.** That day's 8 commits: `74e92a42`, `c730bac5`, `bbad7cbe`, `f280a1ae` (Phase 4) + `e92e69d1`, `9462e7be`, `f549e929`, `007f6b51` (Phase 4.5 tooling).
 - **Phase 4 executed:**
   1. **Connector consolidation** — content-reviewed all 22 exact-title pairs; **14 genuine duplicates merged/deleted** (8 fold-first + 6 clean, incl. Oracle/SugarCRM tie-breakers). Inbound links repointed, nav entries removed, manifest logged.
   2. **8 non-duplicates DEFERRED** — title collisions that are actually distinct connectors (Documents-surface: SFTP/S3/GitHub; variants: WordPress self-hosted, Magento OAuth, Kendra query; **backwards keepers: LinkedIn V1 + Google Ads legacy**). Logged in `RESTRUCTURE-MANIFEST.md` › Connector Merges. **➡️ Needs a dedicated disambiguation/retitle task (can fold into Phase 6 renames).**
@@ -821,18 +831,22 @@ Delta since sync #1: 275 main commits. Applied in 3 commits on `update/fullRestr
 - **Pass 3** — pinned baseline sentinel + `pm_review.py check-baseline` switched from ancestry to
   recorded-sync semantics (a content sync is not an ancestor).
 
-**HELD for human decision — 2 add/add articles** (both branches created them independently; left
-at the restructure version): `s/article/AI-Chat-v2.mdx`, `s/article/Apollo.io-Connector.mdx`
-(restructure's Apollo is *longer* than main's — taking main would drop ~20 lines).
+**2 add/add articles RESOLVED (synthesized to main's superseding versions, `49d23a4f`):**
+`AI-Chat-v2.mdx` → main's GA rename ("AI Chat", Beta dropped) + capabilities list, same structure;
+`Apollo.io-Connector.mdx` → main's OAuth-only simplification. ⚠️ **Apollo flag:** main removed the
+Access-Token auth method — confirm the connector is truly OAuth-only now, else restore that method.
 
-**23 new articles imported — need IA/nav placement in Phase 7** (not hand-placed now to avoid
-churn before the nav rebuild): the 10 `MCP-Toolkits-*` + `Domo-MCP` (→ Develop & Integrate / AI),
-App Components/App Studio set (`Create-a-KPI-Component`, `Group-and-Aggregate-Data-in-App-Components`,
-`Apply-Conditional-Formatting-...`, `Create-and-Share-Workspaces` → Build Apps & Automate),
-connectors (`AWS-Focus-Cost-And-Usage`, `About-Snowflake-Semantic-Views`,
-`Fiscal-and-Standard-Calendar-Configuration-...` → Connect & Integrate Data),
-`Magic-ETL-Tiles-Documents` (→ Prepare & Transform), `Migrate-Embedded-Cards-to-the-New-URL`,
-`May-2026-Release` (→ Release Notes archive), `1500011337961`, `360043431173`.
+**23 new articles imported AND nav-placed (`49d23a4f`, docs.json validated):** MCP group /
+AI & Data Science (`Domo-MCP`, `Connect-Gemini-Enterprise-to-Domo-MCP`, 9 `MCP-Toolkits-*`);
+Build Apps & Automate › App Studio (`Create-a-KPI-Component-in-App-Studio`,
+`Group-and-Aggregate-Data-in-App-Components`, `Apply-Conditional-Formatting-...`,
+`Create-and-Share-Workspaces`); Connect & Integrate Data › Connector Library
+(`AWS-Focus-Cost-And-Usage` A-B, `360043431173`/Emma C-F, `1500011337961`/BigQuery-Writeback →
+Writeback, `About-Snowflake-Semantic-Views` Q-S, `Fiscal-and-Standard-Calendar-Configuration` →
+How Connectors Work); Prepare & Transform › Magic ETL (`Magic-ETL-Tiles-Documents`);
+Share & Collaborate › Embed Domo Everywhere (`Migrate-Embedded-Cards-to-the-New-URL`);
+Release Notes archives — both groups (`May-2026-Release`). Phase 7 nav rebuild will re-derive these
+from the IA mapping; the hand-placements keep them discoverable in the interim.
 
 **PM-branch propagation:** all 12 `restructure/pm/<slug>` branches had zero own commits, so they
 were fast-forwarded to the post-sync integration tip and force-pushed. Going forward, re-sync a PM

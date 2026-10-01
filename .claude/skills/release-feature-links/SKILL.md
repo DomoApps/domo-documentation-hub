@@ -1,6 +1,6 @@
 ---
 name: release-feature-links
-description: For a monthly release, match every feature in the PMM source copy to a KB article in s/article/ and produce link sentences. Two targets — (1) PMM Release Article: emit copy-paste-ready feature + link sentences (with https://www.domo.com/docs prefix) for the shared Word doc; (2) Current Release Notes: edit s/article/Current-Release-Notes.mdx in place, inserting link sentences inline. Two intents — net-new generation (all features) or update (refresh missing/generic links after new KB articles publish). Use when the user asks to "add KB links to the release article", "wire up links for the May release", "update the May release links now that the X article shipped", "match KB articles to release features", or similar.
+description: For a monthly release, match every feature in the PMM source copy to a KB article in s/article/ and produce link sentences. Two targets — (1) PMM Release Article: emit copy-paste-ready feature + link sentences (with https://www.domo.com/docs prefix) for the shared Word doc; (2) Current Release Notes: edit s/article/Current-Release-Notes.mdx in place, inserting link sentences inline. Three intents — net-new generation (all features), update (refresh missing/generic links after new KB articles publish), or branch-driven (Current Release Notes only, no PMM source: link each release-notes section to the KB articles/sections/updates the current branch introduced). Use when the user asks to "add KB links to the release article", "wire up links for the May release", "update the May release links now that the X article shipped", "match KB articles to release features", "link the release notes to the articles in this branch", or similar.
 ---
 
 # Release Feature → KB Article Linker
@@ -9,8 +9,9 @@ Each Domo monthly release ships a marketing/PMM article that introduces every ne
 
 - **Net-new** — first pass when the release ships; produce link sentences for every feature that already has an article.
 - **Update** — later passes after additional KB articles publish; replace missing or generic/umbrella links with the new, more specific article.
+- **Branch-driven** (Current Release Notes only) — no PMM source copy. Walk the `Current-Release-Notes.mdx` sections themselves and wire each to whatever KB article, section, or update the **current branch** introduced (adds, generic→specific swaps, sub-section anchors, and supplements). Use this when the release branch already carries the KB work and you just want the release notes to point at it.
 
-Combined with the two output targets (PMM, Current Release Notes), that gives **four pathways**. The skill picks the right one based on the user's answers in step 1.
+Net-new and update each apply to both output targets (PMM, Current Release Notes); branch-driven applies only to Current Release Notes. That gives **five pathways** (A–E). The skill picks the right one based on the user's answers in step 1.
 
 ## Workflow
 
@@ -18,13 +19,14 @@ Combined with the two output targets (PMM, Current Release Notes), that gives **
 
 Use **AskUserQuestion** with three questions in a single call:
 
-1. **Intent** — net-new or update?
+1. **Intent** — net-new, update, or branch-driven?
    - `Net-new` — first pass; generate link sentences for every feature in the source copy.
    - `Update` — refresh existing links; only handle features that previously had no link or pointed to a generic/umbrella article and now have a better match.
-2. **Target document** — which output mode?
+   - `Branch-driven` — **Current Release Notes only, no PMM source.** Derive the feature list from the release-notes sections and match against KB content added or modified on the current branch. Routes straight to Pathway E; **skip questions 2 and 3.**
+2. **Target document** — which output mode? *(Skip when intent is branch-driven — it's always Current Release Notes.)*
    - `PMM Release Article` (external Word doc — output is copy-paste-ready text).
    - `Current Release Notes` (in-repo `s/article/Current-Release-Notes.mdx` — edit the file directly).
-3. **Source copy file** — which `.txt` file in the repo contains the PMM draft copy for this release?
+3. **Source copy file** — which `.txt` file in the repo contains the PMM draft copy for this release? *(Skip when intent is branch-driven — there is no PMM source; the feature list comes from `Current-Release-Notes.mdx` itself.)*
 
 If helpful, list candidate `.txt` files before asking question 3:
 
@@ -34,7 +36,7 @@ ls *.txt 2>/dev/null
 
 The user can pick by name.
 
-Once you have the user's three answers, route to the matching pathway in step 5. Steps 2–4 (extract features, match articles, build link sentences) are shared by all four pathways with small variations noted below.
+Once you have the user's answers, route to the matching pathway in step 5. Steps 2–4 (extract features, match articles, build link sentences) are shared by all five pathways with small variations noted below — branch-driven (Pathway E) replaces the step-2 PMM extraction with the release-notes sections plus the branch's git diff.
 
 ### 2. Extract the feature list from the PMM source copy
 
@@ -48,7 +50,7 @@ Extract a deduplicated list of feature names, preserving the release ordering. B
 - Slight name variations between the table-of-contents list and the section headers (e.g. *"AI Classification tile"* vs *"AI Classification Tile"* vs *"Magic ETL AI Classification Tile"*) — normalize to the section-header form.
 - Sub-features nested under a parent (e.g. *Workflow Event Triggering – Access Request* and *Queue Notification Controls* under *Workflows Updates*; *AI Classification Tile*, *Sentiment Analysis Tile*, *Multi-Statement SQL Tile* under *Magic ETL Enhancements*). Treat each sub-feature as its own item — they each need their own link.
 
-**Update mode narrows this list** — see step 5's pathway sections for how to scope it.
+**Update mode narrows this list** — see step 5's pathway sections for how to scope it. **Branch-driven mode (Pathway E) skips this step entirely** — there is no PMM `.txt`; the feature list is the `###`/`####` sections of `Current-Release-Notes.mdx`, matched against the branch's git diff. See Pathway E.
 
 ### 3. For each feature, find the best-matching KB article
 
@@ -107,15 +109,15 @@ https://www.domo.com/docs/s/article/<slug-or-id>
 
 The article's slug-or-id is the filename of the matched `s/article/*.mdx` without the `.mdx` extension. Examples: `Connect-AI-Tools-to-Domo-Using-MCP`, `000005172`, `Documents`.
 
-**URL format for Current Release Notes mode (internal):**
+**URL format for Current Release Notes mode — match the file's existing inline links:**
 
-Use root-relative paths only:
+Before adding any sentence, look at how the inline "Learn more about" sentences already in `Current-Release-Notes.mdx` are written, and match that convention exactly — never mix two conventions in one file. In practice the release notes have been authored with the **external absolute** form:
 
 ```
-/s/article/<slug-or-id>
+https://www.domo.com/docs/s/article/<slug-or-id>
 ```
 
-(This matches the existing internal-link convention in the repo per `CLAUDE.md`.)
+so use that when the existing inline links use it. Fall back to the root-relative internal form (`/s/article/<slug-or-id>`, the repo convention per `CLAUDE.md`) only when the file has no existing inline "Learn more about" links to match, or when they are already internal.
 
 **Header anchors for sub-features** — if the matched article is an umbrella article and the feature is documented as a sub-section within it, **append the section's Mintlify anchor** to the URL so the link jumps straight to that section. Anchors are the rendered section header converted to lowercase, with spaces and most punctuation replaced by hyphens, and inline `<Badge>` content (e.g. `Beta`) included as a trailing hyphenated word.
 
@@ -238,6 +240,45 @@ User pastes each updated link sentence into the corresponding feature section of
 6. After approval, use **Edit** to insert each sentence one feature at a time.
 7. If a section already has a weaker link sentence that's being replaced (not just supplemented), make that explicit in the preview and use **Edit**'s `old_string` → `new_string` to swap the sentence cleanly.
 
+---
+
+#### Pathway E — Branch-driven × Current Release Notes (no PMM source)
+
+**When**: The release branch already carries this release's KB work (new articles, new sections, or edits to existing articles) and you want `Current-Release-Notes.mdx` to link to it — **without a PMM source copy**. This is the common in-repo pass: the release notes and the KB articles live on the same branch, so the release notes' own sections are the feature list and the branch's git diff is the source of matches.
+
+This pathway replaces step 2's PMM extraction with two in-repo inputs.
+
+1. **Read** `s/article/Current-Release-Notes.mdx` — its `###`/`####` sections *are* the feature list.
+2. **Inventory the branch's KB content** — both added and modified articles, since a feature's docs often land as a new section in an existing article, not a new file:
+
+   ```bash
+   # Articles ADDED on this branch
+   git log main..HEAD --name-status --pretty=format: -- s/article/ | grep -E "^A" | sort -u
+   # Articles MODIFIED on this branch
+   git log main..HEAD --name-status --pretty=format: -- s/article/ | grep -E "^M" | sort -u
+   ```
+
+   For each touched article, get its `title:` and the headers it gained (for anchors and to confirm what the edit documents):
+
+   ```bash
+   grep -m1 "^title:" s/article/<file>.mdx
+   git diff main..HEAD -- s/article/<file>.mdx | grep -E "^\+#{2,4} "   # added sub-sections → anchors
+   ```
+
+   Watch for **renames** — an article that shows as both added and modified under an old name may have been renamed; confirm the final filename on disk (`ls s/article/ | grep -i <keyword>`) before linking, and use the current slug.
+3. **Map each branch article to its release-notes section** and classify the action:
+   - **Add** — the section has no link and a branch article documents it → append a link sentence.
+   - **Swap** — the section links to a generic/umbrella/legacy article and the branch added a specific one → replace the link with `Edit`'s `old_string`→`new_string`.
+   - **Anchor** — the section links to an umbrella article at its top and the branch added the sub-section → deep-link to the new sub-section anchor (step 4).
+   - **Supplement** — the section already has a link, and the branch added a distinct, relevant section elsewhere (e.g. a feature-docs section beside an existing migration link) → add a second link only when it points somewhere genuinely different.
+   - **Skip** a branch change that is only a cross-reference to another new article, or an edit to an article that maps to no release-notes section.
+4. Draft each link sentence (step 4), **matching the URL convention already used by the file's existing inline "Learn more about" sentences** (see step 4's Current Release Notes note).
+5. **Present the full change set as a preview** grouped by action (add / swap / anchor / supplement), each with the target section, the exact current text, and the exact new text. Wait for confirmation — offer the groups as an **AskUserQuestion multi-select** so the user can accept a subset.
+6. After approval, use **Edit** — **one edit per feature**, top to bottom. For swaps and anchors, match enough surrounding text to keep `old_string` unique (the same umbrella link often appears in several sections).
+7. List any release-notes section whose feature got no branch KB content as "no branch article this pass" — do not edit it, and do not reach outside the branch for a match (that's what net-new/update against the full KB are for).
+
+This pathway does not read or write a PMM `.txt`, so steps 6 and 8 are skipped (as with C/D) and the release notes file is the artifact.
+
 ### 6. Save the link sentences as a `.txt` artifact (pathways A & B only)
 
 In addition to displaying the list in chat, write the same content to a `.txt` file at the repo root so the user has a persistent, shareable artifact (handy when they come back later to paste the rest of the links, or when running an update pass against the previous output).
@@ -250,7 +291,7 @@ In addition to displaying the list in chat, write the same content to a `.txt` f
 4. **Update mode (pathway B)** — name the artifact with an `-update-<YYYYMMDD>.txt` suffix instead, so it doesn't overwrite the initial net-new artifact. Example: `may-2026-pmm-link-sentences-update-20260603.txt`. Include only the features whose links changed in this update pass.
 5. After writing, tell the user the artifact path in the final summary so they can find it.
 
-Skip this step entirely for pathways C and D — the Current Release Notes file *is* the artifact in those cases.
+Skip this step entirely for pathways C, D, and E — the Current Release Notes file *is* the artifact in those cases.
 
 ### 7. Final summary
 
@@ -258,6 +299,7 @@ After delivery, give the user a one-paragraph summary:
 
 - **Pathway A/C** — total features in source copy, count linked, count flagged for follow-up. For A, name the artifact path saved in step 6. For C, confirm the file was saved.
 - **Pathway B/D** — number of features re-checked, number updated, number unchanged, number still without a match. For B, name the artifact path saved in step 6. For D, confirm the file was saved.
+- **Pathway E** — number of branch articles inventoried, and a per-action count (added / swapped / anchored / supplemented), plus any release-notes sections left with no branch article this pass. Confirm the file was saved.
 
 ### 8. Clean up the PMM draft `.txt` (pathways A & B only)
 
@@ -268,7 +310,7 @@ After step 7, in PMM Article pathways (A or B) only:
 1. Ask the user for confirmation before deleting, naming the exact file. Use **AskUserQuestion** with a yes/no question — e.g. *"Delete `<source-copy.txt>` from the repo now that the link sentences are generated and saved to `<artifact.txt>`?"* Default the recommended option to "Yes, delete it." Mention the user can decline if they want to keep it for reference.
 2. On confirmation, use `Bash` to `rm <source-copy.txt>` (or `git rm` if it's already tracked). Note: deletion is destructive, so this confirmation step is non-negotiable.
 3. Do **not** delete the artifact `.txt` from step 6 — that's the user-facing output and should remain in the repo.
-4. Skip this step entirely for pathways C and D (Current Release Notes targets) — the source `.txt` may still be in active use for the PMM doc.
+4. Skip this step entirely for pathways C, D, and E (Current Release Notes targets) — pathway E has no source `.txt` at all, and for C/D the source `.txt` may still be in active use for the PMM doc.
 
 ## Important reminders
 
@@ -277,4 +319,5 @@ After step 7, in PMM Article pathways (A or B) only:
 - **Don't invent URLs.** If no matching KB article exists, say so — recommend the user check with the writer assigned to that feature.
 - **Slug or ID, never both.** Each article has exactly one canonical filename — use it as-is. No fabricated slugs.
 - **Update pathways replace, not duplicate.** When updating Current-Release-Notes.mdx, if a weaker link sentence already exists in the section, swap it cleanly with `Edit`'s old_string → new_string; don't append a second sentence.
-- **All in-repo edits get a preview-and-confirm step.** Direct edits to `Current-Release-Notes.mdx` always need user approval before saving — true in both pathway C and pathway D.
+- **All in-repo edits get a preview-and-confirm step.** Direct edits to `Current-Release-Notes.mdx` always need user approval before saving — true in pathways C, D, and E.
+- **Branch-driven (E) stays inside the branch.** Match only against articles the current branch added or modified (`git ... main..HEAD`); don't reach into the full KB for a match. A release-notes feature with no branch KB content this pass is reported, not linked to an unrelated existing article.

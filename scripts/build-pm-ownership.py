@@ -19,17 +19,71 @@ from pathlib import Path
 
 ROOT = Path(__file__).parent.parent
 
-# ── 1. Parse CSV ──────────────────────────────────────────────────────────────
-# Prefer the row with a PM when a feature appears more than once.
+# ── 1. Feature → PM roster ────────────────────────────────────────────────────
+# The squad CSV is the source of truth when it's present in the tree. It's pasted
+# in ad hoc (often untracked), so when it's absent we fall back to the Feature→PM
+# pairs recorded in the last-generated Article-PM-Ownership-Reference.mdx. That
+# keeps the "add new articles, assign PMs by pillar/group" path runnable with no
+# spreadsheet: nav-group → Feature comes from NAV_FEATURE below, Feature → PM from
+# whichever roster source is available. CSV wins when present.
+CSV_PATH = ROOT / 'Feature - Owning Squad, PM, Eng, UX.csv'
+REFERENCE_PATH = ROOT / 'Article-PM-Ownership-Reference.mdx'
+
 features = {}  # feature_name → {pm, squad_biz}
-with open(ROOT / 'Feature - Owning Squad, PM, Eng, UX.csv', newline='', encoding='utf-8') as f:
-    reader = csv.DictReader(f)
-    for row in reader:
-        feat = row['Feature'].strip()
-        pm = row['PM'].strip()
-        squad_biz = row['Squad Business Name'].strip()
-        if feat not in features or (pm and not features[feat]['pm']):
-            features[feat] = {'pm': pm, 'squad_biz': squad_biz}
+ROSTER_SOURCE = None
+
+def _row_cells(line):
+    """Split a padded MDX pipe-table row into cells, treating \\| as one unit."""
+    esc = line.replace('\\|', '\x01')
+    inner = esc.strip().lstrip('|').rstrip('|')
+    return [c.strip().replace('\x01', '|') for c in inner.split('|')]
+
+if CSV_PATH.exists():
+    ROSTER_SOURCE = 'CSV'
+    # Prefer the row with a PM when a feature appears more than once.
+    with open(CSV_PATH, newline='', encoding='utf-8') as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            feat = row['Feature'].strip()
+            pm = row['PM'].strip()
+            squad_biz = row['Squad Business Name'].strip()
+            if feat not in features or (pm and not features[feat]['pm']):
+                features[feat] = {'pm': pm, 'squad_biz': squad_biz}
+elif REFERENCE_PATH.exists():
+    ROSTER_SOURCE = 'reference'
+    # Recover Feature → PM from the existing reference table:
+    #   | Feature | Article Title | `Article File Name` | PM |
+    with open(REFERENCE_PATH, encoding='utf-8') as f:
+        for line in f:
+            if not line.startswith('| '):
+                continue
+            cells = _row_cells(line)
+            if len(cells) != 4:
+                continue
+            feat, _title, _file, pm = cells
+            if feat == 'Feature' or not feat or set(feat) <= {'-'}:
+                continue  # header or separator row
+            if pm and pm != '(no PM listed)' and feat not in features:
+                features[feat] = {'pm': pm, 'squad_biz': ''}
+else:
+    raise SystemExit(
+        "No roster source found: neither 'Feature - Owning Squad, PM, Eng, UX.csv' "
+        "nor 'Article-PM-Ownership-Reference.mdx' is present. Drop the squad CSV "
+        "into the repo root and re-run."
+    )
+
+# ── PM → GitHub login (for .github/CODEOWNERS) ────────────────────────────────
+# Add a PM here when their GitHub login is confirmed so their articles route.
+# PMs who own articles but are missing here are reported as uncovered on each run.
+PM_GITHUB_LOGIN = {
+    'Andrea Henderson': '@ahenderson-domo',
+    'Dan Brinton':      '@OriginalDanB',
+    'Jordan Jensen':    '@mnwhitepine',
+    'Ken Boyer':        '@bikene1',
+    'Mamta Bolaki':     '@mamtabolaki-gif',
+    'Phil Fuchs':       '@phil-fuchs-domo',
+    'Ryan Despain':     '@RyanDespain',
+}
 
 # ── 2. Build nav hierarchy: slug → [immediate_group, parent, grandparent, …, tab] ──
 article_nav = {}  # slug → list of ancestor group names (most specific first)
@@ -477,9 +531,12 @@ for fname in sorted(os.listdir(article_dir)):
 # ── 8. Print stats ─────────────────────────────────────────────────────────────
 from collections import Counter
 feat_count = Counter(r['feature'] for r in rows)
+print(f"Roster source: {ROSTER_SOURCE}"
+      + ("  (CSV absent — Feature→PM recovered from the existing reference)"
+         if ROSTER_SOURCE == 'reference' else ""))
 print(f"Total articles: {len(rows)}")
 print(f"Distinct features used: {len(feat_count)}")
-print(f"Features assigned that are NOT in CSV:")
+print(f"Features assigned that are NOT in the roster:")
 for feat, cnt in feat_count.most_common():
     if feat not in features:
         print(f"  {cnt:4d}  '{feat}'")
@@ -579,3 +636,77 @@ with open(out_path, 'w', encoding='utf-8') as f:
     f.write('\n'.join(lines))
 
 print(f"\nWrote {out_path} ({len(rows)} rows, columns padded)")
+
+# ── 11. Write .github/CODEOWNERS ──────────────────────────────────────────────
+# Regenerated on every run from the same Feature→PM assignment as the reference,
+# so the two files can't drift. PM → GitHub login comes from PM_GITHUB_LOGIN.
+# Only articles whose PM has a confirmed login are routed; PMs without a login,
+# and articles with no PM, are reported so the gaps stay visible.
+import textwrap
+
+codeowners_path = ROOT / '.github' / 'CODEOWNERS'
+
+by_pm = defaultdict(list)  # pm name → [row, ...]
+for r in rows:
+    by_pm[r['pm']].append(r)
+
+no_pm_count = len(by_pm.get('(no PM listed)', []))
+uncovered_pms = sorted(
+    pm for pm, prs in by_pm.items()
+    if pm != '(no PM listed)' and pm not in PM_GITHUB_LOGIN
+)
+
+name_w = max((len(n) for n in PM_GITHUB_LOGIN), default=0)
+co = [
+    "# CODEOWNERS — notification-only routing for KB article reviews.",
+    "#",
+    "# Generated by scripts/build-pm-ownership.py — do not edit by hand.",
+    "# Regenerated alongside Article-PM-Ownership-Reference.mdx on every run.",
+    "#",
+    "# When a PR touches a file listed here, GitHub automatically requests",
+    "# a review from the listed PM. Branch protection on main does NOT",
+    "# require code-owner approval — this is for visibility routing only.",
+    "#",
+    "# PM → GitHub login mapping (edit PM_GITHUB_LOGIN in the script to change):",
+]
+for name in sorted(PM_GITHUB_LOGIN):
+    co.append(f"#   {name:<{name_w}}  → {PM_GITHUB_LOGIN[name]}")
+co.append("#")
+if uncovered_pms:
+    co.append("# Skipped PMs (own articles but no GitHub login — add to PM_GITHUB_LOGIN):")
+    for wrapped in textwrap.wrap(', '.join(uncovered_pms), width=72):
+        co.append(f"#   {wrapped}")
+else:
+    co.append("# Skipped PMs (own articles but no GitHub login): none.")
+co.append("#")
+if no_pm_count:
+    co.append(f"# {no_pm_count} article(s) have no PM assigned and are omitted from routing.")
+    co.append("#")
+co.append("# To update: see .claude/skills/update-pm-ownership/SKILL.md § Update CODEOWNERS")
+
+routed = 0
+for name in sorted(PM_GITHUB_LOGIN):
+    prs = by_pm.get(name)
+    if not prs:
+        continue
+    login = PM_GITHUB_LOGIN[name]
+    prefix = f"# ── {name} ({login}) "
+    co.append("")
+    co.append(prefix + '─' * max(0, 79 - len(prefix)))
+    for r in sorted(prs, key=lambda r: (r['feature'].lower(), r['title'].lower())):
+        co.append(f"s/article/{r['filename']} {login}")
+        routed += 1
+
+co.append("")
+
+codeowners_path.parent.mkdir(exist_ok=True)
+with open(codeowners_path, 'w', encoding='utf-8') as f:
+    f.write('\n'.join(co))
+
+routed_pms = sum(1 for n in PM_GITHUB_LOGIN if by_pm.get(n))
+print(f"Wrote {codeowners_path} ({routed} articles routed to {routed_pms} PMs)")
+if uncovered_pms:
+    print("  Uncovered PMs (no login, not routed): "
+          + ", ".join(f"{pm} ({len(by_pm[pm])})" for pm in uncovered_pms))
+if no_pm_count:
+    print(f"  Articles with no PM (not routed): {no_pm_count}")

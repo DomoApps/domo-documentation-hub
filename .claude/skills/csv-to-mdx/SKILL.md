@@ -235,7 +235,7 @@ The converter emits image-based inline icons (`<img src="/images/kb/...">`). Bot
 Salesforce-era articles use a variety of legacy beta indicators. Convert any you find to the current convention defined in `Domo-KB-Style-Guide.mdx` › **Beta Features**:
 
 - [ ] `(Beta)` or `(BETA)` in a `title:` frontmatter value → remove the parenthetical and add `tag: "Beta"` to the frontmatter; insert the standard beta Note above the Intro
-- [ ] `(Beta)` or `(BETA)` appended to a heading → remove the parenthetical and append `<Badge className="text-primary bg-primary/10 font-bold">Beta</Badge>` to the heading
+- [ ] `(Beta)` or `(BETA)` appended to a heading → remove the parenthetical and append `<Badge>Beta</Badge>` to the heading
 - [ ] Ad-hoc beta notes (e.g., "This feature is in beta. Contact your account team…") → replace with the standard beta Note from the style guide
 - [ ] References to `betafeedback@domo.com` or `betadmin@domo.com` → replace with `beta.admin@domo.com` (the standard Note already contains the right address)
 - [ ] If multiple sections in one article are beta, keep only one standard Note in the article (under the first beta section) — do not repeat it under each

@@ -444,10 +444,16 @@ def _all_ledgers():
         return []
     out = []
     for p in sorted(STATE_DIR.glob("*.json")):
+        if p.name == SYNC_BASELINE_FILE.name:   # the sync sentinel is not a ledger
+            continue
         try:
-            out.append(json.loads(p.read_text(encoding="utf-8")))
+            data = json.loads(p.read_text(encoding="utf-8"))
         except (OSError, json.JSONDecodeError) as e:
             print(f"  WARNING: could not read {p.name}: {e}", file=sys.stderr)
+            continue
+        if "items" not in data:   # skip any non-ledger json that lands here
+            continue
+        out.append(data)
     return out
 
 

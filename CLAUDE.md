@@ -113,6 +113,7 @@ All scripts live in `scripts/`. They are optional dev-quality tools — non-tech
 | ------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
 | `pad_md_tables.py` | Pad all Markdown pipe-table columns in a file so pipes align. Run after editing any article that has Markdown tables: `python3 scripts/pad_md_tables.py s/article/Filename.mdx` |
 | `build-pm-ownership.py` | Regenerate `Article-PM-Ownership-Reference.mdx` from the squad CSV + `docs.json`. See the `update-pm-ownership` skill. |
+| `pm_review.py` | Engine for the `pm-review` skill (Phase 4.5). Subcommands: `items`/`resume` (per-PM worklist with stable IDs), `set-status`, `rollup` (→ `PM-REVIEW-ROLLUP.md`), `deferred-report` (→ `RESTRUCTURE-DEFERRED-ARTICLES.md`), `reconcile` (the 4.5→4.6 marker gate), `check-baseline`. Reuses `build-pm-review-briefs.py` so items never drift from the briefs. |
 | `docs_cli.py` | Export the full nav structure (all tabs/groups/pages) to CSV. `python3 scripts/docs_cli.py export` → `scripts/reports/doc_structure.csv`. Supports `--language` (en/jp/fr/de/es) and `--output`. |
 | `html_to_mdx.py` | Bulk Salesforce-to-MDX conversion pipeline (used with the `csv-to-mdx` skill). Reads an exported Salesforce CSV, converts HTML bodies to MDX, and writes files to `s/article/`. |
 | `html-to-mdx.mjs` | Node.js single-file HTML-to-MDX converter (used by the `migrate-html` skill for one-off article migrations via pandoc). |
@@ -163,3 +164,4 @@ This activates a `post-merge` hook that warns you when a `git pull` leaves track
 |mintlify-preview-workflow|Working on `.github/workflows/mint-preview.yml` — the Mintlify preview deployment GitHub Action|
 |openapi-sync-workflow|Working on the OpenAPI sync GitHub Action (`sync-api-docs.yml`) — YAML detection, sync scripts, or `docs.json` nav-generation integration|
 |connector-review|Manage the connector PR/Jira review lifecycle: run the dashboard, post follow-ups on stale tickets, merge approved PRs, post release-date comments, close Jira tickets, and handle publish/migration requests from Arun|
+|pm-review|KB-restructure Phase 4.5 interactive PM review: walk a PM through every change in their review brief (approve/deny/rewrite/reject/answer) with the exact diff, author or defer their gap-fill articles, and track dispositions via inline markers + a per-PM ledger. Runs per PM on a `restructure/pm/<slug>` branch; requires `main` merged into the restructure branch first. Driven by `scripts/pm_review.py`|

@@ -80,7 +80,7 @@ Next: advance to **Phase 4** (Consolidation & Retirement), or Phase 3c sync #2 w
 | **3b-Forum: Forum-Driven Article Updates (Critical+High, ~68)** | ✅ Complete (2026-08-20) | All 68 done: Critical 7 (committed), High 61 (10 parallel agents, 2 waves). 45 files, ~84 total `[pm-input]` across the phase. Ranks 42/93 re-routed to correct homes. |
 | **3c: Main Branch Content Sync** | 🔄 Sync #1 complete (2026-08-20); sync #2 pre-merge | Sync #1: 15 new + 68 edits + 12 portal + 72 images + 1 snippet from main; 5 conflicts resolved; 1 deletion mirrored; 1 case-rename; 14 new articles into nav (1 deprecated held). Sync #2 uses the numeric-ID parity system. |
 | **4: Consolidation, Retirement & Archive** | ✅ Executed (2026-08-28) | 14 exact-title duplicate connectors merged/deleted; `DataFusion-Migration-Guide.mdx` written; retirement batches classified + staged for 4.6; disposition vocab reconciled to five-state. **8 non-duplicate title-collisions deferred** to a connector-disambiguation task. |
-| **4.5: PM Review System** | 🔧 Built — run after Phase 4 | Script ready: `scripts/build-pm-review-briefs.py`; generates per-PM task checklists + meeting briefs |
+| **4.5: PM Review System** | 🔧 Built — run after Phase 4 | Briefs: `scripts/build-pm-review-briefs.py`. **Interactive review: `pm-review` skill + `scripts/pm_review.py`** (per-PM branch, hybrid marker+ledger state, resumable, gap-fill author/defer, `reconcile` gate). Requires `main` merged in first. |
 | **4.6: Lifecycle Status Application** | 🔲 Not started | Bulk-add `status: "active"` to all articles; apply PM-confirmed non-Active states; move Legacy/Sunset to Archive group; remove Retired from nav |
 | **5: Interlinking** | 🔲 Not started | Next Steps + Related Articles bulk pass — runs after PM sign-off |
 | **6: Slug Rename + Redirects + Localization** | 🔲 Not started | Enhanced: CSV map, localized file rename, docs.json redirects, internal link updates |
@@ -361,9 +361,66 @@ Step by step:
 3. **Collect** — PM returns answers (annotated docx, email, or meeting). Mark **Responses in**. Big/complex reviews (Tasleema = 1,077 articles) and all `[decision]`/lifecycle items are best done in a live meeting.
 4. **Apply** — hand the answers to Claude. Claude edits articles, fills/removes `[pm-input]` markers, applies corrections, records decisions, and reports what it changed.
 5. **Track** — mark **Fact-checks applied / `[pm-input]` cleared / Lifecycle signed off / Decisions resolved** in the ledger as each completes. Re-run the script to confirm the PM's open counts in `RESTRUCTURE-TASKS.md` are dropping.
-6. **Close** — when a PM's ledger row is all **done** (and their `RESTRUCTURE-TASKS.md` counts are 0), that PM is finished. **When every PM row is Done → Phase 4.5 is complete → proceed to Phase 4.6** (apply confirmed lifecycle states).
+6. **Close** — when a PM's ledger row is all **done** (and their `RESTRUCTURE-TASKS.md` counts are 0), that PM is finished. **When every PM row is Done → run the marker-reconciliation sweep (`python3 scripts/pm_review.py reconcile --strict`) on the integration branch; when it reports `gate_clear: true`, Phase 4.5 is complete → proceed to Phase 4.6** (apply confirmed lifecycle states). The sweep is the machine check behind this gate — see "Interactive PM review" below.
 
 **Progress check any time:** ask Claude "where are we?" — it re-runs the script and reads the ledger to report per-PM counts and workflow state. The `[pm-input]` markers embedded in the articles are the authoritative open-item source; they can never drift from the files.
+
+### Interactive PM review — the `pm-review` skill (2026-09-30)
+
+The manual steps 3–5 above now have an interactive front end: the user-invocable **`pm-review`**
+skill (`.claude/skills/pm-review/SKILL.md`), driven by the engine **`scripts/pm_review.py`**. It
+walks a PM through every item in their brief like a resumable checklist — showing the exact diff,
+taking an approve / deny / rewrite / reject / answer decision, authoring or deferring their
+gap-fill articles, and recording each disposition. This supplements (does not replace) the
+original flow: **Claude still makes every MDX edit** — PMs direct, they don't hand-edit — but each
+PM now works on their own branch so parallel reviews don't contend.
+
+**Prerequisite (skill-enforced): `main` must be merged into `update/fullRestructure` first.**
+Diffs are shown against a pinned `baseline_sha` (the merged-in `main` commit). The skill refuses
+to run (`pm_review.py check-baseline` → `ready: false`) until that merge — which also brings in
+the localization system and must carry the Phase 3c sync-#2 numeric-ID parity — is done.
+
+**Branch & conflict model:**
+- Each PM reviews on `restructure/pm/<slug>` cut from `update/fullRestructure`; merged back when
+  their row is Done.
+- **Per-PM state is merge-safe** because one PM = one branch = one ledger file:
+  `pm-review-state/<slug>.json` (tracked; the durable superset of truth).
+- **PM branches never touch the shared/derived files** — `RESTRUCTURE-TASKS.md`,
+  `PM-REVIEW-ROLLUP.md`, `RESTRUCTURE-DEFERRED-ARTICLES.md`, and `docs.json` nav are regenerated on
+  the integration branch after merge-backs. `add-to-nav` for new gap-fill articles is **deferred
+  to the integration branch** (Phase 7 owns the nav rebuild).
+
+**Hybrid state — two records per disposition (the ordering invariant matters):**
+1. Write the ledger entry FIRST (`pm_review.py set-status …`), THEN edit/burn the marker, THEN
+   commit. A marker burned before the ledger records its ask can never be re-derived.
+2. Inline marker grammar in articles:
+   - open question: `{/* [pm-input] <PM Name> — <ask> */}` (existing; burned when answered)
+   - article sign-off: `{/* [reviewed] pm=<slug> status=<status> date=YYYY-MM-DD */}` (new;
+     multiple PMs may stamp a shared multi-owner overview — reconciliation then requires all
+     expected PMs).
+
+**Engine subcommands** (`scripts/pm_review.py`): `items --pm` / `resume --pm` (reconciled
+worklist + resume point, with stable item IDs that survive re-runs and sibling-marker burns),
+`set-status` (record a disposition), `rollup` (→ `PM-REVIEW-ROLLUP.md`), `deferred-report`
+(→ `RESTRUCTURE-DEFERRED-ARTICLES.md`, the project-end out-of-scope seed list), `reconcile` (the
+sweep), `check-baseline` (the guard). It imports `build-pm-review-briefs.py` and derives items
+from the SAME source as the briefs/tasks, so the skill and the briefs can never drift.
+
+**Marker-reconciliation sweep (the Phase 4.5 → 4.6 gate).** Run `reconcile --strict` on the
+integration branch AFTER all PM branches merge back (a per-branch run sees a partial tree and
+would pass falsely). It cross-references every inline marker against the ledgers and reports
+`stragglers` (open markers with no terminal coverage), `malformed_markers` (unparseable markers),
+`inconsistencies` (answered-but-not-burned, or a `[reviewed]` stamp with no backing),
+`anchorless_open_items` (open decision/lifecycle items — no file anchor), and
+`orphan_marker_pm_names` (marker PM names matching no roster PM). All must reach zero
+(`gate_clear: true`) before advancing. This is the step that guarantees no inline marker is left
+unaddressed — it is the payoff of the hybrid marker + ledger approach.
+
+**Instructions to future Claude:** when the user invokes `/pm-review` (or asks to review a PM's
+restructure changes), run the skill, not an ad-hoc pass. On any restructure session, this skill +
+`pm_review.py` are the authoritative Phase 4.5 mechanism; `PM-REVIEW-STATUS.md` stays
+hand-maintained (workflow milestones only), and `PM-REVIEW-ROLLUP.md` / `RESTRUCTURE-DEFERRED-ARTICLES.md`
+are derived — never hand-edit them.
 
 ### What the system generates
 

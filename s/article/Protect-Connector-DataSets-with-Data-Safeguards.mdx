@@ -17,13 +17,11 @@ To configure data safeguards, the following grant must be enabled for your role:
 
 Learn more about [grants](/s/article/360043438973).
 
-{/* CONFIRM WITH PM (Tasleema Lallmamode): the transcript did not name a grant. "Edit DataSet" is the canonical grant that gates creating and editing connector DataSets, so it is used here. Confirm no separate grant gates data safeguards specifically. */}
-
 ## How Data Safeguards Protect Your Data
 
 When you create a DataSet, it has a specific schema—a set of columns with specific names and specific data types. The cards, DataFlows, and other content you build on that DataSet assume those columns exist and keep their names and types. For example, a card that calculates net profit expects a column for revenue and a column for costs so it can calculate the difference.
 
-Data providers change their schemas often. A provider might stop supplying a column, start supplying an additional column, or change a column's data type—for example, IDs that used to arrive as numbers now arrive as strings. Any of these changes can create a mismatch that breaks the content built on the DataSet. This happens frequently with file-based connectors and with providers that revise the measures they offer.
+Data providers can change the schema of their data at any time. A provider might stop supplying a column, start supplying an additional column, or change a column's data type—for example, IDs that used to arrive as numbers now arrive as strings. Any of these changes can create a mismatch that breaks the content built on the DataSet. This happens frequently with file-based connectors and with providers that revise the measures they offer.
 
 Data safeguards let you decide what Domo does when a connector DataSet's schema changes. For each type of change, you can let the update through silently, record a warning, or stop the run entirely.
 
@@ -41,7 +39,7 @@ For each type of schema change, choose one of the following options:
 
 | Option                 | What happens                                                                           |
 | ---------------------- | -------------------------------------------------------------------------------------- |
-| Accept all updates     | Domo applies the schema change silently and the DataSet updates the way it does today. |
+| Accept all updates     | Domo applies the schema change silently. |
 | Warn on schema update  | Domo lets the data flow through but records a warning in the DataSet's history.        |
 | Abort on schema update | Domo stops the execution and brings in no data.                                        |
 
@@ -56,21 +54,19 @@ Configure data safeguards while you create a new connector DataSet or edit an ex
    For details on creating a connector DataSet, see [Adding a DataSet Using a Connector](/s/article/360042926274).
 
 2. Locate the data safeguards settings for the DataSet.
-
-   {/* SCREENSHOT: the data safeguards settings, showing the three schema-change conditions (column deletion, column addition, column type modification) each with an option selector. */}
-   {/* CONFIRM WITH PM: exact location/label of the data safeguards settings on the DataSet configuration screen. */}
+   If you are creating a new DataSet, you are taken to the data safeguard settings as part of the powerup process.
+   If you are editing an existing DataSet, select the **Data Safeguards** section.
 
 3. For each type of schema change—column deletion, column addition, and column type modification—select the option you want: **Accept all updates**, **Warn on schema update**, or **Abort on schema update**.
 
    You can set a different option for each type of change. For example, you might warn on a column deletion, abort on a column addition, and accept all updates for a column type modification.
 
-4. Finish configuring the DataSet, including the destination where you save it.
+4. Finish configuring the DataSet.
+   If you're configuring a new DataSet, complete the powerup process, including the destination where you save it.
 
    <Note>**Note:** Data safeguards are independent of any safeguards enforced by the destination you save the DataSet to. Saving the DataSet to a cloud data warehouse or another work cloud works exactly as it did before, and those destinations apply their own safeguards separately.</Note>
 
-5. Select **Save and Run**.
-
-   {/* CONFIRM WITH PM: "Save and Run" is the button named in the transcript; confirm it matches the DataSet configuration screen. */}
+5. Select **Save**.
 
 ## FAQ
 
@@ -81,7 +77,7 @@ Configure data safeguards while you create a new connector DataSet or edit an ex
 </Accordion>
 
 <Accordion title="What happens if I choose Accept all updates?">
-  Domo applies the schema change silently and the DataSet updates the way it does today. Because the change is applied without a warning or a stop, downstream content can still break if it depends on a column that was removed or that changed type.
+  Domo applies the schema change silently and does not send any notification of possible updates. Because the change is applied without a warning or a stop, downstream content can still break if it depends on a column that was removed or that changed type.
 </Accordion>
 
 <Accordion title="Do data safeguards change where my DataSet is stored?">
@@ -93,4 +89,3 @@ Configure data safeguards while you create a new connector DataSet or edit an ex
 ## Related Articles
 
 - [Adding a DataSet Using a Connector](/s/article/360042926274)
-- [Workbench 5.1](/s/article/360056669354#schema-protections-for-your-job): the equivalent schema protections for Workbench jobs.

@@ -316,14 +316,35 @@ def resolve_pm(name: str):
 
 # ── baseline guard ────────────────────────────────────────────────────────────
 
+SYNC_BASELINE_FILE = STATE_DIR / "sync-baseline.json"
+
+
+def load_sync_baseline() -> dict:
+    if SYNC_BASELINE_FILE.exists():
+        try:
+            return json.loads(SYNC_BASELINE_FILE.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            pass
+    return {}
+
+
 def resolve_baseline(explicit=None):
     if explicit:
         return explicit
+    sb = load_sync_baseline().get("baseline_sha")
+    if sb:
+        return sb
     for ref in ("origin/main", "main"):
         r = git("rev-parse", "--verify", "--quiet", ref, check=False)
         if r.returncode == 0:
             return r.stdout.strip()
     return None
+
+
+def is_commit(sha_ref: str) -> bool:
+    if not sha_ref:
+        return False
+    return git("cat-file", "-e", f"{sha_ref}^{{commit}}", check=False).returncode == 0
 
 
 def is_ancestor(sha_ref: str) -> bool:
@@ -601,19 +622,32 @@ def cmd_reconcile(args):
 
 
 def cmd_check_baseline(args):
+    # Phase 3c sync is a CONTENT sync, not a git merge, so origin/main is NOT an
+    # ancestor of HEAD. Readiness therefore means: a sync baseline has been RECORDED
+    # (pm-review-state/sync-baseline.json) and points at a real commit. Per-file review
+    # diffs (`git diff <baseline> HEAD -- <file>`) are valid against that SHA regardless
+    # of ancestry, because the sync incorporated main's content for the reviewed files.
+    sb = load_sync_baseline()
     baseline = resolve_baseline(args.baseline)
-    ok = is_ancestor(baseline)
+    recorded = bool(sb.get("baseline_sha"))
+    valid = is_commit(baseline)
+    ready = recorded and valid
     head = git("rev-parse", "HEAD").stdout.strip()
+    main_tip = git("rev-parse", "--verify", "--quiet", "origin/main", check=False).stdout.strip() or None
     print(json.dumps({
         "baseline_sha": baseline,
+        "recorded_sync": sb or None,
         "head": head,
-        "is_ancestor": ok,
-        "ready": ok,
-        "message": ("baseline is an ancestor of HEAD — diffs are valid" if ok else
-                    "baseline is NOT an ancestor of HEAD — merge main into the branch first; "
-                    "the pm-review skill must refuse to run until this is true"),
+        "is_commit": valid,
+        "is_ancestor": is_ancestor(baseline),
+        "main_tip": main_tip,
+        "main_advanced_since_sync": bool(main_tip and baseline and main_tip != baseline),
+        "ready": ready,
+        "message": ("baseline recorded + valid — per-file review diffs are valid" if ready else
+                    "no recorded sync baseline — run the Phase 3c content sync and record "
+                    "pm-review-state/sync-baseline.json before the pm-review skill will run"),
     }, indent=2, ensure_ascii=False))
-    if args.strict and not ok:
+    if args.strict and not ready:
         sys.exit(2)
 
 

@@ -78,7 +78,7 @@ Next: advance to **Phase 4** (Consolidation & Retirement), or Phase 3c sync #2 w
 | **3a-Forum: Forum-Driven New Articles (~57)** | ✅ Writing pass complete (2026-08-04) | All 57 triaged: 14 written, 43 deferred to PM briefs (undocumented mechanics). See Forum Gap Analysis section + `RESTRUCTURE-MANIFEST.md` |
 | **3b: Article Upgrades (~200)** | ✅ COMPLETE (2026-08-26) | Forum-gap pass (~134 articles) + 15 Medium net-new (4 written/5 defer/2 dropped) + structural intro sweep (133 normalized, 9 grant-gap `[pm-input]`). All sub-items done. |
 | **3b-Forum: Forum-Driven Article Updates (Critical+High, ~68)** | ✅ Complete (2026-08-20) | All 68 done: Critical 7 (committed), High 61 (10 parallel agents, 2 waves). 45 files, ~84 total `[pm-input]` across the phase. Ranks 42/93 re-routed to correct homes. |
-| **3c: Main Branch Content Sync** | 🔄 Sync #1 complete (2026-08-20); sync #2 pre-merge | Sync #1: 15 new + 68 edits + 12 portal + 72 images + 1 snippet from main; 5 conflicts resolved; 1 deletion mirrored; 1 case-rename; 14 new articles into nav (1 deprecated held). Sync #2 uses the numeric-ID parity system. |
+| **3c: Main Branch Content Sync** | 🔄 Sync #1 (2026-08-20) + Sync #2 (2026-09-30) complete | Sync #1: 15 new + 68 edits + images from main; 5 conflicts; 1 delete; 1 case-rename. Sync #2 (pulled early for PM review): 275-commit delta, 89 clean + 23 new + 19/21 conflicts resolved + images/skills/localized/release-notes; 2 add/add held; 23 new need Phase-7 nav. Baseline `ad4cee86`. Still pre-Phase-6 so filename-based. A final sync #3 may run pre-merge if main moves materially. |
 | **4: Consolidation, Retirement & Archive** | ✅ Executed (2026-08-28) | 14 exact-title duplicate connectors merged/deleted; `DataFusion-Migration-Guide.mdx` written; retirement batches classified + staged for 4.6; disposition vocab reconciled to five-state. **8 non-duplicate title-collisions deferred** to a connector-disambiguation task. |
 | **4.5: PM Review System** | 🔧 Built — run after Phase 4 | Briefs: `scripts/build-pm-review-briefs.py`. **Interactive review: `pm-review` skill + `scripts/pm_review.py`** (per-PM branch, hybrid marker+ledger state, resumable, gap-fill author/defer, `reconcile` gate). Requires `main` merged in first. |
 | **4.6: Lifecycle Status Application** | 🔲 Not started | Bulk-add `status: "active"` to all articles; apply PM-confirmed non-Active states; move Legacy/Sunset to Archive group; remove Retired from nav |
@@ -801,6 +801,42 @@ Divergence base: `a4dd80c2` (2026-07-14). Main delta since: 432 commits; **87 `s
 - **2 true conflicts** (main + restructure both changed): `000005179.mdx` (Manage Workflows — edited in High batch), `360043437093.mdx` → 3-way merge.
 - **1 delete** `000005946.mdx`; **1 case-rename** `Microsoft-Sharepoint-Connector` → `Microsoft-SharePoint-Connector` (macOS case-collision hazard — handle with `git mv`/explicit checkout).
 - 15 new articles need import + nav placement in the 11-pillar IA.
+
+### Sync #2 execution log (2026-09-30) — pulled early for PM review (Phase 4.5)
+
+Pulled ahead of the originally-planned "immediately before final merge" timing so PMs review
+against current main content. **Pre-Phase-6, so still filename-based** (numeric IDs match main —
+the post-rename parity system was NOT needed). **Baseline pinned:** `ad4cee86` (recorded in
+`pm-review-state/sync-baseline.json`); sync point from sync #1 = `f192eca7`. Full content sync,
+**not a git merge** — `docs.json` and all restructure structure untouched.
+
+Delta since sync #1: 275 main commits. Applied in 3 commits on `update/fullRestructure`:
+- **Pass 1 (`0286c7c2`)** — 89 clean `s/article` content updates + 23 new articles imported +
+  126 images + main's `kb-release-notes*` archives + 15 skills (10 updated, 5 new) + localized
+  ja/fr/es/de + openapi/portal + misc tooling; `favicon.png`→`favicon.ico`; imported
+  `localization/Localization-Style-Guide.mdx`.
+- **Pass 2 (`4525e731`)** — 19/21 conflicts resolved (11 auto 3-way + 6 policy + CLAUDE.md +
+  .gitignore). `Domo-KB-Style-Guide.mdx`: kept BOTH the restructure Lifecycle section and main's
+  new Feature-Gated/Badge section. CLAUDE.md: kept pm-review rows + main's expansion.
+- **Pass 3** — pinned baseline sentinel + `pm_review.py check-baseline` switched from ancestry to
+  recorded-sync semantics (a content sync is not an ancestor).
+
+**HELD for human decision — 2 add/add articles** (both branches created them independently; left
+at the restructure version): `s/article/AI-Chat-v2.mdx`, `s/article/Apollo.io-Connector.mdx`
+(restructure's Apollo is *longer* than main's — taking main would drop ~20 lines).
+
+**23 new articles imported — need IA/nav placement in Phase 7** (not hand-placed now to avoid
+churn before the nav rebuild): the 10 `MCP-Toolkits-*` + `Domo-MCP` (→ Develop & Integrate / AI),
+App Components/App Studio set (`Create-a-KPI-Component`, `Group-and-Aggregate-Data-in-App-Components`,
+`Apply-Conditional-Formatting-...`, `Create-and-Share-Workspaces` → Build Apps & Automate),
+connectors (`AWS-Focus-Cost-And-Usage`, `About-Snowflake-Semantic-Views`,
+`Fiscal-and-Standard-Calendar-Configuration-...` → Connect & Integrate Data),
+`Magic-ETL-Tiles-Documents` (→ Prepare & Transform), `Migrate-Embedded-Cards-to-the-New-URL`,
+`May-2026-Release` (→ Release Notes archive), `1500011337961`, `360043431173`.
+
+**PM-branch propagation:** all 12 `restructure/pm/<slug>` branches had zero own commits, so they
+were fast-forwarded to the post-sync integration tip and force-pushed. Going forward, re-sync a PM
+branch by merging `update/fullRestructure` into it.
 
 ---
 

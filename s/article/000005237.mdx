@@ -29,23 +29,54 @@ For more information, see [Managing User Roles and Grants](/s/article/3600434389
 
 ### Set Up Workload Identity Federation
 
-Domo owns one side of this trust relationship, so the provider type and the values that identify Domo are supplied by Domo Support: an Account ID for AWS, or an Issuer URL and audience for OIDC. You do not choose them.
+Domo owns one side of this trust relationship, so the provider type and the values that identify Domo are supplied by Domo Support: a role ARN for AWS, or an Issuer URL and audience for OIDC. You do not choose them.
 
 1. Open a Domo support ticket requesting BigQuery integration using WIF.
-Domo Support confirms which provider type applies to your instance and returns the values you need: an Account ID for AWS, or an Issuer URL and Allowed Audiences for OIDC. Which type applies depends on how your Domo instance is hosted, so request it rather than selecting one.
+Domo Support confirms which provider type applies to your instance and returns the values you need: a role ARN for AWS, or an Issuer URL and Allowed Audiences for OIDC. Which type applies depends on how your Domo instance is hosted, so request it rather than selecting one.
 
 2. Create a Workload Identity Pool in Google Cloud IAM, and add a provider using the details from Domo Support.
-Set the attribute mapping for `google.subject` to match the provider type:
-   - **AWS:** map `assertion.arn` to `google.subject`. This is the default Google Cloud proposes for an AWS provider.
+Set the attribute mapping to match the provider type:
+   - **AWS:** map `assertion.arn` to `google.subject`, and add `attribute.aws_role` mapped to `assertion.arn.extract('assumed-role/{role_name}/')`. This is the mapping Google recommends for an AWS workload that runs with a role, and the `aws_role` attribute lets you limit access to Domo's role in the next step. For the AWS account ID on the provider, use the 12-digit number in the role ARN.
    - **OIDC:** map `assertion.sub` to `google.subject`.
 
 3. Create a BigQuery service account and grant the required roles and permissions, including Workload Identity User.
-See [Roles and Permissions](#roles-and-permissions). Grant Workload Identity User **on the service account itself**, with the workload identity pool principal as the member—not at the project level.
+See [Roles and Permissions](#roles-and-permissions). Grant Workload Identity User **on the service account itself**, not at the project level, with this member:
+   - **AWS:** `principalSet://iam.googleapis.com/projects/PROJECT_NUMBER/locations/global/workloadIdentityPools/POOL_ID/attribute.aws_role/ROLE_NAME`, where `ROLE_NAME` is the part of the role ARN after `role/`.
+   - **OIDC:** the workload identity pool principal.
 
 4. Download the JSON configuration file from the **Connected Service Accounts** panel.
 For an OIDC provider, use the audience Domo Support provided. For an AWS provider, Domo does not supply an audience—export the configuration as Google Cloud generates it.
 
 <Warning>**Important:** If you use an OIDC provider, use the audience from Domo Support exactly as given. Domo can only request tokens for an audience it owns, so a configuration exported with a different audience fails when Domo tries to authenticate, and the resulting error does not name the audience as the cause. If you no longer have the value, ask Domo Support for it rather than substituting your own.</Warning>
+
+#### Example: Set Up an AWS Provider From a Role ARN
+
+Suppose Domo Support sends you this role ARN:
+
+```text
+arn:aws:iam::123456789012:role/example-ice
+```
+
+Read two values from it: the AWS account ID is `123456789012`, and the role name is `example-ice`. Then:
+
+1. When you add the AWS provider to your Workload Identity Pool, enter `123456789012` as the AWS account ID.
+
+2. Set the attribute mapping:
+
+   ```text
+   google.subject=assertion.arn
+   attribute.aws_role=assertion.arn.extract('assumed-role/{role_name}/')
+   ```
+
+3. On your BigQuery service account, grant Workload Identity User to this member, replacing `PROJECT_NUMBER` with the numeric project number of the project that holds the pool, and `POOL_ID` with the pool's ID:
+
+   ```text
+   principalSet://iam.googleapis.com/projects/PROJECT_NUMBER/locations/global/workloadIdentityPools/POOL_ID/attribute.aws_role/example-ice
+   ```
+
+4. Download the JSON configuration file for the provider as Google Cloud generates it, and upload it in Domo as described in [Option 2: Use Workload Identity Federation (WIF)](#option-2-use-workload-identity-federation-wif).
+
+<Note>**Note:** Do not use the role ARN itself as the member or in an attribute condition. Google sees Domo as a temporary session of the role, such as `arn:aws:sts::123456789012:assumed-role/example-ice/SESSION_ID`, not as the `arn:aws:iam::` form, so a comparison with the role ARN never matches. Matching on the role name, as in step 3, also keeps working when the session changes. For details, see Google's guide, [Configure Workload Identity Federation with AWS or Azure](https://docs.cloud.google.com/iam/docs/workload-identity-federation-with-other-clouds), and select the **AWS** tab.</Note>
 
 ### Roles and Permissions
 
@@ -357,6 +388,6 @@ Error requesting access token
 
 Check these in order:
 
-- **The provider matches the values Domo Support provided.** With an OIDC provider, the first two errors above usually mean the JSON configuration was exported with a different audience—Domo can only request tokens for an audience it owns. With an AWS provider, confirm the provider trusts the Account ID Domo Support provided. See [Set Up Workload Identity Federation](#set-up-workload-identity-federation).
+- **The provider matches the values Domo Support provided.** With an OIDC provider, the first two errors above usually mean the JSON configuration was exported with a different audience—Domo can only request tokens for an audience it owns. With an AWS provider, confirm the provider uses the account ID from the role ARN Domo Support provided, and that the member uses the role name from that ARN. See [Set Up Workload Identity Federation](#set-up-workload-identity-federation).
 - **Workload Identity User is granted on the service account.** `Error requesting access token`, reported by Google as `iam.serviceAccounts.getAccessToken` denied, means the workload identity pool principal cannot impersonate the service account. Grant Workload Identity User or Service Account Token Creator on the service account, with the pool principal as the member.
 - **Use the Google Cloud troubleshooter.** Google includes an IAM Policy Troubleshooter link in the denial, which shows which principal was denied and which binding is missing. Ask Domo Support for the link from your failed attempt if you cannot find it in your own audit logs.

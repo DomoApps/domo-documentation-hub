@@ -35,7 +35,9 @@ Domo owns one side of this trust relationship, so the provider type and the audi
 Domo Support confirms which provider type applies to your instance and returns the values you need: an Account ID for AWS, or an Issuer URL and Allowed Audiences for OIDC. Which type applies depends on how your Domo instance is hosted, so request it rather than selecting one.
 
 2. Create a Workload Identity Pool in Google Cloud IAM, and add a provider using the details from Domo Support.
-Update the attribute mapping to point `assertion.sub` to `google.subject`.
+Set the attribute mapping for `google.subject` to match the provider type:
+   - **AWS:** map `assertion.arn` to `google.subject`. This is the default Google Cloud proposes for an AWS provider.
+   - **OIDC:** map `assertion.sub` to `google.subject`.
 
 3. Create a BigQuery service account and grant the required roles and permissions, including Workload Identity User.
 See [Roles and Permissions](#roles-and-permissions). Grant Workload Identity User **on the service account itself**, with the workload identity pool principal as the member—not at the project level.

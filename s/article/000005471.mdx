@@ -1,17 +1,31 @@
 ---
 title: "Domo on Azure SQL"
-excerpt: "Connect Domo Cloud Integrations to Azure SQL to query and visualize data directly without moving or duplicating it."
+excerpt: "Connect Domo Cloud Integrations to Azure SQL with username and password or a Microsoft Entra ID service principal, and query and visualize data directly without moving or duplicating it."
 ---
 
 ## Intro
 
 This article explains how to connect Domo's Cloud Integrations to Azure SQL, allowing you to query and visualize Azure SQL data directly in Domo without moving or duplicating data.
 
+You can authenticate with a SQL username and password, or with a Microsoft Entra ID (formerly Azure Active Directory) service principal. See [Create an Azure SQL Service Account in Domo](#create-an-azure-sql-service-account-in-domo).
+
 ---
 
 ## Prerequisites
 
-You must have an account with access to Azure SQL to move forward.
+Before you begin, make sure you have one of the following, depending on how you want to authenticate:
+
+- **Username & Password —** A SQL login with read access to your Azure SQL database.
+- **Azure Active Directory —** A Microsoft Entra ID service principal with read access to your Azure SQL database. See [Set Up a Service Principal in Azure](#set-up-a-service-principal-in-azure).
+
+### Set Up a Service Principal in Azure
+
+To authenticate with a service principal, complete the following in Azure:
+
+1. Register an application in Microsoft Entra ID and create a client secret. Note the tenant ID, client ID, and secret value.\
+   For instructions, see [Register an application in Microsoft Entra ID](https://learn.microsoft.com/en-us/entra/identity-platform/quickstart-register-app) in the Microsoft documentation.
+2. In your Azure SQL database, create a database user for the service principal and give it read access to the tables you want to use in Domo.\
+   For instructions, see [Configure and manage Microsoft Entra authentication with Azure SQL](https://learn.microsoft.com/en-us/azure/azure-sql/database/authentication-aad-configure) in the Microsoft documentation.
 
 ## Create or Manage Your Azure SQL Integrations
 
@@ -20,29 +34,34 @@ To access the integration management interface, follow these steps:
 1. Navigate to **Data Warehouse**.
 2. Select **Connect Data**.
 3. From the list of Cloud Integrations, choose **Azure SQL**.  
-   The **Domo on Azure SQL** page appears.
-4. Select **Connect Azure SQL** to start creating a new integration (see the [integration setup instructions](#create-an-azure-sql-integration-in-domo)).
+   The **Domo on Azure SQL Database** page appears.
+4. Select **Connect Azure** to start creating a new integration (see the [integration setup instructions](#create-an-azure-sql-integration-in-domo)).
 5. Select **Manage Integrations** to modify existing integrations.  
    A list of available integrations displays.
 6. Select the wrench icon next to an integration to view available options.  
    The options shown depend on your access level.
 
-<Frame>![Screenshot](/images/kb/0EMVu00000TFVij.jpg)</Frame>
+<Frame>![The Domo on Azure SQL Database page with the Connect Azure, Manage Integrations, and Documentation buttons.](/images/kb/domo-on-azure-sql-01.png)</Frame>
 
 ## Create an Azure SQL Integration in Domo
 
-Every Azure SQL integration in Domo requires an authenticated service account. Once created, a single service account can be reused across multiple integrations.
+Every Azure SQL integration in Domo requires an authenticated service account. After you create a service account, you can reuse it across multiple integrations.
 
 Follow these steps to create your Azure SQL integration in Domo:
 
-1. Provide a name for the integration. This is simply a label to help you identify the integration within Domo. It does not need to match any names in Azure SQL and can be changed later if needed.   
+1. In **Name**, enter a name for the integration. This is a label to help you identify the integration within Domo. It does not need to match any names in Azure SQL and can be changed later if needed.
 
-   
-<Tip>**Tip:** Multiple Azure SQL integrations can exist in the same Domo instance, created by you or your colleagues. Clear naming helps users select the correct integration later. For example, separate integrations might be created to connect different tables or manage access levels.
-2. (Optional) Add a description to explain the purpose of this integration and who created it. Most users will only see the integration name in menus and lists. The description is visible only when viewing integration details.
-3. Select an existing Azure SQL service account from the drop-down menu or select **Add account** to create a new one.  
+   <Tip>**Tip:** Multiple Azure SQL integrations can exist in the same Domo instance, created by you or your colleagues. Clear naming helps users select the correct integration later. For example, separate integrations might be created to connect different tables or manage access levels.</Tip>
+
+2. (Optional) In **Description**, add a description to explain the purpose of this integration and who created it. Most users see only the integration name in menus and lists. The description is visible only when viewing integration details.
+3. From **Azure SQL Database service account**, select an existing service account, or select **Add account...** to create a new one. See [Create an Azure SQL Service Account in Domo](#create-an-azure-sql-service-account-in-domo).  
    You can change the service account later, but switching accounts may require remapping DataSets and ETLs if the new account lacks access to previously used tables. User access may also be affected unless privileges are identical.
-4. Enter the name of the Database that contains your Azure SQL tables.</Tip>
+4. In **Azure SQL Database account database**, enter the name of the database that contains your Azure SQL tables.
+
+   <Frame>![The Azure SQL Database integration form with a name, a service account, and a database entered.](/images/kb/domo-on-azure-sql-02.png)</Frame>
+
+5. Select **Create Integration**.
+6. On the **Success!** page, select **Proceed to Integration Overview**.
 
 **Understanding the Architecture**
 
@@ -61,29 +80,54 @@ There are three levels in this setup:
 - If multiple integrations use the same service account, they inherit the same user privileges.
 - Changes to privileges affect all integrations tied to that account.
 
-To review access settings, go to the Accounts Page and select Account sharing next to the relevant Azure SQL service account.
+To review access settings, go to the **Accounts** page and select **Account sharing** next to the Azure SQL service account. To share an integration, open it and select **Share integration**.
 
 <Tip>**Tip:** You can create multiple service accounts for the same Azure SQL instance, for example, to manage user access separately for different integrations.</Tip>
 
-<Frame>![Screenshot](/images/kb/0EMVu00000TF8MO.jpg)</Frame>
-
 ## Create an Azure SQL Service Account in Domo
 
-Every Azure SQL integration in Domo relies on an authenticated Azure SQL service account. Once created, this account can be reused across multiple Azure SQL integrations.
+Every Azure SQL integration in Domo relies on an authenticated Azure SQL service account. After you create this account, you can reuse it across multiple Azure SQL integrations.
 
-Domo provides a dedicated Accounts Page where you can create and manage service accounts for various external services, including Azure SQL. After creation, your Azure SQL service account will appear on this page.
+Domo provides a dedicated **Accounts** page where you can create and manage service accounts for various external services, including Azure SQL. After you create your Azure SQL service account, it appears on this page.
 
-<Warning>**Important:** Creating a PostgreSQL service account in Domo allows you, other account owners, Domo admins, and anyone with whom the account is shared, to use its credentials to access PostgreSQL and create connected DataSets in Domo. Users will not have access to sensitive values such as passwords, tokens, or keys used by the service account to connect to PostgreSQL.</Warning>
+<Warning>**Important:** Creating an Azure SQL service account in Domo allows you, other account owners, Domo admins, and anyone with whom the account is shared, to use its credentials to access Azure SQL and create connected DataSets in Domo. Users don't have access to the passwords, client secrets, tokens, or other sensitive values used by the service account to connect to Azure SQL.</Warning>
+
+A service account authenticates with **Username & Password** or **Azure Active Directory** (a Microsoft Entra ID service principal). You choose the method in **Connect with** when you create the account.
 
 Follow these steps to create an Azure SQL service account in Domo:
 
-1. Choose a name to identify this Azure SQL service account within Domo.
-
-1. - The name can be changed later.
+1. On the integration form, open **Azure SQL Database service account** and select **Add account...**.  
+   The **New Azure SQL Database Service Account** dialog opens.
+2. In **New account name**, enter a name to identify this Azure SQL service account within Domo.
+   - The name can be changed later.
    - Use clear, distinctive names to avoid confusion between Azure SQL accounts and integrations.
    - You can create multiple service accounts even if they all point to the same Azure SQL instance.
-2. Enter the name of your server or its IP address.
-3. Enter your Azure SQL Username.
-4. Enter your Azure SQL Password.
+3. In **Azure SQL Database connection URL**, enter your server's host name, for example `<server>.database.windows.net`.
+4. In **Connect with**, select your authentication method, and then enter its credentials:
+   - **Username & Password —** Enter your credentials in **Azure SQL Database username** and **Azure SQL Database password**.
+   - **Azure Active Directory —** Enter the following values:
+     - **Tenant ID —** The directory (tenant) ID of your Microsoft Entra tenant.
+     - **Client ID —** The application (client) ID of the app registration.
+     - **Client Secret —** The client secret value.
+     - **Database —** The database to connect to.
 
-<Frame>![Screenshot](/images/kb/0EMVu00000TFWy9.jpg)</Frame>
+     To rotate an expired client secret later, open the account's **Edit Account** dialog and update **Client Secret**.
+
+   <Frame>![The New Azure SQL Database Service Account dialog with the Connect with dropdown open, showing Username & Password and Azure Active Directory.](/images/kb/domo-on-azure-sql-03.png)</Frame>
+
+   <Frame>![The New Azure SQL Database Service Account dialog with Azure Active Directory selected, showing the Tenant ID, Client ID, Client Secret, and Database fields.](/images/kb/domo-on-azure-sql-04.png)</Frame>
+
+5. Select **Create Account**.  
+   Domo returns to the integration form, selects the new account, and shows **New account created!**
+
+## Troubleshoot
+
+### Fix Service Principal Login Failures
+
+If the connection fails with `Login failed for user '<token-identified principal>'`, the service principal signed in to Microsoft Entra ID but has no user in the target database, or the user doesn't have read access.
+
+To fix the error:
+
+- Create the database user and grant it read access, as described in [Set Up a Service Principal in Azure](#set-up-a-service-principal-in-azure).
+- Check that **Tenant ID**, **Client ID**, and **Client Secret** are correct.
+- If the client secret has expired, update it in the account's **Edit Account** dialog.

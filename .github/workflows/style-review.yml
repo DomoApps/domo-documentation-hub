@@ -1,0 +1,42 @@
+name: Style Review
+
+# Comments on lines a pull request adds that break a rule in the Domo KB Style
+# Guide. Rules live in .vale/styles/Domo/, one YAML file each. Comments are
+# advisory and never fail the check, and older content that the PR doesn't
+# touch is never flagged.
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+    paths:
+      - "s/**"
+      - "portal/**"
+      - ".vale.ini"
+      - ".vale/**"
+
+permissions:
+  contents: read
+  pull-requests: write
+
+concurrency:
+  group: style-review-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  vale:
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.draft == false
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: errata-ai/vale-action@v3
+        with:
+          version: 3.22.0
+          files: s,portal
+          separator: ","
+          reporter: github-pr-review
+          filter_mode: added
+          fail_on_error: false
+          # No external style packages yet, so there is nothing to sync.
+          sync: false

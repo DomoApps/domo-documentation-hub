@@ -19,7 +19,7 @@ The diagram below shows how Domo connects to Databricks through Cloud Integratio
 
 ## Before You Begin
 
-- (Conditional) Create a Databricks service account—Required if you authenticate with a service account, or to set up write-back and native transform. Create a new Databricks account specifically for this integration. You can use any account with read access in Databricks, but best practice is a dedicated service account with read access to your default Databricks environment.
+- (Conditional) Create a Databricks service account—Required if you authenticate with a service account, or to set up writeback and native transform. Create a new Databricks account specifically for this integration. You can use any account with read access in Databricks, but best practice is a dedicated service account with read access to your default Databricks environment.
 - (Conditional) Register a Databricks OAuth app connection—Required if you authenticate with U2M OAuth. In the Databricks Account Console, add a custom OAuth app connection for Domo, and have your SQL warehouse's server hostname, port, and HTTP path ready. See [Configure OAuth](#configure-oauth).
 - (Recommended) Create a Domo service account—Create a new Domo account specifically for this integration. Your account's custom role must include the **Manage Cloud Accounts** and **Manage DataSet** grants.
 - (Conditional) If you are migrating from a federated or connector-based integration, review [Migrate from Federated to Cloud Integrations](/s/article/000005675) before proceeding—Beast Mode formulas written in MySQL syntax may not be compatible with Spark SQL.
@@ -36,7 +36,7 @@ For more information about roles and grants, see [Manage User Roles and Grants](
 
 3. Enter a name and optional description in the **Name** and **Description** fields.
 
-   <Frame>![The new integration form with name, description, and service account fields.](/images/kb/databricks-kb-03.png)</Frame>
+   <Frame>![The new integration form with name, description, and the Authentication method list showing Databricks Service Account and U2M OAuth.](/images/kb/databricks-kb-03.png)</Frame>
 
 4. From **Authentication method**, select **Databricks Service Account** or **U2M OAuth**.
 
@@ -54,7 +54,7 @@ For more information about roles and grants, see [Manage User Roles and Grants](
          **Important:** Copy the token before leaving the page—Databricks does not display it again.
        </Warning>
 
-     - **M2M OAuth**—Enter your Databricks OAuth application's **Client ID** and **Client Secret** in the **Client ID** and **Client Secret** fields. This authentication method is used by the service account and supports write-back and native transforms, since those operations run under the service account regardless of how it authenticates.
+     - **M2M OAuth**—Enter your Databricks OAuth application's **Client ID** and **Client Secret** in the **Client ID** and **Client Secret** fields. This authentication method is used by the service account and supports writeback and native transforms, since those operations run under the service account regardless of how it authenticates.
 
        <Frame>![New Databricks Service Account modal with M2M OAuth selected, showing Client ID and Client Secret fields.](/images/kb/databricks-kb-06.png)</Frame>
 
@@ -82,7 +82,7 @@ After creating your integration, connect Databricks tables as DataSets in Domo. 
 
 ## Configure OAuth
 
-Configure OAuth to require users to sign in with their own Databricks credentials when they view cards or DataSets connected through that integration. OAuth does not currently apply to Magic ETL, write-back, or native transforms.
+Configure OAuth to require users to sign in with their own Databricks credentials when they view cards or DataSets connected through that integration. OAuth does not currently apply to Magic ETL, writeback, or native transforms.
 
 You can use OAuth in two ways:
 
@@ -90,7 +90,7 @@ You can use OAuth in two ways:
 * **OAuth with a service account —** Add OAuth to an integration that already uses a service account.
 
 <Note>
-  **Note:** This section covers U2M (per-user) OAuth, used for card and DataSet viewing. It doesn't apply to M2M OAuth, which authenticates the service account itself. If your service account authenticates with M2M OAuth, write-back and native transforms continue to work normally, since those operations always run under the service account.
+  **Note:** This section covers U2M (per-user) OAuth, used for card and DataSet viewing. It doesn't apply to M2M OAuth, which authenticates the service account itself. If your service account authenticates with M2M OAuth, writeback and native transforms continue to work normally, since those operations always run under the service account.
 </Note>
 
 If you're creating an integration, the **Configure OAuth Settings** dialog opens when you select **Add OAuth Config...** (see [Set Up Read-Only Access](#set-up-read-only-access)). Start at step 4. To add OAuth to an existing integration, start at step 1.
@@ -114,9 +114,9 @@ If you're creating an integration, the **Configure OAuth Settings** dialog opens
 
 ## Set Up Write & Native Transform
 
-Enable write-back, native transforms, or both on an existing Databricks integration. You must complete the read-only setup before proceeding.
+Enable writeback, native transforms, or both on an existing Databricks integration. You must complete the read-only setup before proceeding.
 
-If the integration uses U2M OAuth only, add a service account first, because write-back and native transforms always run under the service account. In the integration's **Settings** panel, under **Service Account**, select **Set up service account**. Then select or create a Databricks service account that authenticates with a personal access token or M2M OAuth. For the service account fields, see [Set Up Read-Only Access](#set-up-read-only-access).
+If the integration uses U2M OAuth only, add a service account first, because writeback and native transforms always run under the service account. In the integration's **Settings** panel, under **Service Account**, select **Set up service account**. Then select or create a Databricks service account that authenticates with a personal access token or M2M OAuth. For the service account fields, see [Set Up Read-Only Access](#set-up-read-only-access).
 
 1. From the Databricks Cloud Integrations list, select the **wrench** icon on the integration you want to configure, then select **Settings**.
 
@@ -128,7 +128,7 @@ If the integration uses U2M OAuth only, add a service account first, because wri
    - **Write to Databricks from connectors**—enables Domo to write data back to Databricks.
    - **Execute Magic ETL transformations natively**—enables Magic ETL DataFlows to run transformations directly within your Databricks environment.
 
-4. Under **Default write location**, select your target **Catalog** and **Schema** from the dropdowns. This is the Databricks location where Domo writes data during write-back operations and native transform executions.
+4. Under **Default write location**, select your target **Catalog** and **Schema** from the dropdowns. This is the Databricks location where Domo writes data during writeback operations and native transform executions.
 
    <Frame>![Configure Write & Native Transform modal with capability checkboxes and write location dropdowns.](/images/kb/databricks-kb-14.png)</Frame>
 

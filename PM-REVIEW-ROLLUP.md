@@ -18,3 +18,7 @@ Companion to the hand-maintained `PM-REVIEW-STATUS.md` (workflow milestones) and
 _*authored = gap-fill article written this phase (disposition=author)._
 _dropped = gap-fill article the owning PM judged unnecessary; not written and not carried to the follow-up list._
 
+## Articles awaiting final read-through
+
+_(none — every from-scratch article has a passed read-through)_
+

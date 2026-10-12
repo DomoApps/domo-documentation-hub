@@ -37,7 +37,7 @@ so instead of reviewing a change, you'll decide what should happen to each one. 
 choices, and Claude will record whichever you pick:
 
 - **Write it now** — the article is needed and you'll help. Claude interviews you for the
-  details, drafts it, and you review it like any other item.
+  details, drafts it, and you give it a full read-through (see below) before it's done.
 - **Defer it** — the article is still worth having, but not something you can get to this
   cycle. It's set aside and carried onto a follow-up list so it isn't lost; it just won't be
   written as part of this restructure.
@@ -49,6 +49,24 @@ choices, and Claude will record whichever you pick:
 
 If you're unsure whether something belongs in your area or should exist at all, defer it and
 flag it for Jared rather than dropping it.
+
+---
+
+## Brand-new articles: a final read-through
+
+Any article that was written from scratch for this project — whether the restructure drafted it
+(an overview or "What is X" page) or you just had Claude write a gap-fill — gets one extra step:
+a **read-through**. You read the whole article end-to-end (in the file or the preview) and confirm
+two things: it's **factually correct**, and it's **phrased the way you'd want it published**.
+
+A few things to know:
+
+- It's the **last** step on that article — Claude brings it to you only after you've handled the
+  specific fact-checks and questions on it, so you're signing off on the finished page.
+- It's a genuine read, not a spot-check. This is your name on the article.
+- If something's off, just tell Claude what to change; it edits and shows you, and you give the
+  final OK when you're happy.
+- Claude tracks this sign-off, so an unread new article won't slip through to publication.
 
 ---
 

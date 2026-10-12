@@ -402,29 +402,52 @@ the localization system and must carry the Phase 3c sync-#2 numeric-ID parity �
 
 **Hybrid state — two records per disposition (the ordering invariant matters):**
 1. Write the ledger entry FIRST (`pm_review.py set-status …`), THEN edit/burn the marker, THEN
-   commit. A marker burned before the ledger records its ask can never be re-derived.
+   commit. A marker burned before the ledger records its ask can never be re-derived. Every
+   terminal `set-status` requires `--note "<why>"`, and edits record `--commit`/`--diff-summary`.
 2. Inline marker grammar in articles:
    - open question: `{/* [pm-input] <PM Name> — <ask> */}` (existing; burned when answered)
-   - article sign-off: `{/* [reviewed] pm=<slug> status=<status> date=YYYY-MM-DD */}` (new;
-     multiple PMs may stamp a shared multi-owner overview — reconciliation then requires all
-     expected PMs).
+   - change sign-off (modified existing article): `{/* [reviewed] pm=<slug> status=<status>
+     date=YYYY-MM-DD */}` (multiple PMs may stamp a shared multi-owner overview — reconciliation
+     then requires all expected PMs).
+   - whole-article sign-off (from-scratch article): `{/* [read-through] pm=<slug>
+     date=YYYY-MM-DD */}`.
+
+**Read-through final sign-off.** Every from-scratch article in a PM's lane (restructure-authored
+net-new attributed to the PM, or a gap-fill the PM authored) gets an auto-generated `read-through`
+item: the PM reads the whole article (MDX or preview) and confirms it is factually correct AND
+phrased how they want. It is the article's FINAL gate — the engine passes it only after every
+other item on that article is terminal, and auto-reopens it if a sibling later re-opens.
+
+**Decision logging + recall.** The ledger records a free-text `note` (the WHY) on every history
+entry, a per-sitting `sessions[]` log (`session-start`/`session-end`), per-edit commit +
+diff-summary snapshots, and `decisions[]` — linked cross-article records (`link`) for moves that
+span articles (e.g. drop gap-fill X, fold its content into existing article Y). `journal --pm`
+renders a human-readable `pm-review-state/<slug>.journal.md` (per-PM, merge-safe); after merge-back
+`journal --all` unions them into the root `PM-REVIEW-JOURNAL.md`, and `explain` reconstructs any
+change's full history + reasoning by `--target`/`--id`/`--pm`/`--decision`.
 
 **Engine subcommands** (`scripts/pm_review.py`): `items --pm` / `resume --pm` (reconciled
-worklist + resume point, with stable item IDs that survive re-runs and sibling-marker burns),
-`set-status` (record a disposition), `rollup` (→ `PM-REVIEW-ROLLUP.md`), `deferred-report`
+worklist + resume point, with stable item IDs that survive re-runs and sibling-marker burns;
+`resume` holds back a read-through whose siblings are open), `set-status` (record a disposition;
+`--note` required for terminal), `session-start`/`session-end`, `link`, `journal` (`--pm` or
+`--all`), `explain`, `rollup` (→ `PM-REVIEW-ROLLUP.md`), `deferred-report`
 (→ `RESTRUCTURE-DEFERRED-ARTICLES.md`, the project-end out-of-scope seed list), `reconcile` (the
-sweep), `check-baseline` (the guard). It imports `build-pm-review-briefs.py` and derives items
-from the SAME source as the briefs/tasks, so the skill and the briefs can never drift.
+sweep), `check-baseline` (the guard). `rollup`/`deferred-report`/`journal --all` refuse to run off
+`update/fullRestructure`. It imports `build-pm-review-briefs.py` and derives brief items from the
+SAME source as the briefs/tasks, so the skill and the briefs can never drift. Smoke test:
+`python3 -I scripts/test-pm-review.py`.
 
 **Marker-reconciliation sweep (the Phase 4.5 → 4.6 gate).** Run `reconcile --strict` on the
 integration branch AFTER all PM branches merge back (a per-branch run sees a partial tree and
 would pass falsely). It cross-references every inline marker against the ledgers and reports
 `stragglers` (open markers with no terminal coverage), `malformed_markers` (unparseable markers),
 `inconsistencies` (answered-but-not-burned, or a `[reviewed]` stamp with no backing),
-`anchorless_open_items` (open decision/lifecycle items — no file anchor), and
-`orphan_marker_pm_names` (marker PM names matching no roster PM). All must reach zero
-(`gate_clear: true`) before advancing. This is the step that guarantees no inline marker is left
-unaddressed — it is the payoff of the hybrid marker + ledger approach.
+`anchorless_open_items` (open decision/lifecycle items — no file anchor),
+`orphan_marker_pm_names` (marker PM names matching no roster PM), and `read_through_findings`
+(terminal read-throughs missing their marker; from-scratch articles with no read-through item —
+non-blocking for the first run). All blocking categories must reach zero (`gate_clear: true`)
+before advancing. This is the step that guarantees no inline marker is left unaddressed — it is
+the payoff of the hybrid marker + ledger approach.
 
 **Instructions to future Claude:** when the user invokes `/pm-review` (or asks to review a PM's
 restructure changes), run the skill, not an ad-hoc pass. On any restructure session, this skill +

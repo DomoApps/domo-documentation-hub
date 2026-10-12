@@ -76,6 +76,7 @@ jobs:
           } >> "$GITHUB_OUTPUT"
 
       - name: Update API Navigation
+        id: nav
         if: steps.changed.outputs.has_changes == 'true'
         uses: DomoApps/documentation-generator-action@main
         with:
@@ -84,6 +85,15 @@ jobs:
           openapi_base_path: "${{ env.OPENAPI_BASE_PATH }}"
           process_changed_only: "true"
           changed_files: ${{ steps.changed.outputs.files }}
+
+      # The generator re-serializes docs.json even when it inserts nothing (for
+      # example if it can't find the Product APIs group), which would otherwise
+      # land as a formatting-only commit. Drop that rewrite and say so loudly.
+      - name: Discard no-op navigation rewrite
+        if: steps.changed.outputs.has_changes == 'true' && steps.nav.outputs.groups_updated == '0'
+        run: |
+          echo "::warning::Navigation generator updated 0 groups for the changed YAMLs - docs.json nav was NOT updated. Check the 'Update API Navigation' log."
+          git checkout -- "${DOCS_JSON_PATH}"
 
       # Remove any OpenAPI nav entries in docs.json that reference YAMLs no
       # longer on disk, otherwise Mintlify preview deploys fail.

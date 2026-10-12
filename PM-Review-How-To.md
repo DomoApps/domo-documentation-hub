@@ -29,6 +29,29 @@ That's the whole job: go down your checklist and give each item one of those res
 
 ---
 
+## A special case: articles that still need to be written
+
+Part of your checklist may be **gap-fill articles** — pages the restructure identified as
+missing in your area but that couldn't be written without your input. These don't exist yet,
+so instead of reviewing a change, you'll decide what should happen to each one. You have three
+choices, and Claude will record whichever you pick:
+
+- **Write it now** — the article is needed and you'll help. Claude interviews you for the
+  details, drafts it, and you review it like any other item.
+- **Defer it** — the article is still worth having, but not something you can get to this
+  cycle. It's set aside and carried onto a follow-up list so it isn't lost; it just won't be
+  written as part of this restructure.
+- **Drop it** — the article isn't actually needed (already covered elsewhere, no longer
+  relevant, or not a real gap). It's removed from the restructure's scope for good. Unlike a
+  deferral, a dropped article is **not** carried onto the follow-up list — so only drop when
+  you're sure it shouldn't be written at all. Claude will ask you to confirm, and to say briefly
+  why, before recording it.
+
+If you're unsure whether something belongs in your area or should exist at all, defer it and
+flag it for Jared rather than dropping it.
+
+---
+
 ## One-time check: make sure you're on your branch
 
 You have your own branch so your changes never collide with anyone else's. Open the

@@ -51,7 +51,7 @@ TYPE_PREFIX = {
     "fact-check": "fc", "pm-input": "pmi", "legacy": "life",
     "retired": "ret", "update": "upd", "decision": "dec",
 }
-TERMINAL = {"approved", "denied", "rejected", "answered", "deferred"}
+TERMINAL = {"approved", "denied", "rejected", "answered", "deferred", "dropped"}
 NONTERMINAL = {"pending", "rewrite-redo", "skipped"}
 SCHEMA_VERSION = 1
 
@@ -473,26 +473,27 @@ def cmd_rollup(args):
         "",
         "## Status by PM",
         "",
-        "| PM | total | open | approved | answered | authored* | deferred | denied | rejected | skipped |",
-        "|----|------:|-----:|---------:|---------:|----------:|---------:|-------:|---------:|--------:|",
+        "| PM | total | open | approved | answered | authored* | deferred | dropped | denied | rejected | skipped |",
+        "|----|------:|-----:|---------:|---------:|----------:|---------:|--------:|-------:|---------:|--------:|",
     ]
     tot = defaultdict(int)
     for lg in ledgers:
         c = _status_counts(lg)
         authored = sum(1 for e in lg["items"].values() if e.get("disposition") == "author")
-        for k in ("total", "open", "approved", "answered", "deferred", "denied", "rejected", "skipped"):
+        for k in ("total", "open", "approved", "answered", "deferred", "dropped", "denied", "rejected", "skipped"):
             tot[k] += c.get(k, 0)
         tot["authored"] += authored
         lines.append(
             f"| {lg['pm']} | {c.get('total',0)} | {c.get('open',0)} | {c.get('approved',0)} | "
-            f"{c.get('answered',0)} | {authored} | {c.get('deferred',0)} | {c.get('denied',0)} | "
+            f"{c.get('answered',0)} | {authored} | {c.get('deferred',0)} | {c.get('dropped',0)} | {c.get('denied',0)} | "
             f"{c.get('rejected',0)} | {c.get('skipped',0)} |"
         )
     lines.append(
         f"| **TOTAL** | {tot['total']} | {tot['open']} | {tot['approved']} | {tot['answered']} | "
-        f"{tot['authored']} | {tot['deferred']} | {tot['denied']} | {tot['rejected']} | {tot['skipped']} |"
+        f"{tot['authored']} | {tot['deferred']} | {tot['dropped']} | {tot['denied']} | {tot['rejected']} | {tot['skipped']} |"
     )
-    lines += ["", "_*authored = gap-fill article written this phase (disposition=author)._", ""]
+    lines += ["", "_*authored = gap-fill article written this phase (disposition=author)._",
+              "_dropped = gap-fill article the owning PM judged unnecessary; not written and not carried to the follow-up list._", ""]
     for lg in ledgers:
         open_items = [(iid, e) for iid, e in lg["items"].items() if e["status"] not in TERMINAL]
         if not open_items:
@@ -526,7 +527,9 @@ def cmd_deferred_report(args):
         f"**Generated:** {date.today().isoformat()} by `scripts/pm_review.py deferred-report`. **Do not hand-edit.**",
         "",
         "At project end this is the seed list for a follow-up project: gap-fill articles that "
-        "could not be written now and were explicitly deferred by their owning PM.",
+        "could not be written now and were explicitly deferred by their owning PM. Gap-fill "
+        "articles a PM judged unnecessary (disposition=drop) are intentionally excluded — a drop "
+        "ends the article's life, a defer carries it forward.",
         "",
         f"**Total deferred:** {len(rows)}",
         "",

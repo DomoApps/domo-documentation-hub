@@ -1,7 +1,7 @@
 ---
 name: pm-review
 user-invocable: true
-description: "Walk a PM through every change in their KB-restructure review brief like a resumable checklist: show the exact diff of each change, let the PM approve / deny / rewrite / reject / answer, author or defer the gap-fill articles still owed in their area, fact-check with any context they provide, and record every disposition as inline markers + a tracked ledger. Phase 4.5 of the KB restructure."
+description: "Walk a PM through every change in their KB-restructure review brief like a resumable checklist: show the exact diff of each change, let the PM approve / deny / rewrite / reject / answer, author / defer / drop the gap-fill articles still owed in their area, fact-check with any context they provide, and record every disposition as inline markers + a tracked ledger. Phase 4.5 of the KB restructure."
 argument-hint: "PM name or slug (e.g. \"Ken Boyer\" or ken-boyer); omit to infer from the current restructure/pm/<slug> branch"
 ---
 
@@ -135,12 +135,14 @@ the old "confirmed-fine fact-check leaves no diff" tracking hole).
 
 ---
 
-## Step 3 — Gap-fill articles (author now, or defer out of scope)
+## Step 3 — Gap-fill articles (author now, defer, or drop)
 
 Gap-fill items are `pm-input` items whose target article does not exist yet (`gap_fill: true`)
-— the ~40 articles the KB couldn't write without PM input. For each in the PM's area, ask:
+— the ~40 articles the KB couldn't write without PM input. For each in the PM's area, present
+the PM three mutually exclusive choices and record the one they pick. Keep **defer** and **drop**
+distinct: a defer carries the article forward to a follow-up project; a drop ends its life.
 
-**Author now?** If yes:
+**1. Author now?** The PM wants it written as part of this restructure and will supply the input:
 1. Invoke `kb-intake` to gather what's needed, then `new-kb-article` (or `new-overview-article`
    for a "What is X" / hub page) to draft it into `s/article/<target>`.
 2. Run the three restructure quality gates (`RESTRUCTURE-PROGRESS.md` § Quality Gates):
@@ -149,11 +151,21 @@ Gap-fill items are `pm-input` items whose target article does not exist yet (`ga
    the ledger that nav is pending.
 4. Ledger `status=authored disposition=author --commit <sha>`.
 
-**Out of scope?** If the PM can't/won't supply it now:
+**2. Defer (out of scope for now)?** The article is still wanted, but the PM can't/won't supply
+it during this cycle:
 - Ledger `status=deferred disposition=out-of-scope --reason "<why + what it would cover>"`.
 - Do not write a stub article. The deferral is the record.
 - At project end, `pm_review.py deferred-report` regenerates `RESTRUCTURE-DEFERRED-ARTICLES.md` —
   the seed list for a follow-up project. Tell the user this is where it will surface.
+
+**3. Drop entirely?** The PM judges the article unnecessary — the gap shouldn't be filled at all
+(already covered elsewhere, not a real need, superseded, etc.):
+- Confirm the intent with the PM before recording — drop is terminal and removes the article from
+  the restructure's scope for good; it is **not** a "later" bucket.
+- Ledger `status=dropped disposition=drop --reason "<why it isn't needed>"`. A reason is required.
+- Do not write a stub article. **A dropped item does NOT appear in
+  `RESTRUCTURE-DEFERRED-ARTICLES.md`** and is not carried to any follow-up — that's the whole
+  difference from a defer. It is counted in its own `dropped` column in `PM-REVIEW-ROLLUP.md`.
 
 ---
 
@@ -177,7 +189,7 @@ connector code repositories with annotations, product specs, CSVs, screenshots. 
 
 - Commit on the PM branch at natural breakpoints (end of a type group, or every handful of
   items) with a structured message, e.g.:
-  `pm-review(<slug>): approve 4 fact-checks, answer 2 pm-inputs, defer 1 gap-fill`.
+  `pm-review(<slug>): approve 4 fact-checks, answer 2 pm-inputs, defer 1 gap-fill, drop 1 gap-fill`.
   Include the attribution lines the session requires.
 - The ledger and article edits are the only things that change on a PM branch. Do **not** touch
   the shared derived files.

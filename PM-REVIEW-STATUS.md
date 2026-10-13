@@ -15,7 +15,7 @@ two together: this file for *where each PM is in the process*, `RESTRUCTURE-TASK
 
 For each PM, walk the columns left to right:
 
-1. **Brief sent** — mark when you hand the PM their brief (`pm-review-briefs/pm-review-docs/<PM>.docx`).
+1. **Brief sent** — mark when you hand the PM their brief (`pm-review-briefs/<PM>.md`, or walk them through it live with `/pm-review`).
 2. **Responses in** — mark when they return answers (annotated docx, email, or meeting notes).
 3. Give the answers to Claude → Claude applies edits, fills/removes `[pm-input]` markers, and reports back.
 4. **Fact-checks applied** — mark when their drafted-article fact-checks are all confirmed or corrected.

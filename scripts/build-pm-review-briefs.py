@@ -9,11 +9,10 @@ Reads:
                                           deferred article tables — source of truth)
   - s/article/*.mdx                      (scanned for embedded [pm-input] markers)
 
-Outputs one .md file per PM in pm-review-briefs/, a cross-PM RESTRUCTURE-TASKS.md
-aggregate, and a Word .docx copy of each brief in pm-review-briefs/pm-review-docs/
-(the .docx step is skipped with a note if pandoc is not installed). It also seeds
-PM-REVIEW-STATUS.md once (the hand-maintained Phase 4.5 workflow ledger) and then
-leaves it untouched on later runs so manual status edits are never clobbered.
+Outputs one .md file per PM in pm-review-briefs/ and a cross-PM RESTRUCTURE-TASKS.md
+aggregate. It also seeds PM-REVIEW-STATUS.md once (the hand-maintained Phase 4.5
+workflow ledger) and then leaves it untouched on later runs so manual status edits
+are never clobbered.
 
 The Phase 3a-Forum data (which new articles were written vs. deferred, and which
 drafted articles still carry open [pm-input] placeholders) is NOT hardcoded here —
@@ -33,8 +32,6 @@ Usage:
 import json
 import re
 import os
-import shutil
-import subprocess
 from collections import defaultdict
 from pathlib import Path
 
@@ -44,7 +41,6 @@ GAPS_FILE = REPO_ROOT / "_gaps_with_support.json"
 MANIFEST_FILE = REPO_ROOT / "RESTRUCTURE-MANIFEST.md"
 ARTICLE_DIR = REPO_ROOT / "s" / "article"
 OUTPUT_DIR = REPO_ROOT / "pm-review-briefs"
-DOCS_DIR = OUTPUT_DIR / "pm-review-docs"
 TASKS_FILE = REPO_ROOT / "RESTRUCTURE-TASKS.md"
 PM_STATUS_FILE = REPO_ROOT / "PM-REVIEW-STATUS.md"
 
@@ -62,58 +58,58 @@ EXCLUDED_FEATURES = {
 # ─────────────────────────────────────────────────────────────────────────────
 
 FEATURE_PILLAR = {
-    "Accessibility":                        "Pillar 9: Administer & Govern",
-    "Admin":                                "Pillar 9: Administer & Govern",
-    "AI Services":                          "Pillar 8: AI & Data Science",
-    "Alerts, NLG, Smart Alerts/Insights":   "Pillar 7: Share & Collaborate",
+    "Accessibility":                        "Pillar 10: Administer & Govern",
+    "Admin":                                "Pillar 10: Administer & Govern",
+    "AI Services":                          "Pillar 9: AI & Data Science",
+    "Alerts, NLG, Smart Alerts/Insights":   "Pillar 8: Collaborate",
     "App Dev Framework":                    "Pillar 6: Build Apps & Automate",
     "App Studio":                           "Pillar 6: Build Apps & Automate",
     "AppStore":                             "Pillar 6: Build Apps & Automate",
     "Approvals":                            "Pillar 6: Build Apps & Automate",
-    "Attribute Based Access Control (ABAC)":"Pillar 9: Administer & Govern",
+    "Attribute Based Access Control (ABAC)":"Pillar 10: Administer & Govern",
     "Auto ML":                              "Pillar 4: Prepare & Transform Data",
     "Beast Mode":                           "Pillar 5: Analyze & Visualize",
     "Bricks/Templates":                     "Pillar 6: Build Apps & Automate",
-    "Buzz":                                 "Pillar 7: Share & Collaborate",
-    "CLI":                                  "Pillar 10: Develop & Integrate",
+    "Buzz":                                 "Pillar 8: Collaborate",
+    "CLI":                                  "Pillar 11: Develop & Integrate",
     "Cloud Amplifier":                      "Pillar 2: Connect & Integrate Data",
     "Combined Schema":                      "Pillar 4: Prepare & Transform Data",
-    "Connectors 1.0":                       "Pillar 2: Connect & Integrate Data",
-    "Consumption":                          "Pillar 9: Administer & Govern",
+    "Connectors":                           "Pillar 2: Connect & Integrate Data",
+    "Consumption":                          "Pillar 10: Administer & Govern",
     "Data Center":                          "Pillar 3: Manage Data",
     "Data Flows":                           "Pillar 4: Prepare & Transform Data",
     "Data Views":                           "Pillar 3: Manage Data",
     "DataSets":                             "Pillar 3: Manage Data",
     "Doc Cards":                            "Pillar 5: Analyze & Visualize",
-    "Documents-Filesets":                   "Pillar 8: AI & Data Science",
-    "Domo Everywhere":                      "Pillar 7: Share & Collaborate",
-    "DomoStats":                            "Pillar 8: AI & Data Science",
+    "Documents-Filesets":                   "Pillar 9: AI & Data Science",
+    "Domo Everywhere":                      "Pillar 7: Distribute",
+    "DomoStats":                            "Pillar 9: AI & Data Science",
     "Education":                            "Pillar 1: Getting Started",
     "Export to CSV":                        "Pillar 5: Analyze & Visualize",
     "Federated":                            "Pillar 2: Connect & Integrate Data",
     "Freemium":                             "Pillar 1: Getting Started",
     "Fusions":                              "Archive — DataFusion deprecated (retiring in Phase 4)",
-    "Goals":                                "Pillar 9: Administer & Govern",
-    "Governance Toolkit":                   "Pillar 9: Administer & Govern",
-    "Jupyter Notebooks":                    "Pillar 8: AI & Data Science",
+    "Goals":                                "Pillar 10: Administer & Govern",
+    "Governance Toolkit":                   "Pillar 10: Administer & Govern",
+    "Jupyter Notebooks":                    "Pillar 9: AI & Data Science",
     "Magic ETL":                            "Pillar 4: Prepare & Transform Data",
     "Mobile - iOS":                         "Pillar 1: Getting Started",
-    "MS Office Plugins / Addins":           "Pillar 7: Share & Collaborate",
-    "MS Office Plugins/Addins":             "Pillar 7: Share & Collaborate",
+    "MS Office Plugins / Addins":           "Pillar 8: Collaborate",
+    "MS Office Plugins/Addins":             "Pillar 8: Collaborate",
     "Onboarding":                           "Pillar 1: Getting Started",
     "Period over Period":                   "Pillar 5: Analyze & Visualize",
-    "Profile":                              "Pillar 9: Administer & Govern",
-    "Projects & Tasks":                     "Pillar 7: Share & Collaborate [D2: may → Archive if feature deprecated]",
-    "Publication Groups":                   "Pillar 7: Share & Collaborate",
-    "Sandbox":                              "Pillar 9: Administer & Govern",
-    "Single Sign-On":                       "Pillar 9: Administer & Govern",
-    "Slideshows":                           "Pillar 7: Share & Collaborate",
+    "Profile":                              "Pillar 10: Administer & Govern",
+    "Projects & Tasks":                     "Pillar 8: Collaborate [D2: may → Archive if feature deprecated]",
+    "Publication Groups":                   "Pillar 7: Distribute",
+    "Sandbox":                              "Pillar 10: Administer & Govern",
+    "Single Sign-On":                       "Pillar 10: Administer & Govern",
+    "Slideshows":                           "Pillar 7: Distribute",
     "Third Party Connectors":               "Pillar 2: Connect & Integrate Data",
     "Workbench":                            "Pillar 2: Connect & Integrate Data",
     "Worksheets":                           "Pillar 5: Analyze & Visualize",
     "Charting":                             "Pillar 5: Analyze & Visualize",
     "Analyzer":                             "Pillar 5: Analyze & Visualize",
-    "Application Security":                 "Pillar 9: Administer & Govern (no PM assigned)",
+    "Application Security":                 "Pillar 10: Administer & Govern (no PM assigned)",
     "Release Management":                   "Release Notes (no content PM)",
 }
 
@@ -148,11 +144,11 @@ STRUCTURAL_NOTES = {
         "**Data Views (D9):** Data Views articles may shift between Pillar 3 (Manage Data) and Pillar 4 (Prepare & Transform Data) depending on D9 resolution.",
     ],
     "Mamta Bolaki": [
-        "**Domo Everywhere positioning:** Domo Everywhere content lives in Pillar 7 (Share & Collaborate) with its own sub-section. The embed framing (public vs. private, SSO + PDP interaction) should be consistent across all Domo Everywhere articles.",
+        "**Domo Everywhere positioning:** Domo Everywhere content lives in Pillar 7 (Distribute) with its own sub-section. The embed framing (public vs. private, SSO + PDP interaction) should be consistent across all Domo Everywhere articles.",
     ],
     "Ryan Despain": [
-        "**Projects & Tasks (D2):** 10 articles currently in Share & Collaborate. If the feature is being phased out in favor of Workflows, these may belong in Archive. Confirm status.",
-        "**PDP (Personalized Data Permissions):** PDP articles are in Administer & Govern (Pillar 9). The Governance Toolkit sits in the same pillar.",
+        "**Projects & Tasks (D2):** 10 articles currently in Collaborate. If the feature is being phased out in favor of Workflows, these may belong in Archive. Confirm status.",
+        "**PDP (Personalized Data Permissions):** PDP articles are in Administer & Govern (Pillar 10). The Governance Toolkit sits in the same pillar.",
     ],
     "Ken Boyer": [
         "**Develop & Integrate (Pillar 10):** Currently only 5 articles — severely thin. This pillar cannot tell a story until Phase 3a content is written. The pillar may largely function as an entry ramp to the Developer Portal (developer.domo.com).",
@@ -244,7 +240,7 @@ PHASE3A_ARTICLES = [
      "All Analyzer / chart / dashboard articles",
      "Complete analysis toolbox overview, chart recommendation guidance"),
     ("What-is-an-Alert.mdx",
-     "What is an Alert?", "Pillar 7", "Dan Brinton",
+     "What is an Alert?", "Pillar 8", "Dan Brinton",
      "Alerts Overview, alert articles",
      "Alert types, trigger conditions, Smart Alerts / NLG behavior, notification routing"),
     ("What-is-a-Connector.mdx",
@@ -288,7 +284,7 @@ PHASE3A_ARTICLES = [
      "Workbench 5.2 overview, Workbench Enterprise",
      "Workbench capabilities, read + write paths, current version support status"),
     ("Share-and-Collaborate-Overview.mdx",
-     "Share & Collaborate Overview", "Pillar 7", "Dan Brinton",
+     "Share & Collaborate Overview", "Pillar 8", "Dan Brinton",
      "Sharing / Buzz / Publications / Embed articles",
      "All sharing mechanisms, publication groups vs Domo Everywhere scope distinction"),
     ("Domo-User-Roles.mdx",
@@ -725,6 +721,51 @@ def pm_cell_matches(cell: str, pm_name: str) -> bool:
     return pm_name in parts
 
 
+# ── ownership overrides (mid-review PM reassignment) ──────────────────────────
+# `pm_review.py reassign` records filename → PM overrides when a PM claims or
+# disclaims an article during review. Applied by TARGET FILENAME so a reassigned
+# article's tasks move to the new PM's worklist/brief; both this script and
+# build-pm-ownership.py read the same file so the two pipelines agree.
+OVERRIDES_FILE = REPO_ROOT / "pm-review-state" / "ownership-overrides.json"
+
+
+def load_ownership_overrides() -> dict:
+    out = {}
+    if OVERRIDES_FILE.exists():
+        try:
+            data = json.loads(OVERRIDES_FILE.read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            return out
+        for o in data.get("overrides", []):
+            fn, pm = o.get("filename"), o.get("to_pm")
+            if fn and pm:
+                out[fn] = pm  # last write wins
+    return out
+
+
+OWNERSHIP_OVERRIDES = load_ownership_overrides()
+
+
+def effective_pm(original_pm: str, filename) -> str:
+    """The PM a task belongs to after any reassignment override on its article."""
+    if filename and filename in OWNERSHIP_OVERRIDES:
+        return OWNERSHIP_OVERRIDES[filename]
+    return original_pm
+
+
+def pm_owns_task(original_pm: str, filename, pm_name: str) -> bool:
+    """Exact-match ownership for an article-scoped task, override-aware."""
+    return effective_pm(original_pm, filename) == pm_name
+
+
+def pm_cell_owns(cell: str, filename, pm_name: str) -> bool:
+    """Manifest-cell ownership (multi-PM aware), override-aware: an override on the
+    article replaces the whole cell with a single owner."""
+    if filename and filename in OWNERSHIP_OVERRIDES:
+        return OWNERSHIP_OVERRIDES[filename] == pm_name
+    return pm_cell_matches(cell, pm_name)
+
+
 # ─────────────────────────────────────────────────────────────────────────────
 # BRIEF GENERATION
 # ─────────────────────────────────────────────────────────────────────────────
@@ -768,7 +809,7 @@ def generate_brief(pm_name: str, pm_ownership: dict, all_gaps: list, forum: dict
         "## 1. How Your Content Is Being Reorganized",
         "",
         "The KB is moving from a flat feature encyclopedia to a story-driven structure organized",
-        "around **11 pillars** (user workflows). The table below shows where each of your feature",
+        "around **12 pillars** (user workflows). The table below shows where each of your feature",
         "areas lands in the new structure.",
         "",
         "| Feature | Articles | New Location |",
@@ -793,7 +834,7 @@ def generate_brief(pm_name: str, pm_ownership: dict, all_gaps: list, forum: dict
     # ── Section 2: AI-Generated Articles to Fact-Check ────────────────────────
     pm_phase3a = [(fn, title, pillar, synth, claims)
                   for fn, title, pillar, pm, synth, claims in PHASE3A_ARTICLES
-                  if pm == pm_name]
+                  if pm_owns_task(pm, fn, pm_name)]
 
     lines += [
         "## 2. AI-Generated Articles — Your Fact-Check Required",
@@ -822,20 +863,21 @@ def generate_brief(pm_name: str, pm_ownership: dict, all_gaps: list, forum: dict
     lines += ["---", ""]
 
     # ── Section 3: New Forum-Gap Articles + Open Placeholders ──────────────────
-    pm_input = [(fn, title, what) for fn, title, pm, what in PHASE3A_PM_ARTICLES if pm == pm_name]
+    pm_input = [(fn, title, what) for fn, title, pm, what in PHASE3A_PM_ARTICLES
+                if pm_owns_task(pm, fn, pm_name)]
     # Written forum articles (drafted; need fact-check) — matched on manifest PM cell.
     pm_forum_written = sorted(
-        [w for w in forum["written"] if pm_cell_matches(w["pm"], pm_name)],
+        [w for w in forum["written"] if pm_cell_owns(w["pm"], w["filename"], pm_name)],
         key=lambda w: w["rank"],
     )
     # Deferred forum articles (not written; need PM input to begin).
     pm_forum_deferred = sorted(
-        [d for d in forum["deferred"] if pm_cell_matches(d["pm"], pm_name)],
+        [d for d in forum["deferred"] if pm_cell_owns(d["pm"], d["filename"], pm_name)],
         key=lambda d: d["rank"],
     )
     # Open [pm-input] placeholders: embedded article markers (scanned) + manifest flags.
     pm_checkpoints = [(c["filename"], c["ask"]) for c in forum["checkpoints"]
-                      if c["pm"] == pm_name]
+                      if pm_owns_task(c["pm"], c["filename"], pm_name)]
     pm_checkpoints += [(scope, ask) for scope, ask in MANIFEST_PM_INPUT_FLAGS.get(pm_name, [])]
 
     lines += [
@@ -1100,27 +1142,27 @@ def collect_pm_tasks(pm_name: str, all_gaps: list, forum: dict) -> dict:
     """Gather every typed task for one PM (reuses the same filters as the briefs)."""
     tasks = {"fact-check": [], "pm-input": [], "legacy": [], "retired": [], "update": [], "decision": []}
 
-    # [fact-check] — Phase 3a synthesized articles
+    # [fact-check] — Phase 3a synthesized articles  (override-aware by filename)
     for fn, title, _pillar, pm, _src, fc in PHASE3A_ARTICLES:
-        if pm == pm_name:
+        if pm_owns_task(pm, fn, pm_name):
             tasks["fact-check"].append((f"`{fn}` — *{title}*", fc))
     # [fact-check] — forum-gap articles already drafted
-    for w in sorted([w for w in forum["written"] if pm_cell_matches(w["pm"], pm_name)],
+    for w in sorted([w for w in forum["written"] if pm_cell_owns(w["pm"], w["filename"], pm_name)],
                     key=lambda w: w["rank"]):
         flag = " ⚠️ (open [pm-input])" if w.get("has_pm_input") else ""
         tasks["fact-check"].append((f"`{w['filename']}` (rank {w['rank']}){flag}", w["notes"]))
 
     # [pm-input] — original-plan PM articles
     for fn, title, pm, what in PHASE3A_PM_ARTICLES:
-        if pm == pm_name:
+        if pm_owns_task(pm, fn, pm_name):
             tasks["pm-input"].append((f"`{fn}` — *{title}*", what))
     # [pm-input] — deferred forum articles
-    for d in sorted([d for d in forum["deferred"] if pm_cell_matches(d["pm"], pm_name)],
+    for d in sorted([d for d in forum["deferred"] if pm_cell_owns(d["pm"], d["filename"], pm_name)],
                     key=lambda d: d["rank"]):
         tasks["pm-input"].append((f"`{d['filename']}` (rank {d['rank']})", d["what"]))
     # [pm-input] — scanned inline article markers + manifest-level flags
     for c in forum["checkpoints"]:
-        if c["pm"] == pm_name:
+        if pm_owns_task(c["pm"], c["filename"], pm_name):
             tasks["pm-input"].append((f"`{c['filename']}`", c["ask"]))
     for scope, ask in MANIFEST_PM_INPUT_FLAGS.get(pm_name, []):
         tasks["pm-input"].append((scope, ask))
@@ -1236,35 +1278,6 @@ def build_tasks_aggregate(all_pms: list, ownership: dict, all_gaps: list, forum:
     return "\n".join(lines) + "\n"
 
 
-def write_docx_copies(brief_paths: list) -> None:
-    """Write a Word .docx copy of each markdown brief into pm-review-briefs/pm-review-docs/.
-
-    Uses pandoc (GitHub-flavored markdown so tables + task-list checkboxes render as
-    rich content). If pandoc is not installed the step is skipped with a note — the
-    markdown briefs are the primary artifact and are unaffected.
-    """
-    pandoc = shutil.which("pandoc")
-    if not pandoc:
-        print("\n  ⚠️  pandoc not found — skipping .docx copies. Install pandoc "
-              "(https://pandoc.org/installing.html) to enable them; the markdown "
-              "briefs are unaffected.")
-        return
-    DOCS_DIR.mkdir(parents=True, exist_ok=True)
-    ok = 0
-    for md_path in brief_paths:
-        docx_path = DOCS_DIR / (md_path.stem + ".docx")
-        try:
-            subprocess.run(
-                [pandoc, str(md_path), "-f", "gfm", "-o", str(docx_path)],
-                check=True, capture_output=True, text=True,
-            )
-            ok += 1
-        except subprocess.CalledProcessError as e:
-            print(f"  ✗ .docx failed for {md_path.name}: {e.stderr.strip()}")
-    print(f"  ✓ {ok}/{len(brief_paths)} .docx copies written to "
-          f"{DOCS_DIR.relative_to(REPO_ROOT)}/")
-
-
 def seed_pm_status_ledger(all_pms: list, all_gaps: list, forum: dict) -> None:
     """Create PM-REVIEW-STATUS.md once (if absent) and NEVER overwrite it afterward.
 
@@ -1302,8 +1315,8 @@ def seed_pm_status_ledger(all_pms: list, all_gaps: list, forum: dict) -> None:
         "",
         "For each PM, walk the columns left to right:",
         "",
-        "1. **Brief sent** — mark when you hand the PM their brief (`pm-review-briefs/pm-review-docs/<PM>.docx`).",
-        "2. **Responses in** — mark when they return answers (annotated docx, email, or meeting notes).",
+        "1. **Brief sent** — mark when you hand the PM their brief (`pm-review-briefs/<PM>.md`, or walk them through it live with `/pm-review`).",
+        "2. **Responses in** — mark when they return answers (via the review session, email, or meeting notes).",
         "3. Give the answers to Claude → Claude applies edits, fills/removes `[pm-input]` markers, and reports back.",
         "4. **Fact-checks applied** — mark when their drafted-article fact-checks are all confirmed or corrected.",
         "5. **`[pm-input]` cleared** — mark when their open `[pm-input]` count in `RESTRUCTURE-TASKS.md` reaches 0.",
@@ -1368,6 +1381,9 @@ def main():
     roster.update(MANIFEST_PM_INPUT_FLAGS.keys())
     for c in forum["checkpoints"]:
         roster.add(c["pm"])
+    # A reassignment may hand an article to a PM who had no prior tasks — make sure
+    # they still get a brief/worklist rather than being orphaned.
+    roster.update(OWNERSHIP_OVERRIDES.values())
 
     # Orphan detection: manifest forum rows whose PM cell matches no roster PM
     # (e.g. "Domo University / Enablement (no listed PM)"). These would silently
@@ -1401,9 +1417,6 @@ def main():
     tasks_md = build_tasks_aggregate(all_pms, ownership, gaps, forum)
     TASKS_FILE.write_text(tasks_md, encoding="utf-8")
     print(f"  ✓ {TASKS_FILE.relative_to(REPO_ROOT)} written (aggregate task checklist)")
-
-    # Word .docx copies of each brief (skipped with a note if pandoc is missing)
-    write_docx_copies(brief_paths)
 
     # PM review workflow ledger — seeded once, then hand-maintained (never overwritten)
     seed_pm_status_ledger(all_pms, gaps, forum)

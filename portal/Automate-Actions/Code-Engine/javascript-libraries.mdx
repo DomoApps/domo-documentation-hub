@@ -3,41 +3,253 @@ title: JavaScript Libraries
 permalink: c887b1e09fb75-code-engine-java-script-libraries-reference
 ---
 
-Below is a comprehensive list of JavaScript libraries available for use in Code Engine.
+These libraries are preinstalled in the Code Engine JavaScript runtime. The `codeengine` library provides functions for reading accounts, calling Domo APIs, and getting details about the current execution. It also exports `axios` and `googleAuthLibrary` for calling external APIs.
 
-| **Library**         | **Description**                                                                |
-| ------------------- | ------------------------------------------------------------------------------ |
-| `codeengine`        | Interfaces with the Code Engine system to manage workflows and data processes. |
-| `axios`             | A promise-based HTTP client for making external API requests.                  |
-| `googleAuthLibrary` | Handles Google authentication and authorization flows.                         |
+| **Library**                             | **Description**                                                                |
+| --------------------------------------- | ------------------------------------------------------------------------------ |
+| [codeengine](#codeengine)               | Interfaces with the Code Engine system to manage workflows and data processes. |
+| [axios](#axios)                         | A promise-based HTTP client for making external API requests.                  |
+| [googleAuthLibrary](#googleauthlibrary) | Handles Google authentication and authorization flows.                         |
 
-## Functions in the `codeengine` library
+## codeengine
 
-| **Function**                  | **Description**                                                             |
-| ----------------------------- | --------------------------------------------------------------------------- |
-| `getPersonDetails`            | Retrieves detailed information about a person from your system.             |
-| `getAccount`                  | Fetches account-related data, including access tokens and account settings. |
-| `getExecutionDetails`         | Provides details about workflow execution.                                  |
-| [`sendRequest`](#sendrequest) | Sends HTTP requests for interacting with internal Domo APIs.                |
+Import the library with `require("codeengine")`.
 
-### sendRequest
+| **Function**                                        | **Description**                                                             |
+| --------------------------------------------------- | --------------------------------------------------------------------------- |
+| [getAccount](#getaccount)                           | Fetches account-related data, including access tokens and account settings. |
+| [getExecutionInformation](#getexecutioninformation) | Provides details about the current execution and what triggered it.         |
+| [getPersonDetails](#getpersondetails)               | Retrieves detailed information about a person from your system.             |
+| [getUserAuthorization](#getuserauthorization)       | Retrieves the running user's own OAuth credentials for an account template. |
+| [sendRequest](#sendrequest)                         | Sends HTTP requests for interacting with internal Domo APIs.                |
 
-This function will send an authenticated API request to any of Domo's product APIs.
+### getAccount
+
+This function retrieves an account that is mapped to the package, including its decrypted credentials and a current access token. The user running the function must have access to the account. If the account's access token has expired, it is refreshed before it is returned.
+
+**Function:** `codeengine.getAccount(accountAlias)`  
+**Returns:** `Promise<Object>`
 
 #### Parameters
 
-| Property Name | Type   | Required | Description                                                |
-| ------------- | ------ | -------- | ---------------------------------------------------------- |
-| method        | String | Required | The HTTP method - can be 'GET', 'POST', 'PUT', or 'DELETE' |
-| url           | String | Required | The request url                                            |
-| body          | Object | Optional | The request body                                           |
-| headers       | Object | Optional | The request headers                                        |
-| contentType   | Object | Optional | The request contentType ('application/json' by default)    |
+| Property Name | Type   | Required | Description                                                                                                              |
+| ------------- | ------ | -------- | ------------------------------------------------------------------------------------------------------------------------ |
+| accountAlias  | String | Required | The alias of an account mapped to the package. For a function input of type Account, pass the input's account ID instead |
 
-#### Code Example
+#### Example
 
 ```javascript
-const codeengine = require('codeengine');
+const codeengine = require("codeengine");
+
+async function getAccount(accountAlias) {
+  try {
+    return await codeengine.getAccount(accountAlias);
+  } catch (error) {
+    console.error(`Error getting account ${accountAlias}:`, error);
+    throw error;
+  }
+}
+```
+
+#### Response
+
+The keys in `properties` depend on the account type.
+
+```json
+{
+  "id": 42,
+  "userId": 123456789,
+  "name": "Salesforce",
+  "displayName": "Salesforce - Production",
+  "type": "data",
+  "valid": true,
+  "dataProviderType": "salesforce",
+  "credentialsType": "oauth",
+  "createdAt": "2025-01-15T16:00:00.000+00:00",
+  "createdBy": 123456789,
+  "modifiedAt": "2025-06-01T18:30:00.000+00:00",
+  "modifiedBy": 123456789,
+  "properties": {
+    "access_token": "<access-token>",
+    "refresh_token": "<refresh-token>"
+  }
+}
+```
+
+### getExecutionInformation
+
+This function returns details about the current execution: who ran it, which instance it ran in, and which workflow or app called it. Unlike the other functions in this library, it returns a value directly rather than a promise.
+
+**Function:** `codeengine.getExecutionInformation()`  
+**Returns:** `Object`
+
+#### Parameters
+
+This function takes no parameters.
+
+#### Example
+
+```javascript
+const codeengine = require("codeengine");
+
+function getCaller() {
+  const { userId, entityType, entityDetails } =
+    codeengine.getExecutionInformation();
+
+  if (entityType === "WORKFLOW") {
+    console.log(
+      `Called by workflow ${entityDetails.modelId} version ${entityDetails.version}`,
+    );
+  }
+
+  return userId;
+}
+```
+
+#### Response
+
+`entityType` is `WORKFLOW`, `DOMOAPP`, or `UNKNOWN`, and `entityDetails` depends on it:
+
+- **WORKFLOW** — `modelId`, `version`, and `instanceId` (the ID of the workflow run).
+- **DOMOAPP** — `instanceId` (the ID of the app instance).
+- **UNKNOWN** — `entityDetails` is `null`. This is the case when the function is run directly, such as from the Code Engine editor.
+
+```json
+{
+  "userId": 123456789,
+  "customer": "example",
+  "domoHostname": "https://example.domo.com",
+  "entityType": "WORKFLOW",
+  "entityDetails": {
+    "modelId": "3f8b2c1e-7a4d-4e9b-9c2a-1d5e6f7a8b9c",
+    "version": "1.0.3",
+    "instanceId": "9a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5d"
+  }
+}
+```
+
+### getPersonDetails
+
+This function retrieves a Domo user's profile, including their contact and employment details. It calls `GET /api/content/v3/users/{id}?includeDetails=true` on your behalf.
+
+**Function:** `codeengine.getPersonDetails(person)`  
+**Returns:** `Promise<Object>`
+
+#### Parameters
+
+| Property Name | Type   | Required | Description                   |
+| ------------- | ------ | -------- | ----------------------------- |
+| person        | Number | Required | The ID of the user to look up |
+
+#### Example
+
+```javascript
+const codeengine = require("codeengine");
+
+async function getPerson(personId) {
+  try {
+    return await codeengine.getPersonDetails(personId);
+  } catch (error) {
+    console.error(`Error getting details for person ${personId}:`, error);
+    throw error;
+  }
+}
+```
+
+#### Response
+
+Fields with no value on the user's profile may be omitted from `detail`.
+
+```json
+{
+  "id": 123456789,
+  "invitorUserId": 987654321,
+  "displayName": "Jane Smith",
+  "avatarKey": "/api/content/v1/avatar/USER/123456789",
+  "roleId": 2,
+  "detail": {
+    "title": "Data Analyst",
+    "email": "jane.smith@example.com",
+    "alternateEmail": "jsmith@example.com",
+    "phoneNumber": "555-555-0100",
+    "deskPhoneNumber": "555-555-0101",
+    "employeeNumber": 1001,
+    "employeeId": "E1001",
+    "pending": false,
+    "active": true,
+    "location": "American Fork, UT",
+    "department": "Analytics",
+    "timeZone": "America/Denver",
+    "hireDate": "2024-01-15",
+    "created": 1705334400000,
+    "modified": 1735689600000
+  }
+}
+```
+
+### getUserAuthorization
+
+This function retrieves the OAuth credentials that the user running the function has authorized for an account template. Unlike `getAccount`, which returns a shared account mapped to the package, each user gets their own authorization, so the function can call a third-party API as that user. The user must have access to the account template and must have already authorized it, or the request fails with a `404`.
+
+**Function:** `codeengine.getUserAuthorization(accountTemplateId)`  
+**Returns:** `Promise<Object>`
+
+#### Parameters
+
+| Property Name     | Type   | Required | Description                                       |
+| ----------------- | ------ | -------- | ------------------------------------------------- |
+| accountTemplateId | Number | Required | The ID of the OAuth account template to authorize |
+
+#### Example
+
+```javascript
+const codeengine = require("codeengine");
+
+async function getAuthorization(accountTemplateId) {
+  try {
+    return await codeengine.getUserAuthorization(accountTemplateId);
+  } catch (error) {
+    console.error(
+      `Error getting user authorization for account template ${accountTemplateId}:`,
+      error,
+    );
+    throw error;
+  }
+}
+```
+
+#### Response
+
+The response is a flat object of decrypted string values. The keys depend on how the account template is configured.
+
+```json
+{
+  "access_token": "<access-token>",
+  "refresh_token": "<refresh-token>"
+}
+```
+
+### sendRequest
+
+This function sends an authenticated API request to any of Domo's product APIs, using the credentials of the user running the function. The promise resolves to the response body.
+
+**Function:** `codeengine.sendRequest(method, url, body, headers, contentType)`  
+**Returns:** `Promise<Object>`
+
+#### Parameters
+
+| Property Name | Type   | Required | Description                                                         |
+| ------------- | ------ | -------- | ------------------------------------------------------------------- |
+| method        | String | Required | The HTTP method - can be `GET`, `POST`, `PUT`, `PATCH`, or `DELETE` |
+| url           | String | Required | The request url                                                     |
+| body          | Object | Optional | The request body                                                    |
+| headers       | Object | Optional | The request headers                                                 |
+| contentType   | String | Optional | The request content type (`application/json` by default)            |
+
+#### Example
+
+```javascript
+const codeengine = require("codeengine");
 
 async function handleRequest(
   method,
@@ -57,6 +269,154 @@ async function handleRequest(
   } catch (error) {
     console.error(`Error with ${method} request to ${url}:`, error);
     throw error;
+  }
+}
+```
+
+## axios
+
+[Axios](https://axios-http.com/docs/intro) is a promise-based HTTP client for calling APIs outside of Domo. It is preinstalled in the Code Engine runtime, so you can load it with `require("axios")` or use the copy exported as `codeengine.axios`. Both refer to the same library.
+
+Unlike `sendRequest`, Axios requests are not authenticated for you. Pass any credentials the API needs in the request headers, typically from an account retrieved with [getAccount](#getaccount) or [getUserAuthorization](#getuserauthorization). To call Domo APIs in your own instance, use [sendRequest](#sendrequest) instead.
+
+Axios rejects the promise for any response with a status outside the `2xx` range. The rejected error includes the server's response in `error.response`, so you can read its `status` and `data`.
+
+**Library:** `codeengine.axios` or `require("axios")`  
+**Returns:** `Promise<Object>`
+
+### Parameters
+
+For the full set of request options, see the [Axios request config reference](https://axios-http.com/docs/req_config).
+
+### Example
+
+```javascript
+const codeengine = require("codeengine");
+
+async function getExternalRecord(accountAlias, recordId) {
+  const account = await codeengine.getAccount(accountAlias);
+
+  try {
+    const response = await codeengine.axios.get(
+      `https://api.example.com/v1/records/${recordId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${account.properties.access_token}`,
+          Accept: "application/json",
+        },
+        timeout: 30000,
+      },
+    );
+
+    return response.data;
+  } catch (error) {
+    if (error.response) {
+      console.error(
+        `Request for record ${recordId} failed with status ${error.response.status}:`,
+        error.response.data,
+      );
+    } else {
+      console.error(`Request for record ${recordId} failed:`, error.message);
+    }
+    throw error;
+  }
+}
+```
+
+### Response
+
+Axios wraps the server's reply in a response object. The parsed body is in `data`.
+
+```json
+{
+  "status": 200,
+  "statusText": "OK",
+  "headers": {
+    "content-type": "application/json"
+  },
+  "data": {
+    "id": "rec_001",
+    "name": "Example record"
+  }
+}
+```
+
+## googleAuthLibrary
+
+[Google Auth Library](https://github.com/googleapis/google-auth-library-nodejs) is Google's official library for authenticating to Google APIs, such as Google Drive, Google Sheets, and BigQuery. It is preinstalled in the Code Engine runtime, so you can load it with `require("google-auth-library")` or use the copy exported as `codeengine.googleAuthLibrary`. Both refer to the same library.
+
+The most common pattern in Code Engine is to authenticate as a Google service account. Store the service account's client email and private key in a Domo account, retrieve them with [getAccount](#getaccount), and pass them to a `JWT` client. The client requests an access token, refreshes it when it expires, and adds it to each request it sends.
+
+**Library:** `codeengine.googleAuthLibrary` or `require("google-auth-library")`  
+**Returns:** Classes such as `JWT`, `GoogleAuth`, and `OAuth2Client`
+
+### Parameters
+
+| Property Name | Type     | Required | Description                                                       |
+| ------------- | -------- | -------- | ----------------------------------------------------------------- |
+| email         | String   | Required | The service account's client email                                |
+| key           | String   | Required | The service account's private key, in PEM format                  |
+| scopes        | String[] | Required | The OAuth scopes the access token should be granted               |
+| subject       | String   | Optional | The email of a user to impersonate through domain-wide delegation |
+
+For other ways to authenticate, such as OAuth 2.0 user consent or API keys, see the [Google Auth Library documentation](https://cloud.google.com/nodejs/docs/reference/google-auth-library/latest).
+
+### Example
+
+The property names in `account.properties` depend on the account type you use to store the service account credentials.
+
+```javascript
+const codeengine = require("codeengine");
+const { JWT } = codeengine.googleAuthLibrary;
+
+async function listDriveFiles(accountAlias) {
+  const account = await codeengine.getAccount(accountAlias);
+  const { client_email, private_key } = account.properties;
+
+  const client = new JWT({
+    email: client_email,
+    key: private_key.replace(/\\n/g, "\n"),
+    scopes: ["https://www.googleapis.com/auth/drive.readonly"],
+  });
+
+  try {
+    const response = await client.request({
+      url: "https://www.googleapis.com/drive/v3/files",
+      params: { pageSize: 10 },
+    });
+
+    return response.data;
+  } catch (error) {
+    console.error("Error listing Google Drive files:", error.message);
+    throw error;
+  }
+}
+```
+
+The `replace` call converts escaped `\n` sequences back into line breaks, because a private key copied from a service account JSON file often loses them when it is saved as an account property.
+
+### Response
+
+`client.request` returns a response object with the same shape as an Axios response. The parsed body is in `data`.
+
+```json
+{
+  "status": 200,
+  "statusText": "OK",
+  "headers": {
+    "content-type": "application/json; charset=UTF-8"
+  },
+  "data": {
+    "kind": "drive#fileList",
+    "incompleteSearch": false,
+    "files": [
+      {
+        "kind": "drive#file",
+        "id": "1a2B3c4D5e6F7g8H9i0J",
+        "name": "Quarterly Forecast",
+        "mimeType": "application/vnd.google-apps.spreadsheet"
+      }
+    ]
   }
 }
 ```

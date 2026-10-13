@@ -14,17 +14,17 @@
 ## 1. How Your Content Is Being Reorganized
 
 The KB is moving from a flat feature encyclopedia to a story-driven structure organized
-around **11 pillars** (user workflows). The table below shows where each of your feature
+around **12 pillars** (user workflows). The table below shows where each of your feature
 areas lands in the new structure.
 
 | Feature | Articles | New Location |
 |---------|----------|--------------|
-| Domo Everywhere | 9 | Pillar 7: Share & Collaborate |
-| Sandbox | 2 | Pillar 9: Administer & Govern |
+| Domo Everywhere | 9 | Pillar 7: Distribute |
+| Sandbox | 2 | Pillar 10: Administer & Govern |
 
 ### Notable Navigation Changes
 
-- **Domo Everywhere positioning:** Domo Everywhere content lives in Pillar 7 (Share & Collaborate) with its own sub-section. The embed framing (public vs. private, SSO + PDP interaction) should be consistent across all Domo Everywhere articles.
+- **Domo Everywhere positioning:** Domo Everywhere content lives in Pillar 7 (Distribute) with its own sub-section. The embed framing (public vs. private, SSO + PDP interaction) should be consistent across all Domo Everywhere articles.
 
 ---
 

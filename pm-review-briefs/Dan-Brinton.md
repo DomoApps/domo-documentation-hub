@@ -49,7 +49,7 @@ recommended patterns.
 | 1 | `What-is-Domo.mdx` (Pillar 1) | 000005874, Getting Started role guides | Core value proposition, platform overview, key use cases — verify nothing is outdated or overpromised |
 | 2 | `Getting-Started-for-Admins.mdx` (Pillar 1) | Admin how-tos, roles/grants articles | Admin onboarding path, key first tasks (user setup, SSO, security), grant scopes |
 | 3 | `What-is-an-Alert.mdx` (Pillar 8) | Alerts Overview, alert articles | Alert types, trigger conditions, Smart Alerts / NLG behavior, notification routing |
-| 4 | `Share-and-Collaborate-Overview.mdx` (Pillar 8) | Sharing / Buzz / Publications / Embed articles | All sharing mechanisms, publication groups vs Domo Everywhere scope distinction |
+| 4 | `Collaborate-Overview.mdx` (Pillar 8) | Sharing / Buzz / Publications / Embed articles | All sharing mechanisms, publication groups vs Domo Everywhere scope distinction |
 | 5 | `Domo-User-Roles.mdx` (Pillar 9) | Roles / grants articles | System roles, custom roles, grant scopes — verify completeness of role list |
 | 6 | `Security-and-Permissions-Overview.mdx` (Pillar 9) | PDP, OAuth, security settings articles | PDP, SSO, IP allowlist, access tokens, session management — verify current security model |
 | 7 | `Administer-and-Govern-Overview.mdx` (Pillar 9) | All admin articles | Full admin toolbox overview — verify nothing major is missing from hub |
@@ -200,7 +200,7 @@ A prioritized list of everything this document is asking of you:
 | 1 | Read and fact-check `What-is-Domo.mdx` | Fact-check | 30–45 min |
 | 2 | Read and fact-check `Getting-Started-for-Admins.mdx` | Fact-check | 30–45 min |
 | 3 | Read and fact-check `What-is-an-Alert.mdx` | Fact-check | 30–45 min |
-| 4 | Read and fact-check `Share-and-Collaborate-Overview.mdx` | Fact-check | 30–45 min |
+| 4 | Read and fact-check `Collaborate-Overview.mdx` | Fact-check | 30–45 min |
 | 5 | Read and fact-check `Domo-User-Roles.mdx` | Fact-check | 30–45 min |
 | 6 | Read and fact-check remaining 2 Phase 3a articles | Fact-check | ~30 min each |
 | 7 | Fact-check `Activity-Log-Event-Reference.mdx` (Rank 7 community request) | Fact-check | 20–30 min |

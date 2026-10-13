@@ -1,7 +1,7 @@
 ---
 name: pm-review
 user-invocable: true
-description: "Walk a PM through every change in their KB-restructure review brief like a resumable checklist: show the exact diff of each change, let the PM approve / deny / rewrite / reject / answer, author or defer the gap-fill articles still owed in their area, fact-check with any context they provide, and record every disposition as inline markers + a tracked ledger. Phase 4.5 of the KB restructure."
+description: "Walk a PM through every change in their KB-restructure review brief like a resumable checklist: show the exact diff of each change, let the PM approve / deny / rewrite / reject / answer, author / defer / drop the gap-fill articles still owed in their area, fact-check with any context they provide, and record every disposition as inline markers + a tracked ledger. Phase 4.5 of the KB restructure."
 argument-hint: "PM name or slug (e.g. \"Ken Boyer\" or ken-boyer); omit to infer from the current restructure/pm/<slug> branch"
 ---
 
@@ -23,12 +23,23 @@ items from the same source as the per-PM briefs and `RESTRUCTURE-TASKS.md`.
   (tracked). It is the superset of truth; the item list is a volatile view reconciled against
   it on every run.
 - **Hybrid state.** Every disposition is recorded TWO ways: (1) an inline marker in the article
-  — burn the `{/* [pm-input] … */}` when answered, or stamp
-  `{/* [reviewed] pm=<slug> status=<status> date=YYYY-MM-DD */}` for an article-level sign-off;
+  — burn the `{/* [pm-input] … */}` when answered; stamp
+  `{/* [reviewed] pm=<slug> status=<status> date=YYYY-MM-DD */}` when signing off a change on a
+  **modified existing** article; or stamp `{/* [read-through] pm=<slug> date=YYYY-MM-DD */}` for
+  the whole-article final sign-off on a **from-scratch** article (do NOT also stamp per-hunk
+  `[reviewed]` on a from-scratch article — the read-through marker IS its sign-off);
   (2) a ledger entry via `pm_review.py set-status`.
+- **Every change carries a WHY.** `set-status` requires `--note "<why>"` for any terminal status;
+  that note (plus `--commit`/`--diff-summary` on edits) is the durable record the journal and
+  `explain` reconstruct after merge-back. Never record a disposition without the reason the PM gave.
 - **Ordering invariant (never violate):** write the ledger entry FIRST → then edit/burn the
   marker → then commit. A marker burned before the ledger records its ask can never be
   re-derived.
+- **Read-through = the article's final gate.** Every from-scratch article (restructure-authored
+  net-new in the PM's lane, or a gap-fill the PM authored) gets an auto-generated `read-through`
+  item: the PM reads the whole article (MDX or preview) and confirms it is factually correct AND
+  phrased how they want. It passes ONLY after every other item on that article is terminal; the
+  engine blocks it otherwise and auto-reopens it if a sibling later re-opens.
 - **PM branches never touch shared files.** `RESTRUCTURE-TASKS.md`, `PM-REVIEW-ROLLUP.md`,
   `RESTRUCTURE-DEFERRED-ARTICLES.md`, and `docs.json` nav are regenerated on the integration
   branch after merge-backs — never hand-edited on a PM branch. `add-to-nav` for new gap-fill
@@ -67,20 +78,29 @@ Also read `RESTRUCTURE-PROGRESS.md` § "Phase 4.5 — PM Review System" once to 
 
 ---
 
-## Step 1 — Load the worklist and find the resume point
+## Step 1 — Open a session and load the worklist
+
+Open a review session FIRST (it timestamps the sitting and auto-closes any session left dangling
+from a crash). Then load the worklist:
 
 ```bash
-python3 scripts/pm_review.py items --pm "<PM>"      # full reconciled worklist (JSON)
-python3 scripts/pm_review.py resume --pm "<PM>"     # first non-terminal item
+python3 scripts/pm_review.py session-start --pm "<PM>"   # open the sitting
+python3 scripts/pm_review.py items --pm "<PM>"           # full reconciled worklist (JSON)
+python3 scripts/pm_review.py resume --pm "<PM>"          # first actionable item
 ```
 
-`items` seeds/updates the ledger: it inserts new items as `pending`, refreshes existing ones,
-and reports `new_items` and `stale_items`. **If `stale_items` is non-empty, surface it to the
-user** — an item that was open but is no longer generated means the manifest or ownership
-changed; do not silently drop it.
+`items` seeds/updates the ledger: it inserts new items as `pending` (including an auto-generated
+`read-through` item per from-scratch article in the PM's lane), refreshes existing ones, and
+reports `new_items` and `stale_items`. **If `stale_items` is non-empty, surface it to the user**
+— an item that was open but is no longer generated means the manifest or ownership changed; do
+not silently drop it.
 
-Tell the user the shape of the work (counts by type, how many gap-fill, open vs done), then
-begin at the `resume` item. Offer to filter by type ("just the fact-checks today").
+`resume` returns the first actionable item; it holds back a `read-through` whose siblings are
+still open and reports them under `blocked_read_throughs` rather than claiming `done`.
+
+Tell the user the shape of the work (counts by type, how many gap-fill, how many read-throughs,
+open vs done), then begin at the `resume` item. Offer to filter by type ("just the fact-checks
+today").
 
 ---
 
@@ -95,6 +115,7 @@ claims to verify from `ask_snapshot`), then show **the exact change** according 
 | gap-fill `pm-input` (target file absent) | The intended article + what must be supplied (it isn't written yet). Go to **Step 3**. |
 | inline `pm-input` (target file present) | The `{/* [pm-input] … */}` marker **and its surrounding section**, so the PM answers in context. |
 | `decision` (`dec-D#`), `legacy`, `retired` | **No git diff** (retirements are staged for Phase 4.6; files are unchanged). Show the staged plan from the brief + `RESTRUCTURE-MANIFEST.md`. |
+| `read-through` (`rt-…`) | The **whole from-scratch article** (render the full file, or point the PM at the preview link). This is the final gate — see **Step 2b**. |
 
 For a correction you just made this session (see `rewrite/redo`), re-show only the branch-local
 delta so it isn't buried under the full restructure diff:
@@ -126,34 +147,88 @@ Record every disposition with the engine (ledger entry FIRST, per the ordering i
 
 ```bash
 python3 scripts/pm_review.py set-status --pm "<PM>" --id <item_id> --status <status> \
-  --disposition <disposition> [--reason "…"] [--evidence "…"] [--commit <sha>] --actor <slug>
+  --disposition <disposition> --note "<why the PM decided this>" \
+  [--reason "…"] [--evidence "…"] [--commit <sha>] [--diff-summary "…"] --actor <slug>
 ```
 
-Then make the article edit / marker change, then commit (see Step 5). For fact-checks confirmed
-fine with no edit, the `approved` ledger entry + `[reviewed]` stamp are the record (this closes
-the old "confirmed-fine fact-check leaves no diff" tracking hole).
+`--note` is **required** for any terminal status — capture the PM's reasoning in their words.
+On a **rewrite/redo**, record each edit as its own `--status rewrite-redo` entry carrying
+`--commit <sha> --diff-summary "<what changed>" --note "<why>"`, so every edit is traceable to a
+commit. Then make the article edit / marker change, then commit (see Step 5). For fact-checks
+confirmed fine with no edit, the `approved` ledger entry + `[reviewed]` stamp are the record.
 
 ---
 
-## Step 3 — Gap-fill articles (author now, or defer out of scope)
+## Step 2b — Read-through (the article's final sign-off)
+
+Every from-scratch article in the PM's lane has a `read-through` item. Present it **after** every
+other item on that article is terminal (the engine refuses to pass it otherwise and `resume`
+holds it back until then). Show the PM the **whole article** — render the full MDX, or give them
+the branch preview link — and ask them to confirm it is factually correct AND phrased how they
+want. This is a genuine end-to-end read, not a spot-check of the fact-check claims.
+
+- **pass** → `set-status --id <rt-id> --status approved --disposition read-through --note "<the
+  PM read it through and signed off>"`, then stamp `{/* [read-through] pm=<slug> date=… */}` on
+  the article. Do NOT also stamp `[reviewed]` — the read-through marker is the sign-off.
+- **needs changes** → treat like rewrite/redo on the article (log each edit with
+  `--commit/--diff-summary/--note`), then pass the read-through once the PM is satisfied.
+- If a sibling item re-opens later, the engine auto-reopens this read-through; re-pass it.
+
+---
+
+## Step 3 — Gap-fill articles (author now, defer, or drop)
 
 Gap-fill items are `pm-input` items whose target article does not exist yet (`gap_fill: true`)
-— the ~40 articles the KB couldn't write without PM input. For each in the PM's area, ask:
+— the ~40 articles the KB couldn't write without PM input. For each in the PM's area, present
+the PM three mutually exclusive choices and record the one they pick. Keep **defer** and **drop**
+distinct: a defer carries the article forward to a follow-up project; a drop ends its life.
 
-**Author now?** If yes:
+**1. Author now?** The PM wants it written as part of this restructure and will supply the input:
 1. Invoke `kb-intake` to gather what's needed, then `new-kb-article` (or `new-overview-article`
    for a "What is X" / hub page) to draft it into `s/article/<target>`.
 2. Run the three restructure quality gates (`RESTRUCTURE-PROGRESS.md` § Quality Gates):
    fact-check → screenshot audit → style-guide review.
 3. **Do NOT run `add-to-nav`** — nav registration is deferred to the integration branch. Note in
    the ledger that nav is pending.
-4. Ledger `status=authored disposition=author --commit <sha>`.
+4. Ledger `status=authored disposition=author --commit <sha> --note "<what the PM supplied>"`.
+5. **A `read-through` item is auto-generated for the article on the next `items` run** (it now
+   exists, so attribution picks it up). The PM must give it a final sign-off (Step 2b) before the
+   branch merges back — authoring is not the same as the holistic read.
 
-**Out of scope?** If the PM can't/won't supply it now:
+**2. Defer (out of scope for now)?** The article is still wanted, but the PM can't/won't supply
+it during this cycle:
 - Ledger `status=deferred disposition=out-of-scope --reason "<why + what it would cover>"`.
 - Do not write a stub article. The deferral is the record.
 - At project end, `pm_review.py deferred-report` regenerates `RESTRUCTURE-DEFERRED-ARTICLES.md` —
   the seed list for a follow-up project. Tell the user this is where it will surface.
+
+**3. Drop entirely?** The PM judges the article unnecessary — the gap shouldn't be filled at all
+(already covered elsewhere, not a real need, superseded, etc.):
+- Confirm the intent with the PM before recording — drop is terminal and removes the article from
+  the restructure's scope for good; it is **not** a "later" bucket.
+- Ledger `status=dropped disposition=drop --reason "<why it isn't needed>"`. A reason is required.
+- Do not write a stub article. **A dropped item does NOT appear in
+  `RESTRUCTURE-DEFERRED-ARTICLES.md`** and is not carried to any follow-up — that's the whole
+  difference from a defer. It is counted in its own `dropped` column in `PM-REVIEW-ROLLUP.md`.
+
+### Cross-article moves — record the link
+
+Some decisions span more than one article — most commonly: **drop a gap-fill, but fold its
+information into an existing article instead.** Record each individual item normally (drop the
+gap-fill item; rewrite the existing article's item), THEN tie them together so the reasoning is
+recoverable after merge-back:
+
+```bash
+python3 scripts/pm_review.py link --pm "<PM>" --kind fold \
+  --summary "Fold X into Y instead of a standalone article" \
+  --items <dropped-gapfill-id>,<existing-article-item-id> \
+  --targets <GapFill-Target>.mdx,<Existing-Article>.mdx \
+  --narrative "<the full reasoning the PM gave>"
+```
+
+This one record is what lets `explain --target <Existing-Article>.mdx` later surface *why* that
+content appeared and that it came from a dropped gap-fill. Use `--kind` loosely (`fold`, `split`,
+`merge`, `supersede`, `other`).
 
 ---
 
@@ -173,18 +248,73 @@ connector code repositories with annotations, product specs, CSVs, screenshots. 
 
 ---
 
+## Ownership reassignment (mid-review)
+
+A PM may volunteer that an article — or a whole product area — is or isn't theirs. **Never
+interrogate for this; act only on what they volunteer.**
+
+- **Claim ("this/that is mine"):** if the PM is certain, reassign it to them.
+- **Disclaim ("this isn't mine"):** confirm **which PM it should belong to** before reassigning —
+  don't guess the destination.
+
+Ownership lives in two pipelines (the reference/CODEOWNERS generator and the briefs generator) plus
+inline markers and the manifest; a single **override map** (`pm-review-state/ownership-overrides.json`)
+drives both generators, and `reassign` also sweeps the rest. Because the review runs on a PM branch
+but reassignment is an **integration-branch act**, orchestrate it like this:
+
+1. Commit any in-progress work on the current PM branch (clean tree).
+2. `git switch update/fullRestructure`.
+3. Record it (article- or feature-level — a feature move expands to every article under it):
+   ```bash
+   python3 scripts/pm_review.py reassign --article <File>.mdx --to "<PM>" \
+     --from "<PM>" --reason "<why>" --decided-by "<claiming PM>"
+   # or:  reassign --feature "<Feature>" --to "<PM>" --reason "…" --decided-by "…"
+   ```
+   This writes the override map, rewrites `[pm-input]` markers in the moved articles, sweeps the
+   `RESTRUCTURE-MANIFEST.md` PM columns + `PM-REVIEW-STATUS.md` rows, and logs an audit row
+   (`pm-review-state/ownership-change-log.csv`) + a ledger `decisions[]`/journal entry. **Heed the
+   `warning`** in its output: if the target PM has no `PM_GITHUB_LOGIN`, add their login to
+   `scripts/build-pm-ownership.py` (from memory `reference_pm_github_logins.md`) or CODEOWNERS won't
+   route their articles.
+4. Regenerate both pipelines so every derived file follows the move:
+   ```bash
+   python3 scripts/build-pm-ownership.py        # reference + CODEOWNERS
+   python3 scripts/build-pm-review-briefs.py    # briefs + RESTRUCTURE-TASKS
+   ```
+5. Commit on `update/fullRestructure`, then propagate to every PM branch (incl. the one you were
+   reviewing, so the running review sees the moved items):
+   ```bash
+   python3 scripts/pm_review.py propagate-ownership       # --dry-run first to preview
+   ```
+   It merges `update/fullRestructure` into each `restructure/pm/*` branch and pushes; it skips and
+   reports any branch that conflicts (resolve those by hand).
+6. `git switch` back to the PM's branch and continue the review.
+
+Recall later with `explain --target <File>.mdx` (surfaces the `ownership-reassign` decision + reason)
+or the `ownership-change-log.csv` audit trail.
+
+---
+
 ## Step 5 — Checkpoint, commit, report
 
 - Commit on the PM branch at natural breakpoints (end of a type group, or every handful of
   items) with a structured message, e.g.:
-  `pm-review(<slug>): approve 4 fact-checks, answer 2 pm-inputs, defer 1 gap-fill`.
+  `pm-review(<slug>): approve 4 fact-checks, answer 2 pm-inputs, defer 1 gap-fill, drop 1 gap-fill`.
   Include the attribution lines the session requires.
-- The ledger and article edits are the only things that change on a PM branch. Do **not** touch
-  the shared derived files.
+- The ledger, the per-PM journal, and article edits are the only things that change on a PM
+  branch. Do **not** touch the shared derived files.
+- At a stopping point (or end of the sitting): `session-end --pm "<PM>"` to close the session,
+  then `journal --pm "<PM>"` to regenerate `pm-review-state/<slug>.journal.md` (a human-readable
+  record of what the PM did and why — commit it with the ledger). Both are per-PM files that merge
+  back cleanly.
 - At any time the user asks "where are we?", run `items`/`resume` and report counts + the next
   item. On session resume, Step 1 re-finds the resume point automatically.
-- When the PM's worklist is all terminal (`resume` returns `done: true`), tell the user this PM
-  is ready to merge back; mark their row in `PM-REVIEW-STATUS.md` (hand-maintained ledger).
+- To recall a past decision, use `explain` (read-only): `explain --target <file>.mdx`,
+  `--id <item>`, `--pm "<PM>"`, or `--decision <id>` reconstructs the full history, notes, and any
+  linked cross-article decisions.
+- When the PM's worklist is all terminal (`resume` returns `done: true` with no
+  `blocked_read_throughs`), tell the user this PM is ready to merge back; mark their row in
+  `PM-REVIEW-STATUS.md` (hand-maintained ledger).
 
 ---
 
@@ -196,25 +326,36 @@ but only perform them when the user is on the integration branch:
 ```bash
 python3 scripts/pm_review.py rollup             # regenerate PM-REVIEW-ROLLUP.md from all ledgers
 python3 scripts/pm_review.py deferred-report    # regenerate RESTRUCTURE-DEFERRED-ARTICLES.md
+python3 scripts/pm_review.py journal --all      # regenerate the root PM-REVIEW-JOURNAL.md
 python3 scripts/pm_review.py reconcile --strict # the Phase 4.5 → 4.6 marker-reconciliation gate
 ```
+
+`rollup`, `deferred-report`, and `journal --all` write shared repo-root files and **refuse to run
+off `update/fullRestructure`** (they error if invoked on a PM branch). `journal --all` unions
+every PM's journal into `PM-REVIEW-JOURNAL.md` — the post-merge recall surface for "what did PM X
+want to do with change Y, and why" (pair it with `explain`).
 
 **The reconciliation sweep is the machine gate behind "every PM row Done → proceed to Phase
 4.6."** It cross-references every inline marker against the ledgers and reports: `stragglers`
 (open markers with no terminal coverage), `malformed_markers` (markers the generator can't
 parse), `inconsistencies` (answered in ledger but marker not burned, or a `[reviewed]` stamp
 with no backing), `anchorless_open_items` (open decision/lifecycle items, which have no file
-anchor), and `orphan_marker_pm_names` (marker PM names matching no roster PM). Drive every one to
-zero — answer+burn, defer, or fix the marker — before the restructure advances past 4.5.
+anchor), `orphan_marker_pm_names` (marker PM names matching no roster PM), and
+`read_through_findings` (terminal read-throughs missing their `[read-through]` marker, and
+from-scratch articles with no read-through item — **non-blocking for the first run**; verify them
+by hand, then fold into the gate once clean). Drive the blocking ones to zero — answer+burn,
+defer, or fix the marker — before the restructure advances past 4.5.
 
 ---
 
 ## Guardrails
 
 - Pre-merge: if `check-baseline` is not `ready`, do nothing else.
-- Never edit shared/derived files or run `add-to-nav` on a PM branch.
+- Never edit shared/derived files or run `add-to-nav` on a PM branch. `rollup`,
+  `deferred-report`, and `journal --all` enforce this (they refuse off the integration branch).
 - Never `git checkout <baseline> -- <file>` to reject a change on a modified file.
-- Always: ledger entry → marker edit → commit, in that order.
+- Always: ledger entry → marker edit → commit, in that order. Every terminal `set-status` carries
+  a `--note`.
 - Keep articles clean: no TODO/placeholder markers (restructure quality-gate rule). The only
-  markers that belong in articles are open `[pm-input]` (until answered) and `[reviewed]`
-  sign-offs.
+  markers that belong in articles are open `[pm-input]` (until answered), `[reviewed]` sign-offs
+  (modified existing articles), and `[read-through]` sign-offs (from-scratch articles).

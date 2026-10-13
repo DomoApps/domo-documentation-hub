@@ -20,7 +20,8 @@ Counts in parentheses are existing articles moving to that location.
 | Prepare & Transform Data | 75 *(D9 resolved 2026-07-14)* | 4 (hub + 3 concept) | 🔴 Critical |
 | Analyze & Visualize | 232 | 4 (hub + 3 concept) | 🔴 Critical |
 | Build Apps & Automate | 106 | 3 (hub + 2 concept) | 🟡 Medium |
-| Share & Collaborate | 51 | 2 (hub + 1 concept) | 🟡 Medium |
+| Distribute | 14 | 1 (hub — net-new) | 🟡 Medium |
+| Collaborate | 37 | 2 (hub + 1 concept) | 🟡 Medium |
 | AI & Data Science | 47 | 3 (hub + 2 concept) | 🟡 Medium |
 | Administer & Govern | 73 | 3 (hub + 2 concept) | 🟡 Medium |
 | Develop & Integrate | 7 | 4 (hub + 3 concept) | 🟠 High — severely thin |
@@ -349,13 +350,39 @@ Build Apps & Automate
 
 ---
 
-## Pillar 7: Share & Collaborate
+## Pillar 7: Distribute
 
-**Story:** You've built your insights. Now get them in front of the right people — share dashboards, set up alerts, collaborate in Buzz, and publish to external audiences.
+**Story:** Get your insights out to the people and systems that need them — export and email content, embed Domo in your own apps, and publish to subscriber instances.
 
 ```
-Share & Collaborate
-├── [NEW] Overview: Share & Collaborate               ← hub article
+Distribute
+├── [NEW] Overview: Distribute                        ← hub article (net-new)
+├── Choose How to Share Content Outside Domo          ← cross-cutting chooser
+├── Export (6)
+│   ├── Printing a Visualization Card
+│   ├── Export Visualization Cards
+│   ├── Build Formatted and Static Reports from Domo Data
+│   ├── Exporting Sumo Data
+│   ├── Emailing a Visualization Card
+│   └── Exporting Dashboards to PDF or PowerPoint
+├── Embed (3)
+│   ├── Embed Content Outside of Domo
+│   ├── Filter Options for the Embedded View Experience
+│   └── Exporting Embedded Content
+└── Publications (4)
+    ├── Setting Up Publication Groups
+    ├── Publication Groups and You: The Not Quite Definitive Primer
+    ├── Slideshow Publications Page Layout
+    └── Sharing Content Using Slideshows
+```
+
+## Pillar 8: Collaborate
+
+**Story:** You've built your insights. Now get them in front of the right people — share dashboards, set up alerts, and collaborate in Buzz.
+
+```
+Collaborate
+├── [NEW] Overview: Collaborate                       ← hub article
 ├── Sharing (10)
 │   ├── Sharing and Removing Access to Cards/Dashboards
 │   ├── Certify Cards and DataSets
@@ -374,17 +401,6 @@ Share & Collaborate
 │   ├── Importing an Email Thread into Buzz
 │   ├── Adding a Bot to Buzz
 │   └── [remaining Buzz articles]
-├── Publications (4)
-│   ├── Setting Up Publication Groups
-│   ├── Publish Content to a Subscriber Instance
-│   ├── Slideshow Publications Page Layout
-│   └── Sharing Content Using Slideshows
-├── Export & Embed (8)
-│   ├── Embed Content Outside of Domo
-│   ├── Exporting Dashboards to PDF or PowerPoint
-│   ├── Export Visualization Cards
-│   ├── Exporting Embedded Content
-│   └── [remaining export articles]
 ├── Domo Add-ins (3)
 │   ├── Domo Add-ins for Microsoft Office 365 | User Guide
 │   ├── Manual Installation Guide
@@ -401,7 +417,7 @@ Share & Collaborate
 
 ---
 
-## Pillar 8: AI & Data Science
+## Pillar 9: AI & Data Science
 
 **Story:** Go beyond standard charts — use AI to generate insights, run machine learning models, write Python and R in Jupyter, and build AI agents.
 
@@ -445,7 +461,7 @@ AI & Data Science
 
 ---
 
-## Pillar 9: Administer & Govern
+## Pillar 10: Administer & Govern
 
 **Story:** You're responsible for the Domo instance. Here's how to manage users, set up security, govern data quality, and keep the platform running smoothly.
 
@@ -495,7 +511,7 @@ Administer & Govern
 
 ---
 
-## Pillar 10: Develop & Integrate
+## Pillar 11: Develop & Integrate
 
 **Story:** You want to build on top of Domo programmatically — call the REST API, use SDKs, integrate via MCP, or build custom apps.
 
@@ -517,7 +533,7 @@ Develop & Integrate
 
 ---
 
-## Pillar 11: Release Notes
+## Pillar 12: Release Notes
 
 ```
 Release Notes
@@ -531,7 +547,7 @@ Release Notes
 
 ---
 
-## Pillar 12: Archive (not in primary nav)
+## Pillar 13: Archive (not in primary nav)
 
 > **Archive vs. Legacy vs. Deleted — Three distinct categories:**
 >
@@ -547,7 +563,7 @@ Release Notes
 >
 > **Use Deleted for:** Articles whose content has been restructured, merged, or rewritten into other articles. The source file is removed; its content lives on in a new or updated article.
 
-The Archive group is not a "Pillar 12" — it is a single **Archive** nav group appended after all 11 content pillars at the bottom of the Knowledge Base tab. Articles in Archive remain published (no `hidden: true`) so existing links still resolve, but the group is visually separated from active content.
+The Archive group is not a "Pillar 13" — it is a single **Archive** nav group appended after all 12 content pillars at the bottom of the Knowledge Base tab. Articles in Archive remain published (no `hidden: true`) so existing links still resolve, but the group is visually separated from active content.
 
 ```
 Archive (~115 articles — updated from 64 with Support KB Audit additions)

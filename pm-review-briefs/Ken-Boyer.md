@@ -14,15 +14,15 @@
 ## 1. How Your Content Is Being Reorganized
 
 The KB is moving from a flat feature encyclopedia to a story-driven structure organized
-around **11 pillars** (user workflows). The table below shows where each of your feature
+around **12 pillars** (user workflows). The table below shows where each of your feature
 areas lands in the new structure.
 
 | Feature | Articles | New Location |
 |---------|----------|--------------|
-| AI Services | 29 | Pillar 8: AI & Data Science |
-| CLI | 1 | Pillar 10: Develop & Integrate |
-| Documents-Filesets | 8 | Pillar 8: AI & Data Science |
-| Jupyter Notebooks | 5 | Pillar 8: AI & Data Science |
+| AI Services | 29 | Pillar 9: AI & Data Science |
+| CLI | 1 | Pillar 11: Develop & Integrate |
+| Documents-Filesets | 8 | Pillar 9: AI & Data Science |
+| Jupyter Notebooks | 5 | Pillar 9: AI & Data Science |
 
 ### Notable Navigation Changes
 

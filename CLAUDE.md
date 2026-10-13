@@ -168,6 +168,28 @@ Mid-week releases are possible for urgent fixes or specific customer asks, but t
 
 When telling a user their change is done, be accurate about this: merged is not live. If a deadline is relevant (e.g. it's Friday and they expect Monday publication), say so.
 
+### Mintlify Preview Rate Limit — Batch Multi-Branch Pushes
+
+The `mint-preview.yml` Action fires a Mintlify preview-deploy API call on every PR push/sync (and `release/**` push). Mintlify's preview endpoint allows only **5 requests per minute per org**. When many branches are created or synced at once — most commonly the `restructure/pm/*` PM review branches, which are all cut and synced together — the simultaneous pushes blow past the limit and the preview Action fails with **HTTP 429** on every branch past the first five. A 429 does not change the branch; it just means that branch's PR has no fresh preview.
+
+**Rule: never push or sync more than 4 restructure PM child branches (or any set of branches that each trigger a preview) at a time.** Push a batch of at most 4, then **wait and verify every branch in that batch had a *successful* preview Action run before starting the next batch** — don't make the user validate by hand. Only then push the next batch of 4. Repeat until all branches are done.
+
+Four (not five) leaves headroom for any retry or an unrelated preview firing in the same minute.
+
+How to verify a batch succeeded (and re-trigger a failed one) without a content change:
+
+```bash
+# Latest preview-run conclusion per PM branch (success / failure / in_progress):
+gh run list --workflow mint-preview.yml --limit 40 \
+  --json headBranch,status,conclusion,createdAt \
+  --jq '.[] | select(.headBranch|startswith("restructure/pm/")) | "\(.conclusion // .status)\t\(.headBranch)"'
+
+# Re-trigger a branch's preview without pushing a new commit (re-runs the same PR event):
+gh run rerun <run-id>
+```
+
+A 429 failure is fixed by re-running the failed run (or pushing again) in a later batch — no edit to the branch is needed. The branch-based preview URL (`https://domoinc-<branch-with-dashes>.mintlify.site`) is stable, so a stale sticky comment can still point at a preview that wasn't rebuilt on the latest push; trust the **Action run conclusion**, not the mere presence of the preview comment.
+
 ## Localization
 
 All localization assets live in **`localization/`**. Translation is **deterministic** (a term glossary is applied every run) and **self-improving** (human translator corrections are folded back into the glossary). The full system is documented in `localization/README.md`; the essentials for AI work:

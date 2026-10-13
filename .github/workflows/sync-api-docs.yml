@@ -118,7 +118,18 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -- "${DOCS_JSON_PATH}"
           git commit -m "docs: update API navigation"
-          git push origin "HEAD:${BRANCH}"
+          if ! git push origin "HEAD:${BRANCH}"; then
+            # Two runs can start on the same push; the one that loses the race is rejected as
+            # non-fast-forward. If the branch already has the same docs.json we would have
+            # pushed, a concurrent run did the work and there is nothing left to do.
+            git fetch origin "${BRANCH}"
+            if git diff --quiet FETCH_HEAD HEAD -- "${DOCS_JSON_PATH}"; then
+              echo "Navigation changes were already pushed by a concurrent run."
+            else
+              echo "::error::Push rejected and the branch has different docs.json content - was it updated mid-run?"
+              exit 1
+            fi
+          fi
 
       - name: Open pull request
         if: steps.changed.outputs.has_changes == 'true'

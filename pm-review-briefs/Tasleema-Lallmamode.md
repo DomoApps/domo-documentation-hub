@@ -1,7 +1,7 @@
 # PM Review Brief: Tasleema Lallmamode
 
 **Prepared for:** KB Restructure PM Review Meeting
-**Features owned:** Connectors 1.0, Third Party Connectors, Workbench
+**Features owned:** Connectors, Third Party Connectors, Workbench
 **Total articles in your area:** 1096
 
 > This document is your meeting guide. It shows how your content is being reorganized,
@@ -14,12 +14,12 @@
 ## 1. How Your Content Is Being Reorganized
 
 The KB is moving from a flat feature encyclopedia to a story-driven structure organized
-around **11 pillars** (user workflows). The table below shows where each of your feature
+around **12 pillars** (user workflows). The table below shows where each of your feature
 areas lands in the new structure.
 
 | Feature | Articles | New Location |
 |---------|----------|--------------|
-| Connectors 1.0 | 102 | Pillar 2: Connect & Integrate Data |
+| Connectors | 102 | Pillar 2: Connect & Integrate Data |
 | Third Party Connectors | 895 | Pillar 2: Connect & Integrate Data |
 | Workbench | 99 | Pillar 2: Connect & Integrate Data |
 

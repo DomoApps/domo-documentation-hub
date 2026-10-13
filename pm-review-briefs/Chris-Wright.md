@@ -14,7 +14,7 @@
 ## 1. How Your Content Is Being Reorganized
 
 The KB is moving from a flat feature encyclopedia to a story-driven structure organized
-around **11 pillars** (user workflows). The table below shows where each of your feature
+around **12 pillars** (user workflows). The table below shows where each of your feature
 areas lands in the new structure.
 
 | Feature | Articles | New Location |
@@ -24,7 +24,7 @@ areas lands in the new structure.
 | Doc Cards | 12 | Pillar 5: Analyze & Visualize |
 | Export to CSV | 5 | Pillar 5: Analyze & Visualize |
 | Mobile - iOS | 6 | Pillar 1: Getting Started |
-| Slideshows | 2 | Pillar 7: Share & Collaborate |
+| Slideshows | 2 | Pillar 7: Distribute |
 | Worksheets | 1 | Pillar 5: Analyze & Visualize |
 
 ### Notable Navigation Changes

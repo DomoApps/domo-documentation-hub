@@ -14,20 +14,20 @@
 ## 1. How Your Content Is Being Reorganized
 
 The KB is moving from a flat feature encyclopedia to a story-driven structure organized
-around **11 pillars** (user workflows). The table below shows where each of your feature
+around **12 pillars** (user workflows). The table below shows where each of your feature
 areas lands in the new structure.
 
 | Feature | Articles | New Location |
 |---------|----------|--------------|
-| Admin | 23 | Pillar 9: Administer & Govern |
-| Alerts, NLG, Smart Alerts/Insights | 7 | Pillar 7: Share & Collaborate |
-| Attribute Based Access Control (ABAC) | 4 | Pillar 9: Administer & Govern |
-| Buzz | 11 | Pillar 7: Share & Collaborate |
-| Consumption | 2 | Pillar 9: Administer & Govern |
-| DomoStats | 5 | Pillar 8: AI & Data Science |
-| Goals | 5 | Pillar 9: Administer & Govern |
-| Profile | 8 | Pillar 9: Administer & Govern |
-| Single Sign-On | 5 | Pillar 9: Administer & Govern |
+| Admin | 23 | Pillar 10: Administer & Govern |
+| Alerts, NLG, Smart Alerts/Insights | 7 | Pillar 8: Collaborate |
+| Attribute Based Access Control (ABAC) | 4 | Pillar 10: Administer & Govern |
+| Buzz | 11 | Pillar 8: Collaborate |
+| Consumption | 2 | Pillar 10: Administer & Govern |
+| DomoStats | 5 | Pillar 9: AI & Data Science |
+| Goals | 5 | Pillar 10: Administer & Govern |
+| Profile | 8 | Pillar 10: Administer & Govern |
+| Single Sign-On | 5 | Pillar 10: Administer & Govern |
 
 ### Notable Navigation Changes
 
@@ -48,8 +48,8 @@ recommended patterns.
 |---|---------|------------------|---------------------|
 | 1 | `What-is-Domo.mdx` (Pillar 1) | 000005874, Getting Started role guides | Core value proposition, platform overview, key use cases — verify nothing is outdated or overpromised |
 | 2 | `Getting-Started-for-Admins.mdx` (Pillar 1) | Admin how-tos, roles/grants articles | Admin onboarding path, key first tasks (user setup, SSO, security), grant scopes |
-| 3 | `What-is-an-Alert.mdx` (Pillar 7) | Alerts Overview, alert articles | Alert types, trigger conditions, Smart Alerts / NLG behavior, notification routing |
-| 4 | `Share-and-Collaborate-Overview.mdx` (Pillar 7) | Sharing / Buzz / Publications / Embed articles | All sharing mechanisms, publication groups vs Domo Everywhere scope distinction |
+| 3 | `What-is-an-Alert.mdx` (Pillar 8) | Alerts Overview, alert articles | Alert types, trigger conditions, Smart Alerts / NLG behavior, notification routing |
+| 4 | `Share-and-Collaborate-Overview.mdx` (Pillar 8) | Sharing / Buzz / Publications / Embed articles | All sharing mechanisms, publication groups vs Domo Everywhere scope distinction |
 | 5 | `Domo-User-Roles.mdx` (Pillar 9) | Roles / grants articles | System roles, custom roles, grant scopes — verify completeness of role list |
 | 6 | `Security-and-Permissions-Overview.mdx` (Pillar 9) | PDP, OAuth, security settings articles | PDP, SSO, IP allowlist, access tokens, session management — verify current security model |
 | 7 | `Administer-and-Govern-Overview.mdx` (Pillar 9) | All admin articles | Full admin toolbox overview — verify nothing major is missing from hub |

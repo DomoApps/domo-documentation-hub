@@ -248,6 +248,53 @@ connector code repositories with annotations, product specs, CSVs, screenshots. 
 
 ---
 
+## Ownership reassignment (mid-review)
+
+A PM may volunteer that an article — or a whole product area — is or isn't theirs. **Never
+interrogate for this; act only on what they volunteer.**
+
+- **Claim ("this/that is mine"):** if the PM is certain, reassign it to them.
+- **Disclaim ("this isn't mine"):** confirm **which PM it should belong to** before reassigning —
+  don't guess the destination.
+
+Ownership lives in two pipelines (the reference/CODEOWNERS generator and the briefs generator) plus
+inline markers and the manifest; a single **override map** (`pm-review-state/ownership-overrides.json`)
+drives both generators, and `reassign` also sweeps the rest. Because the review runs on a PM branch
+but reassignment is an **integration-branch act**, orchestrate it like this:
+
+1. Commit any in-progress work on the current PM branch (clean tree).
+2. `git switch update/fullRestructure`.
+3. Record it (article- or feature-level — a feature move expands to every article under it):
+   ```bash
+   python3 scripts/pm_review.py reassign --article <File>.mdx --to "<PM>" \
+     --from "<PM>" --reason "<why>" --decided-by "<claiming PM>"
+   # or:  reassign --feature "<Feature>" --to "<PM>" --reason "…" --decided-by "…"
+   ```
+   This writes the override map, rewrites `[pm-input]` markers in the moved articles, sweeps the
+   `RESTRUCTURE-MANIFEST.md` PM columns + `PM-REVIEW-STATUS.md` rows, and logs an audit row
+   (`pm-review-state/ownership-change-log.csv`) + a ledger `decisions[]`/journal entry. **Heed the
+   `warning`** in its output: if the target PM has no `PM_GITHUB_LOGIN`, add their login to
+   `scripts/build-pm-ownership.py` (from memory `reference_pm_github_logins.md`) or CODEOWNERS won't
+   route their articles.
+4. Regenerate both pipelines so every derived file follows the move:
+   ```bash
+   python3 scripts/build-pm-ownership.py        # reference + CODEOWNERS
+   python3 scripts/build-pm-review-briefs.py    # briefs + RESTRUCTURE-TASKS
+   ```
+5. Commit on `update/fullRestructure`, then propagate to every PM branch (incl. the one you were
+   reviewing, so the running review sees the moved items):
+   ```bash
+   python3 scripts/pm_review.py propagate-ownership       # --dry-run first to preview
+   ```
+   It merges `update/fullRestructure` into each `restructure/pm/*` branch and pushes; it skips and
+   reports any branch that conflicts (resolve those by hand).
+6. `git switch` back to the PM's branch and continue the review.
+
+Recall later with `explain --target <File>.mdx` (surfaces the `ownership-reassign` decision + reason)
+or the `ownership-change-log.csv` audit trail.
+
+---
+
 ## Step 5 — Checkpoint, commit, report
 
 - Commit on the PM branch at natural breakpoints (end of a type group, or every handful of

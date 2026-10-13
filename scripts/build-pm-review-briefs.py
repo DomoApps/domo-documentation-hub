@@ -725,6 +725,51 @@ def pm_cell_matches(cell: str, pm_name: str) -> bool:
     return pm_name in parts
 
 
+# ── ownership overrides (mid-review PM reassignment) ──────────────────────────
+# `pm_review.py reassign` records filename → PM overrides when a PM claims or
+# disclaims an article during review. Applied by TARGET FILENAME so a reassigned
+# article's tasks move to the new PM's worklist/brief; both this script and
+# build-pm-ownership.py read the same file so the two pipelines agree.
+OVERRIDES_FILE = REPO_ROOT / "pm-review-state" / "ownership-overrides.json"
+
+
+def load_ownership_overrides() -> dict:
+    out = {}
+    if OVERRIDES_FILE.exists():
+        try:
+            data = json.loads(OVERRIDES_FILE.read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            return out
+        for o in data.get("overrides", []):
+            fn, pm = o.get("filename"), o.get("to_pm")
+            if fn and pm:
+                out[fn] = pm  # last write wins
+    return out
+
+
+OWNERSHIP_OVERRIDES = load_ownership_overrides()
+
+
+def effective_pm(original_pm: str, filename) -> str:
+    """The PM a task belongs to after any reassignment override on its article."""
+    if filename and filename in OWNERSHIP_OVERRIDES:
+        return OWNERSHIP_OVERRIDES[filename]
+    return original_pm
+
+
+def pm_owns_task(original_pm: str, filename, pm_name: str) -> bool:
+    """Exact-match ownership for an article-scoped task, override-aware."""
+    return effective_pm(original_pm, filename) == pm_name
+
+
+def pm_cell_owns(cell: str, filename, pm_name: str) -> bool:
+    """Manifest-cell ownership (multi-PM aware), override-aware: an override on the
+    article replaces the whole cell with a single owner."""
+    if filename and filename in OWNERSHIP_OVERRIDES:
+        return OWNERSHIP_OVERRIDES[filename] == pm_name
+    return pm_cell_matches(cell, pm_name)
+
+
 # ─────────────────────────────────────────────────────────────────────────────
 # BRIEF GENERATION
 # ─────────────────────────────────────────────────────────────────────────────
@@ -793,7 +838,7 @@ def generate_brief(pm_name: str, pm_ownership: dict, all_gaps: list, forum: dict
     # ── Section 2: AI-Generated Articles to Fact-Check ────────────────────────
     pm_phase3a = [(fn, title, pillar, synth, claims)
                   for fn, title, pillar, pm, synth, claims in PHASE3A_ARTICLES
-                  if pm == pm_name]
+                  if pm_owns_task(pm, fn, pm_name)]
 
     lines += [
         "## 2. AI-Generated Articles — Your Fact-Check Required",
@@ -822,20 +867,21 @@ def generate_brief(pm_name: str, pm_ownership: dict, all_gaps: list, forum: dict
     lines += ["---", ""]
 
     # ── Section 3: New Forum-Gap Articles + Open Placeholders ──────────────────
-    pm_input = [(fn, title, what) for fn, title, pm, what in PHASE3A_PM_ARTICLES if pm == pm_name]
+    pm_input = [(fn, title, what) for fn, title, pm, what in PHASE3A_PM_ARTICLES
+                if pm_owns_task(pm, fn, pm_name)]
     # Written forum articles (drafted; need fact-check) — matched on manifest PM cell.
     pm_forum_written = sorted(
-        [w for w in forum["written"] if pm_cell_matches(w["pm"], pm_name)],
+        [w for w in forum["written"] if pm_cell_owns(w["pm"], w["filename"], pm_name)],
         key=lambda w: w["rank"],
     )
     # Deferred forum articles (not written; need PM input to begin).
     pm_forum_deferred = sorted(
-        [d for d in forum["deferred"] if pm_cell_matches(d["pm"], pm_name)],
+        [d for d in forum["deferred"] if pm_cell_owns(d["pm"], d["filename"], pm_name)],
         key=lambda d: d["rank"],
     )
     # Open [pm-input] placeholders: embedded article markers (scanned) + manifest flags.
     pm_checkpoints = [(c["filename"], c["ask"]) for c in forum["checkpoints"]
-                      if c["pm"] == pm_name]
+                      if pm_owns_task(c["pm"], c["filename"], pm_name)]
     pm_checkpoints += [(scope, ask) for scope, ask in MANIFEST_PM_INPUT_FLAGS.get(pm_name, [])]
 
     lines += [
@@ -1100,27 +1146,27 @@ def collect_pm_tasks(pm_name: str, all_gaps: list, forum: dict) -> dict:
     """Gather every typed task for one PM (reuses the same filters as the briefs)."""
     tasks = {"fact-check": [], "pm-input": [], "legacy": [], "retired": [], "update": [], "decision": []}
 
-    # [fact-check] — Phase 3a synthesized articles
+    # [fact-check] — Phase 3a synthesized articles  (override-aware by filename)
     for fn, title, _pillar, pm, _src, fc in PHASE3A_ARTICLES:
-        if pm == pm_name:
+        if pm_owns_task(pm, fn, pm_name):
             tasks["fact-check"].append((f"`{fn}` — *{title}*", fc))
     # [fact-check] — forum-gap articles already drafted
-    for w in sorted([w for w in forum["written"] if pm_cell_matches(w["pm"], pm_name)],
+    for w in sorted([w for w in forum["written"] if pm_cell_owns(w["pm"], w["filename"], pm_name)],
                     key=lambda w: w["rank"]):
         flag = " ⚠️ (open [pm-input])" if w.get("has_pm_input") else ""
         tasks["fact-check"].append((f"`{w['filename']}` (rank {w['rank']}){flag}", w["notes"]))
 
     # [pm-input] — original-plan PM articles
     for fn, title, pm, what in PHASE3A_PM_ARTICLES:
-        if pm == pm_name:
+        if pm_owns_task(pm, fn, pm_name):
             tasks["pm-input"].append((f"`{fn}` — *{title}*", what))
     # [pm-input] — deferred forum articles
-    for d in sorted([d for d in forum["deferred"] if pm_cell_matches(d["pm"], pm_name)],
+    for d in sorted([d for d in forum["deferred"] if pm_cell_owns(d["pm"], d["filename"], pm_name)],
                     key=lambda d: d["rank"]):
         tasks["pm-input"].append((f"`{d['filename']}` (rank {d['rank']})", d["what"]))
     # [pm-input] — scanned inline article markers + manifest-level flags
     for c in forum["checkpoints"]:
-        if c["pm"] == pm_name:
+        if pm_owns_task(c["pm"], c["filename"], pm_name):
             tasks["pm-input"].append((f"`{c['filename']}`", c["ask"]))
     for scope, ask in MANIFEST_PM_INPUT_FLAGS.get(pm_name, []):
         tasks["pm-input"].append((scope, ask))
@@ -1368,6 +1414,9 @@ def main():
     roster.update(MANIFEST_PM_INPUT_FLAGS.keys())
     for c in forum["checkpoints"]:
         roster.add(c["pm"])
+    # A reassignment may hand an article to a PM who had no prior tasks — make sure
+    # they still get a brief/worklist rather than being orphaned.
+    roster.update(OWNERSHIP_OVERRIDES.values())
 
     # Orphan detection: manifest forum rows whose PM cell matches no roster PM
     # (e.g. "Domo University / Enablement (no listed PM)"). These would silently

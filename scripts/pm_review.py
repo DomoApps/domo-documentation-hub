@@ -28,6 +28,14 @@ Subcommands
                                      branch only).
   explain [--pm NAME] [--target F] [--id ID] [--decision D]
                                      Reconstruct what a PM did and why (read-only).
+  reassign (--article F | --feature NAME) --to PM [--from PM] [--reason R]
+           [--decided-by PM] [--actor A]
+                                     Reassign ownership mid-review (INTEGRATION branch
+                                     only); writes the override map both generators read,
+                                     rewrites [pm-input] markers, sweeps the manifest +
+                                     status, and logs an audit + journal entry.
+  propagate-ownership [--dry-run]   Merge INTEGRATION into every restructure/pm/* branch
+                                     and push (skips conflicts); --dry-run prints the plan.
   reconcile [--pm NAME]             Marker <-> ledger sweep (the Phase 4.5->4.6 gate).
   rollup                            Regenerate PM-REVIEW-ROLLUP.md (INTEGRATION only).
   deferred-report                   Regenerate RESTRUCTURE-DEFERRED-ARTICLES.md (ditto).
@@ -45,6 +53,7 @@ branch after per-PM branches merge back — never hand-edited on a PM branch.
 """
 
 import argparse
+import csv
 import hashlib
 import importlib.util
 import json
@@ -61,7 +70,19 @@ STATE_DIR = REPO_ROOT / "pm-review-state"
 ROLLUP_FILE = REPO_ROOT / "PM-REVIEW-ROLLUP.md"
 DEFERRED_FILE = REPO_ROOT / "RESTRUCTURE-DEFERRED-ARTICLES.md"
 JOURNAL_FILE = REPO_ROOT / "PM-REVIEW-JOURNAL.md"
+OVERRIDES_FILE = STATE_DIR / "ownership-overrides.json"
+OWNERSHIP_LOG = STATE_DIR / "ownership-change-log.csv"
+MANIFEST_FILE = REPO_ROOT / "RESTRUCTURE-MANIFEST.md"
+PM_STATUS_FILE = REPO_ROOT / "PM-REVIEW-STATUS.md"
 INTEGRATION_BRANCH = "update/fullRestructure"
+
+# PMs with a confirmed GitHub login in build-pm-ownership.py's PM_GITHUB_LOGIN, so
+# CODEOWNERS routes their articles. Keep in sync with that dict. A reassignment TO a
+# PM outside this set warns (routing is silently dropped until a login is added).
+ROUTED_PMS = {
+    "Andrea Henderson", "Dan Brinton", "Jordan Jensen", "Ken Boyer",
+    "Mamta Bolaki", "Phil Fuchs", "Ryan Despain",
+}
 
 TYPE_ORDER = ["fact-check", "pm-input", "legacy", "retired", "update", "decision", "read-through"]
 TYPE_PREFIX = {
@@ -960,6 +981,277 @@ def cmd_explain(args):
                      indent=2, ensure_ascii=False))
 
 
+# ── ownership reassignment (mid-review PM claim/disclaim) ─────────────────────
+
+def _load_overrides() -> dict:
+    if OVERRIDES_FILE.exists():
+        try:
+            return json.loads(OVERRIDES_FILE.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            pass
+    return {"schema": 1, "overrides": []}
+
+
+def _save_overrides(data: dict):
+    STATE_DIR.mkdir(exist_ok=True)
+    OVERRIDES_FILE.write_text(json.dumps(data, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+
+
+def _ref_pm_by_file() -> dict:
+    """filename -> current PM, from the ownership reference (via the builder)."""
+    ownership = load_data()[0]
+    out = {}
+    for pm, info in ownership.items():
+        for a in info.get("articles", []):
+            if len(a) >= 3 and a[2]:
+                out[a[2]] = pm
+    return out
+
+
+def _files_for_feature(feature: str) -> list:
+    """Every article filename under a Feature (the ownership reference is the only
+    materialized Feature->article list)."""
+    ownership = load_data()[0]
+    want = normalize(feature)
+    files = set()
+    for info in ownership.values():
+        for a in info.get("articles", []):
+            if len(a) >= 3 and a[2] and normalize(a[0]) == want:
+                files.add(a[2])
+    return sorted(files)
+
+
+def _rewrite_markers(text: str, to_pm: str, pm_input_re, split_re):
+    """Replace the PM-name token in every {/* [pm-input] <PM> — ask */} marker with
+    to_pm, preserving indentation, separator, and the ask. Returns (new_text, count)."""
+    count = 0
+
+    def repl(mo):
+        nonlocal count
+        full, g1 = mo.group(0), mo.group(1)
+        sm = split_re.match(g1)
+        if not sm:
+            return full
+        old = sm.group(1)
+        new_g1 = re.sub(r"^(\s*)" + re.escape(old),
+                        lambda mm: mm.group(1) + to_pm, g1, count=1, flags=re.DOTALL)
+        if new_g1 == g1:
+            return full
+        s, e = mo.start(1) - mo.start(0), mo.end(1) - mo.start(0)
+        count += 1
+        return full[:s] + new_g1 + full[e:]
+
+    return pm_input_re.sub(repl, text), count
+
+
+def _sweep_manifest(files, from_by_file, to_pm):
+    """In RESTRUCTURE-MANIFEST.md rows naming an affected file, swap the from-PM for
+    to_pm (handles 'A / B' and '(suffix)' via word-boundary replace). Conservative:
+    only touches a row when the resolved from-PM literally appears in it."""
+    if not MANIFEST_FILE.exists():
+        return 0, []
+    text = MANIFEST_FILE.read_text(encoding="utf-8")
+    lines = text.split("\n")
+    changed, skipped = 0, []
+    fileset = set(files)
+    for i, line in enumerate(lines):
+        if not line.startswith("|"):
+            continue
+        matched = next((f for f in fileset if f"`{f}`" in line), None)
+        if not matched:
+            continue
+        frm = from_by_file.get(matched)
+        if not frm or frm == "(unknown)":
+            skipped.append([matched, i + 1, "unknown from-PM"])
+            continue
+        if frm not in line:
+            skipped.append([matched, i + 1, "from-PM not literally in row"])
+            continue
+        new_line = re.sub(r"(?<!\w)" + re.escape(frm) + r"(?!\w)", to_pm, line)
+        if new_line != line:
+            lines[i] = new_line
+            changed += 1
+    if changed:
+        MANIFEST_FILE.write_text("\n".join(lines), encoding="utf-8")
+    return changed, skipped
+
+
+def _sweep_status(pms):
+    """Hand-maintained PM-REVIEW-STATUS.md: reset a 'done' Done cell to 'todo' for the
+    affected PMs, since their worklist just changed."""
+    if not PM_STATUS_FILE.exists():
+        return 0
+    lines = PM_STATUS_FILE.read_text(encoding="utf-8").split("\n")
+    changed = 0
+    for i, line in enumerate(lines):
+        if not line.startswith("|"):
+            continue
+        cells = [c.strip() for c in line.strip().strip("|").split("|")]
+        if len(cells) >= 2 and cells[0] in pms and cells[-1] == "done":
+            cells[-1] = "todo"
+            lines[i] = "| " + " | ".join(cells) + " |"
+            changed += 1
+    if changed:
+        PM_STATUS_FILE.write_text("\n".join(lines), encoding="utf-8")
+    return changed
+
+
+def _append_ownership_log(entries):
+    STATE_DIR.mkdir(exist_ok=True)
+    new = not OWNERSHIP_LOG.exists()
+    with OWNERSHIP_LOG.open("a", encoding="utf-8", newline="") as f:
+        w = csv.writer(f)
+        if new:
+            w.writerow(["date", "filename", "from_pm", "to_pm", "scope", "feature",
+                        "decided_by", "actor", "reason", "codeowners_routed"])
+        for e in entries:
+            w.writerow([e["date"], e["filename"], e["from_pm"], e["to_pm"], e["scope"],
+                        e.get("feature") or "", e.get("decided_by") or "", e.get("actor") or "",
+                        e.get("reason") or "", "yes" if e["to_pm"] in ROUTED_PMS else "no"])
+
+
+def _record_reassign_decision(pm_name, files, from_label, to_pm, reason, decided_by, actor):
+    """Append an ownership-reassign decision to a PM's ledger (so `explain`/journal
+    recall it). Targets=the moved files, so `explain --target <file>` surfaces it."""
+    pm, slug = resolve_pm(pm_name)
+    ledger = load_ledger(pm, slug)
+    ledger.setdefault("decisions", [])
+    did = f"reassign-{len(ledger['decisions']) + 1}-{date.today().isoformat()}"
+    ledger["decisions"].append({
+        "id": did, "date": date.today().isoformat(), "actor": actor or slug,
+        "kind": "ownership-reassign",
+        "summary": f"Ownership → {to_pm} (from {from_label})",
+        "items": [], "targets": files, "narrative": reason,
+        "decided_by": decided_by or "", "session": ledger.get("current_session"),
+    })
+    save_ledger(ledger)
+
+
+def cmd_reassign(args):
+    br = current_branch()
+    if br != INTEGRATION_BRANCH:
+        sys.exit(f"error: reassign runs only on {INTEGRATION_BRANCH} (current: {br or 'unknown'}). "
+                 "Switch there first; the skill propagates the result to the PM branches.")
+    to_pm = canonical_pm(args.to)
+    if not to_pm:
+        sys.exit(f"error: --to '{args.to}' is not a canonical roster PM.\nKnown:\n  "
+                 + "\n  ".join(roster()))
+    if bool(args.article) == bool(args.feature):
+        sys.exit("error: pass exactly one of --article <file.mdx> or --feature \"<Feature>\".")
+
+    m = builder()
+    article_dir = m.ARTICLE_DIR
+    ref_pm = _ref_pm_by_file()
+    if args.article:
+        fn = Path(args.article if args.article.endswith(".mdx") else args.article + ".mdx").name
+        files, scope, feature = [fn], "article", None
+    else:
+        files = _files_for_feature(args.feature)
+        if not files:
+            sys.exit(f"error: no articles found for Feature '{args.feature}' in the ownership reference.")
+        scope, feature = "feature", args.feature
+
+    today = date.today().isoformat()
+    from_by_file = {fn: (args.from_pm or ref_pm.get(fn) or "(unknown)") for fn in files}
+
+    # 1) override map (filename-keyed; both generators read this)
+    data = _load_overrides()
+    by_file = {o["filename"]: o for o in data.get("overrides", [])}
+    log_entries = []
+    for fn in files:
+        entry = {"filename": fn, "to_pm": to_pm, "from_pm": from_by_file[fn],
+                 "scope": scope, "feature": feature, "reason": args.reason or "",
+                 "decided_by": args.decided_by or "", "actor": args.actor or "", "date": today}
+        by_file[fn] = entry
+        log_entries.append(entry)
+    data["overrides"] = list(by_file.values())
+    _save_overrides(data)
+
+    # 2) rewrite inline [pm-input] markers in the affected articles
+    marker_edits = marker_files = 0
+    for fn in files:
+        p = article_dir / fn
+        if not p.exists():
+            continue
+        text = p.read_text(encoding="utf-8")
+        if "[pm-input]" not in text:
+            continue
+        new_text, n = _rewrite_markers(text, to_pm, m._PM_INPUT_RE, m._PM_INPUT_SPLIT)
+        if n:
+            p.write_text(new_text, encoding="utf-8")
+            marker_edits += n
+            marker_files += 1
+
+    # 3) manifest PM columns; 4) status rows
+    man_changed, man_skipped = _sweep_manifest(files, from_by_file, to_pm)
+    status_pms = {to_pm} | {v for v in from_by_file.values() if v and v != "(unknown)"}
+    status_changed = _sweep_status(status_pms)
+
+    # 5) audit log
+    _append_ownership_log(log_entries)
+
+    # 6) decision/journal entries (into the gaining PM, and any canonical losing PM)
+    from_label = (feature if scope == "feature" else from_by_file[files[0]])
+    _record_reassign_decision(to_pm, files, from_label, to_pm, args.reason or "",
+                              args.decided_by, args.actor)
+    for frm in {v for v in from_by_file.values()}:
+        if frm and frm != to_pm and frm != "(unknown)" and canonical_pm(frm):
+            _record_reassign_decision(frm, files, frm, to_pm, args.reason or "",
+                                      args.decided_by, args.actor)
+
+    routed = to_pm in ROUTED_PMS
+    out = {
+        "ok": True, "to_pm": to_pm, "scope": scope, "feature": feature, "files": files,
+        "override_entries": len(files), "markers_rewritten": marker_edits,
+        "marker_files": marker_files, "manifest_rows_changed": man_changed,
+        "manifest_skipped": man_skipped, "status_rows_reset": status_changed,
+        "codeowners_routed": routed,
+    }
+    if not routed:
+        out["warning"] = (f"{to_pm} has no confirmed GitHub login — CODEOWNERS will not route these "
+                          "articles until a login is added to PM_GITHUB_LOGIN in "
+                          "scripts/build-pm-ownership.py (see memory reference_pm_github_logins.md).")
+    out["next_steps"] = [
+        "python3 scripts/build-pm-ownership.py       # regenerate reference + CODEOWNERS",
+        "python3 scripts/build-pm-review-briefs.py   # regenerate briefs + RESTRUCTURE-TASKS",
+        f"git commit on {INTEGRATION_BRANCH}",
+        "python3 scripts/pm_review.py propagate-ownership",
+    ]
+    print(json.dumps(out, indent=2, ensure_ascii=False))
+
+
+def cmd_propagate_ownership(args):
+    br = current_branch()
+    if br != INTEGRATION_BRANCH:
+        sys.exit(f"error: propagate-ownership runs from {INTEGRATION_BRANCH} (current: {br or 'unknown'}).")
+    r = git("for-each-ref", "--format=%(refname:short)", "refs/heads/restructure/pm", check=False)
+    branches = [b.strip() for b in r.stdout.splitlines() if b.strip()]
+    if args.dry_run:
+        print(json.dumps({"dry_run": True, "integration": INTEGRATION_BRANCH, "branches": branches,
+                          "actions": [f"git switch {b} && git merge --no-edit {INTEGRATION_BRANCH} "
+                                      f"&& git push" for b in branches]},
+                         indent=2, ensure_ascii=False))
+        return
+    if git("status", "--porcelain", check=False).stdout.strip():
+        sys.exit("error: working tree not clean — commit or stash before propagating.")
+    results = []
+    for b in branches:
+        if git("switch", b, check=False).returncode != 0:
+            results.append({"branch": b, "status": "switch-failed"})
+            continue
+        mg = git("merge", "--no-edit", INTEGRATION_BRANCH, check=False)
+        if mg.returncode != 0:
+            git("merge", "--abort", check=False)
+            results.append({"branch": b, "status": "conflict-skipped"})
+            continue
+        ph = git("push", check=False)
+        results.append({"branch": b, "status": "ok" if ph.returncode == 0 else "push-failed",
+                        "detail": "" if ph.returncode == 0 else ph.stderr.strip()})
+    git("switch", INTEGRATION_BRANCH, check=False)
+    print(json.dumps({"propagated": results, "returned_to": INTEGRATION_BRANCH},
+                     indent=2, ensure_ascii=False))
+
+
 # ── reconciliation sweep (the Phase 4.5 -> 4.6 gate) ──────────────────────────
 
 _PM_INPUT_LOOSE = re.compile(r"\[pm-input\]")
@@ -1177,6 +1469,20 @@ def build_parser():
     pe.add_argument("--id")
     pe.add_argument("--decision")
     pe.set_defaults(func=cmd_explain)
+
+    pra = sub.add_parser("reassign", help="reassign ownership of an article/Feature to a PM")
+    pra.add_argument("--article", help="article filename (e.g. Foo.mdx)")
+    pra.add_argument("--feature", help="Feature name — reassigns every article under it")
+    pra.add_argument("--to", required=True, help="canonical PM to assign ownership to")
+    pra.add_argument("--from", dest="from_pm", help="prior PM (else resolved from the reference)")
+    pra.add_argument("--reason", help="why the reassignment happened")
+    pra.add_argument("--decided-by", dest="decided_by", help="the PM who claimed/confirmed it")
+    pra.add_argument("--actor")
+    pra.set_defaults(func=cmd_reassign)
+
+    pp = sub.add_parser("propagate-ownership", help="merge integration into all PM branches + push")
+    pp.add_argument("--dry-run", action="store_true", help="print the plan without executing")
+    pp.set_defaults(func=cmd_propagate_ownership)
 
     pc = sub.add_parser("reconcile", help="marker<->ledger sweep (the 4.5->4.6 gate)")
     pc.add_argument("--pm", help="(informational; the sweep is global by design)")

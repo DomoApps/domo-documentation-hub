@@ -29,6 +29,7 @@ import pm_review as P  # noqa: E402
 
 PM = "Test PM"
 SLUG = "test-pm"
+OTHER = "Other PM"
 _PASS = 0
 _FAIL = 0
 
@@ -84,8 +85,15 @@ def setup(tmp):
     P._BUILDER = types.SimpleNamespace(
         ARTICLE_DIR=articles,
         scan_article_pm_inputs=lambda d: [],
-        _PM_INPUT_RE=re.compile(r"\{/\*\s*\[pm-input\]"),
+        _PM_INPUT_RE=re.compile(r"\{/\*\s*\[pm-input\]\s*(.*?)\*/\}", re.DOTALL),
+        _PM_INPUT_SPLIT=re.compile(r"\s*(.+?)\s*[—:]\s*(.*)", re.DOTALL),
     )
+    # ownership-reassignment helpers operate on the integration branch + tmp root files
+    P.current_branch = lambda: P.INTEGRATION_BRANCH
+    P.OVERRIDES_FILE = state / "ownership-overrides.json"
+    P.OWNERSHIP_LOG = state / "ownership-change-log.csv"
+    P.MANIFEST_FILE = tmp / "RESTRUCTURE-MANIFEST.md"
+    P.PM_STATUS_FILE = tmp / "PM-REVIEW-STATUS.md"
     # one brief item: a fact-check sibling on the from-scratch article new1.mdx
     normal = [{
         "id": "fc-sib", "type": "fact-check", "target": "new1.mdx",
@@ -94,8 +102,11 @@ def setup(tmp):
         "gap_fill": False,
     }]
     P.regenerate_items = lambda pm: list(normal)
-    P.roster = lambda: [PM]
-    P.load_data = lambda: ({PM: {"features": set(), "articles": [("F", "T", "new1.mdx")]}}, {}, {})
+    P.roster = lambda: [PM, OTHER, "Phil Fuchs"]
+    P.load_data = lambda: (
+        {PM: {"features": {"Cards"},
+              "articles": [("Cards", "T1", "new1.mdx"), ("Cards", "T2", "new2.mdx")]}},
+        {}, {})
     # new1 is owned+added; unowned.mdx is added but NOT owned/targeted (attribution test)
     P.git_added_since = lambda baseline: {"new1.mdx", "unowned.mdx"}
     P.resolve_baseline = lambda explicit=None: "BASE"
@@ -178,6 +189,47 @@ def main():
     fs_targets = {t for _pm, t in rtf["from_scratch_without_item"]}
     check("new1.mdx" in fs_targets, "from-scratch article with no read-through item is flagged")
     check("unowned.mdx" not in fs_targets, "unattributed added file is NOT flagged as missing")
+
+    # (h) reassign --article: override map + marker rewrite + manifest/status sweep + audit + decision
+    (articles / "new1.mdx").write_text(
+        "# new1\n{/* [pm-input] Test PM — confirm the thing */}\n", encoding="utf-8")
+    P.MANIFEST_FILE.write_text(
+        "## T\n\n| Filename | PM | Notes |\n|---|---|---|\n| `new1.mdx` | Test PM | note |\n", encoding="utf-8")
+    P.PM_STATUS_FILE.write_text(
+        "| PM | Done |\n|----|------|\n| Test PM | done |\n| Other PM | todo |\n", encoding="utf-8")
+    data, _ = run(P.cmd_reassign, article="new1.mdx", feature=None, to=OTHER, from_pm=PM,
+                  reason="PM says it's theirs", decided_by=OTHER, actor="other-pm")
+    check(data.get("to_pm") == OTHER and data["files"] == ["new1.mdx"], "reassign returns the move")
+    ov = json.loads((state / "ownership-overrides.json").read_text())
+    check(any(o["filename"] == "new1.mdx" and o["to_pm"] == OTHER for o in ov["overrides"]),
+          "override map records filename -> new PM")
+    check("[pm-input] Other PM —" in (articles / "new1.mdx").read_text(),
+          "inline [pm-input] marker rewritten to new PM")
+    check("| `new1.mdx` | Other PM |" in P.MANIFEST_FILE.read_text(), "manifest PM cell swept to new PM")
+    check("| Test PM | todo |" in P.PM_STATUS_FILE.read_text(), "status Done reset for affected PM")
+    check((state / "ownership-change-log.csv").exists(), "audit log written")
+    exp, _ = run(P.cmd_explain, pm=None, target="new1.mdx", id=None, decision=None)
+    check(any(d.get("kind") == "ownership-reassign" for d in exp["decisions"]),
+          "explain --target surfaces the ownership-reassign decision")
+    check("warning" in data, "warns when target PM lacks a CODEOWNERS login")
+
+    # (i) reassign --feature expands to every article under the Feature
+    data, _ = run(P.cmd_reassign, article=None, feature="Cards", to=OTHER, from_pm=None,
+                  reason="whole area", decided_by=OTHER, actor="other-pm")
+    check(set(data["files"]) == {"new1.mdx", "new2.mdx"}, "feature reassign expands to all its articles")
+
+    # (j) reassign to a routed PM → no warning
+    data, _ = run(P.cmd_reassign, article="new2.mdx", feature=None, to="Phil Fuchs", from_pm=PM,
+                  reason="x", decided_by=None, actor=None)
+    check("warning" not in data, "no warning when target PM has a CODEOWNERS login")
+
+    # (k) propagate-ownership --dry-run lists branches without side effects
+    real_git = P.git
+    P.git = lambda *a, **k: types.SimpleNamespace(
+        returncode=0, stdout="restructure/pm/a\nrestructure/pm/b\n", stderr="")
+    data, _ = run(P.cmd_propagate_ownership, dry_run=True)
+    P.git = real_git
+    check(data.get("dry_run") and len(data["branches"]) == 2, "propagate-ownership --dry-run lists branches")
 
     print(f"\n{_PASS} passed, {_FAIL} failed")
     sys.exit(1 if _FAIL else 0)

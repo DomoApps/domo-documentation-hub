@@ -29,6 +29,26 @@ ROOT = Path(__file__).parent.parent
 CSV_PATH = ROOT / 'Feature - Owning Squad, PM, Eng, UX.csv'
 REFERENCE_PATH = ROOT / 'Article-PM-Ownership-Reference.mdx'
 
+# Ownership overrides recorded by `pm_review.py reassign` when a PM claims/disclaims
+# an article mid-review. filename → PM; applied per-article below so both this file's
+# outputs (the reference + CODEOWNERS) follow the reassignment. See the pm-review skill.
+OVERRIDES_PATH = ROOT / 'pm-review-state' / 'ownership-overrides.json'
+
+def load_ownership_overrides():
+    out = {}
+    if OVERRIDES_PATH.exists():
+        try:
+            data = json.loads(OVERRIDES_PATH.read_text(encoding='utf-8'))
+        except (OSError, ValueError):
+            return out
+        for o in data.get('overrides', []):
+            fn, pm = o.get('filename'), o.get('to_pm')
+            if fn and pm:
+                out[fn] = pm  # last write wins (file order)
+    return out
+
+OWNERSHIP_OVERRIDES = load_ownership_overrides()
+
 features = {}  # feature_name → {pm, squad_biz}
 ROSTER_SOURCE = None
 
@@ -521,6 +541,8 @@ for fname in sorted(os.listdir(article_dir)):
     title, excerpt = read_frontmatter(path)
     feature = assign_feature(slug, title, excerpt)
     pm = features.get(feature, {}).get('pm', '(no PM listed)')
+    if fname in OWNERSHIP_OVERRIDES:        # a mid-review reassignment wins
+        pm = OWNERSHIP_OVERRIDES[fname]
     rows.append({
         'feature': feature,
         'title':   title or slug,

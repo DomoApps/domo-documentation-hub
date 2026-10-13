@@ -426,6 +426,18 @@ renders a human-readable `pm-review-state/<slug>.journal.md` (per-PM, merge-safe
 `journal --all` unions them into the root `PM-REVIEW-JOURNAL.md`, and `explain` reconstructs any
 change's full history + reasoning by `--target`/`--id`/`--pm`/`--decision`.
 
+**Ownership reassignment (mid-review).** When a PM volunteers that an article or product area is (or
+isn't) theirs, `reassign` (integration-branch only) records a filename→PM **override map**
+(`pm-review-state/ownership-overrides.json`) that BOTH ownership pipelines read — `build-pm-ownership.py`
+(reference + CODEOWNERS) and `build-pm-review-briefs.py` (items/briefs, via `effective_pm`) — so the
+moved article's tasks follow the new owner. It also rewrites the article's `[pm-input]` markers,
+sweeps `RESTRUCTURE-MANIFEST.md` PM columns + `PM-REVIEW-STATUS.md`, and writes an audit log
+(`ownership-change-log.csv`) + a `decisions[]`/journal entry. A feature-level claim expands to every
+article under that Feature (enumerated from the reference). After regenerating both pipelines and
+committing, `propagate-ownership` merges the change into all 12 `restructure/pm/*` branches + pushes.
+If the target PM has no `PM_GITHUB_LOGIN`, `reassign` warns (CODEOWNERS won't route until a login is
+added — see memory `reference_pm_github_logins.md`).
+
 **Engine subcommands** (`scripts/pm_review.py`): `items --pm` / `resume --pm` (reconciled
 worklist + resume point, with stable item IDs that survive re-runs and sibling-marker burns;
 `resume` holds back a read-through whose siblings are open), `set-status` (record a disposition;

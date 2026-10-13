@@ -205,7 +205,7 @@ _No open tasks._
 - [ ] **`What-is-Domo.mdx` — *What is Domo?*** — Core value proposition, platform overview, key use cases — verify nothing is outdated or overpromised
 - [ ] **`Getting-Started-for-Admins.mdx` — *Getting Started for Admins*** — Admin onboarding path, key first tasks (user setup, SSO, security), grant scopes
 - [ ] **`What-is-an-Alert.mdx` — *What is an Alert?*** — Alert types, trigger conditions, Smart Alerts / NLG behavior, notification routing
-- [ ] **`Share-and-Collaborate-Overview.mdx` — *Share & Collaborate Overview*** — All sharing mechanisms, publication groups vs Domo Everywhere scope distinction
+- [ ] **`Collaborate-Overview.mdx` — *Collaborate Overview*** — All sharing mechanisms, publication groups vs Domo Everywhere scope distinction
 - [ ] **`Domo-User-Roles.mdx` — *Domo User Roles and What They Can Do*** — System roles, custom roles, grant scopes — verify completeness of role list
 - [ ] **`Security-and-Permissions-Overview.mdx` — *Security & Permissions Overview*** — PDP, SSO, IP allowlist, access tokens, session management — verify current security model
 - [ ] **`Administer-and-Govern-Overview.mdx` — *Administer & Govern Overview*** — Full admin toolbox overview — verify nothing major is missing from hub

@@ -29,6 +29,26 @@ ROOT = Path(__file__).parent.parent
 CSV_PATH = ROOT / 'Feature - Owning Squad, PM, Eng, UX.csv'
 REFERENCE_PATH = ROOT / 'Article-PM-Ownership-Reference.mdx'
 
+# Ownership overrides recorded by `pm_review.py reassign` when a PM claims/disclaims
+# an article mid-review. filename → PM; applied per-article below so both this file's
+# outputs (the reference + CODEOWNERS) follow the reassignment. See the pm-review skill.
+OVERRIDES_PATH = ROOT / 'pm-review-state' / 'ownership-overrides.json'
+
+def load_ownership_overrides():
+    out = {}
+    if OVERRIDES_PATH.exists():
+        try:
+            data = json.loads(OVERRIDES_PATH.read_text(encoding='utf-8'))
+        except (OSError, ValueError):
+            return out
+        for o in data.get('overrides', []):
+            fn, pm = o.get('filename'), o.get('to_pm')
+            if fn and pm:
+                out[fn] = pm  # last write wins (file order)
+    return out
+
+OWNERSHIP_OVERRIDES = load_ownership_overrides()
+
 features = {}  # feature_name → {pm, squad_biz}
 ROSTER_SOURCE = None
 
@@ -171,7 +191,7 @@ NAV_FEATURE = {
     'Data Providers Q-S':     'Third Party Connectors',
     'Data Providers T-Z and #':'Third Party Connectors',
     'File and JSON Connectors':'Third Party Connectors',
-    'General Connector Information': 'Connectors 1.0',
+    'General Connector Information': 'Connectors',
 
     # ── Transform & Manage ────────────────────────────────────────────────────
     'Magic ETL':              'Magic ETL',
@@ -296,9 +316,9 @@ CLOUD_WAREHOUSE_GROUPS = {
 
 def classify_cloud_warehouse_article(title_lower, excerpt_lower):
     """Return Feature name for articles in cloud-warehouse nav groups."""
-    # Connector keyword → Connectors 1.0
+    # Connector keyword → Connectors
     if re.search(r'\bconnector\b', title_lower):
-        return 'Connectors 1.0'
+        return 'Connectors'
     if 'federated' in title_lower or 'federated' in excerpt_lower:
         return 'Federated'
     if 'cloud amplifier' in title_lower or 'cloud amplifier' in excerpt_lower:
@@ -306,9 +326,9 @@ def classify_cloud_warehouse_article(title_lower, excerpt_lower):
     if re.search(r'\bdomo on\b', title_lower):
         return 'Cloud Amplifier'
     if 'writeback' in title_lower:
-        return 'Connectors 1.0'
+        return 'Connectors'
     if 'minimum permissions' in title_lower:
-        return 'Connectors 1.0'
+        return 'Connectors'
     # Default: Cloud Amplifier (integration setup articles)
     return 'Cloud Amplifier'
 
@@ -434,7 +454,7 @@ KEYWORD_RULES = [
     (r'java|python script|r script', 'Data Science'),
     (r'python',             'Python'),
     (r'sql',                'Data Flows'),
-    (r'domo connector',     'Connectors 1.0'),
+    (r'domo connector',     'Connectors'),
     (r'connector',          'Third Party Connectors'),
     (r'app dev framework',  'App Dev Framework'),
     (r'app data structure', 'App Data Structures'),
@@ -521,6 +541,8 @@ for fname in sorted(os.listdir(article_dir)):
     title, excerpt = read_frontmatter(path)
     feature = assign_feature(slug, title, excerpt)
     pm = features.get(feature, {}).get('pm', '(no PM listed)')
+    if fname in OWNERSHIP_OVERRIDES:        # a mid-review reassignment wins
+        pm = OWNERSHIP_OVERRIDES[fname]
     rows.append({
         'feature': feature,
         'title':   title or slug,

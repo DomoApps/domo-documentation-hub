@@ -75,19 +75,19 @@ OVERRIDES = {
     "4578049721495.mdx": ("Administer & Govern", "Goals", None),
     "4578278680855.mdx": ("Administer & Govern", "Goals", None),
     "4663374299031.mdx": ("Administer & Govern", "Goals", None),
-    # Projects & Tasks → Share & Collaborate
-    "360042925914.mdx": ("Share & Collaborate", "Projects & Tasks", None),
-    "360042925934.mdx": ("Share & Collaborate", "Projects & Tasks", None),
-    "360043430473.mdx": ("Share & Collaborate", "Projects & Tasks", None),
-    "360043430493.mdx": ("Share & Collaborate", "Projects & Tasks", None),
+    # Projects & Tasks → Collaborate
+    "360042925914.mdx": ("Collaborate", "Projects & Tasks", None),
+    "360042925934.mdx": ("Collaborate", "Projects & Tasks", None),
+    "360043430473.mdx": ("Collaborate", "Projects & Tasks", None),
+    "360043430493.mdx": ("Collaborate", "Projects & Tasks", None),
 
     # Access Tokens (Beta, orphaned) → Administer & Govern
     "Access-Tokens.mdx": ("Administer & Govern", "Security & Access", None),
     # FileSets (orphaned) → AI & Data Science
     "000005849.mdx": ("AI & Data Science", "Unstructured Data", None),
-    # Slideshows → Share & Collaborate > Publications
-    "360042933014.mdx": ("Share & Collaborate", "Publications", None),  # Slideshow Publications Page Layout
-    "360043437793.mdx": ("Share & Collaborate", "Publications", None),  # Sharing Content Using Slideshows
+    # Slideshows → Distribute > Publications
+    "360042933014.mdx": ("Distribute", "Publications", None),  # Slideshow Publications Page Layout
+    "360043437793.mdx": ("Distribute", "Publications", None),  # Sharing Content Using Slideshows
     # Worksheets → Analyze & Visualize > Cards
     "Use-Worksheets.mdx": ("Analyze & Visualize", "Cards", None),
     # Goals tutorial
@@ -262,7 +262,7 @@ def assign_pillar(entry: dict) -> tuple[str, str, str | None]:
         if "workflow" in title or "workflow" in nav:
             return ("Build Apps & Automate", "Workflows", None)
         if "alert" in title or "alert" in nav:
-            return ("Share & Collaborate", "Alerts", None)
+            return ("Collaborate", "Alerts", None)
         if "form" in title:
             return ("Build Apps & Automate", "Forms", None)
         if "code engine" in title:
@@ -270,7 +270,7 @@ def assign_pillar(entry: dict) -> tuple[str, str, str | None]:
         if "task center" in title:
             return ("Build Apps & Automate", "Workflows", None)
         if "scheduled report" in title:
-            return ("Share & Collaborate", "Notifications & Reports", None)
+            return ("Collaborate", "Notifications & Reports", None)
         return ("Build Apps & Automate", "Workflows", None)
 
     # App Studio content (anywhere)
@@ -279,28 +279,28 @@ def assign_pillar(entry: dict) -> tuple[str, str, str | None]:
             return ("Build Apps & Automate", "Appstore", None)
         return ("Build Apps & Automate", "App Studio", None)
 
-    # 10. Distribute → split between Share & Collaborate and Build Apps
+    # 10. Distribute → split between Collaborate and Build Apps
     if "distribute" in nav:
         if "app studio" in title or "app studio" in excerpt:
             return ("Build Apps & Automate", "App Studio", None)
         if "workflow" in title:
             return ("Build Apps & Automate", "Workflows", None)
         if "buzz" in title or "buzz" in nav:
-            return ("Share & Collaborate", "Buzz", None)
+            return ("Collaborate", "Buzz", None)
         if "project" in title or "task" in title:
-            return ("Share & Collaborate", "Projects & Tasks", None)
+            return ("Collaborate", "Projects & Tasks", None)
         if "publication" in title or "publication" in nav or "subscriber" in title:
-            return ("Share & Collaborate", "Publications", None)
+            return ("Distribute", "Publications", None)
         if "sandbox" in title:
             return ("Administer & Govern", "Sandbox & Environments", None)
         if "export" in title or "embed" in title or "email" in title or "print" in title:
-            return ("Share & Collaborate", "Export & Embed", None)
+            return ("Distribute", "Export & Embed", None)
         if "certif" in title:
             return ("Administer & Govern", "Governance", None)
         if "goal" in title:
             return ("Administer & Govern", "Goals", None)
         if "add-in" in title or "add-ins" in title or "office" in title:
-            return ("Share & Collaborate", "Domo Add-ins", None)
+            return ("Collaborate", "Domo Add-ins", None)
         if "domo bricks" in title or "domo bricks" in excerpt:
             return ("Build Apps & Automate", "App Studio", None)
         if "wire an app" in title:
@@ -310,10 +310,10 @@ def assign_pillar(entry: dict) -> tuple[str, str, str | None]:
         if "appdb" in title:
             return ("Build Apps & Automate", "App Studio", None)
         if "share" in title or "sharing" in title or "access" in title:
-            return ("Share & Collaborate", "Sharing", None)
+            return ("Collaborate", "Sharing", None)
         if "course" in title or "coursebuilder" in title:
             return ("Build Apps & Automate", "CourseBuilder", None)
-        return ("Share & Collaborate", "Sharing", None)
+        return ("Collaborate", "Sharing", None)
 
     # 11. Admin → Administer & Govern
     if "admin" in nav:
@@ -398,7 +398,7 @@ def assign_pillar(entry: dict) -> tuple[str, str, str | None]:
     if dtype == "connector":
         return ("Connect & Integrate Data", "Connector Library", None)
     if "alert" in title:
-        return ("Share & Collaborate", "Alerts", None)
+        return ("Collaborate", "Alerts", None)
     if "dashboard" in title or "page" in title:
         return ("Analyze & Visualize", "Dashboards & Pages", None)
     if "card" in title:

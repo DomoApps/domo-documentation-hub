@@ -5,15 +5,20 @@ excerpt: "Machine rollup of per-item PM-review status, unioned from pm-review-st
 
 # KB Restructure — PM Review Rollup (derived)
 
-**Generated:** 2026-09-30 by `scripts/pm_review.py rollup`.
+**Generated:** 2026-10-12 by `scripts/pm_review.py rollup`.
 **Source:** union of `pm-review-state/*.json`. **Do not hand-edit** — regenerate after merge-backs.
 Companion to the hand-maintained `PM-REVIEW-STATUS.md` (workflow milestones) and `RESTRUCTURE-TASKS.md` (burndown).
 
 ## Status by PM
 
-| PM | total | open | approved | answered | authored* | deferred | denied | rejected | skipped |
-|----|------:|-----:|---------:|---------:|----------:|---------:|-------:|---------:|--------:|
-| **TOTAL** | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+| PM | total | open | approved | answered | authored* | deferred | dropped | denied | rejected | skipped |
+|----|------:|-----:|---------:|---------:|----------:|---------:|--------:|-------:|---------:|--------:|
+| **TOTAL** | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
 
 _*authored = gap-fill article written this phase (disposition=author)._
+_dropped = gap-fill article the owning PM judged unnecessary; not written and not carried to the follow-up list._
+
+## Articles awaiting final read-through
+
+_(none — every from-scratch article has a passed read-through)_
 

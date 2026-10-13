@@ -14,21 +14,21 @@
 ## 1. How Your Content Is Being Reorganized
 
 The KB is moving from a flat feature encyclopedia to a story-driven structure organized
-around **11 pillars** (user workflows). The table below shows where each of your feature
+around **12 pillars** (user workflows). The table below shows where each of your feature
 areas lands in the new structure.
 
 | Feature | Articles | New Location |
 |---------|----------|--------------|
 | Approvals | 2 | Pillar 6: Build Apps & Automate |
-| Governance Toolkit | 12 | Pillar 9: Administer & Govern |
-| Projects & Tasks | 10 | Pillar 7: Share & Collaborate [D2: may → Archive if feature deprecated] |
+| Governance Toolkit | 12 | Pillar 10: Administer & Govern |
+| Projects & Tasks | 10 | Pillar 8: Collaborate [D2: may → Archive if feature deprecated] |
 | Workflows | 14 | TBD — not yet mapped |
 
 ### Notable Navigation Changes
 
-- **Projects & Tasks (D2):** 10 articles currently in Share & Collaborate. If the feature is being phased out in favor of Workflows, these may belong in Archive. Confirm status.
+- **Projects & Tasks (D2):** 10 articles currently in Collaborate. If the feature is being phased out in favor of Workflows, these may belong in Archive. Confirm status.
 
-- **PDP (Personalized Data Permissions):** PDP articles are in Administer & Govern (Pillar 9). The Governance Toolkit sits in the same pillar.
+- **PDP (Personalized Data Permissions):** PDP articles are in Administer & Govern (Pillar 10). The Governance Toolkit sits in the same pillar.
 
 ---
 

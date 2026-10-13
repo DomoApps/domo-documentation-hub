@@ -14,7 +14,7 @@
 ## 1. How Your Content Is Being Reorganized
 
 The KB is moving from a flat feature encyclopedia to a story-driven structure organized
-around **11 pillars** (user workflows). The table below shows where each of your feature
+around **12 pillars** (user workflows). The table below shows where each of your feature
 areas lands in the new structure.
 
 | Feature | Articles | New Location |
@@ -22,8 +22,8 @@ areas lands in the new structure.
 | App Dev Framework | 5 | Pillar 6: Build Apps & Automate |
 | App Studio | 14 | Pillar 6: Build Apps & Automate |
 | Bricks/Templates | 3 | Pillar 6: Build Apps & Automate |
-| MS Office Plugins / Addins | 8 | Pillar 7: Share & Collaborate |
-| Publication Groups | 2 | Pillar 7: Share & Collaborate |
+| MS Office Plugins / Addins | 8 | Pillar 8: Collaborate |
+| Publication Groups | 2 | Pillar 7: Distribute |
 
 ### Notable Navigation Changes
 

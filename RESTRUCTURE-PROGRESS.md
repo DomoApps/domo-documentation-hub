@@ -6,7 +6,7 @@ file at the start of any restructure work to orient themselves before doing anyt
 
 **Plan document:** `KB-RESTRUCTURE-PLAN.md`
 **Disposition log:** `RESTRUCTURE-MANIFEST.md` — running record of what happened to every article; updated throughout all phases; Phase 9 converts it to the final audit report
-**Last updated:** 2026-09-30 — **Phase 4.5 interactive PM-review built + Phase 3c sync #2 done** (committed & pushed; HEAD `49d23a4f`). `pm-review` skill + `scripts/pm_review.py`; 12 per-PM branches; main content synced in (baseline `ad4cee86`, NOT a git merge); 23 new articles navved; 2 add/add synthesized to main's. See the 2026-09-30 resume block below. — _Prior:_ 2026-08-28 (**Phase 4 executed + Phase 4.5 tooling complete — all committed AND pushed**, HEAD `007f6b51` = `origin/update/fullRestructure`, tree clean). Phase 4: 14 duplicate connectors merged/deleted (`74e92a42`), `DataFusion-Migration-Guide.mdx` (`c730bac5`), retirement batches staged for 4.6 (`bbad7cbe`), disposition vocab reconciled to five-state; 8 title-collision non-duplicates deferred. Phase 4.5: `build-pm-review-briefs.py` now generates 14 per-PM briefs + `.docx` copies + `RESTRUCTURE-TASKS.md` (387-task dashboard) + `PM-REVIEW-STATUS.md` (workflow ledger, seed-once); all ownership resolved. **Next: begin the PM review loop (see Phase 4.5 › "The operating loop"), then Phase 4.6.**
+**Last updated:** 2026-09-30 — **Phase 4.5 interactive PM-review built + Phase 3c sync #2 done** (committed & pushed; HEAD `49d23a4f`). `pm-review` skill + `scripts/pm_review.py`; 12 per-PM branches; main content synced in (baseline `ad4cee86`, NOT a git merge); 23 new articles navved; 2 add/add synthesized to main's. See the 2026-09-30 resume block below. — _Prior:_ 2026-08-28 (**Phase 4 executed + Phase 4.5 tooling complete — all committed AND pushed**, HEAD `007f6b51` = `origin/update/fullRestructure`, tree clean). Phase 4: 14 duplicate connectors merged/deleted (`74e92a42`), `DataFusion-Migration-Guide.mdx` (`c730bac5`), retirement batches staged for 4.6 (`bbad7cbe`), disposition vocab reconciled to five-state; 8 title-collision non-duplicates deferred. Phase 4.5: `build-pm-review-briefs.py` now generates 14 per-PM briefs + `RESTRUCTURE-TASKS.md` (387-task dashboard) + `PM-REVIEW-STATUS.md` (workflow ledger, seed-once); all ownership resolved. **Next: begin the PM review loop (see Phase 4.5 › "The operating loop"), then Phase 4.6.**
 
 ---
 
@@ -36,11 +36,11 @@ file at the start of any restructure work to orient themselves before doing anyt
   4. **Retirement batches staged for 4.6** — Workbench 4 (36→legacy), DataFusion (4), old Magic ETL (7, keep `360043428113`), CourseBuilder (9, pending D10), pre-2022 RN (42), defunct connectors (12 named + Google Ads legacy; 185-EN superset → Tasleema). Enumerated in the manifest. **No status stamping/nav removal yet — that's 4.6, post-PM.**
   5. Manifest disposition vocab reconciled to five-state; 3 lifecycle snippets verified pre-existing (no recreate).
 - **Phase 4.5 tooling — DONE (all committed & pushed):**
-  - `build-pm-review-briefs.py` refreshed with real Phase 4 data; one run now emits **per-PM briefs** (`pm-review-briefs/*.md`, gitignored) + **`.docx` copies** (`pm-review-briefs/pm-review-docs/`, gitignored) + **`RESTRUCTURE-TASKS.md`** (tracked; live 387-task dashboard) + **`PM-REVIEW-STATUS.md`** (tracked; hand-maintained workflow ledger, seeded once and never overwritten).
+  - `build-pm-review-briefs.py` refreshed with real Phase 4 data; one run now emits **per-PM briefs** (`pm-review-briefs/*.md`, gitignored) + **`RESTRUCTURE-TASKS.md`** (tracked; live 387-task dashboard) + **`PM-REVIEW-STATUS.md`** (tracked; hand-maintained workflow ledger, seeded once and never overwritten).
   - Ownership fully resolved: `360042934454`→Dan Brinton; cert rank 146→Jordan Jensen; forum gaps 144/161→Ken Boyer. Clean run = no UNASSIGNED warnings.
 - **▶ FIRST ACTION NEXT WEEK — begin the PM review loop** (full spec: Phase 4.5 › "The operating loop"):
   1. Re-run `python3 scripts/build-pm-review-briefs.py` to refresh briefs/docx (leaves the ledger untouched).
-  2. Send each PM their `pm-review-briefs/pm-review-docs/<PM>.docx`; mark **Brief sent** in `PM-REVIEW-STATUS.md`.
+  2. Share each PM their brief `pm-review-briefs/<PM>.md` (or walk them through it with `/pm-review`); mark **Brief sent** in `PM-REVIEW-STATUS.md`.
   3. As answers come back, hand them to Claude → Claude edits articles, burns `[pm-input]` markers, records decisions/lifecycle sign-offs; update the ledger cells.
   4. Tasleema's brief is huge (1,077 articles) — chunk it. `[decision]` items D2/D4/D5/D6/D10 and lifecycle sign-offs are in the briefs + `RESTRUCTURE-TASKS.md`.
   5. When every ledger row is Done → **Phase 4.6** (apply confirmed lifecycle states) → Phase 5.
@@ -347,7 +347,6 @@ These decisions don't block Phase 3a article writing — they only block the nav
 **Script:** `scripts/build-pm-review-briefs.py` (one run produces everything below)
 **Outputs:**
 - `pm-review-briefs/<PM>.md` — per-PM meeting brief (gitignored; regenerable)
-- `pm-review-briefs/pm-review-docs/<PM>.docx` — Word copy of each brief, for sending to PMs (gitignored)
 - `RESTRUCTURE-TASKS.md` — cross-PM master checklist; the **live "how much is left" dashboard** (tracked)
 - `PM-REVIEW-STATUS.md` — the **hand-maintained workflow ledger**; seeded once, never overwritten (tracked)
 
@@ -359,16 +358,16 @@ The three tracked/generated artifacts have distinct jobs; use them together:
 
 | Artifact | Owner | Job |
 |----------|-------|-----|
-| Per-PM brief (`.docx`/`.md`) | Claude generates | What each PM reviews. Send them the `.docx`. |
+| Per-PM brief (`.md`) | Claude generates | What each PM reviews. Share the `.md`, or walk them through it live with `/pm-review`. |
 | `RESTRUCTURE-TASKS.md` | Claude generates (drift-proof) | Live burndown of open work by PM + type. Re-run the script for fresh counts. |
 | `PM-REVIEW-STATUS.md` | **Jared hand-maintains** | Where each PM is in the workflow (brief sent → responses in → signed off → done). |
 
 **The flow is: PMs → Jared → Claude → markers/ledger → dashboard → Jared.** No one edits the branch except Claude (plus the occasional technical-PM PR); PMs are validators/information-sources, not editors — this avoids branch contention with active restructure work, MDX breakage, and the "confirmed-fine fact-check produces no diff" tracking hole.
 
 Step by step:
-1. **Generate** — run `python3 scripts/build-pm-review-briefs.py`. Produces all four outputs above. Safe to re-run anytime; it refreshes briefs/tasks/docx and leaves `PM-REVIEW-STATUS.md` untouched.
-2. **Send** — hand each PM their `pm-review-docs/<PM>.docx`. Mark **Brief sent** in `PM-REVIEW-STATUS.md`.
-3. **Collect** — PM returns answers (annotated docx, email, or meeting). Mark **Responses in**. Big/complex reviews (Tasleema = 1,077 articles) and all `[decision]`/lifecycle items are best done in a live meeting.
+1. **Generate** — run `python3 scripts/build-pm-review-briefs.py`. Produces the outputs above. Safe to re-run anytime; it refreshes briefs/tasks and leaves `PM-REVIEW-STATUS.md` untouched.
+2. **Send** — share each PM their brief `pm-review-briefs/<PM>.md`, or walk them through it live with `/pm-review`. Mark **Brief sent** in `PM-REVIEW-STATUS.md`.
+3. **Collect** — PM returns answers (via the review session, email, or meeting). Mark **Responses in**. Big/complex reviews (Tasleema = 1,077 articles) and all `[decision]`/lifecycle items are best done in a live meeting.
 4. **Apply** — hand the answers to Claude. Claude edits articles, fills/removes `[pm-input]` markers, applies corrections, records decisions, and reports what it changed.
 5. **Track** — mark **Fact-checks applied / `[pm-input]` cleared / Lifecycle signed off / Decisions resolved** in the ledger as each completes. Re-run the script to confirm the PM's open counts in `RESTRUCTURE-TASKS.md` are dropping.
 6. **Close** — when a PM's ledger row is all **done** (and their `RESTRUCTURE-TASKS.md` counts are 0), that PM is finished. **When every PM row is Done → run the marker-reconciliation sweep (`python3 scripts/pm_review.py reconcile --strict`) on the integration branch; when it reports `gate_clear: true`, Phase 4.5 is complete → proceed to Phase 4.6** (apply confirmed lifecycle states). The sweep is the machine check behind this gate — see "Interactive PM review" below.
@@ -534,7 +533,7 @@ Before running, update the script's hardcoded phase data to reflect what was act
 | Mark Adams | Freemium | — | Unconfirmed |
 | Phil Fuchs | Beast Mode, Combined Schema, Data Center, Data Views, Fusions, Period over Period | @phil-fuchs-domo | ✅ Confirmed |
 | Ryan Despain | Approvals, Governance Toolkit, Projects & Tasks, Workflows | @RyanDespain | ✅ Confirmed |
-| Tasleema Lallmamode | Connectors 1.0, Third Party Connectors, Workbench | — | Unconfirmed |
+| Tasleema Lallmamode | Connectors, Third Party Connectors, Workbench | — | Unconfirmed |
 
 *GitHub logins source: `.github/CODEOWNERS`*
 

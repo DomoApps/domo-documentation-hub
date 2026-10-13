@@ -191,7 +191,7 @@ NAV_FEATURE = {
     'Data Providers Q-S':     'Third Party Connectors',
     'Data Providers T-Z and #':'Third Party Connectors',
     'File and JSON Connectors':'Third Party Connectors',
-    'General Connector Information': 'Connectors 1.0',
+    'General Connector Information': 'Connectors',
 
     # ── Transform & Manage ────────────────────────────────────────────────────
     'Magic ETL':              'Magic ETL',
@@ -316,9 +316,9 @@ CLOUD_WAREHOUSE_GROUPS = {
 
 def classify_cloud_warehouse_article(title_lower, excerpt_lower):
     """Return Feature name for articles in cloud-warehouse nav groups."""
-    # Connector keyword → Connectors 1.0
+    # Connector keyword → Connectors
     if re.search(r'\bconnector\b', title_lower):
-        return 'Connectors 1.0'
+        return 'Connectors'
     if 'federated' in title_lower or 'federated' in excerpt_lower:
         return 'Federated'
     if 'cloud amplifier' in title_lower or 'cloud amplifier' in excerpt_lower:
@@ -326,9 +326,9 @@ def classify_cloud_warehouse_article(title_lower, excerpt_lower):
     if re.search(r'\bdomo on\b', title_lower):
         return 'Cloud Amplifier'
     if 'writeback' in title_lower:
-        return 'Connectors 1.0'
+        return 'Connectors'
     if 'minimum permissions' in title_lower:
-        return 'Connectors 1.0'
+        return 'Connectors'
     # Default: Cloud Amplifier (integration setup articles)
     return 'Cloud Amplifier'
 
@@ -454,7 +454,7 @@ KEYWORD_RULES = [
     (r'java|python script|r script', 'Data Science'),
     (r'python',             'Python'),
     (r'sql',                'Data Flows'),
-    (r'domo connector',     'Connectors 1.0'),
+    (r'domo connector',     'Connectors'),
     (r'connector',          'Third Party Connectors'),
     (r'app dev framework',  'App Dev Framework'),
     (r'app data structure', 'App Data Structures'),

@@ -9,11 +9,10 @@ Reads:
                                           deferred article tables — source of truth)
   - s/article/*.mdx                      (scanned for embedded [pm-input] markers)
 
-Outputs one .md file per PM in pm-review-briefs/, a cross-PM RESTRUCTURE-TASKS.md
-aggregate, and a Word .docx copy of each brief in pm-review-briefs/pm-review-docs/
-(the .docx step is skipped with a note if pandoc is not installed). It also seeds
-PM-REVIEW-STATUS.md once (the hand-maintained Phase 4.5 workflow ledger) and then
-leaves it untouched on later runs so manual status edits are never clobbered.
+Outputs one .md file per PM in pm-review-briefs/ and a cross-PM RESTRUCTURE-TASKS.md
+aggregate. It also seeds PM-REVIEW-STATUS.md once (the hand-maintained Phase 4.5
+workflow ledger) and then leaves it untouched on later runs so manual status edits
+are never clobbered.
 
 The Phase 3a-Forum data (which new articles were written vs. deferred, and which
 drafted articles still carry open [pm-input] placeholders) is NOT hardcoded here —
@@ -33,8 +32,6 @@ Usage:
 import json
 import re
 import os
-import shutil
-import subprocess
 from collections import defaultdict
 from pathlib import Path
 
@@ -44,7 +41,6 @@ GAPS_FILE = REPO_ROOT / "_gaps_with_support.json"
 MANIFEST_FILE = REPO_ROOT / "RESTRUCTURE-MANIFEST.md"
 ARTICLE_DIR = REPO_ROOT / "s" / "article"
 OUTPUT_DIR = REPO_ROOT / "pm-review-briefs"
-DOCS_DIR = OUTPUT_DIR / "pm-review-docs"
 TASKS_FILE = REPO_ROOT / "RESTRUCTURE-TASKS.md"
 PM_STATUS_FILE = REPO_ROOT / "PM-REVIEW-STATUS.md"
 
@@ -78,7 +74,7 @@ FEATURE_PILLAR = {
     "CLI":                                  "Pillar 10: Develop & Integrate",
     "Cloud Amplifier":                      "Pillar 2: Connect & Integrate Data",
     "Combined Schema":                      "Pillar 4: Prepare & Transform Data",
-    "Connectors 1.0":                       "Pillar 2: Connect & Integrate Data",
+    "Connectors":                           "Pillar 2: Connect & Integrate Data",
     "Consumption":                          "Pillar 9: Administer & Govern",
     "Data Center":                          "Pillar 3: Manage Data",
     "Data Flows":                           "Pillar 4: Prepare & Transform Data",
@@ -1282,35 +1278,6 @@ def build_tasks_aggregate(all_pms: list, ownership: dict, all_gaps: list, forum:
     return "\n".join(lines) + "\n"
 
 
-def write_docx_copies(brief_paths: list) -> None:
-    """Write a Word .docx copy of each markdown brief into pm-review-briefs/pm-review-docs/.
-
-    Uses pandoc (GitHub-flavored markdown so tables + task-list checkboxes render as
-    rich content). If pandoc is not installed the step is skipped with a note — the
-    markdown briefs are the primary artifact and are unaffected.
-    """
-    pandoc = shutil.which("pandoc")
-    if not pandoc:
-        print("\n  ⚠️  pandoc not found — skipping .docx copies. Install pandoc "
-              "(https://pandoc.org/installing.html) to enable them; the markdown "
-              "briefs are unaffected.")
-        return
-    DOCS_DIR.mkdir(parents=True, exist_ok=True)
-    ok = 0
-    for md_path in brief_paths:
-        docx_path = DOCS_DIR / (md_path.stem + ".docx")
-        try:
-            subprocess.run(
-                [pandoc, str(md_path), "-f", "gfm", "-o", str(docx_path)],
-                check=True, capture_output=True, text=True,
-            )
-            ok += 1
-        except subprocess.CalledProcessError as e:
-            print(f"  ✗ .docx failed for {md_path.name}: {e.stderr.strip()}")
-    print(f"  ✓ {ok}/{len(brief_paths)} .docx copies written to "
-          f"{DOCS_DIR.relative_to(REPO_ROOT)}/")
-
-
 def seed_pm_status_ledger(all_pms: list, all_gaps: list, forum: dict) -> None:
     """Create PM-REVIEW-STATUS.md once (if absent) and NEVER overwrite it afterward.
 
@@ -1348,8 +1315,8 @@ def seed_pm_status_ledger(all_pms: list, all_gaps: list, forum: dict) -> None:
         "",
         "For each PM, walk the columns left to right:",
         "",
-        "1. **Brief sent** — mark when you hand the PM their brief (`pm-review-briefs/pm-review-docs/<PM>.docx`).",
-        "2. **Responses in** — mark when they return answers (annotated docx, email, or meeting notes).",
+        "1. **Brief sent** — mark when you hand the PM their brief (`pm-review-briefs/<PM>.md`, or walk them through it live with `/pm-review`).",
+        "2. **Responses in** — mark when they return answers (via the review session, email, or meeting notes).",
         "3. Give the answers to Claude → Claude applies edits, fills/removes `[pm-input]` markers, and reports back.",
         "4. **Fact-checks applied** — mark when their drafted-article fact-checks are all confirmed or corrected.",
         "5. **`[pm-input]` cleared** — mark when their open `[pm-input]` count in `RESTRUCTURE-TASKS.md` reaches 0.",
@@ -1450,9 +1417,6 @@ def main():
     tasks_md = build_tasks_aggregate(all_pms, ownership, gaps, forum)
     TASKS_FILE.write_text(tasks_md, encoding="utf-8")
     print(f"  ✓ {TASKS_FILE.relative_to(REPO_ROOT)} written (aggregate task checklist)")
-
-    # Word .docx copies of each brief (skipped with a note if pandoc is missing)
-    write_docx_copies(brief_paths)
 
     # PM review workflow ledger — seeded once, then hand-maintained (never overwritten)
     seed_pm_status_ledger(all_pms, gaps, forum)

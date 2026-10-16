@@ -1,6 +1,6 @@
 ---
 title: "Supported Functions in Magic ETL Reference Guide"
-excerpt: "Reference guide listing aggregate, numeric, statistical, financial, logical, and string functions supported in Magic ETL Add Formula and Group By tiles."
+excerpt: "Reference guide listing aggregate, numeric, statistical, window, financial, logic and control, string, date and time, and system functions supported in Magic ETL formulas."
 ---
 
 ## Intro
@@ -17,888 +17,335 @@ This reference guide gives examples of the available functions that can be used 
 
 ## Aggregate Functions
 
-<table data-aura-rendered-by="33:208;a" width="100%"><thead><tr><td class="wysiwyg-text-align-center" colspan="1" rowspan="1"><p><b> Function Name </b></p></td><td class="wysiwyg-text-align-center" colspan="1" rowspan="1"><p><b> Description </b></p></td><td class="wysiwyg-text-align-center" colspan="1" rowspan="1"><p><b> Example </b></p></td></tr></thead><tbody><tr><td colspan="1" rowspan="1"><p> APPROXIMATE COUNT (DISTINCT) </p></td><td colspan="1" rowspan="1"><p> Returns the approximate count of a number of unique values in a column. </p></td><td colspan="1" rowspan="1"><p> APPROXIMATE_COUNT_DISTINCT(X) </p></td></tr><tr><td colspan="1" rowspan="1"><p> CORR </p></td><td colspan="1" rowspan="1"><p> Returns the correlation coefficient of independent variable x and dependent variable y. It is computed for non-null pairs of values only. <br/><br/> For non-null data, it is equivalent to: COVAR_POP(y, x) / (STDDEV_POP(x) * STDDEV_POP(y)). <br/><br/> It is an aggregate function. <br/><br/> VAR_POP() returns NULL if there were no matching rows. </p></td><td colspan="1" rowspan="1"><p> CORR(x,y) </p></td></tr><tr><td colspan="1" rowspan="1"><p> COUNT </p></td><td colspan="1" rowspan="1"><p> Returns a count of the number of non-NULL values of expr. The result is an integer value. It is an aggregate function. </p><p> COUNT(\*) counts the total number of rows. </p><p> COUNT() returns 0 if there were no matching rows. </p></td><td colspan="1" rowspan="1"><p> COUNT(expr) </p></td></tr><tr><td colspan="1" rowspan="1"><p> COVAR_POP </p></td><td colspan="1" rowspan="1"><p> Returns the population covariance of independent variable x and dependent variable y. It is computed for non-null pairs of values only. <br/><br/> For non-null data, it is equivalent to: (SUM(x\*y) - SUM(x) * SUM(y) / COUNT(\*)) / COUNT(\*). <br/><br/> It is an aggregate function. <br/><br/> VAR_POP() returns NULL if there were no matching rows. </p></td><td colspan="1" rowspan="1"><p> COVAR_POP(x,y) </p></td></tr><tr><td colspan="1" rowspan="1"><p> COVAR_SAMP </p></td><td colspan="1" rowspan="1"><p> Returns the sample covariance of independent variable x and dependent variable y; the denominator is the sample size minus one. It is computed for non-null pairs of values only. <br/><br/> For non-null data, it is equivalent to: (SUM(x\*y) - SUM(x) * SUM(y) / COUNT(\*)) / (COUNT(\*) - 1). <br/><br/> It is an aggregate function. <br/><br/> VAR_POP() returns NULL if there were no matching rows. </p></td><td colspan="1" rowspan="1"><p> COVAR_SAMP(x,y) </p></td></tr><tr><td colspan="1" rowspan="1"><p> FIRST_NON_NULL_VALUE </p></td><td colspan="1" rowspan="1"><p> Returns the first non-null value in expr, or NULL if no non-NULL values were found. It is an aggregate function. </p></td><td colspan="1" rowspan="1"><p> FIRST_NON_NULL_VALUE(expr) </p></td></tr><tr><td colspan="1" rowspan="1"><p> FIRST_VALUE </p></td><td colspan="1" rowspan="1"><p> Returns the first value in expr, including NULL. It is an aggregate function. </p></td><td colspan="1" rowspan="1"><p> FIRST_VALUE(expr) </p></td></tr><tr><td colspan="1" rowspan="1"><p> LAST_NON_NULL_VALUE </p></td><td colspan="1" rowspan="1"><p> Returns the last non-null value in expr, or NULL if no non-NULL values were found. It is an aggregate function. </p></td><td colspan="1" rowspan="1"><p> LAST_NON_NULL_VALUE(expr) </p></td></tr><tr><td colspan="1" rowspan="1"><p> LAST_VALUE </p></td><td colspan="1" rowspan="1"><p> Returns the last value in expr, including NULL. It is an aggregate function. </p></td><td colspan="1" rowspan="1"><p> LAST_VALUE(expr) </p></td></tr><tr><td colspan="1" rowspan="1"><p> MAX </p></td><td colspan="1" rowspan="1"><p> Returns the largest, or maximum, value of expr. MAX() can also take a string argument in which case it returns the maximum string value. </p><p></p><p> It is an aggregate function. </p><p></p><p> MAX() returns NULL if there were no matching rows. </p></td><td colspan="1" rowspan="1"><p> MAX(expr) </p></td></tr><tr><td colspan="1" rowspan="1"><p> MEDIAN </p></td><td colspan="1" rowspan="1"><p> Returns the estimated median value of expr. It is an aggregate function. </p></td><td colspan="1" rowspan="1"><p> MEDIAN(expr) </p></td></tr><tr><td colspan="1" rowspan="1"><p> MIN </p></td><td colspan="1" rowspan="1"><p> Returns the smallest, or minimum, value of expr. MIN() can also take a string argument in which case it returns the minimum string value. </p><p></p><p> It is an aggregate function. </p><p></p><p> MIN() returns NULL if there were no matching rows. </p></td><td colspan="1" rowspan="1"><p> MIN(expr) </p></td></tr><tr><td colspan="1" rowspan="1"><p> PERCENTILE </p></td><td colspan="1" rowspan="1"><p> Returns the ntile percentile of expr. It is an aggregate function. </p></td><td colspan="1" rowspan="1"><p> PERCENTILE(expr, ntile) </p></td></tr><tr><td colspan="1" rowspan="1"><p> STD </p></td><td colspan="1" rowspan="1"><p> STD() is a synonym for STDDEV_SAMP(). </p></td><td colspan="1" rowspan="1"><p> STD(expr) </p></td></tr><tr><td colspan="1" rowspan="1"><p> STDDEV </p></td><td colspan="1" rowspan="1"><p> STDDEV() is a synonym for STDDEV_SAMP(). </p></td><td colspan="1" rowspan="1"><p> STDDEV(expr) </p></td></tr><tr><td colspan="1" rowspan="1"><p> STDDEV_POP </p></td><td colspan="1" rowspan="1"><p> Returns the population standard deviation of expr (the square root of VAR_POP()). </p><p> It is an aggregate function. </p><p> STDDEV_POP() returns NULL if there were no matching rows. </p></td><td colspan="1" rowspan="1"><p> STDDEV_POP(expr) </p></td></tr><tr><td colspan="1" rowspan="1"><p> STDDEV_SAMP </p></td><td colspan="1" rowspan="1"><p> Returns the sample standard deviation of expr (the square root of VAR_SAMP()). </p><p> It is an aggregate function. </p><p> STDDEV_POP() returns NULL if there were no matching rows. </p></td><td colspan="1" rowspan="1"><p> STDDEV_SAMP(expr) </p></td></tr><tr><td colspan="1" rowspan="1"><p> SUM </p></td><td colspan="1" rowspan="1"><p> Returns the sum of expr. If the return set has no rows, SUM() returns NULL. </p><p> It is an aggregate function. </p></td><td colspan="1" rowspan="1"><p> SUM(expr) </p></td></tr><tr><td colspan="1" rowspan="1"><p> VAR_POP </p></td><td colspan="1" rowspan="1"><p> Returns the population standard variance of expr. It considers rows as the whole population, not as a sample, so it has the number of rows as the denominator. </p><p> Variance is calculated by working out the mean for the set for each number, subtracting the mean and squaring the result, and finally calculating the average of the resulting differences </p><p> It is an aggregate function. </p><p> VAR_POP() returns NULL if there were no matching rows. </p></td><td colspan="1" rowspan="1"><p> VAR_POP(expr) </p></td></tr><tr><td colspan="1" rowspan="1"><p> VAR_SAMP </p></td><td colspan="1" rowspan="1"><p> Returns the sample standard variance of expr. The denominator is the number of rows minus one. </p><p> Variance is calculated by working out the mean for the set for each number, subtracting the mean and squaring the result, and finally calculating the average of the resulting differences. </p><p> It is an aggregate function. </p><p> VAR_POP() returns NULL if there were no matching rows. </p></td><td colspan="1" rowspan="1"><p> VAR_SAMP(expr) </p></td></tr><tr><td colspan="1" rowspan="1"><p> VARIANCE </p></td><td colspan="1" rowspan="1"><p> VARIANCE() is a synonym for VAR_SAMP(). </p></td><td colspan="1" rowspan="1"><p> VARIANCE(expr) </p></td></tr><tr><td colspan="1" rowspan="1"><p> VARIANCE_POP </p></td><td colspan="1" rowspan="1"><p> VARIANCE_POP() is a synonym for VAR_POP(). </p></td><td colspan="1" rowspan="1"><p> VARIANCE_POP(expr) <a id="numeric_functions" target="_blank"></a></p></td></tr><tr><td colspan="1" rowspan="1"><p> VARIANCE_SAMP </p></td><td colspan="1" rowspan="1"><p> VARIANCE_SAMP() is a synonym for VAR_SAMP(). </p></td><td colspan="1" rowspan="1"><p> VARIANCE_SAMP(expr) </p></td></tr></tbody></table>
+<table width="100%" style={{ tableLayout: "fixed", overflowWrap: "anywhere" }}>
+<thead>
+<tr><th width="22%"><p> Function Name </p></th><th width="48%"><p> Description </p></th><th width="30%"><p> Example </p></th></tr>
+</thead>
+<tbody>
+<tr><td><p> <code>APPROXIMATE_COUNT_DISTINCT</code> </p></td><td><p> Returns an approximate result for <code>COUNT(DISTINCT x)</code> using the HyperLogLog algorithm. When used as an aggregate function (not a window function) in Magic ETL, this function is currently nothing more than an alias for <code>COUNT(DISTINCT X)</code>. </p></td><td><p> <code>APPROXIMATE_COUNT_DISTINCT(X)</code> </p></td></tr>
+<tr><td><p> <code>AVG</code> </p></td><td><p> Returns the average value of expr. <code>NULL</code> values are ignored. It is an aggregate function. </p><p> <code>AVG()</code> returns <code>NULL</code> if there were no matching rows. </p></td><td><p> <code>AVG(expr)</code> </p></td></tr>
+<tr><td><p> <code>CORR</code> </p></td><td><p> Returns the correlation coefficient of independent variable x and dependent variable y. It is computed for non-null pairs of values only. </p><p> For non-null data, it is equivalent to: <code>COVAR_POP(y, x) / (STDDEV_POP(x) * STDDEV_POP(y))</code>. </p><p> It is an aggregate function. </p><p> <code>CORR()</code> returns <code>NULL</code> if there were no matching rows. </p></td><td><p> <code>CORR(x,y)</code> </p></td></tr>
+<tr><td><p> <code>COUNT</code> </p></td><td><p> Returns a count of the number of non-NULL values of expr. The result is an integer value. It is an aggregate function. </p><p> <code>COUNT(\*)</code> counts the total number of rows. </p><p> <code>COUNT()</code> returns 0 if there were no matching rows. </p></td><td><p> <code>COUNT(expr)</code> </p></td></tr>
+<tr><td><p> <code>COUNT_DISTINCT</code> </p></td><td><p> Returns a count of the number of distinct, non-NULL values of expr. The result is an integer value. It is an aggregate function. </p><p> <code>COUNT_DISTINCT()</code> returns 0 if there were no non-null values. </p></td><td><p> <code>COUNT_DISTINCT(expr)</code> </p></td></tr>
+<tr><td><p> <code>COVAR_POP</code> </p></td><td><p> Returns the population covariance of independent variable x and dependent variable y. It is computed for non-null pairs of values only. </p><p> For non-null data, it is equivalent to: <code>(SUM(x\*y) - SUM(x) * SUM(y) / COUNT(\*)) / COUNT(\*)</code>. </p><p> It is an aggregate function. </p><p> <code>COVAR_POP()</code> returns <code>NULL</code> if there were no matching rows. </p></td><td><p> <code>COVAR_POP(x,y)</code> </p></td></tr>
+<tr><td><p> <code>COVAR_SAMP</code> </p></td><td><p> Returns the sample covariance of independent variable x and dependent variable y; the denominator is the sample size minus one. It is computed for non-null pairs of values only. </p><p> For non-null data, it is equivalent to: <code>(SUM(x\*y) - SUM(x) * SUM(y) / COUNT(\*)) / (COUNT(\*) - 1)</code>. </p><p> It is an aggregate function. </p><p> <code>COVAR_SAMP()</code> returns <code>NULL</code> if there were no matching rows. </p></td><td><p> <code>COVAR_SAMP(x,y)</code> </p></td></tr>
+<tr><td><p> <code>FIRST_NON_NULL_VALUE</code> </p></td><td><p> Returns the first non-null value in expr, or <code>NULL</code> if no non-NULL values were found. It is an aggregate function. </p></td><td><p> <code>FIRST_NON_NULL_VALUE(expr)</code> </p></td></tr>
+<tr><td><p> <code>FIRST_VALUE</code> </p></td><td><p> Returns the first value in expr, including <code>NULL</code>. It is an aggregate function. </p></td><td><p> <code>FIRST_VALUE(expr)</code> </p></td></tr>
+<tr><td><p> <code>LAST_NON_NULL_VALUE</code> </p></td><td><p> Returns the last non-null value in expr, or <code>NULL</code> if no non-NULL values were found. It is an aggregate function. </p></td><td><p> <code>LAST_NON_NULL_VALUE(expr)</code> </p></td></tr>
+<tr><td><p> <code>LAST_VALUE</code> </p></td><td><p> Returns the last value in expr, including <code>NULL</code>. It is an aggregate function. </p></td><td><p> <code>LAST_VALUE(expr)</code> </p></td></tr>
+<tr><td><p> <code>MAX</code> </p></td><td><p> Returns the largest, or maximum, value of expr. <code>MAX()</code> can also take a string argument in which case it returns the maximum string value. </p><p> It is an aggregate function. </p><p> <code>MAX()</code> returns <code>NULL</code> if there were no matching rows. </p></td><td><p> <code>MAX(expr)</code> </p></td></tr>
+<tr><td><p> <code>MEDIAN</code> </p></td><td><p> Returns the estimated median value of expr. It is an aggregate function. </p></td><td><p> <code>MEDIAN(expr)</code> </p></td></tr>
+<tr><td><p> <code>MIN</code> </p></td><td><p> Returns the smallest, or minimum, value of expr. <code>MIN()</code> can also take a string argument in which case it returns the minimum string value. </p><p> It is an aggregate function. </p><p> <code>MIN()</code> returns <code>NULL</code> if there were no matching rows. </p></td><td><p> <code>MIN(expr)</code> </p></td></tr>
+<tr><td><p> <code>PERCENTILE</code> </p></td><td><p> Returns the ntile percentile of expr. It is an aggregate function. </p></td><td><p> <code>PERCENTILE(expr, ntile)</code> </p></td></tr>
+<tr><td><p> <code>STD</code> </p></td><td><p> <code>STD()</code> is a synonym for <code>STDDEV_SAMP()</code>. </p></td><td><p> <code>STD(expr)</code> </p></td></tr>
+<tr><td><p> <code>STDDEV</code> </p></td><td><p> <code>STDDEV()</code> is a synonym for <code>STDDEV_SAMP()</code>. </p></td><td><p> <code>STDDEV(expr)</code> </p></td></tr>
+<tr><td><p> <code>STDDEV_POP</code> </p></td><td><p> Returns the population standard deviation of expr (the square root of <code>VAR_POP()</code>). </p><p> It is an aggregate function. </p><p> <code>STDDEV_POP()</code> returns <code>NULL</code> if there were no matching rows. </p></td><td><p> <code>STDDEV_POP(expr)</code> </p></td></tr>
+<tr><td><p> <code>STDDEV_SAMP</code> </p></td><td><p> Returns the sample standard deviation of expr (the square root of <code>VAR_SAMP()</code>). </p><p> It is an aggregate function. </p><p> <code>STDDEV_SAMP()</code> returns <code>NULL</code> if there were no matching rows. </p></td><td><p> <code>STDDEV_SAMP(expr)</code> </p></td></tr>
+<tr><td><p> <code>SUM</code> </p></td><td><p> Returns the sum of expr. If the return set has no rows, <code>SUM()</code> returns <code>NULL</code>. </p><p> It is an aggregate function. </p></td><td><p> <code>SUM(expr)</code> </p></td></tr>
+<tr><td><p> <code>VAR_POP</code> </p></td><td><p> Returns the population standard variance of expr. It considers rows as the whole population, not as a sample, so it has the number of rows as the denominator. </p><p> Variance is calculated by working out the mean for the set for each number, subtracting the mean and squaring the result, and finally calculating the average of the resulting differences. </p><p> It is an aggregate function. </p><p> <code>VAR_POP()</code> returns <code>NULL</code> if there were no matching rows. </p></td><td><p> <code>VAR_POP(expr)</code> </p></td></tr>
+<tr><td><p> <code>VAR_SAMP</code> </p></td><td><p> Returns the sample standard variance of expr. The denominator is the number of rows minus one. </p><p> Variance is calculated by working out the mean for the set for each number, subtracting the mean and squaring the result, and finally calculating the average of the resulting differences. </p><p> It is an aggregate function. </p><p> <code>VAR_SAMP()</code> returns <code>NULL</code> if there were no matching rows. </p></td><td><p> <code>VAR_SAMP(expr)</code> </p></td></tr>
+<tr><td><p> <code>VARIANCE</code> </p></td><td><p> <code>VARIANCE()</code> is a synonym for <code>VAR_SAMP()</code>. </p></td><td><p> <code>VARIANCE(expr)</code> </p></td></tr>
+<tr><td><p> <code>VARIANCE_POP</code> </p></td><td><p> <code>VARIANCE_POP()</code> is a synonym for <code>VAR_POP()</code>. </p></td><td><p> <code>VARIANCE_POP(expr)</code> </p></td></tr>
+<tr><td><p> <code>VARIANCE_SAMP</code> </p></td><td><p> <code>VARIANCE_SAMP()</code> is a synonym for <code>VAR_SAMP()</code>. </p></td><td><p> <code>VARIANCE_SAMP(expr)</code> </p></td></tr>
+</tbody>
+</table>
 
 ## Numeric Functions
 
-<table data-aura-rendered-by="33:208;a" width="100%"><thead><tr><td class="wysiwyg-text-align-center" colspan="1" rowspan="1"><p><b> Function Name </b></p></td><td class="wysiwyg-text-align-center" colspan="1" rowspan="1"><p><b> Description </b></p></td><td class="wysiwyg-text-align-center" colspan="1" rowspan="1"><p><b> Example </b></p></td></tr></thead><tbody><tr><td colspan="1" rowspan="1"><p> ABS </p></td><td colspan="1" rowspan="1"><p> Returns the absolute (non-negative) value of X. If X is not a number, it is converted to a numeric type. </p></td><td colspan="1" rowspan="1"><p> ABS(X) </p></td></tr><tr><td colspan="1" rowspan="1"><p> ACOS </p></td><td colspan="1" rowspan="1"><p> Returns the arc cosine of X, that is, the value whose cosine is X. Returns NaN if X is not in the range -1 to 1. </p></td><td colspan="1" rowspan="1"><p> ACOS(X) </p></td></tr><tr><td colspan="1" rowspan="1"><p> ASIN </p></td><td colspan="1" rowspan="1"><p> Returns the arc sine of X, that is, the value whose sine is X. Returns NaN if X is not in the range -1 to 1. </p></td><td colspan="1" rowspan="1"><p> ASIN(X) </p></td></tr><tr><td colspan="1" rowspan="1"><p> ATAN </p></td><td colspan="1" rowspan="1"><p> Returns the arc tangent of X, that is, the value whose tangent is X. </p></td><td colspan="1" rowspan="1"><p> ATAN(X) </p></td></tr><tr><td colspan="1" rowspan="1"><p> ATAN2 </p></td><td colspan="1" rowspan="1"><p> Returns the arc tangent of the two variables X and Y. It is similar to calculating the arc tangent of Y / X, except that the signs of both arguments are used to determine the quadrant of the result. </p></td><td colspan="1" rowspan="1"><p> ATAN2(Y,X) </p></td></tr><tr><td colspan="1" rowspan="1"><p> AVG </p></td><td colspan="1" rowspan="1"><p> Returns the average value of expr. NULL values are ignored. It is an aggregate function. </p><p> AVG() returns NULL if there were no matching rows. </p></td><td colspan="1" rowspan="1"><p> AVG(expr) </p></td></tr><tr><td colspan="1" rowspan="1"><p> CBRT </p></td><td colspan="1" rowspan="1"><p> Returns the cube root of X. If X is negative, NaN is returned. </p></td><td colspan="1" rowspan="1"><p> CBRT(X) </p></td></tr><tr><td colspan="1" rowspan="1"><p> CEIL </p></td><td colspan="1" rowspan="1"><p> Returns the smallest integer value not less than X. Alias for CEILING(). </p></td><td colspan="1" rowspan="1"><p> CEIL(X) </p></td></tr><tr><td colspan="1" rowspan="1"><p> CEILING </p></td><td colspan="1" rowspan="1"><p> Returns the smallest integer value not less than X. </p></td><td colspan="1" rowspan="1"><p> CEILING(X) </p></td></tr><tr><td colspan="1" rowspan="1"><p> CONV </p></td><td colspan="1" rowspan="1"><p> Converts numbers between different number bases. Returns a string representation of the number N, converted from base from_base to base to_base. </p></td><td colspan="1" rowspan="1"><p> CONV(N,from_base,to_base) </p></td></tr><tr><td colspan="1" rowspan="1"><p> CONVERT_UNIT </p></td><td colspan="1" rowspan="1"><p> Converts expr from from_unit to to_unit. expr will be converted to type DOUBLE if it is not already, and the result always has type DOUBLE. </p><p> from_unit and to_unit are strings describing conmensurable units in English, e.g. ''cubic feet'' and ''liters'', or ''mph'' and ''m/s''. Unit strings follow these rules: </p><p> 1. Most SI (Metric) and Imperial units are supported. Imperial units are defined in terms of their SI counterparts. Imperial units of length, area, and mass/weight are mostly agreed upon internationally; the ton is an exception. Units of volume, like the gallon, also differ between the UK and the USA. When such differences arise, USA customary values (e.g. the short ton; 2000 avoirdupois pounds) are used. </p><p> 2. Units may be written out in full, and optionally pluralized. Metric units may have metric prefixes, and computing units may have metric or binary prefixes. Examples: ''feet'', ''year'', ''kilowatt'', ''megabyte'', ''mebibyte'' </p><p> 3. Units may be abbreviated. Metric and binary prefixes on abbreviated units must also be abbreviated. Abbreviated units are case-sensitive. Examples: ''mi'' (miles), ''KiBps'' (kibibytes per second), ''uPa'' (micropascals) </p><p> 4. Units may be exponentiated using the caret ''^'' or by ending a unit's name with a number. Exponents may be negative to indicate inversion of the unit. Units may also be prefixed with ''cu''/''cubic'' or ''sq''/''square'', followed by a space '' '' or hyphen ''-'', which are equivalent to the exponents ''3'' and ''2'', respectively. Examples: ''sq ft'' (square feet), ''m3'' (cubic meters), ''s^-1'' (inverse seconds; hertz) </p><p> 5. Units may be divided using the forward slash ''/'' character or the word '' per ''. Examples: ''miles per hour'', ''metres/second/second'' (meters per second squared; acceleration) </p><p> 6. Units may be multiplied using the asterisk ''*'' or by being combined with a hyphen ''-'' or space. The asterisk follows normal multiplication order of operations, while the hyphen or space form have the highest precedence, as though the combined units were a single unit name. Examples: ''N*m'' (newton meters; joules), ''half-gal'' (half gallons), ''kilogram-meters/second2'' (kilogram meters per second squared; newtons) </p><p> 7. Parentheses may be used to affect the order of operations of exponentiation, multiplication, and division. Examples: ''(m/s)^2'' (meters squared per second squared; acceleration of area) </p><p> 8. Units whose names or abbreviations consist of more than one word can be written with an underscore ''_'' separator or simply without the space. Examples: ''fluid_ounce'', ''floz'' (fluid ounce), ''poundforce'', ''astronomical_unit'' </p><p> Units must be conmensurable to be converted; they must have the same dimensions. There are five supported dimensional values: Time, length, mass, electric current, and information. Units may have a positive, negative, or zero number of dimensions in any of these values. Some units have zero dimensions in all categories; these units are raw quantities like ''dozen'' or ''half''. ''meters / second'' has one positive length dimension, and one negative time dimension; it is a unit of velocity. The ''gallon'' has three positive length dimensions; it is a unit of volume. These can be converted to ''miles / hour'' and ''cubic inches'', respectively, because they have the same dimensions. Attempting to convert between units that have different dimensions, like from ''seconds'' to ''miles'', results in an error. </p><p> Note that due to the nature of DOUBLE arithmetic, results may appear inexact. The ROUND() function may be used to correct results in these cases. </p></td><td colspan="1" rowspan="1"><p> CONVERT_UNIT(expr,from_unit,to_unit) </p></td></tr><tr><td colspan="1" rowspan="1"><p> COS </p></td><td colspan="1" rowspan="1"><p> Returns the cosine of X, where X is given in radians. </p></td><td colspan="1" rowspan="1"><p> COS(X) </p></td></tr><tr><td colspan="1" rowspan="1"><p> COSH </p></td><td colspan="1" rowspan="1"><p> Returns the hyperbolic cosine of X. </p></td><td colspan="1" rowspan="1"><p> COSH(X) </p></td></tr><tr><td colspan="1" rowspan="1"><p> COT </p></td><td colspan="1" rowspan="1"><p> Returns the cotangent of X. </p></td><td colspan="1" rowspan="1"><p> COT(X) </p></td></tr><tr><td colspan="1" rowspan="1"><p> CRC32 </p></td><td colspan="1" rowspan="1"><p> Computes a cyclic redundancy check value and returns a 32-bit unsigned value. The result is NULL if the argument is NULL. The argument is expected to be a string and (if possible) is treated as one if it is not. </p></td><td colspan="1" rowspan="1"><p> CRC32(expr) </p></td></tr><tr><td colspan="1" rowspan="1"><p> DECIMAL </p></td><td colspan="1" rowspan="1"><p> Returns the value of expr converted to a fixed-precision DECIMAL type. </p></td><td colspan="1" rowspan="1"><p> DECIMAL(expr), CAST(expr AS DECIMAL) </p></td></tr><tr><td colspan="1" rowspan="1"><p> DEGREES </p></td><td colspan="1" rowspan="1"><p> Returns the argument X, converted from radians to degrees. </p><p> This is the converse of the RADIANS() function. </p></td><td colspan="1" rowspan="1"><p> DEGREES(X) </p></td></tr><tr><td colspan="1" rowspan="1"><p> DISTANCE </p></td><td colspan="1" rowspan="1"><p> Returns the kilometer distance between two points on the WGS-84 model of Earth, given as degrees longitude and latitude. Vincenty's formulae are used to calculate the distance. </p></td><td colspan="1" rowspan="1"><p> DISTANCE(lat0, lon0, lat1, lon1) </p></td></tr><tr><td colspan="1" rowspan="1"><p> DISTANCEV </p></td><td colspan="1" rowspan="1"><p> DISTANCEV() is a synonym for DISTANCE(). Both use the slower but more accurate Vincenty method. </p></td><td colspan="1" rowspan="1"><p> DISTANCEV(lat0, lon0, lat1, lon1) </p></td></tr><tr><td colspan="1" rowspan="1"><p> DOUBLE </p></td><td colspan="1" rowspan="1"><p> Returns the value of expr converted to a floating-point DOUBLE type. </p></td><td colspan="1" rowspan="1"><p> DOUBLE(expr), CAST(expr AS DOUBLE) </p></td></tr><tr><td colspan="1" rowspan="1"><p> E </p></td><td colspan="1" rowspan="1"><p> Returns the value of e (Euler's number) as a double-precision floating point. </p></td><td colspan="1" rowspan="1"><p> E() </p></td></tr><tr><td colspan="1" rowspan="1"><p> EXP </p></td><td colspan="1" rowspan="1"><p> Returns the value of e (the base of natural logarithms) raised to the power of X. The inverse of this function is LOG() (using a single argument only) or LN(). </p><p> If X is NULL, this function returns NULL. </p></td><td colspan="1" rowspan="1"><p> EXP(X) </p></td></tr><tr><td colspan="1" rowspan="1"><p> FINITE </p></td><td colspan="1" rowspan="1"><p> Returns TRUE if expr is a finite number, NULL if it is NULL, or FALSE if it is NaN, Infinity, or -Infinity. </p></td><td colspan="1" rowspan="1"><p> FINITE(expr) </p></td></tr><tr><td colspan="1" rowspan="1"><p> FLOOR </p></td><td colspan="1" rowspan="1"><p> Returns the largest integer value not greater than X. </p></td><td colspan="1" rowspan="1"><p> FLOOR(X) </p></td></tr><tr><td colspan="1" rowspan="1"><p> INFINITY </p></td><td colspan="1" rowspan="1"><p> Returns the floating point representation of infinity. </p></td><td colspan="1" rowspan="1"><p> INF(), INFINITY() </p></td></tr><tr><td colspan="1" rowspan="1"><p> LN </p></td><td colspan="1" rowspan="1"><p> Returns the natural logarithm of X; that is, the base-e logarithm of X. If X is less than or equal to 0, or NULL, then NULL is returned. </p><p> The inverse of this function is EXP(). </p></td><td colspan="1" rowspan="1"><p> LN(X) </p></td></tr><tr><td colspan="1" rowspan="1"><p> LOG </p></td><td colspan="1" rowspan="1"><p> If called with one parameter, this function returns the natural logarithm of X. If X is less than or equal to 0, then NULL is returned. </p><p> If called with two parameters, it returns the logarithm of X to the base B. If B is &lt;= 1 or X &lt;= 0, the function returns NULL. </p><p> If any argument is NULL, the function returns NULL. </p><p> The inverse of this function (when called with a single argument) is the EXP() function. </p></td><td colspan="1" rowspan="1"><p> LOG(X), LOG(B,X) </p></td></tr><tr><td colspan="1" rowspan="1"><p> LOG10 </p></td><td colspan="1" rowspan="1"><p> Returns the base-10 logarithm of X. </p></td><td colspan="1" rowspan="1"><p> LOG10(X) </p></td></tr><tr><td colspan="1" rowspan="1"><p> LOG2 </p></td><td colspan="1" rowspan="1"><p> Returns the base-2 logarithm of X. </p></td><td colspan="1" rowspan="1"><p> LOG2(X) </p></td></tr><tr><td colspan="1" rowspan="1"><p> LONG </p></td><td colspan="1" rowspan="1"><p> Returns the value of expr converted to a LONG type integer. </p></td><td colspan="1" rowspan="1"><p> LONG(expr), CAST(expr AS LONG) </p></td></tr><tr><td colspan="1" rowspan="1"><p> LONG_MAX </p></td><td colspan="1" rowspan="1"><p> Returns the value -(2^63) as an integer. This is the smallest value that the type LONG can represent. </p></td><td colspan="1" rowspan="1"><p> LONG_MAX() </p></td></tr><tr><td colspan="1" rowspan="1"><p> LONG_MIN </p></td><td colspan="1" rowspan="1"><p> Returns the value 2^63 - 1 as an integer. This is the largest value that the type LONG can represent. </p></td><td colspan="1" rowspan="1"><p> LONG_MIN() </p></td></tr><tr><td colspan="1" rowspan="1"><p> MOD </p></td><td colspan="1" rowspan="1"><p> Modulo operation. Returns the remainder of N divided by M. </p></td><td colspan="1" rowspan="1"><p> MOD(N,M), N % M </p></td></tr><tr><td colspan="1" rowspan="1"><p> NAN </p></td><td colspan="1" rowspan="1"><p> Returns the floating point representation of NaN (not-a-number). </p></td><td colspan="1" rowspan="1"><p> NAN() </p></td></tr><tr><td colspan="1" rowspan="1"><p> NEGATIVE_INFINITY </p></td><td colspan="1" rowspan="1"><p> Returns the floating point representation of negative infinity. </p></td><td colspan="1" rowspan="1"><p> NEGINF(), NEGATIVE_INFINITY() </p></td></tr><tr><td colspan="1" rowspan="1"><p> PI </p></td><td colspan="1" rowspan="1"><p> Returns the value of π (pi) as a double-precision floating point. </p></td><td colspan="1" rowspan="1"><p> PI() </p></td></tr><tr><td colspan="1" rowspan="1"><p> POW </p></td><td colspan="1" rowspan="1"><p> Returns the value of X raised to the power of Y. </p></td><td colspan="1" rowspan="1"><p> POW(X,Y) </p></td></tr><tr><td colspan="1" rowspan="1"><p> POWER </p></td><td colspan="1" rowspan="1"><p> This is a synonym for POW(), which returns the value of X raised to the power of Y. </p></td><td colspan="1" rowspan="1"><p> POWER(X,Y) </p></td></tr><tr><td colspan="1" rowspan="1"><p> RADIANS </p></td><td colspan="1" rowspan="1"><p> Returns the argument X, converted from degrees to radians. Note that π radians equals 180 degrees. </p><p> This is the converse of the DEGREES() function. </p></td><td colspan="1" rowspan="1"><p> RADIANS(X) </p></td></tr><tr><td colspan="1" rowspan="1"><p> RAND </p></td><td colspan="1" rowspan="1"><p> Returns a random DOUBLE precision floating point value v in the range 0 &lt;= v &lt; 1.0. If a constant integer argument N is specified, it is used as the seed value, which produces a repeatable sequence of column values. </p></td><td colspan="1" rowspan="1"><p> RAND(), RAND(N) </p></td></tr><tr><td colspan="1" rowspan="1"><p> ROUND </p></td><td colspan="1" rowspan="1"><p> Rounds the argument X to D decimal places. D defaults to 0 if not specified. </p><p> If the argument X is a fixed decimal type, if equidistant it rounds to the nearest even neighbor. <br/><em><b> Example: </b> 1.5 and 2.5 both round to 2. </em></p><p> If the argument X is a floating decimal type, if equidistant it rounds up to the nearest neighbor. <br/><em><b> Example: </b> 1.5 rounds to 2 and 2.5 rounds to 3. </em></p></td><td colspan="1" rowspan="1"><p> ROUND(X), ROUND(X,D) </p></td></tr><tr><td colspan="1" rowspan="1"><p> RPAD </p></td><td colspan="1" rowspan="1"><p> Returns the string str, right-padded with the string padstr to a length of len characters. If str is longer than len, the return value is shortened to len characters. </p></td><td colspan="1" rowspan="1"><p> RPAD(str, len, padstr) </p></td></tr><tr><td colspan="1" rowspan="1"><p> RTRIM </p></td><td colspan="1" rowspan="1"><p> Returns the string str with trailing space characters removed. </p></td><td colspan="1" rowspan="1"><p> RTRIM(str) </p></td></tr><tr><td colspan="1" rowspan="1"><p> SIGN </p></td><td colspan="1" rowspan="1"><p> Returns the sign of the argument as -1, 0, or 1, depending on whether X is negative, zero, or positive. </p></td><td colspan="1" rowspan="1"><p> SIGN(X) </p></td></tr><tr><td colspan="1" rowspan="1"><p> SIN </p></td><td colspan="1" rowspan="1"><p> Returns the sine of X, where X is given in radians. </p></td><td colspan="1" rowspan="1"><p> SIN(X) </p></td></tr><tr><td colspan="1" rowspan="1"><p> SINH </p></td><td colspan="1" rowspan="1"><p> Returns the hyperbolic sine of X. </p></td><td colspan="1" rowspan="1"><p> SINH(X) </p></td></tr><tr><td colspan="1" rowspan="1"><p> SQRT </p></td><td colspan="1" rowspan="1"><p> Returns the square root of X. If X is negative, NaN is returned. </p></td><td colspan="1" rowspan="1"><p> SQRT(X) </p></td></tr><tr><td colspan="1" rowspan="1"><p> TAN </p></td><td colspan="1" rowspan="1"><p> Returns the tangent of X, where X is given in radians. </p></td><td colspan="1" rowspan="1"><p> TAN(X) </p></td></tr><tr><td colspan="1" rowspan="1"><p> TANH </p></td><td colspan="1" rowspan="1"><p> Returns the hyperbolic tangent of X. </p></td><td colspan="1" rowspan="1"><p> TANH(X) </p></td></tr><tr><td colspan="1" rowspan="1"><p> TRUNCATE </p></td><td colspan="1" rowspan="1"><p> Returns the number X, truncated to D decimal places. If D is 0, the result has no decimal point or fractional part. </p></td><td colspan="1" rowspan="1"><p> TRUNCATE(X,D) <a id="statistical_functions" target="_blank"></a></p></td></tr><tr><td colspan="1" rowspan="1"><p> WIDTH_BUCKET </p></td><td colspan="1" rowspan="1"><p> Divides the range [min, max) into equal-width buckets and returns the number of the bucket into which expr falls. Buckets are numbered from 1 to N, where N is the number of buckets. Values that fall outside the range are put in overflow buckets with numbers 0 and N + 1. </p><p> Be aware that bucket ranges are inclusive of their minimum bound and exclusive of their maximum bound. So WIDTH_BUCKET(100, 0, 100, 4) = 5, the overflow bucket. Also note that min may be less than max, in which case bucket minimums are larger than bucket maximums. So WIDTH_BUCKET(100, 100, 0, 4) = 1, the first bucket. </p></td><td colspan="1" rowspan="1"><p> WIDTH_BUCKET(expr, min, max, bucket_count) </p></td></tr></tbody></table>
+<table width="100%" style={{ tableLayout: "fixed", overflowWrap: "anywhere" }}>
+<thead>
+<tr><th width="22%"><p> Function Name </p></th><th width="48%"><p> Description </p></th><th width="30%"><p> Example </p></th></tr>
+</thead>
+<tbody>
+<tr><td><p> <code>ABS</code> </p></td><td><p> Returns the absolute (non-negative) value of X. If X is not a number, it is converted to a numeric type. </p></td><td><p> <code>ABS(X)</code> </p></td></tr>
+<tr><td><p> <code>ACOS</code> </p></td><td><p> Returns the arc cosine of X, that is, the value whose cosine is X. Returns <code>NaN</code> if X is not in the range -1 to 1. </p></td><td><p> <code>ACOS(X)</code> </p></td></tr>
+<tr><td><p> <code>ASIN</code> </p></td><td><p> Returns the arc sine of X, that is, the value whose sine is X. Returns <code>NaN</code> if X is not in the range -1 to 1. </p></td><td><p> <code>ASIN(X)</code> </p></td></tr>
+<tr><td><p> <code>ATAN</code> </p></td><td><p> Returns the arc tangent of X, that is, the value whose tangent is X. </p></td><td><p> <code>ATAN(X)</code> </p></td></tr>
+<tr><td><p> <code>ATAN2</code> </p></td><td><p> Returns the arc tangent of the two variables X and Y. It is similar to calculating the arc tangent of Y / X, except that the signs of both arguments are used to determine the quadrant of the result. </p></td><td><p> <code>ATAN2(Y,X)</code> </p></td></tr>
+<tr><td><p> <code>BIT_AND</code> </p></td><td><p> Returns the "bitwise and" of X and Y. Both arguments must be integers; the result is an integer of the same bit width. </p></td><td><p> <code>BIT_AND(X, Y)</code> </p></td></tr>
+<tr><td><p> <code>BIT_LSHIFT</code> </p></td><td><p> Shifts the binary digits of X left by Y digits. Both arguments must be integers. </p></td><td><p> <code>BIT_LSHIFT(X, Y)</code> </p></td></tr>
+<tr><td><p> <code>BIT_NAND</code> </p></td><td><p> Returns the "bitwise nand" of X and Y. Both arguments must be integers; the result is an integer of the same bit width. </p></td><td><p> <code>BIT_NAND(X, Y)</code> </p></td></tr>
+<tr><td><p> <code>BIT_NOR</code> </p></td><td><p> Returns the "bitwise nor" of X and Y. Both arguments must be integers; the result is an integer of the same bit width. </p></td><td><p> <code>BIT_NOR(X, Y)</code> </p></td></tr>
+<tr><td><p> <code>BIT_NOT</code> </p></td><td><p> Returns the "bitwise not" of X. X must be an integer; the result is an integer of the same bit width. </p></td><td><p> <code>BIT_NOT(X)</code> </p></td></tr>
+<tr><td><p> <code>BIT_OR</code> </p></td><td><p> Returns the "bitwise or" of X and Y. Both arguments must be integers; the result is an integer of the same bit width. </p></td><td><p> <code>BIT_OR(X, Y)</code> </p></td></tr>
+<tr><td><p> <code>BIT_RSHIFT</code> </p></td><td><p> Shifts the binary digits of X right by Y digits. The result is not sign-extended; new leftmost bits are zero. Both arguments must be integers. </p></td><td><p> <code>BIT_RSHIFT(X, Y)</code> </p></td></tr>
+<tr><td><p> <code>BIT_XNOR</code> </p></td><td><p> Returns the "bitwise xnor" of X and Y. Both arguments must be integers; the result is an integer of the same bit width. </p></td><td><p> <code>BIT_XNOR(X, Y)</code> </p></td></tr>
+<tr><td><p> <code>BIT_XOR</code> </p></td><td><p> Returns the "bitwise xor" of X and Y. Both arguments must be integers; the result is an integer of the same bit width. </p></td><td><p> <code>BIT_XOR(X, Y)</code> </p></td></tr>
+<tr><td><p> <code>CBRT</code> </p></td><td><p> Returns the cube root of X. If X is negative, <code>NaN</code> is returned. </p></td><td><p> <code>CBRT(X)</code> </p></td></tr>
+<tr><td><p> <code>CEIL</code> </p></td><td><p> Returns the smallest integer value not less than X. Alias for <code>CEILING()</code>. </p></td><td><p> <code>CEIL(X)</code> </p></td></tr>
+<tr><td><p> <code>CEILING</code> </p></td><td><p> Returns the smallest integer value not less than X. </p></td><td><p> <code>CEILING(X)</code> </p></td></tr>
+<tr><td><p> <code>CONV</code> </p></td><td><p> Converts numbers between different number bases. Returns a string representation of the number N, converted from base from_base to base to_base. </p></td><td><p> <code>CONV(N,from_base,to_base)</code> </p></td></tr>
+<tr><td><p> <code>CONVERT_UNIT</code> </p></td><td><p> Converts expr from from_unit to to_unit. expr will be converted to type <code>DOUBLE</code> if it is not already, and the result always has type <code>DOUBLE</code>. </p><p> from_unit and to_unit are strings describing commensurable units in English, e.g. <code>'cubic feet'</code> and <code>'liters'</code>, or <code>'mph'</code> and <code>'m/s'</code>. Unit strings follow these rules: </p><p> 1. Most SI (Metric) and Imperial units are supported. Imperial units are defined in terms of their SI counterparts. Imperial units of length, area, and mass/weight are mostly agreed upon internationally; the ton is an exception. Units of volume, like the gallon, also differ between the UK and the USA. When such differences arise, USA customary values (e.g. the short ton; 2000 avoirdupois pounds) are used. </p><p> 2. Units may be written out in full, and optionally pluralized. Metric units may have metric prefixes, and computing units may have metric or binary prefixes. Examples: <code>'feet'</code>, <code>'year'</code>, <code>'kilowatt'</code>, <code>'megabyte'</code>, <code>'mebibyte'</code> </p><p> 3. Units may be abbreviated. Metric and binary prefixes on abbreviated units must also be abbreviated. Abbreviated units are case-sensitive. Examples: <code>'mi'</code> (miles), <code>'KiBps'</code> (kibibytes per second), <code>'uPa'</code> (micropascals) </p><p> 4. Units may be exponentiated using the caret <code>'^'</code> or by ending a unit's name with a number. Exponents may be negative to indicate inversion of the unit. Units may also be prefixed with <code>'cu'</code>/<code>'cubic'</code> or <code>'sq'</code>/<code>'square'</code>, followed by a space <code>' '</code> or hyphen <code>'-'</code>, which are equivalent to the exponents <code>'3'</code> and <code>'2'</code>, respectively. Examples: <code>'sq ft'</code> (square feet), <code>'m3'</code> (cubic meters), <code>'s^-1'</code> (inverse seconds; hertz) </p><p> 5. Units may be divided using the forward slash <code>'/'</code> character or the word <code>' per '</code>. Examples: <code>'miles per hour'</code>, <code>'metres/second/second'</code> (meters per second squared; acceleration) </p><p> 6. Units may be multiplied using the asterisk <code>'*'</code> or by being combined with a hyphen <code>'-'</code> or space. The asterisk follows normal multiplication order of operations, while the hyphen or space form have the highest precedence, as though the combined units were a single unit name. Examples: <code>'N*m'</code> (newton meters; joules), <code>'half-gal'</code> (half gallons), <code>'kilogram-meters/second2'</code> (kilogram meters per second squared; newtons) </p><p> 7. Parentheses may be used to affect the order of operations of exponentiation, multiplication, and division. Examples: <code>'(m/s)^2'</code> (meters squared per second squared; acceleration of area) </p><p> 8. Units whose names or abbreviations consist of more than one word can be written with an underscore <code>'_'</code> separator or simply without the space. Examples: <code>'fluid_ounce'</code>, <code>'floz'</code> (fluid ounce), <code>'poundforce'</code>, <code>'astronomical_unit'</code> </p><p> Units must be commensurable to be converted; they must have the same dimensions. There are five supported dimensional values: Time, length, mass, electric current, and information. Units may have a positive, negative, or zero number of dimensions in any of these values. Some units have zero dimensions in all categories; these units are raw quantities like <code>'dozen'</code> or <code>'half'</code>. <code>'meters / second'</code> has one positive length dimension, and one negative time dimension; it is a unit of velocity. The <code>'gallon'</code> has three positive length dimensions; it is a unit of volume. These can be converted to <code>'miles / hour'</code> and <code>'cubic inches'</code>, respectively, because they have the same dimensions. Attempting to convert between units that have different dimensions, like from <code>'seconds'</code> to <code>'miles'</code>, results in an error. </p><p> Note that due to the nature of <code>DOUBLE</code> arithmetic, results may appear inexact. The <code>ROUND()</code> function may be used to correct results in these cases. </p></td><td><p> <code>CONVERT_UNIT(expr,from_unit,to_unit)</code> </p></td></tr>
+<tr><td><p> <code>COS</code> </p></td><td><p> Returns the cosine of X, where X is given in radians. </p></td><td><p> <code>COS(X)</code> </p></td></tr>
+<tr><td><p> <code>COSH</code> </p></td><td><p> Returns the hyperbolic cosine of X. </p></td><td><p> <code>COSH(X)</code> </p></td></tr>
+<tr><td><p> <code>COT</code> </p></td><td><p> Returns the cotangent of X. </p></td><td><p> <code>COT(X)</code> </p></td></tr>
+<tr><td><p> <code>CRC32</code> </p></td><td><p> Computes a cyclic redundancy check value and returns a 32-bit unsigned value. The result is <code>NULL</code> if the argument is <code>NULL</code>. The argument is expected to be a string and (if possible) is treated as one if it is not. </p></td><td><p> <code>CRC32(expr)</code> </p></td></tr>
+<tr><td><p> <code>DECIMAL</code> </p></td><td><p> Returns the value of expr converted to a fixed-precision <code>DECIMAL</code> type. </p></td><td><p> <code>DECIMAL(expr)</code>, <code>CAST(expr AS DECIMAL)</code> </p></td></tr>
+<tr><td><p> <code>DEGREES</code> </p></td><td><p> Returns the argument X, converted from radians to degrees. </p><p> This is the converse of the <code>RADIANS()</code> function. </p></td><td><p> <code>DEGREES(X)</code> </p></td></tr>
+<tr><td><p> <code>DISTANCE</code> </p></td><td><p> Returns the kilometer distance between two points on the WGS-84 model of Earth, given as degrees longitude and latitude. Vincenty's formulae are used to calculate the distance. </p></td><td><p> <code>DISTANCE(lat0, lon0, lat1, lon1)</code> </p></td></tr>
+<tr><td><p> <code>DISTANCEV</code> </p></td><td><p> <code>DISTANCEV()</code> is a synonym for <code>DISTANCE()</code>. Both use the slower but more accurate Vincenty method. </p></td><td><p> <code>DISTANCEV(lat0, lon0, lat1, lon1)</code> </p></td></tr>
+<tr><td><p> <code>DIV</code> </p></td><td><p> Divides X by Y using integer division. The fractional part of the operation is effectively truncated. </p></td><td><p> <code>DIV(X,Y)</code> </p></td></tr>
+<tr><td><p> <code>DOUBLE</code> </p></td><td><p> Returns the value of expr converted to a floating-point <code>DOUBLE</code> type. </p></td><td><p> <code>DOUBLE(expr)</code>, <code>CAST(expr AS DOUBLE)</code> </p></td></tr>
+<tr><td><p> <code>E</code> </p></td><td><p> Returns the value of e (Euler's number) as a double-precision floating point. </p></td><td><p> <code>E()</code> </p></td></tr>
+<tr><td><p> <code>EXP</code> </p></td><td><p> Returns the value of e (the base of natural logarithms) raised to the power of X. The inverse of this function is <code>LOG()</code> (using a single argument only) or <code>LN()</code>. </p><p> If X is <code>NULL</code>, this function returns <code>NULL</code>. </p></td><td><p> <code>EXP(X)</code> </p></td></tr>
+<tr><td><p> <code>FINITE</code> </p></td><td><p> Returns <code>TRUE</code> if expr is a finite number, <code>NULL</code> if it is <code>NULL</code>, or <code>FALSE</code> if it is <code>NaN</code>, <code>Infinity</code>, or <code>-Infinity</code>. </p></td><td><p> <code>FINITE(expr)</code> </p></td></tr>
+<tr><td><p> <code>FLOOR</code> </p></td><td><p> Returns the largest integer value not greater than X. </p></td><td><p> <code>FLOOR(X)</code> </p></td></tr>
+<tr><td><p> <code>INFINITY</code> </p></td><td><p> Returns the floating point representation of infinity. </p></td><td><p> <code>INF()</code>, <code>INFINITY()</code> </p></td></tr>
+<tr><td><p> <code>LN</code> </p></td><td><p> Returns the natural logarithm of X; that is, the base-e logarithm of X. If X is less than or equal to 0, or <code>NULL</code>, then <code>NULL</code> is returned. </p><p> The inverse of this function is <code>EXP()</code>. </p></td><td><p> <code>LN(X)</code> </p></td></tr>
+<tr><td><p> <code>LOG</code> </p></td><td><p> If called with one parameter, this function returns the natural logarithm of X. If X is less than or equal to 0, then <code>NULL</code> is returned. </p><p> If called with two parameters, it returns the logarithm of X to the base B. If B is &lt;= 1 or X &lt;= 0, the function returns <code>NULL</code>. </p><p> If any argument is <code>NULL</code>, the function returns <code>NULL</code>. </p><p> The inverse of this function (when called with a single argument) is the <code>EXP()</code> function. </p></td><td><p> <code>LOG(X)</code>, <code>LOG(B,X)</code> </p></td></tr>
+<tr><td><p> <code>LOG10</code> </p></td><td><p> Returns the base-10 logarithm of X. </p></td><td><p> <code>LOG10(X)</code> </p></td></tr>
+<tr><td><p> <code>LOG2</code> </p></td><td><p> Returns the base-2 logarithm of X. </p></td><td><p> <code>LOG2(X)</code> </p></td></tr>
+<tr><td><p> <code>LONG</code> </p></td><td><p> Returns the value of expr converted to a <code>LONG</code> type integer. </p></td><td><p> <code>LONG(expr)</code>, <code>CAST(expr AS LONG)</code> </p></td></tr>
+<tr><td><p> <code>LONG_MAX</code> </p></td><td><p> Returns the value <code>2^63 - 1</code> as an integer. This is the largest value that the type <code>LONG</code> can represent. </p></td><td><p> <code>LONG_MAX()</code> </p></td></tr>
+<tr><td><p> <code>LONG_MIN</code> </p></td><td><p> Returns the value <code>-(2^63)</code> as an integer. This is the smallest value that the type <code>LONG</code> can represent. </p></td><td><p> <code>LONG_MIN()</code> </p></td></tr>
+<tr><td><p> <code>MD5</code> </p></td><td><p> Computes the MD5 sum of the given expressions. All arguments are converted to strings before being processed, and a null-character delimiter is added between arguments. The result is returned as a 32 hexadecimal digit string, or <code>NULL</code> if any arguments were <code>NULL</code>. </p></td><td><p> <code>MD5(expr1,expr2...,exprN)</code> </p></td></tr>
+<tr><td><p> <code>MOD</code> </p></td><td><p> Modulo operation. Returns the remainder of N divided by M. </p></td><td><p> <code>MOD(N,M)</code>, <code>N % M</code> </p></td></tr>
+<tr><td><p> <code>NAN</code> </p></td><td><p> Returns the floating point representation of <code>NaN</code> (not-a-number). </p></td><td><p> <code>NAN()</code> </p></td></tr>
+<tr><td><p> <code>NEGATIVE_INFINITY</code> </p></td><td><p> Returns the floating point representation of negative infinity. </p></td><td><p> <code>NEGINF()</code>, <code>NEGATIVE_INFINITY()</code> </p></td></tr>
+<tr><td><p> <code>PI</code> </p></td><td><p> Returns the value of π (pi) as a double-precision floating point. </p></td><td><p> <code>PI()</code> </p></td></tr>
+<tr><td><p> <code>POW</code> </p></td><td><p> Returns the value of X raised to the power of Y. </p></td><td><p> <code>POW(X,Y)</code> </p></td></tr>
+<tr><td><p> <code>POWER</code> </p></td><td><p> This is a synonym for <code>POW()</code>, which returns the value of X raised to the power of Y. </p></td><td><p> <code>POWER(X,Y)</code> </p></td></tr>
+<tr><td><p> <code>RADIANS</code> </p></td><td><p> Returns the argument X, converted from degrees to radians. Note that π radians equals 180 degrees. </p><p> This is the converse of the <code>DEGREES()</code> function. </p></td><td><p> <code>RADIANS(X)</code> </p></td></tr>
+<tr><td><p> <code>RAND</code> </p></td><td><p> Returns a random <code>DOUBLE</code> precision floating point value v in the range 0 &lt;= v &lt; 1.0. If a constant integer argument N is specified, it is used as the seed value, which produces a repeatable sequence of column values. </p></td><td><p> <code>RAND()</code>, <code>RAND(N)</code> </p></td></tr>
+<tr><td><p> <code>ROUND</code> </p></td><td><p> Rounds the argument X to D decimal places. D defaults to 0 if not specified. </p><p> If the argument X is a fixed decimal type, if equidistant it rounds to the nearest even neighbor. <br/><em><b> Example: </b> 1.5 and 2.5 both round to 2. </em></p><p> If the argument X is a floating decimal type, if equidistant it rounds up to the nearest neighbor. <br/><em><b> Example: </b> 1.5 rounds to 2 and 2.5 rounds to 3. </em></p></td><td><p> <code>ROUND(X)</code>, <code>ROUND(X,D)</code> </p></td></tr>
+<tr><td><p> <code>SHA1</code> </p></td><td><p> Computes the SHA-1 sum of the given expressions. All arguments are converted to strings before being processed, and a null-character delimiter is added between arguments. The result is returned as a 40 hexadecimal digit string, or <code>NULL</code> if any arguments were <code>NULL</code>. </p></td><td><p> <code>SHA1(expr1,expr2...,exprN)</code> </p></td></tr>
+<tr><td><p> <code>SIGN</code> </p></td><td><p> Returns the sign of the argument as -1, 0, or 1, depending on whether X is negative, zero, or positive. </p></td><td><p> <code>SIGN(X)</code> </p></td></tr>
+<tr><td><p> <code>SIN</code> </p></td><td><p> Returns the sine of X, where X is given in radians. </p></td><td><p> <code>SIN(X)</code> </p></td></tr>
+<tr><td><p> <code>SINH</code> </p></td><td><p> Returns the hyperbolic sine of X. </p></td><td><p> <code>SINH(X)</code> </p></td></tr>
+<tr><td><p> <code>SQRT</code> </p></td><td><p> Returns the square root of X. If X is negative, <code>NaN</code> is returned. </p></td><td><p> <code>SQRT(X)</code> </p></td></tr>
+<tr><td><p> <code>TAN</code> </p></td><td><p> Returns the tangent of X, where X is given in radians. </p></td><td><p> <code>TAN(X)</code> </p></td></tr>
+<tr><td><p> <code>TANH</code> </p></td><td><p> Returns the hyperbolic tangent of X. </p></td><td><p> <code>TANH(X)</code> </p></td></tr>
+<tr><td><p> <code>TRUNCATE</code> </p></td><td><p> Returns the number X, truncated to D decimal places. If D is 0, the result has no decimal point or fractional part. </p></td><td><p> <code>TRUNCATE(X,D)</code> </p></td></tr>
+<tr><td><p> <code>WIDTH_BUCKET</code> </p></td><td><p> Divides the range [min, max) into equal-width buckets and returns the number of the bucket into which expr falls. Buckets are numbered from 1 to N, where N is the number of buckets. Values that fall outside the range are put in overflow buckets with numbers 0 and N + 1. </p><p> Be aware that bucket ranges are inclusive of their minimum bound and exclusive of their maximum bound. So <code>WIDTH_BUCKET(100, 0, 100, 4)</code> = 5, the overflow bucket. Also note that min may be less than max, in which case bucket minimums are larger than bucket maximums. So <code>WIDTH_BUCKET(100, 100, 0, 4)</code> = 1, the first bucket. </p></td><td><p> <code>WIDTH_BUCKET(expr, min, max, bucket_count)</code> </p></td></tr>
+</tbody>
+</table>
 
 ## Statistical Functions
 
-<table data-aura-rendered-by="33:208;a" width="100%"><thead><tr><td class="wysiwyg-text-align-center" colspan="1" rowspan="1"><p><b> Function Name </b></p></td><td class="wysiwyg-text-align-center" colspan="1" rowspan="1"><p><b> Description </b></p></td><td class="wysiwyg-text-align-center" colspan="1" rowspan="1"><p><b> Example </b></p></td></tr></thead><tbody><tr><td colspan="1" rowspan="1"><p> ANOVAF </p></td><td colspan="1" rowspan="1"><p> Returns the F-value of a one-way Analysis of Variance of the samples. At least two samples must be provided, and each sample must have at least two non-null values. Note that a one-way ANOVA on two samples is equivalent to the Student's t-test (see the TTEST function). </p><p> See also: ANOVAP() </p></td><td colspan="1" rowspan="1"><p> ANOVAF(sample1,sample2[,sample3[,...,sampleN]]) </p></td></tr><tr><td colspan="1" rowspan="1"><p> ANOVAP </p></td><td colspan="1" rowspan="1"><p> Returns the p-value of a one-way Analysis of Variance of the samples. At least two samples must be provided, and each sample must have at least two non-null values. Note that a one-way ANOVA on two samples is equivalent to the Student's t-test (see the TTEST function). </p><p> See also: ANOVAF() </p></td><td colspan="1" rowspan="1"><p> ANOVAP(sample1,sample2[,sample3[,...,sampleN]]) <a id="financial_functions" target="_blank"></a></p></td></tr><tr><td colspan="1" rowspan="1"><p> TTEST </p></td><td colspan="1" rowspan="1"><p> Returns the p-value result of a Student's t-test. Arguments sample1 and sample2 are two numeric columns with at least 2 non-null values each. The tails argument is either 1 or 2, indicating a one- or two-tailed test. The type argument is a number 1 through 3. Type 1 is a paired sample test; for this type of test, values in both sample1 and sample2 must be non-null or be ignored. Type 2 is for two samples with the assumption of equal variance. Type 3 is for two samples without the assumption of equal variance. </p></td><td colspan="1" rowspan="1"><p> TTEST(sample1,sample2,tails,type) </p></td></tr></tbody></table>
+<table width="100%" style={{ tableLayout: "fixed", overflowWrap: "anywhere" }}>
+<thead>
+<tr><th width="22%"><p> Function Name </p></th><th width="48%"><p> Description </p></th><th width="30%"><p> Example </p></th></tr>
+</thead>
+<tbody>
+<tr><td><p> <code>ANOVAF</code> </p></td><td><p> Returns the F-value of a one-way Analysis of Variance of the samples. At least two samples must be provided, and each sample must have at least two non-null values. Note that a one-way ANOVA on two samples is equivalent to the Student's t-test (see the <code>TTEST</code> function). </p><p> See also: <code>ANOVAP()</code> </p></td><td><p> <code>ANOVAF(sample1,sample2[,sample3[,...,sampleN]])</code> </p></td></tr>
+<tr><td><p> <code>ANOVAP</code> </p></td><td><p> Returns the p-value of a one-way Analysis of Variance of the samples. At least two samples must be provided, and each sample must have at least two non-null values. Note that a one-way ANOVA on two samples is equivalent to the Student's t-test (see the <code>TTEST</code> function). </p><p> See also: <code>ANOVAF()</code> </p></td><td><p> <code>ANOVAP(sample1,sample2[,sample3[,...,sampleN]])</code> </p></td></tr>
+<tr><td><p> <code>TTEST</code> </p></td><td><p> Returns the p-value result of a Student's t-test. Arguments sample1 and sample2 are two numeric columns with at least 2 non-null values each. The tails argument is either 1 or 2, indicating a one- or two-tailed test. The type argument is a number 1 through 3. Type 1 is a paired sample test; for this type of test, values in both sample1 and sample2 must be non-null or be ignored. Type 2 is for two samples with the assumption of equal variance. Type 3 is for two samples without the assumption of equal variance. </p></td><td><p> <code>TTEST(sample1,sample2,tails,type)</code> </p></td></tr>
+</tbody>
+</table>
+
+## Window Functions
+
+Window functions calculate a value for each row from a set of related rows, called a partition. Use an `OVER` clause to define the partition and the order of its rows, for example `RANK() OVER (PARTITION BY region ORDER BY sales DESC)`.
+
+<Note>
+  **Note:** Window functions can only be used in the SQL tile. The Add Formula and Group By tiles do not accept an `OVER` clause. The exception is `ROW_NUMBER()`, which you can use in the Add Formula tile without an `OVER` clause to number the rows of the entire input.
+</Note>
+
+<table width="100%" style={{ tableLayout: "fixed", overflowWrap: "anywhere" }}>
+<thead>
+<tr><th width="22%"><p> Function Name </p></th><th width="48%"><p> Description </p></th><th width="30%"><p> Example </p></th></tr>
+</thead>
+<tbody>
+<tr><td><p> <code>CUME_DIST</code> </p></td><td><p> Returns the ratio of the number of rows with an equal or lesser value to this row to the total number of rows in the partition, according to the window clause. </p></td><td><p> <code>CUME_DIST()</code> </p></td></tr>
+<tr><td><p> <code>DENSE_RANK</code> </p></td><td><p> Returns the rank of this row in the partition, according to the window clause. The rank is 1 for the first row, 2 for the second, and so on. Ties are given the same rank, but no values are skipped. Therefore, if two values are given rank 2, a subsequent, lesser value will be given rank 3. </p></td><td><p> <code>DENSE_RANK()</code> </p></td></tr>
+<tr><td><p> <code>LAG</code> </p></td><td><p> Returns the value of expr from the row offset rows before this one in the partition, according to the window clause. If offset is not specified, it defaults to 1. If default is not specified, it defaults to <code>NULL</code>. If <code>IGNORE NULLS</code> is specified, <code>NULL</code> values are ignored when counting rows. </p></td><td><p> <code>LAG(expr[, offset[, default]][ IGNORE NULLS])</code> </p></td></tr>
+<tr><td><p> <code>LEAD</code> </p></td><td><p> Returns the value of expr from the row offset rows after this one in the partition, according to the window clause. If offset is not specified, it defaults to 1. If default is not specified, it defaults to <code>NULL</code>. If <code>IGNORE NULLS</code> is specified, <code>NULL</code> values are ignored when counting rows. </p></td><td><p> <code>LEAD(expr[, offset[, default]][ IGNORE NULLS])</code> </p></td></tr>
+<tr><td><p> <code>NTH_VALUE</code> </p></td><td><p> Returns the value of expr at the nth row in the partition, according to the window clause. If <code>IGNORE NULLS</code> is specified, <code>NULL</code> values are ignored when counting rows. </p></td><td><p> <code>NTH_VALUE(expr, n[ IGNORE NULLS])</code> </p></td></tr>
+<tr><td><p> <code>NTILE</code> </p></td><td><p> Divides the partition into n buckets and returns the number of the bucket for this row, according to the window clause. Buckets are numbered from 1 to n. </p></td><td><p> <code>NTILE(n)</code> </p></td></tr>
+<tr><td><p> <code>PERCENT_RANK</code> </p></td><td><p> Returns the ratio of the number of rows with a lesser rank to this row to the total number of rows in the partition less one, according to the window clause. Equivalent to (<code>rank()</code> - 1) / (partition row count - 1). </p></td><td><p> <code>PERCENT_RANK()</code> </p></td></tr>
+<tr><td><p> <code>RANK</code> </p></td><td><p> Returns the rank of this row in the partition, according to the window clause. The rank is 1 for the first row, 2 for the second, and so on. Ties are given the same rank, and values are skipped to account for ties. Therefore, if two values are given rank 2, a subsequent, lesser value will be given rank 4. </p></td><td><p> <code>RANK()</code> </p></td></tr>
+<tr><td><p> <code>ROW_NUMBER</code> </p></td><td><p> Returns the number of the row within a window partition, counting from 1. </p><p> In Magic ETL, <code>ROW_NUMBER()</code> may be used without a window clause or context, in which case it returns the number of the row within the entire input stream. </p></td><td><p> <code>ROW_NUMBER()</code> </p></td></tr>
+</tbody>
+</table>
 
 ## Financial Functions
 
-<table data-aura-rendered-by="33:208;a" width="100%"><thead><tr><td class="wysiwyg-text-align-center" colspan="1" rowspan="1"><p><b> Function Name </b></p></td><td class="wysiwyg-text-align-center" colspan="1" rowspan="1"><p><b> Description </b></p></td><td class="wysiwyg-text-align-center" colspan="1" rowspan="1"><p><b> Example </b></p></td></tr></thead><tbody><tr><td colspan="1" rowspan="1"><p> FV </p></td><td colspan="1" rowspan="1"><p> Calculates the future value of an investment based on these arguments: </p><p> rate (required): The interest rate per period, expressed as a ratio (e.g. 1% is 0.01). </p><p> nper (required): The total number of periods. </p><p> pmt (required): The payment made each period. Can be zero. </p><p> pv (optional): The present value; how much the investment is worth right now. </p><p> type (optional): 0/FALSE or 1/TRUE, with 0 indicating that payments are made at the end of each period, and 1 indicating they are paid at the beginning. If not specified, 0 is used. </p><p> NOTE: Unlike spreadsheet syntax, interest rates cannot be expressed as a percent. They must be expressed as a ratio (usually between 0 and 1). </p><p> See also: PV(), PMT(), RATE(), and NPER(). </p></td><td colspan="1" rowspan="1"><p> FV(rate,nper,pmt[,pv[,type]]) </p></td></tr><tr><td colspan="1" rowspan="1"><p> IRR </p></td><td colspan="1" rowspan="1"><p> Calculates the per-period Internal Rate of Return for a set of periodic transactions. ''guess'' is a best guess of the rate of return. It is optional and the default is 0.1, meaning 10%. It is usually not necessary to specify this value. </p><p> IRR is an aggregate function. </p></td><td colspan="1" rowspan="1"><p> IRR(values[,guess]) </p></td></tr><tr><td colspan="1" rowspan="1"><p> NPV </p></td><td colspan="1" rowspan="1"><p> Calculates the Net Present Value for a set of periodic transactions. NPV is an aggregate function. </p></td><td colspan="1" rowspan="1"><p> NPV(rate,values) </p></td></tr><tr><td colspan="1" rowspan="1"><p> PMT </p></td><td colspan="1" rowspan="1"><p> Calculates the number of periods for an investment based on constant interest rate, payments, and period duration. Arguments: </p><p> rate (required): The interest rate per period, expressed as a ratio (e.g. 1% is 0.01). </p><p> pv (required): The present value of the loan; the "principal". </p><p> fv (optional): The future value; the balance at the end of the entire annuity. If omitted, it is assumed to be 0 (e.g. a loan paid in full). </p><p> type (optional): 0/FALSE or 1/TRUE, with 0 indicating that payments are made at the end of each period, and 1 indicating they are paid at the beginning. If not specified, 0 is used. </p><p> NOTE: Unlike spreadsheet syntax, interest rates cannot be expressed as a percent. They must be expressed as a ratio (usually between 0 and 1). </p><p> See also: FV(), PV(), PMT(), and RATE(). </p></td><td colspan="1" rowspan="1"><p> PMT(rate,nper,pv[,fv[,type]]) </p></td></tr><tr><td colspan="1" rowspan="1"><p> PV </p></td><td colspan="1" rowspan="1"><p> Calculates the present value of an investment based on these arguments: </p><p> rate (required): The interest rate per period, expressed as a ratio (e.g. 1% is 0.01). </p><p> nper (required): The total number of periods. </p><p> pmt (required): The payment made each period. Can be zero. </p><p> fv (optional): The future value; the balance at the end of the entire annuity. If omitted, it is assumed to be 0 (e.g. a loan paid in full). </p><p> type (optional): 0/FALSE or 1/TRUE, with 0 indicating that payments are made at the end of each period, and 1 indicating they are paid at the beginning. If not specified, 0 is used. </p><p> NOTE: Unlike spreadsheet syntax, interest rates cannot be expressed as a percent. They must be expressed as a ratio (usually between 0 and 1). </p><p> See also: FV(), PMT(), RATE(), and NPER(). </p></td><td colspan="1" rowspan="1"><p> PV(rate,nper,pmt[,fv[,type]]) </p></td></tr><tr><td colspan="1" rowspan="1"><p> RATE </p></td><td colspan="1" rowspan="1"><p> Attempts to calculate the per-period interest rate of an investment. Not all arguments will have solutions; the result will be NaN if a solution cannot be found. You can also experiment with setting the guess if you believe there is a solution and it is not being returned. Note that the current implementation will not calculate negative interest rates. Arguments: </p><p> nper (required): The total number of periods. </p><p> pmt (required): The payment made each period. Can be zero. </p><p> pv (required): The present value of the loan; the "principal". </p><p> fv (optional): The future value; the balance at the end of the entire annuity. If omitted, it is assumed to be 0 (e.g. a loan paid in full). </p><p> type (optional): 0/FALSE or 1/TRUE, with 0 indicating that payments are made at the end of each period, and 1 indicating they are paid at the beginning. If not specified, 0 is used. </p><p> guess (optional): A best guess of the interest rate. </p><p> See also: FV(), PV(), PMT(), and NPER(). </p></td><td colspan="1" rowspan="1"><p> RATE(rate,nper,pv[,fv[,type[,guess]]]) </p></td></tr><tr><td colspan="1" rowspan="1"><p> XIRR </p></td><td colspan="1" rowspan="1"><p> Calculates the Internal Rate of Return for a set of transactions that is not necessarily periodic. ''values'' is a set of transaction amounts which must contain at least one negative and one positive value. NULL or zero values in this column are ignored. ''dates'' is a list of transaction dates whose time components, if present, are ignored. ''guess'' is a best guess of the rate of return. It is optional and the default is 0.1, meaning 10%. It is usually not necessary to specify this value. </p><p> XIRR is an aggregate function. </p></td><td colspan="1" rowspan="1"><p> XIRR(values,dates[,guess]) <a id="logical_functions" target="_blank"></a></p></td></tr><tr><td colspan="1" rowspan="1"><p> XNPV </p></td><td colspan="1" rowspan="1"><p> Calculates the Net Present Value for a set of transactions that is not necessarily periodic. ''rate'' is the annualized Internal Rate of Return for the values. ''values'' is a set of transaction amounts which must contain at least one negative and one positive value. NULL or zero values in this column are ignored. ''dates'' is a list of transaction dates whose time components, if present, are ignored. </p><p> XNPV is an aggregate function. </p></td><td colspan="1" rowspan="1"><p> XNPV(rate,values,dates) </p></td></tr></tbody></table>
+<table width="100%" style={{ tableLayout: "fixed", overflowWrap: "anywhere" }}>
+<thead>
+<tr><th width="22%"><p> Function Name </p></th><th width="48%"><p> Description </p></th><th width="30%"><p> Example </p></th></tr>
+</thead>
+<tbody>
+<tr><td><p> <code>FV</code> </p></td><td><p> Calculates the future value of an investment based on these arguments: </p><p> rate (required): The interest rate per period, expressed as a ratio (e.g. 1% is 0.01). </p><p> nper (required): The total number of periods. </p><p> pmt (required): The payment made each period. Can be zero. </p><p> pv (optional): The present value; how much the investment is worth right now. </p><p> type (optional): <code>0</code>/<code>FALSE</code> or <code>1</code>/<code>TRUE</code>, with 0 indicating that payments are made at the end of each period, and 1 indicating they are paid at the beginning. If not specified, 0 is used. </p><p> NOTE: Unlike spreadsheet syntax, interest rates cannot be expressed as a percent. They must be expressed as a ratio (usually between 0 and 1). </p><p> See also: <code>PV()</code>, <code>PMT()</code>, <code>RATE()</code>, and <code>NPER()</code>. </p></td><td><p> <code>FV(rate,nper,pmt[,pv[,type]])</code> </p></td></tr>
+<tr><td><p> <code>IRR</code> </p></td><td><p> Calculates the per-period Internal Rate of Return for a set of periodic transactions. 'guess' is a best guess of the rate of return. It is optional and the default is 0.1, meaning 10%. It is usually not necessary to specify this value. </p><p> <code>IRR</code> is an aggregate function. </p></td><td><p> <code>IRR(values[,guess])</code> </p></td></tr>
+<tr><td><p> <code>NPER</code> </p></td><td><p> Calculates the number of periods for an investment based on constant interest rate, payments, and period duration. Arguments: </p><p> rate (required): The interest rate per period, expressed as a ratio (e.g. 1% is 0.01). </p><p> pmt (required): The payment made each period. Can be zero. </p><p> pv (required): The present value of the loan; the "principal". </p><p> fv (optional): The future value; the balance at the end of the entire annuity. If omitted, it is assumed to be 0 (e.g. a loan paid in full). </p><p> type (optional): <code>0</code>/<code>FALSE</code> or <code>1</code>/<code>TRUE</code>, with 0 indicating that payments are made at the end of each period, and 1 indicating they are paid at the beginning. If not specified, 0 is used. </p><p> NOTE: Unlike spreadsheet syntax, interest rates cannot be expressed as a percent. They must be expressed as a ratio (usually between 0 and 1). </p><p> See also: <code>FV()</code>, <code>PV()</code>, <code>PMT()</code>, and <code>RATE()</code>. </p></td><td><p> <code>NPER(rate,pmt,pv[,fv[,type]])</code> </p></td></tr>
+<tr><td><p> <code>NPV</code> </p></td><td><p> Calculates the Net Present Value for a set of periodic transactions. <code>NPV</code> is an aggregate function. </p></td><td><p> <code>NPV(rate,values)</code> </p></td></tr>
+<tr><td><p> <code>PMT</code> </p></td><td><p> Calculates the per-period constant payment made on a loan to achieve the given future value, based on these arguments: </p><p> rate (required): The interest rate per period, expressed as a ratio (e.g. 1% is 0.01). </p><p> nper (required): The total number of periods. </p><p> pv (required): The present value of the loan; the "principal". </p><p> fv (optional): The future value; the balance at the end of the entire annuity. If omitted, it is assumed to be 0 (e.g. a loan paid in full). </p><p> type (optional): <code>0</code>/<code>FALSE</code> or <code>1</code>/<code>TRUE</code>, with 0 indicating that payments are made at the end of each period, and 1 indicating they are paid at the beginning. If not specified, 0 is used. </p><p> NOTE: Unlike spreadsheet syntax, interest rates cannot be expressed as a percent. They must be expressed as a ratio (usually between 0 and 1). </p><p> See also: <code>FV()</code>, <code>PV()</code>, <code>RATE()</code>, and <code>NPER()</code>. </p></td><td><p> <code>PMT(rate,nper,pv[,fv[,type]])</code> </p></td></tr>
+<tr><td><p> <code>PV</code> </p></td><td><p> Calculates the present value of an investment based on these arguments: </p><p> rate (required): The interest rate per period, expressed as a ratio (e.g. 1% is 0.01). </p><p> nper (required): The total number of periods. </p><p> pmt (required): The payment made each period. Can be zero. </p><p> fv (optional): The future value; the balance at the end of the entire annuity. If omitted, it is assumed to be 0 (e.g. a loan paid in full). </p><p> type (optional): <code>0</code>/<code>FALSE</code> or <code>1</code>/<code>TRUE</code>, with 0 indicating that payments are made at the end of each period, and 1 indicating they are paid at the beginning. If not specified, 0 is used. </p><p> NOTE: Unlike spreadsheet syntax, interest rates cannot be expressed as a percent. They must be expressed as a ratio (usually between 0 and 1). </p><p> See also: <code>FV()</code>, <code>PMT()</code>, <code>RATE()</code>, and <code>NPER()</code>. </p></td><td><p> <code>PV(rate,nper,pmt[,fv[,type]])</code> </p></td></tr>
+<tr><td><p> <code>RATE</code> </p></td><td><p> Attempts to calculate the per-period interest rate of an investment. Not all arguments will have solutions; the result will be <code>NaN</code> if a solution cannot be found. You can also experiment with setting the guess if you believe there is a solution and it is not being returned. Note that the current implementation will not calculate negative interest rates. Arguments: </p><p> nper (required): The total number of periods. </p><p> pmt (required): The payment made each period. Can be zero. </p><p> pv (required): The present value of the loan; the "principal". </p><p> fv (optional): The future value; the balance at the end of the entire annuity. If omitted, it is assumed to be 0 (e.g. a loan paid in full). </p><p> type (optional): <code>0</code>/<code>FALSE</code> or <code>1</code>/<code>TRUE</code>, with 0 indicating that payments are made at the end of each period, and 1 indicating they are paid at the beginning. If not specified, 0 is used. </p><p> guess (optional): A best guess of the interest rate. </p><p> See also: <code>FV()</code>, <code>PV()</code>, <code>PMT()</code>, and <code>NPER()</code>. </p></td><td><p> <code>RATE(rate,nper,pv[,fv[,type[,guess]]])</code> </p></td></tr>
+<tr><td><p> <code>XIRR</code> </p></td><td><p> Calculates the Internal Rate of Return for a set of transactions that is not necessarily periodic. 'values' is a set of transaction amounts which must contain at least one negative and one positive value. <code>NULL</code> or zero values in this column are ignored. 'dates' is a list of transaction dates whose time components, if present, are ignored. 'guess' is a best guess of the rate of return. It is optional and the default is 0.1, meaning 10%. It is usually not necessary to specify this value. </p><p> <code>XIRR</code> is an aggregate function. </p></td><td><p> <code>XIRR(values,dates[,guess])</code> </p></td></tr>
+<tr><td><p> <code>XNPV</code> </p></td><td><p> Calculates the Net Present Value for a set of transactions that is not necessarily periodic. 'rate' is the annualized Internal Rate of Return for the values. 'values' is a set of transaction amounts which must contain at least one negative and one positive value. <code>NULL</code> or zero values in this column are ignored. 'dates' is a list of transaction dates whose time components, if present, are ignored. </p><p> <code>XNPV</code> is an aggregate function. </p></td><td><p> <code>XNPV(rate,values,dates)</code> </p></td></tr>
+</tbody>
+</table>
 
-## Logical Functions
+## Logic and Control Functions
 
-<table data-aura-rendered-by="33:208;a" width="100%"><thead><tr><td class="wysiwyg-text-align-center" colspan="1" rowspan="1"><p><b> Function Name </b></p></td><td class="wysiwyg-text-align-center" colspan="1" rowspan="1"><p><b> Description </b></p></td><td class="wysiwyg-text-align-center" colspan="1" rowspan="1"><p><b> Example </b></p></td></tr></thead><tbody><tr><td colspan="1" rowspan="1"><p> ALL_TRUE </p></td><td colspan="1" rowspan="1"><p> Returns TRUE if all arguments evaluate to TRUE, otherwise returns FALSE. Can be invoked with one or more arguments. </p></td><td colspan="1" rowspan="1"><p> ALL_TRUE(cond1,cond2,...) </p></td></tr><tr><td colspan="1" rowspan="1"><p> ANY_TRUE </p></td><td colspan="1" rowspan="1"><p> Returns TRUE if any arguments evaluate to TRUE, otherwise returns FALSE. Can be invoked with one or more arguments. </p></td><td colspan="1" rowspan="1"><p> ANY_TRUE(cond1,cond2,...) </p></td></tr><tr><td colspan="1" rowspan="1"><p> BOOLEAN </p></td><td colspan="1" rowspan="1"><p> Returns the value of expr converted to BOOLEAN type (TRUE, FALSE, or NULL). </p></td><td colspan="1" rowspan="1"><p> BOOLEAN(expr), CAST(expr AS BOOLEAN) </p></td></tr><tr><td colspan="1" rowspan="1"><p> COALESCE </p></td><td colspan="1" rowspan="1"><p> Returns the first non-NULL value in the list, or NULL if there are no non-NULL values. At least one parameter must be passed. </p></td><td colspan="1" rowspan="1"><p> COALESCE(value,...) </p></td></tr><tr><td colspan="1" rowspan="1"><p> ERROR </p></td><td colspan="1" rowspan="1"><p> When evaluated, produces an error with the given error string. Depending on the transformation settings, this may halt execution entirely. </p></td><td colspan="1" rowspan="1"><p> ERROR(error_string) </p></td></tr><tr><td colspan="1" rowspan="1"><p> IF </p></td><td colspan="1" rowspan="1"><p> If test is TRUE, returns exprTrue. Otherwise, returns exprFalse. </p><p> The return type is the type that best matches both exprTrue and exprFalse. For example, if exprTrue has type LONG and exprFalse has type DOUBLE, the return type will be DOUBLE, even if test is TRUE. </p></td><td colspan="1" rowspan="1"><p> IF(test,exprTrue,exprFalse) </p></td></tr><tr><td colspan="1" rowspan="1"><p> IFERROR </p></td><td colspan="1" rowspan="1"><p> If the evaluation of expr1 does not produce an error, IFERROR() returns expr1; otherwise it returns expr2. Note IFERROR() will only handle errors produced at runtime. If expr1 is produces an error before even being evaluated, e.g. if it attempts to convert between inconvertible types, IFERROR() will still produce that error. </p></td><td colspan="1" rowspan="1"><p> IFERROR(expr1,expr2) </p></td></tr><tr><td colspan="1" rowspan="1"><p> IFNULL </p></td><td colspan="1" rowspan="1"><p> If expr1 is not NULL, IFNULL() returns expr1; otherwise it returns expr2. </p></td><td colspan="1" rowspan="1"><p> IFNULL(expr1,expr2) <a id="string_functions" target="_blank"></a></p></td></tr><tr><td colspan="1" rowspan="1"><p> NULLIF </p></td><td colspan="1" rowspan="1"><p> Returns NULL if expr1 = expr2 is true, otherwise returns expr1. This is the same as CASE WHEN expr1 = expr2 THEN NULL ELSE expr1 END. </p></td><td colspan="1" rowspan="1"><p> NULLIF(expr1,expr2) </p></td></tr></tbody></table>
+<table width="100%" style={{ tableLayout: "fixed", overflowWrap: "anywhere" }}>
+<thead>
+<tr><th width="22%"><p> Function Name </p></th><th width="48%"><p> Description </p></th><th width="30%"><p> Example </p></th></tr>
+</thead>
+<tbody>
+<tr><td><p> <code>ALL_TRUE</code> </p></td><td><p> Returns <code>TRUE</code> if all arguments evaluate to <code>TRUE</code>, otherwise returns <code>FALSE</code>. Can be invoked with one or more arguments. </p></td><td><p> <code>ALL_TRUE(cond1,cond2,...)</code> </p></td></tr>
+<tr><td><p> <code>ANY_TRUE</code> </p></td><td><p> Returns <code>TRUE</code> if any arguments evaluate to <code>TRUE</code>, otherwise returns <code>FALSE</code>. Can be invoked with one or more arguments. </p></td><td><p> <code>ANY_TRUE(cond1,cond2,...)</code> </p></td></tr>
+<tr><td><p> <code>BOOLEAN</code> </p></td><td><p> Returns the value of expr converted to <code>BOOLEAN</code> type (<code>TRUE</code>, <code>FALSE</code>, or <code>NULL</code>). </p></td><td><p> <code>BOOLEAN(expr)</code>, <code>CAST(expr AS BOOLEAN)</code> </p></td></tr>
+<tr><td><p> <code>COALESCE</code> </p></td><td><p> Returns the first non-NULL value in the list, or <code>NULL</code> if there are no non-NULL values. At least one parameter must be passed. </p></td><td><p> <code>COALESCE(value,...)</code> </p></td></tr>
+<tr><td><p> <code>ERROR</code> </p></td><td><p> When evaluated, produces an error with the given error string. Depending on the transformation settings, this may halt execution entirely. </p></td><td><p> <code>ERROR(error_string)</code> </p></td></tr>
+<tr><td><p> <code>EXPR_COLUMN</code> </p></td><td><p> Returns a column reference expression for the column name in the string str. </p><p> When a string contains solely a column name, <code>EXPR_COLUMN</code> is superior to <code>EXPR_PARSE</code> because it will not fail when there are special characters in the column name, or when the column name is a reserved word. </p></td><td><p> <code>EXPR_COLUMN(str)</code> </p></td></tr>
+<tr><td><p> <code>EXPR_FORMAT</code> </p></td><td><p> Formats the expression expr as a string. Due to canonicalization, the string that originally produced the expression and the result string may not be equal. </p></td><td><p> <code>EXPR_FORMAT(expr)</code> </p></td></tr>
+<tr><td><p> <code>EXPR_PARSE</code> </p></td><td><p> Attempts to parse the string str as an expression. If there are syntax errors in the expression string, an error is thrown. Due to canonicalization, the string representation of the expression that results from parsing the string may not be equal to the input string. </p></td><td><p> <code>EXPR_PARSE(str)</code> </p></td></tr>
+<tr><td><p> <code>EXPR_PUSH</code> </p></td><td><p> <code>EXPR_PUSH</code> replaces the placeholder variable <code>@1</code> in the expression expr with the expression substitution. It also decrements all the other placeholder variables <code>@2</code>, <code>@3</code>, and above: <code>@2</code> becomes <code>@1</code>, <code>@3</code> becomes <code>@2</code>, and so on. </p></td><td><p> <code>EXPR_PUSH(expr,substitution)</code> </p></td></tr>
+<tr><td><p> <code>EXPR_VALUE</code> </p></td><td><p> <code>EXPR_VALUE</code> converts a value of any type to an expression of that value. The argument to this function is evaluated normally. For example, where <code>EXPRESS(5 + 5)</code> would produce the expression <code>"5 + 5"</code>, <code>EXPR_VALUE(5 + 5)</code> produces the expression <code>"10"</code>. </p></td><td><p> <code>EXPR_VALUE(expr)</code> </p></td></tr>
+<tr><td><p> <code>EXPRESS</code> </p></td><td><p> <code>EXPRESS</code> is used to create an <code>EXPRESSION</code> value, which is provided as the first argument just as it would be to a function. Unique to <code>EXPRESS</code>, this first argument is not evaluated. It is parsed, so it must have correct syntax, but any column or variable references in it need to be found in the immediate context. Canonicalization is performed, so functions which are aliases for others will appear as calls to their canonical names, formatting will be removed, and so on. </p><p> <code>EXPRESS</code> accepts secondary arguments, which are used as substitutions for placeholders in the primary expression. Placeholders are special variables that follow this pattern: <code>@1</code>, <code>@2</code>, <code>@3</code>, etc., where <code>@1</code> is the placeholder that would be replaced by the first secondary argument, and so on. Placeholder variables with no corresponding secondary argument are "reduced" by the number of secondary arguments provided; <code>@3</code> would be replaced by the third secondary argument, but if there were only two secondary arguments provided, it would be replaced by <code>@1</code>. Unlike the primary argument, secondary arguments are evaluated. All secondary arguments must evaluate to the <code>EXPRESSION</code> type. Most often, a secondary argument will be a reference to a column of type <code>EXPRESSION</code>, or a call to <code>EXPR_VALUE()</code> involving a column from the immediate context. Given two columns, &#96;expr&#96; (of type <code>EXPRESSION</code>) and &#96;const&#96; (of type <code>STRING</code>), and a row with respective values "<code>UPPER(&#96;downstream_column&#96;)</code>" and "-suffix", <code>EXPRESS(CONCAT(@1, @2), &#96;expr&#96;, EXPR_VALUE(&#96;const&#96;))</code> would evaluate to the expression value: "<code>CONCAT(UPPER(&#96;downstream_column&#96;), '-suffix')</code>". </p></td><td><p> <code>EXPRESS(expr,substitution1,substitution2,...)</code> </p></td></tr>
+<tr><td><p> <code>EXPRESSION</code> </p></td><td><p> Expressions are a combination of references, constants, function calls, and other components that describe a value in a context where any and all references can be resolved. All of the following are examples of expressions: </p><p> The constant integer zero: 0 </p><p> The constant null: <code>EXPRESS(NULL)</code> </p><p> A constant string: <code>EXPRESS('Hello, World!')</code> </p><p> The field my_column divided by two: <code>EXPRESS(&#96;my_column&#96; / 2)</code> </p><p> The field my_column in upper case: <code>EXPRESS(UPPER(&#96;my_column&#96;))</code> </p><p> Expressions are also a data type; a column may be a column of expressions, and an expression may evaluate to an expression. An expression that uses other expressions as inputs or which evaluates to an expression is called a higher-order expression. Refer to the documentation for <code>EXPRESS</code> and <code>EXPR_PARSE</code> for examples of higher-order expressions. </p></td><td><p> <code>EXPRESS(expr)</code> </p></td></tr>
+<tr><td><p> <code>GREATEST</code> </p></td><td><p> Returns the greatest value in the list, or <code>NULL</code> if there are no non-NULL values. The result type is the Ideal Union Type of all arguments. </p></td><td><p> <code>GREATEST(value,...)</code> </p></td></tr>
+<tr><td><p> <code>IF</code> </p></td><td><p> If test is <code>TRUE</code>, returns exprTrue. Otherwise, returns exprFalse. </p><p> The return type is the type that best matches both exprTrue and exprFalse. For example, if exprTrue has type <code>LONG</code> and exprFalse has type <code>DOUBLE</code>, the return type will be <code>DOUBLE</code>, even if test is <code>TRUE</code>. </p></td><td><p> <code>IF(test,exprTrue,exprFalse)</code> </p></td></tr>
+<tr><td><p> <code>IFERROR</code> </p></td><td><p> If the evaluation of expr1 does not produce an error, <code>IFERROR()</code> returns expr1; otherwise it returns expr2. Note <code>IFERROR()</code> will only handle errors produced at runtime. If expr1 produces an error before even being evaluated, e.g. if it attempts to convert between inconvertible types, <code>IFERROR()</code> will still produce that error. </p></td><td><p> <code>IFERROR(expr1,expr2)</code> </p></td></tr>
+<tr><td><p> <code>IFNULL</code> </p></td><td><p> If expr1 is not <code>NULL</code>, <code>IFNULL()</code> returns expr1; otherwise it returns expr2. </p></td><td><p> <code>IFNULL(expr1,expr2)</code> </p></td></tr>
+<tr><td><p> <code>LEAST</code> </p></td><td><p> Returns the lowest value in the list, or <code>NULL</code> if there are no non-NULL values. The result type is the Ideal Union Type of all arguments. </p></td><td><p> <code>LEAST(value,...)</code> </p></td></tr>
+<tr><td><p> <code>NULLIF</code> </p></td><td><p> Returns <code>NULL</code> if expr1 = expr2 is true, otherwise returns expr1. This is the same as <code>CASE WHEN expr1 = expr2 THEN NULL ELSE expr1 END</code>. </p></td><td><p> <code>NULLIF(expr1,expr2)</code> </p></td></tr>
+</tbody>
+</table>
 
 ## String Functions
 
-<table data-aura-rendered-by="33:208;a" width="100%"><thead><tr><td class="wysiwyg-text-align-center" colspan="1" rowspan="1"><p><b> Function </b></p></td><td class="wysiwyg-text-align-center" colspan="1" rowspan="1"><p><b> Description </b></p></td><td class="wysiwyg-text-align-center" colspan="1" rowspan="1"><p><b> Example </b></p></td></tr></thead><tbody><tr><td colspan="1" rowspan="1"><p> CHAR_LENGTH </p></td><td colspan="1" rowspan="1"><p> Returns the length of the given string argument, measured in characters. A multi-byte character counts as a single character. This means that for a string containing five two-byte characters, LENGTH(), whereas CHAR_LENGTH() returns 5. If the argument is NULL, it returns NULL. </p><p> If the argument is not a string value, it is converted into a string. </p></td><td colspan="1" rowspan="1"><p> CHAR_LENGTH(str) </p></td></tr><tr><td colspan="1" rowspan="1"><p> CONCAT </p></td><td colspan="1" rowspan="1"><p> Returns the string that results from concatenating the arguments. May have one or more arguments. All arguments are converted to strings. </p><p> CONCAT() returns NULL if any argument is NULL. </p></td><td colspan="1" rowspan="1"><p> CONCAT(str1,str2,...) </p></td></tr><tr><td colspan="1" rowspan="1"><p> DYNACAST </p></td><td colspan="1" rowspan="1"><p> Returns the value of expr converted to the same type as type_expr. type_expr is not evaluated; it is only used to determine the type to which expr should be converted. In most cases, type_expr be a column reference. </p></td><td colspan="1" rowspan="1"><p> DYNACAST(expr, type_expr) </p></td></tr><tr><td colspan="1" rowspan="1"><p> GROUP_CONCAT </p></td><td colspan="1" rowspan="1"><p> Returns the string that results from concatenating the arguments, separated by the separator, for the whole group. May have one or more arguments, plus the optional separator. If not set, the separator is the comma character '',''. All arguments are converted to strings. </p><p> It is an aggregate function. </p><p> GROUP_CONCAT() returns null if there were no matching rows. </p><p></p><div class="mdx-embed"><Note><p><b> Note: </b> The GROUP_CONCAT function does not support “ORDER BY” or "DISTINCT" as part of the expression in Magic ETL v2. </p></Note></div></td><td colspan="1" rowspan="1"><p> GROUP_CONCAT(str1,str2,...[SEPARATOR sep]) </p></td></tr><tr><td colspan="1" rowspan="1"><p> INITCAP </p></td><td colspan="1" rowspan="1"><p> Returns str with the start of every word in uppercase and all other characters in lowercase. </p></td><td colspan="1" rowspan="1"><p> INITCAP(str) </p></td></tr><tr><td colspan="1" rowspan="1"><p> INSTR </p></td><td colspan="1" rowspan="1"><p> Returns the position of the first occurrence of substring substr in string str. </p><p> If any argument is NULL, returns NULL. </p></td><td colspan="1" rowspan="1"><p> INSTR(str,substr) </p></td></tr><tr><td colspan="1" rowspan="1"><p> LCASE </p></td><td colspan="1" rowspan="1"><p> LCASE() is a synonym for LOWER(). </p></td><td colspan="1" rowspan="1"><p> LCASE(str) </p></td></tr><tr><td colspan="1" rowspan="1"><p> LEFT </p></td><td colspan="1" rowspan="1"><p> Returns the leftmost len characters from the string str, or NULL if any argument is NULL. </p></td><td colspan="1" rowspan="1"><p> LEFT(str,len) </p></td></tr><tr><td colspan="1" rowspan="1"><p> LENGTH </p></td><td colspan="1" rowspan="1"><p> Returns the length of the string str, measured in bytes using the UTF-8 encoding. A multi-byte character counts as multiple bytes. This means that for a string containing five two-byte characters, LENGTH() returns 10, whereas CHAR_LENGTH() returns 5. </p><p> If str is not a string value, it is converted into a string. If str is NULL, the function returns NULL. </p></td><td colspan="1" rowspan="1"><p> LENGTH(str) </p></td></tr><tr><td colspan="1" rowspan="1"><p> LISTAGG </p></td><td colspan="1" rowspan="1"><p> LISTAGG() is a simplified version of GROUP_CONCAT(). The first argument is required, and is the string to be concatenated. The second argument is optional, and is the separator string. If not set, the separator is the empty string. </p></td><td colspan="1" rowspan="1"><p> LISTAGG(str1[,sep]) </p></td></tr><tr><td colspan="1" rowspan="1"><p> LOWER </p></td><td colspan="1" rowspan="1"><p> Returns the string str with all characters changed to lowercase. </p></td><td colspan="1" rowspan="1"><p> LOWER(str) </p></td></tr><tr><td colspan="1" rowspan="1"><p> LPAD </p></td><td colspan="1" rowspan="1"><p> Returns the string str, left-padded with the string padstr to a length of len characters. If str is longer than len, the return value is shortened to len characters. </p></td><td colspan="1" rowspan="1"><p> LPAD(str, len, padstr) </p></td></tr><tr><td colspan="1" rowspan="1"><p> LTRIM </p></td><td colspan="1" rowspan="1"><p> Returns the string str with leading space characters removed. </p></td><td colspan="1" rowspan="1"><p> LTRIM(str) </p></td></tr><tr><td colspan="1" rowspan="1"><p> REGEXP_LIKE </p></td><td colspan="1" rowspan="1"><p> Performs a pattern match of a string expression str against a pattern pat. The pattern can be an extended regular expression. The optional flags argument is a string that may contain any or all the following characters specifying how to perform matching: </p><p> c: Case-sensitive matching. </p><p> i: Case-insensitive matching. </p><p> m: Multiple-line mode. </p><p> n: The. character matches line terminators. </p></td><td colspan="1" rowspan="1"><p> REGEXP_LIKE(str,pat[,flags]) </p></td></tr><tr><td colspan="1" rowspan="1"><p> REGEXP_REPLACE </p></td><td colspan="1" rowspan="1"><p> Replaces occurrences in the string str that match the regular str specified by the pattern pat with the replacement string repl, and returns the resulting string. If str, pat, or repl is NULL, the return value is NULL. The optional flags argument behaves as it does in REGEXP_LIKE(). </p></td><td colspan="1" rowspan="1"><p> REGEXP_REPLACE(str,pat,repl[,flags]) </p></td></tr><tr><td colspan="1" rowspan="1"><p> REPLACE </p></td><td colspan="1" rowspan="1"><p> Returns the string str with all occurrences of the string from_str replaced by the string to_str. REPLACE() performs a case-sensitive match when searching for from_str. </p></td><td colspan="1" rowspan="1"><p> REPLACE(str,from_str,to_str) </p></td></tr><tr><td colspan="1" rowspan="1"><p> RIGHT </p></td><td colspan="1" rowspan="1"><p> Returns the rightmost len characters from the string str, or NULL if any argument is NULL. </p></td><td colspan="1" rowspan="1"><p> RIGHT(str,len) </p></td></tr><tr><td colspan="1" rowspan="1"><p> SPLIT_PART </p></td><td colspan="1" rowspan="1"><p> Returns the Nth substring of str split by sep. If N is zero or smaller, returns null. If there are fewer than N substrings after str has been split by the given separator, returns empty string. </p><p> Example: </p><p> SPLIT_PART('a~|bc~cb|d|e', '|~', 2) = "bc~cb" </p></td><td colspan="1" rowspan="1"><p> SPLIT_PART(str,sep,N) </p></td></tr><tr><td colspan="1" rowspan="1"><p> STR_CLEAN </p></td><td colspan="1" rowspan="1"><p> Replaces NULL values in str with the empty string, and removes all non-whitespace control characters. These are a subset of the operations performed by STR_NORMALIZE(). </p></td><td colspan="1" rowspan="1"><p> STR_CLEAN(str) </p></td></tr><tr><td colspan="1" rowspan="1"><p> STR_CONTAINS </p></td><td colspan="1" rowspan="1"><p> Returns TRUE if the string str contains the string search, FALSE if it does not, or NULL if either argument is NULL. </p></td><td colspan="1" rowspan="1"><p> STR_CONTAINS(str, search) </p></td></tr><tr><td colspan="1" rowspan="1"><p> STR_DIGITS </p></td><td colspan="1" rowspan="1"><p> Returns a new string consisting of only the digit characters in str in the order they appear. Converse of STR_REMOVE_DIGITS(). </p></td><td colspan="1" rowspan="1"><p> STR_DIGITS(str) </p></td></tr><tr><td colspan="1" rowspan="1"><p> STR_ENDS_WITH </p></td><td colspan="1" rowspan="1"><p> Returns TRUE if the string str ends with the string search, FALSE if it does not, or NULL if either argument is NULL. </p></td><td colspan="1" rowspan="1"><p> STR_ENDS_WITH(str, search) </p></td></tr><tr><td colspan="1" rowspan="1"><p> STR_NORMALIZE </p></td><td colspan="1" rowspan="1"><p> Normalizes str by performing the following operations: </p><p> 1. NULL values in str are replaced with the empty string. </p><p> 2. Leading and trailing whitespace characters are removed. </p><p> 3. All other sequences of one or more whitespace characters are replaced with a single space ('' ''). </p><p> 4. All non-whitespace control characters are removed. </p><p> This is the more thorough version of STR_CLEAN(). </p></td><td colspan="1" rowspan="1"><p> STR_NORMALIZE(str) </p></td></tr><tr><td colspan="1" rowspan="1"><p> STR_REMOVE_DIGITS </p></td><td colspan="1" rowspan="1"><p> Returns str with all digit characters removed. Converse of STR_DIGITS(). </p></td><td colspan="1" rowspan="1"><p> STR_REMOVE_DIGITS(str) </p></td></tr><tr><td colspan="1" rowspan="1"><p> STR_STARTS_WITH </p></td><td colspan="1" rowspan="1"><p> Returns TRUE if the string str starts with the string search, FALSE if it does not, or NULL if either argument is NULL. </p></td><td colspan="1" rowspan="1"><p> STR_STARTS_WITH(str, search) </p></td></tr><tr><td colspan="1" rowspan="1"><p> STRING </p></td><td colspan="1" rowspan="1"><p> Returns the value of expr converted to a STRING. Locale, timezone, and date-format settings all affect this behavior. </p></td><td colspan="1" rowspan="1"><p> STRING(expr), CAST(expr AS STRING) </p></td></tr><tr><td colspan="1" rowspan="1"><p> SUBSTRING </p></td><td colspan="1" rowspan="1"><p> The forms without a len argument return a substring from string str starting at position pos. </p><p> The forms with a len argument return a substring len characters long from string str, starting at position pos. </p><p> It is also possible to use a negative value for pos. In this case, the beginning of the substring is pos characters from the end of the string, rather than the beginning. A negative value may be used for pos in any of the forms of this function. </p><p> By default, the position of the first character in the string from which the substring is to be extracted is reckoned as 1. If any argument is NULL, returns NULL. </p></td><td colspan="1" rowspan="1"><p> SUBSTRING(str,pos), SUBSTRING(str FROM pos), SUBSTRING(str,pos,len), SUBSTRING(str FROM pos FOR len) </p></td></tr><tr><td colspan="1" rowspan="1"><p> UCASE </p></td><td colspan="1" rowspan="1"><p> UCASE() is a synonym for UPPER(). </p></td><td colspan="1" rowspan="1"><p> UCASE(str) <a id="date_and_time_functions" target="_blank"></a></p></td></tr><tr><td colspan="1" rowspan="1"><p> UPPER </p></td><td colspan="1" rowspan="1"><p> Returns the string str with all characters changed to uppercase. </p></td><td colspan="1" rowspan="1"><p> UPPER(str) </p></td></tr></tbody></table>
+<table width="100%" style={{ tableLayout: "fixed", overflowWrap: "anywhere" }}>
+<thead>
+<tr><th width="22%"><p> Function Name </p></th><th width="48%"><p> Description </p></th><th width="30%"><p> Example </p></th></tr>
+</thead>
+<tbody>
+<tr><td><p> <code>CHAR_LENGTH</code> </p></td><td><p> Returns the length of the given string argument, measured in characters. A multi-byte character counts as a single character. This means that for a string containing five two-byte characters, <code>LENGTH()</code> returns 10, whereas <code>CHAR_LENGTH()</code> returns 5. If the argument is <code>NULL</code>, it returns <code>NULL</code>. </p><p> If the argument is not a string value, it is converted into a string. </p></td><td><p> <code>CHAR_LENGTH(str)</code> </p></td></tr>
+<tr><td><p> <code>CONCAT</code> </p></td><td><p> Returns the string that results from concatenating the arguments. May have one or more arguments. All arguments are converted to strings. </p><p> <code>CONCAT()</code> returns <code>NULL</code> if any argument is <code>NULL</code>. </p></td><td><p> <code>CONCAT(str1,str2,...)</code> </p></td></tr>
+<tr><td><p> <code>DYNACAST</code> </p></td><td><p> Returns the value of expr converted to the same type as type_expr. type_expr is not evaluated; it is only used to determine the type to which expr should be converted. In most cases, type_expr should be a column reference. </p></td><td><p> <code>DYNACAST(expr, type_expr)</code> </p></td></tr>
+<tr><td><p> <code>FROM_BASE64</code> </p></td><td><p> Decodes the base64-encoded string str. </p></td><td><p> <code>FROM_BASE64(str)</code> </p></td></tr>
+<tr><td><p> <code>GROUP_CONCAT</code> </p></td><td><p> Returns the string that results from concatenating the arguments, separated by the separator, for the whole group. May have one or more arguments, plus the optional separator. If not set, the separator is the comma character <code>','</code>. All arguments are converted to strings. </p><p> It is an aggregate function. </p><p> <code>GROUP_CONCAT()</code> returns null if there were no matching rows. </p><Note><p><b> Note: </b> The `GROUP_CONCAT` function does not support `ORDER BY` or `DISTINCT` as part of its expression. </p></Note></td><td><p> <code>GROUP_CONCAT(str1,str2,...[SEPARATOR sep])</code> </p></td></tr>
+<tr><td><p> <code>INITCAP</code> </p></td><td><p> Returns str with the start of every word in uppercase and all other characters in lowercase. </p></td><td><p> <code>INITCAP(str)</code> </p></td></tr>
+<tr><td><p> <code>INSTR</code> </p></td><td><p> Returns the position of the first occurrence of substring substr in string str. </p><p> If any argument is <code>NULL</code>, returns <code>NULL</code>. </p></td><td><p> <code>INSTR(str,substr)</code> </p></td></tr>
+<tr><td><p> <code>LCASE</code> </p></td><td><p> <code>LCASE()</code> is a synonym for <code>LOWER()</code>. </p></td><td><p> <code>LCASE(str)</code> </p></td></tr>
+<tr><td><p> <code>LEFT</code> </p></td><td><p> Returns the leftmost len characters from the string str, or <code>NULL</code> if any argument is <code>NULL</code>. </p></td><td><p> <code>LEFT(str,len)</code> </p></td></tr>
+<tr><td><p> <code>LENGTH</code> </p></td><td><p> Returns the length of the string str, measured in bytes using the UTF-8 encoding. A multi-byte character counts as multiple bytes. This means that for a string containing five two-byte characters, <code>LENGTH()</code> returns 10, whereas <code>CHAR_LENGTH()</code> returns 5. </p><p> If str is not a string value, it is converted into a string. If str is <code>NULL</code>, the function returns <code>NULL</code>. </p></td><td><p> <code>LENGTH(str)</code> </p></td></tr>
+<tr><td><p> <code>LISTAGG</code> </p></td><td><p> <code>LISTAGG()</code> is a simplified version of <code>GROUP_CONCAT()</code>. The first argument is required, and is the string to be concatenated. The second argument is optional, and is the separator string. If not set, the separator is the empty string. </p></td><td><p> <code>LISTAGG(str1[,sep])</code> </p></td></tr>
+<tr><td><p> <code>LOWER</code> </p></td><td><p> Returns the string str with all characters changed to lowercase. </p></td><td><p> <code>LOWER(str)</code> </p></td></tr>
+<tr><td><p> <code>LPAD</code> </p></td><td><p> Returns the string str, left-padded with the string padstr to a length of len characters. If str is longer than len, the return value is shortened to len characters. </p></td><td><p> <code>LPAD(str, len, padstr)</code> </p></td></tr>
+<tr><td><p> <code>LTRIM</code> </p></td><td><p> Returns the string str with leading space characters removed. </p></td><td><p> <code>LTRIM(str)</code> </p></td></tr>
+<tr><td><p> <code>OCTET_LENGTH</code> </p></td><td><p> Returns the length of the string str, measured in bytes using the UTF-8 encoding. A multi-byte character counts as multiple bytes. This means that for a string containing five two-byte characters, <code>OCTET_LENGTH()</code> returns 10, whereas <code>CHAR_LENGTH()</code> returns 5. </p><p> If str is not a string value, it is converted into a string. If str is <code>NULL</code>, the function returns <code>NULL</code>. </p></td><td><p> <code>OCTET_LENGTH(str)</code> </p></td></tr>
+<tr><td><p> <code>REGEXP_LIKE</code> </p></td><td><p> Performs a pattern match of a string expression str against a pattern pat. The pattern can be an extended regular expression. The optional flags argument is a string that may contain any or all the following characters specifying how to perform matching: </p><p> <code>c</code>: Case-sensitive matching. </p><p> <code>i</code>: Case-insensitive matching. </p><p> <code>m</code>: Multiple-line mode. </p><p> <code>n</code>: The <code>.</code> character matches line terminators. </p></td><td><p> <code>REGEXP_LIKE(str,pat[,flags])</code> </p></td></tr>
+<tr><td><p> <code>REGEXP_REPLACE</code> </p></td><td><p> Replaces occurrences in the string str that match the regular str specified by the pattern pat with the replacement string repl, and returns the resulting string. If str, pat, or repl is <code>NULL</code>, the return value is <code>NULL</code>. The optional flags argument behaves as it does in <code>REGEXP_LIKE()</code>. </p></td><td><p> <code>REGEXP_REPLACE(str,pat,repl[,flags])</code> </p></td></tr>
+<tr><td><p> <code>REPLACE</code> </p></td><td><p> Returns the string str with all occurrences of the string from_str replaced by the string to_str. <code>REPLACE()</code> performs a case-sensitive match when searching for from_str. </p></td><td><p> <code>REPLACE(str,from_str,to_str)</code> </p></td></tr>
+<tr><td><p> <code>REVERSE</code> </p></td><td><p> Returns the string str with the order of the characters reversed, or <code>NULL</code> if str is <code>NULL</code>. </p></td><td><p> <code>REVERSE(str)</code> </p></td></tr>
+<tr><td><p> <code>RIGHT</code> </p></td><td><p> Returns the rightmost len characters from the string str, or <code>NULL</code> if any argument is <code>NULL</code>. </p></td><td><p> <code>RIGHT(str,len)</code> </p></td></tr>
+<tr><td><p> <code>RPAD</code> </p></td><td><p> Returns the string str, right-padded with the string padstr to a length of len characters. If str is longer than len, the return value is shortened to len characters. </p></td><td><p> <code>RPAD(str, len, padstr)</code> </p></td></tr>
+<tr><td><p> <code>RTRIM</code> </p></td><td><p> Returns the string str with trailing space characters removed. </p></td><td><p> <code>RTRIM(str)</code> </p></td></tr>
+<tr><td><p> <code>SPLIT_PART</code> </p></td><td><p> Returns the Nth substring of str split by sep. If N is zero or smaller, returns null. If there are fewer than N substrings after str has been split by the given separator, returns empty string. </p><p> Example: </p><p> <code>SPLIT_PART('a~|bc~cb|d|e', '|~', 2)</code> = <code>"bc~cb"</code> </p></td><td><p> <code>SPLIT_PART(str,sep,N)</code> </p></td></tr>
+<tr><td><p> <code>SQUASH_WHITESPACE</code> </p></td><td><p> All sequences of whitespace characters, non-breaking spaces, control characters, and null characters (U+000000), are replaced with a single space (<code>' '</code>). Spaces at the beginning and end of the string are dropped. </p><p> See also: <code>STR_NORMALIZE()</code>, <code>LOWER()</code>, <code>UPPER()</code>, <code>TRIM()</code> </p></td><td><p> <code>SQUASH_WHITESPACE(str)</code> </p></td></tr>
+<tr><td><p> <code>STR_CLEAN</code> </p></td><td><p> Replaces <code>NULL</code> values in str with the empty string, and removes all non-whitespace control characters. These are a subset of the operations performed by <code>STR_NORMALIZE()</code>. </p></td><td><p> <code>STR_CLEAN(str)</code> </p></td></tr>
+<tr><td><p> <code>STR_CONTAINS</code> </p></td><td><p> Returns <code>TRUE</code> if the string str contains the string search, <code>FALSE</code> if it does not, or <code>NULL</code> if either argument is <code>NULL</code>. </p></td><td><p> <code>STR_CONTAINS(str, search)</code> </p></td></tr>
+<tr><td><p> <code>STR_DIGITS</code> </p></td><td><p> Returns a new string consisting of only the digit characters in str in the order they appear. Converse of <code>STR_REMOVE_DIGITS()</code>. </p></td><td><p> <code>STR_DIGITS(str)</code> </p></td></tr>
+<tr><td><p> <code>STR_ENDS_WITH</code> </p></td><td><p> Returns <code>TRUE</code> if the string str ends with the string search, <code>FALSE</code> if it does not, or <code>NULL</code> if either argument is <code>NULL</code>. </p></td><td><p> <code>STR_ENDS_WITH(str, search)</code> </p></td></tr>
+<tr><td><p> <code>STR_NORMALIZE</code> </p></td><td><p> Normalizes str by performing the following operations: </p><p> 1. <code>NULL</code> values in str are replaced with the empty string. </p><p> 2. Leading and trailing whitespace characters are removed. </p><p> 3. All other sequences of one or more whitespace characters are replaced with a single space (<code>' '</code>). </p><p> 4. All non-whitespace control characters are removed. </p><p> This is the more thorough version of <code>STR_CLEAN()</code>. </p></td><td><p> <code>STR_NORMALIZE(str)</code> </p></td></tr>
+<tr><td><p> <code>STR_REMOVE_DIGITS</code> </p></td><td><p> Returns str with all digit characters removed. Converse of <code>STR_DIGITS()</code>. </p></td><td><p> <code>STR_REMOVE_DIGITS(str)</code> </p></td></tr>
+<tr><td><p> <code>STR_STARTS_WITH</code> </p></td><td><p> Returns <code>TRUE</code> if the string str starts with the string search, <code>FALSE</code> if it does not, or <code>NULL</code> if either argument is <code>NULL</code>. </p></td><td><p> <code>STR_STARTS_WITH(str, search)</code> </p></td></tr>
+<tr><td><p> <code>STR_TO_CHARNAMES</code> </p></td><td><p> Converts the string str to a descriptive string consisting of a comma-separated list of the official Unicode names of each of its characters. For example, the string <code>'XY'</code> is converted to the string <code>'LATIN CAPITAL LETTER X, LATIN CAPITAL LETTER Y'</code>. Use this function to debug invisible problems with strings, like when two strings that look the same are not considered equal. </p><p> See also: <code>STR_TO_HEX()</code> </p></td><td><p> <code>STR_TO_CHARNAMES(str)</code> </p></td></tr>
+<tr><td><p> <code>STR_TO_HEX</code> </p></td><td><p> Converts the string str to a hexadecimal string. Each character is described by its 6 hexadecimal digit Unicode codepoint. Each hex number is separated by a space. </p><p> See also: <code>STR_TO_CHARNAMES()</code> </p></td><td><p> <code>STR_TO_HEX(str)</code> </p></td></tr>
+<tr><td><p> <code>STRING</code> </p></td><td><p> Returns the value of expr converted to a <code>STRING</code>. Locale, timezone, and date-format settings all affect this behavior. </p></td><td><p> <code>STRING(expr)</code>, <code>CAST(expr AS STRING)</code> </p></td></tr>
+<tr><td><p> <code>SUBSTRING</code> </p></td><td><p> The forms without a len argument return a substring from string str starting at position pos. </p><p> The forms with a len argument return a substring len characters long from string str, starting at position pos. </p><p> It is also possible to use a negative value for pos. In this case, the beginning of the substring is pos characters from the end of the string, rather than the beginning. A negative value may be used for pos in any of the forms of this function. </p><p> By default, the position of the first character in the string from which the substring is to be extracted is reckoned as 1. If any argument is <code>NULL</code>, returns <code>NULL</code>. </p></td><td><p> <code>SUBSTRING(str,pos)</code>, <code>SUBSTRING(str FROM pos)</code>, <code>SUBSTRING(str,pos,len)</code>, <code>SUBSTRING(str FROM pos FOR len)</code> </p></td></tr>
+<tr><td><p> <code>SUBSTRING_INDEX</code> </p></td><td><p> Returns the substring from src before count occurrences of the delimiter. When invoked with a positive count, everything to the left of the final delimiter (counting from the left) is returned. When invoked with a negative count, everything to the right of the final delimiter (counting from the right) is returned. Performs a case-sensitive match when searching for the delimiter. If any argument is null, returns null. </p></td><td><p> <code>SUBSTRING_INDEX(src,delimiter,count)</code> </p></td></tr>
+<tr><td><p> <code>TO_BASE64</code> </p></td><td><p> Encodes the string str as a base64-encoded string. </p></td><td><p> <code>TO_BASE64(str)</code> </p></td></tr>
+<tr><td><p> <code>TRIM</code> </p></td><td><p> Returns the string str with all remstr prefixes or suffixes removed. If none of the specifiers <code>BOTH</code>, <code>LEADING</code>, or <code>TRAILING</code> is given, <code>BOTH</code> is assumed. remstr is optional and, if not specified, spaces are removed. </p></td><td><p> <code>TRIM([\{BOTH | LEADING | TRAILING} [remstr] FROM] str)</code>, <code>TRIM([remstr FROM] str)</code> </p></td></tr>
+<tr><td><p> <code>UCASE</code> </p></td><td><p> <code>UCASE()</code> is a synonym for <code>UPPER()</code>. </p></td><td><p> <code>UCASE(str)</code> </p></td></tr>
+<tr><td><p> <code>UPPER</code> </p></td><td><p> Returns the string str with all characters changed to uppercase. </p></td><td><p> <code>UPPER(str)</code> </p></td></tr>
+</tbody>
+</table>
 
 ## Date and Time Functions
 
-<table data-aura-rendered-by="33:208;a" width="100%">
-    <thead>
-        <tr>
-            <td class="wysiwyg-text-align-center" colspan="1" rowspan="1">
-                <p><b> Function </b></p>
-            </td>
-            <td class="wysiwyg-text-align-center" colspan="1" rowspan="1">
-                <p><b> Description </b></p>
-            </td>
-            <td class="wysiwyg-text-align-center" colspan="1" rowspan="1">
-                <p><b> Example </b></p>
-            </td>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td colspan="1" rowspan="1">
-                <p> ADDDATE </p>
-            </td>
-            <td colspan="1" rowspan="1">
-                <p> When invoked with the INTERVAL form of the second argument, ADDDATE() is a synonym for DATE_ADD().
-                    The related function SUBDATE() is a synonym for DATE_SUB(). For information on the INTERVAL unit
-                    argument, see the description for DATE_ADD(). </p>
-                <p></p>
-                <p> When invoked with the days form of the second argument, Magic ETL treats it as an integer number of
-                    days to be added to expr. </p>
-            </td>
-            <td colspan="1" rowspan="1">
-                <p> ADDDATE(date,INTERVAL expr unit), ADDDATE(expr,days) </p>
-            </td>
-        </tr>
-        <tr>
-            <td colspan="1" rowspan="1">
-                <p> ADDTIME </p>
-            </td>
-            <td colspan="1" rowspan="1">
-                <p> ADDTIME() adds expr2 to expr1 and returns the result. expr1 is a time or datetime expression, and
-                    expr2 is a time expression. </p>
-            </td>
-            <td colspan="1" rowspan="1">
-                <p> ADDTIME(expr1,expr2) </p>
-            </td>
-        </tr>
-        <tr>
-            <td colspan="1" rowspan="1">
-                <p> CONVERT_TZ </p>
-            </td>
-            <td colspan="1" rowspan="1">
-                <p> CONVERT_TZ() converts the datetime value dt to a new moment in time such that the original value''s
-                    wall-clock time when rendered in from_tz matches the new value''s wall-clock time when rendered in
-                    to_tz. </p>
-            </td>
-            <td colspan="1" rowspan="1">
-                <p> CONVERT_TZ(dt,from_tz,to_tz) </p>
-            </td>
-        </tr>
-        <tr>
-            <td colspan="1" rowspan="1">
-                <p> CURDATE </p>
-            </td>
-            <td colspan="1" rowspan="1">
-                <p> Returns the current date. For long-running executions, this is the date that the execution began.</p>
-            </td>
-            <td colspan="1" rowspan="1">
-                <p> CURDATE() </p>
-            </td>
-        </tr>
-        <tr>
-            <td colspan="1" rowspan="1">
-                <p> CURDATETIME </p>
-            </td>
-            <td colspan="1" rowspan="1">
-                <p> CURDATETIME() is a synonym for CURRENT_TIMESTAMP(). </p>
-            </td>
-            <td colspan="1" rowspan="1">
-                <p> CURDATETIME() </p>
-            </td>
-        </tr>
-        <tr>
-            <td colspan="1" rowspan="1">
-                <p> CURRENT_DATE </p>
-            </td>
-            <td colspan="1" rowspan="1">
-                <p> Synonym for CURDATE(). </p>
-            </td>
-            <td colspan="1" rowspan="1">
-                <p> CURRENT_DATE() </p>
-            </td>
-        </tr>
-        <tr>
-            <td colspan="1" rowspan="1">
-                <p> CURRENT_TIME </p>
-            </td>
-            <td colspan="1" rowspan="1">
-                <p> Synonym for CURTIME(). </p>
-            </td>
-            <td colspan="1" rowspan="1">
-                <p> CURRENT_TIME() </p>
-            </td>
-        </tr>
-        <tr>
-            <td colspan="1" rowspan="1">
-                <p> CURRENT_TIMESTAMP </p>
-            </td>
-            <td colspan="1" rowspan="1">
-                <p> Returns the current timestamp (date &amp; time). For long-running executions, this is the timestamp
-                    of the beginning of the execution. </p>
-            </td>
-            <td colspan="1" rowspan="1">
-                <p> CURRENT_TIMESTAMP() </p>
-            </td>
-        </tr>
-        <tr>
-            <td colspan="1" rowspan="1">
-                <p> CURTIME </p>
-            </td>
-            <td colspan="1" rowspan="1">
-                <p> Returns the current time as a duration since the start of the current day. For long-running
-                    executions, this is the time that the execution began. </p>
-            </td>
-            <td colspan="1" rowspan="1">
-                <p> CURTIME() </p>
-            </td>
-        </tr>
-        <tr>
-            <td colspan="1" rowspan="1">
-                <p> DATE </p>
-            </td>
-            <td colspan="1" rowspan="1">
-                <p> Converts expr to a calendar date consisting of a year, month, and day. </p>
-            </td>
-            <td colspan="1" rowspan="1">
-                <p> DATE(expr), CAST(expr AS DATE) </p>
-            </td>
-        </tr>
-        <tr>
-            <td colspan="1" rowspan="1">
-                <p> DATEDIFF </p>
-            </td>
-            <td colspan="1" rowspan="1">
-                <p> Returns the number of days between two dates from datetime values. </p>
-            </td>
-            <td colspan="1" rowspan="1">
-                <p> DATEDIFF(CURRENT_DATE(), `lastmoddate`) </p>
-            </td>
-        </tr>
-        <tr>
-            <td colspan="1" rowspan="1">
-                <p> DATE_ADD </p>
-            </td>
-            <td colspan="1" rowspan="1">
-                <p> Performs date arithmetic. The date argument specifies the starting date or datetime value. expr is
-                    an expression specifying the interval value to be added or subtracted from the starting date. expr
-                    may start with a "-" for negative intervals. unit is a keyword indicating the units in which the
-                    expression should be interpreted. Permitted units are YEAR, QUARTER, MONTH, WEEK, DAY, HOUR, MINUTE,
-                    SECOND, and MILLISECOND. </p>
-                <p> See also DATE_SUB(). </p>
-            </td>
-            <td colspan="1" rowspan="1">
-                <p> DATE_ADD(date,INTERVAL expr unit) </p>
-            </td>
-        </tr>
-        <tr>
-            <td colspan="1" rowspan="1">
-                <p> DATE_FORMAT </p>
-            </td>
-            <td colspan="1" rowspan="1">
-                <p> Formats the date value according to the format string. </p>
-                <p> The language used for the names is controlled by the Locale setting. </p>
-                <p> The options that can be used by DATE_FORMAT(), as well as its inverse STR_TO_DATE() and the
-                    FROM_UNIXTIME() function, are: %a: Short weekday name in current locale. </p>
-                <p> %b: Short form month name in current locale. </p>
-                <p> %c: Month with 1 or 2 digits. </p>
-                <p> %d: Day with 2 digits. </p>
-                <p> %e: Day with 1 or 2 digits. </p>
-                <p> %f: Sub seconds 6 digits. </p>
-                <p> %H: Hour with 2 digits between 00-23. </p>
-                <p> %h: Hour with 2 digits between 01-12. </p>
-                <p> %I: Hour with 2 digits between 01-12. </p>
-                <p> %i: Minute with 2 digits. </p>
-                <p> %j: Day of the year (001-366) </p>
-                <p> %k: Hour with 1 digits between 0-23. </p>
-                <p> %l: Hour with 1 digits between 1-12. </p>
-                <p> %M: Full month name in current locale. </p>
-                <p> %m: Month with 2 digits. </p>
-                <p> %r: Time in 12 hour format, followed by AM/PM. Short for ''%I:%i:%S %p''. </p>
-                <p> %S: Seconds with 2 digits. </p>
-                <p> %s: Seconds with 2 digits. </p>
-                <p> %T: Time in 24 hour format. Short for ''%H:%i:%S''. </p>
-                <p> %U: Week number (00-53), when first day of the week is Sunday. </p>
-                <p> %u: Week number (00-53), when first day of the week is Monday. </p>
-                <p> %V: Week number (01-53), when first day of the week is Sunday. Used with %X. </p>
-                <p> %v: Week number (01-53), when first day of the week is Monday. Used with %x. </p>
-                <p> %W: Full weekday name in current locale. </p>
-                <p> %w: Day of the week. 0 = Sunday, 6 = Saturday. </p>
-                <p> %X: Year with 4 digits when first day of the week is Sunday. Used with %V. </p>
-                <p> %x: Year with 4 digits when first day of the week is Monday. Used with %v. </p>
-                <p> %Y: Year with 4 digits. </p>
-                <p> %y: Year with 2 digits. </p>
-                <p> %#: For str_to_date(), skip all numbers. </p>
-                <p> %.: For str_to_date(), skip all punctation characters. </p>
-                <p> %@: For str_to_date(), skip all alpha characters. </p>
-                <p> %%: A literal % character. </p>
-            </td>
-            <td colspan="1" rowspan="1">
-                <p> DATE_FORMAT(date, format) </p>
-            </td>
-        </tr>
-        <tr>
-            <td colspan="1" rowspan="1">
-                <p> DATE_SUB </p>
-            </td>
-            <td colspan="1" rowspan="1">
-                <p> Performs date arithmetic. The date argument specifies the starting date or datetime value. expr is
-                    an expression specifying the interval value to be added or subtracted from the starting date. expr
-                    is a string; it may start with a "-" for negative intervals. unit is a keyword indicating the units
-                    in which the expression should be interpreted. See DATE_ADD() for a complete list of permitted
-                    units. </p>
-            </td>
-            <td colspan="1" rowspan="1">
-                <p> DATE_SUB(date,INTERVAL expr unit) </p>
-            </td>
-        </tr>
-        <tr>
-            <td colspan="1" rowspan="1">
-                <p> DATE_TRUNC </p>
-            </td>
-            <td colspan="1" rowspan="1">
-                <p> DATE_TRUNC() is almost a synonym for TIMESTAMP_TRUNC(), but its argument order is flipped for
-                    compatibility reasons. See TIMESTAMP_TRUNC() for the description. </p>
-            </td>
-            <td colspan="1" rowspan="1">
-                <p> DATE_TRUNC(precision, date) </p>
-            </td>
-        </tr>
-        <tr>
-            <td colspan="1" rowspan="1">
-                <p> DATE_WORKING_DIFF </p>
-            </td>
-            <td colspan="1" rowspan="1">
-                <p> Returns the number of days between the dates expr1 and expr2, excluding weekends (Saturdays and
-                    Sundays). The result is negative if expr1 is after expr2. </p>
-            </td>
-            <td colspan="1" rowspan="1">
-                <p> DATE_WORKING_DIFF(expr1,expr2) </p>
-            </td>
-        </tr>
-        <tr>
-            <td colspan="1" rowspan="1">
-                <p> DATEDIFF </p>
-            </td>
-            <td colspan="1" rowspan="1">
-                <p> DATEDIFF() returns (expr1 – expr2) expressed as a value in days from one date to the other. expr1
-                    and expr2 are date or date-and-time expressions. Only the date parts of the values are used in the
-                    calculation. </p>
-            </td>
-            <td colspan="1" rowspan="1">
-                <p> DATEDIFF(expr1,expr2) </p>
-            </td>
-        </tr>
-        <tr>
-            <td colspan="1" rowspan="1">
-                <p> DATETIME </p>
-            </td>
-            <td colspan="1" rowspan="1">
-                <p> Returns the value of expr converted to a DATETIME type, consisting of a year, month, day, hour,
-                    minute, second, and millisecond. </p>
-            </td>
-            <td colspan="1" rowspan="1">
-                <p> DATETIME(expr), CAST(expr AS DATETIME) </p>
-            </td>
-        </tr>
-        <tr>
-            <td colspan="1" rowspan="1">
-                <p> DAY </p>
-            </td>
-            <td colspan="1" rowspan="1">
-                <p> DAY() is a synonym for DAYOFMONTH(). </p>
-            </td>
-            <td colspan="1" rowspan="1">
-                <p> DAY(date) </p>
-            </td>
-        </tr>
-        <tr>
-            <td colspan="1" rowspan="1">
-                <p> DAYNAME </p>
-            </td>
-            <td colspan="1" rowspan="1">
-                <p> Returns the name of the weekday for date. The language used for the name is controlled by the Locale
-                    setting. </p>
-            </td>
-            <td colspan="1" rowspan="1">
-                <p> DAYNAME(date) </p>
-            </td>
-        </tr>
-        <tr>
-            <td colspan="1" rowspan="1">
-                <p> DAYOFMONTH </p>
-            </td>
-            <td colspan="1" rowspan="1">
-                <p> Returns the day of the month for date, in the range 1 to 31. </p>
-            </td>
-            <td colspan="1" rowspan="1">
-                <p> DAYOFMONTH(date) </p>
-            </td>
-        </tr>
-        <tr>
-            <td colspan="1" rowspan="1">
-                <p> DAYOFWEEK </p>
-            </td>
-            <td colspan="1" rowspan="1">
-                <p> Returns the day of the week index for the date (1 = Sunday, 2 = Monday,..., 7 = Saturday). These
-                    index values correspond to the ODBC standard. </p>
-                <p> This contrasts with WEEKDAY() which follows a different index numbering (0 = Monday, 1 = Tuesday,
-                    ... 6 = Sunday). </p>
-            </td>
-            <td colspan="1" rowspan="1">
-                <p> DAYOFWEEK(date) </p>
-            </td>
-        </tr>
-        <tr>
-            <td colspan="1" rowspan="1">
-                <p> DAYOFYEAR </p>
-            </td>
-            <td colspan="1" rowspan="1">
-                <p> Returns the day of the year for date, in the range 1 to 366. </p>
-            </td>
-            <td colspan="1" rowspan="1">
-                <p> DAYOFYEAR(date) </p>
-            </td>
-        </tr>
-        <tr>
-            <td colspan="1" rowspan="1">
-                <p> DURATION </p>
-            </td>
-            <td colspan="1" rowspan="1">
-                <p> Returns the value of expr converted to a DURATION, consisting of hours, minutes, seconds, and
-                    milliseconds. </p>
-            </td>
-            <td colspan="1" rowspan="1">
-                <p> DURATION(expr), CAST(expr AS DURATION) </p>
-            </td>
-        </tr>
-        <tr>
-            <td colspan="1" rowspan="1">
-                <p> FROM_DAYS </p>
-            </td>
-            <td colspan="1" rowspan="1">
-                <p> Given a day number N, returns a DATE value. The day count is based on the number of days from the
-                    start of the standard calendar. </p>
-                <p> The function is not designed for use with dates before the advent of the Gregorian calendar in
-                    October 1582. Results will not be reliable since it doesn''t account for the lost days when the
-                    calendar changed from the Julian calendar. </p>
-                <p> This is the converse of the TO_DAYS() function. </p>
-            </td>
-            <td colspan="1" rowspan="1">
-                <p> FROM_DAYS(N) </p>
-            </td>
-        </tr>
-        <tr>
-            <td colspan="1" rowspan="1">
-                <p> FROM_UNIXTIME </p>
-            </td>
-            <td colspan="1" rowspan="1">
-                <p> Given a day number N, returns a DATE value. The day count is based on the number of days from the
-                    start of the standard calendar. </p>
-                <p> The function is not designed for use with dates before the advent of the Gregorian calendar in
-                    October 1582. Results will not be reliable since it doesn''t account for the lost days when the
-                    calendar changed from the Julian calendar. </p>
-                <p> This is the converse of the TO_DAYS() function. </p>
-            </td>
-            <td colspan="1" rowspan="1">
-                <p> FROM_DAYS(N) </p>
-            </td>
-        </tr>
-        <tr>
-            <td colspan="1" rowspan="1">
-                <p> HOUR </p>
-            </td>
-            <td colspan="1" rowspan="1">
-                <p> Returns the hour for time. The range of the return value is 0 to 23. </p>
-            </td>
-            <td colspan="1" rowspan="1">
-                <p> HOUR(time) </p>
-            </td>
-        </tr>
-        <tr>
-            <td colspan="1" rowspan="1">
-                <p> LAST_DAY </p>
-            </td>
-            <td colspan="1" rowspan="1">
-                <p> Takes a date or datetime value and returns the corresponding value for the last day of the month.</p>
-            </td>
-            <td colspan="1" rowspan="1">
-                <p> LAST_DAY(date) </p>
-            </td>
-        </tr>
-        <tr>
-            <td colspan="1" rowspan="1">
-                <p> MICROSECOND </p>
-            </td>
-            <td colspan="1" rowspan="1">
-                <p> Returns the microseconds from the datetime expression expr as a number in the range from 0 to
-                    999999. </p>
-            </td>
-            <td colspan="1" rowspan="1">
-                <p> MICROSECOND(expr) </p>
-            </td>
-        </tr>
-        <tr>
-            <td colspan="1" rowspan="1">
-                <p> MILLISECOND </p>
-            </td>
-            <td colspan="1" rowspan="1">
-                <p> Returns the milliseconds from the datetime expression expr as a number in the range from 0 to 999.</p>
-            </td>
-            <td colspan="1" rowspan="1">
-                <p> MILLISECOND(expr) </p>
-            </td>
-        </tr>
-        <tr>
-            <td colspan="1" rowspan="1">
-                <p> MINUTE </p>
-            </td>
-            <td colspan="1" rowspan="1">
-                <p> Returns the minute of the datetime argument, in the range 0 to 59. </p>
-            </td>
-            <td colspan="1" rowspan="1">
-                <p> MINUTE(time) </p>
-            </td>
-        </tr>
-        <tr>
-            <td colspan="1" rowspan="1">
-                <p> MONTH </p>
-            </td>
-            <td colspan="1" rowspan="1">
-                <p> Returns the month for date in the range 1 to 12 for January to December. </p>
-            </td>
-            <td colspan="1" rowspan="1">
-                <p> MONTH(date) </p>
-            </td>
-        </tr>
-        <tr>
-            <td colspan="1" rowspan="1">
-                <p> MONTHNAME </p>
-            </td>
-            <td colspan="1" rowspan="1">
-                <p> Returns the full name of the month for date. The language used for the name is controlled by the
-                    Locale setting. </p>
-            </td>
-            <td colspan="1" rowspan="1">
-                <p> MONTHNAME(date) </p>
-            </td>
-        </tr>
-        <tr>
-            <td colspan="1" rowspan="1">
-                <p> NOW </p>
-            </td>
-            <td colspan="1" rowspan="1">
-                <p> Synonym for CURRENT_TIMESTAMP(). </p>
-            </td>
-            <td colspan="1" rowspan="1">
-                <p> NOW() </p>
-            </td>
-        </tr>
-        <tr>
-            <td colspan="1" rowspan="1">
-                <p> PERIOD_ADD </p>
-            </td>
-            <td colspan="1" rowspan="1">
-                <p> Adds N months to period P. P is an integer in the format YYMM or YYYYMM. If P contains a two-digit
-                    year, values from 00 to 69 are converted to from 2000 to 2069, while values from 70 are converted to
-                    1970 upwards. </p>
-                <p> Returns an integer value in the format YYYYMM. </p>
-            </td>
-            <td colspan="1" rowspan="1">
-                <p> PERIOD_ADD(P,N) </p>
-            </td>
-        </tr>
-        <tr>
-            <td colspan="1" rowspan="1">
-                <p> PERIOD_DIFF </p>
-            </td>
-            <td colspan="1" rowspan="1">
-                <p> Returns the number of months between periods P1 and P2. P1 and P2 can be in the format YYMM or
-                    YYYYMM, and are integer values. </p>
-                <p> If P1 or P2 contains a two-digit year, values from 00 to 69 are converted to from 2000 to 2069,
-                    while values from 70 are converted to 1970 upwards. </p>
-            </td>
-            <td colspan="1" rowspan="1">
-                <p> PERIOD_DIFF(P1,P2) </p>
-            </td>
-        </tr>
-        <tr>
-            <td colspan="1" rowspan="1">
-                <p> QUARTER </p>
-            </td>
-            <td colspan="1" rowspan="1">
-                <p> Returns the quarter of the year for date, in the range 1 to 4. Returns NULL if the given value is
-                    NULL. </p>
-            </td>
-            <td colspan="1" rowspan="1">
-                <p> QUARTER(date) </p>
-            </td>
-        </tr>
-        <tr>
-            <td colspan="1" rowspan="1">
-                <p> SEC_TO_TIME </p>
-            </td>
-            <td colspan="1" rowspan="1">
-                <p> Returns the seconds argument, converted to hours, minutes, and seconds, as a TIME value. </p>
-            </td>
-            <td colspan="1" rowspan="1">
-                <p> SEC_TO_TIME(seconds) </p>
-            </td>
-        </tr>
-        <tr>
-            <td colspan="1" rowspan="1">
-                <p> SECOND </p>
-            </td>
-            <td colspan="1" rowspan="1">
-                <p> Returns the second for a given time in the range 0 to 59. </p>
-            </td>
-            <td colspan="1" rowspan="1">
-                <p> SECOND(time) </p>
-            </td>
-        </tr>
-        <tr>
-            <td colspan="1" rowspan="1">
-                <p> STR_TO_DATE </p>
-            </td>
-            <td colspan="1" rowspan="1">
-                <p> This is the inverse of the DATE_FORMAT() function. It takes a string str and a format string format.
-                    STR_TO_DATE() returns a DATETIME value. </p>
-                <p> The format that can be used by STR_TO_DATE() is described in the description of DATE_FORMAT(). </p>
-            </td>
-            <td colspan="1" rowspan="1">
-                <p> STR_TO_DATE(str,format) </p>
-            </td>
-        </tr>
-        <tr>
-            <td colspan="1" rowspan="1">
-                <p> SUBDATE </p>
-            </td>
-            <td colspan="1" rowspan="1">
-                <p> When invoked with the INTERVAL form of the second argument, SUBDATE() is a synonym for DATE_SUB().
-                    See DATE_ADD() for a complete list of permitted units. </p>
-                <p> The second form allows the use of an integer value for days. In such cases, it is interpreted as the
-                    number of days to be subtracted from the date or datetime expression expr. </p>
-            </td>
-            <td colspan="1" rowspan="1">
-                <p> SUBDATE(date,INTERVAL expr unit), SUBDATE(expr,days) </p>
-            </td>
-        </tr>
-        <tr>
-            <td colspan="1" rowspan="1">
-                <p> SUBTIME </p>
-            </td>
-            <td colspan="1" rowspan="1">
-                <p> SUBTIME() returns expr1 - expr2 expressed as a value of the same type as expr1. expr1 is a time or
-                    datetime expression, and expr2 is a time expression. </p>
-            </td>
-            <td colspan="1" rowspan="1">
-                <p> SUBTIME(expr1,expr2) </p>
-            </td>
-        </tr>
-        <tr>
-            <td colspan="1" rowspan="1">
-                <p> SYSDATE </p>
-            </td>
-            <td colspan="1" rowspan="1">
-                <p> Synonym for CURRENT_TIMESTAMP(). </p>
-            </td>
-            <td colspan="1" rowspan="1">
-                <p> SYSDATE() </p>
-            </td>
-        </tr>
-        <tr>
-            <td colspan="1" rowspan="1">
-                <p> TIME </p>
-            </td>
-            <td colspan="1" rowspan="1">
-                <p> Converts expr to a duration (TIME-type) consisting of hours, minutes, seconds, and milliseconds.</p>
-            </td>
-            <td colspan="1" rowspan="1">
-                <p> TIME(expr) </p>
-            </td>
-        </tr>
-        <tr>
-            <td colspan="1" rowspan="1">
-                <p> TIME_FORMAT </p>
-            </td>
-            <td colspan="1" rowspan="1">
-                <p> This is used like the DATE_FORMAT() function, but the format string may contain format specifiers
-                    only for hours, minutes, and seconds. Other specifiers produce a NULL value or 0. </p>
-            </td>
-            <td colspan="1" rowspan="1">
-                <p> TIME_FORMAT(time,format) </p>
-            </td>
-        </tr>
-        <tr>
-            <td colspan="1" rowspan="1">
-                <p> TIME_TO_SEC </p>
-            </td>
-            <td colspan="1" rowspan="1">
-                <p> Returns the time argument, converted to seconds. </p>
-            </td>
-            <td colspan="1" rowspan="1">
-                <p> TIME_TO_SEC(time) </p>
-            </td>
-        </tr>
-        <tr>
-            <td colspan="1" rowspan="1">
-                <p> TIMEDIFF </p>
-            </td>
-            <td colspan="1" rowspan="1">
-                <p> TIMEDIFF() returns expr1 - expr2 expressed as a time value. expr1 and expr2 are time or
-                    date-and-time expressions, but both must be of the same type. </p>
-            </td>
-            <td colspan="1" rowspan="1">
-                <p> TIMEDIFF(expr1,expr2) </p>
-            </td>
-        </tr>
-        <tr>
-            <td colspan="1" rowspan="1">
-                <p> TIMESTAMP </p>
-            </td>
-            <td colspan="1" rowspan="1">
-                <p> Converts expr to a timestamp (DATETIME-type) consisting of year, month, day, hour, minute, second,
-                    and millisecond. </p>
-            </td>
-            <td colspan="1" rowspan="1">
-                <p> TIMESTAMP(expr) </p>
-            </td>
-        </tr>
-        <tr>
-            <td colspan="1" rowspan="1">
-                <p> TIMESTAMP_TRUNC </p>
-            </td>
-            <td colspan="1" rowspan="1">
-                <p> Truncates timestamp to the given precision, or to the day if no precision is specified. The result
-                    is of type DATE if timestamp is a DATE, otherwise it has type DATETIME. The value of precision is a
-                    constant string matching one of the following: </p>
-                <p> Millennium: MILLENNIUM </p>
-                <p> Century: CENTURY </p>
-                <p> Year: YEAR </p>
-                <p> ISO Year: ISOYEAR </p>
-                <p> Quarter: QUARTER </p>
-                <p> Month: MONTH </p>
-                <p> Same weekday as first day of year: YEARWEEK </p>
-                <p> Same weekday as first day of ISO year: ISOWEEK </p>
-                <p> Same weekday as first day of month: MONTHWEEK </p>
-                <p> First day of week according to current Locale setting: WEEK </p>
-                <p> Day (the default): DAY </p>
-                <p> Hour: HOUR </p>
-                <p> Minute: MINUTE </p>
-                <p> Second: SECOND </p>
-                <p> Millisecond: MILLISECOND </p>
-                <p> Microsecond: MICROSECOND </p>
-            </td>
-            <td colspan="1" rowspan="1">
-                <p> TIMESTAMP_TRUNC </p>
-                <p> TRUNC(timestamp[,precision]) </p>
-            </td>
-        </tr>
-        <tr>
-            <td colspan="1" rowspan="1">
-                <p> TO_DAYS </p>
-            </td>
-            <td colspan="1" rowspan="1">
-                <p> Given a date date, returns the number of days since the start of the current calendar. </p>
-                <p></p>
-                <p> The function is not designed for use with dates before the advent of the Gregorian calendar in
-                    October 1582. Results will not be reliable since it doesn''t account for the lost days when the
-                    calendar changed from the Julian calendar. </p>
-                <p></p>
-                <p> This is the converse of the FROM_DAYS() function. </p>
-            </td>
-            <td colspan="1" rowspan="1">
-                <p> TO_DAYS(date) </p>
-            </td>
-        </tr>
-        <tr>
-            <td colspan="1" rowspan="1">
-                <p> TODAY </p>
-            </td>
-            <td colspan="1" rowspan="1">
-                <p> TODAY() is a synonym for CURDATE(). </p>
-            </td>
-            <td colspan="1" rowspan="1">
-                <p> TODAY() </p>
-            </td>
-        </tr>
-        <tr>
-            <td colspan="1" rowspan="1">
-                <p> TRIM </p>
-            </td>
-            <td colspan="1" rowspan="1">
-                <p> Returns the string str with all remstr prefixes or suffixes removed. If none of the specifiers BOTH,
-                    LEADING, or TRAILING is given, BOTH is assumed. remstr is optional and, if not specified, spaces are
-                    removed. </p>
-            </td>
-            <td colspan="1" rowspan="1">
-                <p> TRIM([\{BOTH | LEADING | TRAILING} [remstr] FROM] str), TRIM([remstr FROM] str) </p>
-            </td>
-        </tr>
-        <tr>
-            <td colspan="1" rowspan="1">
-                <p> TRUNC </p>
-            </td>
-            <td colspan="1" rowspan="1">
-                <p> TRUNC() is a synonym for TIMESTAMP_TRUNC(). It is not to be confused with TRUNCATE(), which operates
-                    on numeric values. </p>
-            </td>
-            <td colspan="1" rowspan="1">
-                <p> TRUNC(timestamp[,precision]) </p>
-            </td>
-        </tr>
-        <tr>
-            <td colspan="1" rowspan="1">
-                <p> UNIX_TIMESTAMP </p>
-            </td>
-            <td colspan="1" rowspan="1">
-                <p> If called with no argument, returns a Unix timestamp (seconds since ''1970-01-01 00:00:00'' UTC) as
-                    an unsigned integer. If UNIX_TIMESTAMP() is called with a date argument, it returns the value of the
-                    argument as seconds since ''1970-01-01 00:00:00'' UTC. date may be a DATE, a DATETIME, or a date
-                    string. The server interprets date as a value in the current time zone and converts it to an
-                    internal value in UTC. Clients can set their time zone in Magic action settings, DataFlow settings,
-                    or customer settings. </p>
-                <p> The inverse function of UNIX_TIMESTAMP() is FROM_UNIXTIME(). </p>
-            </td>
-            <td colspan="1" rowspan="1">
-                <p> UNIX_TIMESTAMP(), UNIX_TIMESTAMP(date) </p>
-            </td>
-        </tr>
-        <tr>
-            <td colspan="1" rowspan="1">
-                <p> WEEK </p>
-            </td>
-            <td colspan="1" rowspan="1">
-                <p> This function returns the week number for date. The two-argument form of WEEK() allows you to
-                    specify whether the week starts on Sunday or Monday and whether the return value should be in the
-                    range from 0 to 53 or from 1 to 53. If the mode argument is omitted, the value of the
-                    default_week_format system variable is used. Modes are as follows: </p>
-                <p> 0: First day is Sunday, range is 0-53, first week has a Sunday in this year. </p>
-                <p> 1: First day is Monday, range is 0-53, first week has more than 3 days this year. </p>
-                <p> 2: First day is Sunday, range is 1-53, first week has a Sunday in this year. </p>
-                <p> 3: First day is Monday, range is 1-53, first week has more than 3 days this year. </p>
-                <p> 4: First day is Sunday, range is 0-53, first week has more than 3 days this year. </p>
-                <p> 5: First day is Monday, range is 0-53, first week has a Monday in this year. </p>
-                <p> 6: First day is Sunday, range is 1-53, first week has more than 3 days this year. </p>
-                <p> 7: First day is Monday, range is 1-53, first week has a Monday in this year. </p>
-            </td>
-            <td colspan="1" rowspan="1">
-                <p> WEEK(date[,mode]) </p>
-            </td>
-        </tr>
-        <tr>
-            <td colspan="1" rowspan="1">
-                <p> WEEKDAY </p>
-            </td>
-            <td colspan="1" rowspan="1">
-                <p> Returns the weekday index for date (0 = Monday, 1 = Tuesday,... 6 = Sunday). </p>
-                <p> This contrasts with DAYOFWEEK() which follows the ODBC standard (1 = Sunday, 2 = Monday,..., 7 =
-                    Saturday). </p>
-            </td>
-            <td colspan="1" rowspan="1">
-                <p> WEEKDAY(date) </p>
-            </td>
-        </tr>
-        <tr>
-            <td colspan="1" rowspan="1">
-                <p> WEEKOFYEAR </p>
-            </td>
-            <td colspan="1" rowspan="1">
-                <p> WEEKOFYEAR() is a synonym for WEEK(). </p>
-            </td>
-            <td colspan="1" rowspan="1">
-                <p> WEEKOFYEAR(date[,mode]) </p>
-            </td>
-        </tr>
-        <tr>
-            <td colspan="1" rowspan="1">
-                <p> YEAR </p>
-            </td>
-            <td colspan="1" rowspan="1">
-                <p> Returns the year for the given date, in the range 0 to 9999. </p>
-            </td>
-            <td colspan="1" rowspan="1">
-                <p> YEAR(date) </p>
-            </td>
-        </tr>
-        <tr>
-            <td colspan="1" rowspan="1">
-                <p> YEARWEEK </p>
-            </td>
-            <td colspan="1" rowspan="1">
-                <p> Returns year and week for a date. The mode argument works exactly like the mode argument to WEEK().
-                    The year in the result may be different from the year in the date argument for the first and the
-                    last week of the year. </p>
-            </td>
-            <td colspan="1" rowspan="1">
-                <p> YEARWEEK(date), YEARWEEK(date,mode) </p>
-            </td>
-        </tr>
-        <tr>
-            <td colspan="1" rowspan="1">
-                <p> LOCALE </p>
-            </td>
-            <td colspan="1" rowspan="1">
-                <p> For debugging purposes. Returns the Locale setting for this context. This setting controls the
-                    behavior of functions like DAYNAME(). </p>
-            </td>
-            <td colspan="1" rowspan="1">
-                <p> @@LOCALE </p>
-            </td>
-        </tr>
-        <tr>
-            <td colspan="1" rowspan="1">
-                <p> SYSTEM_LOCALE </p>
-            </td>
-            <td colspan="1" rowspan="1">
-                <p> For debugging purposes. Returns the Locale setting for the DataFlow or, if not set, the customer.
-                    This setting controls the behavior of functions like DAYNAME(). This setting might be overridden by
-                    an action- or statement-level control (see @@LOCALE). </p>
-            </td>
-            <td colspan="1" rowspan="1">
-                <p> @@SYSTEM_LOCALE </p>
-            </td>
-        </tr>
-        <tr>
-            <td colspan="1" rowspan="1">
-                <p> SYSTEM_TZ </p>
-            </td>
-            <td colspan="1" rowspan="1">
-                <p> For debugging purposes. Returns the time zone setting for the DataFlow or, if not set, the customer.
-                    This setting controls the behavior of many date- and time-related functions, like STR_TO_DATE().
-                    This setting might be overridden by an action- or statement-level control (see @@TZ). </p>
-            </td>
-            <td colspan="1" rowspan="1">
-                <p> @@SYSTEM_TZ <a id="system_functions" target="_blank"></a></p>
-            </td>
-        </tr>
-        <tr>
-            <td colspan="1" rowspan="1">
-                <p> TZ </p>
-            </td>
-            <td colspan="1" rowspan="1">
-                <p> For debugging purposes. Returns the time zone setting for this context. This setting controls the
-                    behavior of many date- and time-related functions, like STR_TO_DATE(). </p>
-            </td>
-            <td colspan="1" rowspan="1">
-                <p> @@TZ </p>
-            </td>
-        </tr>
-    </tbody>
+<table width="100%" style={{ tableLayout: "fixed", overflowWrap: "anywhere" }}>
+<thead>
+<tr><th width="22%"><p> Function Name </p></th><th width="48%"><p> Description </p></th><th width="30%"><p> Example </p></th></tr>
+</thead>
+<tbody>
+<tr><td><p> <code>ADDDATE</code> </p></td><td><p> When invoked with the <code>INTERVAL</code> form of the second argument, <code>ADDDATE()</code> is a synonym for <code>DATE_ADD()</code>. The related function <code>SUBDATE()</code> is a synonym for <code>DATE_SUB()</code>. For information on the <code>INTERVAL</code> unit argument, see the description for <code>DATE_ADD()</code>. </p><p> When invoked with the days form of the second argument, Magic ETL treats it as an integer number of days to be added to expr. </p></td><td><p> <code>ADDDATE(date,INTERVAL expr unit)</code>, <code>ADDDATE(expr,days)</code> </p></td></tr>
+<tr><td><p> <code>ADDTIME</code> </p></td><td><p> <code>ADDTIME()</code> adds expr2 to expr1 and returns the result. expr1 is a time or datetime expression, and expr2 is a time expression. </p></td><td><p> <code>ADDTIME(expr1,expr2)</code> </p></td></tr>
+<tr><td><p> <code>CONVERT_TZ</code> </p></td><td><p> <code>CONVERT_TZ()</code> converts the datetime value dt to a new moment in time such that the original value's wall-clock time when rendered in from_tz matches the new value's wall-clock time when rendered in to_tz. </p></td><td><p> <code>CONVERT_TZ(dt,from_tz,to_tz)</code> </p></td></tr>
+<tr><td><p> <code>CURDATE</code> </p></td><td><p> Returns the current date. For long-running executions, this is the date that the execution began. </p></td><td><p> <code>CURDATE()</code> </p></td></tr>
+<tr><td><p> <code>CURDATETIME</code> </p></td><td><p> <code>CURDATETIME()</code> is a synonym for <code>CURRENT_TIMESTAMP()</code>. </p></td><td><p> <code>CURDATETIME()</code> </p></td></tr>
+<tr><td><p> <code>CURRENT_DATE</code> </p></td><td><p> Synonym for <code>CURDATE()</code>. </p></td><td><p> <code>CURRENT_DATE()</code> </p></td></tr>
+<tr><td><p> <code>CURRENT_TIME</code> </p></td><td><p> Synonym for <code>CURTIME()</code>. </p></td><td><p> <code>CURRENT_TIME()</code> </p></td></tr>
+<tr><td><p> <code>CURRENT_TIMESTAMP</code> </p></td><td><p> Returns the current timestamp (date &amp; time). For long-running executions, this is the timestamp of the beginning of the execution. </p></td><td><p> <code>CURRENT_TIMESTAMP()</code> </p></td></tr>
+<tr><td><p> <code>CURTIME</code> </p></td><td><p> Returns the current time as a duration since the start of the current day. For long-running executions, this is the time that the execution began. </p></td><td><p> <code>CURTIME()</code> </p></td></tr>
+<tr><td><p> <code>DATE</code> </p></td><td><p> Converts expr to a calendar date consisting of a year, month, and day. </p></td><td><p> <code>DATE(expr)</code>, <code>CAST(expr AS DATE)</code> </p></td></tr>
+<tr><td><p> <code>DATE_ADD</code> </p></td><td><p> Performs date arithmetic. The date argument specifies the starting date or datetime value. expr is an expression specifying the interval value to be added or subtracted from the starting date. expr may start with a <code>"-"</code> for negative intervals. unit is a keyword indicating the units in which the expression should be interpreted. Permitted units are <code>YEAR</code>, <code>QUARTER</code>, <code>MONTH</code>, <code>WEEK</code>, <code>DAY</code>, <code>HOUR</code>, <code>MINUTE</code>, <code>SECOND</code>, and <code>MILLISECOND</code>. </p><p> See also <code>DATE_SUB()</code>. </p></td><td><p> <code>DATE_ADD(date,INTERVAL expr unit)</code> </p></td></tr>
+<tr><td><p> <code>DATE_FORMAT</code> </p></td><td><p> Formats the date value according to the format string. </p><p> The language used for the names is controlled by the Locale setting. </p><p> The options that can be used by <code>DATE_FORMAT()</code>, as well as its inverse <code>STR_TO_DATE()</code> and the <code>FROM_UNIXTIME()</code> function, are: </p><p> <code>%a</code>: Short weekday name in current locale. </p><p> <code>%b</code>: Short form month name in current locale. </p><p> <code>%c</code>: Month with 1 or 2 digits. </p><p> <code>%d</code>: Day with 2 digits. </p><p> <code>%e</code>: Day with 1 or 2 digits. </p><p> <code>%f</code>: Sub seconds 6 digits. </p><p> <code>%H</code>: Hour with 2 digits between 00-23. </p><p> <code>%h</code>: Hour with 2 digits between 01-12. </p><p> <code>%I</code>: Hour with 2 digits between 01-12. </p><p> <code>%i</code>: Minute with 2 digits. </p><p> <code>%j</code>: Day of the year (001-366) </p><p> <code>%k</code>: Hour with 1 digits between 0-23. </p><p> <code>%l</code>: Hour with 1 digits between 1-12. </p><p> <code>%M</code>: Full month name in current locale. </p><p> <code>%m</code>: Month with 2 digits. </p><p> <code>%r</code>: Time in 12 hour format, followed by AM/PM. Short for <code>'%I:%i:%S %p'</code>. </p><p> <code>%S</code>: Seconds with 2 digits. </p><p> <code>%s</code>: Seconds with 2 digits. </p><p> <code>%T</code>: Time in 24 hour format. Short for <code>'%H:%i:%S'</code>. </p><p> <code>%U</code>: Week number (00-53), when first day of the week is Sunday. </p><p> <code>%u</code>: Week number (00-53), when first day of the week is Monday. </p><p> <code>%V</code>: Week number (01-53), when first day of the week is Sunday. Used with <code>%X</code>. </p><p> <code>%v</code>: Week number (01-53), when first day of the week is Monday. Used with <code>%x</code>. </p><p> <code>%W</code>: Full weekday name in current locale. </p><p> <code>%w</code>: Day of the week. 0 = Sunday, 6 = Saturday. </p><p> <code>%X</code>: Year with 4 digits when first day of the week is Sunday. Used with <code>%V</code>. </p><p> <code>%x</code>: Year with 4 digits when first day of the week is Monday. Used with <code>%v</code>. </p><p> <code>%Y</code>: Year with 4 digits. </p><p> <code>%y</code>: Year with 2 digits. </p><p> <code>%#</code>: For <code>str_to_date()</code>, skip all numbers. </p><p> <code>%.</code>: For <code>str_to_date()</code>, skip all punctuation characters. </p><p> <code>%@</code>: For <code>str_to_date()</code>, skip all alpha characters. </p><p> <code>%%</code>: A literal % character. </p></td><td><p> <code>DATE_FORMAT(date, format)</code> </p></td></tr>
+<tr><td><p> <code>DATE_SUB</code> </p></td><td><p> Performs date arithmetic. The date argument specifies the starting date or datetime value. expr is an expression specifying the interval value to be added or subtracted from the starting date. expr is a string; it may start with a <code>"-"</code> for negative intervals. unit is a keyword indicating the units in which the expression should be interpreted. See <code>DATE_ADD()</code> for a complete list of permitted units. </p></td><td><p> <code>DATE_SUB(date,INTERVAL expr unit)</code> </p></td></tr>
+<tr><td><p> <code>DATE_TRUNC</code> </p></td><td><p> <code>DATE_TRUNC()</code> is almost a synonym for <code>TIMESTAMP_TRUNC()</code>, but its argument order is flipped for compatibility reasons. See <code>TIMESTAMP_TRUNC()</code> for the description. </p></td><td><p> <code>DATE_TRUNC(precision, date)</code> </p></td></tr>
+<tr><td><p> <code>DATE_WORKING_DIFF</code> </p></td><td><p> Returns the number of days between the dates expr1 and expr2, excluding weekends (Saturdays and Sundays). The result is negative if expr1 is after expr2. </p></td><td><p> <code>DATE_WORKING_DIFF(expr1,expr2)</code> </p></td></tr>
+<tr><td><p> <code>DATEDIFF</code> </p></td><td><p> Returns the difference between two dates or timestamps. <code>DATEDIFF</code> has two forms: One with only two arguments (omitting the unit) called the "MySQL form", and one with three arguments (with the unit as the first argument) called the "Unit form". The two forms behave completely differently, so it is important to understand the differences and it is inadvisable to mix the forms within a single project. </p><p> In the MySQL form, the difference is returned in days from the second argument until the first. For example, <code>DATEDIFF('2011-01-01', '2011-01-08')</code> returns -7. Timestamp and string arguments in this form are always converted to dates. This form is largely compatible with the behavior of MySQL. </p><p> In the Unit form, the difference is returned in the specified units from the first argument until the second. For example, <code>DATEDIFF(day, '2011-01-01', '2011-01-08')</code> returns 7. Timestamp and string arguments are converted to dates when the unit requires it (day, month, year, etc.), while date and string arguments are converted to timestamps for other units (second, minute, hour, etc.). This form is largely compatible with other SQL dialects, excluding MySQL. </p></td><td><p> <code>DATEDIFF([unit,]expr1,expr2)</code> </p></td></tr>
+<tr><td><p> <code>DATETIME</code> </p></td><td><p> Returns the value of expr converted to a <code>DATETIME</code> type, consisting of a year, month, day, hour, minute, second, and millisecond. </p></td><td><p> <code>DATETIME(expr)</code>, <code>CAST(expr AS DATETIME)</code> </p></td></tr>
+<tr><td><p> <code>DAY</code> </p></td><td><p> <code>DAY()</code> is a synonym for <code>DAYOFMONTH()</code>. </p></td><td><p> <code>DAY(date)</code> </p></td></tr>
+<tr><td><p> <code>DAYNAME</code> </p></td><td><p> Returns the name of the weekday for date. The language used for the name is controlled by the Locale setting. </p></td><td><p> <code>DAYNAME(date)</code> </p></td></tr>
+<tr><td><p> <code>DAYOFMONTH</code> </p></td><td><p> Returns the day of the month for date, in the range 1 to 31. </p></td><td><p> <code>DAYOFMONTH(date)</code> </p></td></tr>
+<tr><td><p> <code>DAYOFWEEK</code> </p></td><td><p> Returns the day of the week index for the date (1 = Sunday, 2 = Monday,..., 7 = Saturday). These index values correspond to the ODBC standard. </p><p> This contrasts with <code>WEEKDAY()</code> which follows a different index numbering (0 = Monday, 1 = Tuesday, ... 6 = Sunday). </p></td><td><p> <code>DAYOFWEEK(date)</code> </p></td></tr>
+<tr><td><p> <code>DAYOFYEAR</code> </p></td><td><p> Returns the day of the year for date, in the range 1 to 366. </p></td><td><p> <code>DAYOFYEAR(date)</code> </p></td></tr>
+<tr><td><p> <code>DURATION</code> </p></td><td><p> Returns the value of expr converted to a <code>DURATION</code>, consisting of hours, minutes, seconds, and milliseconds. </p></td><td><p> <code>DURATION(expr)</code>, <code>CAST(expr AS DURATION)</code> </p></td></tr>
+<tr><td><p> <code>EPOCH_MILLIS</code> </p></td><td><p> Returns the Unix epoch time in milliseconds for the given date or timestamp value. </p></td><td><p> <code>EPOCH_MILLIS([timestamp])</code> </p></td></tr>
+<tr><td><p> <code>EXTRACT</code> </p></td><td><p> Returns the value of the provided field extracted from the Date or Timestamp expression. For example, <code>EXTRACT(MONTH FROM CURDATE())</code> would return 1 during January. "field" may be any of the following: </p><p> <code>YEAR</code>, <code>QUARTER</code>, <code>MONTH</code>, <code>DAY</code>, <code>DAYOFWEEK</code>, <code>WEEKDAY</code>, <code>HOUR</code>, <code>MINUTE</code>, <code>SECOND</code>, <code>MILLISECOND</code>, <code>MICROSECOND</code>, <code>SECOND_MICROSECOND</code>, <code>MINUTE_MICROSECOND</code>, <code>MINUTE_SECOND</code>, <code>HOUR_MICROSECOND</code>, <code>HOUR_SECOND</code>, <code>HOUR_MINUTE</code>, <code>DAY_HOUR</code>, <code>YEAR_MONTH</code>, <code>WEEK</code>, <code>YEAR_WEEK</code>. </p></td><td><p> <code>EXTRACT(field FROM expr)</code> </p></td></tr>
+<tr><td><p> <code>FROM_DAYS</code> </p></td><td><p> Given a day number N, returns a <code>DATE</code> value. The day count is based on the number of days from the start of the standard calendar. </p><p> The function is not designed for use with dates before the advent of the Gregorian calendar in October 1582. Results will not be reliable since it doesn't account for the lost days when the calendar changed from the Julian calendar. </p><p> This is the converse of the <code>TO_DAYS()</code> function. </p></td><td><p> <code>FROM_DAYS(N)</code> </p></td></tr>
+<tr><td><p> <code>FROM_EPOCH_MILLIS</code> </p></td><td><p> Returns the timestamp value associated with the Unix epoch time given in milliseconds. </p></td><td><p> <code>FROM_EPOCH_MILLIS(epoch_millis)</code> </p></td></tr>
+<tr><td><p> <code>FROM_UNIXTIME</code> </p></td><td><p> Returns a representation of the unix_timestamp argument as a <code>TIMESTAMP</code> value. unix_timestamp is an internal timestamp value such as is produced by the <code>UNIX_TIMESTAMP()</code> function. </p></td><td><p> <code>FROM_UNIXTIME(unix_timestamp)</code> </p></td></tr>
+<tr><td><p> <code>FUZZY_PARSE_DATE</code> </p></td><td><p> Parses a Date &amp; Time value out of the given string using a fuzzy algorithm. This function is able to parse many formats in many languages, and is often able to ignore mistakes in formatting. The tradeoff is that it may ignore parts of a string that it does not recognize, or misinterpret ambiguous formats. </p><p> Day-month-year vs. month-day-year ambiguity is resolved by referring to the Locale setting. For country=US, or where country is empty and language=en, month-day-year is assumed. All other locales assume day-month-year. </p><p> NOTE: This is the same date parsing algorithm used by the String to Timestamp converter in the first version of Magic ETL. </p></td><td><p> <code>FUZZY_PARSE_DATE(str)</code> </p></td></tr>
+<tr><td><p> <code>HOUR</code> </p></td><td><p> Returns the hour for time. The range of the return value is 0 to 23. </p></td><td><p> <code>HOUR(time)</code> </p></td></tr>
+<tr><td><p> <code>LAST_DAY</code> </p></td><td><p> Takes a date or datetime value and returns the corresponding value for the last day of the month. </p></td><td><p> <code>LAST_DAY(date)</code> </p></td></tr>
+<tr><td><p> <code>LOCALE</code> </p></td><td><p> For debugging purposes. Returns the Locale setting for this context. This setting controls the behavior of functions like <code>DAYNAME()</code>. Also available as <code>@@LANG</code> and <code>@@LC_TIME_NAMES</code>. </p></td><td><p> <code>@@LOCALE</code> </p></td></tr>
+<tr><td><p> <code>MICROSECOND</code> </p></td><td><p> Returns the microseconds from the datetime expression expr as a number in the range from 0 to 999999. </p></td><td><p> <code>MICROSECOND(expr)</code> </p></td></tr>
+<tr><td><p> <code>MILLISECOND</code> </p></td><td><p> Returns the milliseconds from the datetime expression expr as a number in the range from 0 to 999. </p></td><td><p> <code>MILLISECOND(expr)</code> </p></td></tr>
+<tr><td><p> <code>MINUTE</code> </p></td><td><p> Returns the minute of the datetime argument, in the range 0 to 59. </p></td><td><p> <code>MINUTE(time)</code> </p></td></tr>
+<tr><td><p> <code>MONTH</code> </p></td><td><p> Returns the month for date in the range 1 to 12 for January to December. </p></td><td><p> <code>MONTH(date)</code> </p></td></tr>
+<tr><td><p> <code>MONTHNAME</code> </p></td><td><p> Returns the full name of the month for date. The language used for the name is controlled by the Locale setting. </p></td><td><p> <code>MONTHNAME(date)</code> </p></td></tr>
+<tr><td><p> <code>NOW</code> </p></td><td><p> Synonym for <code>CURRENT_TIMESTAMP()</code>. </p></td><td><p> <code>NOW()</code> </p></td></tr>
+<tr><td><p> <code>PERIOD</code> </p></td><td><p> Periods are quantities of calendar years, months, and days. They are primarily useful for adding to dates and timestamps, as they are not supported outside of Magic ETL. </p><p> Periods can be written in expressions in two ways. One is by wrapping a period string in the <code>PERIOD()</code> function. Period strings follow the ISO8601 standard for intervals, and support the year, month, week, and day fields in that format. The following are valid period strings: <code>'P5D'</code> (five days), <code>'P1Y6M'</code> (one year and six months), <code>'P3W'</code> (three weeks). The other way of including periods in expressions is with <code>INTERVAL</code> expressions, which create single-unit periods for any of these units: <code>CENTURY</code>, <code>DECADE</code>, <code>YEAR</code>, <code>QUARTER</code>, <code>MONTH</code>, <code>WEEK</code>, <code>DAY</code>. Like so: <code>INTERVAL 1 QUARTER</code> </p><p> Periods can be converted to durations, but this conversion is approximate. There is no way to precisely represent one month in terms of seconds. Periods may also be converted to string, which uses the format described above. Finally, periods may be converted to and from numeric types. Those conversions simply convert to and from a number of days. </p></td><td><p> <code>PERIOD(expr)</code> </p></td></tr>
+<tr><td><p> <code>PERIOD_ADD</code> </p></td><td><p> Adds N months to period P. P is an integer in the format YYMM or YYYYMM. If P contains a two-digit year, values from 00 to 69 are converted to from 2000 to 2069, while values from 70 are converted to 1970 upwards. </p><p> Returns an integer value in the format YYYYMM. </p></td><td><p> <code>PERIOD_ADD(P,N)</code> </p></td></tr>
+<tr><td><p> <code>PERIOD_DIFF</code> </p></td><td><p> Returns the number of months between periods P1 and P2. P1 and P2 can be in the format YYMM or YYYYMM, and are integer values. </p><p> If P1 or P2 contains a two-digit year, values from 00 to 69 are converted to from 2000 to 2069, while values from 70 are converted to 1970 upwards. </p></td><td><p> <code>PERIOD_DIFF(P1,P2)</code> </p></td></tr>
+<tr><td><p> <code>QUARTER</code> </p></td><td><p> Returns the quarter of the year for date, in the range 1 to 4. Returns <code>NULL</code> if the given value is <code>NULL</code>. </p></td><td><p> <code>QUARTER(date)</code> </p></td></tr>
+<tr><td><p> <code>SEC_TO_TIME</code> </p></td><td><p> Returns the seconds argument, converted to hours, minutes, and seconds, as a <code>TIME</code> value. </p></td><td><p> <code>SEC_TO_TIME(seconds)</code> </p></td></tr>
+<tr><td><p> <code>SECOND</code> </p></td><td><p> Returns the second for a given time in the range 0 to 59. </p></td><td><p> <code>SECOND(time)</code> </p></td></tr>
+<tr><td><p> <code>STR_TO_DATE</code> </p></td><td><p> This is the inverse of the <code>DATE_FORMAT()</code> function. It takes a string str and a format string format. <code>STR_TO_DATE()</code> returns a <code>DATETIME</code> value. </p><p> The format that can be used by <code>STR_TO_DATE()</code> is described in the description of <code>DATE_FORMAT()</code>. </p></td><td><p> <code>STR_TO_DATE(str,format)</code> </p></td></tr>
+<tr><td><p> <code>SUBDATE</code> </p></td><td><p> When invoked with the <code>INTERVAL</code> form of the second argument, <code>SUBDATE()</code> is a synonym for <code>DATE_SUB()</code>. See <code>DATE_ADD()</code> for a complete list of permitted units. </p><p> The second form allows the use of an integer value for days. In such cases, it is interpreted as the number of days to be subtracted from the date or datetime expression expr. </p></td><td><p> <code>SUBDATE(date,INTERVAL expr unit)</code>, <code>SUBDATE(expr,days)</code> </p></td></tr>
+<tr><td><p> <code>SUBTIME</code> </p></td><td><p> <code>SUBTIME()</code> returns expr1 - expr2 expressed as a value of the same type as expr1. expr1 is a time or datetime expression, and expr2 is a time expression. </p></td><td><p> <code>SUBTIME(expr1,expr2)</code> </p></td></tr>
+<tr><td><p> <code>SYSDATE</code> </p></td><td><p> Synonym for <code>CURRENT_TIMESTAMP()</code>. </p></td><td><p> <code>SYSDATE()</code> </p></td></tr>
+<tr><td><p> <code>SYSTEM_LOCALE</code> </p></td><td><p> For debugging purposes. Returns the Locale setting for the DataFlow or, if not set, the customer. This setting controls the behavior of functions like <code>DAYNAME()</code>. This setting might be overridden by an action- or statement-level control (see <code>@@LOCALE</code>). Also available as <code>@@SYSTEM_LANG</code>. </p></td><td><p> <code>@@SYSTEM_LOCALE</code> </p></td></tr>
+<tr><td><p> <code>SYSTEM_TZ</code> </p></td><td><p> For debugging purposes. Returns the time zone setting for the DataFlow or, if not set, the customer. This setting controls the behavior of many date- and time-related functions, like <code>STR_TO_DATE()</code>. This setting might be overridden by an action- or statement-level control (see <code>@@TZ</code>). Also available as <code>@@SYSTEM_TIMEZONE</code> and <code>@@SYSTEM_TIME_ZONE</code>. </p></td><td><p> <code>@@SYSTEM_TZ</code> </p></td></tr>
+<tr><td><p> <code>TIME</code> </p></td><td><p> Converts expr to a duration (<code>TIME</code>-type) consisting of hours, minutes, seconds, and milliseconds. </p></td><td><p> <code>TIME(expr)</code> </p></td></tr>
+<tr><td><p> <code>TIME_FORMAT</code> </p></td><td><p> This is used like the <code>DATE_FORMAT()</code> function, but the format string may contain format specifiers only for hours, minutes, and seconds. Other specifiers produce a <code>NULL</code> value or 0. </p></td><td><p> <code>TIME_FORMAT(time,format)</code> </p></td></tr>
+<tr><td><p> <code>TIME_TO_SEC</code> </p></td><td><p> Returns the time argument, converted to seconds. </p></td><td><p> <code>TIME_TO_SEC(time)</code> </p></td></tr>
+<tr><td><p> <code>TIMEDIFF</code> </p></td><td><p> <code>TIMEDIFF()</code> returns expr1 - expr2 expressed as a time value. expr1 and expr2 are time or date-and-time expressions, but both must be of the same type. </p></td><td><p> <code>TIMEDIFF(expr1,expr2)</code> </p></td></tr>
+<tr><td><p> <code>TIMESTAMP</code> </p></td><td><p> Converts expr to a timestamp (<code>DATETIME</code>-type) consisting of year, month, day, hour, minute, second, and millisecond. </p></td><td><p> <code>TIMESTAMP(expr)</code> </p></td></tr>
+<tr><td><p> <code>TIMESTAMP_TRUNC</code> </p></td><td><p> Truncates timestamp to the given precision, or to the day if no precision is specified. The result is of type <code>DATE</code> if timestamp is a <code>DATE</code>, otherwise it has type <code>DATETIME</code>. The value of precision is a constant string matching one of the following: </p><p> Millennium: <code>MILLENNIUM</code> </p><p> Century: <code>CENTURY</code> </p><p> Year: <code>YEAR</code> </p><p> ISO Year: <code>ISOYEAR</code> </p><p> Quarter: <code>QUARTER</code> </p><p> Month: <code>MONTH</code> </p><p> Same weekday as first day of year: <code>YEARWEEK</code> </p><p> Same weekday as first day of ISO year: <code>ISOWEEK</code> </p><p> Same weekday as first day of month: <code>MONTHWEEK</code> </p><p> First day of week according to current Locale setting: <code>WEEK</code> </p><p> Day (the default): <code>DAY</code> </p><p> Hour: <code>HOUR</code> </p><p> Minute: <code>MINUTE</code> </p><p> Second: <code>SECOND</code> </p><p> Millisecond: <code>MILLISECOND</code> </p><p> Microsecond: <code>MICROSECOND</code> </p></td><td><p> <code>TIMESTAMP_TRUNC(timestamp[,precision])</code> </p></td></tr>
+<tr><td><p> <code>TO_DAYS</code> </p></td><td><p> Given a date date, returns the number of days since the start of the current calendar. </p><p> The function is not designed for use with dates before the advent of the Gregorian calendar in October 1582. Results will not be reliable since it doesn't account for the lost days when the calendar changed from the Julian calendar. </p><p> This is the converse of the <code>FROM_DAYS()</code> function. </p></td><td><p> <code>TO_DAYS(date)</code> </p></td></tr>
+<tr><td><p> <code>TODAY</code> </p></td><td><p> <code>TODAY()</code> is a synonym for <code>CURDATE()</code>. </p></td><td><p> <code>TODAY()</code> </p></td></tr>
+<tr><td><p> <code>TRUNC</code> </p></td><td><p> <code>TRUNC()</code> is a synonym for <code>TIMESTAMP_TRUNC()</code>. It is not to be confused with <code>TRUNCATE()</code>, which operates on numeric values. </p></td><td><p> <code>TRUNC(timestamp[,precision])</code> </p></td></tr>
+<tr><td><p> <code>TZ</code> </p></td><td><p> For debugging purposes. Returns the time zone setting for this context. This setting controls the behavior of many date- and time-related functions, like <code>STR_TO_DATE()</code>. Also available as <code>@@TIMEZONE</code> and <code>@@TIME_ZONE</code>. </p></td><td><p> <code>@@TZ</code> </p></td></tr>
+<tr><td><p> <code>UNIX_TIMESTAMP</code> </p></td><td><p> If called with no argument, returns a Unix timestamp (seconds since <code>'1970-01-01 00:00:00'</code> UTC) as an unsigned integer. If <code>UNIX_TIMESTAMP()</code> is called with a date argument, it returns the value of the argument as seconds since <code>'1970-01-01 00:00:00'</code> UTC. date may be a <code>DATE</code>, a <code>DATETIME</code>, or a date string. The server interprets date as a value in the current time zone and converts it to an internal value in UTC. Clients can set their time zone in Magic action settings, DataFlow settings, or customer settings. </p><p> The inverse function of <code>UNIX_TIMESTAMP()</code> is <code>FROM_UNIXTIME()</code>. </p></td><td><p> <code>UNIX_TIMESTAMP()</code>, <code>UNIX_TIMESTAMP(date)</code> </p></td></tr>
+<tr><td><p> <code>WEEK</code> </p></td><td><p> This function returns the week number for date. The two-argument form of <code>WEEK()</code> allows you to specify whether the week starts on Sunday or Monday and whether the return value should be in the range from 0 to 53 or from 1 to 53. If the mode argument is omitted, the value of the default_week_format system variable is used. Modes are as follows: </p><p> <code>0</code>: First day is Sunday, range is 0-53, first week has a Sunday in this year. </p><p> <code>1</code>: First day is Monday, range is 0-53, first week has more than 3 days this year. </p><p> <code>2</code>: First day is Sunday, range is 1-53, first week has a Sunday in this year. </p><p> <code>3</code>: First day is Monday, range is 1-53, first week has more than 3 days this year. </p><p> <code>4</code>: First day is Sunday, range is 0-53, first week has more than 3 days this year. </p><p> <code>5</code>: First day is Monday, range is 0-53, first week has a Monday in this year. </p><p> <code>6</code>: First day is Sunday, range is 1-53, first week has more than 3 days this year. </p><p> <code>7</code>: First day is Monday, range is 1-53, first week has a Monday in this year. </p></td><td><p> <code>WEEK(date[,mode])</code> </p></td></tr>
+<tr><td><p> <code>WEEKDAY</code> </p></td><td><p> Returns the weekday index for date (0 = Monday, 1 = Tuesday,... 6 = Sunday). </p><p> This contrasts with <code>DAYOFWEEK()</code> which follows the ODBC standard (1 = Sunday, 2 = Monday,..., 7 = Saturday). </p></td><td><p> <code>WEEKDAY(date)</code> </p></td></tr>
+<tr><td><p> <code>WEEKOFYEAR</code> </p></td><td><p> <code>WEEKOFYEAR()</code> is a synonym for <code>WEEK()</code>. </p></td><td><p> <code>WEEKOFYEAR(date[,mode])</code> </p></td></tr>
+<tr><td><p> <code>YEAR</code> </p></td><td><p> Returns the year for the given date, in the range 0 to 9999. </p></td><td><p> <code>YEAR(date)</code> </p></td></tr>
+<tr><td><p> <code>YEARWEEK</code> </p></td><td><p> Returns year and week for a date. The mode argument works exactly like the mode argument to <code>WEEK()</code>. The year in the result may be different from the year in the date argument for the first and the last week of the year. </p></td><td><p> <code>YEARWEEK(date)</code>, <code>YEARWEEK(date,mode)</code> </p></td></tr>
+</tbody>
 </table>
 
 ## System Functions
 
-<table data-aura-rendered-by="33:208;a" width="100%"><thead><tr><td class="wysiwyg-text-align-center" colspan="1" rowspan="1"><p><b> Function Name </b></p></td><td class="wysiwyg-text-align-center" colspan="1" rowspan="1"><p><b> Description </b></p></td><td class="wysiwyg-text-align-center" colspan="1" rowspan="1"><p><b> Example </b></p></td></tr></thead><tbody><tr><td colspan="1" rowspan="1"><p> DX_ACTION_ID </p></td><td colspan="1" rowspan="1"><p> The system ID of the action executing the statement. This is different from @@DX_ACTION_NAME. </p></td><td colspan="1" rowspan="1"><p> @@DX_ACTION_ID </p></td></tr><tr><td colspan="1" rowspan="1"><p> DX_ACTION_NAME </p></td><td colspan="1" rowspan="1"><p> The user-provided name of the action executing the statement. This is different from @@DX_ACTION_ID. </p></td><td colspan="1" rowspan="1"><p> @@DX_ACTION_NAME </p></td></tr><tr><td colspan="1" rowspan="1"><p> DX_DATAFLOW_ID </p></td><td colspan="1" rowspan="1"><p> The numeric ID of the DataFlow executing the statement, or NULL if the statement is not being executed by a saved DataFlow. This is different from @@DX_DATAFLOW_NAME. </p></td><td colspan="1" rowspan="1"><p> @@DX_DATAFLOW_ID </p></td></tr><tr><td colspan="1" rowspan="1"><p> DX_DATAFLOW_NAME </p></td><td colspan="1" rowspan="1"><p> The user-provided name of the DataFlow executing the statement, or NULL if the statement is not being executed by a DataFlow. This is different from @@DX_DATAFLOW_ID. </p></td><td colspan="1" rowspan="1"><p> @@DX_DATAFLOW_NAME </p></td></tr><tr><td colspan="1" rowspan="1"><p> DX_ENGINE </p></td><td colspan="1" rowspan="1"><p> The execution engine, e.g. MAGIC. </p></td><td colspan="1" rowspan="1"><p> @@DX_ENGINE </p></td></tr><tr><td colspan="1" rowspan="1"><p> DX_EXECUTION_ID </p></td><td colspan="1" rowspan="1"><p> The numeric ID of the current DataFlow execution, or null if the statement is not being executed as part of a DataFlow execution. Note that these IDs are not sequential for a given DataFlow, but are guaranteed to be larger than the IDs of executions started earlier. </p></td><td colspan="1" rowspan="1"><p> @@DX_EXECUTION_ID </p></td></tr><tr><td colspan="1" rowspan="1"><p> DX_IS_PREVIEW </p></td><td colspan="1" rowspan="1"><p> TRUE if the statement is being executed as part of a DataFlow preview, otherwise FALSE. </p></td><td colspan="1" rowspan="1"><p> @@DX_IS_PREVIEW </p></td></tr></tbody></table>
+The time zone and locale settings for a DataFlow (`@@TZ`, `@@SYSTEM_TZ`, `@@LOCALE`, and `@@SYSTEM_LOCALE`) are also available as system functions. They are listed under [Date and Time Functions](#date-and-time-functions).
+
+<table width="100%" style={{ tableLayout: "fixed", overflowWrap: "anywhere" }}>
+<thead>
+<tr><th width="22%"><p> Function Name </p></th><th width="48%"><p> Description </p></th><th width="30%"><p> Example </p></th></tr>
+</thead>
+<tbody>
+<tr><td><p> <code>DX_ACTION_ID</code> </p></td><td><p> The system ID of the action executing the statement. This is different from <code>@@DX_ACTION_NAME</code>. </p></td><td><p> <code>@@DX_ACTION_ID</code> </p></td></tr>
+<tr><td><p> <code>DX_ACTION_NAME</code> </p></td><td><p> The user-provided name of the action executing the statement. This is different from <code>@@DX_ACTION_ID</code>. </p></td><td><p> <code>@@DX_ACTION_NAME</code> </p></td></tr>
+<tr><td><p> <code>DX_DATAFLOW_ID</code> </p></td><td><p> The numeric ID of the DataFlow executing the statement, or <code>NULL</code> if the statement is not being executed by a saved DataFlow. This is different from <code>@@DX_DATAFLOW_NAME</code>. </p></td><td><p> <code>@@DX_DATAFLOW_ID</code> </p></td></tr>
+<tr><td><p> <code>DX_DATAFLOW_NAME</code> </p></td><td><p> The user-provided name of the DataFlow executing the statement, or <code>NULL</code> if the statement is not being executed by a DataFlow. This is different from <code>@@DX_DATAFLOW_ID</code>. </p></td><td><p> <code>@@DX_DATAFLOW_NAME</code> </p></td></tr>
+<tr><td><p> <code>DX_ENGINE</code> </p></td><td><p> The execution engine, e.g. <code>MAGIC</code>. </p></td><td><p> <code>@@DX_ENGINE</code> </p></td></tr>
+<tr><td><p> <code>DX_EXECUTION_ID</code> </p></td><td><p> The numeric ID of the current DataFlow execution, or null if the statement is not being executed as part of a DataFlow execution. Note that these IDs are not sequential for a given DataFlow, but are guaranteed to be larger than the IDs of executions started earlier. </p></td><td><p> <code>@@DX_EXECUTION_ID</code> </p></td></tr>
+<tr><td><p> <code>DX_IS_PREVIEW</code> </p></td><td><p> <code>TRUE</code> if the statement is being executed as part of a DataFlow preview, otherwise <code>FALSE</code>. </p></td><td><p> <code>@@DX_IS_PREVIEW</code> </p></td></tr>
+</tbody>
+</table>

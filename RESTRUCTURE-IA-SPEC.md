@@ -357,7 +357,7 @@ Build Apps & Automate
 ```
 Distribute
 ├── [NEW] Overview: Distribute                        ← hub article (net-new)
-├── Choose How to Share Content Outside Domo          ← cross-cutting chooser
+├── Distribute Content Outside Domo                   ← cross-cutting chooser (slug: Choose-How-to-Share-Outside-Domo)
 ├── Export (6)
 │   ├── Printing a Visualization Card
 │   ├── Export Visualization Cards
@@ -373,8 +373,10 @@ Distribute
     ├── Setting Up Publication Groups
     ├── Publication Groups and You: The Not Quite Definitive Primer
     ├── Slideshow Publications Page Layout
-    └── Sharing Content Using Slideshows
+    └── Distributing Content Using Slideshows
 ```
+
+**Terminology (2026-10-16):** Within Distribute, **"distribute"** is the verb for getting content to audiences outside Domo. **"Share"** is reserved for the Collaborate pillar's share-with-Domo-users function. Distribution-sense "share" was changed to "distribute" across this pillar, and the two formerly-"share"-titled articles were retitled (slugs unchanged). Literal Domo UI labels (**Share** menu, **Share link**, **Sharing** menu) and genuine share-permission references are kept as-is. See `RESTRUCTURE-MANIFEST.md` › "Distribute Pillar — Distribute Terminology".
 
 ## Pillar 8: Collaborate
 

@@ -511,6 +511,22 @@ Integrated main's MCP/Toolkits navigation regroup (main PR #630) into the restru
 
 ---
 
+## Distribute Pillar — "Distribute" Terminology (2026-10-16)
+
+Established a terminology split in the Distribute pillar: **"distribute"** is the verb for getting content to audiences outside Domo; **"share"** is reserved for the Collaborate pillar's share-with-Domo-users function. Applied across the Distribute pillar's articles.
+
+**Retitled (slugs unchanged):**
+- `Choose-How-to-Share-Outside-Domo` — "Choose How to Share Content Outside Domo" → **"Distribute Content Outside Domo"**
+- `360043437793` — "Sharing Content Using Slideshows" → **"Distributing Content Using Slideshows"**
+
+**Distribution-sense "share" → "distribute"** in: the two above, `Export-Domo-Data-to-Reports`, `360042933014` (Slideshow Publications Page Layout), `360043438993` (Setting Up Publication Groups), `360043441593` (Primer). Inbound **link text** to the two renamed titles updated in `What-is-Domo`, `Collaborate-Overview` (×3), `What-is-a-Dashboard`, topic `0TO5w000000Zao7GAC`, `360042934234`, `360043428553`.
+
+**Deliberately KEPT as "share":** the Embed article `360043437993` (zero changes — all its uses are the real **Share** menu/**Share link** UI, the share-with-users permission, or the "shared across users" idiom); literal **Share**/**Sharing** UI menu labels and image paths everywhere; the access-grant "share" in `360043441593` line 37.
+
+**Deferred — icon migration (officially deferred 2026-10-16):** the legacy inline image-icons in `360043437793` (Slideshows) and `360043437813` (Export Visualization Cards) were **not** upgraded to the Domo icon font in this pass. The set is larger/messier than a simple swap (several images double as `<Frame>` screenshots; some "inline" images are mis-sized screenshots, not glyphs). To be done as a dedicated pass: view each image, map to a glyph (or keep as a screenshot) with human verification, then apply.
+
+---
+
 ## Phase 4 — Consolidation, Retirement & Archive (In Progress — 2026-08-28)
 
 Connector merges and the DataFusion migration guide are **executed** (see subsections below). Retirement batches are **classified and staged** here for Phase 4.6 — lifecycle status stamping, callout insertion, and nav removal happen in Phase 4.6 *after PM sign-off*. No article may be deleted or retired without an entry here.

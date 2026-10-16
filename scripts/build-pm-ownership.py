@@ -85,6 +85,14 @@ PM_GITHUB_LOGIN = {
     'Ryan Despain':     '@RyanDespain',
 }
 
+# ── Static (non-article) CODEOWNERS entries ──────────────────────────────────
+# Paths outside the PM-ownership mapping (e.g. OpenAPI specs) that need their
+# own reviewers. Emitted verbatim at the end of .github/CODEOWNERS on every run.
+STATIC_CODEOWNERS = {
+    'openapi/product/AI-Services.yaml': ['@Jeremyrodgers123', '@jwclark'],
+    'openapi/product/Documents.yaml':   ['@HeavyT12'],
+}
+
 # ── 2. Build nav hierarchy: slug → [immediate_group, parent, grandparent, …, tab] ──
 article_nav = {}  # slug → list of ancestor group names (most specific first)
 
@@ -696,6 +704,13 @@ for name in sorted(PM_GITHUB_LOGIN):
     for r in sorted(prs, key=lambda r: (r['feature'].lower(), r['title'].lower())):
         co.append(f"s/article/{r['filename']} {login}")
         routed += 1
+
+if STATIC_CODEOWNERS:
+    prefix = "# ── OpenAPI specs (STATIC_CODEOWNERS) "
+    co.append("")
+    co.append(prefix + '─' * max(0, 79 - len(prefix)))
+    for path in sorted(STATIC_CODEOWNERS):
+        co.append(f"{path} {' '.join(STATIC_CODEOWNERS[path])}")
 
 co.append("")
 

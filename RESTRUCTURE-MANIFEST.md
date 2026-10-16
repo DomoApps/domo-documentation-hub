@@ -501,6 +501,16 @@ Sync #2 (right before merge, post-Phase-6) will reconcile everything main change
 
 ---
 
+## MCP / Toolkits Nav Regroup (2026-10-16 — integrates main PR #630)
+
+Integrated main's MCP/Toolkits navigation regroup (main PR #630) into the restructure. The flat `MCP` group became **MCP → Toolkits** (nested sub-group): MCP Server · Domo MCP · Standard OAuth · Manually Connect · Gemini Enterprise at the group's top level, and the nine capability toolkits (Alerts, Cards, Code Engine, Sandbox Repository, Task Center Queue, User Administration, Workflow, Workspaces, Coming Soon) in a nested **Toolkits** sub-group. IA spec › Pillar 9 updated to match.
+
+**Articles — took main's version (user decision: "main is correct here"):** the restructure copies were stale (old `/api/ai/v1/.../DOMO_BASIC_MCP` endpoints, "Domo Essentials MCP" / "Domo Basic MCP" naming, `<BetaNote/>` snippet, old tool names). Replaced with main's current versions, which carry the modern `/mcp` endpoints, "Domo MCP" terminology, expanded tool lists, the new "How it fits together" diagram, hand-written beta `<Note>` blocks, short `sidebarTitle`s, and PR #630's shortened toolkit titles + "a Domo MCP Toolkit" excerpt/intro framing. 13 articles refreshed (Connect-AI-Tools, Domo-MCP, MCP-Standard-OAuth, MCP-Manually-Connect + 9 toolkits); Connect-Gemini already identical. Added image `images/kb/domo-mcp-toolkits.png`. No `[pm-input]`/review markers existed on any of these, so none were lost.
+
+**Deferred:** `Connect-Amazon-Quick-Suite-To-Domo-MCP` is in main's MCP group but does not exist on this branch yet — left out of the nav (no broken reference); it will arrive with Phase 3c sync #2 from main.
+
+---
+
 ## Phase 4 — Consolidation, Retirement & Archive (In Progress — 2026-08-28)
 
 Connector merges and the DataFusion migration guide are **executed** (see subsections below). Retirement batches are **classified and staged** here for Phase 4.6 — lifecycle status stamping, callout insertion, and nav removal happen in Phase 4.6 *after PM sign-off*. No article may be deleted or retired without an entry here.

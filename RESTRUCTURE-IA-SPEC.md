@@ -436,7 +436,11 @@ AI & Data Science
 │   ├── Magic ETL AI
 │   ├── AI Playground
 │   ├── AI Adapters (Databricks, OpenAI, Bedrock)
-│   ├── MCP Integration
+│   ├── MCP                                           ← own nav group; connect AI tools to Domo's MCP Server
+│   │   ├── MCP Server · Domo MCP · Standard OAuth · Manually Connect · Gemini Enterprise
+│   │   └── Toolkits (sub-group)                       ← the individual capability toolkits, nested
+│   │       ├── Alerts · Cards · Code Engine · Sandbox Repository · Task Center Queue
+│   │       └── User Administration · Workflow · Workspaces · Coming Soon
 │   └── [remaining AI articles]
 ├── AutoML (1)
 │   └── Train and Deploy Models with AutoML           ← single article; needs expansion

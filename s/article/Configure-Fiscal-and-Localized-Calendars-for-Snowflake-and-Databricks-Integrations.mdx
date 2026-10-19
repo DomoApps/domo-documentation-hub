@@ -1,5 +1,5 @@
 ---
-title: "Fiscal and Standard Calendar Configuration for Cloud Integrations"
+title: "Configure Fiscal and Localized Calendars for Snowflake and Databricks Integrations"
 excerpt: "Register a fiscal or localized standard calendar table from your own Snowflake or Databricks warehouse so cards and reports use your company's fiscal year or localized date labels."
 tag: "Beta"
 ---
@@ -10,9 +10,9 @@ import { BetaNote } from '/snippets/BetaNote.mdx';
 
 ## Intro
 
-This article explains how to register a fiscal calendar, register a localized standard calendar, and edit or disable a registered calendar for a Snowflake or Databricks Cloud Integration.
+This article explains how to request fiscal and localized standard calendars for a Snowflake or Databricks Cloud Integration, register them, and edit or disable them. Domo Support must enable calendars for your instance before you can register one.
 
-This is available for Snowflake and Databricks Cloud Integrations. You configure it once per integration, and every card and DataSet connected to that integration can use it.
+You configure calendars once per integration, and every card and DataSet connected to that integration can use them.
 
 ---
 
@@ -27,13 +27,21 @@ You can register two independent calendar types on the same integration, side by
 | **Fiscal Calendar**   | A financial year that doesn't start in January                                                | Fiscal year starting April 1                   |
 | **Standard Calendar** | The regular Jan–Dec calendar, with month and period labels translated into another language | Month and quarter names in Japanese or Spanish |
 
-Registering both is optional and independent — you might set up only a **Fiscal Calendar**, only a **Standard Calendar**, or both.
+Registering both is optional and independent—you might set up only a **Fiscal Calendar**, only a **Standard Calendar**, or both. Tell Domo Support which ones you need when you request calendars.
+
+<Note>**Note:** If any users view this integration's data with their Domo language set to something other than English, register a Standard Calendar with labels in that language. Otherwise, their date-based cards fail. A user's language is their personal language setting or, if they haven't set one, the company default language set by an admin (see [Configure Language Settings](/s/article/360043439133)).</Note>
 
 ## Prerequisites
+
+Before you contact Domo Support, build your calendar table (see the schema below) and decide which calendars you need: fiscal, standard, or both. Support lets you know when calendars are enabled. Register your calendar right away.
+
+<Warning>**Important:** If you requested a Standard Calendar, date-based cards on this integration don't work until you register it.</Warning>
 
 Before you register a calendar, you need a calendar table in your Snowflake or Databricks warehouse that matches Domo's expected schema: 25 columns with specific names, covering every date in the years you want to report on. Row values (day and month names) can be in any language, but the column names themselves must always be in English.
 
 If you already have a table like this, you can register it directly (see [Register an Existing Calendar Table](#register-an-existing-calendar-table)). If you don't have a Fiscal Calendar table, use the built-in generator to create one (see [Generate a New Fiscal Calendar](#generate-a-new-fiscal-calendar)). The generator only builds Fiscal Calendar tables — a Standard Calendar table must be built manually before you can register it.
+
+Calendars work on read-only and read/write integrations. If users sign in to the integration with their own OAuth credentials (U2M OAuth), each user needs SELECT access on the calendar table.
 
 ### Reference the 25-Column Schema
 
@@ -141,6 +149,8 @@ Use this flow if you already have a fiscal or standard calendar table in your wa
 
    <Frame>![Calendar section showing the Fiscal Calendar registered with database, schema, and table](/images/kb/custom-calendar-17.png)</Frame>
 
+<Note>**Note:** Cards can use the calendar as soon as it's registered.</Note>
+
 If validation fails, Domo shows an error identifying the problem (for example, a missing column or an inaccessible table) so you can correct it in your warehouse and try again.
 
 You can repeat this process to register a Standard Calendar independently of a Fiscal Calendar — both can be registered on the same integration at the same time. Selecting **Set up standard calendar** opens the same database, schema, and table pickers used for a Fiscal Calendar:
@@ -165,6 +175,8 @@ To change which table a calendar points to:
 
 To remove a calendar entirely, select **Disable**. This does not delete the underlying table, only Domo's reference to it.
 
+<Warning>**Important:** Don't disable your Standard Calendar unless you're replacing it. While no Standard Calendar is registered, date-based cards on this integration don't work. To stop using calendars, contact Domo Support.</Warning>
+
 To apply a registered calendar to a card in Analyzer, see [Using a Fiscal Calendar](/s/article/360042924254).
 
 <Frame>![Calendar section showing both a registered Fiscal Calendar and a registered Standard Calendar](/images/kb/custom-calendar-22.png)</Frame>
@@ -174,7 +186,11 @@ To apply a registered calendar to a card in Analyzer, see [Using a Fiscal Calend
 <AccordionGroup>
 
 <Accordion title="Why don't I see a Calendar option in my integration settings?">
-This feature is currently available only for Snowflake and Databricks Cloud Integrations. If your integration uses a different engine (for example, BigQuery or Redshift), the **Calendar** section won't appear yet.
+The **Calendar** section appears only for Snowflake and Databricks Cloud Integrations, after Domo Support enables calendars for your instance. Other engines, such as BigQuery or Redshift, aren't supported.
+</Accordion>
+
+<Accordion title="I registered a calendar, but my cards don't use it. Why?">
+Contact Domo Support to confirm that calendars are enabled for your instance for the calendar type you registered (fiscal, standard, or both). To apply a fiscal calendar to a card in Analyzer, see [Using a Fiscal Calendar](/s/article/360042924254).
 </Accordion>
 
 <Accordion title="Can I register more than one fiscal calendar on the same integration?">
@@ -183,6 +199,10 @@ No. Each integration supports one Fiscal Calendar and one Standard Calendar at a
 
 <Accordion title="Do I need to translate the column names in my calendar table for a localized Standard Calendar?">
 No. Column names must always be in English, matching the 25-column schema. Only the row values you want displayed to users (month names, day names, and so on) need to be in the target language.
+</Accordion>
+
+<Accordion title="Why do date-based cards fail for some users but not others?">
+Users whose Domo language isn't English need a registered Standard Calendar on the integration. Register one with labels in their language, or have those users switch their personal language to English. If the company default language isn't English, this affects every user who hasn't set their own language.
 </Accordion>
 
 </AccordionGroup>

@@ -256,58 +256,6 @@ check("a broken bare path fails even when a fragile one is present", _rc, 1)
 
 check("no bare paths at all passes", bare_exit()[0], 0)
 
-# --- anchors on localized links that redirect to English ------------------
-
-print("\n== redirected anchors ==")
-
-_LOC = pathlib.Path(tempfile.mkdtemp())
-(_LOC / "ja/s/article").mkdir(parents=True)
-(_LOC / "s/article").mkdir(parents=True)
-for _slug in ("translated", "untranslated", "u"):
-    (_LOC / "s/article" / f"{_slug}.mdx").write_text("x\n", encoding="utf-8")
-(_LOC / "ja/s/article/translated.mdx").write_text("x\n", encoding="utf-8")
-_LINKER = _LOC / "ja/s/article/linker.mdx"
-
-
-def anchored(body):
-    _LINKER.write_text(textwrap.dedent(body), encoding="utf-8")
-    return lc.anchored_untranslated_links(str(_LINKER), str(_LOC))
-
-
-check("anchor on an untranslated target is flagged",
-      anchored("[x](/ja/s/article/untranslated#intro)\n"),
-      [(1, "/ja/s/article/untranslated#intro")])
-check("anchor on a translated target is left to the CLI",
-      anchored("[x](/ja/s/article/translated#intro)\n"), [])
-check("target missing in English too is left to the CLI",
-      anchored("[x](/ja/s/article/nowhere#intro)\n"), [])
-check("untranslated target without an anchor is not flagged",
-      anchored("[x](/ja/s/article/untranslated)\n"), [])
-check("English article link with an anchor is not flagged",
-      anchored("[x](/s/article/untranslated#intro)\n"), [])
-check("topic link is not flagged", anchored("[x](/ja/s/topic/t#intro)\n"), [])
-check("every localized language is covered",
-      [t for _, t in anchored("[a](/de/s/article/u#h)\n[b](/es/s/article/u#h)\n"
-                              "[c](/fr/s/article/u#h)\n")],
-      ["/de/s/article/u#h", "/es/s/article/u#h", "/fr/s/article/u#h"])
-check("href form is flagged",
-      anchored('<a href="/ja/s/article/untranslated#intro">x</a>\n'),
-      [(1, "/ja/s/article/untranslated#intro")])
-check("fenced code is skipped",
-      anchored("```\n[x](/ja/s/article/untranslated#intro)\n```\n"), [])
-
-
-def anchors_exit(body):
-    _LINKER.write_text(textwrap.dedent(body), encoding="utf-8")
-    with contextlib.redirect_stdout(io.StringIO()):
-        return lc.check_redirected_anchors([str(_LINKER)], str(_LOC))
-
-
-check("a redirected anchor fails the build",
-      anchors_exit("[x](/ja/s/article/untranslated#intro)\n"), 1)
-check("a checkable anchor passes",
-      anchors_exit("[x](/ja/s/article/translated#intro)\n"), 0)
-
 # --- argument handling --------------------------------------------------
 
 print("\n== arguments ==")

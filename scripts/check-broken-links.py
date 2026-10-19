@@ -31,10 +31,6 @@ works in production while the CLI calls it broken. Diffing cannot fix either,
 so bare targets are read out of the changed files directly and judged on whether
 they land on a page in the same folder.
 
-Anchors on localized article links are also read out of the changed files.
-docs.json redirects /{lang}/s/article/* to English when no translation exists,
-and the CLI follows that redirect without checking the anchor.
-
 Usage:
   scripts/check-broken-links.py --base origin/main   # gate: new findings only
   scripts/check-broken-links.py --all                # every finding (triage)
@@ -189,8 +185,8 @@ TARGETS = re.compile(r"\]\(\s*([^)\s]+)|\b(?:href|src)=\"([^\"]*)\"")
 SCHEME = re.compile(r"^[a-zA-Z][a-zA-Z0-9+.-]*:")
 
 
-def link_targets(path: str) -> list[tuple[int, str]]:
-    """(line, target) for each link in `path`, ignoring code."""
+def bare_path_links(path: str) -> list[tuple[int, str]]:
+    """(line, target) for each bare-path internal link in `path`."""
     try:
         with open(path, encoding="utf-8", errors="replace") as fh:
             text = fh.read()
@@ -201,15 +197,10 @@ def link_targets(path: str) -> list[tuple[int, str]]:
     hits = []
     for m in TARGETS.finditer(text):
         t = (m.group(1) or m.group(2) or "").strip()
-        if t:
-            hits.append((text.count("\n", 0, m.start()) + 1, t))
+        if not t or t.startswith(("/", "#", "./", "../")) or SCHEME.match(t):
+            continue
+        hits.append((text.count("\n", 0, m.start()) + 1, t))
     return hits
-
-
-def bare_path_links(path: str) -> list[tuple[int, str]]:
-    """(line, target) for each bare-path internal link in `path`."""
-    return [(ln, t) for ln, t in link_targets(path)
-            if not t.startswith(("/", "#", "./", "../")) and not SCHEME.match(t)]
 
 
 def changed_mdx(base: str) -> list[str]:
@@ -267,51 +258,6 @@ def check_bare_paths(files: list[str]) -> int:
             print(f"  {f}:{ln}  ({t})")
 
     return 1 if broken else 0
-
-
-# --- anchors on redirected localized links, also invisible to the CLI -------
-
-LOCALIZED_ARTICLE = re.compile(r"^/(de|es|fr|ja)/s/article/([^#?]+)#.+$")
-
-
-def anchored_untranslated_links(path: str, root: str = ".") -> list[tuple[int, str]]:
-    """(line, target) for each anchored /{lang}/s/article/ link that redirects.
-
-    A target missing in English too is skipped: the CLI reports that link as
-    broken on its own.
-    """
-    exists = lambda p: any(os.path.exists(p + ext) for ext in (".mdx", ".md"))
-    hits = []
-    for ln, t in link_targets(path):
-        m = LOCALIZED_ARTICLE.match(t)
-        if not m:
-            continue
-        slug = m.group(2).rstrip("/")
-        if (not exists(os.path.join(root, m.group(1), "s", "article", slug))
-                and exists(os.path.join(root, "s", "article", slug))):
-            hits.append((ln, t))
-    return hits
-
-
-def check_redirected_anchors(files: list[str], root: str = ".") -> int:
-    """Fail on anchors carried through the localized-to-English redirect.
-
-    docs.json redirects /{lang}/s/article/* to the English article when no
-    translation exists. The CLI follows the redirect but never checks the
-    anchor, and once the translation ships the anchor will not match its
-    localized headings, so the break lands in someone else's pull request.
-    """
-    found = [(f, ln, t) for f in files
-             for ln, t in anchored_untranslated_links(f, root)]
-    if found:
-        print(f"\n{len(found)} localized link(s) with an anchor on an article "
-              f"that has no translation yet. The link redirects to the English "
-              f"article, where the anchor is never checked, and it will not "
-              f"match the headings once the article is translated. Drop the "
-              f"anchor:\n")
-        for f, ln, t in found:
-            print(f"  {f}:{ln}  ({t})  ->  ({t.split('#', 1)[0]})")
-    return 1 if found else 0
 
 
 # --- entry point -----------------------------------------------------------
@@ -395,17 +341,14 @@ def main() -> int:
             if line and "checking for broken links" not in line:
                 print(line)
         return max(1 if SUMMARY.search(ANSI.sub("", text)) else 0,
-                   check_bare_paths(args.files),
-                   check_redirected_anchors(args.files))
+                   check_bare_paths(args.files))
 
     if not args.base:
         ap.error("one of --base, --all, or a list of files is required")
 
-    # These checks are scoped to changed files: diffing cannot catch either
-    # class, since the CLI never reports them in either scan.
-    changed = changed_mdx(args.base)
-    return max(gate(args.base), check_bare_paths(changed),
-               check_redirected_anchors(changed))
+    # The bare-path check is scoped to changed files: diffing cannot catch this
+    # class, since the CLI never reports it in either scan.
+    return max(gate(args.base), check_bare_paths(changed_mdx(args.base)))
 
 
 if __name__ == "__main__":

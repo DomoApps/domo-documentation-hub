@@ -14,6 +14,12 @@ What it does:
   - All other tabs (Developer Portal, Release Notes) and all localized tabs are untouched
   - Writes updated docs.json in-place
 
+Group root pages (Mintlify) are NOT handled here. After this rebuild, run
+`scripts/apply_group_roots.py --apply` to promote each group's Overview/hub
+article to the group's `root` page. That script scans the built children, so it
+works regardless of how the tree was produced; its decisions persist in
+`scripts/group_roots.json`. (Phase 7 runs the two scripts in sequence.)
+
 Usage:
   python3 scripts/build_docs_nav.py [--dry-run]
 

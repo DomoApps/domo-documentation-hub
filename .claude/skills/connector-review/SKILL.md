@@ -50,7 +50,40 @@ its Jira ticket, and prints a status table. Each PR/ticket pair lands in one of 
 | `MIGRATION REQUEST` | Arun's Jira comment requests a missed-migration article — see Migration flow below |
 | `ON HOLD` | Ticket is on indefinite hold; excluded from all automatic actions — see On-Hold flow below |
 
+Each PR row also prints the matched ticket's **summary and Jira status**, so a branch
+that names the wrong ticket is visible at a glance (e.g. the summary describes a
+different feature than the PR title, or the ticket is already Resolved with no approval).
+
 Show the user the dashboard output, including PR numbers, Jira IDs, ages, and states.
+
+#### Wrong-ticket safeguard (sibling approval)
+
+The Jira ID comes from the branch name (`arun.raj/connectors-DOMO-######-...`). Arun
+sometimes bakes the **wrong number** into the branch, or files near-duplicate tickets
+(e.g. one for the KB body and one for the FAQ) and does the review on the sibling. The
+script then checks a ticket with no approval while the real approval sits on its twin.
+
+When a PR's branch ticket has **no secondary approval**, the script searches for a
+near-identical sibling ticket (matched on the distinctive words in the summary) that
+*does* have one, and prints:
+
+```
+  ⚠️  POSSIBLE WRONG-TICKET MATCH: no approval on DOMO-503202, but sibling DOMO-503201 has one
+      from @Satish Mahenge  —  DOMO-503201: "Shopify Connector - Discount Codes Using GraphQL re" (Resolved)
+      The branch name may reference the wrong ticket. Verify, then route the merge/close to DOMO-503201 if correct.
+```
+
+This never auto-acts — it only surfaces the candidate. When you see it:
+
+1. **Verify** the sibling is genuinely the same work (compare summaries and the PR diff).
+2. If it is, the PR is approved — but `--merge DOMO-<branch-id>` would comment on and close
+   the *wrong* (un-approved) ticket. **Ask Jared how to route the Jira side** (comment +
+   close the approved sibling; optionally close the branch ticket as a duplicate), then
+   run the merge against the correct ticket. If the Jira routing differs from the branch
+   ID, do the merge comment/close on the sibling directly rather than via
+   `--merge <branch-id>`.
+3. If the sibling is *not* the same work, ignore the warning and treat the PR as awaiting
+   approval normally.
 
 ### Step 2 — Take actions
 
@@ -274,6 +307,15 @@ authenticated user (Jared).
 mentioned account IDs, then scans subsequent comments from those accounts for approval
 phrases defined in `connector-templates.json` (e.g., "looks good", "verified", "LGTM",
 "KB looks good to me").
+
+**Sibling fallback**: if the branch's ticket has no approval, the script additionally
+checks for a near-identical sibling ticket that does, and flags it on the dashboard (see
+*Wrong-ticket safeguard* above). This catches a wrong Jira ID in the branch name. It is a
+heads-up only — it never changes merge or `--auto` behavior.
+
+> **Jira search endpoint**: sibling detection and `--find-tasks` use the enhanced
+> `/rest/api/3/search/jql` endpoint. The legacy `/rest/api/3/issue/search` endpoint was
+> retired on Jira Cloud and now returns HTTP 404, so don't reintroduce it.
 
 ---
 

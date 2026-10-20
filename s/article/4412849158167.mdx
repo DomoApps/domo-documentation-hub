@@ -31,20 +31,20 @@ After Cloud Integrations is enabled for your account, you can connect your exist
 
 ![The Create a Cloud Integration modal showing all available provider tiles](/images/kb/cloud-integrations-03.png)
 
-| Provider                                                           | Available support                |
-| ------------------------------------------------------------------ | -------------------------------- |
-| [Amazon Athena](/s/article/000005744)                              | Read-only                        |
-| [Amazon Redshift](/s/article/000005312)                            | Read-only                        |
-| [Azure SQL Database](/s/article/000005471)                         | Read-only                        |
-| [Databricks](/s/article/000005289)                                 | Read, Writeback, Pushdown (Beta) |
-| [Dremio](https://domo-support.domo.com/s/article/000005139)        | Read, Writeback                  |
-| [Google BigQuery](/s/article/000005237)                            | Read, Writeback, Pushdown (Beta) |
-| [Lakebase](/s/article/Domo-on-Lakebase)                            | Read-only                        |
-| [MySQL](/s/article/000005451)                                      | Read-only                        |
-| [Oracle ADW](/s/article/000005586)                                 | Read-only                        |
-| [Oracle NetSuite](/s/article/000005586)                            | Read-only                        |
-| [PostgreSQL](/s/article/000005756)                                 | Read-only                        |
-| [Snowflake](https://domo-support.domo.com/s/article/4402322966807) | Read, Writeback, Pushdown        |
+| Provider                                                           | Available support                                  |
+| ------------------------------------------------------------------ | -------------------------------------------------- |
+| [Amazon Athena](/s/article/000005744)                              | Read-only                                          |
+| [Amazon Redshift](/s/article/000005312)                            | Read-only                                          |
+| [Azure SQL Database](/s/article/000005471)                         | Read-only                                          |
+| [Databricks](/s/article/000005289)                                 | Read, Writeback, Pushdown (Beta), Custom calendars |
+| [Dremio](https://domo-support.domo.com/s/article/000005139)        | Read, Writeback                                    |
+| [Google BigQuery](/s/article/000005237)                            | Read, Writeback, Pushdown (Beta)                   |
+| [Lakebase](/s/article/Domo-on-Lakebase)                            | Read-only                                          |
+| [MySQL](/s/article/000005451)                                      | Read-only                                          |
+| [Oracle ADW](/s/article/000005586)                                 | Read-only                                          |
+| [Oracle NetSuite](/s/article/000005586)                            | Read-only                                          |
+| [PostgreSQL](/s/article/000005756)                                 | Read-only                                          |
+| [Snowflake](https://domo-support.domo.com/s/article/4402322966807) | Read, Writeback, Pushdown, Custom calendars        |
 
 ## Set a Default Storage Cloud
 
@@ -57,7 +57,8 @@ You can specify a default storage account for all DataSets. Changing this settin
 
 <Note>
   **Note:** We recommend setting up your Cloud Integrations connections using a
-  service account.
+  service account. A service account is required for writeback, native transform, and
+  data freshness.
 </Note>
 
 1. In the Domo navigation header, select **More** > **Admin**.
@@ -78,23 +79,23 @@ Configure all connected databases to use UTC as their time zone. When a database
 
 The table below compares federated data to Cloud Integrations read and read/write configurations:
 
-| Capability                                                                        | Federated-Direct Query         | Cloud Integrations (Read-Adapter)   | Cloud Integrations (Read/Write Adapter) |
-| --------------------------------------------------------------------------------- | ------------------------------ | ----------------------------------- | --------------------------------------- |
-| Visualize data from existing tables — Create cards, create Dashboards             | ✅                             | ✅                                  | ✅                                      |
-| Visualize on-premise data behind firewall via an agent                            | ✅                             | ❌                                  | ❌                                      |
-| Get updated metadata from source tables — last updated time, updated row count    | ❌                             | ✅ (Every 15 minutes, Configurable) | ✅ (Every 15 minutes, Configurable)     |
-| Card Alerts                                                                       | Scheduled only                 | ✅ (Every 15 minutes, Configurable) | ✅ (Every 15 minutes, Configurable)     |
-| DataSet Alerts                                                                    | ❌                             | ✅ (Every 15 minutes, Configurable) | ✅ (Every 15 minutes, Configurable)     |
-| DataSet Views                                                                     | ✅                             | △ (See note below)                  | △ (See note below)                      |
-| Use data from existing tables in Magic ETL as inputs                              | ❌                             | ✅                                  | ✅                                      |
-| Use data updates from existing tables to trigger other DataFlows                  | ❌                             | ✅                                  | ✅                                      |
-| Custom fiscal calendar for source table data (one per instance)                   | ❌                             | ✅                                  | ✅                                      |
-| Use Domo Connectors, Workbench, SDK, CLI to write to customer-owned EDW/Data Lake | Via writeback connectors       | Via writeback connectors            | ✅ **Native direct rewrite**            |
-| Write Magic ETL output to customer-owned EDW/Data Lake                            | Via writeback connectors       | Via writeback connectors            | ✅ **Native direct rewrite**            |
-| PDP \| Governance                                                                 | ✅                             | ✅                                  | ✅                                      |
-| Domo App Support                                                                  | ✅                             | ✅                                  | ✅                                      |
-| Jupyter Workspace Support                                                         | ✅                             | ✅                                  | ✅                                      |
-| Domo auto-caching of card loads                                                   | Set static TTL on each DataSet | ✅ Default and per-DataSet TTL      | ✅ Default and per-DataSet TTL          |
+| Capability                                                                                                  | Federated-Direct Query         | Cloud Integrations (Read-Adapter)  | Cloud Integrations (Read/Write Adapter) |
+| ----------------------------------------------------------------------------------------------------------- | ------------------------------ | ---------------------------------- | --------------------------------------- |
+| Visualize data from existing tables — Create cards, create Dashboards                                       | ✅                              | ✅                                  | ✅                                       |
+| Visualize on-premise data behind firewall via an agent                                                      | ✅                              | ❌                                  | ❌                                       |
+| Get updated metadata from source tables — last updated time, updated row count                              | ❌                              | ✅ (Every 15 minutes, Configurable) | ✅ (Every 15 minutes, Configurable)      |
+| Card Alerts                                                                                                 | Scheduled only                 | ✅ (Every 15 minutes, Configurable) | ✅ (Every 15 minutes, Configurable)      |
+| DataSet Alerts                                                                                              | ❌                              | ✅ (Every 15 minutes, Configurable) | ✅ (Every 15 minutes, Configurable)      |
+| DataSet Views                                                                                               | ✅                              | △ (See note below)                 | △ (See note below)                      |
+| Use data from existing tables in Magic ETL as inputs                                                        | ❌                              | ✅                                  | ✅                                       |
+| Use data updates from existing tables to trigger other DataFlows                                            | ❌                              | ✅                                  | ✅                                       |
+| Custom fiscal and localized standard calendars (Snowflake and Databricks only, one of each per integration) | ❌                              | ✅                                  | ✅                                       |
+| Use Domo Connectors, Workbench, SDK, CLI to write to customer-owned EDW/Data Lake                           | Via writeback connectors       | Via writeback connectors           | ✅ **Native direct rewrite**             |
+| Write Magic ETL output to customer-owned EDW/Data Lake                                                      | Via writeback connectors       | Via writeback connectors           | ✅ **Native direct rewrite**             |
+| PDP \| Governance                                                                                           | ✅                              | ✅                                  | ✅                                       |
+| Domo App Support                                                                                            | ✅                              | ✅                                  | ✅                                       |
+| Jupyter Workspace Support                                                                                   | ✅                              | ✅                                  | ✅                                       |
+| Domo auto-caching of card loads                                                                             | Set static TTL on each DataSet | ✅ Default and per-DataSet TTL      | ✅ Default and per-DataSet TTL           |
 
 <Note>
   **Note:** DataSet View support for Cloud Integrations DataSets is limited:
@@ -107,11 +108,9 @@ When creating a DataSet View, make sure every DataSet in the join is a Cloud Int
 </Note>
 
 <Note>
-  **Note:** You can register a custom fiscal calendar or a localized standard
-  calendar directly from a Snowflake or Databricks Cloud Integration's
-  settings, without contacting Domo Support. See [Fiscal and Standard Calendar
-  Configuration for Cloud
-  Integrations](/s/article/Fiscal-and-Standard-Calendar-Configuration-for-Cloud-Integrations).
+  **Note:** Snowflake and Databricks Cloud Integrations support custom fiscal
+  calendars and localized standard calendars. To enable them, contact Domo
+  Support. See [Configure Fiscal and Localized Calendars for Snowflake and Databricks Integrations](/s/article/Configure-Fiscal-and-Localized-Calendars-for-Snowflake-and-Databricks-Integrations).
 </Note>
 
 ## Share a Cloud Integrations Account
@@ -239,9 +238,11 @@ Find answers to frequently asked questions about using Cloud Integrations with e
 <Accordion title="How does Domo access my cloud warehouse account?">
   The method Domo uses to access a cloud warehouse account depends on the
   warehouse. We recommend using a system or service account, rather than
-  individual user accounts, to grant Domo access to all cloud warehouses. See
-  the [provider setup guides](#setup) for details on how Domo accesses each
-  provider.
+  individual user accounts, to grant Domo access to all cloud warehouses.
+  Snowflake, Databricks, and Google BigQuery also support read-only integrations
+  where each user signs in with their own credentials through U2M OAuth, with no
+  service account. See the [provider setup guides](#setup) for details on how
+  Domo accesses each provider.
 </Accordion>
 
 <Accordion title="Can I use both 'traditional' Domo and Cloud Integrations in parallel?">
@@ -273,4 +274,4 @@ For a more comprehensive guide to using the DataSet API, see the [DataSet API re
 
 - [Connect Tables in Cloud Integrations](/s/article/Connect-Tables-in-Cloud-Integrations)
 - [Configure Data Freshness and Caching in Cloud Integrations](/s/article/Configure-Data-Freshness-and-Caching-in-Cloud-Integrations)
-- [Fiscal and Standard Calendar Configuration for Cloud Integrations](/s/article/Fiscal-and-Standard-Calendar-Configuration-for-Cloud-Integrations)
+- [Configure Fiscal and Localized Calendars for Snowflake and Databricks Integrations](/s/article/Configure-Fiscal-and-Localized-Calendars-for-Snowflake-and-Databricks-Integrations)

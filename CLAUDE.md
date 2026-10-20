@@ -45,6 +45,8 @@ All articles require two YAML frontmatter fields: `title` and `excerpt` (a singl
 
 Images and video clips must be committed to `images/kb/` on the same branch before an article references them.
 
+Every screenshot and content image must carry detailed, accurate `alt` text — a repository standard for accessibility compliance, LLM readability, and SEO. When authoring or editing an article that includes a screenshot and no alt text is supplied, state the requirement, reference `Domo-KB-Style-Guide.mdx` › **Alt Text Is Required on Every Screenshot**, and ask the author for it; never ship an empty, placeholder, or invented `alt`. Decorative inline icons already named in the prose are the only exception — they use `aria-hidden="true"` instead. See the style guide section for full guidance.
+
 Key Mintlify components in use:
 
 - `<Frame>` — wraps screenshots (auto-sizes to content width)

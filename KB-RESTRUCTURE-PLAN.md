@@ -613,7 +613,7 @@ This is a **hard dependency for the second main-branch sync (Phase 3c, sync #2)*
 
 ### 6.3 Generate Redirect Map
 
-Output a `redirects.json` (or Mintlify-compatible redirect config entries) mapping every old numeric ID to its new slug. This preserves existing bookmarks, external links, and any SEO value accrued on old URLs.
+Output a `redirects.json` (or Mintlify-compatible redirect config entries) mapping every old numeric ID to its new slug. This preserves existing bookmarks, external links, and any SEO value accrued on old URLs. **Every entry must set `"permanent": true`** (308, not the 307 that `permanent: false` produces) — set it explicitly rather than relying on the platform default. See `RESTRUCTURE-PROGRESS.md` § 6.5 for the exact entry shape and the validation requirement.
 
 ### 6.4 Execution Order
 

@@ -1,0 +1,47 @@
+name: Create Release Branch from Tag
+
+# When a new v* release tag is pushed — which is your Friday-evening release
+# cut — this creates a branch named release/<tag> pointing at the exact commit
+# the tag marks. The result is a frozen, named snapshot of every release.
+#
+# Triggered by the tag push itself, so the branch always corresponds to a real
+# tag: there is no schedule and no fallback tag to guess. The tag commit is the
+# base, so the branch is a snapshot of the release, not of main at run time.
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+# Pushing a new branch needs write access to repository contents.
+permissions:
+  contents: write
+
+concurrency:
+  group: create-release-branch-${{ github.ref_name }}
+  cancel-in-progress: false
+
+jobs:
+  create-branch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the tagged commit
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ github.ref_name }}
+
+      - name: Create release/<tag> branch from the tag commit
+        env:
+          TAG_NAME: ${{ github.ref_name }}
+        run: |
+          BRANCH="release/${TAG_NAME}"
+
+          # Idempotent: a re-pushed or re-run tag must not fail the workflow.
+          if git ls-remote --exit-code --heads origin "refs/heads/${BRANCH}" >/dev/null 2>&1; then
+            echo "Branch ${BRANCH} already exists on origin; nothing to do."
+            exit 0
+          fi
+
+          echo "Creating ${BRANCH} from ${TAG_NAME} ($(git rev-parse --short HEAD))"
+          git push origin "HEAD:refs/heads/${BRANCH}"
+          echo "Created ${BRANCH}."

@@ -142,7 +142,8 @@ Verify every Domo product term against the **Domo-Specific Terms and Usage** tab
 - Convert any legacy beta markers (`(Beta)` in titles, ad-hoc notes, `betafeedback@domo.com` references) to the current convention.
 
 ### Images
-- Block screenshots must be wrapped in `<Frame>` containing a native `<img>` with descriptive `alt` text. No inline `width` or `height` on block screenshots.
+- Block screenshots must be wrapped in `<Frame>` containing a native `<img>`. No inline `width` or `height` on block screenshots.
+- **Alt text is required on every screenshot and content image** — detailed and accurate, for accessibility compliance, LLM readability, and SEO (`Domo-KB-Style-Guide.mdx` › **Alt Text Is Required on Every Screenshot**). Flag any image with weak or missing alt text (empty `alt=""`, `"screenshot"`, `"image"`, a filename, a bare `alt-text-here` placeholder, or alt that's too vague to convey what the image shows). Where you can tell what the image shows from the surrounding prose, rewrite the alt to describe it accurately; where you can't, surface it to the user as a fix they must supply — don't invent a description of an image you can't see. Decorative inline icons already named in the prose are the exception (they use `aria-hidden="true"`, not alt).
 - Inline UI glyphs use the Domo icon font: `<i className="icon-{name}" aria-hidden="true" />` for current Domo UI; `<i className="legacy-icon-{name}" aria-hidden="true" />` for release notes / Workbench.
 - Third-party brand logos: Font Awesome brands via `<Icon icon="{slug}" iconType="brands" aria-hidden="true" />` or inline `<svg fill="currentColor">` — not `<img>` (disappears in dark mode).
 - Never `<Frame>` inside a table cell.

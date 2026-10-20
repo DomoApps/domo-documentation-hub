@@ -26,7 +26,7 @@ import { BetaNote } from '/snippets/BetaNote.mdx';
 
 <body>
 
-<Frame>![](/images/kb/<name>.png)</Frame>
+<Frame>![<detailed, accurate description of what this screenshot shows>](/images/kb/<name>.png)</Frame>
 
 Learn more about [<link text>](https://www.domo.com/docs/s/article/<slug-or-id>).
 
@@ -95,7 +95,7 @@ Invariants:
 - <Optional bulleted list of capabilities, benefits, or options>
 - <Keep each bullet a short phrase or single sentence>
 
-<Frame>![](/images/kb/<descriptive_name>.png)</Frame>
+<Frame>![<detailed, accurate description of what this screenshot shows>](/images/kb/<descriptive_name>.png)</Frame>
 
 Learn more about [<natural link text>](https://www.domo.com/docs/s/article/<slug-or-id>).
 ```
@@ -105,7 +105,7 @@ Rules:
 - **Headings** — Title Case; the product/feature name as customers see it. No internal codenames, squad names, or Jira keys. Use imperative/noun phrasing, never a gerund-led sentence.
 - **Body length** — 1–3 short paragraphs. Lead with what the customer can now do and why it helps; keep the mechanism brief. This is an announcement, not a how-to.
 - **Bulleted lists** — use for a set of new options, capabilities, or benefits (see Flex Table, Workflows Annotations examples). Parallel phrasing; no terminal punctuation on fragment bullets unless full sentences.
-- **`<Frame>`** — wrap every screenshot in `<Frame>![](/images/kb/<name>.png)</Frame>` on its own line, placed after the prose/bullets. A feature may have two stacked Frames when it needs two shots (see Connector Execution Details: `_failed` + `_pass`). Omit the Frame only when there is genuinely no usable screenshot — never insert a placeholder, TODO, or broken path.
+- **`<Frame>`** — wrap every screenshot in `<Frame>![<detailed, accurate description of what the screenshot shows>](/images/kb/<name>.png)</Frame>` on its own line, placed after the prose/bullets. **Alt text is required** — detailed and accurate, for accessibility compliance, LLM readability, and SEO (`Domo-KB-Style-Guide.mdx` › **Alt Text Is Required on Every Screenshot**); write it from the feature's internal blurb and what the image shows, never leave the `![]` empty. A feature may have two stacked Frames when it needs two shots (see Connector Execution Details: `_failed` + `_pass`). Omit the Frame only when there is genuinely no usable screenshot — never insert a placeholder, TODO, or broken path.
 - **"Learn more" line** — include only when a **real, published** KB article covers the feature. Format: `Learn more about [descriptive text](URL).` — a single sentence, no bold, ending in a period. If no article exists yet, omit the line entirely (do not invent a slug or link to a generic page just to have a link).
 
 ### Sub-features (parent + children)

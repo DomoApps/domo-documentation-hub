@@ -40,10 +40,10 @@ Apply these exact MDX patterns wherever the corresponding element appears.
 
 **Screenshots**
 ```mdx
-<Frame>![alt text describing the screenshot](/images/kb/image-name.png)</Frame>
+<Frame>![Detailed, accurate description of what this screenshot shows](/images/kb/image-name.png)</Frame>
 ```
 - Wrapping in `<Frame>` is required — it auto-sizes the image to the content column width.
-- Alt text must describe what the screenshot shows, not just "screenshot."
+- **Alt text is required and must be detailed and accurate** — a repository standard for accessibility compliance, LLM readability, and SEO (`Domo-KB-Style-Guide.mdx` › **Alt Text Is Required on Every Screenshot**). The Salesforce conversion typically leaves empty, boilerplate, or filename-based alt text; it must describe what the screenshot actually shows, not just "screenshot." Where the surrounding prose makes the content clear, write accurate alt text; where it doesn't, flag the image to the user as needing alt text rather than inventing a description of an image you can't see.
 
 **Inline icons**
 ```mdx
@@ -203,6 +203,14 @@ The converter emits image-based inline icons (`<img src="/images/kb/...">`). Bot
 - [ ] Inline `<img>` icons that are **third-party brand logos** (AWS, OpenAI, Anthropic, GitHub, …) → these aren't in the Domo icon font, and a monochrome logo image breaks in dark mode. Migrate to a coded icon: `<Icon icon="{slug}" iconType="brands" aria-hidden="true" />` (Font Awesome brands), or an inline `<svg fill="currentColor">` (e.g. a [Simple Icons](https://simpleicons.org) path) when FA's free set lacks the brand. See `Domo-KB-Style-Guide.mdx` › **Brand and Third-Party Logos**.
 - [ ] After migration, confirm the surrounding prose names the icon (e.g. "click the line chart icon \<icon\>"). If it doesn't, rewrite the prose inline rather than reaching for `aria-label`.
 - [ ] Remove any leftover `import { InlineImage } from "/snippets/InlineImage.mdx";` line — the snippet is no longer in use anywhere in the repo. Inline images should always be a native `<img>` with an inline `style` block (see `Domo-KB-Style-Guide.mdx` › **Inline images**).
+
+**Alt text (required on every screenshot)**
+
+The conversion carries over whatever `alt` the Salesforce HTML had — frequently empty, a filename, or boilerplate like "screenshot." Detailed, accurate alt text on every screenshot and content image is a repository standard for accessibility compliance, LLM readability, and SEO (`Domo-KB-Style-Guide.mdx` › **Alt Text Is Required on Every Screenshot**).
+
+- [ ] Every `<Frame>` screenshot and content `<img>` has detailed, accurate alt text — not empty `alt=""`, `"screenshot"`, `"image"`, a filename, or alt too vague to convey what the image shows.
+- [ ] Where the surrounding prose makes an image's content clear, rewrite weak alt text to describe what the screenshot actually shows. Where it isn't clear, flag the image to the user as needing alt text — don't invent a description of an image you can't see.
+- [ ] Decorative inline icons already named in the prose are the exception: they use `aria-hidden="true"`, not alt (covered by the inline-icon migration above).
 
 **Headings**
 - [ ] All headings use the **imperative mood** — never the gerund. **Correct:** "Connect a DataSet" **Incorrect:** "Connecting a DataSet"

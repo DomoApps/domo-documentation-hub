@@ -147,7 +147,7 @@ If the approved change adds, replaces, or removes screenshots or icons, confirm 
 **Screenshots** — offer these options with AskUserQuestion:
 
 1. **User provides new screenshots** — the files must be committed to `images/kb/` on the same branch before the article references them (see `CLAUDE.md` › **MDX Content Conventions**). Ask for the exact filenames.
-2. **Reuse existing screenshots** — an image already in the repo or the source material, with its original `alt` text preserved.
+2. **Reuse existing screenshots** — an image already in the repo or the source material, with its original `alt` text preserved. If the reused image has weak or missing alt text (empty, `"screenshot"`, a filename), upgrade it to detailed, accurate alt text per the requirement below.
 3. **Remove without replacing** — drop a stale screenshot and keep the surrounding text self-sufficient. This is the preferred default when a fresh capture isn't ready; the article should be publishable as-is without the image.
 4. **Placeholders (opt-in only)** — `{/* SCREENSHOT: <what the image should show> */}` markers, **only if the user explicitly asks**. The default is a clean article with no TODO or placeholder markers.
 
@@ -157,7 +157,8 @@ Whichever option is chosen, keep step text self-sufficient — a reader can comp
 
 **Coding reference** (from `Domo-KB-Style-Guide.mdx` › **Screenshots**, **Icons**, **Inline Images**):
 
-- **Block screenshot:** `<Frame><img src="/images/kb/example.png" alt="Descriptive alt text" /></Frame>` — no inline `width`/`height`; never inside a table cell.
+- **Block screenshot:** `<Frame><img src="/images/kb/example.png" alt="Detailed, accurate description of what this screenshot shows" /></Frame>` — no inline `width`/`height`; never inside a table cell.
+- **Alt text (required):** every screenshot or content image you add or swap in must carry detailed, accurate `alt` text — a repository standard for accessibility, LLM readability, and SEO (`Domo-KB-Style-Guide.mdx` › **Alt Text Is Required on Every Screenshot**). Describe what the image actually shows; don't open with "Image of…" and never claim something the image doesn't show. **If the user supplies a new screenshot without alt text** (or only a placeholder), state the requirement, reference the style-guide rule, and ask them for detailed, accurate alt text — don't invent it or ship an empty/placeholder `alt`.
 - **Current Domo UI glyph:** `<i className="icon-{name}" aria-hidden="true" />` (Phosphor). Browse names at [Domo Icons](https://git.empdev.domo.com/pages/Development/DomoIcons/#!/icons/phosphor).
 - **Legacy UI glyph:** `<i className="legacy-icon-{name}" aria-hidden="true" />` — only for release-notes/Workbench surfaces.
 - **Third-party brand logo:** Font Awesome brands `<Icon icon="{slug}" iconType="brands" aria-hidden="true" />`, or inline `<svg fill="currentColor" …>` when the free FA set lacks it. Never a monochrome `<img>` logo — it disappears in dark mode.
@@ -208,7 +209,7 @@ Reuse the existing description verbatim (adjusting only to fit the em-dash forma
 
 ### Image/screenshot swap
 
-Update the `src` attribute in the `<Frame>` or `<img>` tag. Update `alt` text if appropriate. Do not move or delete image files — note to the user that the image asset itself must be updated separately in `images/kb/`.
+Update the `src` attribute in the `<Frame>` or `<img>` tag. A new screenshot shows something different, so update the `alt` text to match what the replacement image actually shows — detailed and accurate, per the required alt-text standard (`Domo-KB-Style-Guide.mdx` › **Alt Text Is Required on Every Screenshot**). If you don't know what the new image shows, ask the user for the alt text rather than leaving the old one or inventing a description. Do not move or delete image files — note to the user that the image asset itself must be updated separately in `images/kb/`.
 
 ### Image-based icon → icon font swap
 
@@ -341,7 +342,8 @@ Editing introduces style drift just as drafting does. After the fact-check pass 
    - **Voice and word choice** — present tense, not "will"; active voice; "after", not causal "once"; no "utilize"; spell out numbers under 10; "allowlist"/"blocklist"; "select", not "click"; Oxford comma; no exclamation points.
    - **Domo terms** — `DataSet`, `DataFlow`, `DataFusion`, `Beast Mode`, `Workbench`; `dashboard` lowercase except at the start of a sentence or with a type; never "Page" (use "dashboard"). Verify any product term against the **Domo-Specific Terms and Usage** table.
    - **Frontmatter** — if the article still has a `description` field, replace it with a single-sentence `excerpt`.
-   - **Images** — block screenshots wrapped in `<Frame>` with a native `<img>` and descriptive `alt`, no inline `width`/`height`; never `<Frame>` inside a table cell. No placeholders unless the user opted in at Step 4.
+   - **Images** — block screenshots wrapped in `<Frame>` with a native `<img>`, no inline `width`/`height`; never `<Frame>` inside a table cell. No placeholders unless the user opted in at Step 4.
+   - **Alt text** — every screenshot or content image you added or swapped carries detailed, accurate `alt` text (not empty, `"screenshot"`, a filename, or a placeholder). If any is missing, stop and ask the user for it per Step 4 — don't invent it. See `Domo-KB-Style-Guide.mdx` › **Alt Text Is Required on Every Screenshot**.
    - **Icons** — confirm the Step 7 upgrade landed: current-UI glyphs use the `icon-{name}` font, `legacy-icon-{name}` only for release-notes/Workbench, brand logos use Font Awesome brands or inline `<svg fill="currentColor">`, and no legacy image-based icon remains for a glyph that exists in the font. Each icon carries `aria-hidden="true"` and is named in the prose.
 4. **Revise in place.** Run `python3 scripts/pad_md_tables.py <file>` on any file whose tables you touched.
 

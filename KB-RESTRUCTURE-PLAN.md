@@ -484,9 +484,28 @@ Follow-on logic by article type:
 - How-to guide → next steps: related how-tos + "Going deeper" reference article
 - Tutorial → next steps: first practical how-to + key reference article
 
-### 5.2 Related Articles
+### 5.2 Related Pages (Mintlify native feature)
 
-**Script approach:** Use excerpt-level term overlap to generate candidate related-article lists. Agent validates and writes the `## Related Articles` sections. Target 3–5 per article.
+Replace the hand-written `## Related Articles` markdown sections with Mintlify's native [Related Pages](https://www.mintlify.com/docs/organize/related-pages) feature. Mintlify renders a "Related topics" block for us; it supports an **automatic** mode (suggestions generated from the content search index by page title) and per-page **manual overrides** via the `related` frontmatter field, and the manual definitions take precedence over the auto suggestions wherever we set them. Ultimately we want curated relations where we've chosen them and sensible auto-fill everywhere else, with no hand-maintained markdown to keep in sync.
+
+Three steps:
+
+1. **Remove the existing `## Related Articles` sections.** ~40 articles currently carry a hand-written `## Related Articles` heading (from Phase 3b upgrades / legacy content); none use the `related:` frontmatter field yet. Bulk pass to strip these sections so the native feature is the single source of related links and nothing renders twice.
+
+2. **Define relations with the `related` frontmatter field.** For as many pages as practical, set explicit relations in frontmatter — an array of root-relative KB paths (and, where useful, Developer Portal paths or external URLs), optionally as `Title: /path` objects to control the label. The excerpt-level term-overlap script keeps its original job of generating candidate lists; the agent validates them and writes the chosen 3–5 into `related:` instead of a markdown section. Use `related: false` to suppress the block on pages where related links aren't wanted (e.g. hub/overview pages that already cluster links). Example:
+   ```yaml
+   related:
+     - /s/article/What-is-Magic-ETL
+     - Create a DataFlow: /s/article/What-is-a-DataFlow
+     - /s/article/Beast-Mode-Window-Functions
+   ```
+
+3. **Enable automatic mode in Mintlify.** Turn on Related Pages in the Mintlify dashboard (General → "Related topics" → Show related topics; choose automatic mode, display limit default 5 / max 10). Automatic mode then covers every article — even those we didn't curate — while our frontmatter `related` definitions override the auto suggestions wherever present.
+
+**Implementation notes:**
+- The dashboard toggle is a one-time Mintlify admin action — **dashboard-only**, with no `docs.json` key, CLI, or public API to set it — so it must be done by hand in app.mintlify.com (General → "Related topics"). Route it to the KB Administrator. Note the `related:` frontmatter is **inert until that toggle is on**: it customizes the block but does not enable the feature, so no related links (curated or automatic) render until the switch is flipped.
+- `related:` paths are internal links, so Phase 6 (slug rename + internal-link updates) must rewrite them alongside body links.
+- This supersedes the per-article `## Related Articles` sections called for in Phase 3b and the Phase 5 Interlinking Agent. `## Next Steps` (5.1) is unaffected — it stays an in-article section.
 
 ### 5.3 Role Pathway Cards on Section Hubs
 
@@ -709,7 +728,7 @@ Articles not appearing in nav after rebuild: add to a `_uncategorized` holding g
 ### Phase 5 Interlinking Agent
 
 - **Input:** Article + catalog entries for topic-adjacent articles
-- **Tool:** Read article, Edit to add Next Steps + Related Articles
+- **Tool:** Read article, Edit to add the `## Next Steps` section (5.1) and the `related:` frontmatter field (5.2); strip any existing `## Related Articles` section
 - **Output:** Edited article
 - **Parallelism:** Batches of 25–50; Edit tool
 

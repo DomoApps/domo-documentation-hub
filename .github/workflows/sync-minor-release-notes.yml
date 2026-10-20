@@ -24,6 +24,11 @@ on:
   schedule:
     - cron: "17 13 * * 5" # Friday, 13:17 UTC (off the contended top-of-hour)
   workflow_dispatch:
+    inputs:
+      seed_ledger:
+        description: "Go-live bootstrap: seed the published ledger from the current DataSet (writes no article, publishes nothing). Run once, before the first real sync."
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -54,19 +59,26 @@ jobs:
           DOMO_MINOR_RN_DATASET_ID: ${{ vars.DOMO_MINOR_RN_DATASET_ID }}
           DOMO_INSTANCE: ${{ vars.DOMO_INSTANCE }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-        run: python scripts/build_minor_release_notes.py
+        run: |
+          if [ "${{ inputs.seed_ledger }}" = "true" ]; then
+            echo "Go-live: seeding the published ledger (no article, nothing published)."
+            python scripts/build_minor_release_notes.py --seed-ledger
+          else
+            python scripts/build_minor_release_notes.py
+          fi
 
       - name: Commit, push, and open/update PR
         id: push
         env:
           GH_TOKEN: ${{ github.token }}
+          SEED: ${{ inputs.seed_ledger }}
         run: |
           set -euo pipefail
           BRANCH="auto/minor-release-notes"
           PATHS="s/article/Current-Minor-Release-Notes.mdx docs.json tracking/minor-release-ledger.json s/article/Minor-Release-*.mdx"
 
           if [ -z "$(git status --porcelain -- $PATHS)" ]; then
-            echo "No new minor release notes this week — nothing to sync."
+            echo "No changes to sync."
             echo "changed=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
@@ -74,9 +86,19 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
+          if [ "$SEED" = "true" ]; then
+            COMMIT_MSG="chore: seed Minor Release Notes ledger ($(date -u +%F))"
+            PR_TITLE="Seed Minor Release Notes ledger"
+            PR_BODY="One-time go-live bootstrap. Marks every current qualifying note (score >= 7) as already published so the first weekly sync emits only notes that appear afterward. No article changes; nothing publishes. Merge this before the first scheduled run."
+          else
+            COMMIT_MSG="chore: sync Minor Release Notes ($(date -u +%F))"
+            PR_TITLE="Sync Minor Release Notes"
+            PR_BODY="Automated draft of this week's Minor Release Notes from the Domo hotfix DataSet. The previous week has been archived under **Archived Minor Release Notes**. Review the drafted bullets (restyled from the source notes) and merge to publish with the Friday release."
+          fi
+
           git checkout -B "$BRANCH"
           git add -- $PATHS
-          git commit -m "chore: sync Minor Release Notes ($(date -u +%F))"
+          git commit -m "$COMMIT_MSG"
           git push --force origin "$BRANCH"
           echo "changed=true" >> "$GITHUB_OUTPUT"
 
@@ -88,8 +110,8 @@ jobs:
             gh pr create \
               --base main \
               --head "$BRANCH" \
-              --title "Sync Minor Release Notes" \
-              --body "Automated draft of this week's Minor Release Notes from the Domo hotfix DataSet. The previous week has been archived under **Archived Minor Release Notes**. Review the drafted bullets (restyled from the source notes) and merge to publish with the Friday release."
+              --title "$PR_TITLE" \
+              --body "$PR_BODY"
             PR_NUMBER=$(gh pr list --head "$BRANCH" --state open --json number --jq '.[0].number // empty')
           fi
           echo "pr_number=$PR_NUMBER" >> "$GITHUB_OUTPUT"

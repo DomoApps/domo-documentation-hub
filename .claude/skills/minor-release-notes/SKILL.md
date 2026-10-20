@@ -80,15 +80,28 @@ python3 scripts/archive_minor_release_notes.py --dry-run
 
 ## Go-live procedure (one time, by the KB Administrator)
 
+Seeding runs **through CI** off the existing `DOMO_DEVELOPER_TOKEN` repo secret, so the
+token never has to live on anyone's machine. GitHub Actions secrets are write-only — a
+local script can't read them back — which is why the seed is a `workflow_dispatch` option
+rather than a local command.
+
 1. Mint a Domo developer access token (Admin → Authentication → Access Tokens).
 2. Add repo secret `DOMO_DEVELOPER_TOKEN` and `ANTHROPIC_API_KEY`; add repo variable
    `DOMO_MINOR_RN_DATASET_ID` = `1aa127f4-edf6-4294-b509-186645a9e15b` (and `DOMO_INSTANCE`
    if not `domo.domo.com`).
-3. **Seed the ledger** so the first automated run doesn't republish the entire backlog:
-   `python3 scripts/build_minor_release_notes.py --seed-ledger` (needs the token, or
-   `MINOR_RN_CSV`). This marks every current note as already published; the first Friday
-   run then emits only notes that appear afterward. Commit the seeded ledger.
-4. Trigger the workflow manually (`workflow_dispatch`) and review the opened PR + preview.
+3. **Merge this workflow to `main` first** — `workflow_dispatch` and `schedule` only work
+   for workflows on the default branch.
+4. **Seed the ledger** so the first automated run doesn't republish the entire backlog:
+   Actions → *Sync Minor Release Notes* → **Run workflow**, with **`seed_ledger` checked**.
+   This marks every current note as already published and opens a ledger-only PR ("Seed
+   Minor Release Notes ledger"); merge it. The seed writes no article and publishes nothing.
+   (The equivalent local command, if ever seeding off a token/`MINOR_RN_CSV` in env, is
+   `python3 scripts/build_minor_release_notes.py --seed-ledger`.)
+5. **First real run:** Actions → **Run workflow** with `seed_ledger` unchecked (or wait for
+   the Friday cron), then review the opened PR + preview.
+
+**Safety guard:** a normal (non-seed, non-`--dry-run`) build aborts if the ledger is empty,
+so forgetting to seed can never dump the whole backlog into one week.
 
 ## Notes
 

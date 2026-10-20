@@ -382,6 +382,12 @@ def build(use_llm, run_date, dry_run):
     log(f"{len(rows)} unique notes after dedup.")
 
     ledger = load_ledger()
+    if not ledger and not dry_run:
+        raise SystemExit(
+            "Ledger is empty. Seed it first with --seed-ledger (go-live bootstrap); "
+            "a normal run against an empty ledger would publish the entire backlog "
+            "at once. (Use --dry-run to preview selection against an empty ledger.)"
+        )
     selected = select_week(rows, ledger, run_date)
     log(f"{len(selected)} notes selected for the current week "
         f"(run date {run_date.isoformat()}, {len(ledger)} already published).")

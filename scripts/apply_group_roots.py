@@ -10,10 +10,16 @@ group's child list (consolidation).
 Two jobs:
   1. PROPOSE a group -> root-article map by scanning the English Knowledge Base
      tab of docs.json for each group's overview-type child.
-  2. APPLY that map additively to docs.json: set "root" on the matching group
-     node and drop the root page from its "pages" list. Nothing else in the nav
-     is touched (safe to run mid-restructure, unlike the full build_docs_nav.py
-     rebuild).
+  2. RECONCILE docs.json to that map: set "root" on the matching group node and
+     drop the root page from its "pages" list; conversely, un-root any group
+     that should no longer have one (restoring its Overview as the first child).
+     Nothing else in the nav is touched (safe to run mid-restructure, unlike the
+     full build_docs_nav.py rebuild).
+
+Scope: feature SUB-GROUPS only. Top-level pillar groups are deliberately left
+without a root — each pillar keeps its "<Pillar> Overview" article as the first
+child under the pillar. (Pillars read as broad landing sections; rooting them
+hid the overview behind a click, which we didn't want.)
 
 Resolution rule (per group, among its DIRECT string children):
   a. Prefer a modern restructure overview slug: "What-is-*" or "*-Overview"
@@ -118,43 +124,66 @@ def main():
     for g in kb.get("pages", []):
         walk(g, [], groups)
 
-    resolved, skipped_empty, no_root = {}, [], []
+    # Compute the DESIRED root for every group (independent of current state),
+    # then reconcile docs.json to it — so this both applies new roots and
+    # un-roots groups that should no longer have one (e.g. the pillars).
+    desired, skipped_empty, no_root = {}, [], []
     for key, node, str_children in groups:
-        # Idempotent: an existing root is authoritative — leave it untouched so
-        # re-runs (and a second Phase-7 run) are no-ops rather than promoting a
-        # second overview from the now-rootless child list.
-        if node.get("root"):
-            resolved[key] = node["root"]
+        is_pillar = " > " not in key  # top-level pillar node
+        if is_pillar:
+            # Pillars keep their Overview as the first child, not a root page.
+            desired[key] = None
+            no_root.append(key)
             continue
         # Archive is a holding area, not a curated pillar — never root its groups.
         if key.split(" > ", 1)[0] == "Archive":
+            desired[key] = None
             no_root.append(key)
             continue
         if key in overrides:
-            root = overrides[key] or None  # explicit null/"" => force none
-        else:
-            root = resolve_root(node["group"], str_children)
+            desired[key] = overrides[key] or None  # explicit null/"" => force none
+            if not desired[key]:
+                no_root.append(key)
+            continue
+        # An existing sub-group root was validly chosen on a prior run — keep it
+        # (its overview now lives in `root`, so re-resolving from children would
+        # pick a different candidate). This is what makes re-runs idempotent.
+        if node.get("root"):
+            desired[key] = node["root"]
+            continue
+        root = resolve_root(node["group"], str_children)
         if not root:
+            desired[key] = None
             no_root.append(key)
             continue
         # Guard: don't empty the group.
         remaining = [p for p in node.get("pages", []) if not (isinstance(p, str) and p == root)]
         if not remaining:
             skipped_empty.append((key, root))
+            desired[key] = None
             continue
-        resolved[key] = root
+        desired[key] = root
+
+    resolved = {k: v for k, v in desired.items() if v}
 
     if as_json:
         print(json.dumps(resolved, indent=2, ensure_ascii=False))
         return
 
-    print(f"Groups scanned: {len(groups)}   roots resolved: {len(resolved)}")
-    print(f"No overview child (left rootless): {len(no_root)}")
+    gmap = {k: n for k, n, _ in groups}
+    deroots = [k for k, n in gmap.items() if n.get("root") and n["root"] != desired.get(k)]
+
+    print(f"Groups scanned: {len(groups)}   sub-group roots resolved: {len(resolved)}")
+    print(f"Pillars + rootless groups left without a root: {len(no_root)}")
+    if deroots:
+        print(f"Will UN-ROOT (restore Overview as first child): {len(deroots)}")
+        for k in sorted(deroots):
+            print(f"    ~ {k}  (was root {gmap[k]['root']})")
     if skipped_empty:
         print(f"SKIPPED (would empty group): {len(skipped_empty)}")
         for k, r in skipped_empty:
             print(f"    ! {k}  ->  {r}")
-    print("\n--- Resolved root map ---")
+    print("\n--- Resolved sub-group root map ---")
     for key in sorted(resolved):
         t = title_of(resolved[key])
         print(f"  {key}\n      root = {resolved[key]}  ({t!r})")
@@ -164,17 +193,28 @@ def main():
         return
 
     changed = 0
-    gmap = {k: n for k, n, _ in groups}
-    for key, root in resolved.items():
-        node = gmap[key]
-        node["pages"] = [p for p in node.get("pages", []) if not (isinstance(p, str) and p == root)]
-        node["root"] = root
+    for key, node, _ in groups:
+        current = node.get("root")
+        want = desired.get(key)
+        if current == want:
+            continue
+        # Un-root: drop the root key and restore that page as the FIRST child.
+        if current and current != want:
+            del node["root"]
+            pages = node.get("pages", [])
+            if current not in [p for p in pages if isinstance(p, str)]:
+                pages.insert(0, current)
+            node["pages"] = pages
+        # Apply the desired root (remove it from the child list).
+        if want:
+            node["root"] = want
+            node["pages"] = [p for p in node.get("pages", []) if not (isinstance(p, str) and p == want)]
         changed += 1
 
     with open(DOCS_JSON, "w", encoding="utf-8") as f:
         json.dump(docs, f, indent=2, ensure_ascii=False)
         f.write("\n")
-    print(f"\nApplied {changed} root pages. Wrote {DOCS_JSON}.")
+    print(f"\nReconciled {changed} group(s). Wrote {DOCS_JSON}.")
 
 
 if __name__ == "__main__":

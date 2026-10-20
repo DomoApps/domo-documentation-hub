@@ -85,6 +85,11 @@ Remove these from the pandoc output:
 - Inline `style=` attributes on elements
 - Blank `&nbsp;` paragraphs
 
+### Images and alt text
+- Wrap block screenshots in `<Frame>` with a native `<img>`; use an inline `<img>` inside table cells (never `<Frame>` there).
+- **Alt text is required on every screenshot and content image** — detailed and accurate, for accessibility compliance, LLM readability, and SEO (`Domo-KB-Style-Guide.mdx` › **Alt Text Is Required on Every Screenshot**). Pandoc carries over whatever `alt` the source HTML had, which is frequently empty, a filename, or boilerplate like "screenshot." Do not pass that through: where the surrounding prose makes the image's content clear, write accurate alt text describing what it shows; where it doesn't, flag the image to the user as needing alt text rather than inventing a description of an image you can't see. Never leave an empty `alt=""`.
+- Decorative inline icons already named in the prose are the exception — they use `aria-hidden="true"` instead of alt (see the style guide's **Icons** section).
+
 ### Tables
 - Use pipe tables. Pad cells with spaces so column pipes align vertically across all rows.
 - Use `<br/>` to separate multiple lines of plain text within a cell. Do not use `<br/>` between callout components.

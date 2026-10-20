@@ -583,6 +583,21 @@ These portal→KB links are the highest-priority targets for adding the reverse 
 
 **Output:** `scripts/output/portal-kb-crosslinks.json`
 
+### 5.6 Normalize legacy KB full-URL links to root-relative paths
+
+Many migrated articles link to KB content with the **legacy absolute host** instead of a root-relative path — ~1,550 `https://domo-support.domo.com/s/article/...` links today, plus smaller counts on other retired KB hosts (`knowledge.domo.com`, `domohelp.domo.com`, `wiki.domo.com`). These bypass in-site navigation (Mintlify treats them as external links — no client-side nav), rot if the legacy host is ever retired, and dodge the Phase 6 slug/redirect machinery. Convert each legacy KB URL to its root-relative equivalent:
+
+- `https?://domo-support.domo.com/s/article/<ID>[?query][#anchor]` → `/s/article/<ID>` (keep any `#anchor`; drop tracking query params)
+- `https?://domo-support.domo.com/s/topic/<sf-id>/<slug>` → the current `/s/topic/<file>` (a lookup, not mechanical — the legacy path carries a Salesforce topic ID; resolve by slug)
+- bare `.../s/` or `.../` (KB home) → the KB landing path
+- same treatment for the other retired KB hosts wherever the target resolves to a current article
+
+**Scope guard — do NOT relativize genuinely external Domo hosts:** `developer.domo.com`, `community-forums.domo.com`, `university.domo.com` / `learndomo.domo.com`, `embed.domo.com`, `oauth.domo.com`, `app.domo.com`, `www.domo.com` (marketing), `*.domo.com` customer instances, etc. Only hosts serving the SAME content now published on this Mintlify site become relative. When a legacy URL's target can't be resolved to a current article (merged/retired/deleted in Phase 4), flag it for review rather than guess.
+
+**Ordering:** run this as a Phase 5 pre-pass, before 5.1–5.2. Because it leaves `/s/article/<numeric-ID>` paths behind, Phase 6.6 then rewrites those IDs to final slugs automatically — no special-casing. Script-generated, agent/spot-checked; log converted/flagged counts per host in `RESTRUCTURE-MANIFEST.md`.
+
+**Output:** edited article files + a per-host conversion/flag report
+
 ---
 
 ## Phase 6: Rename to Slugs (Migration Script)

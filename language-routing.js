@@ -31,7 +31,13 @@
     location.replace(path + (search ? "?" + search : "") + location.hash);
   }
 
-  async function route() {
+  async function isMissing(initialLoad) {
+    const status = initialLoad && performance.getEntriesByType("navigation")[0]?.responseStatus;
+    if (status) return status === 404;
+    return !(await exists(location.pathname));
+  }
+
+  async function route(initialLoad) {
     const params = new URLSearchParams(location.search);
     const requested = (params.get("language") || "").toLowerCase();
     const { lang, rest } = parse(location.pathname);
@@ -44,12 +50,11 @@
       }
     }
 
-    if (lang && !(await exists(location.pathname))) {
-      const english = pathFor("", rest);
-      if (await exists(english)) go(english, params);
+    if (lang && (await isMissing(initialLoad))) {
+      go(pathFor("", rest), params);
     }
   }
 
-  route();
-  window.addEventListener("mintlify:navigate", route);
+  route(true);
+  window.addEventListener("mintlify:navigate", () => route(false));
 })();

@@ -1,0 +1,143 @@
+name: Connector Review Daily
+
+# Runs the connector-review skill unattended every morning (~5-6am PST) via Claude Code
+# headless. The skill matches open connector PRs to their Jira tickets and, for each PR the
+# secondary approver has already signed off on in Jira, runs the site-safety gate
+# (scripts/connector-review-gate.py) in place of Jared's manual GitHub approval: renderable
+# MDX, repo + docs.json integrity, no new broken links, no case collisions, alt text on
+# added images. If the gate passes, the PR is auto-revised for style, approved, merged, and
+# its Jira ticket is commented + closed. Each run appends a note to the skill's run-log and
+# posts to the tracking GitHub issue. Nothing is fact-checked — this is code and rendering
+# only. Content approval still comes from the Jira secondary approver.
+#
+# Required repo secrets (Settings -> Secrets and variables -> Actions -> Secrets):
+#   ANTHROPIC_API_KEY      Anthropic API key for the headless Claude run (already present)
+#   JIRA_EMAIL             Domo Atlassian account email (Jira Basic auth)
+#   JIRA_API_TOKEN         Jira API token (https://id.atlassian.com/manage-profile/security/api-tokens)
+#   CONNECTOR_REVIEW_PAT   Admin GitHub PAT (Jared's) with `repo` scope. Exported as GH_TOKEN
+#                          so `gh` acts as Jared and merges past the `main` ruleset via the
+#                          Admin-role bypass, exactly as a local run does. If the org enforces
+#                          SSO, authorize the token for DomoApps.
+
+on:
+  schedule:
+    - cron: "11 13 * * *" # 13:11 UTC = ~5:11am PST / 6:11am PDT (off the contended top-of-hour)
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Preview only: run the dashboard + gate, make no merges, comments, or pushes."
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+concurrency:
+  group: connector-review-daily
+  cancel-in-progress: false
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          # Full history: the gate's broken-link check builds a worktree at the base ref.
+          fetch-depth: 0
+          # Admin PAT so merges and the run-log/holds push to `main` act as Jared and
+          # bypass the branch ruleset.
+          token: ${{ secrets.CONNECTOR_REVIEW_PAT }}
+
+      - name: Make the base branch available
+        run: git fetch --no-tags origin main
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Enable Corepack (Yarn 4)
+        run: corepack enable
+
+      - name: Install project dependencies (remark toolchain)
+        run: yarn install --immutable
+
+      - name: Install the Mintlify CLI (broken-link gate)
+        run: npm install -g mint
+        env:
+          PUPPETEER_SKIP_DOWNLOAD: "1"
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Claude Code CLI
+        run: npm install -g @anthropic-ai/claude-code
+
+      - name: Configure git identity
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Run the automated connector review
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          # gh and git read GH_TOKEN; this is Jared's admin PAT.
+          GH_TOKEN: ${{ secrets.CONNECTOR_REVIEW_PAT }}
+          JIRA_EMAIL: ${{ secrets.JIRA_EMAIL }}
+          JIRA_API_TOKEN: ${{ secrets.JIRA_API_TOKEN }}
+          DRY_RUN: ${{ github.event.inputs.dry_run }}
+        run: |
+          set -euo pipefail
+
+          if [ "${DRY_RUN:-false}" = "true" ]; then
+            MODE_NOTE="This is a DRY RUN. Use scripts/connector-review.py --dry-run for the dashboard, run the gate read-only on any merge candidates, and DO NOT merge, approve, comment on Jira, push to any branch, write the run-log, or post the issue. Instead, print a summary to stdout of exactly what you WOULD have done and why."
+          else
+            MODE_NOTE="This is a live run. Take the actions described below."
+          fi
+
+          PROMPT=$(cat <<EOF
+          You are running unattended in CI with no human to ask. Perform the automated daily
+          connector review by invoking the connector-review skill and following its
+          "Automated Daily Review (CI)" section exactly.
+
+          ${MODE_NOTE}
+
+          Steps:
+          1. Invoke the connector-review skill (it is in .claude/skills/connector-review).
+          2. Run the dashboard (python3 scripts/connector-review.py) and read every PR's state.
+          3. For each ticket in a mergeable state (ready-to-merge, awaiting-jared,
+             publish-request, escalation): check out the PR branch, apply the revise-submission
+             style/MDX fixes to the changed s/article, s/topic, and portal .mdx files, run
+             scripts/pad_md_tables.py on any with tables, commit and push those fixes to the PR
+             branch, then run python3 scripts/connector-review-gate.py. If the gate exits 0,
+             run python3 scripts/connector-review.py --merge <DOMO-id>. If the gate exits
+             non-zero, DO NOT merge — leave the PR open and record the exact failing checks.
+             Return to main (git checkout main) before the next candidate.
+          4. Post the next follow-up for stale-1/stale-2 tickets (--follow-up <DOMO-id>).
+          5. Run python3 scripts/connector-review.py --check-holds.
+          6. Defer migration-request tickets to manual (do not act); leave changes-requested
+             and on-hold tickets untouched.
+          7. While on main, append a dated entry to .claude/skills/connector-review/run-log.md
+             describing what you did for every candidate AND WHY (which gate checks passed or
+             failed, what you merged, followed up on, or skipped, and any holds activity). Keep
+             the newest entry directly below the "NEW ENTRIES GO DIRECTLY BELOW THIS LINE"
+             marker. Then commit .claude/skills/connector-review/run-log.md and
+             tracking/connector-on-hold.json (only if changed) and push to main.
+          8. Find-or-create the GitHub issue labeled "connector-review-log" (create it with that
+             label and a clear title like "Connector review — daily automation log" if none
+             exists) and post the same summary as a dated comment with gh issue comment.
+
+          Be conservative: when anything is ambiguous or a gate errors (exit 2), skip the merge
+          and record it for manual review rather than guessing. Never fact-check content.
+          EOF
+          )
+
+          # --dangerously-skip-permissions runs non-interactively and allows all tools,
+          # which this trusted CI automation needs (git, gh, python, remark, editing files).
+          claude -p "$PROMPT" --dangerously-skip-permissions

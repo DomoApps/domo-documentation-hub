@@ -1,8 +1,10 @@
 # Connector Review automation — status & re-enable checklist
 
-**Status as of 2026-10-20 (PT) / 2026-10-21 UTC:** built and merged, but the daily
-**schedule is intentionally DISABLED** pending a network fix. Manual dispatch still works.
-This file is the single place to resume from once the network issue is resolved.
+**Status as of 2026-10-20 (PT) / 2026-10-21 UTC:** built and merged, but the whole workflow
+is intentionally **DISABLED** pending a network fix. It was turned off at the platform level
+with `gh workflow disable "Connector Review Daily"` (state: `disabled_manually`), so **neither
+the daily schedule nor manual dispatch fires** until it is re-enabled. This file is the single
+place to resume from once the network issue is resolved.
 
 ---
 
@@ -17,7 +19,7 @@ Shipped in **PR #647** (merged to `main` 2026-10-21 00:31 UTC):
 
 | File | Role |
 |---|---|
-| `.github/workflows/connector-review-daily.yml` | The Action. Installs the toolchain, runs the skill headless via `claude -p`. Schedule now commented out; `workflow_dispatch` (with a `dry_run` toggle) still active. |
+| `.github/workflows/connector-review-daily.yml` | The Action. Installs the toolchain, runs the skill headless via `claude -p`. Has a `dry_run` toggle on `workflow_dispatch`. (Currently disabled at the platform level — see Status.) |
 | `scripts/connector-review-gate.py` | Deterministic site-safety gate for one PR branch. Exits 0 (pass) / 1 (fail → don't merge) / 2 (couldn't run). |
 | `scripts/test-connector-review-gate.py` | No-framework tests for the gate (`python3 scripts/test-connector-review-gate.py`). |
 | `.claude/skills/connector-review/SKILL.md` | New **"Automated Daily Review (CI)"** section; guardrails qualified — interactive runs still ask Jared, CI mode uses the gate. |
@@ -56,6 +58,9 @@ Jira comments, no pushes happen on failure.
 
 ## Re-enable checklist (do this once the network fix is in)
 
+0. **Turn the workflow back on.** It is currently disabled at the platform level, so nothing —
+   not even manual dispatch — runs until you enable it:
+   `gh workflow enable "Connector Review Daily"`.
 1. **Set the runner.** The fix most likely means running on a **self-hosted runner on the
    authorized network**. In `.github/workflows/connector-review-daily.yml`, change
    `runs-on: ubuntu-latest` to the authorized self-hosted runner label (confirm the label with
@@ -69,12 +74,19 @@ Jira comments, no pushes happen on failure.
 4. **One live run, watched.** Dispatch with `dry_run` unchecked and watch a real candidate end to
    end: branch checked out → style auto-fix pushed → gate pass → approve + merge → Jira comment +
    close → run-log entry + `connector-review-log` issue comment.
-5. **Re-enable the schedule.** Uncomment the `schedule:`/`cron` lines in the workflow `on:` block
-   (restores daily ~5:11am PST / 6:11am PDT). Because `main` is protected, land this via a PR and
-   merge with admin privileges (`gh pr merge <n> --merge --admin`) or a normal approval.
+5. **Re-enable the schedule.** The daily `cron` is still present (active) in the workflow on
+   `main`, so once step 0 has enabled the workflow the schedule resumes on its own. (If you first
+   merge PR #648 below — which comments the `cron` out in-file as a second safety — you'll then
+   need to *uncomment* those two lines to restore the daily run. Because `main` is protected, land
+   that via a PR merged with admin privileges or a normal approval.)
 
-## Pointers
+## Where things live
 
-- Full design & rationale: the approved plan and PR #647 description.
+- **Active control:** the platform disable (`disabled_manually`) is what's keeping the automation
+  off right now. Toggle it with `gh workflow disable/enable "Connector Review Daily"`.
+- **PR #647** (merged): the automation itself — workflow, gate, tests, skill section, run-log.
+- **PR #648** (OPEN, not merged): comments the in-file `cron` out as a second safety, keeps the
+  preflight probe, and adds this status note to `main`. It was left open deliberately — merge it
+  if you want these on `main`, or close it and rely on the platform disable alone.
+- Diagnostic branch with the preflight probe + this note: `jared.peterson/connector-review-auth-fix`.
 - Gate internals and the per-candidate automated flow: `SKILL.md` › **Automated Daily Review (CI)**.
-- Diagnostic branch with the preflight probe: `jared.peterson/connector-review-auth-fix`.

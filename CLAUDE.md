@@ -204,6 +204,8 @@ All localization assets live in **`localization/`**. Translation is **determinis
 
 Workflow: the `localize` skill runs the `localization-retrospective` skill first (Step 0), loads the glossary, applies it during translation, verifies with `scripts/check-glossary.py` in QA, and snapshots its output for **every** language. Once human-corrected articles return as merged PRs, `localization-retrospective` diffs them against the snapshots and writes term-level corrections back into the glossaries. Regenerate the glossaries with `scripts/build-localization-glossary.py` (it preserves `retrospective:*` and `manual*` rows).
 
+**English fallback for untranslated articles.** `language-routing.js` (repo root; Mintlify loads every `.js` file in the content directory on every page) sends a reader who lands on a `/{de,es,fr,ja}/...` page that 404s to the English page at the same path, and redirects `?language=<code>` (region suffixes like `en_US` ignored, `jp` accepted) to the localized article when it exists. That is why localized articles link to `/{lang}/s/article/<slug>` even when the translation doesn't exist yet, and why `check-broken-links.py` doesn't report those links (it still flags a `#anchor` on them). `docs.json` sets `errors.404.redirect: false` so Mintlify shows the 404 page instead of sending readers home before the script runs. `docs.json` redirects can't do this: they apply even when the localized page exists.
+
 ## Finding Existing Articles
 
 To find an article by title keyword, search frontmatter across all KB articles:

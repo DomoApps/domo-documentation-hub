@@ -20,8 +20,13 @@ name: Connector Review Daily
 #                          SSO, authorize the token for DomoApps.
 
 on:
-  schedule:
-    - cron: "11 13 * * *" # 13:11 UTC = ~5:11am PST / 6:11am PDT (off the contended top-of-hour)
+  # SCHEDULE DISABLED 2026-10-20 until the Action can reach the Anthropic API from an
+  # authorized network (the GitHub-hosted runner currently cannot — the headless Claude
+  # step fails with "Invalid API key"). A network fix is in progress with a dev team.
+  # See .claude/skills/connector-review/AUTOMATION-STATUS.md for the full picture and the
+  # re-enable checklist. To re-enable daily runs, uncomment the two lines below:
+  # schedule:
+  #   - cron: "11 13 * * *" # 13:11 UTC = ~5:11am PST / 6:11am PDT (off the contended top-of-hour)
   workflow_dispatch:
     inputs:
       dry_run:
@@ -94,6 +99,15 @@ jobs:
           DRY_RUN: ${{ github.event.inputs.dry_run }}
         run: |
           set -euo pipefail
+
+          # Preflight: confirm the Anthropic API key is accepted (prints HTTP status; never
+          # fails the job). 200 = key valid; 401 = key invalid/expired/wrong org.
+          PROBE=$(curl -s -o /tmp/anthropic_probe.json -w '%{http_code}' \
+            https://api.anthropic.com/v1/models \
+            -H "x-api-key: ${ANTHROPIC_API_KEY}" \
+            -H "anthropic-version: 2023-06-01" || echo "curl-failed")
+          echo "Anthropic API key preflight (GET /v1/models): HTTP ${PROBE}"
+          head -c 300 /tmp/anthropic_probe.json 2>/dev/null || true; echo
 
           if [ "${DRY_RUN:-false}" = "true" ]; then
             MODE_NOTE="This is a DRY RUN. Use scripts/connector-review.py --dry-run for the dashboard, run the gate read-only on any merge candidates, and DO NOT merge, approve, comment on Jira, push to any branch, write the run-log, or post the issue. Instead, print a summary to stdout of exactly what you WOULD have done and why."

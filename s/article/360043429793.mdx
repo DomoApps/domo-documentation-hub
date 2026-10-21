@@ -104,7 +104,10 @@ By default, when a supported chart (such as a Line or Bar chart) uses date data,
 
 For multi-level and trellised date axes, use the **Trellis/Tiered Date Settings** category (for example, **Tiered Date Levels** for up to three date tiers).
 
-{/* [pm-input] Chris Wright — confirm and document the following date-axis behaviors reported by community users: (1) the dashboard/card time-scale control (Default vs. Day) and how it relates to Never Use Time Scale; (2) why DATE fields are coerced to datetime on the axis and using DATE()/DATE_FORMAT in Beast Mode to force a pure date; (3) how Graph By interacts with filtering to produce wrong-date results; (4) filtering out the incomplete current month, and why an ELSE 0 in Beast Mode creates spurious zero points versus returning NULL; (5) adding a vertical divider line between actual and forecast data; (6) Tiered/Trellis Date Settings limits with custom fiscal calendars and on bullet charts. Synthesized from community forum reports; needs confirmation. */}
+When a date axis does not behave as expected, two Beast Mode adjustments are common:
+
+- **Force a pure date on the axis.** Domo may treat a DATE field as a datetime on the axis, which can split or mislabel values. To plot a clean date, convert the field in a Beast Mode calculation with `DATE()` or `DATE_FORMAT`, then graph that field.
+- **Avoid false zero points.** When a Beast Mode returns `ELSE 0`, the chart plots a zero for every period that has no matching data, creating misleading dips. Return `NULL` instead of `0` so those periods drop out of the series. For the same reason, filter out an incomplete current period (such as the current month) rather than letting it render as an artificially low point.
 
 ## Add Goal, Target, and Average Lines
 

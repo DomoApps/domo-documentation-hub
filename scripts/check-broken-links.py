@@ -31,6 +31,12 @@ works in production while the CLI calls it broken. Diffing cannot fix either,
 so bare targets are read out of the changed files directly and judged on whether
 they land on a page in the same folder.
 
+Links to /{lang}/s/article/ pages with no translation are dropped from the
+CLI's findings, because language-routing.js sends a reader who lands on one to
+the English article. Their anchors are read out of the changed files instead:
+a fragment that matches the English headings today stops matching once the
+article is translated.
+
 Usage:
   scripts/check-broken-links.py --base origin/main   # gate: new findings only
   scripts/check-broken-links.py --all                # every finding (triage)
@@ -185,8 +191,8 @@ TARGETS = re.compile(r"\]\(\s*([^)\s]+)|\b(?:href|src)=\"([^\"]*)\"")
 SCHEME = re.compile(r"^[a-zA-Z][a-zA-Z0-9+.-]*:")
 
 
-def bare_path_links(path: str) -> list[tuple[int, str]]:
-    """(line, target) for each bare-path internal link in `path`."""
+def link_targets(path: str) -> list[tuple[int, str]]:
+    """(line, target) for each link in `path`, ignoring code."""
     try:
         with open(path, encoding="utf-8", errors="replace") as fh:
             text = fh.read()
@@ -197,10 +203,15 @@ def bare_path_links(path: str) -> list[tuple[int, str]]:
     hits = []
     for m in TARGETS.finditer(text):
         t = (m.group(1) or m.group(2) or "").strip()
-        if not t or t.startswith(("/", "#", "./", "../")) or SCHEME.match(t):
-            continue
-        hits.append((text.count("\n", 0, m.start()) + 1, t))
+        if t:
+            hits.append((text.count("\n", 0, m.start()) + 1, t))
     return hits
+
+
+def bare_path_links(path: str) -> list[tuple[int, str]]:
+    """(line, target) for each bare-path internal link in `path`."""
+    return [(ln, t) for ln, t in link_targets(path)
+            if not t.startswith(("/", "#", "./", "../")) and not SCHEME.match(t)]
 
 
 def changed_mdx(base: str) -> list[str]:
@@ -260,6 +271,61 @@ def check_bare_paths(files: list[str]) -> int:
     return 1 if broken else 0
 
 
+# --- localized links that fall back to English -----------------------------
+
+LOCALIZED_ARTICLE = re.compile(r"^/(de|es|fr|ja)/s/article/([^#?]+)")
+
+
+def page_exists(root: str, *parts: str) -> bool:
+    path = os.path.join(root, *parts)
+    return any(os.path.exists(path + ext) for ext in (".mdx", ".md"))
+
+
+def falls_back_to_english(target: str, root: str = ".") -> bool:
+    """True for a /{lang}/s/article/ link with no translation but an English page.
+
+    language-routing.js sends a reader who lands on one of these to the English
+    article, so the link works even though the CLI reports the page as missing.
+    """
+    m = LOCALIZED_ARTICLE.match(target)
+    if not m:
+        return False
+    slug = m.group(2).rstrip("/")
+    return (not page_exists(root, m.group(1), "s", "article", slug)
+            and page_exists(root, "s", "article", slug))
+
+
+def drop_english_fallbacks(found: collections.Counter,
+                           root: str = ".") -> collections.Counter:
+    return collections.Counter({k: n for k, n in found.items()
+                                if not falls_back_to_english(k[1], root)})
+
+
+def anchored_untranslated_links(path: str, root: str = ".") -> list[tuple[int, str]]:
+    """(line, target) for each anchored link that falls back to English."""
+    return [(ln, t) for ln, t in link_targets(path)
+            if "#" in t and falls_back_to_english(t, root)]
+
+
+def check_fallback_anchors(files: list[str], root: str = ".") -> int:
+    """Fail on anchors on localized links that fall back to English.
+
+    The reader lands on the English article, where the anchor may well match
+    today. Once the target is translated its headings are localized, so the
+    anchor stops matching and the break lands in someone else's pull request.
+    """
+    found = [(f, ln, t) for f in files
+             for ln, t in anchored_untranslated_links(f, root)]
+    if found:
+        print(f"\n{len(found)} localized link(s) with an anchor on an article "
+              f"that has no translation yet. Readers are sent to the English "
+              f"article for now, but the anchor will not match the headings "
+              f"once the article is translated. Drop the anchor:\n")
+        for f, ln, t in found:
+            print(f"  {f}:{ln}  ({t})  ->  ({t.split('#', 1)[0]})")
+    return 1 if found else 0
+
+
 # --- entry point -----------------------------------------------------------
 
 def gate(base: str) -> int:
@@ -283,6 +349,8 @@ def gate(base: str) -> int:
                     baseline, bn, bf = fut_base.result()
                 except ScanError as exc:
                     die(str(exc))
+            head = drop_english_fallbacks(head)
+            baseline = drop_english_fallbacks(baseline, tree)
         finally:
             subprocess.run(["git", "worktree", "remove", "--force", tree],
                            capture_output=True)
@@ -322,6 +390,8 @@ def main() -> int:
             found, n, nf = scan(os.getcwd(), "whole project")
         except ScanError as exc:
             die(str(exc))
+        found = drop_english_fallbacks(found)
+        n, nf = sum(found.values()), len({f for f, _ in found})
         print(f"{n} findings in {nf} files\n")
         by_file: dict[str, list[str]] = collections.defaultdict(list)
         for (f, t), n in sorted(found.items()):
@@ -335,20 +405,25 @@ def main() -> int:
     if args.files:
         if args.base:
             ap.error("give either --base REF or a list of files")
-        text = run_scan(os.getcwd(), args.files)
-        for line in text.splitlines():
-            line = ANSI.sub("", line).lstrip(SPINNER).rstrip()
-            if line and "checking for broken links" not in line:
-                print(line)
-        return max(1 if SUMMARY.search(ANSI.sub("", text)) else 0,
-                   check_bare_paths(args.files))
+        found = drop_english_fallbacks(parse(run_scan(os.getcwd(), args.files)))
+        by_file = collections.defaultdict(list)
+        for (f, t), n in sorted(found.items()):
+            by_file[f].extend([t] * n)
+        for f in sorted(by_file):
+            print(f)
+            for t in by_file[f]:
+                print(f"  {t}")
+        return max(1 if found else 0, check_bare_paths(args.files),
+                   check_fallback_anchors(args.files))
 
     if not args.base:
         ap.error("one of --base, --all, or a list of files is required")
 
-    # The bare-path check is scoped to changed files: diffing cannot catch this
-    # class, since the CLI never reports it in either scan.
-    return max(gate(args.base), check_bare_paths(changed_mdx(args.base)))
+    # These checks are scoped to changed files: diffing cannot catch either
+    # class, since the CLI never reports them as they are.
+    changed = changed_mdx(args.base)
+    return max(gate(args.base), check_bare_paths(changed),
+               check_fallback_anchors(changed))
 
 
 if __name__ == "__main__":

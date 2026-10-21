@@ -95,6 +95,15 @@ jobs:
         run: |
           set -euo pipefail
 
+          # Preflight: confirm the Anthropic API key is accepted (prints HTTP status; never
+          # fails the job). 200 = key valid; 401 = key invalid/expired/wrong org.
+          PROBE=$(curl -s -o /tmp/anthropic_probe.json -w '%{http_code}' \
+            https://api.anthropic.com/v1/models \
+            -H "x-api-key: ${ANTHROPIC_API_KEY}" \
+            -H "anthropic-version: 2023-06-01" || echo "curl-failed")
+          echo "Anthropic API key preflight (GET /v1/models): HTTP ${PROBE}"
+          head -c 300 /tmp/anthropic_probe.json 2>/dev/null || true; echo
+
           if [ "${DRY_RUN:-false}" = "true" ]; then
             MODE_NOTE="This is a DRY RUN. Use scripts/connector-review.py --dry-run for the dashboard, run the gate read-only on any merge candidates, and DO NOT merge, approve, comment on Jira, push to any branch, write the run-log, or post the issue. Instead, print a summary to stdout of exactly what you WOULD have done and why."
           else

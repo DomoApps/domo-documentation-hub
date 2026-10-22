@@ -305,15 +305,22 @@ Analyze & Visualize
 Build Apps & Automate
 ├── [NEW] Overview: Build Apps & Automate             ← hub article
 ├── [NEW] What is App Studio?                         ← synthesize from App Studio Overview + articles
-├── App Studio (11)
+├── App Studio (10)
 │   ├── App Studio | Overview                         ← existing (may become the "What is App Studio?")
 │   ├── Build Domo Apps with the Pro-code Editor
 │   ├── Design with App Studio Themes
-│   ├── Create and Customize App Components
 │   ├── Explore Data with Table Elements
 │   ├── Deliver Reports with Report Builder
-│   ├── Wire an App
+│   ├── App Components                                ← sub-group
+│   │   ├── Create and Customize App Components
+│   │   ├── Create a KPI Component in App Studio
+│   │   ├── Group and Aggregate Data in App Components
+│   │   └── Apply Conditional Formatting and Conditional Rendering in App Components
 │   └── [remaining App Studio how-tos]
+├── Apps (3)                                           ← general app building & management (moved out of App Studio)
+│   ├── Domo Bricks | Overview
+│   ├── AppDB Admin User Interface
+│   └── Wire an App
 ├── Workflows (13)
 │   ├── [NEW] What is Workflows?                      ← Workflows | Overview already exists
 │   │         (may just promote existing overview)
@@ -369,11 +376,12 @@ Distribute
 │   ├── Embed Content Outside of Domo
 │   ├── Filter Options for the Embedded View Experience
 │   └── Exporting Embedded Content
-└── Publications (4)
+└── Publications (5)
     ├── Setting Up Publication Groups
     ├── Publication Groups and You: The Not Quite Definitive Primer
     ├── Slideshow Publications Page Layout
-    └── Distributing Content Using Slideshows
+    ├── Distributing Content Using Slideshows
+    └── Publish Content to a Subscriber Instance       ← moved from App Studio
 ```
 
 **Terminology (2026-10-16):** Within Distribute, **"distribute"** is the verb for getting content to audiences outside Domo. **"Share"** is reserved for the Collaborate pillar's share-with-Domo-users function. Distribution-sense "share" was changed to "distribute" across this pillar, and the two formerly-"share"-titled articles were retitled (slugs unchanged). Literal Domo UI labels (**Share** menu, **Share link**, **Sharing** menu) and genuine share-permission references are kept as-is. See `RESTRUCTURE-MANIFEST.md` › "Distribute Pillar — Distribute Terminology".
@@ -444,8 +452,9 @@ AI & Data Science
 │   │       ├── Alerts · Cards · Code Engine · Sandbox Repository · Task Center Queue
 │   │       └── User Administration · Workflow · Workspaces · Coming Soon
 │   └── [remaining AI articles]
-├── AutoML (1)
-│   └── Train and Deploy Models with AutoML           ← single article; needs expansion
+├── AutoML (2)
+│   ├── Train and Deploy Models with AutoML           ← single article; needs expansion
+│   └── Forecasting Universal Model                   ← moved from App Studio
 ├── Jupyter Workspaces (5)
 │   ├── Jupyter articles
 │   └── Jupyter Troubleshooting Guide
@@ -502,8 +511,9 @@ Administer & Govern
 │   ├── Credit Monitoring
 │   ├── Observability Metrics
 │   └── [remaining instance settings]
-├── Sandbox & Environments (1)
+├── Sandbox & Environments (2)
 │   ├── [NEW] Domo Sandbox & Promotion Overview       ← synthesize from Sandbox article
+│   ├── Domo Sandbox                                  ← moved from App Studio
 │   └── Domo Sandbox: Linked Repositories
 └── Goals (5)
     ├── Getting Started With Goals                    ← existing tutorial

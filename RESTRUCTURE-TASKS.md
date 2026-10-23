@@ -22,7 +22,7 @@ open architectural decision.
 | PM | Pillars | fact-check | pm-input | legacy | retired | update | decision | Total | +High-update |
 |----|---------|-----------:|---------:|-------:|--------:|-------:|---------:|------:|-------------:|
 | (no PM listed) | P10 | 0 | 0 | 0 | 0 | 0 | 0 | **0** |  |
-| Andrea Henderson | P4 | 5 | 39 | 0 | 2 | 3 | 0 | **49** | 9 |
+| Andrea Henderson | P4 | 4 | 38 | 0 | 2 | 3 | 0 | **47** | 9 |
 | Beth Saenz | P10 | 0 | 1 | 0 | 0 | 0 | 0 | **1** |  |
 | Chris Wright | P1, P5, P7 | 5 | 53 | 0 | 0 | 0 | 1 | **59** | 9 |
 | Dan Brinton | P8, P9, P10 | 11 | 28 | 0 | 0 | 0 | 1 | **40** | 3 |
@@ -34,8 +34,8 @@ open architectural decision.
 | Phil Fuchs | P3, P4, P5 | 5 | 34 | 0 | 0 | 2 | 0 | **41** | 10 |
 | Release Management | — | 0 | 1 | 0 | 0 | 0 | 0 | **1** |  |
 | Ryan Despain | P6, P8, P10 | 1 | 50 | 0 | 0 | 1 | 1 | **53** | 5 |
-| Tasleema Lallmamode | P2 | 4 | 39 | 1 | 1 | 1 | 0 | **46** | 4 |
-| **TOTAL** | | 47 | 323 | 1 | 4 | 8 | 5 | **388** | 61 |
+| Tasleema Lallmamode | P2 | 5 | 39 | 1 | 1 | 1 | 0 | **47** | 4 |
+| **TOTAL** | | 47 | 322 | 1 | 4 | 8 | 5 | **387** | 61 |
 
 ---
 
@@ -47,15 +47,14 @@ _No open tasks._
 
 ## Andrea Henderson — Pillar 4
 
-### [fact-check] (5)
+### [fact-check] (4)
 
 - [ ] **`What-is-Magic-ETL.mdx` — *What is Magic ETL?*** — Magic ETL capabilities, when to use vs SQL DataFlows, 400k preview row limit
 - [ ] **`What-is-a-DataFlow.mdx` — *What is a DataFlow?*** — DataFlow types (SQL, Python, R), when to use each vs Magic ETL
 - [ ] **`Prepare-and-Transform-Overview.mdx` — *Prepare & Transform Data Overview*** — Full data prep toolbox, positioning of each tool, credit/consumption model accuracy
 - [ ] **`Split-Multi-Value-Fields-into-Rows.mdx` (rank 117)** — Synthesized from 360045402873 (Text tile) + 360044951294 (Unpivot); two-step Split Column → Dynamic Unpivot recipe
-- [ ] **`Handle-Source-Schema-Drift-in-Connectors.mdx` (rank 299) ⚠️ (open [pm-input])** — Synthesized from 000005809 (FUZZY_PARSE_DATE), 000005408 (SFTP Generate Header Row / Start Row Scheme), 360044876874 (Select Columns tile). No `[pm-input]` — fully synthesizable (was rank-299 DEFER, promoted to written after 2026-08-26 coverage research)
 
-### [pm-input] (39)
+### [pm-input] (38)
 
 - [ ] **`How-Data-Flows-Through-Domo.mdx` — *How Data Flows Through Domo*** — Canonical end-to-end pipeline narrative; confirm how connect → prepare → analyze → share → govern is described; sign off on framing
 - [ ] **`Choosing-the-Right-Data-Prep-Tool.mdx` — *Choosing the Right Data Prep Tool*** — Positioning: when to use Magic ETL vs SQL DataFlow vs Python/R vs Data Models; official recommendation matrix
@@ -90,7 +89,6 @@ _No open tasks._
 - [ ] **`360044289573.mdx`** — confirm whether STR_TO_DATE() reliably parses the short month-name token %b (community reports needing to map to full month names and use %M as a workaround). Synthesized from community forum reports; needs confirmation.
 - [ ] **`360044876094.mdx`** — confirm whether GROUP_CONCAT(DISTINCT ...) is supported inside a Group By tile formula. The Supported Functions reference notes DISTINCT/ORDER BY are not supported in Magic ETL v2, while the SQL Expressions reference lists [DISTINCT]. synthesized from community forum reports and conflicting repo references; needs confirmation.
 - [ ] **`360044876194.mdx`** — confirm the current enforcement status of Relationship Type constraints. Community reports describe a period where the asymmetric constraints (One-to-Many / Many-to-One) were reversed and enforcement was paused. synthesized from community forum reports; needs confirmation.
-- [ ] **`360044876614.mdx`** — confirm the date-picker calendar shortcut in the Filter Rows tile: clicking the month/year header to jump to a month, year, and decade selection view. Synthesized from community forum reports; needs confirmation.
 - [ ] **`360045485833.mdx`** — confirm the exact current outbound-network limitation of the Magic ETL Python/R scripting tiles (whether external API calls are fully blocked, unreliable, or environment-dependent) before publishing. Synthesized from community forum reports; needs confirmation.
 - [ ] **`360047787514.mdx`** — confirm the current status of these editor issues (which are fixed vs. still present in the current release) and the confirmed fix for the dark pop-up text and formula-editor scrolling issues. Synthesized from recurring community forum reports (2025–2026): the save-failure, Group By validate-button, and cut-text fixes come from forum resolutions; the pop-up-text and formula-scroll rows use a safe generic fix pending your confirmation.
 - [ ] **`360057087393.mdx`** — confirm the CLI workaround community members reference for remapping a Magic ETL output to an existing DataSet ID (reported as list-dataflow / update-dataflow commands in the Domo CLI). These commands are not currently documented in the Domo CLI article, so confirm the exact command names, parameters, and whether this is supported before documenting or linking a procedure. Synthesized from community forum reports; needs confirmation.
@@ -568,12 +566,13 @@ _No open tasks._
 
 ## Tasleema Lallmamode — Pillar 2
 
-### [fact-check] (4)
+### [fact-check] (5)
 
 - [ ] **`What-is-a-Connector.mdx` — *What is a Connector?*** — Connector concept, OAuth vs API key auth, scheduling, update methods
 - [ ] **`Connect-and-Integrate-Data-Overview.mdx` — *Connect & Integrate Data Overview*** — Read + write framing accuracy, Cloud Amplifier as recommended CDW path, connector types
 - [ ] **`What-is-Workbench.mdx` — *What is Workbench?*** — Workbench capabilities, read + write paths, current version support status
 - [ ] **`Connect-Unsupported-Data-Sources.mdx` (rank 32)** — Decision hub synthesized from 360042926294; links to JSON No Code, Workbench, Jupyter, custom connector
+- [ ] **`Handle-Source-Schema-Drift-in-Connectors.mdx` (rank 299) ⚠️ (open [pm-input])** — Synthesized from 000005809 (FUZZY_PARSE_DATE), 000005408 (SFTP Generate Header Row / Start Row Scheme), 360044876874 (Select Columns tile). No `[pm-input]` — fully synthesizable (was rank-299 DEFER, promoted to written after 2026-08-26 coverage research)
 
 ### [pm-input] (39)
 

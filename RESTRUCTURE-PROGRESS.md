@@ -77,6 +77,32 @@ Next: advance to **Phase 4** (Consolidation & Retirement), or Phase 3c sync #2 w
 
 ---
 
+## Parked Ideas / Backlog (NOT yet scoped into a phase)
+
+Candidate work captured for later. **These are not committed phases** — each needs a go/no-go before it becomes real work. Revisit, then promote to a numbered phase if approved.
+
+### IDEA — Repo-wide descriptive, LLM-friendly image alt-text pass (raised 2026-10-19)
+
+Generate descriptive, LLM-friendly alt text for every referenced image by actually reading the image, then stamp that alt into every instance of the image across the KB code.
+
+**Why:** helps screen readers *and* Mintlify's AI/search index; current alt is ~⅓ missing and much of the rest is weak/filename-ish.
+
+**Scope (measured 2026-10-19):** 12,099 image files in `images/kb/`; **7,402 unique images referenced** in the English KB; **8,666** EN references total (~1,264 are reuses → generate once per unique image, apply everywhere); **2,345** EN `<img>` have empty/missing alt; ~4,816 have some alt worth re-captioning; **10,072** image refs in localized tabs.
+
+**How it would work:**
+1. Committed `image-alt-map.csv` (`image_path → alt_text`) as the single source of truth, keyed on the image **filename** — images aren't renamed in the restructure, so this is **independent of Phase 6 slug renames** and can run anytime / in parallel.
+2. Batched vision sub-agents caption each unique referenced image into the map (~7,400 calls, not 8,666).
+3. A script writes the map's alt into every reference instance — `<img alt="…">` and markdown `![alt](src)` (`<Frame>` takes no alt; it wraps the inner `<img>`). Idempotent.
+
+**Hard parts / cost drivers:**
+- **Vision accuracy on UI screenshots** (misread button/menu labels) — needs a verification tier; this is the main cost/time driver, not generation.
+- **Localization multiplier** — English alt in a localized article is wrong; translating the alt-map for the 10k localized refs belongs with the `localize` skill (Phase 6+), not this pass. Cleanest: **English-only now**, localized alt folded in later.
+- **Re-caption vs. fill-only** — filling the 2,345 blanks is cheap; re-captioning all ~7,400 for consistent quality is ~3× the work. That's the scope dial.
+
+**Open decisions if promoted:** (a) English-only now vs. all languages; (b) fill blanks only vs. re-caption everything; (c) standalone phase vs. fold into the screenshot/Gate-2 work. Complements the existing screenshot policy and Gate 2.
+
+---
+
 ## Phase Completion
 
 | Phase | Status | Notes |
@@ -1135,7 +1161,7 @@ Move all planning and analysis artifacts generated during the restructure into a
 - `snippets/` — stays; active MDX components
 - `scripts/` — stays; active tooling
 
-After moving, update `CLAUDE.md` to reflect the new location of these files (the Claude project instructions reference some of them by root-relative path).
+After moving, update `CLAUDE.md`: repoint any files it references by their new `restructure/` location, **and remove the restructure-only sections** so the post-project `CLAUDE.md` is clean. These are restructure-temporary and must be deleted, not just repointed — in particular the **PM-branch propagation convention** (`### Propagating Integration Changes to PM Review Branches`). Review the other restructure-specific sections at the same time (the Mintlify preview-batch rule, the Phase 4.5 PM-review tooling descriptions, GA-coverage tracking) and strip whatever exists only for this project.
 
 ---
 

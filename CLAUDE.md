@@ -213,6 +213,8 @@ When `update/fullRestructure` gains changes PMs need (new/moved/edited articles,
 4. Regenerate briefs, `git add -f pm-review-briefs/<PM>.md` (that PM's own brief), commit, push.
 5. After each ≤4 batch, verify every branch's `mint-preview.yml` run succeeded before the next batch.
 
+_Restructure-temporary: this subsection exists only to support the KB-restructure project. **Remove it in the Phase 9 artifacts cleanup** (see `RESTRUCTURE-PROGRESS.md` › Phase 9) so the post-project `CLAUDE.md` is clean._
+
 ## Localization
 
 All localization assets live in **`localization/`**. Translation is **deterministic** (a term glossary is applied every run) and **self-improving** (human translator corrections are folded back into the glossary). The full system is documented in `localization/README.md`; the essentials for AI work:

@@ -305,18 +305,26 @@ Analyze & Visualize
 Build Apps & Automate
 ├── [NEW] Overview: Build Apps & Automate             ← hub article
 ├── [NEW] What is App Studio?                         ← synthesize from App Studio Overview + articles
-├── App Studio (10)
-│   ├── App Studio | Overview                         ← existing (may become the "What is App Studio?")
-│   ├── Build Domo Apps with the Pro-code Editor
-│   ├── Design with App Studio Themes
-│   ├── Explore Data with Table Elements
-│   ├── Deliver Reports with Report Builder
-│   ├── App Components                                ← sub-group
+├── App Studio   (root: What Is App Studio?)
+│   │   NOTE (2026-10): "App Studio | Overview" (000005295) was SPLIT into the task-based
+│   │   series below and DELETED. /s/article/000005295 now redirects to What-is-App-Studio
+│   │   (the group root). Every screenshot and all prose were preserved across the split;
+│   │   54 legacy inline UI icons were upgraded to the Domo icon font.
+│   ├── Build an App Studio App                        ← [NEW] from the Overview split
+│   ├── Add Charts and Tables to an App Studio App     ← [NEW] from the Overview split
+│   ├── Explore Data with Table Elements in App Studio
+│   ├── Add Interactivity: Popups, Filters, and Actions to an App Studio App  ← [NEW]
+│   ├── Add Themes to an App Studio App                ← was "Design with App Studio Themes" (retitled)
+│   ├── Use Advanced Customization in App Studio with Forms and Pro-Code Components  ← [NEW]
+│   ├── Deliver Customized Reports with App Studio Report Builder
+│   ├── Distribute an App Studio App                   ← [NEW] from the Overview split
+│   ├── Manage an App Studio App                       ← [NEW] from the Overview split
+│   ├── App Components                                 ← sub-group
 │   │   ├── Create and Customize App Components
 │   │   ├── Create a KPI Component in App Studio
 │   │   ├── Group and Aggregate Data in App Components
 │   │   └── Apply Conditional Formatting and Conditional Rendering in App Components
-│   └── [remaining App Studio how-tos]
+│   └── App Studio Appendix                            ← [NEW] glossary from the Overview split
 ├── Apps (3)                                           ← general app building & management (moved out of App Studio)
 │   ├── Domo Bricks | Overview
 │   ├── AppDB Admin User Interface

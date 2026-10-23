@@ -192,6 +192,29 @@ gh run rerun <run-id>
 
 A 429 failure is fixed by re-running the failed run (or pushing again) in a later batch — no edit to the branch is needed. The branch-based preview URL (`https://domoinc-<branch-with-dashes>.mintlify.site`) is stable, so a stale sticky comment can still point at a preview that wasn't rebuilt on the latest push; trust the **Action run conclusion**, not the mere presence of the preview comment.
 
+### Propagating Integration Changes to PM Review Branches (preserve review progress)
+
+When `update/fullRestructure` gains changes PMs need (new/moved/edited articles, nav, ownership), propagate them to each `restructure/pm/*` branch **without destroying in-progress review work**. This is the standing convention — follow it every time.
+
+**Where review progress lives — and doesn't.** Progress is stored **only** in *state files*: the per-PM ledger `pm-review-state/<slug>.json` (every item's status — `approved`/`answered`/`pending` — keyed by stable IDs like `fc-…`/`pmi-…`), the `{/* [reviewed] */}` / `{/* [pm-input] */}` markers inside the article `.mdx` files, `pm-review-state/ownership-overrides.json` + `ownership-change-log.csv`, and the hand-maintained `PM-REVIEW-STATUS.md`. The per-PM brief (`pm-review-briefs/<PM>.md`) and `RESTRUCTURE-TASKS.md` are **stateless generated views** — they carry *no* progress annotations (verified: a branch with 64 `approved` ledger items has zero checked boxes in its brief/TASKS). `pm_review.py` reattaches each item's saved ledger status by stable ID after any view refresh.
+
+**Consequences:**
+- **Never overwrite a branch's state files** with integration's versions. That — not regenerating a view — is what loses tracked work.
+- **Regenerating the stateless views is safe** and is how today's new items appear in a PM's worklist; prior progress stays in the ledger and reattaches by item ID. ("Refresh the views, preserve the state files.")
+- **Do not rely on `pm_review.py propagate-ownership` as the final step** — it does a bare `git merge` that conflicts on `RESTRUCTURE-TASKS.md` and `ownership-overrides.json` and silently *skips* any branch with review activity. Use the per-branch procedure below.
+
+**Per-branch procedure (batched ≤4, previews verified between batches per the rule above):**
+1. Ensure the working tree has no untracked regenerated briefs before switching: `git clean -fdX pm-review-briefs/` (each branch tracks only its *own* brief, force-added).
+2. `git switch restructure/pm/<slug>` → `git merge --no-edit update/fullRestructure`.
+3. Resolve conflicts by **preserving state**:
+   - `ownership-overrides.json` → **union** (keep the branch's reassignments **and** add integration's new entries; dedup by `filename`).
+   - `RESTRUCTURE-TASKS.md` → **regenerate** on the branch (`python3 scripts/build-pm-review-briefs.py`) — it's a stateless view.
+   - `PM-REVIEW-STATUS.md`, `pm-review-state/<slug>.json`, `ownership-change-log.csv`, and any in-article `[reviewed]` markers → **keep the branch's** (`--ours`); never take integration's.
+4. Regenerate briefs, `git add -f pm-review-briefs/<PM>.md` (that PM's own brief), commit, push.
+5. After each ≤4 batch, verify every branch's `mint-preview.yml` run succeeded before the next batch.
+
+_Restructure-temporary: this subsection exists only to support the KB-restructure project. **Remove it in the Phase 9 artifacts cleanup** (see `RESTRUCTURE-PROGRESS.md` › Phase 9) so the post-project `CLAUDE.md` is clean._
+
 ## Localization
 
 All localization assets live in **`localization/`**. Translation is **deterministic** (a term glossary is applied every run) and **self-improving** (human translator corrections are folded back into the glossary). The full system is documented in `localization/README.md`; the essentials for AI work:

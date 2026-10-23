@@ -30,6 +30,32 @@ Counts in parentheses are existing articles moving to that location.
 
 ---
 
+## Changelog — App Studio & Related Regrouping (2026-10-22)
+
+All changes below are reflected in the per-pillar trees in this document and in `docs.json`.
+
+**App Studio | Overview (`000005295`) split and deleted.** The monolithic overview was split (cut-and-reassemble; all prose + 131 screenshots + 26 `[pm-input]` markers preserved, and 54 inline UI icons upgraded to the Domo icon font) into a task-based series under the App Studio group (root = **What Is App Studio?** / `What-is-App-Studio`):
+
+- `Build-an-App-Studio-App`, `Add-Charts-and-Tables-to-an-App-Studio-App`, `Add-Interactivity-to-an-App-Studio-App`, `Use-Advanced-Customization-in-App-Studio` (Forms + Pro-Code Components), `Distribute-an-App-Studio-App`, `Manage-an-App-Studio-App`, `App-Studio-Appendix` (all `[NEW]`).
+- `000005543` retitled "Design with App Studio Themes" → **"Add Themes to an App Studio App"**; `000005829` (Report Builder) and `000005681` (Table Elements) kept.
+- `000005295.mdx` **deleted**; `/s/article/000005295` **redirects** to `What-is-App-Studio`. Inbound links repointed (plain/title → root; anchored → the same heading's new article), and link text reading the old title updated to "What Is App Studio?".
+
+**New groups/subgroups:**
+
+- **App Components** subgroup under App Studio — root **What Are App Components?** (`What-Are-App-Components`, `[NEW]`); holds `000005864`, Create-a-KPI-Component, Group-and-Aggregate, Apply-Conditional.
+- **Apps** group under Build Apps & Automate (flat, no overview) — **Domo Bricks | Overview** (`4423762260375`), **AppDB Admin User Interface** (`9221297758615`), **Wire an App** (not App Studio-related; not linked from the App Studio hub).
+- **Workspaces** group under Collaborate — root **What Are Workspaces?** (`What-Are-Workspaces`, `[NEW]`, owned by Dan Brinton); holds **Create and Share Workspaces** (moved from App Studio).
+
+**Articles moved to other pillars:**
+
+- **Forecasting Universal Model** (`000005567`) → AI & Data Science > AutoML (linked from the AI & Data Science hub).
+- **Publish Content to a Subscriber Instance** (`360045120554`) → Distribute > Publications (already linked from the "Distribute Content Outside Domo" hub).
+- **Domo Sandbox** (`4403367344023`) → Administer & Govern > Sandbox & Environments (already linked from `Domo-Sandbox-Overview`).
+
+**PM ownership:** new App Studio articles → Khushboo; Workspaces articles → Dan Brinton (via `pm-review-state/ownership-overrides.json`). `Article-PM-Ownership-Reference.mdx` and `.github/CODEOWNERS` were scope-updated for today's articles — a full regen is deferred until `scripts/build-pm-ownership.py`'s `NAV_FEATURE` map is calibrated for the restructured nav (a full regen today dumps ~512 unrelated articles into the `Admin` catch-all). PM review briefs and `RESTRUCTURE-TASKS.md` were regenerated.
+
+---
+
 ## Cross-Cutting Concerns
 
 These three principles apply across all pillars and must be kept in mind during Phase 3 (content creation), Phase 5 (interlinking), and Phase 7 (nav rebuild).
@@ -319,7 +345,7 @@ Build Apps & Automate
 │   ├── Deliver Customized Reports with App Studio Report Builder
 │   ├── Distribute an App Studio App                   ← [NEW] from the Overview split
 │   ├── Manage an App Studio App                       ← [NEW] from the Overview split
-│   ├── App Components                                 ← sub-group
+│   ├── App Components                                 ← sub-group (root: What Are App Components? — [NEW] overview)
 │   │   ├── Create and Customize App Components
 │   │   ├── Create a KPI Component in App Studio
 │   │   ├── Group and Aggregate Data in App Components
@@ -429,7 +455,7 @@ Collaborate
 │   └── [remaining P&T articles]
 ├── Notifications & Reports (1)
 │   └── Scheduled Reports
-└── Workspaces (1)
+└── Workspaces (1)   (root: What Are Workspaces? — [NEW] overview; owned by Dan Brinton)
     └── Create and Share Workspaces              ← moved from App Studio; organize and share dashboards, cards, apps, and DataSets
 ```
 

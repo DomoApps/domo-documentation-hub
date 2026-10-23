@@ -98,25 +98,20 @@ Use these existing Chart Properties to control how many items appear and to keep
 
 Native bar charts do not scroll to reveal additional bars. To show a large number of categories, split the chart into groups with **Trellis/Tiered Date Settings**, or use a horizontal-bar visualization from the App Store.
 
-{/* [pm-input] Chris Wright — confirm the recommended way to display more categories than fit on a native (non-scrolling) bar chart, including the exact App Store horizontal-bar Brick to use. Synthesized from community forum reports; needs confirmation. */}
-
-Chart Properties do not include a native option for dynamic column headers that change with the underlying data. To achieve this, reshape the data upstream—unpivoting (pivot-longer) columns into rows in an ETL DataFlow so the header values become a single category field the chart can read.
-
-{/* [pm-input] Chris Wright — confirm the supported ETL pattern (pivot-longer / unpivot) for driving dynamic column headers in a chart, and whether any native chart setting exists. Synthesized from community forum reports; needs confirmation. */}
-
 ## Configure Date and Time-Scale Behavior
 
 By default, when a supported chart (such as a Line or Bar chart) uses date data, Domo applies a time scale that groups the data by an appropriate date grain and shows gaps for periods that have no data. To display date values exactly as they appear in your DataSet instead—using individual dates and your **Date Output Format** setting, with no gaps for empty periods—select **Category Scale** > **Never Use Time Scale**.
 
 For multi-level and trellised date axes, use the **Trellis/Tiered Date Settings** category (for example, **Tiered Date Levels** for up to three date tiers).
 
-{/* [pm-input] Chris Wright — confirm and document the following date-axis behaviors reported by community users: (1) the dashboard/card time-scale control (Default vs. Day) and how it relates to Never Use Time Scale; (2) why DATE fields are coerced to datetime on the axis and using DATE()/DATE_FORMAT in Beast Mode to force a pure date; (3) how Graph By interacts with filtering to produce wrong-date results; (4) filtering out the incomplete current month, and why an ELSE 0 in Beast Mode creates spurious zero points versus returning NULL; (5) adding a vertical divider line between actual and forecast data; (6) Tiered/Trellis Date Settings limits with custom fiscal calendars and on bullet charts. Synthesized from community forum reports; needs confirmation. */}
+When a date axis does not behave as expected, two Beast Mode adjustments are common:
+
+- **Force a pure date on the axis.** Domo may treat a DATE field as a datetime on the axis, which can split or mislabel values. To plot a clean date, convert the field in a Beast Mode calculation with `DATE()` or `DATE_FORMAT`, then graph that field.
+- **Avoid false zero points.** When a Beast Mode returns `ELSE 0`, the chart plots a zero for every period that has no matching data, creating misleading dips. Return `NULL` instead of `0` so those periods drop out of the series. For the same reason, filter out an incomplete current period (such as the current month) rather than letting it render as an artificially low point.
 
 ## Add Goal, Target, and Average Lines
 
 - **Static goal or target line.** Use the **Scale Marker** category. Set **Type** to **Line**, set **Value Type** to **Manual**, and enter the target in the **Value** field. You can rename the marker with **Text**, choose which axis it applies to with **Scale**, and adjust **Color**, **Width**, and **Style**. To draw a shaded target band instead of a single line, set **Type** to **Range**.
 - **Average or median reference line.** Use **Grid Lines** > **Calculated Line** and select **Average** or **Median** to add a reference line calculated from the chart's data.
 
-For a goal that varies by row or by category (a dynamic target), a single static Scale Marker value is not sufficient; build the target as a Beast Mode measure and plot it as its own series.
-
-{/* [pm-input] Chris Wright — confirm the supported approach for a dynamic/per-row goal or target line built with Beast Mode (including projecting toward a variable target and rendering multiple actual-vs-target progress bars with dynamic color), and document the reported gotcha that a Calculated Line average will not render once an additional series is configured on the chart. Synthesized from community forum reports; needs confirmation. */}
+For a goal that varies by row or by category (a dynamic target), a single static Scale Marker value is not sufficient; build the target as a Beast Mode measure and plot it as its own series. To let viewers adjust the goal interactively, reference a **Variable** inside that Beast Mode and expose it as a variable control on the dashboard or app—viewers move the control to change the target, and the goal series updates to match.

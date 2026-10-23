@@ -1161,7 +1161,7 @@ Move all planning and analysis artifacts generated during the restructure into a
 - `snippets/` — stays; active MDX components
 - `scripts/` — stays; active tooling
 
-After moving, update `CLAUDE.md` to reflect the new location of these files (the Claude project instructions reference some of them by root-relative path).
+After moving, update `CLAUDE.md`: repoint any files it references by their new `restructure/` location, **and remove the restructure-only sections** so the post-project `CLAUDE.md` is clean. These are restructure-temporary and must be deleted, not just repointed — in particular the **PM-branch propagation convention** (`### Propagating Integration Changes to PM Review Branches`). Review the other restructure-specific sections at the same time (the Mintlify preview-batch rule, the Phase 4.5 PM-review tooling descriptions, GA-coverage tracking) and strip whatever exists only for this project.
 
 ---
 

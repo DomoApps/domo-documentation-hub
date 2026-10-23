@@ -419,8 +419,10 @@ Collaborate
 │   ├── Creating a Project
 │   ├── Creating and Assigning Project Tasks
 │   └── [remaining P&T articles]
-└── Notifications & Reports (1)
-    └── Scheduled Reports
+├── Notifications & Reports (1)
+│   └── Scheduled Reports
+└── Workspaces (1)
+    └── Create and Share Workspaces              ← moved from App Studio; organize and share dashboards, cards, apps, and DataSets
 ```
 
 **[DECISION]** Projects & Tasks is a legacy feature (pre-Workflows era). Are these articles current? If the feature is being phased out in favor of Workflows, these may belong in Archive.

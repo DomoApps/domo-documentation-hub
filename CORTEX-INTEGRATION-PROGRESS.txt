@@ -1,0 +1,187 @@
+===============================================================================
+CORTEX INTEGRATION FIX — PROGRESS NOTE
+Parked 2026-10-23 (Fri) — pick up next week.
+Branch: jared.peterson/cortex-integration-fix
+===============================================================================
+
+WHY THIS EXISTS
+---------------
+The "Sync Minor Release Notes" GitHub Action (.github/workflows/
+sync-minor-release-notes.yml) ran today and reported SUCCESS, but the Anthropic/
+Claude style-rewrite step actually failed on every note. Jared's standing
+assumption was that the API key can't run on a GitHub-hosted runner and needs an
+in-network (Domo-proprietary) runner, so he'd been holding off building one. This
+investigation tested that assumption. Key turned out to be a SNOWFLAKE CORTEX PAT,
+not a direct Anthropic key — which changes everything.
+
+
+WHAT ACTUALLY HAPPENED IN TODAY'S RUN (evidence)
+------------------------------------------------
+Run: 39961624209 (scheduled, 2026-10-23 13:29 UTC, "success", 55s).
+
+- Domo DataSet query SUCCEEDED (Domo developer token is fine):
+    299 rows at score >= 7 -> 169 unique after dedup -> 44 selected for the week.
+- EVERY style-rewrite call returned HTTP 401:
+    "authentication_error / Invalid bearer token"  (44 times, one per note).
+- The script NEVER fails on an API error: on any exception it falls back to
+  deterministic_restyle() — scripts/build_minor_release_notes.py:294 / :255.
+  So all 44 notes used the MECHANICAL rules cleanup (strip boilerplate lead,
+  capitalize, add terminal period), NOT the Claude Haiku house-voice rewrite.
+- Archiving: NOTHING was archived — the current file was a placeholder with no
+  prior "## {Month} {D}, {Year} Release" heading, so there was nothing to roll.
+  (Expected; not a failure.)
+- Ledger: updated (+44 notes) — tracking/minor-release-ledger.json. These 44 are
+  now marked published and will NOT re-emit next week.
+- Output: committed to branch auto/minor-release-notes; opened PR #658
+  ("Sync Minor Release Notes", OPEN). Mintlify preview triggered (HTTP 202).
+
+NET: PR #658 is FAITHFUL DataSet content, mechanically cleaned, just NOT
+house-styled. Safe to merge as-is if un-styled phrasing is acceptable this week.
+No hallucination risk; the words are the DataSet's own AI_release_notes column.
+
+
+ROOT CAUSE
+----------
+The secret is a Snowflake Cortex PAT, but the script creates a vanilla
+anthropic.Anthropic() client with NO base_url (scripts/build_minor_release_notes.py:278),
+so it talks to api.anthropic.com directly and sends the Cortex PAT as the bearer.
+Anthropic rejects it as an invalid token -> the clean 401.
+
+CRITICAL: the 401 came from ANTHROPIC, not Snowflake. The code never contacted
+Snowflake at all. So the "can a GitHub runner reach Domo's Snowflake?" question
+has NOT actually been tested yet. The 401 is NOT evidence of a network block.
+
+
+TWO SEPARATE PROBLEMS
+---------------------
+1. CODE (definitely broken, easy fix): client points at api.anthropic.com instead
+   of the Cortex endpoint. Fix below.
+2. NETWORK (untested — the REAL question behind the in-network-runner belief):
+   can a GitHub-hosted runner reach <account>.snowflakecomputing.com? If Domo's
+   Snowflake account has a network policy (IP allowlist) or is PrivateLink-only,
+   GitHub-hosted runners are blocked -> a self-hosted in-network runner IS
+   required. If not, no in-network runner is needed. This is a checkable fact,
+   not something to assume. THE PROBE (below) answers it.
+
+The code change is needed regardless of the network answer. The network answer
+only decides WHERE the runner lives, not WHAT the code does.
+
+
+SNOWFLAKE CORTEX FACTS (from Snowflake docs, confirmed 2026-10-23)
+------------------------------------------------------------------
+- Cortex exposes an Anthropic-Messages-API-COMPATIBLE endpoint, so the Anthropic
+  Python SDK works against it with a base_url override.
+- Endpoint:  https://<account>.snowflakecomputing.com/api/v2/cortex/v1/messages
+  Set base_url to .../api/v2/cortex  (the SDK appends /v1/messages itself).
+- Auth: PAT (Programmatic Access Token) as a static bearer. Jared confirmed the
+  secret is a PAT. api_key is ignored; auth goes in the Authorization header.
+- Model id "claude-haiku-5-5" IS a valid Cortex identifier — NO model change
+  needed. (Cortex also offers claude-opus-5-5, claude-sonnet-5-5, etc.)
+- Supported params: standard Anthropic Messages set. NOT supported: flex/priority
+  tier and some anthropic-beta headers. -> DROP output_config={"effort":"low"}
+  from the restyle call to be safe (build_minor_release_notes.py ~:283).
+
+
+DECISIONS MADE
+--------------
+- Token type: PAT (static bearer).  [confirmed by Jared]
+- Sequencing: PROBE REACHABILITY FIRST, before changing pipeline code. [Jared]
+
+
+THE CODE FIX (apply AFTER the probe, in build_minor_release_notes.py make_restyler)
+-----------------------------------------------------------------------------------
+Replace:
+    client = anthropic.Anthropic()
+with:
+    pat = os.environ["CORTEX_PAT"]
+    client = anthropic.Anthropic(
+        api_key="not-used",                       # ignored; header does the auth
+        base_url=os.environ["CORTEX_BASE_URL"],   # https://<account>.snowflakecomputing.com/api/v2/cortex
+        default_headers={"Authorization": f"Bearer {pat}"},
+    )
+Also: remove output_config={"effort": "low"} from client.messages.create(...).
+Keep model="claude-haiku-5-5".
+
+Secrets/vars housekeeping (do with the code fix):
+  - Rename repo secret ANTHROPIC_API_KEY -> CORTEX_PAT (it's misleading as-is).
+  - Add repo var/secret CORTEX_BASE_URL = https://<account>.snowflakecomputing.com/api/v2/cortex
+  - Update env: block in sync-minor-release-notes.yml accordingly.
+  - Update the header comment + docstring references from ANTHROPIC_API_KEY.
+  - Keep the minor-release-notes skill's data-contract/env docs in sync.
+
+
+WHAT'S ALREADY BUILT (committed on this branch)
+-----------------------------------------------
+.github/workflows/cortex-reachability-probe.yml
+  - Manual-only (workflow_dispatch) diagnostic. NO schedule, NO push trigger —
+    inert until explicitly run. Safe to leave; delete once the question's settled.
+  - Inputs: account_host (required, e.g. abc12345.snowflakecomputing.com),
+    model (default claude-haiku-5-5).
+  - Uses the EXISTING ANTHROPIC_API_KEY secret (holds the PAT) so no rename is
+    needed just to test.
+  - curls the Cortex messages endpoint with --max-time 25 and prints a plain-
+    English verdict: 200 = reachable + authenticated (no in-network runner
+    needed); timeout/connection-refused (curl exit 28/7) = network blocking the
+    runner (in-network runner required); 401/403 = reachable but auth issue
+    (network is fine); 400 = reachable, payload/model issue.
+
+
+NEXT STEPS (in order)
+---------------------
+1. VALIDATE THE PAT LOCALLY (disambiguates a later runner 401 from a dead token).
+   From Jared's machine, with real account host + PAT:
+     curl -s -o /dev/null -w "%{http_code}\n" -X POST \
+       "https://<account>.snowflakecomputing.com/api/v2/cortex/v1/messages" \
+       -H "Authorization: Bearer <PAT>" -H "Content-Type: application/json" \
+       -d '{"model":"claude-haiku-5-5","max_tokens":50,"messages":[{"role":"user","content":"ping"}]}'
+   200 = PAT/endpoint good. Anything else = fix the PAT before the runner test
+   matters.
+
+2. MAKE THE PROBE DISPATCHABLE. GitHub only lists a workflow_dispatch workflow
+   once it's on the DEFAULT branch (main). The probe is inert, so merging it to
+   main is low-risk. Open a PR from this branch (or cherry-pick just the .yml),
+   merge it.
+
+3. RUN THE PROBE. Actions -> "Cortex Reachability Probe" -> Run workflow, enter
+   the account host. Or:
+     gh workflow run cortex-reachability-probe.yml \
+       -f account_host=<account>.snowflakecomputing.com
+   Read the verdict in the run log.
+
+4. BASED ON THE VERDICT:
+   - 200  -> no in-network runner needed. Apply THE CODE FIX above + secret/var
+             housekeeping. Done.
+   - timeout / connection-refused -> network policy IS blocking GitHub runners
+             (original belief confirmed, for the network reason, NOT the
+             "key can't run" reason). Stand up a self-hosted in-network runner,
+             THEN apply the same code fix (the code is identical either way).
+   - 401/403 -> network fine; it's a PAT/permission problem. Re-check the secret
+             value vs. the local curl result.
+
+5. CLEAN UP: once settled, delete cortex-reachability-probe.yml and this
+   progress note.
+
+6. (Optional) Add a hard-fail or PR banner to sync-minor-release-notes.yml so a
+   future 401 doesn't silently ship fallback-only notes as "success" again.
+
+
+OPEN ITEMS / NEED FROM JARED
+----------------------------
+- The Snowflake account host/identifier (for base_url and the probe input).
+- Result of the local curl (step 1) — confirms the PAT is valid at all.
+
+
+KEY FILE REFERENCES
+-------------------
+- scripts/build_minor_release_notes.py
+    :255 deterministic_restyle()   (the fallback that ran today)
+    :271 make_restyler()           (where the Cortex client fix goes)
+    :278 client = anthropic.Anthropic()   (the bug — no base_url)
+    :283 client.messages.create(... output_config=... )  (drop effort param)
+- .github/workflows/sync-minor-release-notes.yml  (production weekly action)
+- .github/workflows/cortex-reachability-probe.yml (NEW — this branch)
+- tracking/minor-release-ledger.json  (ledger; +44 today)
+- s/article/Current-Minor-Release-Notes.mdx  (today's output, 44 notes)
+- PR #658 "Sync Minor Release Notes" (OPEN; fallback-quality content)
+- minor-release-notes skill = canonical spec for this automation.
+===============================================================================

@@ -1,0 +1,71 @@
+name: Cortex Reachability Probe
+
+# Manual-only diagnostic. Checks two things, separately, from a GitHub-hosted
+# runner:
+#   1. Can the runner reach Domo's Snowflake Cortex endpoint at all? (network)
+#   2. Does the PAT authenticate once it gets there? (auth)
+#
+# It has NO schedule and NO push trigger, so it never runs on its own and is
+# safe to leave in the repo. Delete it once the question is settled.
+#
+# Uses the existing ANTHROPIC_API_KEY secret (which currently holds the Cortex
+# PAT) so no secret rename is needed just to test. The account host is passed in
+# at dispatch time, so nothing sensitive is stored for this probe.
+
+on:
+  workflow_dispatch:
+    inputs:
+      account_host:
+        description: "Snowflake account host, e.g. abc12345.snowflakecomputing.com"
+        required: true
+        type: string
+      model:
+        description: "Cortex model id to test"
+        required: false
+        default: "claude-haiku-5-5"
+        type: string
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Probe Cortex endpoint
+        env:
+          PAT: ${{ secrets.ANTHROPIC_API_KEY }} # currently holds the Cortex PAT
+          HOST: ${{ inputs.account_host }}
+          MODEL: ${{ inputs.model }}
+        run: |
+          set -uo pipefail
+          URL="https://${HOST}/api/v2/cortex/v1/messages"
+          echo "Runner egress IP: $(curl -s --max-time 10 https://api.ipify.org || echo unknown)"
+          echo "Probing: $URL"
+          echo ""
+
+          HTTP=$(curl -sS --max-time 25 \
+            -o /tmp/resp.json -w '%{http_code}' \
+            -X POST "$URL" \
+            -H "Authorization: Bearer ${PAT}" \
+            -H "Content-Type: application/json" \
+            -d "{\"model\":\"${MODEL}\",\"max_tokens\":50,\"messages\":[{\"role\":\"user\",\"content\":\"ping\"}]}")
+          CURL_EXIT=$?
+
+          echo "curl exit=$CURL_EXIT  http_status=$HTTP"
+          echo "--- response body ---"
+          cat /tmp/resp.json 2>/dev/null || true
+          echo ""
+          echo "--- verdict ---"
+
+          case "$CURL_EXIT" in
+            28) echo "TIMEOUT: the runner got no response in 25s. Strong sign Snowflake's network policy / PrivateLink is blocking GitHub-hosted runners -> a self-hosted in-network runner is likely required."; exit 1 ;;
+            6)  echo "DNS FAILURE: could not resolve $HOST. Check the account host spelling."; exit 1 ;;
+            7)  echo "CONNECTION REFUSED/BLOCKED: reached DNS but could not open the connection. Likely a network policy blocking the runner -> self-hosted in-network runner likely required."; exit 1 ;;
+            0)  : ;;
+            *)  echo "curl failed with exit $CURL_EXIT (see above)."; exit 1 ;;
+          esac
+
+          case "$HTTP" in
+            200)     echo "SUCCESS: the runner reached Cortex AND the PAT authenticated. No in-network runner needed -- just apply the code fix." ;;
+            401|403) echo "REACHABLE but AUTH REJECTED ($HTTP): the runner CAN reach Snowflake, so the network is fine. This is a PAT/permission issue. (If the same PAT returns 200 from your laptop, the stored secret value is wrong.)" ;;
+            400)     echo "REACHABLE but BAD REQUEST (400): network is fine; payload/model issue -- check the model id." ;;
+            *)       echo "REACHABLE: HTTP $HTTP. Network is fine; inspect the body above." ;;
+          esac

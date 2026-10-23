@@ -32,7 +32,7 @@ In Workbench, click <i className="legacy-icon-database" aria-hidden="true" /> in
 ```
 
 - Icons inherit text color and size automatically — they adapt to light/dark mode without any extra props.
-- Override size only when needed: `<i className="icon-gear" style={{fontSize: 24}} aria-hidden="true" />`.
+- Don't add a size class by default; the bare form is `font-size: 1em`. Override only when needed with a size class from `style.css`: `xs` 18px, `sm` 20px, `md` 24px, `lg` 36px, `xl` 48px, e.g. `<i className="icon-gear md" aria-hidden="true" />`. These are fixed sizes, so the icon stops scaling with headings or table text.
 
 **Accessibility: pair every icon with an inline text label**
 

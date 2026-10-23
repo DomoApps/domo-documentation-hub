@@ -192,6 +192,29 @@ gh run rerun <run-id>
 
 A 429 failure is fixed by re-running the failed run (or pushing again) in a later batch — no edit to the branch is needed. The branch-based preview URL (`https://domoinc-<branch-with-dashes>.mintlify.site`) is stable, so a stale sticky comment can still point at a preview that wasn't rebuilt on the latest push; trust the **Action run conclusion**, not the mere presence of the preview comment.
 
+### Propagating Integration Changes to PM Review Branches (preserve review progress)
+
+When `update/fullRestructure` gains changes PMs need (new/moved/edited articles, nav, ownership), propagate them to each `restructure/pm/*` branch **without destroying in-progress review work**. This is the standing convention — follow it every time.
+
+**Where review progress lives — and doesn't.** Progress is stored **only** in *state files*: the per-PM ledger `pm-review-state/<slug>.json` (every item's status — `approved`/`answered`/`pending` — keyed by stable IDs like `fc-…`/`pmi-…`), the `{/* [reviewed] */}` / `{/* [pm-input] */}` markers inside the article `.mdx` files, `pm-review-state/ownership-overrides.json` + `ownership-change-log.csv`, and the hand-maintained `PM-REVIEW-STATUS.md`. The per-PM brief (`pm-review-briefs/<PM>.md`) and `RESTRUCTURE-TASKS.md` are **stateless generated views** — they carry *no* progress annotations (verified: a branch with 64 `approved` ledger items has zero checked boxes in its brief/TASKS). `pm_review.py` reattaches each item's saved ledger status by stable ID after any view refresh.
+
+**Consequences:**
+- **Never overwrite a branch's state files** with integration's versions. That — not regenerating a view — is what loses tracked work.
+- **Regenerating the stateless views is safe** and is how today's new items appear in a PM's worklist; prior progress stays in the ledger and reattaches by item ID. ("Refresh the views, preserve the state files.")
+- **Do not rely on `pm_review.py propagate-ownership` as the final step** — it does a bare `git merge` that conflicts on `RESTRUCTURE-TASKS.md` and `ownership-overrides.json` and silently *skips* any branch with review activity. Use the per-branch procedure below.
+
+**Per-branch procedure (batched ≤4, previews verified between batches per the rule above):**
+1. Ensure the working tree has no untracked regenerated briefs before switching: `git clean -fdX pm-review-briefs/` (each branch tracks only its *own* brief, force-added).
+2. `git switch restructure/pm/<slug>` → `git merge --no-edit update/fullRestructure`.
+3. Resolve conflicts by **preserving state**:
+   - `ownership-overrides.json` → **union** (keep the branch's reassignments **and** add integration's new entries; dedup by `filename`).
+   - `RESTRUCTURE-TASKS.md` → **regenerate** on the branch (`python3 scripts/build-pm-review-briefs.py`) — it's a stateless view.
+   - `PM-REVIEW-STATUS.md`, `pm-review-state/<slug>.json`, `ownership-change-log.csv`, and any in-article `[reviewed]` markers → **keep the branch's** (`--ours`); never take integration's.
+4. Regenerate briefs, `git add -f pm-review-briefs/<PM>.md` (that PM's own brief), commit, push.
+5. After each ≤4 batch, verify every branch's `mint-preview.yml` run succeeded before the next batch.
+
+_Restructure-temporary: this subsection exists only to support the KB-restructure project. **Remove it in the Phase 9 artifacts cleanup** (see `RESTRUCTURE-PROGRESS.md` › Phase 9) so the post-project `CLAUDE.md` is clean._
+
 ## Localization
 
 All localization assets live in **`localization/`**. Translation is **deterministic** (a term glossary is applied every run) and **self-improving** (human translator corrections are folded back into the glossary). The full system is documented in `localization/README.md`; the essentials for AI work:
@@ -203,6 +226,8 @@ All localization assets live in **`localization/`**. Translation is **determinis
 - **`localization/retrospective/`** — `retrospective-log.csv` (run log) and `.snapshots/` (gitignored per-run snapshots of the skill's raw output, keyed by commit SHA, so the retrospective can diff human-corrected merged PRs against the AI original).
 
 Workflow: the `localize` skill runs the `localization-retrospective` skill first (Step 0), loads the glossary, applies it during translation, verifies with `scripts/check-glossary.py` in QA, and snapshots its output for **every** language. Once human-corrected articles return as merged PRs, `localization-retrospective` diffs them against the snapshots and writes term-level corrections back into the glossaries. Regenerate the glossaries with `scripts/build-localization-glossary.py` (it preserves `retrospective:*` and `manual*` rows).
+
+**English fallback for untranslated articles.** `language-routing.js` (repo root; Mintlify loads every `.js` file in the content directory on every page) sends a reader who lands on a `/{de,es,fr,ja}/...` page that 404s to the English page at the same path, and redirects `?language=<code>` (region suffixes like `en_US` ignored, `jp` accepted) to the localized article when it exists. That is why localized articles link to `/{lang}/s/article/<slug>` even when the translation doesn't exist yet, and why `check-broken-links.py` doesn't report those links (it still flags a `#anchor` on them). `docs.json` sets `errors.404.redirect: false` so Mintlify shows the 404 page instead of sending readers home before the script runs. `docs.json` redirects can't do this: they apply even when the localized page exists.
 
 ## Finding Existing Articles
 
@@ -246,12 +271,15 @@ All scripts live in `scripts/`. They are optional dev-quality tools — non-tech
 
 | Script | Purpose |
 | ------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
-| `pad_md_tables.py` | Pad all Markdown pipe-table columns in a file so pipes align. Run after editing any article that has Markdown tables: `python3 scripts/pad_md_tables.py s/article/Filename.mdx` |
+| `pad_md_tables.py` | Pad all Markdown pipe-table columns in a file so pipes align. Run after editing any article that has Markdown tables: `python3 scripts/pad_md_tables.py s/article/Filename.mdx`. Its output matches the MDX formatter exactly (display widths via the same rules as `string-width`, alignment colons kept, `\|` stays in its cell, rows cut to the header's columns), so the two never fight. |
 | `build-pm-ownership.py` | Regenerate `Article-PM-Ownership-Reference.mdx` **and** `.github/CODEOWNERS` from the squad CSV (or the existing reference when the CSV is absent) + `docs.json`. Also applies `pm-review-state/ownership-overrides.json` (per-article PM reassignments recorded by `pm_review.py reassign`). See the `update-pm-ownership` skill. |
 | `pm_review.py` | Engine for the `pm-review` skill (Phase 4.5). Subcommands: `items`/`resume` (per-PM worklist with stable IDs, incl. an auto-generated `read-through` final-sign-off item per from-scratch article), `set-status` (`--note` required for terminal statuses; records per-edit `--commit`/`--diff-summary`), `session-start`/`session-end` (per-sitting log), `link` (one linked cross-article decision), `journal` (per-PM `pm-review-state/<slug>.journal.md`, or `--all` → root `PM-REVIEW-JOURNAL.md`), `explain` (read-only recall of what a PM did and why), `reassign` (mid-review ownership change — writes `pm-review-state/ownership-overrides.json` that BOTH `build-pm-ownership.py` and `build-pm-review-briefs.py` read, rewrites `[pm-input]` markers, sweeps the manifest + `PM-REVIEW-STATUS.md`, logs `ownership-change-log.csv` + a journal entry), `propagate-ownership` (merge `update/fullRestructure` into every `restructure/pm/*` branch + push), `rollup` (→ `PM-REVIEW-ROLLUP.md`), `deferred-report` (→ `RESTRUCTURE-DEFERRED-ARTICLES.md`), `reconcile` (the 4.5→4.6 marker gate), `check-baseline`. `rollup`/`deferred-report`/`journal --all`/`reassign` refuse to run off `update/fullRestructure`. Reuses `build-pm-review-briefs.py` so items never drift from the briefs. |
 | `test-pm-review.py` | Smoke test for `pm_review.py`: `python3 -I scripts/test-pm-review.py`. No framework/CI; stubs the builder/git/data boundaries and a tmp state dir. Covers read-through generation + attribution, the read-through gating block, sign-off auto-reopen, v1→v2 ledger back-compat, the `--note` requirement, session open/close, and the reconcile read-through findings. Exits 0 when green. |
 | `docs_cli.py` | Export the full nav structure (all tabs/groups/pages) to CSV. `python3 scripts/docs_cli.py export` → `scripts/reports/doc_structure.csv`. Supports `--language` (en/jp/fr/de/es) and `--output`. |
 | `html_to_mdx.py` | Bulk Salesforce-to-MDX conversion pipeline (used with the `csv-to-mdx` skill). Reads an exported Salesforce CSV, converts HTML bodies to MDX, and writes files to `s/article/`. |
+| `format-mdx.sh` | Optional MDX format-on-save. `.vscode/settings.json` wires it to the recommended `jkillian.custom-local-formatters` extension: it runs `remark` with `.remarkrc.mjs` (same output as `yarn format <path>`) and echoes the file unchanged when Node or `node_modules` is missing, the file is outside the repo or in `.remarkignore`, or the MDX (input or output) doesn't parse. Prettier is not used for MDX because it only supports MDX 1. |
+| `remark-domo-format.mjs` | Stringify overrides loaded by `.remarkrc.mjs` so formatter output matches how articles are written: each `<tr>` on its own line (only where that provably renders the same), one-line single-child elements like `<Frame><img/></Frame>`, flush `<AccordionGroup>`/`<Accordion>` children per the style guide, two-space hard breaks, no `\_` escapes, bare URLs left bare, and extra table cells beyond the header dropped (GFM never renders them). |
+| `check-format-safety.mjs` | Prove formatting only changes how MDX is written, not what renders: `node scripts/check-format-safety.mjs <file-or-dir>...` formats in memory (writes nothing) and reports any file whose output fails to parse or renders differently; `--compare <before> <after>` checks two files. Run it over the whole repo after any change to `.remarkrc.mjs` or the remark plugins, and before a formatting sweep; it should report 0 problems. The comparison rules live in `mdx-render-shape.mjs`, which `remark-domo-format.mjs` also uses to verify its own row splits and collapses. |
 | `html-to-mdx.mjs` | Node.js single-file HTML-to-MDX converter (used by the `migrate-html` skill for one-off article migrations via pandoc). |
 | `add_excerpts.py` | Batch-add `excerpt:` frontmatter to articles that only have `title:`. |
 | `fix-heading-levels.py` | Normalize heading levels across migrated articles. |

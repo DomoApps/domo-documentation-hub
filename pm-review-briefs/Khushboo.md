@@ -2,7 +2,7 @@
 
 **Prepared for:** KB Restructure PM Review Meeting
 **Features owned:** App Dev Framework, App Studio, Bricks/Templates, MS Office Plugins / Addins, Publication Groups
-**Total articles in your area:** 32
+**Total articles in your area:** 39
 
 > This document is your meeting guide. It shows how your content is being reorganized,
 > which AI-generated articles need your fact-check, which articles need a dedicated
@@ -20,7 +20,7 @@ areas lands in the new structure.
 | Feature | Articles | New Location |
 |---------|----------|--------------|
 | App Dev Framework | 5 | Pillar 6: Build Apps & Automate |
-| App Studio | 14 | Pillar 6: Build Apps & Automate |
+| App Studio | 21 | Pillar 6: Build Apps & Automate |
 | Bricks/Templates | 3 | Pillar 6: Build Apps & Automate |
 | MS Office Plugins / Addins | 8 | Pillar 8: Collaborate |
 | Publication Groups | 2 | Pillar 7: Distribute |
@@ -28,6 +28,10 @@ areas lands in the new structure.
 ### Notable Navigation Changes
 
 - **CourseBuilder (9 EN articles):** Support KB Audit flags CourseBuilder as retired/removed from Domo Appstore. Staged for Retired in Phase 4.6. Pending D10: confirm CourseBuilder is gone from the product before the nav rebuild.
+
+- **App Studio Overview split (2026-10):** `App Studio | Overview` (000005295) was split into a task-based series — Build an App Studio App, Add Charts and Tables, Add Interactivity, Use Advanced Customization (Forms + Pro-Code Components), Distribute, Manage — plus a new App Studio Appendix and a new 'What Are App Components?' overview (root of the new App Components subgroup). The old article was deleted and redirected to the What Is App Studio? hub (the App Studio group root). All prose + 131 screenshots + 26 [pm-input] markers were preserved, and 54 inline UI icons were upgraded to the Domo icon font. Please review the new articles and confirm the flagged icon mappings (Components/'Add Content' → icon-chart-bar-box; Layout → icon-badge-layout-small) and the new [pm-input] on pro-code/Forms grants.
+
+- **Articles moved out of App Studio (2026-10):** Forecasting Universal Model → AutoML (AI & Data Science); Domo Sandbox → Sandbox & Environments (Administer & Govern); Publish Content to a Subscriber Instance → Distribute > Publications; and Domo Bricks | Overview, AppDB Admin User Interface, and Wire an App → a new 'Apps' group under Build Apps & Automate.
 
 ---
 
@@ -96,84 +100,6 @@ off once you've provided the answer.
 - [ ] **`000005143.mdx`**
   confirm PowerPoint dashboard-import layout behavior vs. the legacy plug-in: whether each imported card is placed on its own slide, and how slide order and template are determined. Synthesized from community forum reports; needs confirmation.
 
-- [ ] **`000005295.mdx`**
-  confirm the current Apps Home organization options (alphabetical-by-title ordering, favorites, no folder/tag grouping), the exact app-title truncation length in the tile view (community reports cite roughly 20 characters), and that the "Last Updated" timestamp reflects app/layout edit time rather than dataset refresh (and whether it can be hidden). Document the folder-structure feature here once it releases. Synthesized from community forum reports; needs confirmation.
-
-- [ ] **`000005295.mdx`**
-  confirm that App Studio sharing is app-level only (no per-page or per-group page visibility, and no per-page PDP), and that the recommended workaround is separate apps per audience. Synthesized from community forum reports; needs confirmation.
-
-- [ ] **`000005295.mdx`**
-  confirm that the App Studio mobile layout is independent of the desktop layout (element position, size, and visibility can be set separately per view) and that desktop edits do not overwrite the mobile layout. Synthesized from community forum reports; needs confirmation.
-
-- [ ] **`000005295.mdx`**
-  confirm the per-tab card-sizing behavior on mobile: whether resizing a card in one tab propagates that size to cards in other tabs, and the supported way to give a card a different size on a specific tab. Synthesized from community forum reports; needs confirmation.
-
-- [ ] **`000005295.mdx`**
-  confirm how tab and page order is determined on mobile (whether it follows the desktop Order tab) and whether there is a known issue in which mobile tab order can differ from desktop. Synthesized from community forum reports; needs confirmation.
-
-- [ ] **`000005295.mdx`**
-  confirm there is no prompt or option to delete an app's underlying cards at the same time as the app (the cards always remain as orphans in the instance). Synthesized from a high-demand community forum thread; needs confirmation.
-
-- [ ] **`000005295.mdx`**
-  confirm that App Studio app pages do not appear in a card's Move or Copy menu or in the card info panel, so a card cannot be traced to its parent app page through those menus. Synthesized from community forum reports; corroborates an open question in "Find Which Dashboard a Card Lives On"; needs confirmation.
-
-- [ ] **`000005295.mdx`**
-  confirm the exact way to delete cards from More > Admin > Cards (the menu path/label, for example an Edit > Delete action) and whether a filter or column exists to isolate the cards that belonged to a specific (or deleted) App Studio app page. The bulk "Add to dashboards" action is documented; the delete action and an App-page filter are not yet verified. Synthesized from community forum reports; needs confirmation.
-
-- [ ] **`000005295.mdx`**
-  confirm whether the Domo Governance Datasets connector (or a Governance Toolkit / card lineage feature) is the recommended way to locate App Studio orphaned cards, and whether its reports actually map cards to App Studio app pages rather than only classic dashboards. Synthesized from community forum reports; needs confirmation.
-
-- [ ] **`000005295.mdx`**
-  confirm the interaction between the app-level background (App theme) and a page-level background (Format Page): that a page background paints over the app background and there is no transparency option to let the app background show through. Synthesized from community forum reports; needs confirmation.
-
-- [ ] **`000005295.mdx`**
-  confirm the conditional-formatting "Apply to" blank-column-list behavior when editing a card inside App Studio, and that the supported workaround is to edit the card on a traditional dashboard in Analyzer. Synthesized from community forum reports; needs confirmation.
-
-- [ ] **`000005295.mdx`**
-  confirm the current concurrent-editing behavior in App Studio: whether multiple users can safely edit the same app (or different pages of the same app) at once, and what happens to conflicting changes when each person saves. Synthesized from community forum reports; needs confirmation.
-
-- [ ] **`000005295.mdx`**
-  confirm that rebuilding a page is the recommended recovery step for a corrupted App Studio page layout, and whether a support-assisted repair path exists. Synthesized from community forum reports; needs confirmation.
-
-- [ ] **`000005295.mdx`**
-  confirm that Domo Sandbox is the supported versioning/rollback path for App Studio apps and the basic commit/restore steps, and confirm the resolution for an app stuck in full-screen/wide mode (clear cache, close other sessions). Synthesized from community forum reports; needs confirmation.
-
-- [ ] **`000005295.mdx`**
-  confirm that a card's Filter Exceptions "Allow filtering" setting is all-or-nothing (there is no way to allow only specific filter columns to affect one card while ignoring others). Synthesized from community forum reports; needs confirmation.
-
-- [ ] **`000005295.mdx`**
-  confirm the reported behavior in which a filter selection persists visually in Controls but does not apply to cards, and the correct resolution. Synthesized from community forum reports; needs confirmation.
-
-- [ ] **`000005295.mdx`**
-  confirm whether and how an app owner can limit which columns appear in Controls > Add Filter for viewers (for example, through a Filter Options setting or a per-DataSet configuration). Synthesized from community forum reports; needs confirmation.
-
-- [ ] **`000005295.mdx`**
-  confirm the supported method for a dynamic/relative default date filter in App Studio (Filter Views with a relative range, and any Beast Mode approach), and the reported limitation that a dropdown filter card cannot supply a relative default date. Synthesized from community forum reports; needs confirmation.
-
-- [ ] **`000005295.mdx`**
-  confirm that on-page filter controls must be added one at a time (no bulk-add action) and that grouping them in a Tabs or layout container is the recommended pattern for many-filter pages. The bulk-add action and independent on-page legend-visibility control are feature requests. Synthesized from community forum reports; needs confirmation.
-
-- [ ] **`000005295.mdx`**
-  confirm the current App Studio navigation behaviors: that text-only nav buttons appear invisible until hovered (icons recommended), that the Home button can be hidden but not relabeled or repointed, that only built-in icons are available (no custom icon upload), the exact controls for hiding app vs. system/Domo navigation in embedded apps and Domo Everywhere, the known logo/nav shift or flash-on-load behavior, and how mobile vs. desktop navigation and filter settings currently differ. Remaining requests (custom icon upload, secondary nav) are feature requests. Synthesized from community forum reports; needs confirmation.
-
-- [ ] **`000005295.mdx`**
-  confirm the tab nesting/save behavior (improperly nested components causing save failures) and the shared-height behavior with the Spacer workaround, including that the spacer workaround does not carry over to mobile. Synthesized from community forum reports; needs confirmation.
-
-- [ ] **`000005295.mdx`**
-  confirm the current limitations that a tab layout cannot be copied to another tab and that no navigation action (Page Drill or button) can deep-link to a specific tab within a page. Synthesized from community forum reports; needs confirmation.
-
-- [ ] **`000005295.mdx`**
-  confirm that App Studio has no accordion/collapsible-section element today and that tabs or additional pages are the recommended alternative for long pages. Synthesized from community forum reports; needs confirmation.
-
-- [ ] **`000005295.mdx`**
-  confirm that only Button components (not text or image elements) can open a Form as a pop-up, that button icons are limited to the built-in Domo set, and that page filter selections are not passed into a popup-opened form (whereas an inline form receives them). The Brick/Pro-Code workaround for a pop-up from other elements needs confirmation. Synthesized from community forum reports; needs confirmation.
-
-- [ ] **`000005295.mdx`**
-  confirm the supported settings for fitting table columns to card width and wrapping cell text on resize (responsive/auto-fit column sizing and a text-wrap toggle) in App Studio table cards. Only manual column resizing by dragging the header edge is documented today. Synthesized from community forum reports; needs confirmation.
-
-- [ ] **`000005295.mdx`**
-  confirm the exact permission required to edit data in Editable/Linked Table cells within a published App Studio app (community reports indicate the viewer also needs the Edit Cards grant, coupling table-cell editing to card-edit permission), and document the current Linked Tables column capabilities and limitations. Column-type and cell-validation controls are feature requests. Synthesized from community forum reports; needs confirmation.
-
 - [ ] **`000005543.mdx`**
   confirm whether App Studio app themes override per-card color settings such as heatmaps and conditional formatting, whether an individual card can be made theme-independent, the supported workaround to preserve a card's own colors, and which theme setting controls the background of an expanded (pop-out) card view. Synthesized from community forum reports; needs confirmation.
 
@@ -188,6 +114,87 @@ off once you've provided the answer.
 
 - [ ] **`000005864.mdx`**
   confirm that a Filter List component sources its selectable values from the first DataSet alphabetically when a page contains multiple DataSets, and the supported workarounds (renaming a DataSet with a leading space so it sorts first, or unioning the DataSets into one). Synthesized from community forum reports; needs confirmation.
+
+- [ ] **`Add-Charts-and-Tables-to-an-App-Studio-App.mdx`**
+  confirm the supported settings for fitting table columns to card width and wrapping cell text on resize (responsive/auto-fit column sizing and a text-wrap toggle) in App Studio table cards. Only manual column resizing by dragging the header edge is documented today. Synthesized from community forum reports; needs confirmation.
+
+- [ ] **`Add-Charts-and-Tables-to-an-App-Studio-App.mdx`**
+  confirm the exact permission required to edit data in Editable/Linked Table cells within a published App Studio app (community reports indicate the viewer also needs the Edit Cards grant, coupling table-cell editing to card-edit permission), and document the current Linked Tables column capabilities and limitations. Column-type and cell-validation controls are feature requests. Synthesized from community forum reports; needs confirmation.
+
+- [ ] **`Add-Interactivity-to-an-App-Studio-App.mdx`**
+  confirm that a card's Filter Exceptions "Allow filtering" setting is all-or-nothing (there is no way to allow only specific filter columns to affect one card while ignoring others). Synthesized from community forum reports; needs confirmation.
+
+- [ ] **`Add-Interactivity-to-an-App-Studio-App.mdx`**
+  confirm the reported behavior in which a filter selection persists visually in Controls but does not apply to cards, and the correct resolution. Synthesized from community forum reports; needs confirmation.
+
+- [ ] **`Add-Interactivity-to-an-App-Studio-App.mdx`**
+  confirm whether and how an app owner can limit which columns appear in Controls > Add Filter for viewers (for example, through a Filter Options setting or a per-DataSet configuration). Synthesized from community forum reports; needs confirmation.
+
+- [ ] **`Add-Interactivity-to-an-App-Studio-App.mdx`**
+  confirm the supported method for a dynamic/relative default date filter in App Studio (Filter Views with a relative range, and any Beast Mode approach), and the reported limitation that a dropdown filter card cannot supply a relative default date. Synthesized from community forum reports; needs confirmation.
+
+- [ ] **`Add-Interactivity-to-an-App-Studio-App.mdx`**
+  confirm that on-page filter controls must be added one at a time (no bulk-add action) and that grouping them in a Tabs or layout container is the recommended pattern for many-filter pages. The bulk-add action and independent on-page legend-visibility control are feature requests. Synthesized from community forum reports; needs confirmation.
+
+- [ ] **`Add-Interactivity-to-an-App-Studio-App.mdx`**
+  confirm that only Button components (not text or image elements) can open a Form as a pop-up, that button icons are limited to the built-in Domo set, and that page filter selections are not passed into a popup-opened form (whereas an inline form receives them). The Brick/Pro-Code workaround for a pop-up from other elements needs confirmation. Synthesized from community forum reports; needs confirmation.
+
+- [ ] **`Build-an-App-Studio-App.mdx`**
+  confirm the current Apps Home organization options (alphabetical-by-title ordering, favorites, no folder/tag grouping), the exact app-title truncation length in the tile view (community reports cite roughly 20 characters), and that the "Last Updated" timestamp reflects app/layout edit time rather than dataset refresh (and whether it can be hidden). Document the folder-structure feature here once it releases. Synthesized from community forum reports; needs confirmation.
+
+- [ ] **`Build-an-App-Studio-App.mdx`**
+  confirm that the App Studio mobile layout is independent of the desktop layout (element position, size, and visibility can be set separately per view) and that desktop edits do not overwrite the mobile layout. Synthesized from community forum reports; needs confirmation.
+
+- [ ] **`Build-an-App-Studio-App.mdx`**
+  confirm the per-tab card-sizing behavior on mobile: whether resizing a card in one tab propagates that size to cards in other tabs, and the supported way to give a card a different size on a specific tab. Synthesized from community forum reports; needs confirmation.
+
+- [ ] **`Build-an-App-Studio-App.mdx`**
+  confirm how tab and page order is determined on mobile (whether it follows the desktop Order tab) and whether there is a known issue in which mobile tab order can differ from desktop. Synthesized from community forum reports; needs confirmation.
+
+- [ ] **`Build-an-App-Studio-App.mdx`**
+  confirm the interaction between the app-level background (App theme) and a page-level background (Format Page): that a page background paints over the app background and there is no transparency option to let the app background show through. Synthesized from community forum reports; needs confirmation.
+
+- [ ] **`Build-an-App-Studio-App.mdx`**
+  confirm the conditional-formatting "Apply to" blank-column-list behavior when editing a card inside App Studio, and that the supported workaround is to edit the card on a traditional dashboard in Analyzer. Synthesized from community forum reports; needs confirmation.
+
+- [ ] **`Build-an-App-Studio-App.mdx`**
+  confirm the current concurrent-editing behavior in App Studio: whether multiple users can safely edit the same app (or different pages of the same app) at once, and what happens to conflicting changes when each person saves. Synthesized from community forum reports; needs confirmation.
+
+- [ ] **`Build-an-App-Studio-App.mdx`**
+  confirm that rebuilding a page is the recommended recovery step for a corrupted App Studio page layout, and whether a support-assisted repair path exists. Synthesized from community forum reports; needs confirmation.
+
+- [ ] **`Build-an-App-Studio-App.mdx`**
+  confirm that Domo Sandbox is the supported versioning/rollback path for App Studio apps and the basic commit/restore steps, and confirm the resolution for an app stuck in full-screen/wide mode (clear cache, close other sessions). Synthesized from community forum reports; needs confirmation.
+
+- [ ] **`Build-an-App-Studio-App.mdx`**
+  confirm the current App Studio navigation behaviors: that text-only nav buttons appear invisible until hovered (icons recommended), that the Home button can be hidden but not relabeled or repointed, that only built-in icons are available (no custom icon upload), the exact controls for hiding app vs. system/Domo navigation in embedded apps and Domo Everywhere, the known logo/nav shift or flash-on-load behavior, and how mobile vs. desktop navigation and filter settings currently differ. Remaining requests (custom icon upload, secondary nav) are feature requests. Synthesized from community forum reports; needs confirmation.
+
+- [ ] **`Build-an-App-Studio-App.mdx`**
+  confirm the tab nesting/save behavior (improperly nested components causing save failures) and the shared-height behavior with the Spacer workaround, including that the spacer workaround does not carry over to mobile. Synthesized from community forum reports; needs confirmation.
+
+- [ ] **`Build-an-App-Studio-App.mdx`**
+  confirm the current limitations that a tab layout cannot be copied to another tab and that no navigation action (Page Drill or button) can deep-link to a specific tab within a page. Synthesized from community forum reports; needs confirmation.
+
+- [ ] **`Build-an-App-Studio-App.mdx`**
+  confirm that App Studio has no accordion/collapsible-section element today and that tabs or additional pages are the recommended alternative for long pages. Synthesized from community forum reports; needs confirmation.
+
+- [ ] **`Distribute-an-App-Studio-App.mdx`**
+  confirm that App Studio sharing is app-level only (no per-page or per-group page visibility, and no per-page PDP), and that the recommended workaround is separate apps per audience. Synthesized from community forum reports; needs confirmation.
+
+- [ ] **`Manage-an-App-Studio-App.mdx`**
+  confirm there is no prompt or option to delete an app's underlying cards at the same time as the app (the cards always remain as orphans in the instance). Synthesized from a high-demand community forum thread; needs confirmation.
+
+- [ ] **`Manage-an-App-Studio-App.mdx`**
+  confirm that App Studio app pages do not appear in a card's Move or Copy menu or in the card info panel, so a card cannot be traced to its parent app page through those menus. Synthesized from community forum reports; corroborates an open question in "Find Which Dashboard a Card Lives On"; needs confirmation.
+
+- [ ] **`Manage-an-App-Studio-App.mdx`**
+  confirm the exact way to delete cards from More > Admin > Cards (the menu path/label, for example an Edit > Delete action) and whether a filter or column exists to isolate the cards that belonged to a specific (or deleted) App Studio app page. The bulk "Add to dashboards" action is documented; the delete action and an App-page filter are not yet verified. Synthesized from community forum reports; needs confirmation.
+
+- [ ] **`Manage-an-App-Studio-App.mdx`**
+  confirm whether the Domo Governance Datasets connector (or a Governance Toolkit / card lineage feature) is the recommended way to locate App Studio orphaned cards, and whether its reports actually map cards to App Studio app pages rather than only classic dashboards. Synthesized from community forum reports; needs confirmation.
+
+- [ ] **`Use-Advanced-Customization-in-App-Studio.mdx`**
+  confirm the exact grant(s) required to add and edit a pro-code component (Domo Brick) inside an App Studio app, and the grant(s) required to add and edit a Form in an app, beyond Edit App (App Studio). Synthesized from the App Studio Overview and Domo Bricks | Overview; needs confirmation.
 
 ---
 
@@ -250,38 +257,39 @@ A prioritized list of everything this document is asking of you:
 | 13 | **Open placeholder in `000005143.mdx`:** confirm the Excel re-import-in-place limitation vs | **Answer required** | 15–30 min |
 | 14 | **Open placeholder in `000005143.mdx`:** confirm whether Google Slides or other Google Workspace integration is planned | **Answer required** | 15–30 min |
 | 15 | **Open placeholder in `000005143.mdx`:** confirm PowerPoint dashboard-import layout behavior vs | **Answer required** | 15–30 min |
-| 16 | **Open placeholder in `000005295.mdx`:** confirm the current Apps Home organization options (alphabetical-by-title orderi | **Answer required** | 15–30 min |
-| 17 | **Open placeholder in `000005295.mdx`:** confirm that App Studio sharing is app-level only (no per-page or per-group page | **Answer required** | 15–30 min |
-| 18 | **Open placeholder in `000005295.mdx`:** confirm that the App Studio mobile layout is independent of the desktop layout ( | **Answer required** | 15–30 min |
-| 19 | **Open placeholder in `000005295.mdx`:** confirm the per-tab card-sizing behavior on mobile: whether resizing a card in o | **Answer required** | 15–30 min |
-| 20 | **Open placeholder in `000005295.mdx`:** confirm how tab and page order is determined on mobile (whether it follows the d | **Answer required** | 15–30 min |
-| 21 | **Open placeholder in `000005295.mdx`:** confirm there is no prompt or option to delete an app's underlying cards at the  | **Answer required** | 15–30 min |
-| 22 | **Open placeholder in `000005295.mdx`:** confirm that App Studio app pages do not appear in a card's Move or Copy menu or | **Answer required** | 15–30 min |
-| 23 | **Open placeholder in `000005295.mdx`:** confirm the exact way to delete cards from More > Admin > Cards (the menu path/l | **Answer required** | 15–30 min |
-| 24 | **Open placeholder in `000005295.mdx`:** confirm whether the Domo Governance Datasets connector (or a Governance Toolkit  | **Answer required** | 15–30 min |
-| 25 | **Open placeholder in `000005295.mdx`:** confirm the interaction between the app-level background (App theme) and a page- | **Answer required** | 15–30 min |
-| 26 | **Open placeholder in `000005295.mdx`:** confirm the conditional-formatting "Apply to" blank-column-list behavior when ed | **Answer required** | 15–30 min |
-| 27 | **Open placeholder in `000005295.mdx`:** confirm the current concurrent-editing behavior in App Studio: whether multiple  | **Answer required** | 15–30 min |
-| 28 | **Open placeholder in `000005295.mdx`:** confirm that rebuilding a page is the recommended recovery step for a corrupted  | **Answer required** | 15–30 min |
-| 29 | **Open placeholder in `000005295.mdx`:** confirm that Domo Sandbox is the supported versioning/rollback path for App Stud | **Answer required** | 15–30 min |
-| 30 | **Open placeholder in `000005295.mdx`:** confirm that a card's Filter Exceptions "Allow filtering" setting is all-or-noth | **Answer required** | 15–30 min |
-| 31 | **Open placeholder in `000005295.mdx`:** confirm the reported behavior in which a filter selection persists visually in C | **Answer required** | 15–30 min |
-| 32 | **Open placeholder in `000005295.mdx`:** confirm whether and how an app owner can limit which columns appear in Controls  | **Answer required** | 15–30 min |
-| 33 | **Open placeholder in `000005295.mdx`:** confirm the supported method for a dynamic/relative default date filter in App S | **Answer required** | 15–30 min |
-| 34 | **Open placeholder in `000005295.mdx`:** confirm that on-page filter controls must be added one at a time (no bulk-add ac | **Answer required** | 15–30 min |
-| 35 | **Open placeholder in `000005295.mdx`:** confirm the current App Studio navigation behaviors: that text-only nav buttons  | **Answer required** | 15–30 min |
-| 36 | **Open placeholder in `000005295.mdx`:** confirm the tab nesting/save behavior (improperly nested components causing save | **Answer required** | 15–30 min |
-| 37 | **Open placeholder in `000005295.mdx`:** confirm the current limitations that a tab layout cannot be copied to another ta | **Answer required** | 15–30 min |
-| 38 | **Open placeholder in `000005295.mdx`:** confirm that App Studio has no accordion/collapsible-section element today and t | **Answer required** | 15–30 min |
-| 39 | **Open placeholder in `000005295.mdx`:** confirm that only Button components (not text or image elements) can open a Form | **Answer required** | 15–30 min |
-| 40 | **Open placeholder in `000005295.mdx`:** confirm the supported settings for fitting table columns to card width and wrapp | **Answer required** | 15–30 min |
-| 41 | **Open placeholder in `000005295.mdx`:** confirm the exact permission required to edit data in Editable/Linked Table cell | **Answer required** | 15–30 min |
-| 42 | **Open placeholder in `000005543.mdx`:** confirm whether App Studio app themes override per-card color settings such as h | **Answer required** | 15–30 min |
-| 43 | **Open placeholder in `000005543.mdx`:** confirm which Brand Kit branding elements (beyond the built-in fonts) carry into | **Answer required** | 15–30 min |
-| 44 | **Open placeholder in `000005829.mdx`:** confirm the current output/export formats for Report Builder reports (emailed sn | **Answer required** | 15–30 min |
-| 45 | **Open placeholder in `000005829.mdx`:** confirm which app changes do and do not propagate to an existing report automati | **Answer required** | 15–30 min |
-| 46 | **Open placeholder in `000005864.mdx`:** confirm that a Filter List component sources its selectable values from the firs | **Answer required** | 15–30 min |
-| 47 | Validate additions to: App Studio card management (Rank 4) | Review | 20 min |
+| 16 | **Open placeholder in `000005543.mdx`:** confirm whether App Studio app themes override per-card color settings such as h | **Answer required** | 15–30 min |
+| 17 | **Open placeholder in `000005543.mdx`:** confirm which Brand Kit branding elements (beyond the built-in fonts) carry into | **Answer required** | 15–30 min |
+| 18 | **Open placeholder in `000005829.mdx`:** confirm the current output/export formats for Report Builder reports (emailed sn | **Answer required** | 15–30 min |
+| 19 | **Open placeholder in `000005829.mdx`:** confirm which app changes do and do not propagate to an existing report automati | **Answer required** | 15–30 min |
+| 20 | **Open placeholder in `000005864.mdx`:** confirm that a Filter List component sources its selectable values from the firs | **Answer required** | 15–30 min |
+| 21 | **Open placeholder in `Add-Charts-and-Tables-to-an-App-Studio-App.mdx`:** confirm the supported settings for fitting table columns to card width and wrapp | **Answer required** | 15–30 min |
+| 22 | **Open placeholder in `Add-Charts-and-Tables-to-an-App-Studio-App.mdx`:** confirm the exact permission required to edit data in Editable/Linked Table cell | **Answer required** | 15–30 min |
+| 23 | **Open placeholder in `Add-Interactivity-to-an-App-Studio-App.mdx`:** confirm that a card's Filter Exceptions "Allow filtering" setting is all-or-noth | **Answer required** | 15–30 min |
+| 24 | **Open placeholder in `Add-Interactivity-to-an-App-Studio-App.mdx`:** confirm the reported behavior in which a filter selection persists visually in C | **Answer required** | 15–30 min |
+| 25 | **Open placeholder in `Add-Interactivity-to-an-App-Studio-App.mdx`:** confirm whether and how an app owner can limit which columns appear in Controls  | **Answer required** | 15–30 min |
+| 26 | **Open placeholder in `Add-Interactivity-to-an-App-Studio-App.mdx`:** confirm the supported method for a dynamic/relative default date filter in App S | **Answer required** | 15–30 min |
+| 27 | **Open placeholder in `Add-Interactivity-to-an-App-Studio-App.mdx`:** confirm that on-page filter controls must be added one at a time (no bulk-add ac | **Answer required** | 15–30 min |
+| 28 | **Open placeholder in `Add-Interactivity-to-an-App-Studio-App.mdx`:** confirm that only Button components (not text or image elements) can open a Form | **Answer required** | 15–30 min |
+| 29 | **Open placeholder in `Build-an-App-Studio-App.mdx`:** confirm the current Apps Home organization options (alphabetical-by-title orderi | **Answer required** | 15–30 min |
+| 30 | **Open placeholder in `Build-an-App-Studio-App.mdx`:** confirm that the App Studio mobile layout is independent of the desktop layout ( | **Answer required** | 15–30 min |
+| 31 | **Open placeholder in `Build-an-App-Studio-App.mdx`:** confirm the per-tab card-sizing behavior on mobile: whether resizing a card in o | **Answer required** | 15–30 min |
+| 32 | **Open placeholder in `Build-an-App-Studio-App.mdx`:** confirm how tab and page order is determined on mobile (whether it follows the d | **Answer required** | 15–30 min |
+| 33 | **Open placeholder in `Build-an-App-Studio-App.mdx`:** confirm the interaction between the app-level background (App theme) and a page- | **Answer required** | 15–30 min |
+| 34 | **Open placeholder in `Build-an-App-Studio-App.mdx`:** confirm the conditional-formatting "Apply to" blank-column-list behavior when ed | **Answer required** | 15–30 min |
+| 35 | **Open placeholder in `Build-an-App-Studio-App.mdx`:** confirm the current concurrent-editing behavior in App Studio: whether multiple  | **Answer required** | 15–30 min |
+| 36 | **Open placeholder in `Build-an-App-Studio-App.mdx`:** confirm that rebuilding a page is the recommended recovery step for a corrupted  | **Answer required** | 15–30 min |
+| 37 | **Open placeholder in `Build-an-App-Studio-App.mdx`:** confirm that Domo Sandbox is the supported versioning/rollback path for App Stud | **Answer required** | 15–30 min |
+| 38 | **Open placeholder in `Build-an-App-Studio-App.mdx`:** confirm the current App Studio navigation behaviors: that text-only nav buttons  | **Answer required** | 15–30 min |
+| 39 | **Open placeholder in `Build-an-App-Studio-App.mdx`:** confirm the tab nesting/save behavior (improperly nested components causing save | **Answer required** | 15–30 min |
+| 40 | **Open placeholder in `Build-an-App-Studio-App.mdx`:** confirm the current limitations that a tab layout cannot be copied to another ta | **Answer required** | 15–30 min |
+| 41 | **Open placeholder in `Build-an-App-Studio-App.mdx`:** confirm that App Studio has no accordion/collapsible-section element today and t | **Answer required** | 15–30 min |
+| 42 | **Open placeholder in `Distribute-an-App-Studio-App.mdx`:** confirm that App Studio sharing is app-level only (no per-page or per-group page | **Answer required** | 15–30 min |
+| 43 | **Open placeholder in `Manage-an-App-Studio-App.mdx`:** confirm there is no prompt or option to delete an app's underlying cards at the  | **Answer required** | 15–30 min |
+| 44 | **Open placeholder in `Manage-an-App-Studio-App.mdx`:** confirm that App Studio app pages do not appear in a card's Move or Copy menu or | **Answer required** | 15–30 min |
+| 45 | **Open placeholder in `Manage-an-App-Studio-App.mdx`:** confirm the exact way to delete cards from More > Admin > Cards (the menu path/l | **Answer required** | 15–30 min |
+| 46 | **Open placeholder in `Manage-an-App-Studio-App.mdx`:** confirm whether the Domo Governance Datasets connector (or a Governance Toolkit  | **Answer required** | 15–30 min |
+| 47 | **Open placeholder in `Use-Advanced-Customization-in-App-Studio.mdx`:** confirm the exact grant(s) required to add and edit a pro-code component (Domo B | **Answer required** | 15–30 min |
+| 48 | Validate additions to: App Studio card management (Rank 4) | Review | 20 min |
 
 ---
 

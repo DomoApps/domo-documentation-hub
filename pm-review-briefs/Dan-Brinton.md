@@ -1,8 +1,8 @@
 # PM Review Brief: Dan Brinton
 
 **Prepared for:** KB Restructure PM Review Meeting
-**Features owned:** Admin, Alerts, NLG, Smart Alerts/Insights, Attribute Based Access Control (ABAC), Buzz, Consumption, DomoStats, Goals, Profile, Single Sign-On
-**Total articles in your area:** 70
+**Features owned:** Admin, Alerts, NLG, Smart Alerts/Insights, Attribute Based Access Control (ABAC), Buzz, Consumption, DomoStats, Goals, Profile, Single Sign-On, Workspaces
+**Total articles in your area:** 71
 
 > This document is your meeting guide. It shows how your content is being reorganized,
 > which AI-generated articles need your fact-check, which articles need a dedicated
@@ -22,18 +22,21 @@ areas lands in the new structure.
 | Admin | 23 | Pillar 10: Administer & Govern |
 | Alerts, NLG, Smart Alerts/Insights | 7 | Pillar 8: Collaborate |
 | Attribute Based Access Control (ABAC) | 4 | Pillar 10: Administer & Govern |
-| Buzz | 11 | Pillar 8: Collaborate |
+| Buzz | 10 | Pillar 8: Collaborate |
 | Consumption | 2 | Pillar 10: Administer & Govern |
 | DomoStats | 5 | Pillar 9: AI & Data Science |
 | Goals | 5 | Pillar 10: Administer & Govern |
 | Profile | 8 | Pillar 10: Administer & Govern |
 | Single Sign-On | 5 | Pillar 10: Administer & Govern |
+| Workspaces | 2 | TBD — not yet mapped |
 
 ### Notable Navigation Changes
 
 - **'Introduction to Domo' (D5):** The existing 000005874 article overlaps with the new 'What is Domo?' synthesis article. Decision needed: keep as deep-dive companion, or retire once new article ships?
 
 - **'What is an Alert?' new article:** An alert concept article is being synthesized and added to the Alerts section. The existing Alerts Overview article may become secondary.
+
+- **Workspaces now its own group (2026-10):** Create and Share Workspaces moved out of App Studio into a new Workspaces group under Collaborate, owned by you, with a new 'What Are Workspaces?' overview as the group root. Please confirm the overview and that Workspaces ownership is correct.
 
 ---
 
@@ -94,12 +97,6 @@ async written answer) is needed before drafting can begin.
 The items below are open `[pm-input]` placeholders where specific information from
 you is needed before the content can be finalized. Each is a checkbox — check it
 off once you've provided the answer.
-
-- [ ] **`000005326.mdx`**
-  Confirm how Magic ETL credit consumption relates to processed row counts (for example, a runaway many-to-many join that generates very large row counts), how to cancel an in-progress DataFlow or ETL execution, and whether any automatic protections stop runaway runs. Synthesized from community forum reports; needs confirmation.
-
-- [ ] **`000005492.mdx`**
-  Confirm the behavior when Data Refresh Permissions is enabled: whether only full admins can set advanced or sub-hourly refresh schedules regardless of a user's assigned policy, and exactly how a policy's frequency limit interacts with a non-admin user's role. Synthesized from community forum reports; needs confirmation.
 
 - [ ] **`360042925994.mdx`**
   Confirm the exact prerequisites and failure conditions for Alert-triggered Task creation: the Project role/membership the Alert owner needs (owner vs. member) to add Tasks, and the specific reasons a Task can silently fail to be created when an Alert fires. Synthesized from community forum reports; needs confirmation.
@@ -211,30 +208,28 @@ A prioritized list of everything this document is asking of you:
 | 12 | Supply info to write `Domo-API-Changelog.mdx` (Rank 99) | Info meeting | 30 min |
 | 13 | Supply info to write `ETL-Credits-and-Consumption-Model.mdx` (Rank 103) | Info meeting | 30 min |
 | 14 | Supply info to write `Alert-on-Stuck-Dataset-Refresh.mdx` (Rank 127) | Info meeting | 30 min |
-| 15 | **Open placeholder in `000005326.mdx`:** Confirm how Magic ETL credit consumption relates to processed row counts (for ex | **Answer required** | 15–30 min |
-| 16 | **Open placeholder in `000005492.mdx`:** Confirm the behavior when Data Refresh Permissions is enabled: whether only full | **Answer required** | 15–30 min |
-| 17 | **Open placeholder in `360042925994.mdx`:** Confirm the exact prerequisites and failure conditions for Alert-triggered Task  | **Answer required** | 15–30 min |
-| 18 | **Open placeholder in `360042925994.mdx`:** Confirm how numeric column formatting and exponential/scientific display affect  | **Answer required** | 15–30 min |
-| 19 | **Open placeholder in `360042925994.mdx`:** Confirm how an attached Scheduled/Triggered Report resolves the actual triggered | **Answer required** | 15–30 min |
-| 20 | **Open placeholder in `360042934294.mdx`:** Confirm which objects support group ownership versus individual ownership only—s | **Answer required** | 15–30 min |
-| 21 | **Open placeholder in `360042934294.mdx`:** Confirm the following dynamic-group criteria behaviors: (1) that leaving a crite | **Answer required** | 15–30 min |
-| 22 | **Open placeholder in `360042934454.mdx`:** confirm the Required Grants for adding and managing user licenses; no Required G | **Answer required** | 15–30 min |
-| 23 | **Open placeholder in `360042934594.mdx`:** Confirm the precise meaning of the Activity Log action and object values, specif | **Answer required** | 15–30 min |
-| 24 | **Open placeholder in `360042934594.mdx`:** Confirm exactly how the card-footer view count is calculated and the time window | **Answer required** | 15–30 min |
-| 25 | **Open placeholder in `360043427513.mdx`:** Confirm whether invitation and password-reset email delivery depends on Buzz bei | **Answer required** | 15–30 min |
-| 26 | **Open placeholder in `360043438133.mdx`:** confirm the Required Grants for enabling SSO with Okta; no Required Grants secti | **Answer required** | 15–30 min |
-| 27 | **Open placeholder in `360043438213.mdx`:** confirm which certificate's expiration affects SAML auth-request signing (the "I | **Answer required** | 15–30 min |
-| 28 | **Open placeholder in `360043438953.mdx`:** Confirm the exact names of the account-management/account-sharing grants, that t | **Answer required** | 15–30 min |
-| 29 | **Open placeholder in `360043438973.mdx`:** Confirm whether Domo hides menus and features that a user's role lacks the grant | **Answer required** | 15–30 min |
-| 30 | **Open placeholder in `360043438973.mdx`:** Confirm which grants the default Admin system role includes and excludes, and co | **Answer required** | 15–30 min |
-| 31 | **Open placeholder in `360043438973.mdx`:** Confirm any role or grant visibility conferred by the Assign Users to a Role gra | **Answer required** | 15–30 min |
-| 32 | **Open placeholder in `360043438973.mdx`:** Confirm the implicit or coupled grant requirements for common actions, such as w | **Answer required** | 15–30 min |
-| 33 | **Open placeholder in `360043438973.mdx`:** Confirm the policy for how newly released grants are applied to existing custom  | **Answer required** | 15–30 min |
-| 34 | **Open placeholder in `360043439293.mdx`:** Confirm the supported way to obtain DataFlow trigger type and schedule for repor | **Answer required** | 15–30 min |
-| 35 | **Open placeholder in `360043439313.mdx`:** confirm the exact field-level gaps in the DomoStats Projects and Tasks datasets: | **Answer required** | 15–30 min |
-| 36 | **Open placeholder in `Activity-Log-Event-Reference.mdx`:** confirm the canonical description wording for the View Activity Logs grant; the  | **Answer required** | 15–30 min |
-| 37 | **Open placeholder in `Activity-Log-Event-Reference.mdx`:** provide the complete enumerated list of Activity Log event types with a precise  | **Answer required** | 15–30 min |
-| 38 | **Open placeholder in `Restore-a-Deleted-Dashboard.mdx`:** confirm the backup retention window (how far back a deleted dashboard can be rec | **Answer required** | 15–30 min |
+| 15 | **Open placeholder in `360042925994.mdx`:** Confirm the exact prerequisites and failure conditions for Alert-triggered Task  | **Answer required** | 15–30 min |
+| 16 | **Open placeholder in `360042925994.mdx`:** Confirm how numeric column formatting and exponential/scientific display affect  | **Answer required** | 15–30 min |
+| 17 | **Open placeholder in `360042925994.mdx`:** Confirm how an attached Scheduled/Triggered Report resolves the actual triggered | **Answer required** | 15–30 min |
+| 18 | **Open placeholder in `360042934294.mdx`:** Confirm which objects support group ownership versus individual ownership only—s | **Answer required** | 15–30 min |
+| 19 | **Open placeholder in `360042934294.mdx`:** Confirm the following dynamic-group criteria behaviors: (1) that leaving a crite | **Answer required** | 15–30 min |
+| 20 | **Open placeholder in `360042934454.mdx`:** confirm the Required Grants for adding and managing user licenses; no Required G | **Answer required** | 15–30 min |
+| 21 | **Open placeholder in `360042934594.mdx`:** Confirm the precise meaning of the Activity Log action and object values, specif | **Answer required** | 15–30 min |
+| 22 | **Open placeholder in `360042934594.mdx`:** Confirm exactly how the card-footer view count is calculated and the time window | **Answer required** | 15–30 min |
+| 23 | **Open placeholder in `360043427513.mdx`:** Confirm whether invitation and password-reset email delivery depends on Buzz bei | **Answer required** | 15–30 min |
+| 24 | **Open placeholder in `360043438133.mdx`:** confirm the Required Grants for enabling SSO with Okta; no Required Grants secti | **Answer required** | 15–30 min |
+| 25 | **Open placeholder in `360043438213.mdx`:** confirm which certificate's expiration affects SAML auth-request signing (the "I | **Answer required** | 15–30 min |
+| 26 | **Open placeholder in `360043438953.mdx`:** Confirm the exact names of the account-management/account-sharing grants, that t | **Answer required** | 15–30 min |
+| 27 | **Open placeholder in `360043438973.mdx`:** Confirm whether Domo hides menus and features that a user's role lacks the grant | **Answer required** | 15–30 min |
+| 28 | **Open placeholder in `360043438973.mdx`:** Confirm which grants the default Admin system role includes and excludes, and co | **Answer required** | 15–30 min |
+| 29 | **Open placeholder in `360043438973.mdx`:** Confirm any role or grant visibility conferred by the Assign Users to a Role gra | **Answer required** | 15–30 min |
+| 30 | **Open placeholder in `360043438973.mdx`:** Confirm the implicit or coupled grant requirements for common actions, such as w | **Answer required** | 15–30 min |
+| 31 | **Open placeholder in `360043438973.mdx`:** Confirm the policy for how newly released grants are applied to existing custom  | **Answer required** | 15–30 min |
+| 32 | **Open placeholder in `360043439293.mdx`:** Confirm the supported way to obtain DataFlow trigger type and schedule for repor | **Answer required** | 15–30 min |
+| 33 | **Open placeholder in `360043439313.mdx`:** confirm the exact field-level gaps in the DomoStats Projects and Tasks datasets: | **Answer required** | 15–30 min |
+| 34 | **Open placeholder in `Activity-Log-Event-Reference.mdx`:** confirm the canonical description wording for the View Activity Logs grant; the  | **Answer required** | 15–30 min |
+| 35 | **Open placeholder in `Activity-Log-Event-Reference.mdx`:** provide the complete enumerated list of Activity Log event types with a precise  | **Answer required** | 15–30 min |
+| 36 | **Open placeholder in `Restore-a-Deleted-Dashboard.mdx`:** confirm the backup retention window (how far back a deleted dashboard can be rec | **Answer required** | 15–30 min |
 
 ---
 

@@ -270,7 +270,7 @@ When an inline `<img>` has an `alt` text or filename that identifies a known Dom
 ```
 <img alt="settings.png" src="/images/kb/..." style={{...}} />
 →
-<i className="icon-gear sm" aria-hidden="true" />
+<i className="icon-gear" aria-hidden="true" />
 ```
 
 Only substitute when you can confidently identify the icon. If the `alt` is empty or ambiguous, leave the `<img>` in place.

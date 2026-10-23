@@ -196,7 +196,7 @@ Learn more about [grants](/s/article/360043438973).
 
 <One short paragraph or numbered list showing the 1–3 ways to open or get to the product. Reference the dedicated "Opening X" article if one exists.>
 
-1. **From <surface 1>.** <Action sentence with the icon if applicable, e.g., select <i className="icon-pencil sm" aria-hidden="true" /> **Edit**.>
+1. **From <surface 1>.** <Action sentence with the icon if applicable, e.g., select <i className="icon-pencil" aria-hidden="true" /> **Edit**.>
 2. **From <surface 2>.** <Action sentence.>
 3. **From <surface 3>.** <Action sentence.>
 

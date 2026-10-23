@@ -128,6 +128,8 @@ STRUCTURAL_NOTES = {
     ],
     "Khushboo": [
         "**CourseBuilder (9 EN articles):** Support KB Audit flags CourseBuilder as retired/removed from Domo Appstore. Staged for Retired in Phase 4.6. Pending D10: confirm CourseBuilder is gone from the product before the nav rebuild.",
+        "**App Studio Overview split (2026-10):** `App Studio | Overview` (000005295) was split into a task-based series — Build an App Studio App, Add Charts and Tables, Add Interactivity, Use Advanced Customization (Forms + Pro-Code Components), Distribute, Manage — plus a new App Studio Appendix and a new 'What Are App Components?' overview (root of the new App Components subgroup). The old article was deleted and redirected to the What Is App Studio? hub (the App Studio group root). All prose + 131 screenshots + 26 [pm-input] markers were preserved, and 54 inline UI icons were upgraded to the Domo icon font. Please review the new articles and confirm the flagged icon mappings (Components/'Add Content' → icon-chart-bar-box; Layout → icon-badge-layout-small) and the new [pm-input] on pro-code/Forms grants.",
+        "**Articles moved out of App Studio (2026-10):** Forecasting Universal Model → AutoML (AI & Data Science); Domo Sandbox → Sandbox & Environments (Administer & Govern); Publish Content to a Subscriber Instance → Distribute > Publications; and Domo Bricks | Overview, AppDB Admin User Interface, and Wire an App → a new 'Apps' group under Build Apps & Automate.",
     ],
     "Chris Wright": [
         "**'Build Your First Dashboard' (D4):** This tutorial currently lives in Getting Started. It should move to Analyze & Visualize > Dashboards & Pages. Confirm before moving.",
@@ -138,6 +140,7 @@ STRUCTURAL_NOTES = {
     "Dan Brinton": [
         "**'Introduction to Domo' (D5):** The existing 000005874 article overlaps with the new 'What is Domo?' synthesis article. Decision needed: keep as deep-dive companion, or retire once new article ships?",
         "**'What is an Alert?' new article:** An alert concept article is being synthesized and added to the Alerts section. The existing Alerts Overview article may become secondary.",
+        "**Workspaces now its own group (2026-10):** Create and Share Workspaces moved out of App Studio into a new Workspaces group under Collaborate, owned by you, with a new 'What Are Workspaces?' overview as the group root. Please confirm the overview and that Workspaces ownership is correct.",
     ],
     "Phil Fuchs": [
         "**DataFusion/Fusions:** Fusions (DataFusion) articles are being archived in Phase 4. If any Beast Mode or Combined Schema articles reference DataFusion, they'll need updating.",

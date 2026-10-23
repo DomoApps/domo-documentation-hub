@@ -71,7 +71,6 @@ also contains an open `[pm-input]` placeholder — see Section 3d for the exact 
 | Rank | Article | What Was Synthesized / What to Verify |
 |------|---------|---------------------------------------|
 | 117 | `Split-Multi-Value-Fields-into-Rows.mdx` — *Split a Delimited Field into Multiple Rows in Magic ETL* | Synthesized from 360045402873 (Text tile) + 360044951294 (Unpivot); two-step Split Column → Dynamic Unpivot recipe |
-| 299 | `Handle-Source-Schema-Drift-in-Connectors.mdx` — *Handle Changing Source Headers and Date Formats in Magic ETL* ⚠️ | Synthesized from 000005809 (FUZZY_PARSE_DATE), 000005408 (SFTP Generate Header Row / Start Row Scheme), 360044876874 (Select Columns tile). No `[pm-input]` — fully synthesizable (was rank-299 DEFER, promoted to written after 2026-08-26 coverage research) |
 
 ### 3c. Forum-Gap Articles Awaiting Your Input — Cannot Be Written Yet
 
@@ -173,9 +172,6 @@ off once you've provided the answer.
 - [ ] **`360044876194.mdx`**
   confirm the current enforcement status of Relationship Type constraints. Community reports describe a period where the asymmetric constraints (One-to-Many / Many-to-One) were reversed and enforcement was paused. synthesized from community forum reports; needs confirmation.
 
-- [ ] **`360044876614.mdx`**
-  confirm the date-picker calendar shortcut in the Filter Rows tile: clicking the month/year header to jump to a month, year, and decade selection view. Synthesized from community forum reports; needs confirmation.
-
 - [ ] **`360045485833.mdx`**
   confirm the exact current outbound-network limitation of the Magic ETL Python/R scripting tiles (whether external API calls are fully blocked, unreliable, or environment-dependent) before publishing. Synthesized from community forum reports; needs confirmation.
 
@@ -246,47 +242,45 @@ A prioritized list of everything this document is asking of you:
 | 4 | Provide input for `How-Data-Flows-Through-Domo.mdx` | Info meeting | 30 min |
 | 5 | Provide input for `Choosing-the-Right-Data-Prep-Tool.mdx` | Info meeting | 30 min |
 | 6 | Fact-check `Split-Multi-Value-Fields-into-Rows.mdx` (Rank 117 community request) | Fact-check | 20–30 min |
-| 7 | Fact-check `Handle-Source-Schema-Drift-in-Connectors.mdx` (Rank 299 community request) | Fact-check | 20–30 min |
-| 8 | Supply info to write `Pivot-Table-Census-Calendar-Join.mdx` (Rank 57) | Info meeting | 30 min |
-| 9 | Supply info to write `Plot-Two-Date-Columns-on-One-Axis.mdx` (Rank 61) | Info meeting | 30 min |
-| 10 | Supply info to write `Data-Allocation-Split-Credit-in-ETL.mdx` (Rank 62) | Info meeting | 30 min |
-| 11 | Supply info to write `Time-Interval-Bucketing-and-Dedup.mdx` (Rank 77) | Info meeting | 30 min |
-| 12 | **Open placeholder in `000005150.mdx`:** confirm the exact preview row-sampling limit per input (reported in the communit | **Answer required** | 15–30 min |
-| 13 | **Open placeholder in `000005541.mdx`:** confirm the exact behavior when an existing Replace/Append DataSet is switched t | **Answer required** | 15–30 min |
-| 14 | **Open placeholder in `000005741.mdx`:** confirm the exact reason an AI Forecasting DataFlow can succeed in Preview but f | **Answer required** | 15–30 min |
-| 15 | **Open placeholder in `000005809.mdx`:** confirm that the Magic ETL SQL tile does not support recursive CTEs and that rec | **Answer required** | 15–30 min |
-| 16 | **Open placeholder in `000005809.mdx`:** confirm SQL-tile handling of temporary tables (for example, CREATE TEMP TABLE) a | **Answer required** | 15–30 min |
-| 17 | **Open placeholder in `000005901.mdx`:** confirm the current names and behavior of Magic ETL run-control features beyond  | **Answer required** | 15–30 min |
-| 18 | **Open placeholder in `360042922974.mdx`:** confirm whether Magic ETL DataFlows expose the same privacy lock and whether the | **Answer required** | 15–30 min |
-| 19 | **Open placeholder in `360042923134.mdx`:** confirm the supported approach for bulk re-mapping many pieces of content to new | **Answer required** | 15–30 min |
-| 20 | **Open placeholder in `360042923174.mdx`:** confirm the Required Grants for changing DataFlow ownership; no Required Grants  | **Answer required** | 15–30 min |
-| 21 | **Open placeholder in `360042923174.mdx`:** confirm two current-state facts reported in the community: (1) the exact scope o | **Answer required** | 15–30 min |
-| 22 | **Open placeholder in `360043427653.mdx`:** confirm the Larger Grid details: the April 8, 2025 default cutoff, that the swit | **Answer required** | 15–30 min |
-| 23 | **Open placeholder in `360043427653.mdx`:** confirm the exact control used to leave the full-screen Magic ETL editor without | **Answer required** | 15–30 min |
-| 24 | **Open placeholder in `360043427953.mdx`:** confirm the complete list of conditions that produce a "Not Runnable" error and  | **Answer required** | 15–30 min |
-| 25 | **Open placeholder in `360043427953.mdx`:** confirm whether run status reflects all outputs finishing indexing or only the f | **Answer required** | 15–30 min |
-| 26 | **Open placeholder in `360043427953.mdx`:** confirm the exact meaning and resolution of the "Saved but Incomplete" status, t | **Answer required** | 15–30 min |
-| 27 | **Open placeholder in `360043427953.mdx`:** confirm that the "output DataSet deleted" error indicates the user is not the ou | **Answer required** | 15–30 min |
-| 28 | **Open placeholder in `360043427953.mdx`:** confirm the recommended patterns for one-time historical corrections in append p | **Answer required** | 15–30 min |
-| 29 | **Open placeholder in `360043437753.mdx`:** document how to open Data Assembler and create a new job (the app or page entry  | **Answer required** | 15–30 min |
-| 30 | **Open placeholder in `360043437753.mdx`:** document how to access and edit an existing Data Assembler job's settings (where | **Answer required** | 15–30 min |
-| 31 | **Open placeholder in `360044258533.mdx`:** confirm whether DataSet Forms (interactive data entry that writes back to a Data | **Answer required** | 15–30 min |
-| 32 | **Open placeholder in `360044258533.mdx`:** confirm the supported pattern for intentionally failing a DataFlow when the inpu | **Answer required** | 15–30 min |
-| 33 | **Open placeholder in `360044289573.mdx`:** confirm the exact default-time-zone behavior of NOW()/CURRENT_TIME()/CURRENT_TIM | **Answer required** | 15–30 min |
-| 34 | **Open placeholder in `360044289573.mdx`:** confirm Beast Mode's exact ROUND() rounding mode for equidistant values so the E | **Answer required** | 15–30 min |
-| 35 | **Open placeholder in `360044289573.mdx`:** confirm the ETL-vs-Beast-Mode difference for HOUR() on elapsed-time strings over | **Answer required** | 15–30 min |
-| 36 | **Open placeholder in `360044289573.mdx`:** confirm whether STR_TO_DATE() reliably parses the short month-name token %b (com | **Answer required** | 15–30 min |
-| 37 | **Open placeholder in `360044876094.mdx`:** confirm whether GROUP_CONCAT(DISTINCT  | **Answer required** | 15–30 min |
-| 38 | **Open placeholder in `360044876194.mdx`:** confirm the current enforcement status of Relationship Type constraints | **Answer required** | 15–30 min |
-| 39 | **Open placeholder in `360044876614.mdx`:** confirm the date-picker calendar shortcut in the Filter Rows tile: clicking the  | **Answer required** | 15–30 min |
-| 40 | **Open placeholder in `360045485833.mdx`:** confirm the exact current outbound-network limitation of the Magic ETL Python/R  | **Answer required** | 15–30 min |
-| 41 | **Open placeholder in `360047787514.mdx`:** confirm the current status of these editor issues (which are fixed vs | **Answer required** | 15–30 min |
-| 42 | **Open placeholder in `360057087393.mdx`:** confirm the CLI workaround community members reference for remapping a Magic ETL | **Answer required** | 15–30 min |
-| 43 | **Open placeholder in `4404652354583.mdx`:** confirm the exact steps to re-enable a DataFlow that was auto-disabled for inact | **Answer required** | 15–30 min |
-| 44 | **Open placeholder in `What-is-Magic-ETL.mdx`:** confirm the exact behavior when a Magic ETL DataFlow references a cloud-connecto | **Answer required** | 15–30 min |
-| 45 | Validate additions to: Magic ETL troubleshooting (Rank 2) | Review | 20 min |
-| 46 | Validate additions to: Magic ETL troubleshooting (Rank 3) | Review | 20 min |
-| 47 | Validate additions to: Magic ETL preview documentation (Rank 8) | Review | 20 min |
+| 7 | Supply info to write `Pivot-Table-Census-Calendar-Join.mdx` (Rank 57) | Info meeting | 30 min |
+| 8 | Supply info to write `Plot-Two-Date-Columns-on-One-Axis.mdx` (Rank 61) | Info meeting | 30 min |
+| 9 | Supply info to write `Data-Allocation-Split-Credit-in-ETL.mdx` (Rank 62) | Info meeting | 30 min |
+| 10 | Supply info to write `Time-Interval-Bucketing-and-Dedup.mdx` (Rank 77) | Info meeting | 30 min |
+| 11 | **Open placeholder in `000005150.mdx`:** confirm the exact preview row-sampling limit per input (reported in the communit | **Answer required** | 15–30 min |
+| 12 | **Open placeholder in `000005541.mdx`:** confirm the exact behavior when an existing Replace/Append DataSet is switched t | **Answer required** | 15–30 min |
+| 13 | **Open placeholder in `000005741.mdx`:** confirm the exact reason an AI Forecasting DataFlow can succeed in Preview but f | **Answer required** | 15–30 min |
+| 14 | **Open placeholder in `000005809.mdx`:** confirm that the Magic ETL SQL tile does not support recursive CTEs and that rec | **Answer required** | 15–30 min |
+| 15 | **Open placeholder in `000005809.mdx`:** confirm SQL-tile handling of temporary tables (for example, CREATE TEMP TABLE) a | **Answer required** | 15–30 min |
+| 16 | **Open placeholder in `000005901.mdx`:** confirm the current names and behavior of Magic ETL run-control features beyond  | **Answer required** | 15–30 min |
+| 17 | **Open placeholder in `360042922974.mdx`:** confirm whether Magic ETL DataFlows expose the same privacy lock and whether the | **Answer required** | 15–30 min |
+| 18 | **Open placeholder in `360042923134.mdx`:** confirm the supported approach for bulk re-mapping many pieces of content to new | **Answer required** | 15–30 min |
+| 19 | **Open placeholder in `360042923174.mdx`:** confirm the Required Grants for changing DataFlow ownership; no Required Grants  | **Answer required** | 15–30 min |
+| 20 | **Open placeholder in `360042923174.mdx`:** confirm two current-state facts reported in the community: (1) the exact scope o | **Answer required** | 15–30 min |
+| 21 | **Open placeholder in `360043427653.mdx`:** confirm the Larger Grid details: the April 8, 2025 default cutoff, that the swit | **Answer required** | 15–30 min |
+| 22 | **Open placeholder in `360043427653.mdx`:** confirm the exact control used to leave the full-screen Magic ETL editor without | **Answer required** | 15–30 min |
+| 23 | **Open placeholder in `360043427953.mdx`:** confirm the complete list of conditions that produce a "Not Runnable" error and  | **Answer required** | 15–30 min |
+| 24 | **Open placeholder in `360043427953.mdx`:** confirm whether run status reflects all outputs finishing indexing or only the f | **Answer required** | 15–30 min |
+| 25 | **Open placeholder in `360043427953.mdx`:** confirm the exact meaning and resolution of the "Saved but Incomplete" status, t | **Answer required** | 15–30 min |
+| 26 | **Open placeholder in `360043427953.mdx`:** confirm that the "output DataSet deleted" error indicates the user is not the ou | **Answer required** | 15–30 min |
+| 27 | **Open placeholder in `360043427953.mdx`:** confirm the recommended patterns for one-time historical corrections in append p | **Answer required** | 15–30 min |
+| 28 | **Open placeholder in `360043437753.mdx`:** document how to open Data Assembler and create a new job (the app or page entry  | **Answer required** | 15–30 min |
+| 29 | **Open placeholder in `360043437753.mdx`:** document how to access and edit an existing Data Assembler job's settings (where | **Answer required** | 15–30 min |
+| 30 | **Open placeholder in `360044258533.mdx`:** confirm whether DataSet Forms (interactive data entry that writes back to a Data | **Answer required** | 15–30 min |
+| 31 | **Open placeholder in `360044258533.mdx`:** confirm the supported pattern for intentionally failing a DataFlow when the inpu | **Answer required** | 15–30 min |
+| 32 | **Open placeholder in `360044289573.mdx`:** confirm the exact default-time-zone behavior of NOW()/CURRENT_TIME()/CURRENT_TIM | **Answer required** | 15–30 min |
+| 33 | **Open placeholder in `360044289573.mdx`:** confirm Beast Mode's exact ROUND() rounding mode for equidistant values so the E | **Answer required** | 15–30 min |
+| 34 | **Open placeholder in `360044289573.mdx`:** confirm the ETL-vs-Beast-Mode difference for HOUR() on elapsed-time strings over | **Answer required** | 15–30 min |
+| 35 | **Open placeholder in `360044289573.mdx`:** confirm whether STR_TO_DATE() reliably parses the short month-name token %b (com | **Answer required** | 15–30 min |
+| 36 | **Open placeholder in `360044876094.mdx`:** confirm whether GROUP_CONCAT(DISTINCT  | **Answer required** | 15–30 min |
+| 37 | **Open placeholder in `360044876194.mdx`:** confirm the current enforcement status of Relationship Type constraints | **Answer required** | 15–30 min |
+| 38 | **Open placeholder in `360045485833.mdx`:** confirm the exact current outbound-network limitation of the Magic ETL Python/R  | **Answer required** | 15–30 min |
+| 39 | **Open placeholder in `360047787514.mdx`:** confirm the current status of these editor issues (which are fixed vs | **Answer required** | 15–30 min |
+| 40 | **Open placeholder in `360057087393.mdx`:** confirm the CLI workaround community members reference for remapping a Magic ETL | **Answer required** | 15–30 min |
+| 41 | **Open placeholder in `4404652354583.mdx`:** confirm the exact steps to re-enable a DataFlow that was auto-disabled for inact | **Answer required** | 15–30 min |
+| 42 | **Open placeholder in `What-is-Magic-ETL.mdx`:** confirm the exact behavior when a Magic ETL DataFlow references a cloud-connecto | **Answer required** | 15–30 min |
+| 43 | Validate additions to: Magic ETL troubleshooting (Rank 2) | Review | 20 min |
+| 44 | Validate additions to: Magic ETL troubleshooting (Rank 3) | Review | 20 min |
+| 45 | Validate additions to: Magic ETL preview documentation (Rank 8) | Review | 20 min |
 
 ---
 

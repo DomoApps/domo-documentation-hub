@@ -325,10 +325,10 @@ Build Apps & Automate
 │   │   ├── Group and Aggregate Data in App Components
 │   │   └── Apply Conditional Formatting and Conditional Rendering in App Components
 │   └── App Studio Appendix                            ← [NEW] glossary from the Overview split
-├── Apps (3)                                           ← general app building & management (moved out of App Studio)
+├── Apps (3)                                           ← general app building & management; NOT App Studio (not linked from the What Is App Studio? hub)
 │   ├── Domo Bricks | Overview
 │   ├── AppDB Admin User Interface
-│   └── Wire an App
+│   └── Wire an App                                    ← unrelated to App Studio; lives here, not in the App Studio group/hub
 ├── Workflows (13)
 │   ├── [NEW] What is Workflows?                      ← Workflows | Overview already exists
 │   │         (may just promote existing overview)

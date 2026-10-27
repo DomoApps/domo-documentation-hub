@@ -133,72 +133,48 @@ Variable controls are dashboard-level parameters that viewers can adjust to chan
 
 <Note>**Note:** Variable controls must already be configured on the dashboard. `pvariables` only sets the initial value of an existing control — it cannot create new controls.</Note>
 
-### Basic Format
+### Format
 
-The `pvariables` parameter takes a JSON-encoded object keyed by variable control ID:
+The `pvariables` parameter takes a JSON-encoded object where each key is the variable name:
 
 ```url
-?pvariables={"<variable_control_id>":{"parsedExpression":{"exprType":"<type>","value":<value>}}}
+?pvariables={"Name":"Jim"}
 ```
 
-The `exprType` field specifies the data type:
-
-| exprType | Value type | Description |
-| --- | --- | --- |
-| NUMERIC_VALUE | number | Integer or decimal numeric variable |
-| STRING_VALUE | string | Text variable |
-
-<Note>**Note:** The wrapper key must be spelled exactly `parsedExpression`. Common typos like `parsedExpresion` or `parseExpression` cause the value to be silently ignored with no error shown.</Note>
-
-### Examples
-
-Single numeric variable:
+Multiple variables in one object:
 
 ```url
-?pvariables={"111":{"parsedExpression":{"exprType":"NUMERIC_VALUE","value":20}}}
-```
-
-Single string variable:
-
-```url
-?pvariables={"111":{"parsedExpression":{"exprType":"STRING_VALUE","value":"West"}}}
-```
-
-Multiple variables:
-
-```url
-?pvariables={"1842":{"parsedExpression":{"exprType":"NUMERIC_VALUE","value":5031660}},"216560":{"parsedExpression":{"exprType":"NUMERIC_VALUE","value":2484860}}}
+?pvariables={"Name":"Jim","Region":"West"}
 ```
 
 URL-encoded (recommended):
 
 ```url
-?pvariables=%7B%221842%22%3A%7B%22parsedExpression%22%3A%7B%22exprType%22%3A%22NUMERIC_VALUE%22%2C%22value%22%3A5031660%7D%7D%7D
+?pvariables=%7B%22Name%22%3A%22Jim%22%7D
 ```
 
-### Find a Variable Control ID
+### Find a Variable Control Name
 
-Variable control IDs are numeric identifiers assigned when a variable control is created in Domo. To find them:
+Variable names are set when a variable control is created in Domo. To find the exact name to use in the URL:
 
 1. Open the dashboard in Domo (not the embed view).
 2. Open your browser's developer tools (F12) and select the **Network** tab.
 3. Reload the page and look for a request to `/api/content/v3/pages/{pageId}/analyzer`.
-4. Open that response — each variable control is listed with its numeric `id` field under function which is under VariableControls.
-
+4. Open that response — each variable control is listed with its `name` field under `VariableControls`.
 
 ### Use PFilters and PVariables Together
 
 Both parameters can be included in the same URL, separated by `&`:
 
 ```url
-?pvariables={"111":{"parsedExpression":{"exprType":"NUMERIC_VALUE","value":20}}}&pfilters=[{"column":"Region","operand":"IN","values":["West"]}]
+?pvariables={"Name":"Jim"}&pfilters=[{"column":"Region","operand":"IN","values":["West"]}]
 ```
 
 In JavaScript:
 
 ```javascript
 const filters = [{ "column": "Region", "dataType": "string", "operand": "IN", "values": ["West"] }];
-const variables = { "111": { "parsedExpression": { "exprType": "NUMERIC_VALUE", "value": 20 } } };
+const variables = { "Name": "Jim" };
 
 const url = baseUrl
   + `?pfilters=${encodeURIComponent(JSON.stringify(filters))}`
@@ -211,7 +187,7 @@ const url = baseUrl
 
 The appData parameter supports passing in general types of inputs to the app. The app developer needs to watch for the parameter, parse the value, and inject it into the most relevant part of the app.
 
-For example, the value of the parameter could then auto-populate a drop-down menu in an app that selects the location. This way, the host page can avoid the delay of waiting for manual inputs. They can now deep-link to a version of the app that already has specific values filled in. Spaces should be encoded as “+” :
+For example, the value of the parameter could then auto-populate a drop-down menu in an app that selects the location. This way, the host page can avoid the delay of waiting for manual inputs. They can now deep-link to a version of the app that already has specific values filled in. Spaces should be encoded as "+" :
 
 ```html
 public.domo.com/embed/pages/abcde?appData=Salt+Lake+City
@@ -225,7 +201,7 @@ The query parameters on the embed URL will then be automatically passed down int
 
 App Studio includes many navigatable page views, for control outside of the embeded App Studio app, a viewId can be provided in the URL to tell the app a specific page view to open to directly instead of the default landing page view. As well as this parameter can be used by programmatic filter calls to prevent reloading and ensure the page opens to the page that the filter was set.
 
-To find these view ids, when opening an embedded page, looking at the network traffic, the views can be found in the following request `https://embed.domo.com/embed/app-studio/<EMBED TOKEN>/dataapp`. In the response, there is an array of `views`, listing the id and names.
+To find these view ids, when opening an embedded page, looking at the network traffic, the views can be found in the following request `https://embed.domo.com/embed/app-studio/<EMBED TOKEN>/dataapp`. In the response, there is an array of `views`, listing the ID and Name.
 
 ```html
 public.domo.com/embed/pages/abcde?viewId=835972594

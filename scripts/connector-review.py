@@ -304,6 +304,18 @@ def analyze_jira_ticket(jira_id, my_account_id, templates):
     except RuntimeError as e:
         return {"error": str(e)}
 
+    # Ticket summary + status — shown on the dashboard so a branch that names the
+    # wrong Jira ticket (see find_sibling_approval) is easy to spot by eye.
+    summary = ""
+    status = ""
+    try:
+        meta = jira_get(f"/rest/api/3/issue/{jira_id}?fields=summary,status")
+        fields = meta.get("fields", {})
+        summary = fields.get("summary", "") or ""
+        status = (fields.get("status") or {}).get("name", "") or ""
+    except RuntimeError:
+        pass
+
     comments = data.get("comments", [])
     approval_phrases = templates.get("approval_phrases", ["looks good", "lgtm", "approved", "verified"])
     publish_phrases = templates.get("publish_request_phrases", ["please publish"])
@@ -408,6 +420,8 @@ def analyze_jira_ticket(jira_id, my_account_id, templates):
 
     return {
         "comments": comments,
+        "summary": summary,
+        "status": status,
         "secondary_approvers": secondary_approvers,
         "secondary_approved": secondary_approved,
         "follow_up_count": follow_up_count,
@@ -416,6 +430,92 @@ def analyze_jira_ticket(jira_id, my_account_id, templates):
         "action_type": action_type,
         "arun_account": arun_account,
     }
+
+
+# ── Sibling-ticket approval detection ─────────────────────────────────────────────
+# A connector branch name encodes the Jira ticket (e.g. ...-DOMO-503202-Shopify), and
+# the script trusts that ID. But Arun sometimes bakes the wrong number into the branch,
+# or files near-duplicate tickets (one for the KB body, one for the FAQ) and reviews on
+# the sibling. The script then checks a ticket with no approval while the real approval
+# sits on its twin. This can't be auto-corrected safely — but when the branch ticket has
+# no approval we search for a near-identical sibling that DOES, and surface it so a human
+# can verify before acting. It never changes merge/auto behavior on its own.
+
+def jira_search_jql(jql, fields="summary,status", max_results=20):
+    """Run a JQL search via the enhanced /search/jql endpoint and return its issues.
+    (The legacy /issue/search endpoint was retired on Jira Cloud and now 404s.)"""
+    url = (f"/rest/api/3/search/jql?jql={urllib.request.quote(jql)}"
+           f"&maxResults={max_results}&fields={urllib.request.quote(fields)}")
+    data = jira_request("GET", url)
+    return data.get("issues", [])
+
+
+def _summary_tokens(summary):
+    return set(re.findall(r"[a-z0-9]+", (summary or "").lower()))
+
+
+# Generic words that carry no connector/feature signal — dropped before picking the
+# distinctive tokens that drive the sibling search.
+_SIBLING_STOPWORDS = {
+    "need", "needs", "added", "adding", "report", "reports", "article", "articles",
+    "faqs", "faq", "update", "updates", "page", "pages", "section", "kb", "doc", "docs",
+}
+
+
+def find_sibling_approval(jira_id, summary, my_account_id, templates, min_overlap=0.6):
+    """Return {key, summary, status, approvers} for a near-identical sibling ticket
+    that has a secondary approval, or None. Only meaningful when `jira_id` itself has
+    no approval."""
+    base_tokens = _summary_tokens(summary)
+    if len(base_tokens) < 3:
+        return None  # too little signal to match reliably
+
+    # Distinctive tokens drive the search: alphanumeric, length >= 4, minus generic
+    # workflow words. ANDing a few of these recalls near-duplicate siblings without the
+    # phrase-contiguity fragility of `summary ~ "<whole summary>"` (the differing tail —
+    # "...FAQs" vs "...KB article" — otherwise breaks the match). Precision then comes
+    # from the token-overlap gate below.
+    significant = [t for t in re.findall(r"[A-Za-z0-9]{4,}", summary or "")
+                   if t.lower() not in _SIBLING_STOPWORDS]
+    # De-dupe (case-insensitively), keep order, prefer the longest/most distinctive.
+    seen, ordered = set(), []
+    for t in significant:
+        if t.lower() not in seen:
+            seen.add(t.lower())
+            ordered.append(t)
+    ordered.sort(key=len, reverse=True)
+    key_tokens = ordered[:4]
+    if len(key_tokens) < 2:
+        return None
+
+    project = jira_id.split("-")[0]
+    token_clause = " AND ".join(f'summary ~ "{t}"' for t in key_tokens)
+    query = (f'project = {project} AND {token_clause} '
+             f'AND key != {jira_id} ORDER BY updated DESC')
+    try:
+        issues = jira_search_jql(query, fields="summary,status", max_results=10)
+    except RuntimeError:
+        return None
+
+    for issue in issues:
+        cand_key = issue.get("key")
+        cand_summary = issue.get("fields", {}).get("summary", "") or ""
+        cand_tokens = _summary_tokens(cand_summary)
+        union = base_tokens | cand_tokens
+        if not union:
+            continue
+        overlap = len(base_tokens & cand_tokens) / len(union)
+        if overlap < min_overlap:
+            continue
+        cand_data = analyze_jira_ticket(cand_key, my_account_id, templates)
+        if cand_data.get("secondary_approved"):
+            return {
+                "key": cand_key,
+                "summary": cand_summary,
+                "status": (issue.get("fields", {}).get("status") or {}).get("name", ""),
+                "approvers": [a["displayName"] for a in cand_data.get("secondary_approvers", [])],
+            }
+    return None
 
 
 # ── State machine ─────────────────────────────────────────────────────────────────
@@ -741,9 +841,7 @@ def find_special_action_tickets(jql, templates):
     for phrase in all_phrases:
         query = f'project = DOMO AND status != Done AND comment ~ "{phrase}" ORDER BY updated DESC'
         try:
-            data = jira_request("GET",
-                f"/rest/api/3/issue/search?jql={urllib.request.quote(query)}&maxResults=20&fields=summary,status,comment")
-            for issue in data.get("issues", []):
+            for issue in jira_search_jql(query, fields="summary,status", max_results=20):
                 results.append({
                     "key": issue["key"],
                     "summary": issue["fields"]["summary"],
@@ -786,11 +884,22 @@ def print_dashboard(items):
 
         print(f"\n  PR #{pr['number']}: {pr['title'][:58]}")
         print(f"  Jira: {item['jira_id']}  |  Age: {item['pr_age']} days  |  Secondary: {secondary_names}")
+        if jdata.get("summary"):
+            print(f"  Ticket: \"{jdata['summary'][:62]}\"  |  Status: {jdata.get('status') or '—'}")
         print(f"  GitHub approved: {'✓' if item['gh']['jared_approved'] else '✗'}  "
               f"|  Jira approved: {'✓' if jdata.get('secondary_approved') else '✗'}  "
               f"|  Follow-ups sent: {jdata.get('follow_up_count', 0)}  "
               f"|  Action type: {jdata.get('action_type', 'review')}")
         print(f"  State: {STATE_DISPLAY.get(state, state)}")
+        sibling = jdata.get("sibling_approval")
+        if sibling:
+            approvers = ", ".join(sibling.get("approvers", [])) or "a reviewer"
+            print(f"  ⚠️  POSSIBLE WRONG-TICKET MATCH: no approval on {item['jira_id']}, but sibling "
+                  f"{sibling['key']} has one")
+            print(f"      from {approvers}  —  {sibling['key']}: \"{sibling['summary'][:56]}\" "
+                  f"({sibling.get('status') or '—'})")
+            print(f"      The branch name may reference the wrong ticket. Verify, then route the "
+                  f"merge/close to {sibling['key']} if correct.")
         print(f"  URL:   {pr['url']}")
 
     if held_items:
@@ -1068,6 +1177,13 @@ def main():
                 jira_data.get("has_escalation_comment", False),
                 jira_data.get("action_type", "review"),
             )
+            # No approval on the branch's ticket? Check for a near-identical sibling
+            # ticket that was actually reviewed (wrong-ticket branch name safeguard).
+            if not jira_data.get("secondary_approved"):
+                sibling = find_sibling_approval(
+                    jira_id, jira_data.get("summary", ""), jared_jira_id, templates)
+                if sibling:
+                    jira_data["sibling_approval"] = sibling
 
         items.append({
             "pr": pr, "jira_id": jira_id, "state": state,

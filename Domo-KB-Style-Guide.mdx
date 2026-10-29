@@ -215,6 +215,27 @@ Do not add explicit `width` or `height` styles to the `<img>`, since they overri
 
 For inline glyphs and small UI fragments that flow with surrounding text, use the icon font or a native inline `<img>` instead. See *Icons* and *Inline images* below.
 
+### Alt Text Is Required on Every Screenshot
+
+Every screenshot — and every content image — must carry detailed, accurate `alt` text.
+
+Alt text serves three audiences at once:
+
+- **Accessibility compliance.** Screen-reader users can't see the image; the `alt` text is the only thing read in its place. Empty, missing, or vague alt text fails [WCAG image guidance](https://www.w3.org/WAI/tutorials/images/) and leaves those readers without the information the screenshot carries.
+- **LLM readability.** AI assistants that index and answer from the KB read the `alt` text, not the pixels. Accurate alt text is often the only way a model learns what a screenshot shows.
+- **SEO.** Search engines use `alt` text to understand and rank image content.
+
+**What good alt text looks like.** Describe what the screenshot actually shows and the state or detail that matters in context — the specific screen, the control the reader is acting on, and any on-screen values the step depends on. Write it so a reader who can't see the image loses nothing from the step.
+
+- **Do:** `alt="The DataSet Settings page with the Scheduling tab open and update frequency set to Every 15 minutes"`
+- **Don't:** `alt="screenshot"`, `alt="image"`, `alt="DataSet settings"` (too vague), or an empty `alt=""`.
+
+Keep it to roughly a sentence. Don't open with "Image of…" or "Screenshot of…" (the medium is already implied); describe the content directly. Never let the alt text claim something the image doesn't show.
+
+**Decorative icons are the exception**. An inline UI icon that the surrounding prose already names is hidden from screen readers with `aria-hidden="true"` rather than carrying alt text (see *Always Pair an Icon with a Text Label*). That exception applies only to decorative glyphs. A screenshot is content and always takes descriptive `alt`.
+
+**If you don't have the alt text, ask for it.** When writing or editing an article and a screenshot has no alt text — or only a placeholder such as `alt-text-here` — do not ship it and do not invent a description of an image you can't see. State this requirement, reference this rule, and ask the author for detailed, accurate alt text describing what each image shows.
+
 ## Icons
 
 When you need to show a Domo UI icon inside an article — like a gear, a chart, or an arrow — use the **Domo icon font** rather than uploading an image. The font already contains about a thousand icons and is built into every article automatically, so there's nothing to install or import. Using the font keeps icons crisp at any size, lets them match the surrounding text color (including in dark mode), and saves you from hunting down a screenshot.
@@ -222,14 +243,14 @@ When you need to show a Domo UI icon inside an article — like a gear, a chart,
 Here's what a typical icon reference looks like in an article:
 
 ```mdx
-Select <i className="icon-gear sm" aria-hidden="true" /> **Settings** to open Settings.
+Select <i className="icon-gear" aria-hidden="true" /> **Settings** to open Settings.
 ```
 
 A few things worth knowing:
 
 - The name after `icon-` always matches the name in the Domo design system. You can browse the full set at [Domo Icons](https://git.empdev.domo.com/pages/Development/DomoIcons/#!/icons/phosphor?size=xl).
-- Icons automatically pick up the color and size of the text around them, so they'll look right in both light and dark mode without any extra work.
-- If a particular icon ever looks off — too small or too large next to its label — you can resize just that one with `style={{fontSize: 24}}`. Don't reach for this unless the default genuinely looks wrong.
+- Icons automatically pick up the color and size of the text around them, so they'll look right in both light and dark mode without any extra work. An icon in a heading comes out heading-sized, and one in a table comes out table-sized. You don't need to add anything to get this.
+- If a particular icon ever looks off — too small or too large next to its label — you can give just that one a fixed size by adding a size word after the icon name, like `className="icon-gear md"`. The sizes are `xs` (18 pixels), `sm` (20 pixels), `md` (24 pixels), `lg` (36 pixels), and `xl` (48 pixels). A fixed size no longer matches the text around it, so don't reach for this unless the default genuinely looks wrong.
 
 ### Always Pair an Icon with a Text Label
 
@@ -238,18 +259,18 @@ The icon font uses a set of special Unicode characters that screen readers can't
 Here's the pattern again, with the screen-reader-friendly attribute called out:
 
 ```mdx
-Select <i className="icon-gear sm" aria-hidden="true" /> **Settings** to open Settings.
+Select <i className="icon-gear" aria-hidden="true" /> **Settings** to open Settings.
 ```
 
 If the sentence around the icon doesn't already name it — for example, "select [icon]" with nothing else — **rewrite the sentence to include the icon's name in the prose**. Don't try to fix it with a hidden `aria-label`. Naming the icon out loud helps everyone, not just screen-reader users; sighted readers benefit too, because they don't have to recognize an unfamiliar glyph at a glance.
 
-- **Don't:** "Select <i className="icon-chart-line sm" aria-hidden="true" /> to view the chart."
-- **Do:** "Select the line chart icon <i className="icon-chart-line sm" aria-hidden="true" /> to view the chart."
+- **Don't:** "Select <i className="icon-chart-line" aria-hidden="true" /> to view the chart."
+- **Do:** "Select the line chart icon <i className="icon-chart-line" aria-hidden="true" /> to view the chart."
 
 Occasionally an icon has no surrounding sentence to lean on — for example, an icon-only button, an icon used as the entire content of a link, or a glyph squeezed into a tight table cell where there's no room for a label. In those rare cases, use `role="img"` together with `aria-label` to give the icon its own accessible name:
 
 ```mdx
-<i className="icon-gear sm" role="img" aria-label="Settings" />
+<i className="icon-gear" role="img" aria-label="Settings" />
 ```
 
 Treat this as a last resort. Whenever the icon sits inside normal prose, the rewrite-the-sentence approach above is always the better choice.
@@ -296,7 +317,7 @@ Use whichever font matches the UI you're describing:
 - **Use `icon-*`** (Phosphor) everywhere else. The current Domo product uses the refreshed icons, so articles about today's UI should match. This holds even when an article's existing screenshots still show legacy icons — the screenshots are out of date, and pairing them with legacy-icon references would only reinforce the confusion.
 
 ```mdx
-In Workbench, select <i className="legacy-icon-database sm" aria-hidden="true" /> in the left icon bar.
+In Workbench, select <i className="legacy-icon-database" aria-hidden="true" /> in the left icon bar.
 ```
 
 ### Icons in Migrated Articles
@@ -326,6 +347,8 @@ The `height` value controls how big the image appears relative to the surroundin
 - **A plain number, such as `111`** — for screenshots inside a table cell where you want a specific pixel size.
 
 Keep the other three style values — `display: 'inline'`, `verticalAlign: 'start'`, and `margin: '0'` — the same across every inline image. They're what keep the image aligned with the text baseline and prevent extra vertical space from creeping in.
+
+An inline image that conveys content (a small UI-fragment screenshot, for example) follows the same rule as a block screenshot: it needs detailed, accurate `alt` text — see *Alt Text Is Required on Every Screenshot* above. The only images that omit `alt` are decorative icons already named in the surrounding prose, which use `aria-hidden="true"` instead.
 
 ## Videos
 

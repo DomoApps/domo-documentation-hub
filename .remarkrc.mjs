@@ -13,6 +13,7 @@ import remarkLintNoFileNameIrregularCharacters from "remark-lint-no-file-name-ir
 import remarkLintEmphasisMarker from "remark-lint-emphasis-marker";
 import remarkLintNoFileNameMixedCase from "remark-lint-no-file-name-mixed-case";
 import remarkLintOrderedListMarkerValue from "remark-lint-ordered-list-marker-value";
+import remarkMath from "remark-math";
 import remarkMdx from "remark-mdx";
 import remarkPresetLintConsistent from "remark-preset-lint-consistent";
 import remarkPresetLintMarkdownStyleGuide from "remark-preset-lint-markdown-style-guide";
@@ -22,8 +23,10 @@ import retextEnglish from "retext-english";
 import retextRepeatedWords from "retext-repeated-words";
 import retextSentenceSpacing from "retext-sentence-spacing";
 import retextSyntaxUrls from "retext-syntax-urls";
+import stringWidth from "string-width";
 import { unified } from "unified";
 
+import { remarkDomoFormat } from "./scripts/remark-domo-format.mjs";
 import {
   remarkDomoForbiddenTerms,
   remarkDomoImgAlt,
@@ -31,24 +34,22 @@ import {
   remarkDomoNoExclamation,
   remarkDomoNoH1,
 } from "./scripts/remark-domo-style.mjs";
-import { remarkSplitTableRows } from "./scripts/remark-split-table-rows.mjs";
 import { remarkStripRedundantLinkTitle } from "./scripts/remark-strip-redundant-link-title.mjs";
 
-// Transformer: normalize a list's `spread` to match its items. CommonMark says
-// a list is loose iff any item has internal blank-line block separation, but
-// remark only sets list-level `spread` from sibling spacing in the source. On
-// save, `remark-stringify` writes blank lines between items only when
-// `list.spread === true`, so we promote it whenever any child item is spread,
-// and demote it when none are. Result: tight by default, loose only when an
-// item contains sub-blocks (continuation paragraph, sub-list, Note, code, etc.).
+// Transformer: a list renders loose when it or any item is spread, but
+// `remark-stringify` writes blank lines between items only when
+// `list.spread === true`. Promote the list when an item is spread so the
+// output spaces every item consistently. Never demote: a list written with
+// blank lines between single-block items renders loose, and tightening it
+// would change the page's spacing.
 function remarkNormalizeListSpread() {
   return (tree) => {
     const walk = (node) => {
       if (!node || typeof node !== "object") return;
       if (node.type === "list" && Array.isArray(node.children)) {
-        node.spread = node.children.some(
-          (child) => child && child.spread === true,
-        );
+        if (node.children.some((child) => child && child.spread === true)) {
+          node.spread = true;
+        }
       }
       if (Array.isArray(node.children)) {
         for (const child of node.children) walk(child);
@@ -59,11 +60,9 @@ function remarkNormalizeListSpread() {
 }
 
 const config = {
-  // `settings` configures remark-stringify (the formatter that
-  // `unified-prettier` runs on format-on-save) to match the lint rules
-  // enforced by `remark-preset-lint-markdown-style-guide`. Without these,
-  // Prettier emits `*` bullets while the linter wants `-` — fight on every
-  // save.
+  // `settings` configures remark-stringify (the formatter behind format-on-save
+  // and `yarn format`) to match `remark-preset-lint-markdown-style-guide`, so
+  // formatting never produces output the linter then flags.
   settings: {
     bullet: "-",
     emphasis: "_",
@@ -74,21 +73,28 @@ const config = {
     remarkFrontmatter,
     // `remark-mdx` lets the parser handle JSX, imports, and expressions in
     // .mdx files (Mintlify components like <Frame>, <Note>, etc.). Without
-    // this, the linter crashes on the first JSX tag.
-    remarkMdx,
+    // this, the linter crashes on the first JSX tag. `tightSelfClosing` keeps
+    // `<br/>` and `<img .../>` as most articles write them.
+    [remarkMdx, { tightSelfClosing: true }],
     // `remark-gfm` must run on the outer mdast tree so the parser
     // recognizes task lists, tables, strikethrough, and autolinks.
     // Without this, `- [ ] item` parses as a plain list item and the
     // stringifier escapes the `[` to `\[` on every format-on-save.
-    remarkGfm,
+    // `stringWidth` pads table columns by display width, so emoji and CJK
+    // count as two columns (matching scripts/pad_md_tables.py).
+    [remarkGfm, { stringLength: stringWidth }],
+    // Mintlify renders `$...$` as LaTeX, so the formatter must parse math too
+    // or it drops the `\$` escapes that keep a literal dollar sign literal.
+    remarkMath,
     // Must run before stringify so the corrected `spread` flag drives output.
     remarkNormalizeListSpread,
     // Drop `[Text](/url "Text")` redundant titles — leftover from CMS
     // migration; the title duplicates the visible label.
     remarkStripRedundantLinkTitle,
-    // Wraps the stringifier to put each <tr> on its own line. Source
-    // readability only — no effect on the rendered HTML.
-    remarkSplitTableRows,
+    // Stringify overrides (see the file): each <tr> on its own line, one-line
+    // single-child elements like <Frame><img/></Frame>, flush Accordions,
+    // two-space hard breaks, no `\_` escapes, bare URLs left bare.
+    remarkDomoFormat,
     [
       remarkRetext,
       unified().use({
@@ -108,11 +114,10 @@ const config = {
     [remarkLintMaximumLineLength, false],
     [remarkLintMaximumHeadingLength, false],
     [remarkLintNoDuplicateHeadings, false],
-    // Enforce CommonMark loose/tight list convention: lists stay tight unless
-    // any item has multi-block content (continuation paragraph, sub-list,
-    // Note/Frame/code block, etc.), in which case every sibling needs a blank
-    // line between it and the next.
-    [remarkLintListItemSpacing, { checkBlanks: true }],
+    // Off: blank lines between items decide whether a list renders loose, so
+    // every mode of this rule asks writers to change the page's spacing.
+    // remarkNormalizeListSpread adds the blank lines a list needs instead.
+    [remarkLintListItemSpacing, false],
     // Authors number ordered lists explicitly (1./2./3.); the style-guide
     // default ("1.") forces every item to `1.` which is noisy in source.
     [remarkLintOrderedListMarkerValue, false],

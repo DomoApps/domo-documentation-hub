@@ -3,6 +3,8 @@ title: "Adding a DataSet Using a Connector"
 excerpt: "Add a DataSet to Domo with a data connector by entering connection details once and reusing the connector to power multiple Cards."
 ---
 
+import { BetaNote } from '/snippets/BetaNote.mdx';
+
 ## Intro
 
 You can add a DataSet using a data Connector. A data Connector (similar to an alias or DSN) lets you define connection information to a DataSet. While adding a DataSet using a Connector, you can specify the connection information for the specific data provider. Afterwards when you power up Cards you can use the DataSet by selecting the Connector by name.
@@ -22,13 +24,13 @@ For information about the Data Center, see [Data Center Layout](/s/article/36004
 
 <iframe width="557" height="312" src="https://www.youtube.com/embed/T4YKU7v4f7I" title="Connectors Overview" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 
-## Adding a DataSet using a Connector
+## Add a DataSet Using a Connector
 
 When you add a DataSet using a Connector, it is stored in Domo where you can use it to power multiple Cards without having to specify connection information to that DataSet in each Card.
 
-When you add a DataSet, you are automatically assigned as the DataSet owner. For information about changing the owner of a DataSet, see [Changing the Owner of a DataSet](/s/article/360042926074 "Changing the Owner of a DataSet").
+When you add a DataSet, you are automatically assigned as the DataSet owner. For information about changing the owner of a DataSet, see [Changing the Owner of a DataSet](/s/article/360042926074).
 
-You can access the interface for adding Connector DataSets via the Appstore, the Data Center, or the <i className="icon-plus-circle sm" aria-hidden="true" /> menu.
+You can access the interface for adding Connector DataSets via the Appstore, the Data Center, or the <i className="icon-plus-circle" aria-hidden="true" /> create menu.
 
 **To add a DataSet using a Connector,**
 
@@ -56,7 +58,11 @@ You can access the interface for adding Connector DataSets via the Appstore, the
           
         You can use the following table to learn more about these Connector types:
 
-        <table border="1" cellpadding="1" cellspacing="1" class="mt-responsive-table"><thead><tr><th colspan="1" rowspan="1"><p> Connector Type </p></th><th colspan="1" rowspan="1"><p> Description </p></th></tr><tr><td colspan="1" rowspan="1"><p> Connectors </p></td><td colspan="1" rowspan="1"><p> A Connector for a third-party app in which data is stored in the cloud. Most of Domo's Connectors fall into this category. Examples include Facebook, Salesforce, Adobe Analytics, and so on. </p></td></tr><tr><td colspan="1" rowspan="1"><p> File </p></td><td colspan="1" rowspan="1"><p> A Connector used to pull files into Domo. Examples include Excel, Google Sheets, and Box. </p></td></tr><tr><td colspan="1" rowspan="1"><p> Database </p></td><td colspan="1" rowspan="1"><p> A Connector in which you write a query to pull data from a database into Domo. Examples include MySQL, Amazon Redshift, and MongoDB. </p></td></tr></thead></table>
+        | Connector Type | Description                                                                                                                                                                                   |
+        | -------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+        | Connectors     | A Connector for a third-party app in which data is stored in the cloud. Most of Domo's Connectors fall into this category. Examples include Facebook, Salesforce, Adobe Analytics, and so on. |
+        | File           | A Connector used to pull files into Domo. Examples include Excel, Google Sheets, and Box.                                                                                                     |
+        | Database       | A Connector in which you write a query to pull data from a database into Domo. Examples include MySQL, Amazon Redshift, and MongoDB.                                                          |
 
         The other two icons in this area denote other non-Connector methods for bringing data into Domo. **Federated** refers to federated DataSets, and **API** refers to Domo's development environment, where you can build your own custom Connectors. For more information on Federated DataSets, see [Connecting to Data Using Workbench 5](/s/article/4404246789783).
      3. Select the Connector type you want.
@@ -66,11 +72,9 @@ You can access the interface for adding Connector DataSets via the Appstore, the
       **Note:** Popular Connectors are marked with a Preferred tag. This is also used when there are several different Connectors to the same data, such as Facebook. The most commonly used option will display the Preferred tag.
      </Note>
 
-   * (Conditional) If you want to connect to data via the
-     <i className="icon-plus-circle sm" aria-hidden="true" /> menu, do the following:
+   * (Conditional) If you want to connect to data via the <i className="icon-plus-circle" aria-hidden="true" /> create menu, do the following:
 
-     1. Select
-        <i className="icon-plus-circle sm" aria-hidden="true" /> **> Data**.
+     1. Select the <i className="icon-plus-circle" aria-hidden="true" /> create menu > **Data**.
      2. Select
         **Connectors**, **File**, or **Database**.
           
@@ -88,6 +92,69 @@ You can access the interface for adding Connector DataSets via the Appstore, the
    * If you select **Save**, you are taken to the details view for the DataSet in the Data Center. For more information about this view, see [Data Center Layout](/s/article/360047553253).
    * If you select **Save and New**, the DataSet is created and starts running in the background, and you are taken back to the start of the power up experience for that Connector.
 
+## Protect Connector DataSets with Data Safeguards <Badge>Beta</Badge>
+
+<BetaNote />
+
+### Required Grants
+
+To configure data safeguards, the following grant must be enabled for your role:
+
+- **Edit DataSet —** Allows a user to create, edit, and delete DataSets to which they have access.
+
+Learn more about [grants](/s/article/360043438973).
+
+### How Data Safeguards Protect Your Data
+
+When you create a DataSet, it has a specific schema—a set of columns with specific names and specific data types. The cards, DataFlows, and other content you build on that DataSet assume those columns exist and keep their names and types. For example, a card that calculates net profit expects a column for revenue and a column for costs so it can calculate the difference.
+
+Data providers can change the schema of their data at any time. A provider might stop supplying a column, start supplying an additional column, or change a column's data type—for example, IDs that used to arrive as numbers now arrive as strings. Any of these changes can create a mismatch that breaks the content built on the DataSet. This happens frequently with file-based connectors and with providers that revise the measures they offer.
+
+Data safeguards let you decide what Domo does when a connector DataSet's schema changes. For each type of change, you can let the update through silently, record a warning, or stop the run entirely.
+
+### Schema Changes That Trigger Data Safeguards
+
+Data safeguards respond to three types of schema change, and you set an option for each one independently:
+
+- **Column deletion —** A data provider stops supplying a column that was part of the DataSet.
+- **Column addition —** A data provider supplies an additional column that was not part of the DataSet.
+- **Column type modification —** A column's data type changes—for example, a column that used to come in as a number now comes in as a string.
+
+### Data Safeguard Options
+
+For each type of schema change, choose one of the following options:
+
+| Option                 | What happens                                                                    |
+| ---------------------- | ------------------------------------------------------------------------------- |
+| Accept all updates     | Domo applies the schema change silently.                                        |
+| Warn on schema update  | Domo lets the data flow through but records a warning in the DataSet's history. |
+| Abort on schema update | Domo stops the execution and brings in no data.                                 |
+
+### Set Data Safeguards for a Connector DataSet
+
+Configure data safeguards while you create a new connector DataSet or edit an existing one.
+
+1. Create a new DataSet with a connector, or edit an existing connector DataSet.
+
+   For details on creating a connector DataSet, see [Add a DataSet Using a Connector](#add-a-dataset-using-a-connector).
+
+2. Locate the data safeguards settings for the DataSet.
+   If you are creating a new DataSet, you are taken to the data safeguard settings as part of the powerup process.
+   If you are editing an existing DataSet, select the **Data Safeguards** section.
+
+   <Frame>![Data Safeguards section of the connector setup with Column Deletion set to Warn on schema update and Column Addition and Column Type Modification set to Accept all updates](/images/kb/DataSafeguardsSettings.png)</Frame>
+
+3. For each type of schema change—column deletion, column addition, and column type modification—select the option you want: **Accept all updates**, **Warn on schema update**, or **Abort on schema update**.
+
+   You can set a different option for each type of change. For example, you might warn on a column deletion, abort on a column addition, and accept all updates for a column type modification.
+
+4. Finish configuring the DataSet.
+   If you're configuring a new DataSet, complete the powerup process, including the destination where you save it.
+
+   <Note>**Note:** Data safeguards are independent of any safeguards enforced by the destination you save the DataSet to. Saving the DataSet to a cloud data warehouse or another work cloud works exactly as it did before, and those destinations apply their own safeguards separately.</Note>
+
+5. Select **Save**.
+
 ## Connector settings
 
 All Connector types in Domo have different options for setting up a DataSet. Most Connectors require you to enter login credentials, an API key, a server URL, or a combination of these to access the Connector. If you cannot connect after entering your credentials, you have most likely entered incorrect credentials. For information about finding credentials, see the documentation for your specific Connector. You can find this under API Connectors.
@@ -100,7 +167,7 @@ The information in this section is general and may or may not be required for a 
 
 ### Credentials
 
-If required, specify the credentials for connecting to the data provider. If available, you can select an account or create an account to use in connecting. For more information about accounts, see [Manage Connector Accounts](/s/article/360042926054 "Managing User Accounts for Connectors").
+If required, specify the credentials for connecting to the data provider. If available, you can select an account or create an account to use in connecting. For more information about accounts, see [Manage Connector/Adapter Accounts](/s/article/360042926054).
 
 Some Connectors, such as Google Drive, use OAuth to connect. This means that you only need to enter your credentials once for a given account. In the future, when you go to create a DataSet using this Connector account, your credentials are passed in automatically. Other Connectors do not use OAuth, so you must enter your credentials each time you create a DataSet using this Connector account.
 
@@ -132,7 +199,7 @@ For hour, day, and week options, you can specify the interval (every # hours/day
 
 If you select **Manually** for your update interval, you can instruct Domo to send you a notification when the data has not been updated for a given period of time. Time periods range from one hour to three months.
 
-<Frame><img alt="Basic_Scheduling.png" src="/images/kb/ka05w00000129sq-00N5w00000Ri7BU-0EM5w000005wKmU.png"/></Frame>
+<Frame><img alt="Basic scheduling tab with Update interval set to Every day, a start window between 6 PM UTC and 7 PM UTC, and Update method set to Replace" src="/images/kb/ka05w00000129sq-00N5w00000Ri7BU-0EM5w000005wKmU.png"/></Frame>
 
 <Note>
 **Note:** If you need your DataSet to update faster than every 15 minutes, please reach out to your account team for evaluation.
@@ -142,7 +209,12 @@ If you select **Manually** for your update interval, you can instruct Domo to se
 
 When creating or editing a DataSet, you can specify whether to append or replace data when updates occur. The update options are found at the bottom of the **Basic Scheduling** and **Advanced Scheduling** tabs.
 
-<table border="1" cellpadding="1" cellspacing="1" data-aura-rendered-by="33:194;a"><thead><tr><th colspan="1" rowspan="1"><p> Option </p></th><th colspan="1" rowspan="1"><p> Description </p></th></tr></thead><tbody><tr><td colspan="1" rowspan="1"><p> Replace </p></td><td colspan="1" rowspan="1"><p> Replace the current version of the data with a new version of the data. Previous versions are preserved. </p></td></tr><tr><td colspan="1" rowspan="1"><p> Append </p></td><td colspan="1" rowspan="1"><p> Add data to the current version of the data, increasing the size of the DataSet. </p></td></tr><tr><td colspan="1" rowspan="1"> Upsert </td><td colspan="1" rowspan="1"> Update DataSets with restated data to ensure you have the most up-to-date information. Available for selected connectors only. For a list of available connectors, see <a href="/s/article/360043430733" target="_self" title="DataSet Update Methods"> DataSet Update Methods </a>. </td></tr><tr><td colspan="1" rowspan="1"> Partition </td><td colspan="1" rowspan="1"> Select a rolling window of data to keep, making it easier to focus on relevant data. Available for selected connectors only. For a list of available connectors, see <a href="/s/article/360043430733" target="_self" title="DataSet Update Methods"> DataSet Update Methods </a>. </td></tr></tbody></table>
+| Option    | Description                                                                                                                                                                                                               |
+| --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Replace   | Replace the current version of the data with a new version of the data. Previous versions are preserved.                                                                                                                  |
+| Append    | Add data to the current version of the data, increasing the size of the DataSet.                                                                                                                                          |
+| Upsert    | Update DataSets with restated data to ensure you have the most up-to-date information. Available for selected connectors only. For a list of available connectors, see [DataSet Update Methods](/s/article/360043430733). |
+| Partition | Select a rolling window of data to keep, making it easier to focus on relevant data. Available for selected connectors only. For a list of available connectors, see [DataSet Update Methods](/s/article/360043430733).   |
 
 #### Advanced Scheduling
 
@@ -156,16 +228,38 @@ You can indicate whether updates are done on a set interval (such as "every 15 m
 
 Schedule times are based on UTC but can be seen in your timezone.
 
-<Frame><img src="/images/kb/ka0Vq0000001ML3-00N5w00000Ri7BU-0EMVq000000jL6j.jpg"/></Frame>
+<Frame><img alt="Advanced scheduling tab set to update once a day at 4:53 AM UTC every day of every month, with Error handling set to Do not retry when update fails and Update method set to Replace" src="/images/kb/ka0Vq0000001ML3-00N5w00000Ri7BU-0EMVq000000jL6j.jpg"/></Frame>
 
-<Frame><img src="/images/kb/ka0Vq0000001ML3-00N5w00000Ri7BU-0EMVq000000jKfK.jpg"/></Frame>
+<Frame><img alt="Advanced scheduling tab set to update more than once a day every 15 minutes on specific days of the week and specific months, with Error handling set to Always retry when an update fails every 15 minutes, 3 times" src="/images/kb/ka0Vq0000001ML3-00N5w00000Ri7BU-0EMVq000000jKfK.jpg"/></Frame>
 
 #### Error handling
 
 Retry settings determine whether Domo should attempt to retry if updates fail for this DataSet and, if so, the frequency and maximum number of retries. These settings apply only to scheduled runs, not manual runs. You access the retry options dialog by selecting **Always retry when an update fails**.
 
-<Frame><img src="/images/kb/ka0Vq0000001ML3-00N5w00000Ri7BU-0EMVq000000jL9x.jpg"/></Frame>
+<Frame><img alt="Error handling set to Always retry when an update fails, with Retry every set to 15 minutes and Number of times to retry set to 3" src="/images/kb/ka0Vq0000001ML3-00N5w00000Ri7BU-0EMVq000000jL9x.jpg"/></Frame>
 
 The options in this dialog are as follows:
 
-<table border="1" cellpadding="1" cellspacing="1" data-aura-rendered-by="33:194;a"><thead><tr><th colspan="1" rowspan="1"><p> Option </p></th><th colspan="1" rowspan="1"><p> Description </p></th></tr></thead><tbody><tr><td colspan="1" rowspan="1"><p> Always retry when an update fails </p></td><td colspan="1" rowspan="1"><p> Domo retries to update the DataSet. After retrying the specified number of times, Domo sends a notification if the update attempt is unsuccessful. </p></td></tr><tr><td colspan="1" rowspan="1"><p> Do not retry when update fails </p></td><td colspan="1" rowspan="1"><p> Domo sends a notification if the update attempt is unsuccessful, and no retries are made. </p></td></tr></tbody></table>
+| Option                            | Description                                                                                                                                        |
+| --------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Always retry when an update fails | Domo retries to update the DataSet. After retrying the specified number of times, Domo sends a notification if the update attempt is unsuccessful. |
+| Do not retry when update fails    | Domo sends a notification if the update attempt is unsuccessful, and no retries are made.                                                          |
+
+## FAQ
+
+<AccordionGroup>
+
+<Accordion title="Where do I see the warning when a schema change occurs?">
+  When you choose **Warn on schema update** and a matching schema change occurs, Domo lets the data through and records a warning in the DataSet's history.
+  <Frame>![DataSet history results showing a schema protection violation, a schema change detected warning for added columns, and a successful data update](/images/kb/Error-And-Warning-Messages.png)</Frame>
+</Accordion>
+
+<Accordion title="What happens if I choose Accept all updates?">
+  Domo applies the schema change silently and does not send any notification of possible updates. Because the change is applied without a warning or a stop, downstream content can still break if it depends on a column that was removed or that changed type.
+</Accordion>
+
+<Accordion title="Do data safeguards change where my DataSet is stored?">
+  No. You can still save the DataSet to whichever cloud you want. Data safeguards are independent of any safeguards your destination cloud data warehouse or work cloud enforces.
+</Accordion>
+
+</AccordionGroup>

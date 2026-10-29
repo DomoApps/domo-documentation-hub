@@ -12,6 +12,16 @@ description: >
 Orchestrates `scripts/connector-review.py` to manage the full connector documentation
 review lifecycle — from open PR to merged and Jira-closed.
 
+This skill runs in **two modes**:
+
+- **Interactive** — Jared runs it by hand. It presents the dashboard and **asks before any
+  merge** (see **Guardrails**). This is the default when a human invokes the skill.
+- **Automated daily (CI)** — the **Connector Review Daily** GitHub Action
+  (`.github/workflows/connector-review-daily.yml`) runs it unattended every morning (~5–6am
+  PST). There is no human to ask, so the manual "ask Jared" approval is replaced by an
+  automated **site-safety gate** that performs the same "won't break the site" check Jared
+  did by eye. See **Automated Daily Review (CI)** below.
+
 ## Prerequisites
 
 Before the first run, ensure `.env` exists at the repo root with these values:
@@ -50,7 +60,40 @@ its Jira ticket, and prints a status table. Each PR/ticket pair lands in one of 
 | `MIGRATION REQUEST` | Arun's Jira comment requests a missed-migration article — see Migration flow below |
 | `ON HOLD` | Ticket is on indefinite hold; excluded from all automatic actions — see On-Hold flow below |
 
+Each PR row also prints the matched ticket's **summary and Jira status**, so a branch
+that names the wrong ticket is visible at a glance (e.g. the summary describes a
+different feature than the PR title, or the ticket is already Resolved with no approval).
+
 Show the user the dashboard output, including PR numbers, Jira IDs, ages, and states.
+
+#### Wrong-ticket safeguard (sibling approval)
+
+The Jira ID comes from the branch name (`arun.raj/connectors-DOMO-######-...`). Arun
+sometimes bakes the **wrong number** into the branch, or files near-duplicate tickets
+(e.g. one for the KB body and one for the FAQ) and does the review on the sibling. The
+script then checks a ticket with no approval while the real approval sits on its twin.
+
+When a PR's branch ticket has **no secondary approval**, the script searches for a
+near-identical sibling ticket (matched on the distinctive words in the summary) that
+*does* have one, and prints:
+
+```
+  ⚠️  POSSIBLE WRONG-TICKET MATCH: no approval on DOMO-503202, but sibling DOMO-503201 has one
+      from @Satish Mahenge  —  DOMO-503201: "Shopify Connector - Discount Codes Using GraphQL re" (Resolved)
+      The branch name may reference the wrong ticket. Verify, then route the merge/close to DOMO-503201 if correct.
+```
+
+This never auto-acts — it only surfaces the candidate. When you see it:
+
+1. **Verify** the sibling is genuinely the same work (compare summaries and the PR diff).
+2. If it is, the PR is approved — but `--merge DOMO-<branch-id>` would comment on and close
+   the *wrong* (un-approved) ticket. **Ask Jared how to route the Jira side** (comment +
+   close the approved sibling; optionally close the branch ticket as a duplicate), then
+   run the merge against the correct ticket. If the Jira routing differs from the branch
+   ID, do the merge comment/close on the sibling directly rather than via
+   `--merge <branch-id>`.
+3. If the sibling is *not* the same work, ignore the warning and treat the PR as awaiting
+   approval normally.
 
 ### Step 2 — Take actions
 
@@ -275,13 +318,99 @@ mentioned account IDs, then scans subsequent comments from those accounts for ap
 phrases defined in `connector-templates.json` (e.g., "looks good", "verified", "LGTM",
 "KB looks good to me").
 
+**Sibling fallback**: if the branch's ticket has no approval, the script additionally
+checks for a near-identical sibling ticket that does, and flags it on the dashboard (see
+*Wrong-ticket safeguard* above). This catches a wrong Jira ID in the branch name. It is a
+heads-up only — it never changes merge or `--auto` behavior.
+
+> **Jira search endpoint**: sibling detection and `--find-tasks` use the enhanced
+> `/rest/api/3/search/jql` endpoint. The legacy `/rest/api/3/issue/search` endpoint was
+> retired on Jira Cloud and now returns HTTP 404, so don't reintroduce it.
+
 ---
+
+## Automated Daily Review (CI)
+
+The **Connector Review Daily** workflow (`.github/workflows/connector-review-daily.yml`)
+runs this skill headless every morning via `claude -p`. Because no human is present, the
+manual GitHub approval is replaced by an automated **site-safety gate**. The gate answers
+only the narrow question Jared answered by eye when approving — *does this submission render
+and leave the site intact?* — **not** whether the content is correct. **Content approval is
+unchanged: it still comes from the secondary approver in the Jira ticket.** No fact-checking.
+
+### The site-safety gate — `scripts/connector-review-gate.py`
+
+Run against a candidate PR's branch (checked out, compared to `origin/main`). It prints a
+JSON summary and exits `0` (pass), `1` (fail → do not merge), or `2` (gate could not run).
+
+**Hard checks (any failure blocks the merge, PR left open for manual attention):**
+- `docs.json` is valid JSON.
+- `docs.json` navigation integrity — every page reference resolves to a real file, in every
+  language (reuses `DocStructureExtractor` from `scripts/commands/export_structure.py`).
+- **MDX renderability** — `remark` reports no fatal (unparseable MDX/JSX) on the changed files.
+- **No new broken internal links** — `scripts/check-broken-links.py --base origin/main`.
+- **No case-colliding paths** — same rule as `.github/workflows/case-collision-check.yml`.
+- **Alt text on added images** — every image this branch adds carries non-empty `alt`
+  (decorative icons marked `aria-hidden="true"` are exempt). Scoped to added lines, so legacy
+  images never block. Missing alt can't be invented, so it routes the PR to manual.
+
+**Soft (reported, never blocks):** Domo style-guide warnings from `remark-domo-style.mjs`.
+These are auto-fixed by the revise pass below; residual warnings are logged but don't break
+the site, so they don't gate the merge.
+
+### Per-candidate automated flow
+
+For each ticket the dashboard puts in a mergeable state — `ready-to-merge`, `awaiting-jared`
+(secondary approved in Jira, just missing the human GitHub approval), `publish-request`, or
+`escalation`:
+
+1. Check out the PR branch (`gh pr checkout <n>`).
+2. **Auto-revise:** apply the `revise-submission` style/MDX checklist to the changed
+   `s/article`/`s/topic`/`portal` `.mdx` files and run `python3 scripts/pad_md_tables.py` on
+   any with tables. Commit and push the fixes to the PR branch. This must happen **before**
+   the merge, because the branch ruleset dismisses stale reviews on push.
+3. Run `python3 scripts/connector-review-gate.py`.
+4. **Gate passes** → `python3 scripts/connector-review.py --merge DOMO-######` (approves on
+   GitHub, merges, posts the Jira comment, closes the ticket). **Gate fails or errors** → do
+   **not** merge; leave the PR open and record the exact reason in the run-log and the issue.
+5. Return to `main` (`git checkout main`) before processing the next candidate, so the working
+   tree is never left on a feature branch.
+
+Other states: `stale-1`/`stale-2` → `--follow-up DOMO-######`; always run `--check-holds`;
+`migration-request` is deferred to manual (it needs Salesforce HTML and the `/migrate-html`
+skill); `changes-requested` and on-hold tickets are left untouched.
+
+### Outputs every run
+
+- **Run-log:** while on `main` at the end of the run, append a dated entry to
+  `.claude/skills/connector-review/run-log.md` — the candidates seen, the gate ruling and
+  action for each ticket (merged / followed-up / skipped) **and why**, plus holds activity.
+  Then commit this file **and** `tracking/connector-on-hold.json` (if changed) and push to
+  `main` (the PAT's admin bypass allows the direct push).
+- **Tracking issue:** find-or-create the pinned GitHub issue labeled `connector-review-log`
+  and post the same summary as a dated comment (`gh issue list/create/comment`).
+
+### Credentials (CI)
+
+`JIRA_EMAIL` + `JIRA_API_TOKEN` (Jira Basic auth), `ANTHROPIC_API_KEY` (the headless Claude
+run), and `CONNECTOR_REVIEW_PAT` — an **admin** GitHub PAT exported as `GH_TOKEN` so `gh`
+acts as Jared and merges past the `main` ruleset via the Admin bypass, exactly as a local run
+does. The `dry_run` workflow input forces `--dry-run` and skips all writes.
 
 ## Guardrails
 
 The script will **refuse to merge** if:
 - There is an outstanding `CHANGES_REQUESTED` review on GitHub from any non-Jared reviewer.
+- The target ticket is on hold.
+- The PR has unresolved merge conflicts that can't be auto-resolved.
 
-The skill will **always ask Jared before**:
+**Interactive mode** — when a human runs the skill, it will **always ask Jared before**:
 - Running `--auto` (which may approve + merge multiple PRs)
 - Merging any `awaiting-jared` ticket (secondary approved; call it out explicitly)
+
+**Automated daily (CI) mode** — there is no human to ask, so the **site-safety gate replaces
+Jared's GitHub approval** (see **Automated Daily Review (CI)**). The Jira secondary-approval
+precondition is unchanged — the automation never merges content that lacks the approver's
+sign-off in Jira (the `publish-request` and `escalation` states remain the same deliberate
+exceptions they already were). A gate failure always stops the merge and routes the PR to
+manual review.

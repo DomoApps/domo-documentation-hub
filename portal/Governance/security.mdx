@@ -1,14 +1,12 @@
 ---
-title: 'Security and Governance'
+title: "Security and Governance"
 permalink: 459eb69d51e78-security-and-governance
-sidebarTitle: 'Groups'
+sidebarTitle: "Groups"
 ---
 
 ## Overview
 
-Groups are useful inside Domo because you can grant access to specified content or conversations to all members of a group. It also adds quick access for users inside Domo's chat tool, Buzz, to mention a group of users which can then trigger notifications to each member.
-
-![](/images/dev/s3.amazonaws.com/development.domo.com/wp-content/uploads/2017/06/07120326/GroupImage.png)
+Groups are useful inside Domo because you can grant access to specified content or conversations to all members of a group. It also adds quick access for users inside Domo's chat tool, Buzz, to mention a group of users which can then trigger notifications to each member. For the full list of endpoints, parameters, and response objects, see the [Group API reference](/portal/6tw2454j0zttg-group-api).
 
 For example, you might create a "Marketing" group whose members have access to marketing-related dashboards. Or, you could create a "Solutions Consulting" group with access to specific message conversation inside Domo's Buzz tool.
 
@@ -18,55 +16,44 @@ For example, you might create a "Marketing" group whose members have access to m
 <Frame>
   ![](/images/dev/s3.amazonaws.com/development.domo.com/wp-content/uploads/2017/06/07120327/GroupMessage.png)
 </Frame>
-<Frame>
-  ![](/images/dev/s3.amazonaws.com/development.domo.com/wp-content/uploads/2017/06/07120327/GroupMessage.png)
-</Frame>
 
 ### Group use cases
-
----
 
 Groups in Domo allow you to scale and extend Domo's user management to support multiple use cases:
 
 - Grant personalized data permissions to an entire set of related users based on similar attributes (e.g. department, team, locale)
 - Share subscriptions and access to dashboards and metrics to a group without needing to enroll individuals one at a time
-- Easily draw attention to a larger audience by sending a message to an entire group while in Domo's collaboration tool.
+- Easily draw attention to a larger audience by sending a message to an entire group while in Domo's collaboration tool
 
 ## Quickstart
 
----
+In this guide we will show you how to:
 
-Creating a group with users inside Domo is easy to do and only requires two steps
+- Create a group
+- Add a user to a group
+- Remove a user from a group
 
-<ol>
-  <li>Create a group</li>
-  <li>Add a user to a group</li>
-  <li>Remove a user from a group</li>
-</ol>
-After creating a group, you will need to execute the second step and third steps
-as more users need to be added or removed from a group.
+After creating a group, you will need to execute the second and third steps as more users need to be added or removed from a group.
 
-<Info>
-**Note**
-In order to utilize this Quickstart you will need to obtain an [access token](/portal/uc9ls4li6ny8s-embed-token-api#quickstart) or you can leverage any of [Domo's SDKs](/portal/Getting-Started/sdks) which will also handle authentication.
-</Info>
+<Note>
+  **Note:** In order to follow this Quickstart you will need to obtain an
+  [access token](/portal/1845fc11bbe5d-api-authentication#quickstart) or you can
+  leverage any of [Domo's SDKs](/portal/Getting-Started/sdks) which will also
+  handle authentication.
+</Note>
 
 ### Step 1: Create a group
 
----
-
-Groups are collections of users. Group APIs makes it easy to manage a large number of users that are related in some way. Groups allow you to set access rights to data that stays consistent even when the group members may change. Groups are also a convenient way to communicate with a group of related users inside Domo's collaboration tool, Buzz.
-
-This code creates a group via the [Group](/portal/6tw2454j0zttg-group-api) API:
+Groups are collections of users. Group APIs make it easy to manage a large number of users that are related in some way. Groups allow you to set access rights to data that stays consistent even when the group members may change. Groups are also a convenient way to communicate with a group of related users inside Domo's collaboration tool, Buzz.
 
 #### Sample Request
 
-See this sample request in [Java](https://github.com/domoinc/domo-java-sdk/tree/master/domo-java-sdk-all/src/test/java/com/domo/sdk/groups/CreateExample.java), [Python](https://github.com/domoinc/domo-python-sdk/blob/master/examples/group.py).
-
-```HTTP
-POST https://api.domo.com/v1/groups HTTP/1.1
+<CodeGroup>
+```http HTTP icon="globe"
+POST /v1/groups HTTP/1.1
 Content-Type: application/json
 Accept: application/json
+Host: api.domo.com
 Authorization: bearer <your-valid-oauth-access-token>
 
 {
@@ -74,11 +61,92 @@ Authorization: bearer <your-valid-oauth-access-token>
 }
 ```
 
+```javascript Node icon="node-js"
+// https://github.com/domoinc/domo-node-sdk/blob/master/src/groups/GroupClient.ts#L14
+// Build a Group
+const group = {
+  name: 'Groupy Group',
+  active: true,
+  default: false
+};
+
+// Create a Group
+domo.groups.create(group)
+  .then(res => { console.log(`Created Group '${res.name}'`); })
+  .catch(console.error);
+```
+
+```python Python icon="python"
+# https://github.com/domoinc/domo-python-sdk/blob/master/examples/group.py#L12
+from pydomo.groups import CreateGroupRequest
+
+# Build a Group
+group_request = CreateGroupRequest()
+group_request.name = 'Groupy Group'
+group_request.active = True
+group_request.default = False
+
+# Create a Group
+group = domo.groups.create(group_request)
+domo.logger.info("Created Group '{}'".format(group['name']))
+```
+
+```rust Rust icon="rust"
+// https://github.com/domoinc/domo-rust-sdk/blob/master/src/public/group/mod.rs#L92
+use domo::public::group::Group;
+
+// Group's fields are private, so build the request from JSON
+let group_request: Group = serde_json::from_value(serde_json::json!({
+    "name": "Groupy Group",
+    "active": true,
+    "default": false
+}))?;
+
+// Create a Group
+let group = domo.post_group(group_request).await?;
+```
+
+```java Java icon="java"
+// https://github.com/domoinc/domo-java-sdk/tree/master/domo-java-sdk-all/src/test/java/com/domo/sdk/groups/CreateExample.java
+package com.domo.sdk.groups;
+
+import com.domo.sdk.ExampleBase;
+import com.domo.sdk.groups.model.Group;
+import org.junit.Test;
+
+public class CreateExample extends ExampleBase {
+  @Test
+  public void groupClient_smokeTest() {
+    GroupClient gClient = client.groupClient();
+
+    CreateExample.createGroup(gClient);
+  }
+
+  public static Group createGroup(GroupClient gClient) {
+    //Build a group
+    Group group = new Group();
+    group.setName("Groupy Group");
+
+    //Create a group
+    return gClient.create(group);
+  }
+}
+```
+
+```r R icon="r-project"
+# https://github.com/domoinc/rdomo/blob/main/R/rdomo.R#L457
+# Create a Group
+group <- domo$groups_create('Groupy Group')
+message(sprintf("Created Group '%s'", group$name))
+```
+
+</CodeGroup>
+
 Domo returns a new `Group` object with all the relevant details:
 
 #### Sample Response
 
-```HTTP
+```http
 HTTP/1.1 201 Created
 Content-Type: application/json;charset=UTF-8
 
@@ -91,24 +159,69 @@ Content-Type: application/json;charset=UTF-8
 }
 ```
 
-Once you create the group, store the id value to group name in your own database to utilize when adding users with the [User](/portal/v91hopqk7ki3b-user-api) API or applying data permissions inside with the [Personalized Data Permission Policy (PDP)](/portal/Governance/pdp) API.
+Once you create the group, store the `id` value with the group name in your own database to use when adding users with the [User](/portal/v91hopqk7ki3b-user-api) API or applying data permissions with the [Personalized Data Permission Policy (PDP)](/portal/Governance/pdp) API.
 
 ### Step 2: Add user(s) to a group
 
----
-
-With a new `group_id`, add an existing `user_id` (from [User](/portal/v91hopqk7ki3b-user-api) API) to the group:
+With a new `group_id`, add an existing `user_id` (from the [User](/portal/v91hopqk7ki3b-user-api) API) to the group:
 
 #### Sample Request
 
-See this sample request in [Java](https://github.com/domoinc/domo-java-sdk/tree/master/domo-java-sdk-all/src/test/java/com/domo/sdk/groups/CreateExample.java), [Python](https://github.com/domoinc/domo-python-sdk/blob/master/examples/group.py).
-
-```HTTP
-PUT https://api.domo.com/v1/groups/876655018/users/27
-Content-Type: application/json
+<CodeGroup>
+```http HTTP icon="globe"
+PUT /v1/groups/876655018/users/27 HTTP/1.1
 Accept: application/json
+Host: api.domo.com
 Authorization: bearer <your-valid-oauth-access-token>
 ```
+
+```javascript Node icon="node-js"
+// https://github.com/domoinc/domo-node-sdk/blob/master/src/groups/GroupClient.ts#L51
+domo.groups.addUser(groupId, userId)
+  .then(() => { console.log(`Added User ${userId} to Group ${groupId}`); })
+  .catch(console.error);
+```
+
+```python Python icon="python"
+# https://github.com/domoinc/domo-python-sdk/blob/master/examples/group.py#L39
+domo.groups.add_user(group['id'], user['id'])
+```
+
+```rust Rust icon="rust"
+// https://github.com/domoinc/domo-rust-sdk/blob/master/src/public/group/mod.rs#L181
+let group_id = "876655018";
+let user_id = "27";
+domo.put_group_user(group_id, user_id).await?;
+```
+
+```java Java icon="java"
+// https://github.com/domoinc/domo-java-sdk/tree/master/domo-java-sdk-all/src/test/java/com/domo/sdk/groups/UserActionExample.java
+package com.domo.sdk.groups;
+
+import com.domo.sdk.ExampleBase;
+import com.domo.sdk.groups.model.Group;
+import org.junit.Test;
+
+public class UserActionExample extends ExampleBase {
+  @Test
+  public void groupClient_smokeTest() {
+    GroupClient gClient = client.groupClient();
+
+    //Create group
+    Group group = CreateExample.createGroup(gClient);
+
+    //Add user to group
+    gClient.addUserToGroup(group.getId(), 27);
+  }
+}
+```
+
+```r R icon="r-project"
+# https://github.com/domoinc/rdomo/blob/main/R/rdomo.R#L450
+domo$groups_add_users(group$id, list(27))
+```
+
+</CodeGroup>
 
 Domo will return a parameter of success or error based on the group ID being valid.
 
@@ -118,27 +231,73 @@ Domo will return a parameter of success or error based on the group ID being val
 HTTP/1.1 204 No Content
 ```
 
-### Step 3: Remove user(s)
-
----
+### Step 3: Remove user(s) from a group
 
 Similar to adding a user to a group, you will need both the `group_id` and `user_id` in order to remove a user from a group:
 
 #### Sample Request
 
-See this sample request in [Java](https://github.com/domoinc/domo-java-sdk/tree/master/domo-java-sdk-all/src/test/java/com/domo/sdk/groups/CreateExample.java), [Python](https://github.com/domoinc/domo-python-sdk/blob/master/examples/group.py).
-
-```HTTP
-DELETE https://api.domo.com/v1/groups/876655018/users/27 HTTP/1.1
-Content-Type: application/json
+<CodeGroup>
+```http HTTP icon="globe"
+DELETE /v1/groups/876655018/users/27 HTTP/1.1
 Accept: application/json
+Host: api.domo.com
 Authorization: bearer <your-valid-oauth-access-token>
 ```
+
+```javascript Node icon="node-js"
+// https://github.com/domoinc/domo-node-sdk/blob/master/src/groups/GroupClient.ts#L65
+domo.groups.removeUser(groupId, userId)
+  .then(() => { console.log(`Removed User ${userId} from Group ${groupId}`); })
+  .catch(console.error);
+```
+
+```python Python icon="python"
+# https://github.com/domoinc/domo-python-sdk/blob/master/examples/group.py#L51
+domo.groups.remove_user(group['id'], user['id'])
+```
+
+```rust Rust icon="rust"
+// https://github.com/domoinc/domo-rust-sdk/blob/master/src/public/group/mod.rs#L201
+domo.delete_group_user(group_id, user_id).await?;
+```
+
+```java Java icon="java"
+// https://github.com/domoinc/domo-java-sdk/tree/master/domo-java-sdk-all/src/test/java/com/domo/sdk/groups/UserActionExample.java
+package com.domo.sdk.groups;
+
+import com.domo.sdk.ExampleBase;
+import com.domo.sdk.groups.model.Group;
+import org.junit.Test;
+
+public class UserActionExample extends ExampleBase {
+  @Test
+  public void groupClient_smokeTest() {
+    GroupClient gClient = client.groupClient();
+
+    //Create group
+    Group group = CreateExample.createGroup(gClient);
+
+    //Add user to group
+    gClient.addUserToGroup(group.getId(), 27);
+
+    //Remove user from group
+    gClient.removeUserFromGroup(group.getId(), 27);
+  }
+}
+```
+
+```r R icon="r-project"
+# https://github.com/domoinc/rdomo/blob/main/R/rdomo.R#L510
+domo$groups_remove_users(group$id, list(27))
+```
+
+</CodeGroup>
 
 Domo will return a parameter of success or error based on the group ID being valid.
 
 #### Sample Response
 
-```HTTP
+```http
 HTTP/1.1 204 No Content
 ```

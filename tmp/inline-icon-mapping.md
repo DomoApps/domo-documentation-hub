@@ -16,20 +16,20 @@ Mapping of every inline-icon `<img>` reference (images embedded in articles with
 
 ## Coverage
 
-- **1,076 distinct image contents** identified (deduplicated by md5 hash; charts and release-notes-only refs excluded)
-- **2,250 inline-icon references** in non-release-notes articles resolve to images on disk
+- **1,072 distinct image contents** identified (deduplicated by md5 hash; charts and release-notes-only refs excluded)
+- **2,221 inline-icon references** in non-release-notes articles resolve to images on disk
 - (the original scan found 3,815 total inline-icon refs across all articles; ~1,203 broken refs to missing files are tracked separately)
 
 ## Confidence tally
 
 | Confidence | Entries | Refs covered |
 |---|---:|---:|
-| `high` | 647 | 1603 |
-| `medium` | 146 | 222 |
+| `high` | 645 | 1579 |
+| `medium` | 144 | 217 |
 | `low` | 1 | 2 |
 | `not-icon` | 273 | 412 |
 | `needs-review` | 9 | 11 |
-| **Total** | **1076** | **2250** |
+| **Total** | **1072** | **2221** |
 
 - `high` / `medium` / `low` — mapped to a font glyph (or literal-character replacement) at that level of certainty
 - `not-icon` — not actually an icon (full UI screenshot, table, labeled button caught by `style={{display: 'inline'}}`, or tile illustration)
@@ -41,14 +41,14 @@ Many image hashes converge on the same target glyph. Replacing one logical mappi
 
 | Target | Total refs | Distinct image contents |
 |---|---:|---:|
-| `icon-wrench` | 136 | 31 |
+| `icon-wrench` | 121 | 30 |
 | `icon-trash` | 99 | 37 |
 | `icon-pencil` | 94 | 23 |
-| `icon-dots-vertical` | 85 | 30 |
-| `icon-arrow-square-out` | 77 | 6 |
-| `icon-plus` | 60 | 26 |
+| `icon-dots-vertical` | 84 | 30 |
+| `icon-arrow-square-out` | 75 | 6 |
+| `icon-plus` | 58 | 25 |
 | `icon-gear` | 49 | 23 |
-| `icon-dots-horizontal` | 42 | 17 |
+| `icon-dots-horizontal` | 39 | 17 |
 | `icon-check-square-fill text-green-600` | 36 | 2 |
 | `icon-x` | 29 | 19 |
 | `legacy-icon-wrench` | 27 | 8 |
@@ -59,22 +59,20 @@ Many image hashes converge on the same target glyph. Replacing one logical mappi
 | `icon-eye` | 19 | 11 |
 | `icon-chevron-down` | 18 | 13 |
 | `icon-plus-circle` | 18 | 4 |
-| `icon-search` | 18 | 6 |
+| `icon-arrow-box` | 17 | 3 |
 | `icon-chevron-up` | 17 | 4 |
 | `legacy-icon-badge-layout-small` | 17 | 1 |
 | `icon-bell` | 15 | 3 |
 | `icon-duplicate` | 15 | 12 |
-| `icon-arrows-diagonal-in` | 14 | 11 |
 | `icon-database` | 14 | 8 |
 | `icon-funnel-plus` | 14 | 4 |
 | `legacy-icon-database` | 14 | 4 |
-| `icon-arrow-box` | 13 | 2 |
+| `icon-arrows-diagonal-in` | 13 | 11 |
 | `icon-pencil-box` | 13 | 7 |
-| `icon-play` | 13 | 5 |
 | `icon-play-circle-outline` | 13 | 4 |
-| `icon-upload` | 13 | 7 |
 | `legacy-icon-save` | 13 | 5 |
 | `icon-key` | 12 | 7 |
+| `icon-play` | 12 | 5 |
 | `icon-arrow-curved-right` | 11 | 3 |
 | `icon-chart-bar-vertical` | 11 | 7 |
 | `icon-chat-bubbles` | 11 | 2 |
@@ -85,6 +83,8 @@ Many image hashes converge on the same target glyph. Replacing one logical mappi
 | `icon-x text-red-600` | 11 | 1 |
 | `icon-caret-down` | 9 | 4 |
 | `icon-save` | 9 | 5 |
+| `icon-search` | 9 | 5 |
+| `icon-upload` | 9 | 6 |
 | `legacy-icon-arrow-up` | 9 | 2 |
 | `icon-chart-line` | 8 | 3 |
 | `icon-check` | 8 | 5 |
@@ -92,13 +92,13 @@ Many image hashes converge on the same target glyph. Replacing one logical mappi
 | `icon-expand` | 8 | 5 |
 | `icon-plus-circle-fill` | 8 | 4 |
 
-_(274 distinct target glyphs total)_
+_(272 distinct target glyphs total)_
 
 ## Top 100 entries (detailed)
 
 | Rank | Refs | Locales | Srcs | Glyph | Maps to | Confidence | Notes |
 |---:|---:|---|---|---|---|---|---|
-| 1 | 48 | de, en, es, ja | [ja/0EMVq000005scBu.jpg](../images/kb/ja/0EMVq000005scBu.jpg)<br />[ja/0EMVq000003k2I2.jpg](../images/kb/ja/0EMVq000003k2I2.jpg)<br />[de/0EMVq000005scBu.jpg](../images/kb/de/0EMVq000005scBu.jpg)<br />[es/0EMVq000005scBu.jpg](../images/kb/es/0EMVq000005scBu.jpg)<br />[0EMVq000008gSmT.jpg](../images/kb/0EMVq000008gSmT.jpg)<br />[ja/0EMVq0000043wLJ.jpg](../images/kb/ja/0EMVq0000043wLJ.jpg)<br />[ja/0EMVq000002cL77.jpg](../images/kb/ja/0EMVq000002cL77.jpg)<br />[0EMVq000008fzSj.jpg](../images/kb/0EMVq000008fzSj.jpg)<br />[0EMVq000002cL77.jpg](../images/kb/0EMVq000002cL77.jpg)<br />[ja/0EMVq000005Ww7d.jpg](../images/kb/ja/0EMVq000005Ww7d.jpg)<br />[ja/0EMVq000001ctMH.jpg](../images/kb/ja/0EMVq000001ctMH.jpg)<br />[ja/0EMVq000003FPAr.jpg](../images/kb/ja/0EMVq000003FPAr.jpg)<br />[ja/0EMVq000006wbdF.jpg](../images/kb/ja/0EMVq000006wbdF.jpg)<br />[ja/0EMVq0000026ObB.jpg](../images/kb/ja/0EMVq0000026ObB.jpg)<br />[ja/0EMVq000000KYTl.jpg](../images/kb/ja/0EMVq000000KYTl.jpg)<br />[ja/0EMVq000000KZ85.jpg](../images/kb/ja/0EMVq000000KZ85.jpg)<br />[ja/0EMVq000003fnKn.jpg](../images/kb/ja/0EMVq000003fnKn.jpg)<br />[ja/0EMVq000000KZo1.jpg](../images/kb/ja/0EMVq000000KZo1.jpg)<br />[ja/0EMVq000000oyqb.jpg](../images/kb/ja/0EMVq000000oyqb.jpg)<br />[ja/0EMVq000002YFjR.jpg](../images/kb/ja/0EMVq000002YFjR.jpg)<br />[ja/0EMVq000000KtRl.jpg](../images/kb/ja/0EMVq000000KtRl.jpg)<br />[ja/0EMVq0000023r6f.jpg](../images/kb/ja/0EMVq0000023r6f.jpg)<br />[0EMVq000008gOvl.jpg](../images/kb/0EMVq000008gOvl.jpg)<br />[0EMVq000003FPAr.jpg](../images/kb/0EMVq000003FPAr.jpg)<br />[0EMVq000000Buen.jpg](../images/kb/0EMVq000000Buen.jpg)<br />[0EMVq000000KYTl.jpg](../images/kb/0EMVq000000KYTl.jpg)<br />[0EMVq000000KZ85.jpg](../images/kb/0EMVq000000KZ85.jpg)<br />[0EMVq000000KZo1.jpg](../images/kb/0EMVq000000KZo1.jpg)<br />[0EMVq000005kLBR.jpg](../images/kb/0EMVq000005kLBR.jpg)<br />[0EMVq000005kPJt.jpg](../images/kb/0EMVq000005kPJt.jpg)<br />[0EMVq00000DTPJi.jpg](../images/kb/0EMVq00000DTPJi.jpg)<br />[0EMVq00000DT9wU.jpg](../images/kb/0EMVq00000DT9wU.jpg)<br />[0EMVq000000T2OD.jpg](../images/kb/0EMVq000000T2OD.jpg)<br />[0EMVq000005Ys4j.jpg](../images/kb/0EMVq000005Ys4j.jpg) | external link square+arrow-out | `icon-arrow-square-out` | high |  |
+| 1 | 46 | de, en, es, ja | [ja/0EMVq000005scBu.jpg](../images/kb/ja/0EMVq000005scBu.jpg)<br />[ja/0EMVq000003k2I2.jpg](../images/kb/ja/0EMVq000003k2I2.jpg)<br />[de/0EMVq000005scBu.jpg](../images/kb/de/0EMVq000005scBu.jpg)<br />[es/0EMVq000005scBu.jpg](../images/kb/es/0EMVq000005scBu.jpg)<br />[0EMVq000008gSmT.jpg](../images/kb/0EMVq000008gSmT.jpg)<br />[ja/0EMVq0000043wLJ.jpg](../images/kb/ja/0EMVq0000043wLJ.jpg)<br />[ja/0EMVq000002cL77.jpg](../images/kb/ja/0EMVq000002cL77.jpg)<br />[0EMVq000008fzSj.jpg](../images/kb/0EMVq000008fzSj.jpg)<br />[0EMVq000002cL77.jpg](../images/kb/0EMVq000002cL77.jpg)<br />[ja/0EMVq000005Ww7d.jpg](../images/kb/ja/0EMVq000005Ww7d.jpg)<br />[ja/0EMVq000001ctMH.jpg](../images/kb/ja/0EMVq000001ctMH.jpg)<br />[ja/0EMVq000003FPAr.jpg](../images/kb/ja/0EMVq000003FPAr.jpg)<br />[ja/0EMVq000006wbdF.jpg](../images/kb/ja/0EMVq000006wbdF.jpg)<br />[ja/0EMVq0000026ObB.jpg](../images/kb/ja/0EMVq0000026ObB.jpg)<br />[ja/0EMVq000003fnKn.jpg](../images/kb/ja/0EMVq000003fnKn.jpg)<br />[ja/0EMVq000000KZo1.jpg](../images/kb/ja/0EMVq000000KZo1.jpg)<br />[ja/0EMVq000000oyqb.jpg](../images/kb/ja/0EMVq000000oyqb.jpg)<br />[ja/0EMVq000002YFjR.jpg](../images/kb/ja/0EMVq000002YFjR.jpg)<br />[ja/0EMVq000000KtRl.jpg](../images/kb/ja/0EMVq000000KtRl.jpg)<br />[ja/0EMVq0000023r6f.jpg](../images/kb/ja/0EMVq0000023r6f.jpg)<br />[0EMVq000008gOvl.jpg](../images/kb/0EMVq000008gOvl.jpg)<br />[0EMVq000003FPAr.jpg](../images/kb/0EMVq000003FPAr.jpg)<br />[0EMVq000000Buen.jpg](../images/kb/0EMVq000000Buen.jpg)<br />[0EMVq000000KYTl.jpg](../images/kb/0EMVq000000KYTl.jpg)<br />[0EMVq000000KZ85.jpg](../images/kb/0EMVq000000KZ85.jpg)<br />[0EMVq000000KZo1.jpg](../images/kb/0EMVq000000KZo1.jpg)<br />[0EMVq000005kLBR.jpg](../images/kb/0EMVq000005kLBR.jpg)<br />[0EMVq000005kPJt.jpg](../images/kb/0EMVq000005kPJt.jpg)<br />[0EMVq00000DTPJi.jpg](../images/kb/0EMVq00000DTPJi.jpg)<br />[0EMVq00000DT9wU.jpg](../images/kb/0EMVq00000DT9wU.jpg)<br />[0EMVq000000T2OD.jpg](../images/kb/0EMVq000000T2OD.jpg)<br />[0EMVq000005Ys4j.jpg](../images/kb/0EMVq000005Ys4j.jpg) | external link square+arrow-out | `icon-arrow-square-out` | high |  |
 | 2 | 26 | de, en, es, ja | [ka0Vq0000000qbJ-00N5w00000Ri7BU-0EMVq000000Mcmc.jpg](../images/kb/ka0Vq0000000qbJ-00N5w00000Ri7BU-0EMVq000000Mcmc.jpg)<br />[es/0EMVq000000Mcmc.jpg](../images/kb/es/0EMVq000000Mcmc.jpg)<br />[ja/0EMVq000000Mcmc.jpg](../images/kb/ja/0EMVq000000Mcmc.jpg)<br />[de/0EMVq000000Mcmc.jpg](../images/kb/de/0EMVq000000Mcmc.jpg) |  | `icon-megaphone` | high |  |
 | 3 | 25 | en, ja | [ja/0EMVq000000MdYz.jpg](../images/kb/ja/0EMVq000000MdYz.jpg)<br />[ja/0EMVq000000Mddp.jpg](../images/kb/ja/0EMVq000000Mddp.jpg)<br />[ja/0EMVq000000Mdh3.jpg](../images/kb/ja/0EMVq000000Mdh3.jpg)<br />[ja/0EMVq000000MdkH.jpg](../images/kb/ja/0EMVq000000MdkH.jpg)<br />[0EMVq000003qUpu.jpg](../images/kb/0EMVq000003qUpu.jpg)<br />[ja/0EMVq000004oUwf.jpg](../images/kb/ja/0EMVq000004oUwf.jpg)<br />[0EMVq000004oUwf.jpg](../images/kb/0EMVq000004oUwf.jpg)<br />[0EMVq000003tbbW.jpg](../images/kb/0EMVq000003tbbW.jpg) | external link variant | `icon-arrow-square-out` | high |  |
 | 4 | 22 | en, ja | [ja/0EMVq000001luvq.jpg](../images/kb/ja/0EMVq000001luvq.jpg)<br />[ja/0EMVq000000J38g.jpg](../images/kb/ja/0EMVq000000J38g.jpg)<br />[0EMVq000001luvq.jpg](../images/kb/0EMVq000001luvq.jpg)<br />[ja/0EMVq000000JC0f.jpg](../images/kb/ja/0EMVq000000JC0f.jpg)<br />[ka0Vq0000007KoP-00N5w00000Ri7BU-0EMVq000000SmMf.jpg](../images/kb/ka0Vq0000007KoP-00N5w00000Ri7BU-0EMVq000000SmMf.jpg)<br />[ja/0EMVq000000SmMf.jpg](../images/kb/ja/0EMVq000000SmMf.jpg)<br />[ja/0EMVq000001Fbcz.jpg](../images/kb/ja/0EMVq000001Fbcz.jpg)<br />[ja/0EMVq000001pd6n.jpg](../images/kb/ja/0EMVq000001pd6n.jpg)<br />[ja/0EMVq000000J7CH.jpg](../images/kb/ja/0EMVq000000J7CH.jpg)<br />[ja/0EMVq000000J5VT.jpg](../images/kb/ja/0EMVq000000J5VT.jpg)<br />[ja/0EMVq000000x3I1.jpg](../images/kb/ja/0EMVq000000x3I1.jpg)<br />[ja/0EMVq000000yxmn.jpg](../images/kb/ja/0EMVq000000yxmn.jpg)<br />[ja/0EMVq000000yy2v.jpg](../images/kb/ja/0EMVq000000yy2v.jpg)<br />[0EMVq000001Fbcz.jpg](../images/kb/0EMVq000001Fbcz.jpg) | trash can | `icon-trash` | high |  |
@@ -111,7 +111,6 @@ _(274 distinct target glyphs total)_
 | 11 | 16 | en | [Integration-Account-Table-Indicator-Dot.png](../images/kb/Integration-Account-Table-Indicator-Dot.png) |  | `icon-check-square-fill text-green-600` | high |  |
 | 12 | 15 | en | [0EM5w000005vXkS.png](../images/kb/0EM5w000005vXkS.png) |  | `icon-wrench` | high |  |
 | 13 | 14 | en, ja | [ja/0EM5w000005wLHe.png](../images/kb/ja/0EM5w000005wLHe.png)<br />[ja/0EM5w000005vNik.png](../images/kb/ja/0EM5w000005vNik.png)<br />[ka0Vq000000FmNh-00N5w00000Ri7BU-0EM5w000005vNjp-1.png](../images/kb/ka0Vq000000FmNh-00N5w00000Ri7BU-0EM5w000005vNjp-1.png)<br />[ka0Vq000000FmNh-00N5w00000Ri7BU-0EM5w000005vNjp-2.png](../images/kb/ka0Vq000000FmNh-00N5w00000Ri7BU-0EM5w000005vNjp-2.png)<br />[ka0Vq000000FmNh-00N5w00000Ri7BU-0EM5w000005vNjp-3.png](../images/kb/ka0Vq000000FmNh-00N5w00000Ri7BU-0EM5w000005vNjp-3.png)<br />[ka0Vq000000FmNh-00N5w00000Ri7BU-0EM5w000005vNjp-4.png](../images/kb/ka0Vq000000FmNh-00N5w00000Ri7BU-0EM5w000005vNjp-4.png) | pencil light gray small | `icon-pencil` | high |  |
-| 14 | 14 | ja | [ja/0EM5w000005vXkS.png](../images/kb/ja/0EM5w000005vXkS.png) |  | `icon-wrench` | high |  |
 | 15 | 13 | en | [ka05w00000123rQ-00N5w00000Ri7BU-0EM5w000005vPKu.png](../images/kb/ka05w00000123rQ-00N5w00000Ri7BU-0EM5w000005vPKu.png) | chevron up | `icon-chevron-up` | high |  |
 | 16 | 12 | en, ja | [ja/0EMVq000006vBxm.jpg](../images/kb/ja/0EMVq000006vBxm.jpg)<br />[0EMVq000006vBxm.jpg](../images/kb/0EMVq000006vBxm.jpg) | three vertical dots | `icon-dots-vertical` | high |  |
 | 17 | 11 | en, ja | [ka0Vq0000001Fg9-00N5w00000Ri7BU-0EM5w000005wybX.jpg](../images/kb/ka0Vq0000001Fg9-00N5w00000Ri7BU-0EM5w000005wybX.jpg)<br />[ja/0EMVq000004rbIT.jpg](../images/kb/ja/0EMVq000004rbIT.jpg)<br />[0EMVq000004rbIT.jpg](../images/kb/0EMVq000004rbIT.jpg) |  | `icon-x text-red-600` | high |  |
@@ -128,7 +127,7 @@ _(274 distinct target glyphs total)_
 | 29 | 8 | en, ja | [ka05w00000123tG-00N5w00000Ri7BU-0EM5w000005vPPk.png](../images/kb/ka05w00000123tG-00N5w00000Ri7BU-0EM5w000005vPPk.png)<br />[ja/0EM5w000005wLED.png](../images/kb/ja/0EM5w000005wLED.png)<br />[0EM5w000005vPMo.png](../images/kb/0EM5w000005vPMo.png) |  | `icon-play-circle-outline` | high |  |
 | 30 | 8 | en | [ka0Vq000000C3gT-00N5w00000Ri7BU-0EMVq000000J38g.jpg](../images/kb/ka0Vq000000C3gT-00N5w00000Ri7BU-0EMVq000000J38g.jpg)<br />[ka0Vq000000C3gT-00N5w00000Ri7BU-0EMVq000000JC0f.jpg](../images/kb/ka0Vq000000C3gT-00N5w00000Ri7BU-0EMVq000000JC0f.jpg)<br />[ka0Vq000000C3gT-00N5w00000Ri7BU-0EMVq000001pd6n.jpg](../images/kb/ka0Vq000000C3gT-00N5w00000Ri7BU-0EMVq000001pd6n.jpg) | trash can | `icon-trash` | high |  |
 | 31 | 8 | en, ja | [ka05w00000123tU-00N5w00000Ri7BU-0EM5w000005vPQj.png](../images/kb/ka05w00000123tU-00N5w00000Ri7BU-0EM5w000005vPQj.png)<br />[ja/0EM5w000005wLEP.png](../images/kb/ja/0EM5w000005wLEP.png) |  | `icon-lines-horizontal` | high |  |
-| 32 | 8 | en, ja | [ka05w0000012Aam-00N5w00000Ri7BU-0EM5w000006vrB8.jpg](../images/kb/ka05w0000012Aam-00N5w00000Ri7BU-0EM5w000006vrB8.jpg)<br />[ja/0EM5w000006uVxG.jpg](../images/kb/ja/0EM5w000006uVxG.jpg)<br />[ja/0EMVq000001FbbN.jpg](../images/kb/ja/0EMVq000001FbbN.jpg)<br />[0EM5w000006uVxG.jpg](../images/kb/0EM5w000006uVxG.jpg)<br />[0EMVq000001FbbN.jpg](../images/kb/0EMVq000001FbbN.jpg) |  | `icon-wrench` | high |  |
+| 32 | 7 | en, ja | [ka05w0000012Aam-00N5w00000Ri7BU-0EM5w000006vrB8.jpg](../images/kb/ka05w0000012Aam-00N5w00000Ri7BU-0EM5w000006vrB8.jpg)<br />[ja/0EMVq000001FbbN.jpg](../images/kb/ja/0EMVq000001FbbN.jpg)<br />[0EM5w000006uVxG.jpg](../images/kb/0EM5w000006uVxG.jpg)<br />[0EMVq000001FbbN.jpg](../images/kb/0EMVq000001FbbN.jpg) |  | `icon-wrench` | high |  |
 | 33 | 8 | en, ja | [ka05w00000123RF-00N5w00000Ri7BU-0EM5w000005vOCU.png](../images/kb/ka05w00000123RF-00N5w00000Ri7BU-0EM5w000005vOCU.png)<br />[ja/0EM5w000005vXl9.png](../images/kb/ja/0EM5w000005vXl9.png)<br />[0EM5w000005vXl9.png](../images/kb/0EM5w000005vXl9.png) |  | `icon-wrench` | high |  |
 | 34 | 7 | ja | [ja/0EM5w000005vOVX.png](../images/kb/ja/0EM5w000005vOVX.png) | KPI cards screenshot | — | not-icon | False positive |
 | 35 | 7 | en | [ka05w00000126DW-00N5w00000Ri7BU-0EM5w000005vZ3P.png](../images/kb/ka05w00000126DW-00N5w00000Ri7BU-0EM5w000005vZ3P.png) | trash can | `icon-trash` | high |  |
@@ -171,7 +170,7 @@ _(274 distinct target glyphs total)_
 | 72 | 5 | en | [ka05w00000123kQ-00N5w00000Ri7BU-0EM5w000005vOyu.png](../images/kb/ka05w00000123kQ-00N5w00000Ri7BU-0EM5w000005vOyu.png) |  | `icon-analyzer` | high |  |
 | 73 | 5 | en, ja | [ka05w00000128SJ-00N5w00000Ri7BU-0EM5w000005vOcQ.png](../images/kb/ka05w00000128SJ-00N5w00000Ri7BU-0EM5w000005vOcQ.png)<br />[ja/0EM5w000005vOc8.png](../images/kb/ja/0EM5w000005vOc8.png)<br />[0EM5w000005vOc8.png](../images/kb/0EM5w000005vOc8.png) | bell (notifications/alerts) | `icon-bell` | high |  |
 | 74 | 5 | en | [ka0Vq0000005UQT-00N5w00000Ri7BU-0EM5w000005vNtu.png](../images/kb/ka0Vq0000005UQT-00N5w00000Ri7BU-0EM5w000005vNtu.png) | wrench | `icon-wrench` | high |  |
-| 75 | 5 | en, ja | [ja/0EM5w000005vXkP.png](../images/kb/ja/0EM5w000005vXkP.png)<br />[0EM5w000005vXkP.png](../images/kb/0EM5w000005vXkP.png)<br />[ka0Vq00000051WX-00N5w00000Ri7BU-0EM5w000005vXkP.png](../images/kb/ka0Vq00000051WX-00N5w00000Ri7BU-0EM5w000005vXkP.png) | three horizontal dots inside a tile/box | `icon-dots-horizontal` | high |  |
+| 75 | 3 | en | [0EM5w000005vXkP.png](../images/kb/0EM5w000005vXkP.png)<br />[ka0Vq00000051WX-00N5w00000Ri7BU-0EM5w000005vXkP.png](../images/kb/ka0Vq00000051WX-00N5w00000Ri7BU-0EM5w000005vXkP.png) | three horizontal dots inside a tile/box | `icon-dots-horizontal` | high |  |
 | 76 | 5 | en, ja | [ka05w00000126DW-00N5w00000Ri7BU-0EM5w000005vZ3K.png](../images/kb/ka05w00000126DW-00N5w00000Ri7BU-0EM5w000005vZ3K.png)<br />[ja/0EM5w000005vOVV.png](../images/kb/ja/0EM5w000005vOVV.png)<br />[ja/0EM5w000005wLFd.png](../images/kb/ja/0EM5w000005wLFd.png)<br />[0EM5w000005vObn.png](../images/kb/0EM5w000005vObn.png) |  | `icon-wrench` | high |  |
 | 77 | 5 | ja | [ja/0EM5w000005vNjp.png](../images/kb/ja/0EM5w000005vNjp.png) | full screenshot of a Product Container table column listing pack/box sizes with red circles around Jumbo Box rows | — | not-icon | Not an icon - full UI screenshot |
 | 78 | 4 | en | [ka05w00000123tG-00N5w00000Ri7BU-0EM5w000005vPPb.png](../images/kb/ka05w00000123tG-00N5w00000Ri7BU-0EM5w000005vPPb.png) |  | `legacy-icon-pencil-fill` | high |  |
@@ -259,9 +258,9 @@ _(Full list in `inline-icon-mapping.json` — filter by `confidence == "not-icon
 
 ## Next steps
 
-1. **Spot-check the `medium`/`needs-review` entries.** ~148 medium-confidence mappings and 9 needs-review entries cover 246 references combined. A 30-minute eyeball pass would catch most miscalls.
+1. **Spot-check the `medium`/`needs-review` entries.** 144 medium-confidence mappings and 9 needs-review entries cover 228 references combined. A 30-minute eyeball pass would catch most miscalls.
 2. **Audit the 1,203 missing-file references.** These are broken image refs in the source, separate from the mapping problem.
-3. **Tighten the scanner** to filter out images with width/height > ~40px before generating future inline-icon audits. ~272 of the 1,077 entries here are false positives (full screenshots caught because they used `style={{display: 'inline'}}`).
+3. **Tighten the scanner** to filter out images with width/height > ~40px before generating future inline-icon audits. 273 of the 1,072 entries here are false positives (full screenshots caught because they used `style={{display: 'inline'}}`).
 4. **Build a replacement script** that consumes `inline-icon-mapping.json` and walks `.mdx` files, proposing per-article diffs for review. Should:
    - Skip release-notes articles (titles containing "Release Notes" or matching `YYYY Release N | Month`)
    - Look up each `<img src="...">` by src path → find the matching entry by hash

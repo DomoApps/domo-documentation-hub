@@ -139,7 +139,7 @@ Before drafting, confirm with the user:
 
 **Coding reference** (from `Domo-KB-Style-Guide.mdx` › **Screenshots**, **Icons**, **Brand and Third-Party Logos**):
 
-- **Block (hero) screenshot:** `<Frame><img src="/images/kb/example.png" alt="Descriptive alt text" /></Frame>` — no inline `width`/`height`; never inside a table cell.
+- **Block (hero) screenshot:** `<Frame><img src="/images/kb/example.png" alt="Detailed, accurate description of what this screenshot shows" /></Frame>` — no inline `width`/`height`; never inside a table cell. Alt text is required: every screenshot must carry detailed, accurate `alt` text for accessibility, LLM readability, and SEO (`Domo-KB-Style-Guide.mdx` › **Alt Text Is Required on Every Screenshot**). If the user wants the hero screenshot but hasn't described what it shows, state the requirement, reference the rule, and ask for the alt text — don't invent it or ship an empty/placeholder `alt`.
 - **Current Domo UI glyph:** `<i className="icon-{name}" aria-hidden="true" />` (Phosphor font). Browse names at [Domo Icons](https://git.empdev.domo.com/pages/Development/DomoIcons/#!/icons/phosphor).
 - **Legacy UI glyph:** `<i className="legacy-icon-{name}" aria-hidden="true" />` — only for release-notes/Workbench surfaces.
 - **Third-party brand logo:** Font Awesome brands `<Icon icon="{slug}" iconType="brands" aria-hidden="true" />`, or inline `<svg fill="currentColor" …>` when the free FA set lacks it. Never a monochrome `<img>` logo — it disappears in dark mode.
@@ -196,7 +196,7 @@ Learn more about [grants](/s/article/360043438973).
 
 <One short paragraph or numbered list showing the 1–3 ways to open or get to the product. Reference the dedicated "Opening X" article if one exists.>
 
-1. **From <surface 1>.** <Action sentence with the icon if applicable, e.g., select <i className="icon-pencil sm" aria-hidden="true" /> **Edit**.>
+1. **From <surface 1>.** <Action sentence with the icon if applicable, e.g., select <i className="icon-pencil" aria-hidden="true" /> **Edit**.>
 2. **From <surface 2>.** <Action sentence.>
 3. **From <surface 3>.** <Action sentence.>
 
@@ -287,7 +287,7 @@ Drafting always introduces style drift. After the fact-check pass, and before ve
    - **Voice and word choice** — present tense, not "will"; active voice; "after", not causal "once"; no "utilize"; spell out numbers under 10; "allowlist"/"blocklist"; "select", not "click"; Oxford comma; no exclamation points.
    - **Domo terms** — apply the Step 4 treatment for the product name consistently, plus `DataSet`, `DataFlow`, `DataFusion`, `Beast Mode`, `Workbench`; `dashboard` lowercase except at the start of a sentence or with a type; never "Page". Verify against the **Domo-Specific Terms and Usage** table.
    - **Beta** — correct convention applied (frontmatter `tag` + verbatim Note for a whole-article beta; Badge + single verbatim Note for section-level).
-   - **Images** — if you included the optional hero screenshot, it is wrapped in `<Frame>` with a native `<img>` and descriptive `alt`, no inline `width`/`height`; never `<Frame>` inside a table cell. No placeholders unless the user opted in at Step 6.
+   - **Images** — if you included the optional hero screenshot, it is wrapped in `<Frame>` with a native `<img>` and detailed, accurate `alt` text (not empty, `"screenshot"`, or a placeholder — ask the user for it if it's missing, per Step 6), no inline `width`/`height`; never `<Frame>` inside a table cell. No placeholders unless the user opted in at Step 6.
    - **Icons** — current UI glyphs use the `icon-{name}` font; `legacy-icon-{name}` only for release-notes/Workbench surfaces; brand logos use Font Awesome brands or inline `<svg fill="currentColor">`; never the old inline-image icon pattern for a glyph that exists in the font. Each icon carries `aria-hidden="true"` and is named in the prose.
 4. **Revise the Overview in place** to resolve every issue found, then re-run the table normalizer if you changed any tables.
 

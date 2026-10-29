@@ -56,10 +56,10 @@ Do this **before** asking where the context is, so the file is clear and ready t
    ```bash
    python3 scripts/archive-current-release-notes.py
    ```
-   This creates the archived `.mdx` (content copied verbatim, only the `title:` changed) and inserts its path at the end of the **English** "2025-2026" subgroup under "Archived Feature Release Notes" in `docs.json`. It does **not** touch `Current-Release-Notes.mdx` — you overwrite that in Step 6.
+   This creates the archived `.mdx` (content copied verbatim, only the `title:` changed) and inserts its path at the top of the **English** "2025-2026" subgroup under "Archived Feature Release Notes" in `docs.json` (the archive list is newest first). It does **not** touch `Current-Release-Notes.mdx` — you overwrite that in Step 6.
 
    > The script edits only the English nav. Localized nav entries for the archived file are created later by the `localize` flow — do not add them here.
-   > If a new calendar year needs a new nav subgroup (e.g. a "2027" group), the script appends to "2025-2026"; flag this to the user so they can decide whether to rename/split the group via the `add-to-nav` skill.
+   > If a new calendar year needs a new nav subgroup (e.g. a "2027" group), the script adds to "2025-2026"; flag this to the user so they can decide whether to rename/split the group via the `add-to-nav` skill.
 
 ### Step 3 — Ask where the context is
 

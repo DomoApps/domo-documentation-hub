@@ -274,6 +274,8 @@ Then insert the localized version at the equivalent position in the target langu
 
 For release notes articles specifically, use the localized tab and group names from the style guide (see the Release Notes Conventions section).
 
+**Exception — Japanese connector ordering.** Localized navs mirror English structure and ordering for all non-connector content. **Connectors are the exception:** the Connect & Integrate → Data Providers section is alphabetical, and the Japanese (`jp`) connector nav must be alphabetized **in Japanese** (by the Japanese article title), not placed in the English page order. Keep the connector at parity with English for its *provider group* and its *letter-range subgroup* (`データプロバイダー A～B` … `T～Z、#`), but order the entries within that Japanese subgroup by Japanese collation of the title. A vendor is a provider group in a given language only when that language has 2+ of its connectors; with exactly one translated connector it is a loose page (so an English provider group can be a single loose page in Japanese). `fr`/`de`/`es` have no Data Providers section. See **Navigation parity exception** in `CLAUDE.md` and `localization/Localization-Style-Guide.mdx`.
+
 **Page path to insert:** `{lang}/s/article/FILENAME` (no `.mdx`)
 
 Invoke `add-to-nav` once per language (three invocations total, or fewer if only specific languages were requested).

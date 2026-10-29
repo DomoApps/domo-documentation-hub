@@ -182,6 +182,18 @@ All localization assets live in **`localization/`**. Translation is **determinis
 
 Workflow: the `localize` skill runs the `localization-retrospective` skill first (Step 0), loads the glossary, applies it during translation, verifies with `scripts/check-glossary.py` in QA, and snapshots its output for **every** language. Once human-corrected articles return as merged PRs, `localization-retrospective` diffs them against the snapshots and writes term-level corrections back into the glossaries. Regenerate the glossaries with `scripts/build-localization-glossary.py` (it preserves `retrospective:*` and `manual*` rows).
 
+### Navigation parity exception: Japanese connector ordering
+
+Localized navs in `docs.json` are expected to **mirror the English nav structure**: for non-connector content the group/page hierarchy and ordering should match English 100%. **Connectors are the one exception.** The Connect & Integrate → Data Providers section is organized alphabetically, and the Japanese (`jp`) connector nav must be alphabetized **in Japanese** (by the Japanese article title), not mirrored from the English order.
+
+Concretely, for the Data Providers subgroups:
+
+- **Group membership and the alphabetical-range subgroups** (`Data Providers A-B` … `T-Z and #`) stay at parity with English — a connector sits in the same provider group (or as a loose page) and the same letter-range subgroup it occupies in English. The subgroup scaffold and provider-group names (brand names, kept in Latin) are shared across languages.
+- **Ordering within each Japanese subgroup follows Japanese collation of the Japanese title**, so the Japanese connector list reads alphabetically to a Japanese reader even though it diverges from the English page order. Most connector titles are brand-led (e.g. `Instagram Businessコネクター`), so this largely tracks Latin order, but verb-led Japanese titles (e.g. `DomoでInContact Echoデータに接続する`) sort by their Japanese leading text.
+- **Group-vs-loose is decided per language by the count present in that language** (2+ translated connectors for a vendor → a provider group; exactly 1 → a loose page). Because Japanese carries only a translated subset, a vendor that is a group in English can legitimately be a loose page in Japanese (e.g. Instagram is a 2-article group in English but a single loose page in Japanese).
+
+Only `en` and `jp` currently carry the full connector catalog; `fr`/`de`/`es` have no Data Providers section to mirror. See the `add-to-nav` and `localize` skills, and `localization/Localization-Style-Guide.mdx`, which record the same exception.
+
 ## Finding Existing Articles
 
 To find an article by title keyword, search frontmatter across all KB articles:

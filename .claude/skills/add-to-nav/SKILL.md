@@ -11,6 +11,10 @@ The user has provided: $ARGUMENTS
 
 ---
 
+**Connector nav + Japanese ordering exception.** Connector articles live under Connect & Integrate → Data Providers, organized alphabetically into letter-range subgroups (`Data Providers A-B` … `T-Z and #`); a vendor with 2+ connectors gets a named provider group (brand name, kept in Latin), and a single-connector vendor is a loose page placed alphabetically. Localized navs mirror the English structure for everything **except** Japanese connector ordering: the Japanese (`jp`) connector nav must be alphabetized **in Japanese** (by the Japanese title) within each subgroup, while still keeping each connector in the same provider group and letter-range subgroup it occupies in English. (Group-vs-loose is per language: 2+ translated connectors → group, exactly 1 → loose page, so an English group can be a single loose page in Japanese.) Only `en` and `jp` carry a connector catalog. See **Navigation parity exception** in `CLAUDE.md`, the `localize` skill, and `localization/Localization-Style-Guide.mdx`.
+
+---
+
 ## Overview
 
 `docs.json` is the Mintlify navigation manifest. It is ~307KB and deeply nested:

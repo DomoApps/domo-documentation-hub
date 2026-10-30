@@ -33,13 +33,32 @@ Instance `domo.domo.com`, DataSet ID `1aa127f4-edf6-4294-b509-186645a9e15b`.
 | `master_targetdate` | Planned deploy date — buckets notes into weeks |
 | `Public_Parent_Component` | Section heading (friendly-renamed where needed) |
 | `master_key` | EC ticket (batch id, *not* a feature title) — traceback only |
+| *(optional)* note-type column | If the DataSet ever adds one, turns the flat list back into Updates / Issues Resolved sections — see below |
 
 The pipeline: filter `score ≥ 7` + non-empty → **dedup** on normalized note text
 (~40% are exact duplicates) → select notes dated on/before run day **not already in the
-ledger** → classify Update vs Issue Resolved → restyle → group by component → render.
+ledger** → restyle → group by component → render.
 
-**Update vs Issue Resolved** is inferred from the sentence (no column): "resolves an
-issue", "fixed", "no longer", "restored", "preventing" → Issue Resolved; otherwise Update.
+## No Updates / Issues Resolved split (unless an official column exists)
+
+Published Minor Release Notes list every note in **one flat list under its product
+section** — there is deliberately **no "Updates" vs "Issues Resolved" delineation**. The
+script never infers that split from the sentence for publishing.
+
+**The one exception (future-proofed):** if the source DataSet gains an *official* column
+tagging each note's type, the split comes back automatically, driven by that column:
+
+- **Live Domo run:** set the repo variable **`DOMO_MINOR_RN_TYPE_COLUMN`** to the column's
+  exact name. The build then SELECTs it, detects it, and renders **Updates** then **Issues
+  Resolved** per section. Leave the variable unset and the output stays flat — the SELECT
+  never references the column, so it can't fail against a DataSet that lacks it.
+- **Local CSV test:** just include a column named `Public_Note_Type` (the default name) and
+  the delineated render activates. Cell values containing "issue"/"resolved"/"fix"/"bug" →
+  *Issues Resolved*; anything else → *Updates*.
+
+`classify()` in the build script still infers Update-vs-Issue, but **only to shape each
+bullet's voice** (past-tense problem vs present-tense behavior); with no official column it
+produces no visible section headers.
 
 ## The published ledger
 

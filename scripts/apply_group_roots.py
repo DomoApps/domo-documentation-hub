@@ -201,10 +201,15 @@ def main():
             node["pages"] = pages
         # Apply the desired root (remove it from the child list).
         if want:
-            node["root"] = want
             node["pages"] = [p for p in node.get("pages", []) if not (isinstance(p, str) and p == want)]
+            # Key order is group, root, expanded (top-level only), then everything else.
+            head = {"group": node["group"], "root": want}
             if " > " not in key:
-                node["expanded"] = True
+                head["expanded"] = True
+            rest = {k: v for k, v in node.items() if k not in head}
+            node.clear()
+            node.update(head)
+            node.update(rest)
         changed += 1
 
     with open(DOCS_JSON, "w", encoding="utf-8") as f:

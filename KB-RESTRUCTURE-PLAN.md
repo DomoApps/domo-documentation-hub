@@ -221,11 +221,10 @@ Classification heuristics (from title + excerpt):
 
 ### 2.2 Section Structure Template
 
-Every pillar follows this hub-and-spoke pattern in the nav:
+Every pillar follows this hub-and-spoke pattern in the nav. The hub article is the group's **root page**, not a child: selecting the group title opens the hub. See [7.1](#71-nav-authoring) for how this is encoded in `docs.json`.
 
 ```
-[Pillar Name]
-├── Overview                       ← hub article, new or rewrite
+[Pillar Name]                      ← group root: Overview hub article, new or rewrite
 ├── What is [X]?                   ← explanation article, new
 ├── Getting Started with [X]       ← tutorial, new or upgrade
 ├── Key Concepts                   ← 3–8 explanation articles
@@ -249,15 +248,11 @@ Connectors are a reference library — they don't need full story treatment per 
 **Proposed structure for "Connect & Integrate Data":**
 
 ```
-Connect & Integrate Data
-├── Overview: Connecting Your Data to Domo        ← new hub (frames read + write)
-├── What is a Connector?                          ← new explanation
+Connect & Integrate Data                          ← root: Connecting Your Data to Domo hub (frames read + write)
 ├── Getting Started: Connect Your First DataSet   ← new tutorial
-├── How Connectors Work (OAuth, scheduling, etc.) ← new explanation
-└── Connector Library — Reference
-    ├── Connector Library Overview                ← hub; "most commonly used" curated list
-    ├── Cloud Data Warehouses                     ← CDW sub-groups promoted within the library
-    │   ├── Cloud Data Warehouses Overview        ← Cloud Amplifier as #1 for all CDWs
+├── How Connectors Work (OAuth, scheduling, etc.) ← root: What is a Connector? (new explanation)
+└── Connector Library — Reference                 ← root: Connector Library Overview; "most commonly used" curated list
+    ├── Cloud Data Warehouses                     ← CDW sub-groups promoted within the library; root: Cloud Data Warehouses Overview (Cloud Amplifier as #1 for all CDWs)
     │   ├── Snowflake (hub → existing articles)   ← read + write framing; Cloud Amplifier first
     │   ├── Google BigQuery
     │   ├── Databricks
@@ -274,6 +269,7 @@ Connect & Integrate Data
 - Writeback Connectors are not a standalone section. CDW writeback is in each CDW's sub-group; standard writeback connectors appear alphabetically in the library alongside read connectors.
 - "Data Providers" terminology replaced with "Connectors" throughout.
 - Connector Library stays alphabetical. No use-case grouping for the main list.
+- Each article in the alphabetical groups is placed and sorted by its **title**, and the title is the connector name with no lead-in prose ("Adobe Analytics Data Warehouse", not "Connecting to Adobe Analytics Data Warehouse"). In the last group, titles that start with a number sort after the letters.
 
 ### 2.3a Read/Write Framing Convention
 
@@ -292,7 +288,7 @@ Current: 3 separate Workbench sections (Enterprise, 5, 4) with ~90 articles.
 Proposed: One "Workbench" section with:
 - Current version content prominently first
 - Legacy version content clearly labeled under a "Legacy Versions" collapsible group
-- A "Which version do I have?" decision article at the top
+- `What-is-Workbench` as the group root, with a "Which version do I have?" decision article as the first child
 
 This collapses ~3 nav sections and removes ~35 Workbench 4 articles from primary nav visibility.
 
@@ -353,7 +349,7 @@ These ~26 articles can be drafted by reading existing how-tos and reformatting t
 
 **Tier 3 — Section hub articles (curate links + write brief intro; one per pillar):**
 
-All 8 hub articles use the `new-overview-article` skill, which is designed exactly for this pattern. Source material is the set of existing articles that will nest under each hub.
+All 8 hub articles use the `new-overview-article` skill, which is designed exactly for this pattern. Source material is the set of existing articles that will nest under each hub. Each hub becomes its pillar's group `root` (see [7.1](#71-nav-authoring)), not a child page.
 
 | # | Article | Source content |
 |---|---------|---------------|
@@ -628,7 +624,7 @@ This is a **hard dependency for the second main-branch sync (Phase 3c, sync #2)*
 
 ### 6.2 Update Internal Links
 
-**Script:** Read `rename-mapping.json`, find all occurrences of old paths (by filename) in all `.mdx` files and `docs.json`, replace with new slug paths.
+**Script:** Read `rename-mapping.json`, find all occurrences of old paths (by filename) in all `.mdx` files and `docs.json`, replace with new slug paths. In `docs.json` this covers group `root` values as well as `pages` entries, and the override map in `scripts/group_roots.json` must be rewritten the same way.
 
 ### 6.3 Generate Redirect Map
 
@@ -651,7 +647,7 @@ After the slug rename completes, the following GitHub Actions keep the documenta
 
 | Action | Trigger | What it does |
 |--------|---------|--------------|
-| **Nav validator** | PR, push to `main` | Runs `scripts/validate-nav.js`; fails the PR if any `docs.json` page ref points to a missing file, or if any article in `s/article/` has no nav entry | Extends the Phase 7 validator |
+| **Nav validator** | PR, push to `main` | Runs `scripts/validate-nav.js`; fails the PR if any `docs.json` page or `root` ref points to a missing file, if any article in `s/article/` has no nav entry, or if the root rules in 7.2 are broken | Extends the Phase 7 validator |
 | **Orphan detector** | PR, push to `main` | Flags any new `.mdx` file in `s/article/` not referenced in `docs.json` — catches articles added without a nav entry | New: `scripts/check-orphans.js` |
 | **Slug linter** | PR only | Checks that new article filenames follow the slug convention (lowercase, hyphens only, no special characters) — prevents regression to numeric IDs | New: `scripts/lint-slugs.js` or a remark lint rule |
 | **Numeric-ID ref checker** | PR, push to `main` | After Phase 6, greps all `.mdx` files and `docs.json` for any remaining `s/article/[0-9]` references — enforces migration completeness as new articles are added | New: simple grep action |
@@ -676,16 +672,27 @@ After the slug rename completes, the following GitHub Actions keep the documenta
 
 ### 7.1 Nav Authoring
 
-New `docs.json` navigation authored to match the Phase 2 structure. Each section hub article appears as the first entry in its group. Example:
+New `docs.json` navigation authored to match the Phase 2 structure. Each group's hub article is set as the group's Mintlify [`root`](https://www.mintlify.com/docs/organize/navigation#root-page) page: selecting the group title opens the hub, so the hub is not repeated as a child.
+
+**Rules:**
+- A group with an Overview or "What is X?" hub sets `"root"` to it, and the hub is **not** also listed in `pages`. Listing it in both makes it appear twice.
+- `"root"` comes directly after `"group"`.
+- Every **top-level** group (pillar) with a root also sets `"expanded": true` directly after `"root"`, so its sub-groups show by default. Nested groups set `root` only, never `expanded`.
+- Groups with no hub article stay rootless and keep their pages as plain children.
+- Groups inside the Archive pillar are not rooted. The Archive pillar itself is.
+- A group must keep at least one child page alongside its root.
+
+Example:
 
 ```json
 {
   "group": "Prepare & Transform Data",
+  "root": "s/article/Prepare-and-Transform-Overview",
+  "expanded": true,
   "pages": [
-    "s/article/Prepare-and-Transform-Data-Overview",
-    "s/article/What-is-Magic-ETL",
     {
       "group": "Magic ETL",
+      "root": "s/article/What-is-Magic-ETL",
       "pages": [
         "s/article/Magic-ETL-Getting-Started",
         "s/article/Magic-ETL-Tiles-Reference",
@@ -696,14 +703,20 @@ New `docs.json` navigation authored to match the Phase 2 structure. Each section
 }
 ```
 
+**Tooling:** on the Knowledge Base tab, `scripts/apply_group_roots.py` proposes and applies roots: dry-run by default, `--apply` to write `docs.json`. Decisions and `null` overrides live in `scripts/group_roots.json`, which wins over the script's auto-proposal. The Developer Portal tab follows the same rules but is maintained by hand. Localized tabs (`ja`, `fr`, `de`, `es`) mirror the English roots in Phase 6.
+
+**OpenAPI sync caveat:** when a Product APIs spec re-syncs, `sync-api-docs.yml` replaces that whole group with endpoint-only pages, which drops the group's `root` and its overview page. Re-add them after each sync.
+
 ### 7.2 Validation Script
 
 ```bash
 # scripts/validate-nav.js
-# 1. Parse docs.json, extract all page references
+# 1. Parse docs.json, extract all page references, including group "root" values
 # 2. Check each reference resolves to a real file
-# 3. Check each file in s/article/ appears at least once in nav
-# 4. Report: broken references, orphaned articles
+# 3. Check each file in s/article/ appears at least once in nav (as a page or a root)
+# 4. Check root rules: no root page also listed in its group's pages, every
+#    rooted group keeps at least one child page, expanded only on top-level groups
+# 5. Report: broken references, orphaned articles, root-rule violations
 # Exit code 1 if any errors (integrate with CI/pre-commit hook)
 ```
 
@@ -782,7 +795,8 @@ Articles not appearing in nav after rebuild: add to a `_uncategorized` holding g
 
 | Risk | Mitigation |
 |------|-----------|
-| Broken internal links after rename | Link-updater script + post-rename nav validation |
+| Broken internal links after rename | Link-updater script (rewrites `pages`, `root`, and `scripts/group_roots.json`) + post-rename nav validation |
+| Group roots dropped by the OpenAPI sync | Re-add the root and overview page after each Product APIs spec sync; the nav validator flags a rooted group that lost its root file |
 | Existing SEO / bookmarks broken by rename | Redirects map generated before rename executes; maintained in Mintlify config |
 | Connector articles too numerous to individually maintain | Templated structure; consider a connector article generator script for new connectors |
 | Net-new articles don't match style guide | All new articles authored via `new-kb-article` or `new-overview-article` skill (encodes style guide automatically) + human review before merge |

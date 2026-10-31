@@ -677,7 +677,7 @@ New `docs.json` navigation authored to match the Phase 2 structure. Each group's
 **Rules:**
 - A group with an Overview or "What is X?" hub sets `"root"` to it, and the hub is **not** also listed in `pages`. Listing it in both makes it appear twice.
 - `"root"` comes directly after `"group"`.
-- Every **top-level** group (pillar) with a root also sets `"expanded": true` directly after `"root"`, so its sub-groups show by default. Nested groups set `root` only, never `expanded`.
+- Every **top-level** group (pillar) with a root also sets `"expanded": true` directly after `"root"`, so its sub-groups show by default. The one exception is Archive, which sets `"expanded": false` so legacy content stays collapsed. Nested groups set `root` only, never `expanded`.
 - Groups with no hub article stay rootless and keep their pages as plain children.
 - Groups inside the Archive pillar are not rooted. The Archive pillar itself is.
 - A group must keep at least one child page alongside its root.
@@ -716,6 +716,7 @@ Example:
 # 3. Check each file in s/article/ appears at least once in nav (as a page or a root)
 # 4. Check root rules: no root page also listed in its group's pages, every
 #    rooted group keeps at least one child page, expanded only on top-level groups
+#    (true everywhere except Archive, which must be false)
 # 5. Report: broken references, orphaned articles, root-rule violations
 # Exit code 1 if any errors (integrate with CI/pre-commit hook)
 ```

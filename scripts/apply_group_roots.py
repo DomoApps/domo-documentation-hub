@@ -18,8 +18,10 @@ Two jobs:
 
 Scope: every group, pillars included. A top-level pillar that gets a root is
 also set "expanded": true, so its sub-groups stay visible; sub-groups are not
-expanded. Groups under the Archive pillar are never rooted (the Archive pillar
-itself is).
+expanded. The exception is Archive (COLLAPSED_PILLARS), which is rooted but set
+"expanded": false so its legacy content stays out of the way. Every run also
+corrects a rooted pillar whose "expanded" value has drifted. Groups under the
+Archive pillar are never rooted (the Archive pillar itself is).
 
 Resolution rule (per group, among its DIRECT string children):
   a. Prefer a modern restructure overview slug: "What-is-*" or "*-Overview"
@@ -48,6 +50,14 @@ import sys
 
 DOCS_JSON = "docs.json"
 OVERRIDES = "scripts/group_roots.json"
+COLLAPSED_PILLARS = {"Archive"}
+
+
+def expanded_for(key):
+    """The "expanded" value a rooted group should carry, or None for nested groups."""
+    if " > " in key:
+        return None
+    return key not in COLLAPSED_PILLARS
 
 
 def title_of(navpath):
@@ -166,6 +176,11 @@ def main():
 
     gmap = {k: n for k, n, _ in groups}
     deroots = [k for k, n in gmap.items() if n.get("root") and n["root"] != desired.get(k)]
+    expand_fixes = [
+        k for k, n in gmap.items()
+        if desired.get(k) and n.get("root") == desired[k]
+        and expanded_for(k) is not None and n.get("expanded") is not expanded_for(k)
+    ]
 
     print(f"Groups scanned: {len(groups)}   roots resolved: {len(resolved)}")
     print(f"Groups left without a root: {len(no_root)}")
@@ -173,6 +188,10 @@ def main():
         print(f"Will UN-ROOT (restore Overview as first child): {len(deroots)}")
         for k in sorted(deroots):
             print(f"    ~ {k}  (was root {gmap[k]['root']})")
+    if expand_fixes:
+        print(f"Will correct \"expanded\": {len(expand_fixes)}")
+        for k in sorted(expand_fixes):
+            print(f"    ~ {k}  (expanded -> {str(expanded_for(k)).lower()})")
     if skipped_empty:
         print(f"SKIPPED (would empty group): {len(skipped_empty)}")
         for k, r in skipped_empty:
@@ -191,6 +210,9 @@ def main():
         current = node.get("root")
         want = desired.get(key)
         if current == want:
+            if key in expand_fixes:
+                node["expanded"] = expanded_for(key)
+                changed += 1
             continue
         # Un-root: drop the root key and restore that page as the FIRST child.
         if current and current != want:
@@ -204,8 +226,8 @@ def main():
             node["pages"] = [p for p in node.get("pages", []) if not (isinstance(p, str) and p == want)]
             # Key order is group, root, expanded (top-level only), then everything else.
             head = {"group": node["group"], "root": want}
-            if " > " not in key:
-                head["expanded"] = True
+            if expanded_for(key) is not None:
+                head["expanded"] = expanded_for(key)
             rest = {k: v for k, v in node.items() if k not in head}
             node.clear()
             node.update(head)

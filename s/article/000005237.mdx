@@ -95,6 +95,8 @@ The BigQuery service account must have the following roles.
 
 <Note>**Note:** BigQuery Job User is required for a read-only integration, not only for writeback. When you create the integration, Domo validates the connection by running a query, and BigQuery runs every query inside a job—so the service account must be able to create jobs. Grant these roles on the project you enter as the **Project ID**.</Note>
 
+<Note>**Note:** With WIF, grant Service Account Token Creator **on the service account itself, with the service account as the member**. When a Magic ETL DataFlow running in Domo reads a BigQuery DataSet, BigQuery exports the data as files, and Domo uses the service account to sign the links it downloads those files with. Granting the role only to the workload identity pool principal lets Domo impersonate the service account, but does not let the service account sign. See [Resolve a Magic ETL Error When Using WIF](#resolve-a-magic-etl-error-when-using-wif).</Note>
+
 With U2M OAuth only, there's no service account. Instead, each user who signs in needs BigQuery Data Viewer on the data they query, and BigQuery Job User on the default billing project.
 
 **Writeback and native transform**
@@ -423,3 +425,33 @@ Check these in order:
 - **The provider matches the values Domo Support provided.** With an OIDC provider, the first two errors above usually mean the JSON configuration was exported with a different audience—Domo can only request tokens for an audience it owns. With an AWS provider, confirm the provider uses the account ID from the role ARN Domo Support provided, and that the member uses the role name from that ARN. See [Set Up Workload Identity Federation](#set-up-workload-identity-federation).
 - **Workload Identity User is granted on the service account.** `Error requesting access token`, reported by Google as `iam.serviceAccounts.getAccessToken` denied, means the workload identity pool principal cannot impersonate the service account. Grant Workload Identity User or Service Account Token Creator on the service account, with the pool principal as the member.
 - **Use the Google Cloud troubleshooter.** Google includes an IAM Policy Troubleshooter link in the denial, which shows which principal was denied and which binding is missing. Ask Domo Support for the link from your failed attempt if you cannot find it in your own audit logs.
+
+### Resolve a Magic ETL Error When Using WIF
+
+If you authenticate with Workload Identity Federation, a Magic ETL DataFlow that reads a BigQuery DataSet can fail with this error even though the integration itself connects and the input export completes:
+
+```text
+DP-50000 unknown engine error
+```
+
+Domo Support sees the underlying cause as:
+
+```text
+Permission 'iam.serviceAccounts.signBlob' denied on resource (or it may not exist).
+```
+
+After BigQuery exports the input to Google Cloud Storage, Domo signs a download link for each exported file. With WIF, Google signs those links on behalf of the service account, so the service account needs permission to sign as itself. Grant Service Account Token Creator on the service account, with the same service account as the member:
+
+```bash
+gcloud iam service-accounts add-iam-policy-binding SERVICE_ACCOUNT_EMAIL \
+  --member="serviceAccount:SERVICE_ACCOUNT_EMAIL" \
+  --role="roles/iam.serviceAccountTokenCreator" \
+  --project=PROJECT_ID
+```
+
+If your security policy requires a narrower grant, a custom role with only `iam.serviceAccounts.signBlob` on the service account is enough.
+
+Two more things to check:
+
+- **VPC Service Controls.** If your project is inside a service perimeter, allow the IAM Service Account Credentials API (`iamcredentials.googleapis.com`) as well as access to the Domo staging bucket. Otherwise the signing requests fail with a perimeter error instead of a permission error.
+- **Re-enable the DataFlow.** After repeated failures, Domo disables the DataFlow automatically. Re-enable it after you grant the role, then run it again.

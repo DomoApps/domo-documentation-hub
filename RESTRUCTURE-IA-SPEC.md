@@ -30,6 +30,15 @@ Counts in parentheses are existing articles moving to that location.
 
 ---
 
+## Changelog — Group Roots, Cards/Analyzer, and Connector Vendor Regroup (2026-10-31, PR #684)
+
+Reflected in Pillar 2 (vendor groups, writeback note), Pillar 5 (tree), and Pillar 12 below, and in `docs.json`. Full detail in `RESTRUCTURE-MANIFEST.md` › "Group Roots, Cards/Analyzer, and Connector Vendor Regroup".
+
+- **Pillar roots:** every pillar's Overview (marked `[NEW] Overview` / hub in the trees below) is now the pillar's `root` page with `"expanded": true`; Archive is rooted on `Archive-Overview` and collapsed. Getting Started is rooted on `000005874`, with its nested Getting Started subgroup flattened in (D5 now also decides this root).
+- **`docs.json` is the nav source of truth.** The trees here describe intent; where they and `docs.json` disagree, `docs.json` wins and this spec should be updated. `build_docs_nav.py` and `ia-mapping.json` no longer drive the nav (pending Jared's confirmation).
+
+---
+
 ## Changelog — App Studio & Related Regrouping (2026-10-22)
 
 All changes below are reflected in the per-pillar trees in this document and in `docs.json`.
@@ -187,6 +196,10 @@ Connect & Integrate Data
 
 **Note on Writeback Connectors:** The 55 writeback connector articles are no longer a standalone top-level section. CDW-specific write paths (Cloud Amplifier writeback) are documented within each CDW's sub-group overview. Standard writeback connectors are integrated into the alphabetical Connector Library groups alongside read connectors. Workbench writeback is covered in the Workbench section.
 
+**Current nav differs (2026-10-31):** the nav still has a Writeback Connectors group (inside the Connector Library, before Workbench), so writeback connectors are not yet interleaved with the read connectors. Folding them in is still open.
+
+**Vendor groups (2026-10-31, PR #684):** inside the alphabetical ranges, Files & APIs, and Writeback Connectors, any vendor or product with more than one connector has its own group (Adobe, Amazon, Google, Microsoft, Salesforce, ..., 112 in all; names from `main`), sorted alphabetically among the single connector pages and never rooted. Format families (CSV, JSON, XML) are grouped the same way. Vendors with one connector stay flat, and vendors that already have a CDW group (Oracle, Snowflake, PostgreSQL, MySQL, Azure, Redshift, Databricks) are not duplicated. This is not the use-case grouping ruled out in the plan, so don't flatten them back.
+
 **[DECISION]** Workbench 4 (37 articles) is in Archive. Confirm: should it be completely removed from primary nav, or kept in a Legacy group? Recommend: Archive — these are 5+ year old articles for an EOL product.
 
 **[DECISION]** "Files & APIs" is a sub-group of the connector library containing 24 articles. These are HTTP-based and file-upload connectors (SFTP, XML, JSON, etc.). Confirm they stay in Connector Library vs. getting their own section.
@@ -280,44 +293,53 @@ Prepare & Transform Data
 
 **Story:** Your data is clean and ready. Now let's turn it into insights — cards, charts, dashboards, and calculations.
 
+Current nav (2026-10-31, PR #684). Counts include the root page.
+
 ```
-Analyze & Visualize
-├── [NEW] Overview: Analyze & Visualize in Domo      ← hub article
-├── [NEW] What is a Card?                             ← synthesize from Analyzer articles
-├── [NEW] What is a Dashboard?                        ← synthesize from dashboard articles
-├── Cards (33)                                        ← building individual visualization cards
-│   ├── [NEW] Getting Started: Build Your First Card  ← synthesize; "Build Your First Dashboard"
-│   │                                                    tutorial already exists (Getting Started)
-│   ├── Analyzer Overview
-│   ├── Analyzer Layout
-│   ├── Powering a Card with Data
-│   ├── Save a Visualization Card
-│   ├── Card Building FAQs
-│   └── [remaining card how-tos and references]
-├── Chart Types — Reference (143)                     ← reference library; not a story section
-│   ├── [NEW] Chart Types Overview / How to Choose    ← upgrade existing "Best Practices for Choosing
-│   │                                                    Chart Types" into the hub article
-│   ├── Line Charts
-│   ├── Bar Charts
-│   ├── Pie-Type Charts
-│   ├── Map Charts
-│   └── [remaining chart type articles]
-├── Beast Mode (18)
-│   ├── [NEW] What is Beast Mode?                     ← synthesize from FAQs + functions reference
+Analyze & Visualize                                   ← root: Analyze-and-Visualize-Overview
+├── Beast Mode (22)                                   ← root: What-is-Beast-Mode
 │   ├── Create a Beast Mode Calculation
 │   ├── Beast Mode Functions Reference
 │   ├── Beast Mode FAQs
 │   ├── Sample Beast Mode Calculations (5 sub-articles)
 │   └── Troubleshooting Beast Mode
-└── Dashboards & Pages (36)
-    ├── [NEW] Getting Started: Build Your First Dashboard  ← already exists in Getting Started;
-    │                                                          MOVE here (it's misplaced)
-    ├── Manage Dashboards
-    ├── Page Filters and Filter Views
-    ├── Dashboard Optimization Best Practices
-    ├── Top 10 Dashboard Design Best Practices
-    └── [remaining dashboard articles]
+├── Cards (179)                                       ← root: What-is-a-Card
+│   ├── Analyzer (26)                                 ← root: Analyzer-Overview; task subgroups
+│   │   ├── Get Started
+│   │   ├── Work with Your Data
+│   │   ├── Build Your Chart
+│   │   ├── Format Your Chart
+│   │   ├── Save and Manage Cards
+│   │   ├── Best Practices
+│   │   └── Card Building FAQs
+│   ├── Chart Types — Reference (108)                 ← subgroups restored from main's
+│   │   ├── Best Practices for Choosing Chart Types      "Chart Types for Visualization Cards"
+│   │   ├── Custom Charts
+│   │   ├── Area and Bar Charts
+│   │   ├── Data Science Charts
+│   │   ├── Filter and Miscellaneous Charts
+│   │   ├── Gauges
+│   │   ├── Line and Lollipop Charts
+│   │   ├── Period-over-Period Charts
+│   │   ├── Pie and Funnel Charts
+│   │   ├── Tables
+│   │   └── Textboxes and Map Charts
+│   ├── Chart Properties (26)                         ← sibling of Chart Types, not a child
+│   ├── Card Details View (4)
+│   ├── Powering Your Card (3)
+│   ├── Doc Cards (6)
+│   ├── Notebook Cards (2)
+│   └── Sumo Cards (3)
+├── Dashboards & Pages (38)                           ← root: What-is-a-Dashboard
+│   ├── Manage Dashboards
+│   ├── Page Filters and Filter Views
+│   ├── Dashboard Optimization Best Practices
+│   ├── Top 10 Dashboard Design Best Practices
+│   └── [remaining dashboard articles]
+└── Worksheets (1)                                    ← own group again, as on main
 ```
+
+`[NEW] Getting Started: Build Your First Card` (synthesize; the "Build Your First Dashboard" tutorial already exists in Getting Started) is still open.
 
 **[DECISION]** "Build Your First Dashboard | Tutorial" currently lives in Getting Started. It should move to Analyze & Visualize > Dashboards & Pages, and Getting Started should link to it. Confirm before moving.
 
@@ -586,6 +608,8 @@ Develop & Integrate
 ---
 
 ## Pillar 12: Release Notes
+
+Lives in its own **Release Notes** tab, not as a pillar group on the Knowledge Base tab (the duplicate KB-tab group was removed 2026-10-31). Archives sort newest first.
 
 ```
 Release Notes

@@ -13,13 +13,14 @@ Two jobs:
   2. RECONCILE docs.json to that map: set "root" on the matching group node and
      drop the root page from its "pages" list; conversely, un-root any group
      that should no longer have one (restoring its Overview as the first child).
-     Nothing else in the nav is touched (safe to run mid-restructure, unlike the
-     full build_docs_nav.py rebuild).
+     Nothing else in the nav is touched (safe to run mid-restructure).
 
-Scope: feature SUB-GROUPS only. Top-level pillar groups are deliberately left
-without a root — each pillar keeps its "<Pillar> Overview" article as the first
-child under the pillar. (Pillars read as broad landing sections; rooting them
-hid the overview behind a click, which we didn't want.)
+Scope: every group, pillars included. A top-level pillar that gets a root is
+also set "expanded": true, so its sub-groups stay visible; sub-groups are not
+expanded. The exception is Archive (COLLAPSED_PILLARS), which is rooted but set
+"expanded": false so its legacy content stays out of the way. Every run also
+corrects a rooted pillar whose "expanded" value has drifted. Groups under the
+Archive pillar are never rooted (the Archive pillar itself is).
 
 Resolution rule (per group, among its DIRECT string children):
   a. Prefer a modern restructure overview slug: "What-is-*" or "*-Overview"
@@ -48,6 +49,14 @@ import sys
 
 DOCS_JSON = "docs.json"
 OVERRIDES = "scripts/group_roots.json"
+COLLAPSED_PILLARS = {"Archive"}
+
+
+def expanded_for(key):
+    """The "expanded" value a rooted group should carry, or None for nested groups."""
+    if " > " in key:
+        return None
+    return key not in COLLAPSED_PILLARS
 
 
 def title_of(navpath):
@@ -126,17 +135,11 @@ def main():
 
     # Compute the DESIRED root for every group (independent of current state),
     # then reconcile docs.json to it — so this both applies new roots and
-    # un-roots groups that should no longer have one (e.g. the pillars).
+    # un-roots groups that should no longer have one.
     desired, skipped_empty, no_root = {}, [], []
     for key, node, str_children in groups:
-        is_pillar = " > " not in key  # top-level pillar node
-        if is_pillar:
-            # Pillars keep their Overview as the first child, not a root page.
-            desired[key] = None
-            no_root.append(key)
-            continue
         # Archive is a holding area, not a curated pillar — never root its groups.
-        if key.split(" > ", 1)[0] == "Archive":
+        if key.startswith("Archive > "):
             desired[key] = None
             no_root.append(key)
             continue
@@ -145,7 +148,7 @@ def main():
             if not desired[key]:
                 no_root.append(key)
             continue
-        # An existing sub-group root was validly chosen on a prior run — keep it
+        # An existing root was validly chosen on a prior run — keep it
         # (its overview now lives in `root`, so re-resolving from children would
         # pick a different candidate). This is what makes re-runs idempotent.
         if node.get("root"):
@@ -172,18 +175,27 @@ def main():
 
     gmap = {k: n for k, n, _ in groups}
     deroots = [k for k, n in gmap.items() if n.get("root") and n["root"] != desired.get(k)]
+    expand_fixes = [
+        k for k, n in gmap.items()
+        if desired.get(k) and n.get("root") == desired[k]
+        and expanded_for(k) is not None and n.get("expanded") is not expanded_for(k)
+    ]
 
-    print(f"Groups scanned: {len(groups)}   sub-group roots resolved: {len(resolved)}")
-    print(f"Pillars + rootless groups left without a root: {len(no_root)}")
+    print(f"Groups scanned: {len(groups)}   roots resolved: {len(resolved)}")
+    print(f"Groups left without a root: {len(no_root)}")
     if deroots:
         print(f"Will UN-ROOT (restore Overview as first child): {len(deroots)}")
         for k in sorted(deroots):
             print(f"    ~ {k}  (was root {gmap[k]['root']})")
+    if expand_fixes:
+        print(f"Will correct \"expanded\": {len(expand_fixes)}")
+        for k in sorted(expand_fixes):
+            print(f"    ~ {k}  (expanded -> {str(expanded_for(k)).lower()})")
     if skipped_empty:
         print(f"SKIPPED (would empty group): {len(skipped_empty)}")
         for k, r in skipped_empty:
             print(f"    ! {k}  ->  {r}")
-    print("\n--- Resolved sub-group root map ---")
+    print("\n--- Resolved root map ---")
     for key in sorted(resolved):
         t = title_of(resolved[key])
         print(f"  {key}\n      root = {resolved[key]}  ({t!r})")
@@ -197,6 +209,9 @@ def main():
         current = node.get("root")
         want = desired.get(key)
         if current == want:
+            if key in expand_fixes:
+                node["expanded"] = expanded_for(key)
+                changed += 1
             continue
         # Un-root: drop the root key and restore that page as the FIRST child.
         if current and current != want:
@@ -207,8 +222,15 @@ def main():
             node["pages"] = pages
         # Apply the desired root (remove it from the child list).
         if want:
-            node["root"] = want
             node["pages"] = [p for p in node.get("pages", []) if not (isinstance(p, str) and p == want)]
+            # Key order is group, root, expanded (top-level only), then everything else.
+            head = {"group": node["group"], "root": want}
+            if expanded_for(key) is not None:
+                head["expanded"] = expanded_for(key)
+            rest = {k: v for k, v in node.items() if k not in head}
+            node.clear()
+            node.update(head)
+            node.update(rest)
         changed += 1
 
     with open(DOCS_JSON, "w", encoding="utf-8") as f:

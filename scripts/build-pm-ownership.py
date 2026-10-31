@@ -42,9 +42,9 @@ def load_ownership_overrides():
         except (OSError, ValueError):
             return out
         for o in data.get('overrides', []):
-            fn, pm = o.get('filename'), o.get('to_pm')
-            if fn and pm:
-                out[fn] = pm  # last write wins (file order)
+            fn, pm, feature = o.get('filename'), o.get('to_pm'), o.get('feature')
+            if fn and (pm or feature):
+                out[fn] = (pm, feature)  # last write wins (file order)
     return out
 
 OWNERSHIP_OVERRIDES = load_ownership_overrides()
@@ -115,7 +115,10 @@ def traverse(pages, ancestors):
             if slug not in article_nav:
                 article_nav[slug] = ancestors[:]
         elif isinstance(item, dict) and 'group' in item:
-            traverse(item.get('pages', []), [item['group']] + ancestors)
+            group_pages = item.get('pages', [])
+            if item.get('root'):
+                group_pages = [item['root']] + group_pages
+            traverse(group_pages, [item['group']] + ancestors)
 
 with open(ROOT / 'docs.json', encoding='utf-8') as f:
     docs = json.load(f)
@@ -542,7 +545,9 @@ for fname in sorted(os.listdir(article_dir)):
     feature = assign_feature(slug, title, excerpt)
     pm = features.get(feature, {}).get('pm', '(no PM listed)')
     if fname in OWNERSHIP_OVERRIDES:        # a mid-review reassignment wins
-        pm = OWNERSHIP_OVERRIDES[fname]
+        override_pm, override_feature = OWNERSHIP_OVERRIDES[fname]
+        feature = override_feature or feature
+        pm = override_pm or features.get(feature, {}).get('pm', '(no PM listed)')
     rows.append({
         'feature': feature,
         'title':   title or slug,

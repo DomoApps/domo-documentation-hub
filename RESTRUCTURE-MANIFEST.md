@@ -527,6 +527,24 @@ Established a terminology split in the Distribute pillar: **"distribute"** is th
 
 ---
 
+## Group Roots, Cards/Analyzer, and Connector Vendor Regroup (2026-10-31, PR #684)
+
+Nav-only regroup plus a handful of new overviews and title fixes. The set of reachable pages (children plus roots) is unchanged apart from the seven new overviews; no article was retired, merged, or deleted. All 12 `restructure/pm/*` branches test-merge cleanly.
+
+**Pillar roots.** All 12 top-level KB pillars use their Overview as `root` with `"expanded": true`; Archive uses the new `Archive-Overview` as `root` with `"expanded": false`. Getting Started's root is `000005874` (its nested Getting Started subgroup was flattened into the pillar; see D5). Supersedes the 2026-10-19 sub-groups-only scope (decision log, 2026-10-31).
+
+**New overviews:** `s/article/Archive-Overview.mdx` (maps each archived feature to its replacement; feature-only ownership entry under Release Management, no PM), and `portal/{Partner-Developers,Other-Resources,Developer-Topics,Domo-SDK}/overview.mdx`. 57 Developer Portal groups rooted by hand.
+
+**Analyze & Visualize > Cards.** Analyzer (root `Analyzer-Overview`, task subgroups Get Started / Work with Your Data / Build Your Chart / Format Your Chart / Save and Manage Cards / Best Practices), Chart Types (subgroups restored from `main`'s "Chart Types for Visualization Cards"), and Chart Properties (now a sibling of Chart Types) nest under Cards, followed by Card Details View, Powering Your Card, Doc Cards, Notebook Cards, Sumo Cards. Ten chart-editing how-tos moved from Chart Types into Analyzer; the Table Card write-back article moved into Chart Types > Tables. Worksheets is its own group again.
+
+**Connect & Integrate Data.** 112 vendor groups restored in the Data Providers ranges, Files & APIs, and Writeback Connectors (any vendor with more than one connector), sorted alphabetically among single pages, no roots. Five connectors moved into their vendor group in another range. How Connectors Work is the first subgroup; Writeback Connectors sits before Workbench. The two loose Snowflake articles moved into the Snowflake group. 11 connector articles, 7 topic pages, and `Connect-Unsupported-Data-Sources.mdx` retitled to the bare connector name.
+
+**Other moves:** Build Apps & Automate > Apps rooted on `4423762260375` (retitled "Domo Bricks Overview"; link text updated in 6 EN + 1 JA article). Workbench 5.1 (Legacy) rooted on `360056669354`. Nine Old Magic ETL articles moved from Archive > Deprecated Features into Archive > Legacy Magic ETL (Phase 4.6 lifecycle staging unchanged). Duplicate Release Notes group removed from the KB tab (Release Notes keeps its own tab). Archived release notes sort newest first in every language.
+
+**Tooling:** `apply_group_roots.py` (pillar roots, Archive collapsed, key order), `build-pm-ownership.py` (roots count as group members; overrides can set Feature), `build_catalog.py` and `docs_cli.py export` (count roots), `build_docs_nav.py` (refuses to write without `--force`), `archive-current-release-notes.py` (inserts newest first).
+
+---
+
 ## Phase 4 — Consolidation, Retirement & Archive (In Progress — 2026-08-28)
 
 Connector merges and the DataFusion migration guide are **executed** (see subsections below). Retirement batches are **classified and staged** here for Phase 4.6 — lifecycle status stamping, callout insertion, and nav removal happen in Phase 4.6 *after PM sign-off*. No article may be deleted or retired without an entry here.

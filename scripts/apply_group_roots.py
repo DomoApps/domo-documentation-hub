@@ -13,8 +13,7 @@ Two jobs:
   2. RECONCILE docs.json to that map: set "root" on the matching group node and
      drop the root page from its "pages" list; conversely, un-root any group
      that should no longer have one (restoring its Overview as the first child).
-     Nothing else in the nav is touched (safe to run mid-restructure, unlike the
-     full build_docs_nav.py rebuild).
+     Nothing else in the nav is touched (safe to run mid-restructure).
 
 Scope: every group, pillars included. A top-level pillar that gets a root is
 also set "expanded": true, so its sub-groups stay visible; sub-groups are not

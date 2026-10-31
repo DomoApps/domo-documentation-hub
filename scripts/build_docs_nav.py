@@ -20,10 +20,15 @@ article to the group's `root` page. That script scans the built children, so it
 works regardless of how the tree was produced; its decisions persist in
 `scripts/group_roots.json`. (Phase 7 runs the two scripts in sequence.)
 
+Since Phase 2, the KB tab in docs.json has been curated by hand (deeper
+nesting, vendor groups, non-alphabetical order, pillar roots) and is the source
+of truth. A write replaces all of that, so it requires --force.
+
 Usage:
-  python3 scripts/build_docs_nav.py [--dry-run]
+  python3 scripts/build_docs_nav.py [--dry-run | --force]
 
   --dry-run   Print the generated KB groups as JSON instead of writing docs.json.
+  --force     Overwrite the KB tab in docs.json.
 """
 
 import json
@@ -189,6 +194,9 @@ def count_pages(pages):
 
 def main():
     dry_run = "--dry-run" in sys.argv
+    if not dry_run and "--force" not in sys.argv:
+        sys.exit("error: this replaces the hand-curated KB tab in docs.json. "
+                 "Use --dry-run to preview, or --force to overwrite it.")
 
     print("Loading ia-mapping.json...")
     with open(IA_MAPPING, "r", encoding="utf-8") as f:

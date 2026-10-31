@@ -217,7 +217,7 @@ Classification heuristics (from title + excerpt):
 | 10 | AI & Data Science | 15 | ~50 |
 | 11 | Administer & Govern | 30 | ~150 |
 | 12 | Develop & Integrate | 20 | ~80 |
-| — | Release Notes | 10 | all release notes |
+| — | Release Notes (own tab, not a KB pillar) | 10 | all release notes |
 
 ### 2.2 Section Structure Template
 
@@ -672,7 +672,7 @@ After the slug rename completes, the following GitHub Actions keep the documenta
 
 ### 7.1 Nav Authoring
 
-New `docs.json` navigation authored to match the Phase 2 structure. Each group's hub article is set as the group's Mintlify [`root`](https://www.mintlify.com/docs/organize/navigation#root-page) page: selecting the group title opens the hub, so the hub is not repeated as a child.
+The Knowledge Base tab in `docs.json` is curated by hand and is the source of truth, so Phase 7 edits it in place rather than regenerating it with `scripts/build_docs_nav.py` (that script flattens to three levels, sorts alphabetically, and re-adds a Release Notes pillar; it now refuses to write without `--force`). Each group's hub article is set as the group's Mintlify [`root`](https://www.mintlify.com/docs/organize/navigation#root-page) page: selecting the group title opens the hub, so the hub is not repeated as a child.
 
 **Rules:**
 - A group with an Overview or "What is X?" hub sets `"root"` to it, and the hub is **not** also listed in `pages`. Listing it in both makes it appear twice.

@@ -533,7 +533,7 @@ Nav-only regroup plus a handful of new overviews and title fixes. The set of rea
 
 **Pillar roots.** All 12 top-level KB pillars use their Overview as `root` with `"expanded": true`; Archive uses the new `Archive-Overview` as `root` with `"expanded": false`. Getting Started's root is `000005874` (its nested Getting Started subgroup was flattened into the pillar; see D5). Supersedes the 2026-10-19 sub-groups-only scope (decision log, 2026-10-31).
 
-**New overviews:** `s/article/Archive-Overview.mdx` (maps each archived feature to its replacement; feature-only ownership entry under Release Management, no PM), and `portal/{Partner-Developers,Other-Resources,Developer-Topics,Domo-SDK}/overview.mdx`. 57 Developer Portal groups rooted by hand.
+**New overview:** `s/article/Archive-Overview.mdx` (maps each archived feature to its replacement; feature-only ownership entry under Release Management, no PM). Developer Portal roots and overviews are in a separate PR.
 
 **Analyze & Visualize > Cards.** Analyzer (root `Analyzer-Overview`, task subgroups Get Started / Work with Your Data / Build Your Chart / Format Your Chart / Save and Manage Cards / Best Practices), Chart Types (subgroups restored from `main`'s "Chart Types for Visualization Cards"), and Chart Properties (now a sibling of Chart Types) nest under Cards, followed by Card Details View, Powering Your Card, Doc Cards, Notebook Cards, Sumo Cards. Ten chart-editing how-tos moved from Chart Types into Analyzer; the Table Card write-back article moved into Chart Types > Tables. Worksheets is its own group again.
 

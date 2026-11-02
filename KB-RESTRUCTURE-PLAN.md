@@ -703,9 +703,7 @@ Example:
 }
 ```
 
-**Tooling:** on the Knowledge Base tab, `scripts/apply_group_roots.py` proposes and applies roots: dry-run by default, `--apply` to write `docs.json`. Decisions and `null` overrides live in `scripts/group_roots.json`, which wins over the script's auto-proposal. The Developer Portal tab follows the same rules but is maintained by hand. Localized tabs (`ja`, `fr`, `de`, `es`) mirror the English roots in Phase 6.
-
-**OpenAPI sync caveat:** when a Product APIs spec re-syncs, `sync-api-docs.yml` replaces that whole group with endpoint-only pages, which drops the group's `root` and its overview page. Re-add them after each sync.
+**Tooling:** on the Knowledge Base tab, `scripts/apply_group_roots.py` proposes and applies roots: dry-run by default, `--apply` to write `docs.json`. Decisions and `null` overrides live in `scripts/group_roots.json`, which wins over the script's auto-proposal. Localized tabs (`ja`, `fr`, `de`, `es`) mirror the English roots in Phase 6.
 
 ### 7.2 Validation Script
 
@@ -797,7 +795,6 @@ Articles not appearing in nav after rebuild: add to a `_uncategorized` holding g
 | Risk | Mitigation |
 |------|-----------|
 | Broken internal links after rename | Link-updater script (rewrites `pages`, `root`, and `scripts/group_roots.json`) + post-rename nav validation |
-| Group roots dropped by the OpenAPI sync | Re-add the root and overview page after each Product APIs spec sync; the nav validator flags a rooted group that lost its root file |
 | Existing SEO / bookmarks broken by rename | Redirects map generated before rename executes; maintained in Mintlify config |
 | Connector articles too numerous to individually maintain | Templated structure; consider a connector article generator script for new connectors |
 | Net-new articles don't match style guide | All new articles authored via `new-kb-article` or `new-overview-article` skill (encodes style guide automatically) + human review before merge |

@@ -4,9 +4,13 @@ Build Article-PM-Ownership-Reference.mdx
 
 Matches every article in s/article/ to a Feature (and PM) from the CSV.
 Strategy (priority order):
-  1. Exact or rule-based match by nav group hierarchy
-  2. Title/excerpt keyword match
-  3. Fallback to broad nav section defaults
+  1. An ownership override from pm-review-state/ownership-overrides.json
+  2. The article's Feature in the existing reference (assignments are sticky)
+  3. New articles only: the majority Feature of their nav-group neighbors
+  4. Exact or rule-based match by nav group hierarchy
+  5. Title/excerpt keyword match
+  6. Fallback to broad nav section defaults
+New articles placed by 3 at pillar level, or by 4-6, are printed for review.
 """
 
 import json
@@ -14,7 +18,7 @@ import os
 import re
 import csv
 import datetime
-from collections import defaultdict
+from collections import Counter, defaultdict
 from pathlib import Path
 
 ROOT = Path(__file__).parent.parent
@@ -58,6 +62,26 @@ def _row_cells(line):
     inner = esc.strip().lstrip('|').rstrip('|')
     return [c.strip().replace('\x01', '|') for c in inner.split('|')]
 
+def load_reference_rows():
+    """Yield (feature, filename, pm) for each data row of the existing reference."""
+    if not REFERENCE_PATH.exists():
+        return
+    with open(REFERENCE_PATH, encoding='utf-8') as f:
+        for line in f:
+            if not line.startswith('| '):
+                continue
+            cells = _row_cells(line)
+            if len(cells) != 4:
+                continue
+            feat, _title, fname, pm = cells
+            if feat == 'Feature' or not feat or set(feat) <= {'-'}:
+                continue  # header or separator row
+            yield feat, fname.strip('`'), pm
+
+# Feature each article already has. Re-deriving it from nav position on every run
+# reshuffles hundreds of curated assignments whenever the nav is reorganized.
+PRIOR_FEATURE = {fname: feat for feat, fname, _pm in load_reference_rows()}
+
 if CSV_PATH.exists():
     ROSTER_SOURCE = 'CSV'
     # Prefer the row with a PM when a feature appears more than once.
@@ -73,18 +97,9 @@ elif REFERENCE_PATH.exists():
     ROSTER_SOURCE = 'reference'
     # Recover Feature → PM from the existing reference table:
     #   | Feature | Article Title | `Article File Name` | PM |
-    with open(REFERENCE_PATH, encoding='utf-8') as f:
-        for line in f:
-            if not line.startswith('| '):
-                continue
-            cells = _row_cells(line)
-            if len(cells) != 4:
-                continue
-            feat, _title, _file, pm = cells
-            if feat == 'Feature' or not feat or set(feat) <= {'-'}:
-                continue  # header or separator row
-            if pm and pm != '(no PM listed)' and feat not in features:
-                features[feat] = {'pm': pm, 'squad_biz': ''}
+    for feat, _file, pm in load_reference_rows():
+        if pm and pm != '(no PM listed)' and feat not in features:
+            features[feat] = {'pm': pm, 'squad_biz': ''}
 else:
     raise SystemExit(
         "No roster source found: neither 'Feature - Owning Squad, PM, Eng, UX.csv' "
@@ -107,18 +122,24 @@ PM_GITHUB_LOGIN = {
 
 # ── 2. Build nav hierarchy: slug → [immediate_group, parent, grandparent, …, tab] ──
 article_nav = {}  # slug → list of ancestor group names (most specific first)
+article_group_paths = {}  # slug → list of ancestor group paths (most specific first)
+group_members = defaultdict(list)  # group path → slugs anywhere under it
 
-def traverse(pages, ancestors):
+def traverse(pages, ancestors, paths=()):
     for item in pages:
         if isinstance(item, str):
             slug = item.replace('s/article/', '')
             if slug not in article_nav:
                 article_nav[slug] = ancestors[:]
+                article_group_paths[slug] = list(paths)
+                for p in paths:
+                    group_members[p].append(slug)
         elif isinstance(item, dict) and 'group' in item:
             group_pages = item.get('pages', [])
             if item.get('root'):
                 group_pages = [item['root']] + group_pages
-            traverse(group_pages, [item['group']] + ancestors)
+            path = (paths[0] + ' > ' if paths else '') + item['group']
+            traverse(group_pages, [item['group']] + ancestors, (path,) + tuple(paths))
 
 with open(ROOT / 'docs.json', encoding='utf-8') as f:
     docs = json.load(f)
@@ -493,6 +514,24 @@ def read_frontmatter(path):
         return '', ''
 
 # ── 6. Assign feature to each article ─────────────────────────────────────────
+NEIGHBOR_MIN_SHARE = 0.5
+
+def neighbor_feature(slug):
+    """Majority Feature among already-assigned articles in the nearest nav group.
+
+    Returns (feature, group_path), or (None, None) when no group has at least two
+    assigned neighbors agreeing at NEIGHBOR_MIN_SHARE or better.
+    """
+    for path in article_group_paths.get(slug, []):
+        known = [PRIOR_FEATURE[m + '.mdx'] for m in group_members[path]
+                 if m != slug and m + '.mdx' in PRIOR_FEATURE]
+        if len(known) < 2:
+            continue
+        feat, n = Counter(known).most_common(1)[0]
+        if n / len(known) >= NEIGHBOR_MIN_SHARE:
+            return feat, path
+    return None, None
+
 def assign_feature(slug, title, excerpt):
     groups = article_nav.get(slug, [])
     tl = title.lower()
@@ -535,6 +574,7 @@ def assign_feature(slug, title, excerpt):
 # ── 7. Process all articles ────────────────────────────────────────────────────
 article_dir = ROOT / 's' / 'article'
 rows = []
+needs_review = []  # (fname, feature, how) for new articles placed with low confidence
 
 for fname in sorted(os.listdir(article_dir)):
     if not fname.endswith('.mdx'):
@@ -542,7 +582,17 @@ for fname in sorted(os.listdir(article_dir)):
     slug = fname[:-4]
     path = article_dir / fname
     title, excerpt = read_frontmatter(path)
-    feature = assign_feature(slug, title, excerpt)
+    if fname in PRIOR_FEATURE:
+        feature = PRIOR_FEATURE[fname]
+    else:
+        feature, group_path = neighbor_feature(slug)
+        if feature is None:
+            feature = assign_feature(slug, title, excerpt)
+            how = 'nav/keyword rules'
+        else:
+            how = f'neighbors in {group_path}'
+        if fname not in OWNERSHIP_OVERRIDES and (group_path is None or ' > ' not in group_path):
+            needs_review.append((fname, feature, how))
     pm = features.get(feature, {}).get('pm', '(no PM listed)')
     if fname in OWNERSHIP_OVERRIDES:        # a mid-review reassignment wins
         override_pm, override_feature = OWNERSHIP_OVERRIDES[fname]
@@ -572,6 +622,14 @@ print(f"Top 20 feature assignments:")
 for feat, cnt in feat_count.most_common(20):
     pm = features.get(feat, {}).get('pm', '???')
     print(f"  {cnt:4d}  {feat}  [{pm}]")
+new_count = sum(1 for r in rows if r['filename'] not in PRIOR_FEATURE)
+print(f"\nNew articles (not in the previous reference): {new_count}")
+if needs_review:
+    print(f"Review these {len(needs_review)} new assignments (pillar-level neighbors or fallback"
+          " rules); fix any with `pm_review.py reassign` or an ownership override:")
+    for fname, feat, how in needs_review:
+        pm = features.get(feat, {}).get('pm', '(no PM listed)')
+        print(f"  {fname}  →  {feat} [{pm}]  ({how})")
 
 # ── 9. Write MDX ───────────────────────────────────────────────────────────────
 # Sort: by feature (Product Group), then by title within each group

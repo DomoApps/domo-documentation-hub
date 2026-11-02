@@ -668,11 +668,11 @@ After the slug rename completes, the following GitHub Actions keep the documenta
 
 ## Phase 7: Navigation Rebuild
 
-**Goal:** Rebuild `docs.json` to implement the 12-pillar IA, validate all references, and eliminate orphans.
+**Goal:** Finalize the hand-curated `docs.json` against the 12-pillar IA, validate all references, and eliminate orphans.
 
 ### 7.1 Nav Authoring
 
-The Knowledge Base tab in `docs.json` is curated by hand and is the source of truth, so Phase 7 edits it in place rather than regenerating it with `scripts/build_docs_nav.py` (that script flattens to three levels, sorts alphabetically, and re-adds a Release Notes pillar; it now refuses to write without `--force`). Each group's hub article is set as the group's Mintlify [`root`](https://www.mintlify.com/docs/organize/navigation#root-page) page: selecting the group title opens the hub, so the hub is not repeated as a child.
+The Knowledge Base tab in `docs.json` is curated by hand and is the source of truth, so Phase 7 edits it in place; it is never regenerated from a mapping file. Each group's hub article is set as the group's Mintlify [`root`](https://www.mintlify.com/docs/organize/navigation#root-page) page: selecting the group title opens the hub, so the hub is not repeated as a child.
 
 **Rules:**
 - A group with an Overview or "What is X?" hub sets `"root"` to it, and the hub is **not** also listed in `pages`. Listing it in both makes it appear twice.
@@ -786,7 +786,7 @@ Articles not appearing in nav after rebuild: add to a `_uncategorized` holding g
 | 4: Consolidation & Retirement | Human + Agent | 1 week | Merged/retired articles, merge decision log |
 | 5: Interlinking | Agent (batch) | 2–3 days | Next Steps + Related Articles on all articles |
 | 6: Rename to Slugs | Script + human review | 1–2 days | Renamed files, `rename-mapping.json`, `redirects.json` |
-| 7: Nav Rebuild | Agent + Human | 2–3 days | New `docs.json`, validation passing |
+| 7: Nav Rebuild | Agent + Human | 2–3 days | Finalized `docs.json` (edited in place), validation passing |
 
 **Total estimate:** 6–8 weeks for full execution. Phases 3a (content creation) and 3b/5 (bulk agent edits) can run in parallel after Phase 1 completes. Phase 6 (rename) should run after Phase 3a to avoid renaming files that are being actively written.
 

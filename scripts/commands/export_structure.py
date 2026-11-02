@@ -8,7 +8,7 @@ tab, group, file_path, title, url
 Usage:
     python scripts/docs_cli.py export-structure
     python scripts/docs_cli.py export-structure --base-url https://docs.domo.com
-    python scripts/docs_cli.py export-structure --language jp
+    python scripts/docs_cli.py export-structure --language ja
 """
 
 import csv

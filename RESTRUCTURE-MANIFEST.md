@@ -547,6 +547,17 @@ Nav-only regroup plus one new overview and title fixes. The set of Knowledge Bas
 
 ---
 
+## Developer Portal Group Roots (2026-11-02, split from PR #684)
+
+Applies the KB root convention to the Developer Portal tab. Pending Jon T.'s approval (Developer Portal owner); Jared approved the approach.
+
+- **57 portal groups** use their overview page as `root` instead of listing it as the first child. Overviews were identified by an `overview` filename or `sidebarTitle: Overview`, plus four Product API intro pages that play the same role (Code Engine, Federated V1 to V2 Migration, Managing Dataset History, Workflows).
+- **Four new overviews** for top-level groups that had none: `portal/{Partner-Developers,Other-Resources,Developer-Topics,Domo-SDK}/overview.mdx`.
+- **`expanded: true` only on the 12 top-level portal groups**; nested groups are rooted but collapsed. Groups with no overview are unchanged.
+- Portal roots are maintained by hand (`apply_group_roots.py` only touches the English KB tab) and are outside PM ownership and CODEOWNERS. The OpenAPI sync drops a Product APIs group's root and overview page when its spec re-syncs, so re-add them after a sync.
+
+---
+
 ## Phase 4 — Consolidation, Retirement & Archive (In Progress — 2026-08-28)
 
 Connector merges and the DataFusion migration guide are **executed** (see subsections below). Retirement batches are **classified and staged** here for Phase 4.6 — lifecycle status stamping, callout insertion, and nav removal happen in Phase 4.6 *after PM sign-off*. No article may be deleted or retired without an entry here.

@@ -541,7 +541,7 @@ Nav-only regroup plus a handful of new overviews and title fixes. The set of rea
 
 **Other moves:** Build Apps & Automate > Apps rooted on `4423762260375` (retitled "Domo Bricks Overview"; link text updated in 6 EN + 1 JA article). Workbench 5.1 (Legacy) rooted on `360056669354`. Nine Old Magic ETL articles moved from Archive > Deprecated Features into Archive > Legacy Magic ETL (Phase 4.6 lifecycle staging unchanged). Duplicate Release Notes group removed from the KB tab (Release Notes keeps its own tab). Archived release notes sort newest first in every language.
 
-**Tooling:** `apply_group_roots.py` (pillar roots, Archive collapsed, key order), `build-pm-ownership.py` (roots count as group members; overrides can set Feature), `build_catalog.py` and `docs_cli.py export` (count roots), `build_docs_nav.py` (removed: Phase 7 edits `docs.json` in place), `archive-current-release-notes.py` (inserts newest first).
+**Tooling:** `apply_group_roots.py` (pillar roots, Archive collapsed, key order), `build-pm-ownership.py` (roots count as group members; overrides can set Feature; existing assignments are sticky and new articles take their nav neighbors' Feature, so a full regen is safe again. Regenerated 2026-11-02: 0 existing rows changed, 60 missing restructure articles added, 15 rows for deleted files dropped; overrides for the Distribute hub → Chris Wright, `Activity-Log-Event-Reference` → Dan Brinton, `What-is-a-DataSet` → Phil Fuchs), `build_catalog.py` and `docs_cli.py export` (count roots), `build_docs_nav.py` (removed: Phase 7 edits `docs.json` in place), `archive-current-release-notes.py` (inserts newest first).
 
 ---
 

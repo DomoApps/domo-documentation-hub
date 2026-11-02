@@ -27,7 +27,7 @@ Reads `docs.json` and every MDX file it references, then writes a CSV containing
 python scripts/docs_cli.py export
 
 # Export Japanese docs
-python scripts/docs_cli.py export --language jp
+python scripts/docs_cli.py export --language ja
 
 # Write the CSV somewhere else
 python scripts/docs_cli.py export --output ~/Desktop/doc_pages.csv
@@ -36,7 +36,7 @@ python scripts/docs_cli.py export --output ~/Desktop/doc_pages.csv
 python scripts/docs_cli.py export --base-url https://staging-docs.domo.com
 
 # Combine options
-python scripts/docs_cli.py export --language jp --output reports/jp_docs.csv --base-url https://staging-docs.domo.com
+python scripts/docs_cli.py export --language ja --output reports/ja_docs.csv --base-url https://staging-docs.domo.com
 
 # Point at a different project root (if running from outside the repo)
 python scripts/docs_cli.py export --project-dir /path/to/domo-documentation-hub
@@ -46,7 +46,7 @@ python scripts/docs_cli.py export --project-dir /path/to/domo-documentation-hub
 
 | Option          | Default                             | What it does                                                                |
 | --------------- | ----------------------------------- | --------------------------------------------------------------------------- |
-| `--language`    | `en`                                | Language section to extract from `docs.json` (`en`, `jp`, `fr`, `de`, `es`) |
+| `--language`    | `en`                                | Language section to extract from `docs.json` (`en`, `ja`, `fr`, `de`, `es`) |
 | `--base-url`    | `https://docs.domo.com`             | Base URL prepended to each file path to build the full page URL             |
 | `--output`      | `scripts/reports/doc_structure.csv` | Where to write the CSV file                                                 |
 | `--project-dir` | `.`                                 | Project root containing `docs.json` and the MDX files                       |

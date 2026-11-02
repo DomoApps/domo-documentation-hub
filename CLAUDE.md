@@ -186,7 +186,7 @@ Workflow: the `localize` skill runs the `localization-retrospective` skill first
 
 ### Navigation parity exception: Japanese connector ordering
 
-Localized navs in `docs.json` are expected to **mirror the English nav structure**: for non-connector content the group/page hierarchy and ordering should match English 100%. **Connectors are the one exception.** The Connect & Integrate → Data Providers section is organized alphabetically, and the Japanese (`jp`) connector nav must be alphabetized **in Japanese** (by the Japanese article title), not mirrored from the English order.
+Localized navs in `docs.json` are expected to **mirror the English nav structure**: for non-connector content the group/page hierarchy and ordering should match English 100%. **Connectors are the one exception.** The Connect & Integrate → Data Providers section is organized alphabetically, and the Japanese (`ja`) connector nav must be alphabetized **in Japanese** (by the Japanese article title), not mirrored from the English order.
 
 Concretely, for the Data Providers subgroups:
 
@@ -194,7 +194,7 @@ Concretely, for the Data Providers subgroups:
 - **Ordering within each Japanese subgroup follows Japanese collation of the Japanese title**, so the Japanese connector list reads alphabetically to a Japanese reader even though it diverges from the English page order. Most connector titles are brand-led (e.g. `Instagram Businessコネクター`), so this largely tracks Latin order, but verb-led Japanese titles (e.g. `DomoでInContact Echoデータに接続する`) sort by their Japanese leading text.
 - **Group-vs-loose is decided per language by the count present in that language** (2+ translated connectors for a vendor → a provider group; exactly 1 → a loose page). Because Japanese carries only a translated subset, a vendor that is a group in English can legitimately be a loose page in Japanese (e.g. Instagram is a 2-article group in English but a single loose page in Japanese).
 
-Only `en` and `jp` currently carry the full connector catalog; `fr`/`de`/`es` have no Data Providers section to mirror. See the `add-to-nav` and `localize` skills, and `localization/Localization-Style-Guide.mdx`, which record the same exception.
+Only `en` and `ja` currently carry the full connector catalog; `fr`/`de`/`es` have no Data Providers section to mirror. See the `add-to-nav` and `localize` skills, and `localization/Localization-Style-Guide.mdx`, which record the same exception.
 
 ## Finding Existing Articles
 
@@ -240,7 +240,7 @@ All scripts live in `scripts/`. They are optional dev-quality tools — non-tech
 | ------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
 | `pad_md_tables.py` | Pad all Markdown pipe-table columns in a file so pipes align. Run after editing any article that has Markdown tables: `python3 scripts/pad_md_tables.py s/article/Filename.mdx`. Its output matches the MDX formatter exactly (display widths via the same rules as `string-width`, alignment colons kept, `\|` stays in its cell, rows cut to the header's columns), so the two never fight. |
 | `build-pm-ownership.py` | Regenerate `Article-PM-Ownership-Reference.mdx` **and** `.github/CODEOWNERS` from the squad CSV (or the existing reference when the CSV is absent) + `docs.json`. See the `update-pm-ownership` skill. |
-| `docs_cli.py` | Export the full nav structure (all tabs/groups/pages) to CSV. `python3 scripts/docs_cli.py export` → `scripts/reports/doc_structure.csv`. Supports `--language` (en/jp/fr/de/es) and `--output`. |
+| `docs_cli.py` | Export the full nav structure (all tabs/groups/pages) to CSV. `python3 scripts/docs_cli.py export` → `scripts/reports/doc_structure.csv`. Supports `--language` (en/ja/fr/de/es) and `--output`. |
 | `html_to_mdx.py` | Bulk Salesforce-to-MDX conversion pipeline (used with the `csv-to-mdx` skill). Reads an exported Salesforce CSV, converts HTML bodies to MDX, and writes files to `s/article/`. |
 | `format-mdx.sh` | Optional MDX format-on-save. `.vscode/settings.json` wires it to the recommended `jkillian.custom-local-formatters` extension: it runs `remark` with `.remarkrc.mjs` (same output as `yarn format <path>`) and echoes the file unchanged when Node or `node_modules` is missing, the file is outside the repo or in `.remarkignore`, or the MDX (input or output) doesn't parse. Prettier is not used for MDX because it only supports MDX 1. |
 | `remark-domo-format.mjs` | Stringify overrides loaded by `.remarkrc.mjs` so formatter output matches how articles are written: each `<tr>` on its own line (only where that provably renders the same), one-line single-child elements like `<Frame><img/></Frame>`, flush `<AccordionGroup>`/`<Accordion>` children per the style guide, two-space hard breaks, no `\_` escapes, bare URLs left bare, and extra table cells beyond the header dropped (GFM never renders them). |

@@ -527,6 +527,26 @@ Established a terminology split in the Distribute pillar: **"distribute"** is th
 
 ---
 
+## Group Roots, Cards/Analyzer, and Connector Vendor Regroup (2026-10-31, PR #684)
+
+Nav-only regroup plus one new overview and title fixes. The set of Knowledge Base tab pages (children plus roots) is unchanged apart from the new `Archive-Overview` and the 65 release-notes pages of the removed duplicate Release Notes group, which are all still in the Release Notes tab; no article was retired, merged, or deleted. Ten `restructure/pm/*` branches test-merge cleanly; `chris-wright` and `dan-brinton` conflict only on `RESTRUCTURE-TASKS.md`, which propagation regenerates on the branch.
+
+**Pillar roots.** All 12 top-level KB pillars use their Overview as `root` with `"expanded": true`; Archive uses the new `Archive-Overview` as `root` with `"expanded": false`. Getting Started's root is `000005874` (its nested Getting Started subgroup was flattened into the pillar; see D5). Supersedes the 2026-10-19 sub-groups-only scope (decision log, 2026-10-31).
+
+**New overview:** `s/article/Archive-Overview.mdx` (maps each archived feature to its replacement; feature-only ownership entry under Release Management, no PM). Developer Portal roots and overviews are in a separate PR.
+
+**Analyze & Visualize > Cards.** Analyzer (root `Analyzer-Overview`, task subgroups Get Started / Work with Your Data / Build Your Chart / Format Your Chart / Save and Manage Cards / Best Practices), Chart Types (subgroups restored from `main`'s "Chart Types for Visualization Cards"), and Chart Properties (now a sibling of Chart Types) nest under Cards, followed by Card Details View, Powering Your Card, Doc Cards, Notebook Cards, Sumo Cards. Ten chart-editing how-tos moved from Chart Types into Analyzer; the Table Card write-back article moved into Chart Types > Tables. Worksheets is its own group again.
+
+**Connect & Integrate Data.** 112 vendor groups restored in the Data Providers ranges, Files & APIs, and Writeback Connectors (any vendor with more than one connector), sorted alphabetically among single pages, no roots. Five connectors moved into their vendor group in another range. How Connectors Work is the first subgroup; Writeback Connectors sits before Workbench. The two loose Snowflake articles moved into the Snowflake group. 11 connector articles, 7 topic pages, and `Connect-Unsupported-Data-Sources.mdx` retitled to the bare connector name.
+
+**Other moves:** Build Apps & Automate > Apps rooted on `4423762260375` (retitled "Domo Bricks Overview"; link text updated in 6 EN + 1 JA article). Workbench 5.1 (Legacy) rooted on `360056669354`. Nine Old Magic ETL articles moved from Archive > Deprecated Features into Archive > Legacy Magic ETL (Phase 4.6 lifecycle staging unchanged). Duplicate Release Notes group removed from the KB tab (Release Notes keeps its own tab). Archived release notes sort newest first in every language.
+
+**Tooling:** `apply_group_roots.py` (pillar roots, Archive collapsed, key order), `build-pm-ownership.py` (roots count as group members; overrides can set Feature; existing assignments are sticky and new articles take their nav neighbors' Feature, so a full regen is safe again. Regenerated 2026-11-02: 0 existing rows changed, 60 missing restructure articles added, 15 rows for deleted files dropped; overrides for the Distribute hub → Chris Wright, `Activity-Log-Event-Reference` → Dan Brinton, `What-is-a-DataSet` → Phil Fuchs; `RESTRUCTURE-TASKS.md` regenerated, moving one fact-check item each to Chris Wright and Phil Fuchs from Jordan Jensen and Mamta Bolaki, neither of whom had started review), `build_catalog.py` and `docs_cli.py export` (count roots), `build_docs_nav.py` (removed: Phase 7 edits `docs.json` in place), `archive-current-release-notes.py` (inserts newest first).
+
+**Nav depth (2026-11-02):** three levels (pillar › group › sub-group) is now the default rather than a hard cap; one or two more levels, never past five, are allowed when they add significant value. The vendor groups, Analyzer task groups, and Chart Types subgroups above are the four-level examples. See `KB-RESTRUCTURE-PLAN.md` › 7.1.
+
+---
+
 ## Phase 4 — Consolidation, Retirement & Archive (In Progress — 2026-08-28)
 
 Connector merges and the DataFusion migration guide are **executed** (see subsections below). Retirement batches are **classified and staged** here for Phase 4.6 — lifecycle status stamping, callout insertion, and nav removal happen in Phase 4.6 *after PM sign-off*. No article may be deleted or retired without an entry here.

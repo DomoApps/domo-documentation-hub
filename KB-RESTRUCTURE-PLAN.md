@@ -681,6 +681,7 @@ The Knowledge Base tab in `docs.json` is curated by hand and is the source of tr
 - Groups with no hub article stay rootless and keep their pages as plain children.
 - Groups inside the Archive pillar are not rooted. The Archive pillar itself is.
 - A group must keep at least one child page alongside its root.
+- **Keep the nav to three levels deep by default** (pillar › group › sub-group). Treat this as a strong default, not a hard cap: go one or two levels deeper (four or five) only when the extra level adds significant value — a long list that readers would otherwise scan item by item, broken into groups they'd look for by name. Current approved examples at four levels: the connector vendor groups (Connect & Integrate Data › Connector Library › Data Providers A-B › Google), the Analyzer task groups (Analyze & Visualize › Cards › Analyzer › Build Your Chart), and the Chart Types subgroups. Never go deeper than five levels, and don't add a level just to hold two or three pages.
 
 Example:
 
@@ -715,7 +716,9 @@ Example:
 # 4. Check root rules: no root page also listed in its group's pages, every
 #    rooted group keeps at least one child page, expanded only on top-level groups
 #    (true everywhere except Archive, which must be false)
-# 5. Report: broken references, orphaned articles, root-rule violations
+# 5. Check depth: warn on any group deeper than three levels (pillar = level 1)
+#    so a reviewer confirms the extra level earns its place; error above five
+# 6. Report: broken references, orphaned articles, root-rule violations, depth warnings
 # Exit code 1 if any errors (integrate with CI/pre-commit hook)
 ```
 

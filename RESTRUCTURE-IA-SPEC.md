@@ -36,6 +36,7 @@ Reflected in Pillar 2 (vendor groups, writeback note), Pillar 5 (tree), and Pill
 
 - **Pillar roots:** every pillar's Overview (marked `[NEW] Overview` / hub in the trees below) is now the pillar's `root` page with `"expanded": true`; Archive is rooted on `Archive-Overview` and collapsed. Getting Started is rooted on `000005874`, with its nested Getting Started subgroup flattened in (D5 now also decides this root).
 - **`docs.json` is the nav source of truth.** The trees here describe intent; where they and `docs.json` disagree, `docs.json` wins and this spec should be updated. `ia-mapping.json` no longer drives the nav, and the `build_docs_nav.py` generator was removed (confirmed by Jared 2026-11-02).
+- **Nav depth is a default, not a cap.** Three levels (pillar › group › sub-group) is the default; one or two more levels are allowed when they add significant value, as with the connector vendor groups, the Analyzer task groups, and the Chart Types subgroups (all four levels). See `KB-RESTRUCTURE-PLAN.md` › 7.1.
 
 ---
 

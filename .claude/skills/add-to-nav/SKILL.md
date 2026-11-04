@@ -154,4 +154,4 @@ If this fails, show the error and fix it before finishing.
 Tell the user:
 - What was changed (insertion point, any removal)
 - The exact path string that was added
-- That they can preview the nav locally with `mintlify dev`
+- That they can preview the nav locally with `mint dev`

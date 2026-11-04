@@ -386,7 +386,7 @@ Tell the user:
 4. **Nav placement:** where the new article was added in `docs.json` (and any restructure performed).
 5. **Verification:** every factual claim was confirmed against a source or with the user (Step 8), all internal links resolved to the correct target articles (Step 10), and `docs.json` is valid JSON.
 6. **Open items:** any fact-check items you flagged in Step 8 that still need the user's confirmation.
-7. **Local preview:** suggest `mintlify dev` to confirm the rendered Overview reads the way the user expects.
+7. **Local preview:** suggest `mint dev` to confirm the rendered Overview reads the way the user expects.
 
 ---
 

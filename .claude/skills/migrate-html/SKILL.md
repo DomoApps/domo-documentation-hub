@@ -149,4 +149,4 @@ If this fails, show the error and fix it before finishing.
 Tell the user:
 - The path of the new article (`s/article/<filename>.mdx`)
 - Where it was inserted in `docs.json` (group name and neighboring entries)
-- That the branch is ready to commit and preview with `mintlify dev`
+- That the branch is ready to commit and preview with `mint dev`

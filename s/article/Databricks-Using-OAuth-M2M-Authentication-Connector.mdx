@@ -18,12 +18,11 @@ To configure this connector, you must have the following:
 - HTTP path
 - OAuth client ID
 - OAuth client secret
-- Scopes
+- OAuth scope, if your service-principal OAuth secret is restricted to specific scopes
 
 For more information about the Databricks API, see the [Databricks API documentation](https://docs.databricks.com/aws/en/reference/api).
 
 This article covers the fields and menus specific to the Databricks using OAuth M2M Authentication connector user interface. For general information about adding DataSets, setting update schedules, and editing DataSet information, see [Add a DataSet Using a Data Connector](/s/article/360042926274).
-
 
 ## Configure Databricks OAuth Machine-to-Machine (M2M) Authentication
 
@@ -38,7 +37,6 @@ Before you begin, complete the following:
 - On the service principal's **Configuration** tab, select the entitlements it needs for this workspace.
 - On the **Permissions** tab, grant access to any Databricks users, service principals, and groups that need to manage or use this service principal. For details, see [Who can manage and use service principals?](https://docs.databricks.com/aws/en/admin/users-groups/manage-service-principals#add-sp).
 
-
 ### Add a service principal to your account
 
 As an account admin, use the account console to add a service principal.
@@ -48,7 +46,6 @@ As an account admin, use the account console to add a service principal.
 3. Select the **Service principals** tab, and then select **Add service principal**.
 4. Enter a name for the service principal.
 5. Select **Add**.
-
 
 ### Create an OAuth secret
 
@@ -68,12 +65,9 @@ Account admins and workspace admins can create OAuth secrets for service princip
 
 <Note>**Note:** Account admins can also create an OAuth secret in the account console. On the **User management** tab, select the service principal, and then go to the **Credentials & secrets** tab.</Note>
 
-
-
 ## Configure the Connection
 
 This section describes the options in the **Credentials** and **Details** panes on the Databricks using OAuth M2M Authentication connector page. The components of the **Scheduling** and **Name & Describe Your DataSet** panes are universal across most connector types and are discussed in [Add a DataSet Using a Data Connector](/s/article/360042926274).
-
 
 ### Enter your credentials
 
@@ -86,10 +80,13 @@ The **Credentials** pane contains fields for entering credentials to connect to 
 | HTTP Path           | Enter the HTTP path. To find it, go to the **JDBC/ODBC** tab under the cluster's **Advanced Options** in Databricks. If you do not have access to this tab, contact your Databricks administrator.     |
 | OAuth Client ID     | Enter the application (client) ID for your service principal. This unique identifier is used for machine-to-machine (M2M) authentication.                                                              |
 | OAuth Client Secret | Enter the client secret for your service principal. This confidential key is associated with the application (client) ID.                                                                              |
-| Scopes              | Enter an OAuth scope. Leave this field blank to use all APIs. Enter sql if your Databricks OAuth secret is scoped to SQL only. Separate multiple scopes with spaces. |  
+| Scopes              | Optional. Enter the OAuth scope configured for your service-principal OAuth secret, such as `sql`. To specify multiple scopes, separate them with spaces. Leave this field blank to use the default `all-apis` scope. |  
+
+<Note>
+**Note:** If your Databricks service-principal OAuth secret is restricted to specific scopes, the Scope value must match the scope configured for the secret. For example, if the secret uses the `sql` scope, enter `sql`. If you leave Scope blank, the connector uses the default `all-apis` scope.
+</Note>
 
 After you enter valid credentials, you can use the same account any time you set up a new Databricks using OAuth M2M Authentication connection. You can manage connector accounts in the **Accounts** tab in the Data Center. For more information about this tab, see [Manage User Accounts for Connectors](/s/article/360042926054).
-
 
 ### Configure the Details pane
 
@@ -120,8 +117,19 @@ In the **Details** pane, you can configure various fields.
 | Partition Non Date Key Column Name           | Select the partition column name.                                                                                                                                                                                                                                                 |
 | Fetch Size                                   | Enter the fetch size to control memory usage. If you leave this field blank, the connector uses the default fetch size. If you get an "out of memory" error, try a smaller fetch size.                                                                                            |
 
-
-
 ## Configure Other Options
 
 For information about the remaining sections of the connector interface, including how to configure scheduling, retry, and update options, see [Add a DataSet Using a Data Connector](/s/article/360042926274).
+
+## Troubleshoot
+
+<AccordionGroup>
+
+<Accordion title="OAuth authentication fails with access_denied">
+If authentication fails with an access_denied or Failed to refresh credentials error:
+
+- Verify that the **Scope** value matches the scope configured for your Databricks OAuth secret. For example, if the OAuth secret uses the sql scope, enter sql in the **Scope** field.
+- If you leave the **Scope** field blank, the connector uses the default all-apis scope.
+</Accordion>
+
+</AccordionGroup>

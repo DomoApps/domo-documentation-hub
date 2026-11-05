@@ -56,6 +56,7 @@ This pane contains a single **Report** menu from which to select your desired Do
 | Cards and Datasets (Legacy)                      | Returns cards along with the DataSet that powers each one. This is a legacy report.                                                                                                                                                                                                                                                                                                                                                                    |
 | Certified Attributes Usage                       | Returns each certified attribute (key/value metadata) applied to cards and DataSets in your instance.                                                                                                                                                                                                                                                                                                                                                  |
 | Certified Content                                | Returns information on the certified content.                                                                                                                                                                                                                                                                                                                                                                                                          |
+| Cloud Integration Query Report                   | Returns one row for each query Domo runs against a Cloud Integration, including the engine, the user and card that ran it, query duration, rows returned, cache use, and whether the query succeeded. See Cloud Integration Query Report DataSet below.                                                                                                                                                                                                |
 | Columns used in Beast Modes                      | Returns information about which columns are currently in use in a Beast Mode.                                                                                                                                                                                                                                                                                                                                                                          |
 | Connector Permissions                            | Returns information about connector access policies created within your instance. See reference.                                                                                                                                                                                                                                                                                                                                                       |
 | Credit Balance Details                           | Returns line-item detail behind consumption credit balances, including adjustments, usage, and per-category impact for each billing statement.                                                                                                                                                                                                                                                                                                         |
@@ -623,6 +624,40 @@ Learn about [nested calculations](/s/article/000005307).
 | Remover ID            | The ID of the person that manually removed the certification from the card or dataset                               |
 
 There is a limitation if you attempt to combine a Certified Content DomoStats DataSet with an Activity Log DomoStats DataSet.
+
+### Cloud Integration Query Report
+
+Each row is one query that Domo runs against a DataSet that uses a Cloud Integration, such as Snowflake, PostgreSQL, MySQL, or Azure SQL, including queries that Domo answers from its cache. Use this report to see which DataSets are queried most, which queries fail, how long queries take in Domo and in the cloud warehouse, and how often Domo answers from its cache.
+
+| Field                | Description                                                                                                                                                        |
+| -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| timestamp            | The date and time of the query.                                                                                                                                    |
+| datasource           | The ID of the queried DataSet. To get DataSet names and owners, match this value to the `ID` field in the DataSets report.                                         |
+| eventType            | The type of request. Values: `Query` (an interactive query) or `Export` (a full-data export).                                                                      |
+| success              | Whether the query completed without an error. Values: `true` or `false`, stored as text.                                                                           |
+| fromCache            | Whether Domo returned a cached result (`true`) instead of sending the query to the cloud warehouse (`false`). Stored as text.                                      |
+| device               | The name of the Cloud Integration that handled the query.                                                                                                          |
+| engine               | The type of cloud warehouse behind the Cloud Integration. Values include `snowflake`, `postgres`, `mysql`, `azuresql`, `dbt`, and `lakebase`.                      |
+| externalQueryId      | The ID that the cloud warehouse assigned to the query. Use it to find the query in the warehouse's query history.                                                  |
+| sql                  | The text of the SQL query that Domo ran.                                                                                                                           |
+| queryHash            | A fingerprint of the query. Identical queries share the same value, so you can count repeated runs.                                                                |
+| timeQueuedDomo       | The time, in milliseconds, that the query waited in Domo before Domo sent it to the cloud warehouse.                                                               |
+| timeInDomoAdrenaline | The time, in milliseconds, that the Domo query engine spent preparing the query and assembling the result, including translating the query and checking the cache. |
+| timeRemoteExecution  | The time, in milliseconds, that the query ran in the cloud warehouse.                                                                                              |
+| rows                 | The number of rows that the query returned.                                                                                                                        |
+| columns              | The number of columns that the query returned.                                                                                                                     |
+| dataLengthBytes      | The size of the returned data, in bytes.                                                                                                                           |
+| querySource          | The Domo feature that ran the query. Values: `Tables`, `Visualizations`, `APIs`, `Data Transformations`, or `Other`.                                               |
+| userId               | The ID of the user or service account that ran the query. To get user names, match this value to the user ID in the People report.                                 |
+| cardId               | The ID of the card that ran the query, if a card ran it.                                                                                                           |
+| \_BATCH_ID\_         | The sequence number of the load that added the row.                                                                                                                |
+| \_BATCH_LAST_RUN\_   | The date and time of the load that added the row.                                                                                                                  |
+
+<Note>
+  **Note:** When Domo answers a query from its cache (`fromCache` is `true`),
+  the `timeQueuedDomo`, `timeRemoteExecution`, `rows`, and `columns` fields are
+  empty. The `dataLengthBytes` field still has a value.
+</Note>
 
 ### Columns used in Beast Modes
 

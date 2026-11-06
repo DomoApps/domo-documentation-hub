@@ -2,7 +2,7 @@
 
 **Prepared for:** KB Restructure PM Review Meeting
 **Features owned:** Connectors, Third Party Connectors, Workbench
-**Total articles in your area:** 1096
+**Total articles in your area:** 1087
 
 > This document is your meeting guide. It shows how your content is being reorganized,
 > which AI-generated articles need your fact-check, which articles need a dedicated
@@ -20,8 +20,8 @@ areas lands in the new structure.
 | Feature | Articles | New Location |
 |---------|----------|--------------|
 | Connectors | 102 | Pillar 2: Connect & Integrate Data |
-| Third Party Connectors | 895 | Pillar 2: Connect & Integrate Data |
-| Workbench | 99 | Pillar 2: Connect & Integrate Data |
+| Third Party Connectors | 885 | Pillar 2: Connect & Integrate Data |
+| Workbench | 100 | Pillar 2: Connect & Integrate Data |
 
 ### Notable Navigation Changes
 
@@ -148,9 +148,6 @@ off once you've provided the answer.
 - [ ] **`360042932974.mdx`**
   confirm the preemptive unfiltered-query/materialization behavior for Federated DataSets, that it cannot be prevented, and how the cache TTL interacts with it. synthesized from community forum reports; needs confirmation.
 
-- [ ] **`360042933494.mdx`**
-  confirm the exact steps to remove a recipient who used an email unsubscribe link from the unsubscribers list so they can receive campaigns again (the Unsubscribes tab currently documents only Search, Export, and Refresh). Synthesized from community forum reports; needs confirmation.
-
 - [ ] **`360043432333.mdx`**
   confirm whether the Salesforce Advanced connector offers any built-in option to return picklist display labels instead of API values. Synthesized from community forum reports; needs confirmation.
 
@@ -189,9 +186,6 @@ off once you've provided the answer.
 
 - [ ] **`4406022964375.mdx`**
   confirm whether the "Domo Workbench Users" group still lets non-admin users run Workbench, or whether administrative access is now required to both install and run Workbench (as stated under System Requirements). Community forum reports indicate the non-admin workaround may be outdated; needs confirmation before removing this note.
-
-- [ ] **`Find-Which-Dashboard-a-Card-Lives-On.mdx`**
-  the Governance connector reports cover classic pages and dashboards. Confirm how to trace a card to an App Studio app/page (whether an App Studio pages dataset exists) and document why App Studio pages are not shown in a card's info panel or Move/Copy menu. Add an App Studio section once confirmed.
 
 ---
 
@@ -263,21 +257,19 @@ A prioritized list of everything this document is asking of you:
 | 27 | **Open placeholder in `360042932734.mdx`:** confirm the maximum precision/digit limits for Domo's LONG, DOUBLE, and DECIMAL  | **Answer required** | 15–30 min |
 | 28 | **Open placeholder in `360042932974.mdx`:** confirm the provider-specific connection fields required when configuring an OAu | **Answer required** | 15–30 min |
 | 29 | **Open placeholder in `360042932974.mdx`:** confirm the preemptive unfiltered-query/materialization behavior for Federated D | **Answer required** | 15–30 min |
-| 30 | **Open placeholder in `360042933494.mdx`:** confirm the exact steps to remove a recipient who used an email unsubscribe link | **Answer required** | 15–30 min |
-| 31 | **Open placeholder in `360043432333.mdx`:** confirm whether the Salesforce Advanced connector offers any built-in option to  | **Answer required** | 15–30 min |
-| 32 | **Open placeholder in `360043432333.mdx`:** confirm the exact UI labels and behavior for the connector's REST vs | **Answer required** | 15–30 min |
-| 33 | **Open placeholder in `360043433453.mdx`:** confirm whether an official NetSuite | **Answer required** | 15–30 min |
-| 34 | **Open placeholder in `360043433453.mdx`:** confirm the exact date literal format SuiteAnalytics Connect / NetSuite2 | **Answer required** | 15–30 min |
-| 35 | **Open placeholder in `360043433453.mdx`:** confirm that Upsert support has shipped for the SuiteAnalytics Connect connector | **Answer required** | 15–30 min |
-| 36 | **Open placeholder in `360043433813.mdx`:** confirm whether the DomoStats connector supports only basic scheduling (no advan | **Answer required** | 15–30 min |
-| 37 | **Open placeholder in `360046864914.mdx`:** confirm the recommended fix for the "Error converting value {null} to type Syste | **Answer required** | 15–30 min |
-| 38 | **Open placeholder in `360046864914.mdx`:** confirm the cause and the canonical fix for the "No agents found matching comput | **Answer required** | 15–30 min |
-| 39 | **Open placeholder in `360052105454.mdx`:** confirm which OAuth 2 | **Answer required** | 15–30 min |
-| 40 | **Open placeholder in `360052105454.mdx`:** confirm the exact stop conditions the JSON No Code OAuth connector uses for each | **Answer required** | 15–30 min |
-| 41 | **Open placeholder in `360052122294.mdx`:** confirm the recommended, supported pattern for detecting hard-deleted source rec | **Answer required** | 15–30 min |
-| 42 | **Open placeholder in `360056318074.mdx`:** confirm the deprecation/support status of the Domo Governance Datasets connector | **Answer required** | 15–30 min |
-| 43 | **Open placeholder in `4406022964375.mdx`:** confirm whether the "Domo Workbench Users" group still lets non-admin users run  | **Answer required** | 15–30 min |
-| 44 | **Open placeholder in `Find-Which-Dashboard-a-Card-Lives-On.mdx`:** the Governance connector reports cover classic pages and dashboards | **Answer required** | 15–30 min |
+| 30 | **Open placeholder in `360043432333.mdx`:** confirm whether the Salesforce Advanced connector offers any built-in option to  | **Answer required** | 15–30 min |
+| 31 | **Open placeholder in `360043432333.mdx`:** confirm the exact UI labels and behavior for the connector's REST vs | **Answer required** | 15–30 min |
+| 32 | **Open placeholder in `360043433453.mdx`:** confirm whether an official NetSuite | **Answer required** | 15–30 min |
+| 33 | **Open placeholder in `360043433453.mdx`:** confirm the exact date literal format SuiteAnalytics Connect / NetSuite2 | **Answer required** | 15–30 min |
+| 34 | **Open placeholder in `360043433453.mdx`:** confirm that Upsert support has shipped for the SuiteAnalytics Connect connector | **Answer required** | 15–30 min |
+| 35 | **Open placeholder in `360043433813.mdx`:** confirm whether the DomoStats connector supports only basic scheduling (no advan | **Answer required** | 15–30 min |
+| 36 | **Open placeholder in `360046864914.mdx`:** confirm the recommended fix for the "Error converting value {null} to type Syste | **Answer required** | 15–30 min |
+| 37 | **Open placeholder in `360046864914.mdx`:** confirm the cause and the canonical fix for the "No agents found matching comput | **Answer required** | 15–30 min |
+| 38 | **Open placeholder in `360052105454.mdx`:** confirm which OAuth 2 | **Answer required** | 15–30 min |
+| 39 | **Open placeholder in `360052105454.mdx`:** confirm the exact stop conditions the JSON No Code OAuth connector uses for each | **Answer required** | 15–30 min |
+| 40 | **Open placeholder in `360052122294.mdx`:** confirm the recommended, supported pattern for detecting hard-deleted source rec | **Answer required** | 15–30 min |
+| 41 | **Open placeholder in `360056318074.mdx`:** confirm the deprecation/support status of the Domo Governance Datasets connector | **Answer required** | 15–30 min |
+| 42 | **Open placeholder in `4406022964375.mdx`:** confirm whether the "Domo Workbench Users" group still lets non-admin users run  | **Answer required** | 15–30 min |
 
 ---
 

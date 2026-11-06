@@ -24,16 +24,16 @@ open architectural decision.
 | (no PM listed) | P1, P10 | 0 | 0 | 0 | 0 | 0 | 0 | **0** |  |
 | Andrea Henderson | P4 | 5 | 39 | 0 | 2 | 3 | 0 | **49** | 9 |
 | Beth Saenz | P10 | 0 | 1 | 0 | 0 | 0 | 0 | **1** |  |
-| Chris Wright | P1, P5 | 6 | 55 | 0 | 0 | 0 | 1 | **62** | 9 |
-| Dan Brinton | P1, P5, P8, P9, P10 | 11 | 28 | 0 | 0 | 0 | 1 | **40** | 3 |
-| Jordan Jensen | — | 3 | 14 | 0 | 0 | 0 | 0 | **17** | 3 |
+| Chris Wright | P1, P5 | 6 | 55 | 0 | 0 | 0 | 0 | **61** |  |
+| Dan Brinton | P1, P5, P8, P9, P10 | 11 | 29 | 0 | 0 | 0 | 1 | **41** | 3 |
+| Jordan Jensen | — | 0 | 13 | 0 | 0 | 0 | 0 | **13** |  |
 | Ken Boyer | P9, P11 | 6 | 14 | 0 | 0 | 0 | 1 | **21** | 3 |
-| Khushboo | P5, P6, P7, P8 | 4 | 41 | 0 | 1 | 1 | 1 | **48** | 9 |
+| Khushboo | P5, P6, P7, P8 | 4 | 41 | 0 | 1 | 1 | 2 | **49** | 18 |
 | Mamta Bolaki | P6, P7, P10 | 1 | 8 | 0 | 0 | 0 | 0 | **9** | 4 |
-| Phil Fuchs | P3, P4, P5 | 6 | 32 | 0 | 0 | 2 | 0 | **40** | 10 |
+| Phil Fuchs | P3, P4, P5 | 8 | 32 | 0 | 0 | 2 | 0 | **42** | 10 |
 | Release Management | — | 0 | 1 | 0 | 0 | 0 | 0 | **1** |  |
 | Ryan Despain | P6, P8 | 1 | 50 | 0 | 0 | 1 | 1 | **53** | 5 |
-| Sam Lowen | P2, P3 | 0 | 0 | 0 | 0 | 0 | 0 | **0** |  |
+| Sam Lowen | P2, P3 | 1 | 0 | 0 | 0 | 0 | 0 | **1** | 3 |
 | Tasleema Lallmamode | P2 | 4 | 39 | 1 | 1 | 1 | 0 | **46** | 4 |
 | **TOTAL** | | 47 | 322 | 1 | 4 | 8 | 5 | **387** | 61 |
 
@@ -191,14 +191,6 @@ _No open tasks._
 - [ ] **`Dynamic-Dropdowns-in-Table-Cards.mdx`** — confirm the capability boundary for this article: that a standard Analyzer table card supports only display, drill, and action-link behavior and does NOT support interactive in-cell input controls (dropdowns, editable cells) or write-back, and that App Framework / Bricks / a writeback connector is the required path for in-cell interactivity. State the boundary explicitly once confirmed.
 - [ ] **`Use-Worksheets.mdx`** — confirm the recommended decision criteria between Worksheets, Projects & Tasks, and App Studio editable tables for task-list / editable-tracker / CRM-style workflows, including: whether Projects & Tasks items can be powered by or tied to a DataSet, the current state of editable table components in App Studio (including Edit-in-Place for table components), and which option to recommend for each use case. Synthesized from community forum reports; needs confirmation.
 
-### [decision] (1)
-
-- [ ] **D4** — 'Build Your First Dashboard' — move from Getting Started to Analyze & Visualize > Dashboards & Pages?
-
-### [update] — High-priority forum targets (9)
-
-- [ ] 9 High-priority forum-gap update targets in this area — itemized in `pm-review-briefs/Chris-Wright.md` § 4b (summarized here to keep the list actionable).
-
 ---
 
 ## Dan Brinton — Pillar 1, Pillar 5, Pillar 8, Pillar 9, Pillar 10
@@ -217,7 +209,7 @@ _No open tasks._
 - [ ] **`DomoStats-vs-Governance-Datasets-Connector.mdx` (rank 26)** — Synthesized from 360043433813 + 360056318074; report-by-report comparison + service-account Activity Log caveat. Omitted unverifiable deprecation/scheduling claims
 - [ ] **`Find-Which-Dashboard-a-Card-Lives-On.mdx` (rank 152) ⚠️ (open [pm-input])** — Synthesized from 360056318074 (Governance connector Cards/Pages reports). Classic dashboards only; `[pm-input]` Tasleema Lallmamode for App Studio lineage
 
-### [pm-input] (28)
+### [pm-input] (29)
 
 - [ ] **`Manage-Dataset-Error-Alerts.mdx` (rank 82)** — How data-load-failure ("Error Loading Data") notifications are generated and why system-managed, per-dataset disable path, bulk-suppression options and official status
 - [ ] **`Domo-API-Changelog.mdx` (rank 99)** — The versioning convention (if any), whether/where breaking changes are announced, deprecation timeline policy, any existing changelog content
@@ -247,6 +239,7 @@ _No open tasks._
 - [ ] **`Activity-Log-Event-Reference.mdx`** — confirm the canonical description wording for the View Activity Logs grant; the description above was authored for this article because no existing article defines it in the standard grant format.
 - [ ] **`Activity-Log-Event-Reference.mdx`** — provide the complete enumerated list of Activity Log event types with a precise one-line definition of each, including the semantic distinctions users ask about: VIEWED vs. EXPORTED vs. DOWNLOADED, the Shared / Added / Access Granted distinctions, and the FILE / FILE_REVISION / ACTIVITY_LOG_CSV object types. Replace the representative table above with the confirmed glossary.
 - [ ] **`Restore-a-Deleted-Dashboard.mdx`** — confirm the backup retention window (how far back a deleted dashboard can be recovered from a backup) and the exact recovery path Support follows. Replace the "not guaranteed" language with the confirmed retention window once known.
+- [ ] **Getting Started role articles — eLearning course URLs** — All Getting Started role articles (Admins, App Builders, Data Engineers, Developers) currently link to the same `data-consumer-training` eLearning course URL, which is likely wrong for non-consumer roles. Confirm the correct course URL for each role (coordinate with the Education / Domo University team).
 
 ### [decision] (1)
 
@@ -260,13 +253,7 @@ _No open tasks._
 
 ## Jordan Jensen — (no pillar mapping)
 
-### [fact-check] (3)
-
-- [ ] **`Manage-Data-Overview.mdx` — *Manage Data Overview*** — Data Center navigation, dataset discovery, lifecycle, sharing — verify current UI state
-- [ ] **`What-is-the-Data-Center.mdx` — *What is the Data Center?*** — Data Center UI, dataset cards, status indicators — verify current UI state
-- [ ] **`Find-and-Manage-Your-DataSets.mdx` — *Find and Manage Your DataSets*** — Search/filter/favorite/share datasets — verify current Data Center UI
-
-### [pm-input] (14)
+### [pm-input] (13)
 
 - [ ] **`Choose-a-Cloud-Data-Warehouse.mdx` (rank 142)** — Credit model (pushdown vs materialization), sizing guidance for small datasets, which Domo features force materialization and consume ingestion credits (PDP, View Data Explorer, alerts, scheduled emails)
 - [ ] **`Domo-Certification-Exam-Logistics.mdx` (rank 146)** — Exam duration, single-sitting requirement, online vs proctored format, three-step structure, hands-on requirements, whether the KB hosts content or points to Domo University
@@ -281,11 +268,6 @@ _No open tasks._
 - [ ] **`Configure-Data-Freshness-and-Caching-in-Cloud-Integrations.mdx`** — Confirm that a DataSet View built on a Cloud Amplifier connection cannot be remapped to a different Cloud Amplifier connection (unlike standard connectors, which is useful for DEV/PROD moves), and that remapping support is a tracked feature request. synthesized from community forum reports; needs confirmation.
 - [ ] **`Configure-Data-Freshness-and-Caching-in-Cloud-Integrations.mdx`** — Confirm whether the DataSet History tab is intentionally absent (or hidden) for Cloud Integration (Cloud Amplifier) DataSets, and whether full run-history metadata support is a tracked feature request. Synthesized from community forum reports; needs confirmation.
 - [ ] **`Configure-Data-Freshness-and-Caching-in-Cloud-Integrations.mdx`** — Confirm whether a dedicated control to pause or cap per-card queries against a live Cloud Amplifier source (beyond caching/TTL) exists or is a tracked feature request. Synthesized from community forum reports; needs confirmation.
-- [ ] **Getting Started role articles — eLearning course URLs** — All Getting Started role articles (Admins, App Builders, Data Engineers, Developers) currently link to the same `data-consumer-training` eLearning course URL, which is likely wrong for non-consumer roles. Confirm the correct course URL for each role (coordinate with the Education / Domo University team).
-
-### [update] — High-priority forum targets (3)
-
-- [ ] 3 High-priority forum-gap update targets in this area — itemized in `pm-review-briefs/Jordan-Jensen.md` § 4b (summarized here to keep the list actionable).
 
 ---
 
@@ -388,13 +370,14 @@ _No open tasks._
 
 - [ ] **App Studio card management (rank 4)** — Orphan card recovery procedure; delete-app-with-cards warning — verify: Confirm orphan card recovery steps; verify what happens when you delete an app that contains cards
 
-### [decision] (1)
+### [decision] (2)
 
+- [ ] **D4** — 'Build Your First Dashboard' — move from Getting Started to Analyze & Visualize > Dashboards & Pages?
 - [ ] **D10** — CourseBuilder — confirm it is fully retired from the product (gates the 9-article retirement batch).
 
-### [update] — High-priority forum targets (9)
+### [update] — High-priority forum targets (18)
 
-- [ ] 9 High-priority forum-gap update targets in this area — itemized in `pm-review-briefs/Khushboo.md` § 4b (summarized here to keep the list actionable).
+- [ ] 18 High-priority forum-gap update targets in this area — itemized in `pm-review-briefs/Khushboo.md` § 4b (summarized here to keep the list actionable).
 
 ---
 
@@ -423,10 +406,12 @@ _No open tasks._
 
 ## Phil Fuchs — Pillar 3, Pillar 4, Pillar 5
 
-### [fact-check] (6)
+### [fact-check] (8)
 
 - [ ] **`What-is-a-DataSet.mdx` — *What is a DataSet?*** — DataSet definition, dataset types, lifecycle states, update methods — especially the 'archived' state
 - [ ] **`What-is-Beast-Mode.mdx` — *What is Beast Mode?*** — Beast Mode definition, when to use vs Magic ETL, aggregation rules, filter limitations
+- [ ] **`Manage-Data-Overview.mdx` — *Manage Data Overview*** — Data Center navigation, dataset discovery, lifecycle, sharing — verify current UI state
+- [ ] **`What-is-the-Data-Center.mdx` — *What is the Data Center?*** — Data Center UI, dataset cards, status indicators — verify current UI state
 - [ ] **`Beast-Mode-Window-Functions.mdx` (rank 1) ⚠️ (open [pm-input])** — Filter limitation FAQ has `[pm-input]` placeholder — Phil Fuchs to confirm workaround
 - [ ] **`Beast-Mode-for-Spreadsheet-Users.mdx` (rank 11)** — Synthesized from 360043430073 (Basic Transforms) + 360043430053 (Beast Mode FAQs); IF→CASE, SUMIF/COUNTIF→SUM(CASE), VLOOKUP→ETL join, no-stacking guidance
 - [ ] **`Period-over-Period-Calculations.mdx` (rank 49)** — Synthesized from 360042923094 + 360042925494; prior-period flags, offset-join snapshot, rolling avg. Omitted unverifiable YEARWEEK/LAG year-boundary pitfalls
@@ -561,7 +546,13 @@ _No open tasks._
 
 ## Sam Lowen — Pillar 2, Pillar 3
 
-_No open tasks._
+### [fact-check] (1)
+
+- [ ] **`Find-and-Manage-Your-DataSets.mdx` — *Find and Manage Your DataSets*** — Search/filter/favorite/share datasets — verify current Data Center UI
+
+### [update] — High-priority forum targets (3)
+
+- [ ] 3 High-priority forum-gap update targets in this area — itemized in `pm-review-briefs/Sam-Lowen.md` § 4b (summarized here to keep the list actionable).
 
 ---
 

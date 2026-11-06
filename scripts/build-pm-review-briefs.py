@@ -130,13 +130,9 @@ STRUCTURAL_NOTES = {
         "**CourseBuilder (9 EN articles):** Support KB Audit flags CourseBuilder as retired/removed from Domo Appstore. Staged for Retired in Phase 4.6. Pending D10: confirm CourseBuilder is gone from the product before the nav rebuild.",
         "**App Studio Overview split (2026-10):** `App Studio | Overview` (000005295) was split into a task-based series — Build an App Studio App, Add Charts and Tables, Add Interactivity, Use Advanced Customization (Forms + Pro-Code Components), Distribute, Manage — plus a new App Studio Appendix and a new 'What Are App Components?' overview (root of the new App Components subgroup). The old article was deleted and redirected to the What Is App Studio? hub (the App Studio group root). All prose + 131 screenshots + 26 [pm-input] markers were preserved, and 54 inline UI icons were upgraded to the Domo icon font. Please review the new articles and confirm the flagged icon mappings (Components/'Add Content' → icon-chart-bar-box; Layout → icon-badge-layout-small) and the new [pm-input] on pro-code/Forms grants.",
         "**Articles moved out of App Studio (2026-10):** Forecasting Universal Model → AutoML (AI & Data Science); Domo Sandbox → Sandbox & Environments (Administer & Govern); Publish Content to a Subscriber Instance → Distribute > Publications; and Domo Bricks | Overview, AppDB Admin User Interface, and Wire an App → a new 'Apps' group under Build Apps & Automate.",
+        "**'Build Your First Dashboard' (D4):** This tutorial currently lives in Getting Started. It should move to Analyze & Visualize > Dashboards & Pages. Confirm before moving. (Dashboards moved from Chris Wright to you under the Nov-2026 roster.)",
     ],
-    "Chris Wright": [
-        "**'Build Your First Dashboard' (D4):** This tutorial currently lives in Getting Started. It should move to Analyze & Visualize > Dashboards & Pages. Confirm before moving.",
-    ],
-    "Jordan Jensen": [
-        "**DataSet Management split (D9):** Some DataSet Management articles currently in Prepare & Transform will move to the new Manage Data pillar (Pillar 3). The split: pipeline-oriented articles stay in Pillar 4; governance/lifecycle articles move to Pillar 3. Resolve before Phase 7.",
-    ],
+    "Chris Wright": [],
     "Dan Brinton": [
         "**'Introduction to Domo' (D5):** The existing 000005874 article overlaps with the new 'What is Domo?' synthesis article. Decision needed: keep as deep-dive companion, or retire once new article ships?",
         "**'What is an Alert?' new article:** An alert concept article is being synthesized and added to the Alerts section. The existing Alerts Overview article may become secondary.",
@@ -145,6 +141,7 @@ STRUCTURAL_NOTES = {
     "Phil Fuchs": [
         "**DataFusion/Fusions:** Fusions (DataFusion) articles are being archived in Phase 4. If any Beast Mode or Combined Schema articles reference DataFusion, they'll need updating.",
         "**Data Views (D9):** Data Views articles may shift between Pillar 3 (Manage Data) and Pillar 4 (Prepare & Transform Data) depending on D9 resolution.",
+        "**DataSet Management split (D9):** Some DataSet Management articles currently in Prepare & Transform will move to the new Manage Data pillar (Pillar 3). The split: pipeline-oriented articles stay in Pillar 4; governance/lifecycle articles move to Pillar 3. Resolve before Phase 7. (Data Center / DataSet ownership moved to you and Sam Lowen under the Nov-2026 roster.)",
     ],
     "Mamta Bolaki": [
         "**Domo Everywhere positioning:** Domo Everywhere content lives in Pillar 7 (Distribute) with its own sub-section. The embed framing (public vs. private, SSO + PDP interaction) should be consistent across all Domo Everywhere articles.",
@@ -175,8 +172,9 @@ STRUCTURAL_NOTES = {
 MANIFEST_PM_INPUT_FLAGS = {
     # Getting Started role articles all link to the same `data-consumer-training`
     # eLearning URL. No single article carries a [pm-input] marker for this, so it
-    # is tracked here. Routed to Jordan Jensen, who owns Education + Onboarding.
-    "Jordan Jensen": [
+    # is tracked here. Routed to Dan Brinton (Getting Started / Admin / Onboarding owner
+    # under the Nov-2026 roster; Education has no PM).
+    "Dan Brinton": [
         (
             "Getting Started role articles — eLearning course URLs",
             "All Getting Started role articles (Admins, App Builders, Data Engineers, "
@@ -211,7 +209,7 @@ PHASE3A_ARTICLES = [
      "API articles, MCP article, Access Tokens",
      "Developer entry points, API auth methods, available SDKs, MCP integration availability"),
     ("What-is-a-DataSet.mdx",
-     "What is a DataSet?", "Pillar 4", "Jordan Jensen",
+     "What is a DataSet?", "Pillar 4", "Phil Fuchs",
      "Connector how-tos, ETL input tile articles",
      "DataSet definition, dataset types, lifecycle states, update methods — especially the 'archived' state"),
     ("What-is-Magic-ETL.mdx",
@@ -255,15 +253,15 @@ PHASE3A_ARTICLES = [
      "All connector / Workbench articles",
      "Read + write framing accuracy, Cloud Amplifier as recommended CDW path, connector types"),
     ("Manage-Data-Overview.mdx",
-     "Manage Data Overview", "Pillar 3", "Jordan Jensen",
+     "Manage Data Overview", "Pillar 3", "Phil Fuchs",
      "DataSet articles, Data Center context",
      "Data Center navigation, dataset discovery, lifecycle, sharing — verify current UI state"),
     ("What-is-the-Data-Center.mdx",
-     "What is the Data Center?", "Pillar 3", "Jordan Jensen",
+     "What is the Data Center?", "Pillar 3", "Phil Fuchs",
      "DataSet management articles, connector how-tos",
      "Data Center UI, dataset cards, status indicators — verify current UI state"),
     ("Find-and-Manage-Your-DataSets.mdx",
-     "Find and Manage Your DataSets", "Pillar 3", "Jordan Jensen",
+     "Find and Manage Your DataSets", "Pillar 3", "Sam Lowen",
      "DataSet management, sharing, workspace/favorites articles",
      "Search/filter/favorite/share datasets — verify current Data Center UI"),
     ("What-is-Domo-AI.mdx",
@@ -413,7 +411,7 @@ PHASE4_URGENT_FIXES = [
 # (decision_id, pm, question)
 DECISIONS = [
     ("D2",  "Ryan Despain", "Projects & Tasks (10 articles) — still an active feature, or archive in favor of Workflows?"),
-    ("D4",  "Chris Wright", "'Build Your First Dashboard' — move from Getting Started to Analyze & Visualize > Dashboards & Pages?"),
+    ("D4",  "Khushboo", "'Build Your First Dashboard' — move from Getting Started to Analyze & Visualize > Dashboards & Pages?"),
     ("D5",  "Dan Brinton",  "'Introduction to Domo' (000005874) — keep as a deep-dive companion to the new 'What is Domo?', or retire?"),
     ("D6",  "Ken Boyer",    "Develop & Integrate scope — KB how-tos, or primarily a link-out to developer.domo.com?"),
     ("D10", "Khushboo",     "CourseBuilder — confirm it is fully retired from the product (gates the 9-article retirement batch)."),
@@ -433,8 +431,8 @@ AREA_PM_RULES = [
     ("Embed",                   "Mamta Bolaki"),
     ("Sandbox",                 "Mamta Bolaki"),
     ("Governance Toolkit",      "Ryan Despain"),
-    ("PDP",                     "Ryan Despain"),
-    ("Personalized Data",       "Ryan Despain"),
+    ("PDP",                     "Dan Brinton"),
+    ("Personalized Data",       "Dan Brinton"),
     ("Workflows",               "Ryan Despain"),
     ("Workflow",                "Ryan Despain"),
     ("Approvals",               "Ryan Despain"),
@@ -451,12 +449,12 @@ AREA_PM_RULES = [
     ("DataFlow",                "Andrea Henderson"),
     ("Data Flow",               "Andrea Henderson"),
     ("Auto ML",                 "Andrea Henderson"),
-    ("Cloud Amplifier",         "Jordan Jensen"),
-    ("Federated",               "Jordan Jensen"),
-    ("AppStore",                "Jordan Jensen"),
-    ("DataSet",                 "Jordan Jensen"),
-    ("Dataset",                 "Jordan Jensen"),
-    ("Data Center",             "Jordan Jensen"),
+    ("Cloud Amplifier",         "Sam Lowen"),
+    ("Federated",               "Sam Lowen"),
+    ("AppStore",                "Mamta Bolaki"),
+    ("DataSet",                 "Sam Lowen"),
+    ("Dataset",                 "Sam Lowen"),
+    ("Data Center",             "Phil Fuchs"),
     ("Workbench",               "Tasleema Lallmamode"),
     ("workbench",               "Tasleema Lallmamode"),
     ("Third Party Connector",   "Tasleema Lallmamode"),
@@ -485,7 +483,7 @@ AREA_PM_RULES = [
     ("DDX",                     "Khushboo"),
     ("AppDB",                   "Khushboo"),
     ("Bricks",                  "Khushboo"),
-    ("Code Engine",             "Khushboo"),
+    ("Code Engine",             "Ryan Despain"),
     ("Office",                  "Khushboo"),
     ("Add-in",                  "Khushboo"),
     ("Plugin",                  "Khushboo"),
@@ -498,17 +496,17 @@ AREA_PM_RULES = [
     ("Unstructured",            "Ken Boyer"),
     ("MCP",                     "Ken Boyer"),
     ("API",                     "Ken Boyer"),
-    ("Dashboard",               "Chris Wright"),
-    ("Dashboards",              "Chris Wright"),
-    ("dashboard",               "Chris Wright"),
-    ("Charting",                "Chris Wright"),
-    ("Analyzer",                "Chris Wright"),
-    ("Chart",                   "Chris Wright"),
-    ("Export",                  "Chris Wright"),
-    ("Reporting",               "Chris Wright"),
-    ("Slideshow",               "Chris Wright"),
-    ("Worksheet",               "Chris Wright"),
-    ("Doc Cards",               "Chris Wright"),
+    ("Dashboard",               "Khushboo"),
+    ("Dashboards",              "Khushboo"),
+    ("dashboard",               "Khushboo"),
+    ("Charting",                "Khushboo"),
+    ("Analyzer",                "Khushboo"),
+    ("Chart",                   "Khushboo"),
+    ("Export",                  "Khushboo"),
+    ("Reporting",               "Khushboo"),
+    ("Slideshow",               "Khushboo"),
+    ("Worksheet",               "Khushboo"),
+    ("Doc Cards",               "Khushboo"),
     ("Mobile",                  "Chris Wright"),
     ("AI",                      "Ken Boyer"),
 ]
@@ -756,6 +754,23 @@ def effective_pm(original_pm: str, filename) -> str:
     return original_pm
 
 
+# Filename → PM from the ownership reference (populated in main() before briefs are
+# generated). Open [pm-input] placeholders are routed to an article's CURRENT owner
+# via this map so they follow the Nov-2026 re-ownership, instead of the (now-stale)
+# PM baked into the marker text. The markers themselves are left untouched (state).
+REFERENCE_OWNER = {}
+
+def checkpoint_pm(embedded_pm, filename):
+    """Route an open [pm-input] placeholder to the article's current owner: an
+    ownership override wins, else the ownership-reference owner, else the PM named
+    in the marker (for files not in the reference)."""
+    if filename and filename in OWNERSHIP_OVERRIDES:
+        return OWNERSHIP_OVERRIDES[filename]
+    if filename and filename in REFERENCE_OWNER:
+        return REFERENCE_OWNER[filename]
+    return embedded_pm
+
+
 def pm_owns_task(original_pm: str, filename, pm_name: str) -> bool:
     """Exact-match ownership for an article-scoped task, override-aware."""
     return effective_pm(original_pm, filename) == pm_name
@@ -880,7 +895,7 @@ def generate_brief(pm_name: str, pm_ownership: dict, all_gaps: list, forum: dict
     )
     # Open [pm-input] placeholders: embedded article markers (scanned) + manifest flags.
     pm_checkpoints = [(c["filename"], c["ask"]) for c in forum["checkpoints"]
-                      if pm_owns_task(c["pm"], c["filename"], pm_name)]
+                      if checkpoint_pm(c["pm"], c["filename"]) == pm_name]
     pm_checkpoints += [(scope, ask) for scope, ask in MANIFEST_PM_INPUT_FLAGS.get(pm_name, [])]
 
     lines += [
@@ -1356,6 +1371,10 @@ def seed_pm_status_ledger(all_pms: list, all_gaps: list, forum: dict) -> None:
 def main():
     print("Loading data...")
     ownership = load_ownership_reference(OWNERSHIP_FILE)
+    REFERENCE_OWNER.clear()
+    for _pm, _data in ownership.items():
+        for _feat, _title, _fn in _data.get("articles", []):
+            REFERENCE_OWNER[_fn.strip("`").strip()] = _pm
     gaps = load_forum_gaps(GAPS_FILE)
     manifest_text = MANIFEST_FILE.read_text(encoding="utf-8") if MANIFEST_FILE.exists() else ""
     if not manifest_text:

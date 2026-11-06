@@ -1,8 +1,8 @@
 # PM Review Brief: Ryan Despain
 
 **Prepared for:** KB Restructure PM Review Meeting
-**Features owned:** Approvals, Governance Toolkit, Projects & Tasks, Workflows
-**Total articles in your area:** 38
+**Features owned:** Approvals, Projects & Tasks, Workflows
+**Total articles in your area:** 27
 
 > This document is your meeting guide. It shows how your content is being reorganized,
 > which AI-generated articles need your fact-check, which articles need a dedicated
@@ -20,9 +20,8 @@ areas lands in the new structure.
 | Feature | Articles | New Location |
 |---------|----------|--------------|
 | Approvals | 2 | Pillar 6: Build Apps & Automate |
-| Governance Toolkit | 12 | Pillar 10: Administer & Govern |
 | Projects & Tasks | 10 | Pillar 8: Collaborate [D2: may → Archive if feature deprecated] |
-| Workflows | 14 | TBD — not yet mapped |
+| Workflows | 15 | TBD — not yet mapped |
 
 ### Notable Navigation Changes
 
@@ -72,12 +71,6 @@ async written answer) is needed before drafting can begin.
 The items below are open `[pm-input]` placeholders where specific information from
 you is needed before the content can be finalized. Each is a checkbox — check it
 off once you've provided the answer.
-
-- [ ] **`000005105.mdx`**
-  confirm the exact Custom Query format and SQL dialect for DataSet Watchdog: whether the query must be a full SELECT with a table reference (and what to use for the table name) or only a condition, the SQL dialect (community reports indicate MySQL-style syntax), and how comments and backticks are handled. Synthesized from community forum reports; needs confirmation.
-
-- [ ] **`000005105.mdx`**
-  confirm the execution/metrics-log retention and display limits (how many past runs are kept and shown in a job's execution log) and the scheduling behavior that determines which hour of the day an hourly job runs. Synthesized from community forum reports; needs confirmation.
 
 - [ ] **`000005171.mdx`**
   confirm the current status of the legacy Form Builder/Form Viewer (deprecated vs. still supported), the recommended migration path from it to App Studio/Advanced Forms, and the cause of the "Form not found" error and reports of Form Builder forms disappearing. Synthesized from community forum reports; needs confirmation.
@@ -190,30 +183,6 @@ off once you've provided the answer.
 - [ ] **`360043437773.mdx`**
   confirm whether there is a documented limit on the number of scheduled reports per dashboard (or per instance) and the expected UI behavior when many reports are scheduled to run simultaneously. Synthesized from community forum reports; needs confirmation.
 
-- [ ] **`4415800746391.mdx`**
-  confirm whether the attribute key entered in the `Value` column is case-sensitive (must match the Key exactly as defined on the Attributes page). Synthesized from community forum reports; needs confirmation.
-
-- [ ] **`4415826269335.mdx`**
-  confirm how to identify the source instance of a Virtual DataSet from the destination side (the exact UI indicator or DataSet detail), and confirm the recommended guidance for choosing Virtual DataSets vs. a second Workbench job. Synthesized from community forum reports; needs confirmation.
-
-- [ ] **`4415826269335.mdx`**
-  confirm the diagnostic steps and expected behavior for cross-instance scenarios where the source and destination are fully separated (instance separation), including what to check when data stops after a separation and any additional Virtual DataSet create-failure causes beyond token, grants, PDP, and materialization. Synthesized from community forum reports; needs confirmation.
-
-- [ ] **`6305057013527.mdx`**
-  confirm whether product release notifications can be suppressed for embedded users, and the supported setting or method for doing so. Synthesized from community forum reports; needs confirmation.
-
-- [ ] **`6305057013527.mdx`**
-  confirm the recommended account-lifecycle pattern for temporarily deactivating a user (for example, converting to a Social role and/or transferring owned objects to a temporary holding group, then re-transferring on return), and how DataFlow ownership should be handled in that pattern. Synthesized from community forum reports; needs confirmation.
-
-- [ ] **`6814561223959.mdx`**
-  confirm which file-upload path exposes a "keep leading zeros" option (reported to be the newer CONNECT DATA > FILE uploader vs. others). Synthesized from community forum reports; needs confirmation.
-
-- [ ] **`6814561223959.mdx`**
-  confirm the Dataset View type-inference behavior: that CAST/CONVERT in a View may not persist the intended type and the recommended workaround (for example, CONCAT an empty string to force text), and whether this is expected behavior or a known issue. Synthesized from community forum reports; needs confirmation.
-
-- [ ] **`Workflows-Write-Data-Back.mdx`**
-  confirm the exact action names and configuration steps for writing data back to a DataSet from Workflows (for example, the append and multiline-append actions), including how values and delimiters are entered, how a list of rows is mapped to the write action, and how to create a new DataSet as the write target. Add a step-by-step configuration section once the action details are confirmed.
-
 ---
 
 ## 4. Changes Flagged by Support Gap Integrations
@@ -256,54 +225,44 @@ A prioritized list of everything this document is asking of you:
 | 2 | Supply info to write `Workflows-Package-Administration.mdx` (Rank 13) | Info meeting | 30 min |
 | 3 | Supply info to write `Dataset-Archived-Lifecycle-State.mdx` (Rank 44) | Info meeting | 30 min |
 | 4 | Supply info to write `Schedule-Enterprise-Dataset-Copy.mdx` (Rank 81) | Info meeting | 30 min |
-| 5 | **Open placeholder in `000005105.mdx`:** confirm the exact Custom Query format and SQL dialect for DataSet Watchdog: whet | **Answer required** | 15–30 min |
-| 6 | **Open placeholder in `000005105.mdx`:** confirm the execution/metrics-log retention and display limits (how many past ru | **Answer required** | 15–30 min |
-| 7 | **Open placeholder in `000005171.mdx`:** confirm the current status of the legacy Form Builder/Form Viewer (deprecated vs | **Answer required** | 15–30 min |
-| 8 | **Open placeholder in `000005171.mdx`:** confirm (1) whether editable/linked tables that allow in-place editing of form-b | **Answer required** | 15–30 min |
-| 9 | **Open placeholder in `000005171.mdx`:** confirm whether a clickable URL or raw HTML placed in form question text, a ques | **Answer required** | 15–30 min |
-| 10 | **Open placeholder in `000005171.mdx`:** confirm the exact storage format of multi-select Multiple Choice answers in the  | **Answer required** | 15–30 min |
-| 11 | **Open placeholder in `000005171.mdx`:** confirm whether Form Date/Time inputs can constrain selectable dates (a min/max  | **Answer required** | 15–30 min |
-| 12 | **Open placeholder in `000005171.mdx`:** confirm whether a form submission can capture the current app page filter/slicer | **Answer required** | 15–30 min |
-| 13 | **Open placeholder in `000005171.mdx`:** confirm the supported pattern for reviewing/approving form submissions in a tabl | **Answer required** | 15–30 min |
-| 14 | **Open placeholder in `000005171.mdx`:** confirm whether bulk approval of form submissions or tasks is supported natively | **Answer required** | 15–30 min |
-| 15 | **Open placeholder in `000005171.mdx`:** confirm the recommended controls for securing a publicly embedded, PII-collectin | **Answer required** | 15–30 min |
-| 16 | **Open placeholder in `000005171.mdx`:** confirm whether the form's underlying response/output DataSet must be explicitly | **Answer required** | 15–30 min |
-| 17 | **Open placeholder in `000005172.mdx`:** confirm that the automatic email sent when a task is created or assigned is gove | **Answer required** | 15–30 min |
-| 18 | **Open placeholder in `000005172.mdx`:** confirm the exact error string ("Assignee does not have update content access to | **Answer required** | 15–30 min |
-| 19 | **Open placeholder in `000005172.mdx`:** confirm whether Task List columns are customizable, the exact control or menu us | **Answer required** | 15–30 min |
-| 20 | **Open placeholder in `000005172.mdx`:** confirm the supported way to surface and filter Task Center queues inside an App | **Answer required** | 15–30 min |
-| 21 | **Open placeholder in `000005173.mdx`:** provide/confirm canonical signatures and examples for the DataSet library functi | **Answer required** | 15–30 min |
-| 22 | **Open placeholder in `000005173.mdx`:** confirm the visibility rule for accounts in the Code Engine account-input dropdo | **Answer required** | 15–30 min |
-| 23 | **Open placeholder in `000005179.mdx`:** confirm the supported way to pass a clicked App Studio component/button value in | **Answer required** | 15–30 min |
-| 24 | **Open placeholder in `000005179.mdx`:** confirm (1) whether a DataSet/Alert trigger can be configured to fire only after | **Answer required** | 15–30 min |
-| 25 | **Open placeholder in `000005179.mdx`:** confirm the exact name, inputs, and returned fields of the Get Executor function | **Answer required** | 15–30 min |
-| 26 | **Open placeholder in `000005179.mdx`:** confirm where per-execution and per-step credit consumption is surfaced (executi | **Answer required** | 15–30 min |
-| 27 | **Open placeholder in `000005179.mdx`:** confirm how failure and completion notifications are configured for a workflow a | **Answer required** | 15–30 min |
-| 28 | **Open placeholder in `000005179.mdx`:** confirm the name and availability of the DomoStats Workflows dataset used to rep | **Answer required** | 15–30 min |
-| 29 | **Open placeholder in `000005331.mdx`:** confirm whether the editor supports copy/paste or duplication of a configured sh | **Answer required** | 15–30 min |
-| 30 | **Open placeholder in `000005331.mdx`:** confirm whether a workflow can be exported/imported or otherwise ported to anoth | **Answer required** | 15–30 min |
-| 31 | **Open placeholder in `000005797.mdx`:** confirm the supported way to terminate a single parallel branch without ending t | **Answer required** | 15–30 min |
-| 32 | **Open placeholder in `000005797.mdx`:** confirm what the attachments field of the Send Email/Notification function expec | **Answer required** | 15–30 min |
-| 33 | **Open placeholder in `000005797.mdx`:** confirm whether the email body supports HTML, and any limitation on rendering hy | **Answer required** | 15–30 min |
-| 34 | **Open placeholder in `000005797.mdx`:** confirm the sender/From and Reply-To behavior (whether these are governed by the | **Answer required** | 15–30 min |
-| 35 | **Open placeholder in `000005797.mdx`:** confirm the supported recipient inputs (single Person vs | **Answer required** | 15–30 min |
-| 36 | **Open placeholder in `000005797.mdx`:** confirm the custom-value format for Duration values used by Wait and timer shape | **Answer required** | 15–30 min |
-| 37 | **Open placeholder in `000005797.mdx`:** confirm the supported pattern for obtaining the current date/time inside a workf | **Answer required** | 15–30 min |
-| 38 | **Open placeholder in `000005865.mdx`:** confirm the best practice for having an AI Agent produce chart or HTML output su | **Answer required** | 15–30 min |
-| 39 | **Open placeholder in `000005865.mdx`:** document how to pass a File attachment from a Form into an AI Agent Task: the at | **Answer required** | 15–30 min |
-| 40 | **Open placeholder in `360042925874.mdx`:** confirm there is no native Workflows action for Projects & Tasks and that the su | **Answer required** | 15–30 min |
-| 41 | **Open placeholder in `360043437773.mdx`:** confirm these are not currently supported: reusable recipient distribution lists | **Answer required** | 15–30 min |
-| 42 | **Open placeholder in `360043437773.mdx`:** confirm whether a scheduled report can be delivered as a CSV attachment only, wi | **Answer required** | 15–30 min |
-| 43 | **Open placeholder in `360043437773.mdx`:** confirm whether there is a documented limit on the number of scheduled reports p | **Answer required** | 15–30 min |
-| 44 | **Open placeholder in `4415800746391.mdx`:** confirm whether the attribute key entered in the `Value` column is case-sensitiv | **Answer required** | 15–30 min |
-| 45 | **Open placeholder in `4415826269335.mdx`:** confirm how to identify the source instance of a Virtual DataSet from the destin | **Answer required** | 15–30 min |
-| 46 | **Open placeholder in `4415826269335.mdx`:** confirm the diagnostic steps and expected behavior for cross-instance scenarios  | **Answer required** | 15–30 min |
-| 47 | **Open placeholder in `6305057013527.mdx`:** confirm whether product release notifications can be suppressed for embedded use | **Answer required** | 15–30 min |
-| 48 | **Open placeholder in `6305057013527.mdx`:** confirm the recommended account-lifecycle pattern for temporarily deactivating a | **Answer required** | 15–30 min |
-| 49 | **Open placeholder in `6814561223959.mdx`:** confirm which file-upload path exposes a "keep leading zeros" option (reported t | **Answer required** | 15–30 min |
-| 50 | **Open placeholder in `6814561223959.mdx`:** confirm the Dataset View type-inference behavior: that CAST/CONVERT in a View ma | **Answer required** | 15–30 min |
-| 51 | **Open placeholder in `Workflows-Write-Data-Back.mdx`:** confirm the exact action names and configuration steps for writing data back to  | **Answer required** | 15–30 min |
-| 52 | Validate additions to: Workflows forms/tasks (Rank 12) | Review | 20 min |
+| 5 | **Open placeholder in `000005171.mdx`:** confirm the current status of the legacy Form Builder/Form Viewer (deprecated vs | **Answer required** | 15–30 min |
+| 6 | **Open placeholder in `000005171.mdx`:** confirm (1) whether editable/linked tables that allow in-place editing of form-b | **Answer required** | 15–30 min |
+| 7 | **Open placeholder in `000005171.mdx`:** confirm whether a clickable URL or raw HTML placed in form question text, a ques | **Answer required** | 15–30 min |
+| 8 | **Open placeholder in `000005171.mdx`:** confirm the exact storage format of multi-select Multiple Choice answers in the  | **Answer required** | 15–30 min |
+| 9 | **Open placeholder in `000005171.mdx`:** confirm whether Form Date/Time inputs can constrain selectable dates (a min/max  | **Answer required** | 15–30 min |
+| 10 | **Open placeholder in `000005171.mdx`:** confirm whether a form submission can capture the current app page filter/slicer | **Answer required** | 15–30 min |
+| 11 | **Open placeholder in `000005171.mdx`:** confirm the supported pattern for reviewing/approving form submissions in a tabl | **Answer required** | 15–30 min |
+| 12 | **Open placeholder in `000005171.mdx`:** confirm whether bulk approval of form submissions or tasks is supported natively | **Answer required** | 15–30 min |
+| 13 | **Open placeholder in `000005171.mdx`:** confirm the recommended controls for securing a publicly embedded, PII-collectin | **Answer required** | 15–30 min |
+| 14 | **Open placeholder in `000005171.mdx`:** confirm whether the form's underlying response/output DataSet must be explicitly | **Answer required** | 15–30 min |
+| 15 | **Open placeholder in `000005172.mdx`:** confirm that the automatic email sent when a task is created or assigned is gove | **Answer required** | 15–30 min |
+| 16 | **Open placeholder in `000005172.mdx`:** confirm the exact error string ("Assignee does not have update content access to | **Answer required** | 15–30 min |
+| 17 | **Open placeholder in `000005172.mdx`:** confirm whether Task List columns are customizable, the exact control or menu us | **Answer required** | 15–30 min |
+| 18 | **Open placeholder in `000005172.mdx`:** confirm the supported way to surface and filter Task Center queues inside an App | **Answer required** | 15–30 min |
+| 19 | **Open placeholder in `000005173.mdx`:** provide/confirm canonical signatures and examples for the DataSet library functi | **Answer required** | 15–30 min |
+| 20 | **Open placeholder in `000005173.mdx`:** confirm the visibility rule for accounts in the Code Engine account-input dropdo | **Answer required** | 15–30 min |
+| 21 | **Open placeholder in `000005179.mdx`:** confirm the supported way to pass a clicked App Studio component/button value in | **Answer required** | 15–30 min |
+| 22 | **Open placeholder in `000005179.mdx`:** confirm (1) whether a DataSet/Alert trigger can be configured to fire only after | **Answer required** | 15–30 min |
+| 23 | **Open placeholder in `000005179.mdx`:** confirm the exact name, inputs, and returned fields of the Get Executor function | **Answer required** | 15–30 min |
+| 24 | **Open placeholder in `000005179.mdx`:** confirm where per-execution and per-step credit consumption is surfaced (executi | **Answer required** | 15–30 min |
+| 25 | **Open placeholder in `000005179.mdx`:** confirm how failure and completion notifications are configured for a workflow a | **Answer required** | 15–30 min |
+| 26 | **Open placeholder in `000005179.mdx`:** confirm the name and availability of the DomoStats Workflows dataset used to rep | **Answer required** | 15–30 min |
+| 27 | **Open placeholder in `000005331.mdx`:** confirm whether the editor supports copy/paste or duplication of a configured sh | **Answer required** | 15–30 min |
+| 28 | **Open placeholder in `000005331.mdx`:** confirm whether a workflow can be exported/imported or otherwise ported to anoth | **Answer required** | 15–30 min |
+| 29 | **Open placeholder in `000005797.mdx`:** confirm the supported way to terminate a single parallel branch without ending t | **Answer required** | 15–30 min |
+| 30 | **Open placeholder in `000005797.mdx`:** confirm what the attachments field of the Send Email/Notification function expec | **Answer required** | 15–30 min |
+| 31 | **Open placeholder in `000005797.mdx`:** confirm whether the email body supports HTML, and any limitation on rendering hy | **Answer required** | 15–30 min |
+| 32 | **Open placeholder in `000005797.mdx`:** confirm the sender/From and Reply-To behavior (whether these are governed by the | **Answer required** | 15–30 min |
+| 33 | **Open placeholder in `000005797.mdx`:** confirm the supported recipient inputs (single Person vs | **Answer required** | 15–30 min |
+| 34 | **Open placeholder in `000005797.mdx`:** confirm the custom-value format for Duration values used by Wait and timer shape | **Answer required** | 15–30 min |
+| 35 | **Open placeholder in `000005797.mdx`:** confirm the supported pattern for obtaining the current date/time inside a workf | **Answer required** | 15–30 min |
+| 36 | **Open placeholder in `000005865.mdx`:** confirm the best practice for having an AI Agent produce chart or HTML output su | **Answer required** | 15–30 min |
+| 37 | **Open placeholder in `000005865.mdx`:** document how to pass a File attachment from a Form into an AI Agent Task: the at | **Answer required** | 15–30 min |
+| 38 | **Open placeholder in `360042925874.mdx`:** confirm there is no native Workflows action for Projects & Tasks and that the su | **Answer required** | 15–30 min |
+| 39 | **Open placeholder in `360043437773.mdx`:** confirm these are not currently supported: reusable recipient distribution lists | **Answer required** | 15–30 min |
+| 40 | **Open placeholder in `360043437773.mdx`:** confirm whether a scheduled report can be delivered as a CSV attachment only, wi | **Answer required** | 15–30 min |
+| 41 | **Open placeholder in `360043437773.mdx`:** confirm whether there is a documented limit on the number of scheduled reports p | **Answer required** | 15–30 min |
+| 42 | Validate additions to: Workflows forms/tasks (Rank 12) | Review | 20 min |
 
 ---
 

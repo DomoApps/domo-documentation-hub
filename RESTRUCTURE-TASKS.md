@@ -32,10 +32,10 @@ open architectural decision.
 | Mamta Bolaki | P6, P7, P10 | 1 | 8 | 0 | 0 | 0 | 0 | **9** | 4 |
 | Phil Fuchs | P3, P4, P5 | 8 | 32 | 0 | 0 | 2 | 0 | **42** | 10 |
 | Release Management | — | 0 | 1 | 0 | 0 | 0 | 0 | **1** |  |
-| Ryan Despain | P6, P8 | 1 | 50 | 0 | 0 | 1 | 1 | **53** | 5 |
+| Ryan Despain | P6, P8 | 1 | 49 | 0 | 0 | 1 | 1 | **52** | 5 |
 | Sam Lowen | P2, P3 | 1 | 0 | 0 | 0 | 0 | 0 | **1** | 3 |
 | Tasleema Lallmamode | P2 | 4 | 39 | 1 | 1 | 1 | 0 | **46** | 4 |
-| **TOTAL** | | 47 | 322 | 1 | 4 | 8 | 5 | **387** | 61 |
+| **TOTAL** | | 47 | 321 | 1 | 4 | 8 | 5 | **386** | 61 |
 
 ---
 
@@ -477,7 +477,7 @@ _No open tasks._
 
 - [ ] **`Workflows-Write-Data-Back.mdx` (rank 6) ⚠️ (open [pm-input])** — Synthesized from 000005797 (Workflows Reference — read side only). Conceptual/decision guidance written; `[pm-input]` Ryan Despain: exact append/multiline-append action names + config steps
 
-### [pm-input] (50)
+### [pm-input] (49)
 
 - [ ] **`Workflows-Package-Administration.mdx` (rank 13)** — Domo Users / DataSet package function signatures + params, ID-type requirements, createUser attribute limits, group-support status/version, executor-context permission rule
 - [ ] **`Dataset-Archived-Lifecycle-State.mdx` (rank 44)** — Definition/trigger of the archived / "not accessed" state, inactivity threshold, how to detect via DomoStats/Activity Log, AI-readiness/lineage interaction
@@ -528,7 +528,6 @@ _No open tasks._
 - [ ] **`6305057013527.mdx`** — confirm the recommended account-lifecycle pattern for temporarily deactivating a user (for example, converting to a Social role and/or transferring owned objects to a temporary holding group, then re-transferring on return), and how DataFlow ownership should be handled in that pattern. Synthesized from community forum reports; needs confirmation.
 - [ ] **`6814561223959.mdx`** — confirm which file-upload path exposes a "keep leading zeros" option (reported to be the newer CONNECT DATA > FILE uploader vs. others). Synthesized from community forum reports; needs confirmation.
 - [ ] **`6814561223959.mdx`** — confirm the Dataset View type-inference behavior: that CAST/CONVERT in a View may not persist the intended type and the recommended workaround (for example, CONCAT an empty string to force text), and whether this is expected behavior or a known issue. Synthesized from community forum reports; needs confirmation.
-- [ ] **`Workflows-Write-Data-Back.mdx`** — confirm the exact action names and configuration steps for writing data back to a DataSet from Workflows (for example, the append and multiline-append actions), including how values and delimiters are entered, how a list of rows is mapped to the write action, and how to create a new DataSet as the write target. Add a step-by-step configuration section once the action details are confirmed.
 
 ### [update] (1)
 

@@ -1,8 +1,8 @@
 # PM Review Brief: Khushboo
 
 **Prepared for:** KB Restructure PM Review Meeting
-**Features owned:** App Dev Framework, App Studio, Bricks/Templates, MS Office Plugins / Addins, Publication Groups
-**Total articles in your area:** 39
+**Features owned:** App Dev Framework, App Studio, Bricks/Templates, Charting, Doc Cards, MS Office Plugins / Addins, Period over Period, Publication Groups, Slideshows
+**Total articles in your area:** 216
 
 > This document is your meeting guide. It shows how your content is being reorganized,
 > which AI-generated articles need your fact-check, which articles need a dedicated
@@ -19,11 +19,15 @@ areas lands in the new structure.
 
 | Feature | Articles | New Location |
 |---------|----------|--------------|
-| App Dev Framework | 5 | Pillar 6: Build Apps & Automate |
-| App Studio | 21 | Pillar 6: Build Apps & Automate |
+| App Dev Framework | 8 | Pillar 6: Build Apps & Automate |
+| App Studio | 22 | Pillar 6: Build Apps & Automate |
 | Bricks/Templates | 3 | Pillar 6: Build Apps & Automate |
+| Charting | 158 | Pillar 5: Analyze & Visualize |
+| Doc Cards | 11 | Pillar 5: Analyze & Visualize |
 | MS Office Plugins / Addins | 8 | Pillar 8: Collaborate |
+| Period over Period | 2 | Pillar 5: Analyze & Visualize |
 | Publication Groups | 2 | Pillar 7: Distribute |
+| Slideshows | 2 | Pillar 7: Distribute |
 
 ### Notable Navigation Changes
 
@@ -32,6 +36,8 @@ areas lands in the new structure.
 - **App Studio Overview split (2026-10):** `App Studio | Overview` (000005295) was split into a task-based series — Build an App Studio App, Add Charts and Tables, Add Interactivity, Use Advanced Customization (Forms + Pro-Code Components), Distribute, Manage — plus a new App Studio Appendix and a new 'What Are App Components?' overview (root of the new App Components subgroup). The old article was deleted and redirected to the What Is App Studio? hub (the App Studio group root). All prose + 131 screenshots + 26 [pm-input] markers were preserved, and 54 inline UI icons were upgraded to the Domo icon font. Please review the new articles and confirm the flagged icon mappings (Components/'Add Content' → icon-chart-bar-box; Layout → icon-badge-layout-small) and the new [pm-input] on pro-code/Forms grants.
 
 - **Articles moved out of App Studio (2026-10):** Forecasting Universal Model → AutoML (AI & Data Science); Domo Sandbox → Sandbox & Environments (Administer & Govern); Publish Content to a Subscriber Instance → Distribute > Publications; and Domo Bricks | Overview, AppDB Admin User Interface, and Wire an App → a new 'Apps' group under Build Apps & Automate.
+
+- **'Build Your First Dashboard' (D4):** This tutorial currently lives in Getting Started. It should move to Analyze & Visualize > Dashboards & Pages. Confirm before moving. (Dashboards moved from Chris Wright to you under the Nov-2026 roster.)
 
 ---
 
@@ -79,7 +85,6 @@ async written answer) is needed before drafting can begin.
 | 69 | `Dashboard-Editor-Unresponsive-Multi-Select-Filter.mdx` | Confirm multi-select filter card as a reproducible cause, the isolate-by-removing-cards flow as supported, Domo-side fix vs browser-side mitigation |
 | 83 | `Host-Images-for-Domo-Apps.mdx` | The `data-files` endpoint contract, how a FILE_ID is minted, beta Files feature scope/status, auth/size/type limits, internal-vs-external (S3/Azure/GCS) storage criteria |
 | 100 | `App-Studio-Performance-with-Large-Datasets.mdx` | Filter-card load impact (group-by/aggregate behavior), why unfiltered raw card data is slow, dataset/view design recommendations and size thresholds |
-| 109 | `Custom-Card-Visuals-with-HTML-and-Bricks.mdx` | HTML/CONCAT recipes + hyperlink pitfalls, avatar endpoint support (`/api/content/v1/avatar/...`), table-with-bars via Flex/Faceted bar, in-cell dropdown via bricks confirmation |
 | 209 | `Workspaces-and-Folder-Organization.mdx` | How to create folders/sub-folders for apps/dashboards/data sources, grid vs list views, required grant/role, the grid-vs-list sub-folder visibility difference |
 
 ### 3d. Open Article Placeholders — Your Answer Required
@@ -220,16 +225,25 @@ hallucination risk in the updated articles.
 |------|-------------|-----------------|------------------------|
 | 4 | App Studio card management | Orphan card recovery procedure; delete-app-with-cards warning | Confirm orphan card recovery steps; verify what happens when you delete an app that contains cards |
 
-**High priority update targets** (9 articles in your area):
+**High priority update targets** (18 articles in your area):
 
 | Rank | Score | Topic | Affected Area | Specific Addition Needed |
 |------|-------|-------|---------------|--------------------------|
+| 16 | 73.5 | Period-over-period / Year-over-year comparison patterns and percent-change | Charting & Analyzer | A canonical PoP/YoY guide: why hardcoding YEAR()='2025' in Beast Modes breaks the native Choose Date |
 | 40 | 68.5 | App Studio mobile layout: independent mobile view, elongated charts, tab order | App Studio / Mobile | Document how the App Studio mobile layout works as an independent layout from desktop, how to adjust |
 | 46 | 67.7 | App Studio Report Builder: capabilities, scheduling, export formats, filters, th | App Studio / Report Builder | Document Report Builder capabilities and limitations: how to rename a report (About > name), support |
 | 53 | 66.3 | App Studio Forms: multi-select output stored as comma-separated single row | App Studio / Forms | Need documentation of the actual output behavior of multi-select form fields (one row, comma-separat |
+| 54 | 66.2 | Analyzer / card feature requests with documentable current limits (filters, form | Analyzer | These are product feature requests. A few imply documentable current limitations (e.g. tooltip-field |
+| 60 | 65.2 | Pivot table layout limitations and capabilities (values as rows/columns, totals, | Analyzer / Pivot Table | Largely feature requests, but documentation should cover what IS available today and key limitations |
 | 63 | 64.9 | App Studio editor UX bugs and quirks (save behavior, background image override,  | App Studio / Editor | Document known editor behaviors and the editor-vs-Analyzer card editing introduced recently: save-ex |
+| 68 | 64.6 | Conditional / cross-column color formatting, color-rule scope and per-card manag | Charting & Analyzer | Document the limitation (color rules can't reference another column and operate per-column not per-r |
+| 70 | 64.5 | Multi-select filter AND logic vs OR logic | Dashboards - Filters | Documentation should state that multi-select filters use OR logic with no native AND option, and doc |
 | 72 | 64.4 | App Studio filter control: per-card scoping, persistence, exceptions, field sele | App Studio / Filters & Controls | Document filter mechanics in depth: persistent page filters, Filter Exceptions 'Allow Filtering' all |
+| 74 | 64.4 | HTML vs Mega vs Flex table card comparison and HTML-card legacy status | Charting & Analyzer / Tables | A comparison/decision guide of HTML vs Mega vs Flex (features, limits, color coding, scroll, sorting |
+| 75 | 64.4 | Exporting dashboards/reports to PDF/PPT/Excel and scheduled-report feature gaps  | Dashboards / Scheduled Reports (Export & | Mostly feature requests, but documentable behaviors/limits: scheduled-report card attachments are CS |
 | 76 | 64.2 | App Studio multi-user concurrent editing | App Studio / Collaboration | Document the current concurrent-editing capability and its limits (e.g., multiple users editing diff |
+| 85 | 62.8 | Gauge chart configuration and limitations (abbreviation, multi-value, targets, c | Charting & Analyzer / Gauges | Documentation of gauge options that exist (Divide value by > None to stop abbreviation; multi-value  |
+| 93 | 61.9 | Text / Notebook card capabilities and formatting (HTML support, summary-number f | Charting & Analyzer / Text & Notebook Ca | Documentation clarifying which card types support HTML/rich formatting (notebook/brick/app/image vs  |
 | 94 | 61.8 | App Studio Tabs: save errors, mobile stretching, shared height, layout copying,  | App Studio / Layout (Tabs) | Document Tabs gotchas: properly nesting components inside a tab (visual vs technical nesting causing |
 | 97 | 61.6 | App Studio page-level / component-level access control (cannot share or hide ind | App Studio / Sharing & Permissions | Predominantly a feature request (page-level permissions don't exist). Doc-actionable: clearly docume |
 | 110 | 60.0 | App Studio collapsible/accordion sections and broader dashboard layout/navigatio | App Studio / Layout (feature request) | Document that App Studio has no accordion/collapsible-section element today and the recommended alte |
@@ -251,45 +265,44 @@ A prioritized list of everything this document is asking of you:
 | 7 | Supply info to write `Dashboard-Editor-Unresponsive-Multi-Select-Filter.mdx` (Rank 69) | Info meeting | 30 min |
 | 8 | Supply info to write `Host-Images-for-Domo-Apps.mdx` (Rank 83) | Info meeting | 30 min |
 | 9 | Supply info to write `App-Studio-Performance-with-Large-Datasets.mdx` (Rank 100) | Info meeting | 30 min |
-| 10 | Supply info to write `Custom-Card-Visuals-with-HTML-and-Bricks.mdx` (Rank 109) | Info meeting | 30 min |
-| 11 | Supply info to write `Workspaces-and-Folder-Organization.mdx` (Rank 209) | Info meeting | 30 min |
-| 12 | **Open placeholder in `000005143.mdx`:** confirm the current state of relative date filtering for add-in imported content | **Answer required** | 15–30 min |
-| 13 | **Open placeholder in `000005143.mdx`:** confirm the Excel re-import-in-place limitation vs | **Answer required** | 15–30 min |
-| 14 | **Open placeholder in `000005143.mdx`:** confirm whether Google Slides or other Google Workspace integration is planned | **Answer required** | 15–30 min |
-| 15 | **Open placeholder in `000005143.mdx`:** confirm PowerPoint dashboard-import layout behavior vs | **Answer required** | 15–30 min |
-| 16 | **Open placeholder in `000005543.mdx`:** confirm whether App Studio app themes override per-card color settings such as h | **Answer required** | 15–30 min |
-| 17 | **Open placeholder in `000005543.mdx`:** confirm which Brand Kit branding elements (beyond the built-in fonts) carry into | **Answer required** | 15–30 min |
-| 18 | **Open placeholder in `000005829.mdx`:** confirm the current output/export formats for Report Builder reports (emailed sn | **Answer required** | 15–30 min |
-| 19 | **Open placeholder in `000005829.mdx`:** confirm which app changes do and do not propagate to an existing report automati | **Answer required** | 15–30 min |
-| 20 | **Open placeholder in `000005864.mdx`:** confirm that a Filter List component sources its selectable values from the firs | **Answer required** | 15–30 min |
-| 21 | **Open placeholder in `Add-Charts-and-Tables-to-an-App-Studio-App.mdx`:** confirm the supported settings for fitting table columns to card width and wrapp | **Answer required** | 15–30 min |
-| 22 | **Open placeholder in `Add-Charts-and-Tables-to-an-App-Studio-App.mdx`:** confirm the exact permission required to edit data in Editable/Linked Table cell | **Answer required** | 15–30 min |
-| 23 | **Open placeholder in `Add-Interactivity-to-an-App-Studio-App.mdx`:** confirm that a card's Filter Exceptions "Allow filtering" setting is all-or-noth | **Answer required** | 15–30 min |
-| 24 | **Open placeholder in `Add-Interactivity-to-an-App-Studio-App.mdx`:** confirm the reported behavior in which a filter selection persists visually in C | **Answer required** | 15–30 min |
-| 25 | **Open placeholder in `Add-Interactivity-to-an-App-Studio-App.mdx`:** confirm whether and how an app owner can limit which columns appear in Controls  | **Answer required** | 15–30 min |
-| 26 | **Open placeholder in `Add-Interactivity-to-an-App-Studio-App.mdx`:** confirm the supported method for a dynamic/relative default date filter in App S | **Answer required** | 15–30 min |
-| 27 | **Open placeholder in `Add-Interactivity-to-an-App-Studio-App.mdx`:** confirm that on-page filter controls must be added one at a time (no bulk-add ac | **Answer required** | 15–30 min |
-| 28 | **Open placeholder in `Add-Interactivity-to-an-App-Studio-App.mdx`:** confirm that only Button components (not text or image elements) can open a Form | **Answer required** | 15–30 min |
-| 29 | **Open placeholder in `Build-an-App-Studio-App.mdx`:** confirm the current Apps Home organization options (alphabetical-by-title orderi | **Answer required** | 15–30 min |
-| 30 | **Open placeholder in `Build-an-App-Studio-App.mdx`:** confirm that the App Studio mobile layout is independent of the desktop layout ( | **Answer required** | 15–30 min |
-| 31 | **Open placeholder in `Build-an-App-Studio-App.mdx`:** confirm the per-tab card-sizing behavior on mobile: whether resizing a card in o | **Answer required** | 15–30 min |
-| 32 | **Open placeholder in `Build-an-App-Studio-App.mdx`:** confirm how tab and page order is determined on mobile (whether it follows the d | **Answer required** | 15–30 min |
-| 33 | **Open placeholder in `Build-an-App-Studio-App.mdx`:** confirm the interaction between the app-level background (App theme) and a page- | **Answer required** | 15–30 min |
-| 34 | **Open placeholder in `Build-an-App-Studio-App.mdx`:** confirm the conditional-formatting "Apply to" blank-column-list behavior when ed | **Answer required** | 15–30 min |
-| 35 | **Open placeholder in `Build-an-App-Studio-App.mdx`:** confirm the current concurrent-editing behavior in App Studio: whether multiple  | **Answer required** | 15–30 min |
-| 36 | **Open placeholder in `Build-an-App-Studio-App.mdx`:** confirm that rebuilding a page is the recommended recovery step for a corrupted  | **Answer required** | 15–30 min |
-| 37 | **Open placeholder in `Build-an-App-Studio-App.mdx`:** confirm that Domo Sandbox is the supported versioning/rollback path for App Stud | **Answer required** | 15–30 min |
-| 38 | **Open placeholder in `Build-an-App-Studio-App.mdx`:** confirm the current App Studio navigation behaviors: that text-only nav buttons  | **Answer required** | 15–30 min |
-| 39 | **Open placeholder in `Build-an-App-Studio-App.mdx`:** confirm the tab nesting/save behavior (improperly nested components causing save | **Answer required** | 15–30 min |
-| 40 | **Open placeholder in `Build-an-App-Studio-App.mdx`:** confirm the current limitations that a tab layout cannot be copied to another ta | **Answer required** | 15–30 min |
-| 41 | **Open placeholder in `Build-an-App-Studio-App.mdx`:** confirm that App Studio has no accordion/collapsible-section element today and t | **Answer required** | 15–30 min |
-| 42 | **Open placeholder in `Distribute-an-App-Studio-App.mdx`:** confirm that App Studio sharing is app-level only (no per-page or per-group page | **Answer required** | 15–30 min |
-| 43 | **Open placeholder in `Manage-an-App-Studio-App.mdx`:** confirm there is no prompt or option to delete an app's underlying cards at the  | **Answer required** | 15–30 min |
-| 44 | **Open placeholder in `Manage-an-App-Studio-App.mdx`:** confirm that App Studio app pages do not appear in a card's Move or Copy menu or | **Answer required** | 15–30 min |
-| 45 | **Open placeholder in `Manage-an-App-Studio-App.mdx`:** confirm the exact way to delete cards from More > Admin > Cards (the menu path/l | **Answer required** | 15–30 min |
-| 46 | **Open placeholder in `Manage-an-App-Studio-App.mdx`:** confirm whether the Domo Governance Datasets connector (or a Governance Toolkit  | **Answer required** | 15–30 min |
-| 47 | **Open placeholder in `Use-Advanced-Customization-in-App-Studio.mdx`:** confirm the exact grant(s) required to add and edit a pro-code component (Domo B | **Answer required** | 15–30 min |
-| 48 | Validate additions to: App Studio card management (Rank 4) | Review | 20 min |
+| 10 | Supply info to write `Workspaces-and-Folder-Organization.mdx` (Rank 209) | Info meeting | 30 min |
+| 11 | **Open placeholder in `000005143.mdx`:** confirm the current state of relative date filtering for add-in imported content | **Answer required** | 15–30 min |
+| 12 | **Open placeholder in `000005143.mdx`:** confirm the Excel re-import-in-place limitation vs | **Answer required** | 15–30 min |
+| 13 | **Open placeholder in `000005143.mdx`:** confirm whether Google Slides or other Google Workspace integration is planned | **Answer required** | 15–30 min |
+| 14 | **Open placeholder in `000005143.mdx`:** confirm PowerPoint dashboard-import layout behavior vs | **Answer required** | 15–30 min |
+| 15 | **Open placeholder in `000005543.mdx`:** confirm whether App Studio app themes override per-card color settings such as h | **Answer required** | 15–30 min |
+| 16 | **Open placeholder in `000005543.mdx`:** confirm which Brand Kit branding elements (beyond the built-in fonts) carry into | **Answer required** | 15–30 min |
+| 17 | **Open placeholder in `000005829.mdx`:** confirm the current output/export formats for Report Builder reports (emailed sn | **Answer required** | 15–30 min |
+| 18 | **Open placeholder in `000005829.mdx`:** confirm which app changes do and do not propagate to an existing report automati | **Answer required** | 15–30 min |
+| 19 | **Open placeholder in `000005864.mdx`:** confirm that a Filter List component sources its selectable values from the firs | **Answer required** | 15–30 min |
+| 20 | **Open placeholder in `Add-Charts-and-Tables-to-an-App-Studio-App.mdx`:** confirm the supported settings for fitting table columns to card width and wrapp | **Answer required** | 15–30 min |
+| 21 | **Open placeholder in `Add-Charts-and-Tables-to-an-App-Studio-App.mdx`:** confirm the exact permission required to edit data in Editable/Linked Table cell | **Answer required** | 15–30 min |
+| 22 | **Open placeholder in `Add-Interactivity-to-an-App-Studio-App.mdx`:** confirm that a card's Filter Exceptions "Allow filtering" setting is all-or-noth | **Answer required** | 15–30 min |
+| 23 | **Open placeholder in `Add-Interactivity-to-an-App-Studio-App.mdx`:** confirm the reported behavior in which a filter selection persists visually in C | **Answer required** | 15–30 min |
+| 24 | **Open placeholder in `Add-Interactivity-to-an-App-Studio-App.mdx`:** confirm whether and how an app owner can limit which columns appear in Controls  | **Answer required** | 15–30 min |
+| 25 | **Open placeholder in `Add-Interactivity-to-an-App-Studio-App.mdx`:** confirm the supported method for a dynamic/relative default date filter in App S | **Answer required** | 15–30 min |
+| 26 | **Open placeholder in `Add-Interactivity-to-an-App-Studio-App.mdx`:** confirm that on-page filter controls must be added one at a time (no bulk-add ac | **Answer required** | 15–30 min |
+| 27 | **Open placeholder in `Add-Interactivity-to-an-App-Studio-App.mdx`:** confirm that only Button components (not text or image elements) can open a Form | **Answer required** | 15–30 min |
+| 28 | **Open placeholder in `Build-an-App-Studio-App.mdx`:** confirm the current Apps Home organization options (alphabetical-by-title orderi | **Answer required** | 15–30 min |
+| 29 | **Open placeholder in `Build-an-App-Studio-App.mdx`:** confirm that the App Studio mobile layout is independent of the desktop layout ( | **Answer required** | 15–30 min |
+| 30 | **Open placeholder in `Build-an-App-Studio-App.mdx`:** confirm the per-tab card-sizing behavior on mobile: whether resizing a card in o | **Answer required** | 15–30 min |
+| 31 | **Open placeholder in `Build-an-App-Studio-App.mdx`:** confirm how tab and page order is determined on mobile (whether it follows the d | **Answer required** | 15–30 min |
+| 32 | **Open placeholder in `Build-an-App-Studio-App.mdx`:** confirm the interaction between the app-level background (App theme) and a page- | **Answer required** | 15–30 min |
+| 33 | **Open placeholder in `Build-an-App-Studio-App.mdx`:** confirm the conditional-formatting "Apply to" blank-column-list behavior when ed | **Answer required** | 15–30 min |
+| 34 | **Open placeholder in `Build-an-App-Studio-App.mdx`:** confirm the current concurrent-editing behavior in App Studio: whether multiple  | **Answer required** | 15–30 min |
+| 35 | **Open placeholder in `Build-an-App-Studio-App.mdx`:** confirm that rebuilding a page is the recommended recovery step for a corrupted  | **Answer required** | 15–30 min |
+| 36 | **Open placeholder in `Build-an-App-Studio-App.mdx`:** confirm that Domo Sandbox is the supported versioning/rollback path for App Stud | **Answer required** | 15–30 min |
+| 37 | **Open placeholder in `Build-an-App-Studio-App.mdx`:** confirm the current App Studio navigation behaviors: that text-only nav buttons  | **Answer required** | 15–30 min |
+| 38 | **Open placeholder in `Build-an-App-Studio-App.mdx`:** confirm the tab nesting/save behavior (improperly nested components causing save | **Answer required** | 15–30 min |
+| 39 | **Open placeholder in `Build-an-App-Studio-App.mdx`:** confirm the current limitations that a tab layout cannot be copied to another ta | **Answer required** | 15–30 min |
+| 40 | **Open placeholder in `Build-an-App-Studio-App.mdx`:** confirm that App Studio has no accordion/collapsible-section element today and t | **Answer required** | 15–30 min |
+| 41 | **Open placeholder in `Distribute-an-App-Studio-App.mdx`:** confirm that App Studio sharing is app-level only (no per-page or per-group page | **Answer required** | 15–30 min |
+| 42 | **Open placeholder in `Manage-an-App-Studio-App.mdx`:** confirm there is no prompt or option to delete an app's underlying cards at the  | **Answer required** | 15–30 min |
+| 43 | **Open placeholder in `Manage-an-App-Studio-App.mdx`:** confirm that App Studio app pages do not appear in a card's Move or Copy menu or | **Answer required** | 15–30 min |
+| 44 | **Open placeholder in `Manage-an-App-Studio-App.mdx`:** confirm the exact way to delete cards from More > Admin > Cards (the menu path/l | **Answer required** | 15–30 min |
+| 45 | **Open placeholder in `Manage-an-App-Studio-App.mdx`:** confirm whether the Domo Governance Datasets connector (or a Governance Toolkit  | **Answer required** | 15–30 min |
+| 46 | **Open placeholder in `Use-Advanced-Customization-in-App-Studio.mdx`:** confirm the exact grant(s) required to add and edit a pro-code component (Domo B | **Answer required** | 15–30 min |
+| 47 | Validate additions to: App Studio card management (Rank 4) | Review | 20 min |
 
 ---
 

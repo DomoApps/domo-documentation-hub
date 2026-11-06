@@ -11,7 +11,7 @@ For the product-release-notes skill, step "archive". Given the current
      among archived articles) + 1.
   4. Copy the current content into the archived file, replacing only the
      frontmatter `title:` with "{Year} Release {N} | {Month}".
-  5. Insert the archived path at the END of the English "2025-2026" subgroup
+  5. Insert the archived path at the START of the English "2025-2026" subgroup
      under "Archived Feature Release Notes" in docs.json (surgical text edit;
      English nav only -- localized nav is handled later by the localize flow).
 
@@ -60,7 +60,7 @@ def highest_release_number(year):
 
 
 def insert_into_nav(docs_text, archived_path):
-    """Append "{archived_path}" to the end of the English 2025-2026 pages array.
+    """Insert "{archived_path}" at the start of the English 2025-2026 pages array (newest first).
     Returns (new_text, preview_snippet) or exits on failure."""
     if f'"{archived_path}"' in docs_text:
         print(f"NOTE: {archived_path} already present in docs.json -- leaving nav untouched.")
@@ -79,37 +79,15 @@ def insert_into_nav(docs_text, archived_path):
     if pages_kw == -1 or open_br == -1:
         sys.exit("Could not locate the 2025-2026 pages array.")
 
-    # find matching close bracket (respect quotes)
-    depth, i, in_str = 0, open_br, False
-    while i < len(docs_text):
-        ch = docs_text[i]
-        if ch == '"' and docs_text[i - 1] != "\\":
-            in_str = not in_str
-        elif not in_str:
-            if ch == "[":
-                depth += 1
-            elif ch == "]":
-                depth -= 1
-                if depth == 0:
-                    break
-        i += 1
-    close_br = i
-    array_body = docs_text[open_br + 1:close_br]
-
-    # last string entry inside the array
-    entries = list(re.finditer(r'"[^"]+"', array_body))
-    if not entries:
+    first = re.compile(r'\s*("[^"]+")').match(docs_text, open_br + 1)
+    if not first:
         sys.exit("The 2025-2026 pages array appears empty -- aborting.")
-    last = entries[-1]
-    last_end_abs = open_br + 1 + last.end()
+    line_start = docs_text.rfind("\n", 0, first.start(1)) + 1
+    indent = docs_text[line_start:first.start(1)]
 
-    # indentation of the last entry's line
-    line_start = docs_text.rfind("\n", 0, open_br + 1 + last.start()) + 1
-    indent = re.match(r"[ \t]*", docs_text[line_start:]).group(0)
-
-    insertion = f',\n{indent}"{archived_path}"'
-    new_text = docs_text[:last_end_abs] + insertion + docs_text[last_end_abs:]
-    preview = docs_text[line_start:last_end_abs] + insertion
+    insertion = f'{indent}"{archived_path}",\n'
+    new_text = docs_text[:line_start] + insertion + docs_text[line_start:]
+    preview = insertion + docs_text[line_start:first.end(1)]
     return new_text, preview
 
 
@@ -146,7 +124,7 @@ def main():
         print("--- DRY RUN (no files written) ---")
         print(f"Would create {archived_file} with new title.")
         if preview:
-            print("\ndocs.json 2025-2026 group would become (tail):")
+            print("\ndocs.json 2025-2026 group would become (head):")
             print(preview)
         return
 

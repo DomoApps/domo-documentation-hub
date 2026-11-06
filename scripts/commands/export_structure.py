@@ -112,8 +112,9 @@ class DocStructureExtractor:
 
             elif isinstance(entry, dict) and "group" in entry:
                 nested_stack = group_stack + [entry["group"]]
+                root = [entry["root"]] if isinstance(entry.get("root"), str) else []
                 self._process_pages_recursive(
-                    tab_name, entry.get("pages", []), nested_stack
+                    tab_name, root + entry.get("pages", []), nested_stack
                 )
 
     def _extract_title(self, file_path: str) -> str:

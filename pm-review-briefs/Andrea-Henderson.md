@@ -2,7 +2,7 @@
 
 **Prepared for:** KB Restructure PM Review Meeting
 **Features owned:** Auto ML, Data Flows, Magic ETL
-**Total articles in your area:** 84
+**Total articles in your area:** 89
 
 > This document is your meeting guide. It shows how your content is being reorganized,
 > which AI-generated articles need your fact-check, which articles need a dedicated
@@ -20,8 +20,8 @@ areas lands in the new structure.
 | Feature | Articles | New Location |
 |---------|----------|--------------|
 | Auto ML | 3 | Pillar 4: Prepare & Transform Data |
-| Data Flows | 28 | Pillar 4: Prepare & Transform Data |
-| Magic ETL | 53 | Pillar 4: Prepare & Transform Data |
+| Data Flows | 29 | Pillar 4: Prepare & Transform Data |
+| Magic ETL | 57 | Pillar 4: Prepare & Transform Data |
 
 ### Notable Navigation Changes
 

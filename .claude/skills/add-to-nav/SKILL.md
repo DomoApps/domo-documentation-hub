@@ -18,6 +18,8 @@ The user has provided: $ARGUMENTS
 
 Pages are string entries like `"s/article/Article-Title"` or `"portal/some-slug"`.
 
+On the Knowledge Base tab, nesting defaults to three levels (pillar › group › sub-group). If a placement would create a fourth or fifth level, confirm with the user that the extra group adds real value (as the connector vendor groups do); never go past five.
+
 This skill makes targeted, surgical edits — never reads the full file.
 
 ---

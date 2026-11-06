@@ -1,8 +1,8 @@
 # PM Review Brief: Mamta Bolaki
 
 **Prepared for:** KB Restructure PM Review Meeting
-**Features owned:** Domo Everywhere, Sandbox
-**Total articles in your area:** 11
+**Features owned:** AppStore, Domo Everywhere, Sandbox
+**Total articles in your area:** 91
 
 > This document is your meeting guide. It shows how your content is being reorganized,
 > which AI-generated articles need your fact-check, which articles need a dedicated
@@ -19,8 +19,9 @@ areas lands in the new structure.
 
 | Feature | Articles | New Location |
 |---------|----------|--------------|
+| AppStore | 79 | Pillar 6: Build Apps & Automate |
 | Domo Everywhere | 9 | Pillar 7: Distribute |
-| Sandbox | 2 | Pillar 10: Administer & Govern |
+| Sandbox | 3 | Pillar 10: Administer & Govern |
 
 ### Notable Navigation Changes
 
@@ -48,16 +49,6 @@ restructure plan). Some are **already drafted and need your fact-check**; others
 **cannot be written until you supply information**. The two are separated below so
 it's clear which is which.
 
-### 3b. Forum-Gap Articles Already Drafted — Fact-Check Required
-
-These articles have been **written** in response to the highest-demand community
-forum gaps. Please read each draft and verify accuracy. A ⚠️ flag means the draft
-also contains an open `[pm-input]` placeholder — see Section 3d for the exact ask.
-
-| Rank | Article | What Was Synthesized / What to Verify |
-|------|---------|---------------------------------------|
-| 139 | `Choose-How-to-Share-Outside-Domo.mdx` — *Choose How to Share Content Outside Domo* | Synthesized from 360043437993 + portal embed guides; public/private-embed/Publish/Edit-Experience decision matrix. Omitted unverifiable single-SSO-provider limit |
-
 ### 3c. Forum-Gap Articles Awaiting Your Input — Cannot Be Written Yet
 
 These forum gaps **cannot be written without your input** — the KB has no source
@@ -74,6 +65,12 @@ async written answer) is needed before drafting can begin.
 The items below are open `[pm-input]` placeholders where specific information from
 you is needed before the content can be finalized. Each is a checkbox — check it
 off once you've provided the answer.
+
+- [ ] **`1500000406641.mdx`**
+  Confirm that pydomo has no native upsert-key command and document the schema-based Python SDK approach (reported as marking a column as an upsert key via a schema-upsert.json definition): the exact field/flag and where it is set. Synthesized from community forum reports; needs confirmation.
+
+- [ ] **`360042933494.mdx`**
+  confirm the exact steps to remove a recipient who used an email unsubscribe link from the unsubscribers list so they can receive campaigns again (the Unsubscribes tab currently documents only Search, Export, and Refresh). Synthesized from community forum reports; needs confirmation.
 
 - [ ] **`360043437993.mdx`**
   Confirm whether private embed IDs/codes are intentionally user-specific (per-user rather than a single universal code) for security and audit purposes, and document the supported way to programmatically monitor embedded-page health: the embed load sequence, the stack?parts endpoint, TOE codes, and the 401 authentication errors users hit when calling it. Synthesized from community forum reports; needs confirmation.
@@ -125,15 +122,16 @@ A prioritized list of everything this document is asking of you:
 | # | Action | Type | Est. Effort |
 |---|--------|------|------------|
 | 1 | Read and fact-check `Domo-Sandbox-Overview.mdx` | Fact-check | 30–45 min |
-| 2 | Fact-check `Choose-How-to-Share-Outside-Domo.mdx` (Rank 139 community request) | Fact-check | 20–30 min |
-| 3 | Supply info to write `Embed-Domo-in-Third-Party-Platforms.mdx` (Rank 17) | Info meeting | 30 min |
-| 4 | Supply info to write `Embedded-Dashboard-Unfiltered-Data-Flash.mdx` (Rank 28) | Info meeting | 30 min |
-| 5 | **Open placeholder in `360043437993.mdx`:** Confirm whether private embed IDs/codes are intentionally user-specific (per-use | **Answer required** | 15–30 min |
-| 6 | **Open placeholder in `360043437993.mdx`:** Confirm the exact wording and behavior of the "You are editing content embedded  | **Answer required** | 15–30 min |
-| 7 | **Open placeholder in `360043437993.mdx`:** Confirm the specific browser and version behind this Private Network Access chan | **Answer required** | 15–30 min |
-| 8 | **Open placeholder in `360045120554.mdx`:** Confirm whether a DataSet's name or description can be changed at publish time ( | **Answer required** | 15–30 min |
-| 9 | **Open placeholder in `4403367344023.mdx`:** Confirm the recommended DEV/PROD promotion pattern; whether App Studio global an | **Answer required** | 15–30 min |
-| 10 | **Open placeholder in `4403367344023.mdx`:** Confirm the exact generic error text users see (reported as an "invalid content  | **Answer required** | 15–30 min |
+| 2 | Supply info to write `Embed-Domo-in-Third-Party-Platforms.mdx` (Rank 17) | Info meeting | 30 min |
+| 3 | Supply info to write `Embedded-Dashboard-Unfiltered-Data-Flash.mdx` (Rank 28) | Info meeting | 30 min |
+| 4 | **Open placeholder in `1500000406641.mdx`:** Confirm that pydomo has no native upsert-key command and document the schema-bas | **Answer required** | 15–30 min |
+| 5 | **Open placeholder in `360042933494.mdx`:** confirm the exact steps to remove a recipient who used an email unsubscribe link | **Answer required** | 15–30 min |
+| 6 | **Open placeholder in `360043437993.mdx`:** Confirm whether private embed IDs/codes are intentionally user-specific (per-use | **Answer required** | 15–30 min |
+| 7 | **Open placeholder in `360043437993.mdx`:** Confirm the exact wording and behavior of the "You are editing content embedded  | **Answer required** | 15–30 min |
+| 8 | **Open placeholder in `360043437993.mdx`:** Confirm the specific browser and version behind this Private Network Access chan | **Answer required** | 15–30 min |
+| 9 | **Open placeholder in `360045120554.mdx`:** Confirm whether a DataSet's name or description can be changed at publish time ( | **Answer required** | 15–30 min |
+| 10 | **Open placeholder in `4403367344023.mdx`:** Confirm the recommended DEV/PROD promotion pattern; whether App Studio global an | **Answer required** | 15–30 min |
+| 11 | **Open placeholder in `4403367344023.mdx`:** Confirm the exact generic error text users see (reported as an "invalid content  | **Answer required** | 15–30 min |
 
 ---
 

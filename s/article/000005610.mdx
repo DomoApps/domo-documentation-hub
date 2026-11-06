@@ -1,64 +1,104 @@
 ---
-title: "Adding a Microsoft Sharepoint Online Rest OAuth Config"
-excerpt: "Register an Azure app and add a SharePoint Online REST OAuth configuration so Domo can connect to SharePoint Online."
+title: "Adding a Microsoft Sharepoint Online REST OAuth Config"
+excerpt: "Register an Entra app and add a SharePoint Online REST OAuth configuration so Domo can connect to SharePoint Online."
 ---
+
+## Intro
+
+Register an Entra app and add a SharePoint Online REST OAuth configuration so Domo can connect to SharePoint Online.
 
 ## Prerequisites
 
-To connect to Microsoft SharePoint Online to retrieve the information, you must have the following:
+To connect to Microsoft SharePoint Online to retrieve the information, you must have the following. Instructions to obtain these items are provided in the following sections.
 
-* An installed Microsoft Azure app.
-* The CLIENT ID and CLIENT SECRET. To generate an app and locate these credentials, see [Microsoft's documentation](https://docs.microsoft.com/en-us/azure/active-directory/develop/quickstart-register-app "Microsoft's documentation"). You may need the following information to register for the app:
+- A Microsoft Entra app registration.
+- The Client ID and Client Secret. To register an app and generate these credentials, see [Microsoft's documentation](https://docs.microsoft.com/en-us/azure/active-directory/develop/quickstart-register-app) or the below instructions. You'll need the following information to register for the app:
+  - **Entra Portal:** [https://entra.microsoft.com](https://entra.microsoft.com)
+  - **Sharepoint App to Register:** SharePoint Online Rest API
+  - **Domo Redirect URI:** `https://oauth.domo.com/api/data/v1/oauth/providers/microsoft-sharepoint-online-rest-enterprise-oauth/exchange`
 
-  + **Azure Portal:** [https://portal.azure.com/](https://portal.azure.com/ "https://portal.azure.com/")
-  + **Sharepoint App to Register:** SharePoint Online Rest API
-  + **Domo Re-direct URL:** [https://oauth.domo.com/api/data/v1/oauth/providers/microsoft-sharepoint-online-rest-enterprise-oauth/exchange](https://oauth.domo.com/api/data/v1/oauth/providers/microsoft-sharepoint-online-rest-enterprise-oauth/exchange "https://oauth.domo.com/api/data/v1/oauth/providers/microsoft-sharepoint-online-rest-enterprise-oauth/exchange")
+## 1. Create an Entra App Registration
 
-## Creating an Azure App for Enterprise OAuth
+1. Log in to [https://entra.microsoft.com](https://entra.microsoft.com).
 
-To create a Microsoft Azure app, do the following:
+2. Select **Entra ID** > **App registrations**. Or navigate straight to [the app registrations page](https://entra.microsoft.com/#view/Microsoft_AAD_RegisteredApps/ApplicationsListBlade).
 
-1. Log in to [https://portal.azure.com](https://portal.azure.com/ "https://portal.azure.com").
-2. Select Microsoft Entra ID > App registrations.
-   
-   <Frame><img alt="Capture1.PNG" src="/images/kb/ka05w000001236O-00N5w00000Ri7BU-0EM5w000005vNz7.png"/></Frame>
+3. Click **+ New registration**.
+   <Frame>
+     ![Capture1.PNG](/images/kb/ka05w000001236O-00N5w00000Ri7BU-0EM5w000005vNz7.png)
+   </Frame>
 
-3. Click **New registration**.
-4. Enter the application name and select the supported account type. Enter the Redirect URI for Web as https://oauth.domo.com/api/data/v1/oauth/providers/microsoft-sharepoint-online-rest-enterprise-oauth/exchange.
-5. Change the default tenant selection from single tenant to multi tenant. This is a requirement for the connector.
-   
-   <Frame><img alt="REgister.png" src="/images/kb/ka0Vq0000006d0H-00N5w00000Ri7BU-0EM5w000006vIDX.jpg"/></Frame>
+4. Name your application.
 
-6. Click **Register**.
-7. Now, click **API Permissions**.
-     
-   <Frame><img alt="API_permission.png" src="/images/kb/ka0Vq0000006d0H-00N5w00000Ri7BU-0EM5w000005vO6o.png"/></Frame>
+5. Select the supported account type as **Multiple Entra ID tenants** then select **Allow all tenants**. This is a requirement for the connector.
+   <Frame>
+     ![Entra Supported Account Types Screenshot](/images/kb/screenshot-microsoft-entra-sharepoint-create-application-supported-account-types.png)
+   </Frame>
 
-8. Click **+Add Permissions** button.
-     
-   <Frame><img alt="Capture8.PNG" src="/images/kb/ka05w00000123LH-00N5w00000Ri7BU-0EM5w000005vO61.png"/></Frame>
+6. Add a Redirect URI, select **Web** for the platform, and paste the following URL:
 
-9. Select **Microsoft Graph > Delegated Permissions**.
-10. Select the permissions as required.
-11. After adding the permissions, all configured permissions will be listed as below.
-      
-    <Frame><img alt="Configure.png" src="/images/kb/ka0Vq0000006d0H-00N5w00000Ri7BU-0EM5w000006vIDc.jpg"/></Frame>
+   ```text
+   https://oauth.domo.com/api/data/v1/oauth/providers/microsoft-sharepoint-online-rest-enterprise-oauth/exchange
+   ```
 
-## To Obtain the Sharepoint CLIENT ID:
+   <Frame>
+     ![Redirect URI Screenshot](/images/kb/screenshot-microsoft-entra-sharepoint-create-application-redirect-uri.png)
+   </Frame>
 
-1. Go to [https://portal.azure.com](https://portal.azure.com/ "https://portal.azure.com").
-2. Select Microsoft Entra ID > App registrations.
-3. Find and click on your web app.
-4. The "application" ID is your CLIENT ID.
+7. Finish by clicking **Register** at the bottom.
 
-## To obtain the Sharepoint CLIENT SECRET:
+## 2. Add API Permissions
 
-1. Go to [https://portal.azure.com](https://portal.azure.com/ "https://portal.azure.com").
-2. Select Microsoft Entra ID > App registrations.
-3. Find and click on your web app.
-4. Open **Certificates and secrets**.
-5. Click **+New Value**.
-6. Provide the value description and the expiry period for your secret. Click **Add**.
-7. Your new value will appear. Copy the Value field and paste it in your Domo connector Value field.
-     
-   <Frame><img alt="Secret.png" src="/images/kb/ka0Vq000000A67N-00N5w00000Ri7BU-0EM5w000005vO71.png"/></Frame>
+1. From your Entra app registration, go to the **API permissions** page.
+   <Frame>
+     ![API\_permission.png](/images/kb/ka0Vq0000006d0H-00N5w00000Ri7BU-0EM5w000005vO6o.png)
+   </Frame>
+
+2. Click **+ Add a permission**.
+
+3. Select **Microsoft Graph** > **Delegated permissions**.
+
+4. Search and check the following permissions:
+
+   - OpenId permissions
+     - `email`
+     - `offline_access`
+     - `openid`
+     - `profile`
+   - Files
+     - `Files.Read.All`
+   - Group
+     - `Group.Read.All`
+   - Notes
+     - `Notes.Read.All`
+   - Reports
+     - `Reports.Read.All`
+   - Sites
+     - `Sites.Read.All`
+   - User
+     - `User.Read` (granted by default)
+     - `User.Read.All`
+
+5. Click **Add permissions** at the bottom to save your changes.
+
+6. After adding the permissions, all configured permissions will be listed as below.
+   <Frame>
+     ![Configure.png](/images/kb/ka0Vq0000006d0H-00N5w00000Ri7BU-0EM5w000006vIDc.jpg)
+   </Frame>
+
+## 3. Obtain the Client ID
+
+1. From your Entra app registration, go to the **Overview** page.
+2. Under the **Essentials** section, find the **Application (client) ID**. This is your Client ID, paste it in your Domo connector **Client ID** field.
+
+## 4. Create the Client Secret
+
+1. From your Entra app registration, go to the **Certificates & secrets** page.
+2. Under the **Client secrets (0)** tab, click **+ New client secret**.
+3. (Optional) Enter a description.
+4. Select an expiration period.
+5. Click **Add** at the bottom.
+6. Your new secret will appear. Copy the **Value** field and paste it in your Domo connector **Client Secret** field. Make sure to save this value somewhere secure, as you won't be able to retrieve it again after leaving this page.
+   <Frame>
+     ![Secret.png](/images/kb/screenshot-microsoft-entra-sharepoint-client-secret.png)
+   </Frame>

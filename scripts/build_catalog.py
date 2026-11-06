@@ -100,8 +100,10 @@ def build_nav_map(docs_json_path: str) -> dict[str, str]:
 
     Mintlify docs.json structure (this repo):
       navigation.languages[i].tabs[j].pages → list of groups or strings
-      group: {group: "Label", pages: [...]}
+      group: {group: "Label", root: "s/article/slug", pages: [...]}
       leaf: "s/article/slug"
+
+    A group's root page counts as a member of that group.
 
     article_path_stem examples:
       "s/article/360042925394"
@@ -123,6 +125,8 @@ def build_nav_map(docs_json_path: str) -> dict[str, str]:
             elif isinstance(node, dict):
                 label = node.get("group") or node.get("tab") or ""
                 crumb = f"{breadcrumb} > {label}" if (breadcrumb and label) else (label or breadcrumb)
+                if isinstance(node.get("root"), str):
+                    nav_map[node["root"].rstrip("/")] = crumb
                 sub = node.get("pages", [])
                 if isinstance(sub, list):
                     walk_pages(sub, crumb)

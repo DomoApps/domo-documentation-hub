@@ -19,6 +19,8 @@ The user has provided: $ARGUMENTS
 2. **`docs.json`** — nav group hierarchy used to infer which feature each article belongs to
 3. **Article frontmatter** — title and excerpt used as keyword fallback for articles not clearly placed by nav group
 
+**Assignments are sticky.** An article already in the reference keeps its Feature on every run (its PM still comes from the roster, so a roster change still moves it), and an entry in `pm-review-state/ownership-overrides.json` beats both. Only articles missing from the reference are routed, in this order: the majority Feature of their already-assigned neighbors in the nearest nav group (at least two neighbors, at least half agreeing), then `NAV_FEATURE`, `KEYWORD_RULES`, and the tab fallbacks. The run prints every new article placed by a pillar-level group or by the fallback rules; confirm those with the user. This is what keeps a nav reorganization from reshuffling existing ownership.
+
 The same run also regenerates **`.github/CODEOWNERS`** from the identical Feature→PM assignment, so the two files can't drift. See **Update CODEOWNERS** below.
 
 **The roster CSV is optional.** It's the source of truth when it's present in the repo root, but it's pasted in ad hoc and usually isn't in the working tree. When it's absent, the script recovers each Feature's PM from the **existing `Article-PM-Ownership-Reference.mdx`** instead. This is what lets you run the skill with no spreadsheet — to absorb newly added articles and assign each a PM by its product pillar/group (nav-group → Feature from the script's `NAV_FEATURE`/`KEYWORD_RULES`; Feature → PM from the reference). A new article whose Feature has no PM in the reference is flagged as `(no PM listed)`, never guessed. Drop the CSV in only when the roster itself changed (new PM, reassignment).
@@ -66,7 +68,9 @@ If articles were added (scenarios 2 or 3), check whether the new articles would 
 git diff main...HEAD --name-only -- 's/article/*.mdx' | head -30
 ```
 
-For each new article, predict what feature the script would assign:
+Run the script and read its "Review these new assignments" list: those articles sit at pillar level or matched no confident neighbor group, so their Feature came from a guess. For each one the user disagrees with, record the right Feature or PM with `pm_review.py reassign` or a feature-only entry in `ownership-overrides.json`, then re-run. Articles placed by a specific nav group's neighbors rarely need attention.
+
+For a new article that isn't on the list but still looks wrong, trace the fallback rules:
 
 1. Look up the article's nav group in `docs.json`:
    ```bash
@@ -167,8 +171,8 @@ If the user reports a specific mis-assignment (e.g. "article X should be Feature
    head -10 s/article/filename.mdx
    grep "filename" docs.json
    ```
-2. Trace the current assignment through the script's logic to find why it was mis-assigned (wrong `NAV_FEATURE` entry, keyword false positive, etc.).
-3. Fix the root cause in the script (not in the MDX output directly).
+2. If the article is already in the reference, its Feature is sticky, so a script change won't move it: record the correction as an ownership override (`pm_review.py reassign`, or a feature-only entry in `pm-review-state/ownership-overrides.json`). Otherwise trace the assignment through the script's logic to find why it was mis-assigned (a misleading neighbor majority, a wrong `NAV_FEATURE` entry, or a keyword false positive).
+3. Fix the root cause in the override file or the script (not in the MDX output directly).
 4. Re-run the script and verify the correction.
 5. If the fix has downstream effects (other articles that were similarly mis-assigned), surface them to the user before regenerating.
 

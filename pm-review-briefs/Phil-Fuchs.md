@@ -1,8 +1,8 @@
 # PM Review Brief: Phil Fuchs
 
 **Prepared for:** KB Restructure PM Review Meeting
-**Features owned:** Beast Mode, Combined Schema, Data Center, Data Views, Fusions, Period over Period
-**Total articles in your area:** 54
+**Features owned:** Beast Mode, Combined Schema, Data Center, Data Views, Fusions
+**Total articles in your area:** 59
 
 > This document is your meeting guide. It shows how your content is being reorganized,
 > which AI-generated articles need your fact-check, which articles need a dedicated
@@ -19,18 +19,19 @@ areas lands in the new structure.
 
 | Feature | Articles | New Location |
 |---------|----------|--------------|
-| Beast Mode | 18 | Pillar 5: Analyze & Visualize |
+| Beast Mode | 21 | Pillar 5: Analyze & Visualize |
 | Combined Schema | 1 | Pillar 4: Prepare & Transform Data |
-| Data Center | 28 | Pillar 3: Manage Data |
+| Data Center | 32 | Pillar 3: Manage Data |
 | Data Views | 2 | Pillar 3: Manage Data |
 | Fusions | 3 | Archive — DataFusion deprecated (retiring in Phase 4) |
-| Period over Period | 2 | Pillar 5: Analyze & Visualize |
 
 ### Notable Navigation Changes
 
 - **DataFusion/Fusions:** Fusions (DataFusion) articles are being archived in Phase 4. If any Beast Mode or Combined Schema articles reference DataFusion, they'll need updating.
 
 - **Data Views (D9):** Data Views articles may shift between Pillar 3 (Manage Data) and Pillar 4 (Prepare & Transform Data) depending on D9 resolution.
+
+- **DataSet Management split (D9):** Some DataSet Management articles currently in Prepare & Transform will move to the new Manage Data pillar (Pillar 3). The split: pipeline-oriented articles stay in Pillar 4; governance/lifecycle articles move to Pillar 3. Resolve before Phase 7. (Data Center / DataSet ownership moved to you and Sam Lowen under the Nov-2026 roster.)
 
 ---
 
@@ -43,7 +44,10 @@ recommended patterns.
 
 | # | Article | Synthesized From | Key Claims to Verify |
 |---|---------|------------------|---------------------|
-| 1 | `What-is-Beast-Mode.mdx` (Pillar 5) | Beast Mode FAQs, functions reference | Beast Mode definition, when to use vs Magic ETL, aggregation rules, filter limitations |
+| 1 | `What-is-a-DataSet.mdx` (Pillar 4) | Connector how-tos, ETL input tile articles | DataSet definition, dataset types, lifecycle states, update methods — especially the 'archived' state |
+| 2 | `What-is-Beast-Mode.mdx` (Pillar 5) | Beast Mode FAQs, functions reference | Beast Mode definition, when to use vs Magic ETL, aggregation rules, filter limitations |
+| 3 | `Manage-Data-Overview.mdx` (Pillar 3) | DataSet articles, Data Center context | Data Center navigation, dataset discovery, lifecycle, sharing — verify current UI state |
+| 4 | `What-is-the-Data-Center.mdx` (Pillar 3) | DataSet management articles, connector how-tos | Data Center UI, dataset cards, status indicators — verify current UI state |
 
 ---
 
@@ -158,20 +162,8 @@ off once you've provided the answer.
 - [ ] **`4408174643607.mdx`**
   confirm the recommended FIXED pattern for replacing COUNT(DISTINCT ...) / cross-row distinct aggregation, and whether it is officially supported. Provenance: synthesized from community forum reports; needs confirmation.
 
-- [ ] **`7903767835031.mdx`**
-  confirm whether variable logic must be removed from a Beast Mode before its associated control can be removed, and the exact behavior/error path when promoting an app that uses variables from dev to prod. Provenance: synthesized from community forum reports; needs confirmation.
-
-- [ ] **`7903767835031.mdx`**
-  confirm the current scope for surfacing a variable's selected value as dynamic text: which card elements (title, axis labels, legends, column headers) can reference it today, and whether formatting can follow the selected metric. Provenance: synthesized from community forum reports; needs confirmation.
-
 - [ ] **`Beast-Mode-Window-Functions.mdx`**
   confirm the supported workaround for filtering on window function results. Options likely include materializing the calculation in Magic ETL before bringing into Analyzer, or restructuring logic to avoid the post-aggregation filter. Add workaround steps here and remove this note.
-
-- [ ] **`Editor-Dataset-Access-Scope.mdx`**
-  confirm the exact dataset-access scope an Editor receives from a shared card: does the implicit grant give the Editor edit/build access to the underlying DataSet, or view access only? Document the precise scope once confirmed.
-
-- [ ] **`Editor-Dataset-Access-Scope.mdx`**
-  confirm whether a viewer-facing "Go To DataSet" control exists on shared cards and, if so, which roles/grants expose it and how to disable it. No current KB article documents such a control; add a section once confirmed.
 
 ---
 
@@ -217,47 +209,46 @@ A prioritized list of everything this document is asking of you:
 
 | # | Action | Type | Est. Effort |
 |---|--------|------|------------|
-| 1 | Read and fact-check `What-is-Beast-Mode.mdx` | Fact-check | 30–45 min |
-| 2 | Provide input for `Understanding-DataSet-Joins.mdx` | Info meeting | 30 min |
-| 3 | Fact-check `Beast-Mode-Window-Functions.mdx` (Rank 1 community request) | Fact-check | 20–30 min |
-| 4 | Fact-check `Beast-Mode-for-Spreadsheet-Users.mdx` (Rank 11 community request) | Fact-check | 20–30 min |
-| 5 | Fact-check `Period-over-Period-Calculations.mdx` (Rank 49 community request) | Fact-check | 20–30 min |
-| 6 | Fact-check `Editor-Dataset-Access-Scope.mdx` (Rank 118 community request) | Fact-check | 20–30 min |
-| 7 | Supply info to write `Dataset-Column-Rename-Impact.mdx` (Rank 14) | Info meeting | 30 min |
-| 8 | Supply info to write `Card-Refresh-Timing-After-Dataset-Update.mdx` (Rank 25) | Info meeting | 30 min |
-| 9 | Supply info to write `Zero-Fill-Missing-Date-Gaps-in-Charts.mdx` (Rank 33) | Info meeting | 30 min |
-| 10 | Supply info to write `Dataset-Column-Character-Limits.mdx` (Rank 56) | Info meeting | 30 min |
-| 11 | Supply info to write `Request-Access-Behavior.mdx` (Rank 64) | Info meeting | 30 min |
-| 12 | Supply info to write `Time-Interval-Bucketing-and-Dedup.mdx` (Rank 77) | Info meeting | 30 min |
-| 13 | Supply info to write `Remove-Bad-Rows-from-a-Dataset.mdx` (Rank 91) | Info meeting | 30 min |
-| 14 | Supply info to write `Multi-Language-Dashboards.mdx` (Rank 107) | Info meeting | 30 min |
-| 15 | **Open placeholder in `000005559.mdx`:** confirm the exact current wording of the editor warning and that it is non-block | **Answer required** | 15–30 min |
-| 16 | **Open placeholder in `360042925474.mdx`:** confirm how Beast Mode metadata (specifically the data type) can be retrieved pr | **Answer required** | 15–30 min |
-| 17 | **Open placeholder in `360042925474.mdx`:** confirm the exact behavior when a card is moved/switched to a new DataSet: the " | **Answer required** | 15–30 min |
-| 18 | **Open placeholder in `360042926154.mdx`:** confirm the now-shipped DataSet management options for this: (1) the "Duplicate  | **Answer required** | 15–30 min |
-| 19 | **Open placeholder in `360042926194.mdx`:** confirm the Required Grants for deleting DataSets; no Required Grants section ex | **Answer required** | 15–30 min |
-| 20 | **Open placeholder in `360042926214.mdx`:** confirm the Required Grants for executing DataSets; no Required Grants section e | **Answer required** | 15–30 min |
-| 21 | **Open placeholder in `360042934614.mdx`:** Confirm the reported behavior that adding a user or group to a PDP policy (and/o | **Answer required** | 15–30 min |
-| 22 | **Open placeholder in `360042934614.mdx`:** Confirm whether PDP row and column policies are enforced across all the ways an  | **Answer required** | 15–30 min |
-| 23 | **Open placeholder in `360043429933.mdx`:** confirm current ABS() semantics with aggregated / FIXED expressions; community r | **Answer required** | 15–30 min |
-| 24 | **Open placeholder in `360043429933.mdx`:** confirm the practical maximum length / value count for a Beast Mode IN-list (or  | **Answer required** | 15–30 min |
-| 25 | **Open placeholder in `360043429933.mdx`:** confirm whether Beast Mode supports a thousands-separator / grouping function (s | **Answer required** | 15–30 min |
-| 26 | **Open placeholder in `360043429933.mdx`:** confirm (1) the default week-start / mode for WEEK, YEARWEEK, and WEEKOFYEAR in  | **Answer required** | 15–30 min |
-| 27 | **Open placeholder in `360043430053.mdx`:** confirm whether TIMESTAMPDIFF is supported in Beast Mode (it is not currently in | **Answer required** | 15–30 min |
-| 28 | **Open placeholder in `360043430053.mdx`:** Confirm whether SUM() on a natively boolean-typed column (not a string) counts t | **Answer required** | 15–30 min |
-| 29 | **Open placeholder in `360043430133.mdx`:** confirm whether a native window-function capability, or a dedicated window-funct | **Answer required** | 15–30 min |
-| 30 | **Open placeholder in `360043430153.mdx`:** Confirm the reported table-cell vs | **Answer required** | 15–30 min |
-| 31 | **Open placeholder in `360043437733.mdx`:** confirm (1) the exact mechanism by which a schema/table update drops the upsert  | **Answer required** | 15–30 min |
-| 32 | **Open placeholder in `360046074774.mdx`:** confirm the precise same-type join rule for Views across storage types (Cloud Am | **Answer required** | 15–30 min |
-| 33 | **Open placeholder in `360046074774.mdx`:** confirm the SQL Editor switch is one-directional: that once a View uses the SQL  | **Answer required** | 15–30 min |
-| 34 | **Open placeholder in `4408174643607.mdx`:** confirm the recommended FIXED pattern for replacing COUNT(DISTINCT  | **Answer required** | 15–30 min |
-| 35 | **Open placeholder in `7903767835031.mdx`:** confirm whether variable logic must be removed from a Beast Mode before its asso | **Answer required** | 15–30 min |
-| 36 | **Open placeholder in `7903767835031.mdx`:** confirm the current scope for surfacing a variable's selected value as dynamic t | **Answer required** | 15–30 min |
-| 37 | **Open placeholder in `Beast-Mode-Window-Functions.mdx`:** confirm the supported workaround for filtering on window function results | **Answer required** | 15–30 min |
-| 38 | **Open placeholder in `Editor-Dataset-Access-Scope.mdx`:** confirm the exact dataset-access scope an Editor receives from a shared card: do | **Answer required** | 15–30 min |
-| 39 | **Open placeholder in `Editor-Dataset-Access-Scope.mdx`:** confirm whether a viewer-facing "Go To DataSet" control exists on shared cards a | **Answer required** | 15–30 min |
-| 40 | Validate additions to: Beast Mode date functions (Rank 5) | Review | 20 min |
-| 41 | Validate additions to: Beast Mode reference (Rank 10) | Review | 20 min |
+| 1 | Read and fact-check `What-is-a-DataSet.mdx` | Fact-check | 30–45 min |
+| 2 | Read and fact-check `What-is-Beast-Mode.mdx` | Fact-check | 30–45 min |
+| 3 | Read and fact-check `Manage-Data-Overview.mdx` | Fact-check | 30–45 min |
+| 4 | Read and fact-check `What-is-the-Data-Center.mdx` | Fact-check | 30–45 min |
+| 5 | Provide input for `Understanding-DataSet-Joins.mdx` | Info meeting | 30 min |
+| 6 | Fact-check `Beast-Mode-Window-Functions.mdx` (Rank 1 community request) | Fact-check | 20–30 min |
+| 7 | Fact-check `Beast-Mode-for-Spreadsheet-Users.mdx` (Rank 11 community request) | Fact-check | 20–30 min |
+| 8 | Fact-check `Period-over-Period-Calculations.mdx` (Rank 49 community request) | Fact-check | 20–30 min |
+| 9 | Fact-check `Editor-Dataset-Access-Scope.mdx` (Rank 118 community request) | Fact-check | 20–30 min |
+| 10 | Supply info to write `Dataset-Column-Rename-Impact.mdx` (Rank 14) | Info meeting | 30 min |
+| 11 | Supply info to write `Card-Refresh-Timing-After-Dataset-Update.mdx` (Rank 25) | Info meeting | 30 min |
+| 12 | Supply info to write `Zero-Fill-Missing-Date-Gaps-in-Charts.mdx` (Rank 33) | Info meeting | 30 min |
+| 13 | Supply info to write `Dataset-Column-Character-Limits.mdx` (Rank 56) | Info meeting | 30 min |
+| 14 | Supply info to write `Request-Access-Behavior.mdx` (Rank 64) | Info meeting | 30 min |
+| 15 | Supply info to write `Time-Interval-Bucketing-and-Dedup.mdx` (Rank 77) | Info meeting | 30 min |
+| 16 | Supply info to write `Remove-Bad-Rows-from-a-Dataset.mdx` (Rank 91) | Info meeting | 30 min |
+| 17 | Supply info to write `Multi-Language-Dashboards.mdx` (Rank 107) | Info meeting | 30 min |
+| 18 | **Open placeholder in `000005559.mdx`:** confirm the exact current wording of the editor warning and that it is non-block | **Answer required** | 15–30 min |
+| 19 | **Open placeholder in `360042925474.mdx`:** confirm how Beast Mode metadata (specifically the data type) can be retrieved pr | **Answer required** | 15–30 min |
+| 20 | **Open placeholder in `360042925474.mdx`:** confirm the exact behavior when a card is moved/switched to a new DataSet: the " | **Answer required** | 15–30 min |
+| 21 | **Open placeholder in `360042926154.mdx`:** confirm the now-shipped DataSet management options for this: (1) the "Duplicate  | **Answer required** | 15–30 min |
+| 22 | **Open placeholder in `360042926194.mdx`:** confirm the Required Grants for deleting DataSets; no Required Grants section ex | **Answer required** | 15–30 min |
+| 23 | **Open placeholder in `360042926214.mdx`:** confirm the Required Grants for executing DataSets; no Required Grants section e | **Answer required** | 15–30 min |
+| 24 | **Open placeholder in `360042934614.mdx`:** Confirm the reported behavior that adding a user or group to a PDP policy (and/o | **Answer required** | 15–30 min |
+| 25 | **Open placeholder in `360042934614.mdx`:** Confirm whether PDP row and column policies are enforced across all the ways an  | **Answer required** | 15–30 min |
+| 26 | **Open placeholder in `360043429933.mdx`:** confirm current ABS() semantics with aggregated / FIXED expressions; community r | **Answer required** | 15–30 min |
+| 27 | **Open placeholder in `360043429933.mdx`:** confirm the practical maximum length / value count for a Beast Mode IN-list (or  | **Answer required** | 15–30 min |
+| 28 | **Open placeholder in `360043429933.mdx`:** confirm whether Beast Mode supports a thousands-separator / grouping function (s | **Answer required** | 15–30 min |
+| 29 | **Open placeholder in `360043429933.mdx`:** confirm (1) the default week-start / mode for WEEK, YEARWEEK, and WEEKOFYEAR in  | **Answer required** | 15–30 min |
+| 30 | **Open placeholder in `360043430053.mdx`:** confirm whether TIMESTAMPDIFF is supported in Beast Mode (it is not currently in | **Answer required** | 15–30 min |
+| 31 | **Open placeholder in `360043430053.mdx`:** Confirm whether SUM() on a natively boolean-typed column (not a string) counts t | **Answer required** | 15–30 min |
+| 32 | **Open placeholder in `360043430133.mdx`:** confirm whether a native window-function capability, or a dedicated window-funct | **Answer required** | 15–30 min |
+| 33 | **Open placeholder in `360043430153.mdx`:** Confirm the reported table-cell vs | **Answer required** | 15–30 min |
+| 34 | **Open placeholder in `360043437733.mdx`:** confirm (1) the exact mechanism by which a schema/table update drops the upsert  | **Answer required** | 15–30 min |
+| 35 | **Open placeholder in `360046074774.mdx`:** confirm the precise same-type join rule for Views across storage types (Cloud Am | **Answer required** | 15–30 min |
+| 36 | **Open placeholder in `360046074774.mdx`:** confirm the SQL Editor switch is one-directional: that once a View uses the SQL  | **Answer required** | 15–30 min |
+| 37 | **Open placeholder in `4408174643607.mdx`:** confirm the recommended FIXED pattern for replacing COUNT(DISTINCT  | **Answer required** | 15–30 min |
+| 38 | **Open placeholder in `Beast-Mode-Window-Functions.mdx`:** confirm the supported workaround for filtering on window function results | **Answer required** | 15–30 min |
+| 39 | Validate additions to: Beast Mode date functions (Rank 5) | Review | 20 min |
+| 40 | Validate additions to: Beast Mode reference (Rank 10) | Review | 20 min |
 
 ---
 

@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: "Documents"
   description: "Domo Documents APIs"
-  version: "2.3.4561_master"
+  version: "2.3.4679_master"
 servers:
 - url: "https://{subdomain}.domo.com"
   variables:
@@ -110,6 +110,14 @@ paths:
         required: true
         schema:
           type: string
+      - name: recordView
+        in: query
+        description: Whether to record a "Viewed" activity-log event; pass false for
+          display-only lookups.
+        required: false
+        schema:
+          type: boolean
+          default: true
       responses:
         "413":
           description: Content Too Large
@@ -2186,16 +2194,22 @@ components:
           - OWNER
           - EDIT
           - READ
+          - READ_ONLY
           - NONE
         size:
           type: integer
           format: int64
-          description: "The estimated total size of the files in the Document Collection,\
-            \ in bytes."
+          description: |-
+            The estimated total size of the files in the Document Collection, in bytes. Null when the
+              viewer's file policy restricts which files they can see; {@link FileSetStats#size FileSetStats#size()} gives the size of
+              the files they can see.
         fileCount:
           type: integer
           format: int64
-          description: The estimated total number of files in the Document Collection.
+          description: |-
+            The estimated total number of files in the Document Collection. Null when the viewer's
+              file policy restricts which files they can see; {@link FileSetStats#fileCount FileSetStats#fileCount()} gives the number they
+              can see.
     UpdateFileSetRequest:
       type: object
       description: |-
@@ -2607,6 +2621,7 @@ components:
           - OWNER
           - EDIT
           - READ
+          - READ_ONLY
           - NONE
       required:
       - entityId

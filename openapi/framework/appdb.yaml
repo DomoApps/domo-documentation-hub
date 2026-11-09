@@ -140,8 +140,8 @@ components:
             - "Defense Against the Dark Arts"
             - "Potions"
             - "Transfiguration"
-          enrolledOn: "1991-09-01"
-          lastDetention: "1994-06-08T20:00:00Z"
+          enrolledOn: "1991-09-01T00:00:00.000Z"
+          lastDetention: "1994-06-08T20:00:00.000Z"
 
     DocumentCreate:
       type: object
@@ -332,7 +332,12 @@ paths:
     post:
       x-excluded: true
       summary: Create Document (v1)
-      description: Creates a single document in a collection.
+      description: |
+        Creates a single document in a collection.
+
+        <Note>
+          **Storing dates:** wrap a value in `$date` to store it as a date rather than text — for example `{"content": {"enrolledOn": {"$date": "1991-09-01T00:00:00Z"}}}`. A plain ISO 8601 string is stored as text, and a value that cannot be read as a date is rejected with `400`. Dates are returned as ISO 8601 strings, not wrapped in `$date`. See [Working with Dates](/portal/API-Reference/app-framework-apis/AppDB-API#working-with-dates).
+        </Note>
       tags:
       - AppDB API
       parameters:
@@ -355,6 +360,8 @@ paths:
                   - "Defense Against the Dark Arts"
                   - "Potions"
                   - "Transfiguration"
+                enrolledOn: {"$date": "1991-09-01T00:00:00Z"}
+                lastDetention: {"$date": "1994-06-08T20:00:00Z"}
       x-codeSamples:
         - lang: JavaScript
           label: domo.js
@@ -367,8 +374,8 @@ paths:
                 house: 'Gryffindor',
                 wand: { wood: 'holly', core: 'phoenix feather', length: 11 },
                 courses: ['Defense Against the Dark Arts', 'Potions', 'Transfiguration'],
-                enrolledOn: '1991-09-01',
-                lastDetention: '1992-05-26T20:00:00Z'
+                enrolledOn: { $date: '1991-09-01T00:00:00Z' },
+                lastDetention: { $date: '1992-05-26T20:00:00Z' }
               }
             }).then(doc => console.log(doc));
         - &stub_curl
@@ -434,8 +441,8 @@ paths:
                     - "Defense Against the Dark Arts"
                     - "Potions"
                     - "Transfiguration"
-                  enrolledOn: "1991-09-01"
-                  lastDetention: "1994-06-08T20:00:00Z"
+                  enrolledOn: "1991-09-01T00:00:00.000Z"
+                  lastDetention: "1994-06-08T20:00:00.000Z"
 
     get:
       x-excluded: true
@@ -500,8 +507,8 @@ paths:
                       - "Defense Against the Dark Arts"
                       - "Potions"
                       - "Transfiguration"
-                    enrolledOn: "1991-09-01"
-                    lastDetention: "1994-06-08T20:00:00Z"
+                    enrolledOn: "1991-09-01T00:00:00.000Z"
+                    lastDetention: "1994-06-08T20:00:00.000Z"
                 - id: "dd363c89-60d2-4f70-89cb-c3c175be625b"
                   datastoreId: "daee775a-3be4-410d-ba20-bb0d94ce51cb"
                   collectionId: "2148c830-14c2-478f-bb14-5c3019de46b4"
@@ -522,8 +529,8 @@ paths:
                       - "Transfiguration"
                       - "Arithmancy"
                       - "Care of Magical Creatures"
-                    enrolledOn: "1991-09-01"
-                    lastDetention: "1995-10-15T15:30:00Z"
+                    enrolledOn: "1991-09-01T00:00:00.000Z"
+                    lastDetention: "1995-10-15T15:30:00.000Z"
 
   /domo/datastores/v1/collections/{collectionName}/documents/{documentId}:
     get:
@@ -577,15 +584,20 @@ paths:
                     - "Defense Against the Dark Arts"
                     - "Potions"
                     - "Transfiguration"
-                  enrolledOn: "1991-09-01"
-                  lastDetention: "1994-06-08T20:00:00Z"
+                  enrolledOn: "1991-09-01T00:00:00.000Z"
+                  lastDetention: "1994-06-08T20:00:00.000Z"
         '404':
           description: Document not found
 
     put:
       x-excluded: true
       summary: Update Document (v1)
-      description: Updates an existing document in a collection.
+      description: |
+        Updates an existing document in a collection.
+
+        <Note>
+          **Storing dates:** wrap a value in `$date` to store it as a date rather than text — for example `{"content": {"enrolledOn": {"$date": "1991-09-01T00:00:00Z"}}}`. A plain ISO 8601 string is stored as text, and a value that cannot be read as a date is rejected with `400`. Dates are returned as ISO 8601 strings, not wrapped in `$date`. Because this overwrites the whole `content` object, a date you read from a document and send back unchanged is stored as text — re-wrap it in `$date`. See [Working with Dates](/portal/API-Reference/app-framework-apis/AppDB-API#working-with-dates).
+        </Note>
       tags:
       - AppDB API
       parameters:
@@ -662,8 +674,8 @@ paths:
                     - "Potions"
                     - "Transfiguration"
                   prefect: false
-                  enrolledOn: "1991-09-01"
-                  lastDetention: "1994-06-08T20:00:00Z"
+                  enrolledOn: "1991-09-01T00:00:00.000Z"
+                  lastDetention: "1994-06-08T20:00:00.000Z"
 
     delete:
       x-excluded: true
@@ -702,7 +714,7 @@ paths:
       description: |
         Query documents using MongoDB query syntax.
 
-        **Supported operators**
+        ## Supported operators
 
         All MongoDB query predicates supported in a `find()` call are available, including comparison, logical, array, data type, bitwise, `$expr`, `$jsonSchema`, `$regex`, `$geoWithin`, and `$geoIntersects`. See the [MongoDB query predicate documentation](https://www.mongodb.com/docs/manual/reference/mql/query-predicates/) for the full operator list.
 
@@ -713,9 +725,9 @@ paths:
           - `$near` and `$nearSphere` — geospatial proximity searches require an index that AppDB collections do not have.
         </Warning>
 
-        **Examples**
+        ## Sample collection
 
-        The following examples use this sample Students collection:
+        Every example below runs against this Students collection. `enrolledOn` and `lastDetention` were written with `$date`, so both are stored as dates:
         ```json
         [
           {
@@ -724,8 +736,8 @@ paths:
               "wand": { "wood": "holly", "core": "phoenix feather", "length": 11 },
               "courses": ["Defense Against the Dark Arts", "Potions", "Transfiguration"],
               "prefect": false,
-              "enrolledOn": "1991-09-01",
-              "lastDetention": "1994-06-08T20:00:00Z"
+              "enrolledOn": {"$date": "1991-09-01T00:00:00Z"},
+              "lastDetention": {"$date": "1994-06-08T20:00:00Z"}
             }
           },
           {
@@ -734,8 +746,8 @@ paths:
               "wand": { "wood": "vine", "core": "dragon heartstring", "length": 10.75 },
               "courses": ["Potions", "Transfiguration", "Arithmancy", "Care of Magical Creatures"],
               "prefect": true,
-              "enrolledOn": "1991-09-01",
-              "lastDetention": "1995-10-15T15:30:00Z"
+              "enrolledOn": {"$date": "1991-09-01T00:00:00Z"},
+              "lastDetention": {"$date": "1995-10-15T15:30:00Z"}
             }
           },
           {
@@ -744,8 +756,8 @@ paths:
               "wand": { "wood": "willow", "core": "unicorn hair", "length": 14 },
               "courses": ["Defense Against the Dark Arts", "Potions", "Divination"],
               "prefect": true,
-              "enrolledOn": "1991-09-01",
-              "lastDetention": "1994-06-08T20:00:00Z"
+              "enrolledOn": {"$date": "1991-09-01T00:00:00Z"},
+              "lastDetention": {"$date": "1994-06-08T20:00:00Z"}
             }
           },
           {
@@ -754,21 +766,24 @@ paths:
               "wand": { "wood": "hawthorn", "core": "unicorn hair", "length": 10 },
               "courses": ["Potions", "Transfiguration", "Defense Against the Dark Arts"],
               "prefect": true,
-              "enrolledOn": "1991-09-01",
-              "lastDetention": "1996-03-12T19:00:00Z"
+              "enrolledOn": {"$date": "1991-09-01T00:00:00Z"},
+              "lastDetention": {"$date": "1996-03-12T19:00:00Z"}
             }
           },
           {
             "content": {
               "name": "Luna Lovegood", "house": "Ravenclaw",
               "courses": ["Charms", "Defense Against the Dark Arts", "Care of Magical Creatures"],
-              "enrolledOn": "1992-09-01"
+              "enrolledOn": {"$date": "1992-09-01T00:00:00Z"}
             }
           }
         ]
         ```
+        That is the write form. Read back, the two date fields come out as ISO 8601 strings — `"1991-09-01T00:00:00.000Z"` — not wrapped in `$date`.
 
-        **Querying nested fields**
+        ## Querying documents
+
+        ### By nested field
 
         AppDB stores documents as arbitrary JSON, so nested objects like `wand` are queryable directly using dot notation — no joins or schema changes needed. To find all students whose wand core is phoenix feather:
         ```js
@@ -780,58 +795,34 @@ paths:
           .then((docs) => console.log(docs));
         ```
 
-        **Querying by date**
+        ### By date
 
-        AppDB has two categories of date fields that require different query approaches. Using the wrong approach for a field type fails silently — no error, just incorrect results.
-
-        **System date fields** (`createdOn`, `updatedOn`) are stored as BSON DateTime by AppDB. Query them using [MongoDB Extended JSON v2](https://www.mongodb.com/docs/manual/reference/mongodb-extended-json/#mongodb-bsontype-Date) `$date` syntax:
+        The system timestamps `createdOn` and `updatedOn` are always dates. Query them with `$date`:
         ```json
         {"createdOn": {"$gt": {"$date": "2026-01-01"}}}
         ```
 
-        **Content date fields** are stored as whatever JSON primitive you write. An ISO 8601 string like `"2026-09-01T18:30:00Z"` is stored as a BSON String. Two approaches work:
-
-        **String comparison** — ISO 8601 strings sort lexicographically in date order, so standard comparison operators work directly for both date-only (`YYYY-MM-DD`) and datetime (`YYYY-MM-DDTHH:MM:SSZ`) strings. To find students who enrolled after the original 1991 cohort:
+        A field inside `content` is a date only if it was written that way. `enrolledOn` in the sample above was, so the same syntax applies — to find students who enrolled after the original 1991 cohort:
         ```json
-        {"content.enrolledOn": {"$gt": "1991-09-01"}}
+        {"content.enrolledOn": {"$gt": {"$date": "1992-08-30"}}}
         ```
 
-        To find students with a detention after a specific datetime:
+        A field written as a plain ISO 8601 string is stored as text instead, and text is compared as text. ISO 8601 sorts lexicographically in date order, so comparison operators still work on it directly:
         ```json
-        {"content.lastDetention": {"$gt": "1995-01-01T00:00:00Z"}}
-        ```
-
-        **`$expr` + `$toDate`** — converts the string to a date at query time, enabling `$date` comparisons and handling mixed-precision strings correctly. Works for both date-only and datetime strings:
-        ```json
-        {
-          "$expr": {
-            "$gt": [
-              {"$toDate": "$content.enrolledOn"},
-              {"$date": "1992-08-30"}
-            ]
-          }
-        }
-        ```
-        ```json
-        {
-          "$expr": {
-            "$gt": [
-              {"$toDate": "$content.lastDetention"},
-              {"$date": "1995-01-01T00:00:00Z"}
-            ]
-          }
-        }
+        {"content.signedUpOn": {"$gt": "1991-09-01"}}
         ```
 
         <Warning>
-          **Mixing up these approaches produces wrong results without an error.**
+          **A date and a text date never match each other.** `$date` matches only a field stored as a date; string comparison matches only a field stored as text. Querying across the two returns an empty result — no error, whichever operator you use.
 
-          Using `$date` against a content string field always returns empty — BSON DateTime never matches BSON String. Using plain string comparison against a system field like `createdOn` also always returns empty — BSON String never compares against BSON DateTime regardless of the operator used.
-
-          To confirm the stored type of any field, use the `$type` operator. If `{"someField": {"$type": "date"}}` returns documents, use `$date` syntax. If `{"someField": {"$type": "string"}}` returns documents, use string comparison or `$expr` + `$toDate`.
+          Check what a field holds with `$type`. If `{"content.enrolledOn": {"$type": "date"}}` returns documents, use `$date`. If `{"content.enrolledOn": {"$type": "string"}}` returns documents, use string comparison or `$toDate`. A single field can hold both across different documents.
         </Warning>
 
-        **Students per house**
+        See [Working with Dates](/portal/API-Reference/app-framework-apis/AppDB-API#working-with-dates) for how to store a date, what a read returns, comparing text dates of mixed precision with `$toDate`, and how dates behave in DataSet sync.
+
+        ## Aggregating documents
+
+        ### Students per house
         ```
         ?groupby=content.house&count=count
         ```
@@ -849,7 +840,7 @@ paths:
         Field names use dot notation; fields inside `content` must be prefixed with `content.` (e.g., `content.house`). Nested fields like `content.wand.length` also work. Top-level fields like `owner` and `createdOn` can be referenced directly.
         </Info>
 
-        **Average wand length per house**
+        ### Average wand length per house
 
         Because `wand` is a nested object, `content.wand.length` works as an aggregation target directly — no joins or flattening needed.
         ```
@@ -863,7 +854,7 @@ paths:
         ]
         ```
 
-        **Course enrollment frequency**
+        ### Course enrollment frequency
 
         `unwind` produces one document per course value before grouping, so a student enrolled in `["Potions", "Transfiguration"]` counts once toward each group.
         ```
@@ -957,15 +948,20 @@ paths:
                 value:
                   content.wand.core: "phoenix feather"
               dateQuery:
-                summary: Query by content date field
+                summary: Query a date field with $date
                 value:
                   content.enrolledOn:
-                    $gt: "1991-09-01"
+                    $gt: {"$date": "1992-08-30"}
               datetimeQuery:
-                summary: Query by content datetime field
+                summary: Query a datetime field with $date
                 value:
                   content.lastDetention:
-                    $gt: "1995-01-01T00:00:00Z"
+                    $gt: {"$date": "1995-01-01T00:00:00Z"}
+              textDateQuery:
+                summary: Query a field that holds date text
+                value:
+                  content.signedUpOn:
+                    $gt: "1991-09-01"
       x-codeSamples:
         - lang: JavaScript
           label: domo.js
@@ -1021,8 +1017,8 @@ paths:
                       - "Potions"
                       - "Transfiguration"
                     prefect: false
-                    enrolledOn: "1991-09-01"
-                    lastDetention: "1994-06-08T20:00:00Z"
+                    enrolledOn: "1991-09-01T00:00:00.000Z"
+                    lastDetention: "1994-06-08T20:00:00.000Z"
 
   /domo/datastores/v1/collections/{collectionName}/documents/update:
     put:
@@ -1031,17 +1027,27 @@ paths:
       description: |
         Partially updates documents matching a query using MongoDB update operators.
 
-        **Supported operators**
+        ## Supported operators
 
         `$currentDate` · `$inc` · `$min` · `$max` · `$mul` · `$rename` · `$set` · `$unset` · `$addToSet` · `$pop` · `$pull` · `$pullAll` · `$push`
 
-        **Supported modifiers**
+        ## Supported modifiers
 
         `$each` · `$position` · `$slice` · `$sort`
 
         <Note>
           `$setOnInsert` has no effect — partial updates do not perform upserts.
         </Note>
+
+        ## Storing dates
+
+        `$set` accepts a `$date` wrapper, so you can set a field to a real date without rewriting the whole document:
+        ```json
+        {"operation": {"$set": {"content.enrolledOn": {"$date": "1991-09-01T00:00:00Z"}}}}
+        ```
+        `$currentDate` also stores a real date. Either way the field is then queryable with `$date` — see [Working with Dates](/portal/API-Reference/app-framework-apis/AppDB-API#working-with-dates).
+
+        This is also the way to repair a field that was accidentally stored as text: `$set` it with a `$date` wrapper.
 
         See the [MongoDB update operator documentation](https://www.mongodb.com/docs/manual/reference/mql/update/) for full semantics.
       tags:
@@ -1089,8 +1095,7 @@ paths:
             }).then(count => console.log(count + ' document(s) updated'));
 
             // $currentDate — stamp the moment Harry was caught out after curfew.
-            // Note: $currentDate stores a BSON Date, not a string. Query it with
-            // {"content.caughtAfterCurfewAt": {"$lt": {"$date": "..."}}} not plain string comparison.
+            // Stores a real date, so query it with $date (see Storing dates above).
             domo.put(url, {
               query: { 'content.name': 'Harry Potter' },
               operation: { $currentDate: { 'content.caughtAfterCurfewAt': true } }
@@ -1126,7 +1131,12 @@ paths:
     post:
       x-excluded: true
       summary: Create Documents in Bulk (v1)
-      description: Create multiple documents in a given collection in a single HTTP request. Each document is limited to 2 MB.
+      description: |
+        Create multiple documents in a given collection in a single HTTP request. Each document is limited to 2 MB.
+
+        <Note>
+          **Storing dates:** wrap a value in `$date` to store it as a date rather than text — for example `{"content": {"enrolledOn": {"$date": "1991-09-01T00:00:00Z"}}}`. A plain ISO 8601 string is stored as text, and a value that cannot be read as a date is rejected with `400`. Dates are returned as ISO 8601 strings, not wrapped in `$date`. See [Working with Dates](/portal/API-Reference/app-framework-apis/AppDB-API#working-with-dates).
+        </Note>
       tags:
       - AppDB API
       parameters:
@@ -1202,7 +1212,12 @@ paths:
     put:
       x-excluded: true
       summary: Upsert Documents in Bulk (v1)
-      description: "Update existing documents or create new ones in bulk. Documents with a matching `id` are updated; documents without a matching `id` are created. Each document is limited to 2 MB."
+      description: |
+        Update existing documents or create new ones in bulk. Documents with a matching `id` are updated; documents without a matching `id` are created. Each document is limited to 2 MB.
+
+        <Note>
+          **Storing dates:** wrap a value in `$date` to store it as a date rather than text — for example `{"content": {"enrolledOn": {"$date": "1991-09-01T00:00:00Z"}}}`. A plain ISO 8601 string is stored as text, and a value that cannot be read as a date is rejected with `400`. Dates are returned as ISO 8601 strings, not wrapped in `$date`. Because this overwrites the whole `content` object, a date you read from a document and send back unchanged is stored as text — re-wrap it in `$date`. See [Working with Dates](/portal/API-Reference/app-framework-apis/AppDB-API#working-with-dates).
+        </Note>
       tags:
       - AppDB API
       parameters:
@@ -1236,8 +1251,8 @@ paths:
                     - "Potions"
                     - "Transfiguration"
                   prefect: false
-                  enrolledOn: "1991-09-01"
-                  lastDetention: "1994-06-08T20:00:00Z"
+                  enrolledOn: {"$date": "1991-09-01T00:00:00Z"}
+                  lastDetention: {"$date": "1994-06-08T20:00:00Z"}
               - id: "dd363c89-60d2-4f70-89cb-c3c175be625b"
                 content:
                   name: "Hermione Granger"
@@ -1252,8 +1267,8 @@ paths:
                     - "Arithmancy"
                     - "Care of Magical Creatures"
                   prefect: true
-                  enrolledOn: "1991-09-01"
-                  lastDetention: "1995-10-15T15:30:00Z"
+                  enrolledOn: {"$date": "1991-09-01T00:00:00Z"}
+                  lastDetention: {"$date": "1995-10-15T15:30:00Z"}
               - content:
                   name: "Ron Weasley"
                   house: "Gryffindor"
@@ -1365,7 +1380,12 @@ paths:
   /domo/datastores/v2/collections/{collectionName}/documents:
     post:
       summary: Create Document
-      description: "Creates a single document in a collection."
+      description: |
+        Creates a single document in a collection.
+
+        <Note>
+          **Storing dates:** wrap a value in `$date` to store it as a date rather than text — for example `{"content": {"enrolledOn": {"$date": "1991-09-01T00:00:00Z"}}}`. A plain ISO 8601 string is stored as text, and a value that cannot be read as a date is rejected with `400`. Dates are returned as ISO 8601 strings, not wrapped in `$date`. See [Working with Dates](/portal/API-Reference/app-framework-apis/AppDB-API#working-with-dates).
+        </Note>
       tags:
       - AppDB API
       parameters:
@@ -1388,8 +1408,8 @@ paths:
                   - "Defense Against the Dark Arts"
                   - "Potions"
                   - "Transfiguration"
-                enrolledOn: "1991-09-01"
-                lastDetention: "1994-06-08T20:00:00Z"
+                enrolledOn: {"$date": "1991-09-01T00:00:00Z"}
+                lastDetention: {"$date": "1994-06-08T20:00:00Z"}
       x-codeSamples:
         - lang: JavaScript
           label: domo.js
@@ -1402,8 +1422,8 @@ paths:
                 house: 'Gryffindor',
                 wand: { wood: 'holly', core: 'phoenix feather', length: 11 },
                 courses: ['Defense Against the Dark Arts', 'Potions', 'Transfiguration'],
-                enrolledOn: '1991-09-01',
-                lastDetention: '1994-06-08T20:00:00Z'
+                enrolledOn: { $date: '1991-09-01T00:00:00Z' },
+                lastDetention: { $date: '1994-06-08T20:00:00Z' }
               }
             }).then(doc => console.log(doc));
         - lang: JavaScript
@@ -1418,8 +1438,8 @@ paths:
               house: 'Gryffindor',
               wand: { wood: 'holly', core: 'phoenix feather', length: 11 },
               courses: ['Defense Against the Dark Arts', 'Potions', 'Transfiguration'],
-              enrolledOn: '1991-09-01',
-              lastDetention: '1994-06-08T20:00:00Z'
+              enrolledOn: { $date: '1991-09-01T00:00:00Z' },
+              lastDetention: { $date: '1994-06-08T20:00:00Z' }
             });
             console.log(doc);
         - *stub_curl
@@ -1456,8 +1476,10 @@ paths:
                     - "Defense Against the Dark Arts"
                     - "Potions"
                     - "Transfiguration"
-                  enrolledOn: "1991-09-01"
-                  lastDetention: "1994-06-08T20:00:00Z"
+                  enrolledOn: "1991-09-01T00:00:00.000Z"
+                  lastDetention: "1994-06-08T20:00:00.000Z"
+        '400':
+          description: 'Bad request. The request body could not be processed — for example, a `$date` value that cannot be read as a date (an ISO 8601 string, epoch milliseconds, or a `$numberLong` wrapper).'
         '403':
           description: "Forbidden. The user does not have permission to create documents on this collection — either directly or inherited through app permissions."
           content:
@@ -1550,8 +1572,8 @@ paths:
                       - "Defense Against the Dark Arts"
                       - "Potions"
                       - "Transfiguration"
-                    enrolledOn: "1991-09-01"
-                    lastDetention: "1994-06-08T20:00:00Z"
+                    enrolledOn: "1991-09-01T00:00:00.000Z"
+                    lastDetention: "1994-06-08T20:00:00.000Z"
                 - id: "dd363c89-60d2-4f70-89cb-c3c175be625b"
                   datastoreId: "daee775a-3be4-410d-ba20-bb0d94ce51cb"
                   collectionId: "2148c830-14c2-478f-bb14-5c3019de46b4"
@@ -1573,8 +1595,8 @@ paths:
                       - "Transfiguration"
                       - "Arithmancy"
                       - "Care of Magical Creatures"
-                    enrolledOn: "1991-09-01"
-                    lastDetention: "1995-10-15T15:30:00Z"
+                    enrolledOn: "1991-09-01T00:00:00.000Z"
+                    lastDetention: "1995-10-15T15:30:00.000Z"
         '403':
           description: "Forbidden. The user does not have the READ_CONTENT permission on this collection."
           content:
@@ -1657,8 +1679,8 @@ paths:
                     - "Defense Against the Dark Arts"
                     - "Potions"
                     - "Transfiguration"
-                  enrolledOn: "1991-09-01"
-                  lastDetention: "1994-06-08T20:00:00Z"
+                  enrolledOn: "1991-09-01T00:00:00.000Z"
+                  lastDetention: "1994-06-08T20:00:00.000Z"
         '403':
           description: "Forbidden. The user does not have the READ_CONTENT permission on this collection."
           content:
@@ -1682,7 +1704,12 @@ paths:
 
     put:
       summary: Replace Document
-      description: "Replaces an existing document in a collection — the entire `content` object is overwritten with whatever you send. To update individual fields without replacing the whole document, use Partially Update Documents instead."
+      description: |
+        Replaces an existing document in a collection — the entire `content` object is overwritten with whatever you send. To update individual fields without replacing the whole document, use Partially Update Documents instead.
+
+        <Note>
+          **Storing dates:** wrap a value in `$date` to store it as a date rather than text — for example `{"content": {"enrolledOn": {"$date": "1991-09-01T00:00:00Z"}}}`. A plain ISO 8601 string is stored as text, and a value that cannot be read as a date is rejected with `400`. Dates are returned as ISO 8601 strings, not wrapped in `$date`. Because this overwrites the whole `content` object, a date you read from a document and send back unchanged is stored as text — re-wrap it in `$date`. See [Working with Dates](/portal/API-Reference/app-framework-apis/AppDB-API#working-with-dates).
+        </Note>
       tags:
       - AppDB API
       parameters:
@@ -1707,8 +1734,8 @@ paths:
                   - "Potions"
                   - "Transfiguration"
                 prefect: false
-                enrolledOn: "1991-09-01"
-                lastDetention: "1994-06-08T20:00:00Z"
+                enrolledOn: {"$date": "1991-09-01T00:00:00Z"}
+                lastDetention: {"$date": "1994-06-08T20:00:00Z"}
       x-codeSamples:
         - lang: JavaScript
           label: domo.js
@@ -1778,8 +1805,10 @@ paths:
                     - "Potions"
                     - "Transfiguration"
                   prefect: false
-                  enrolledOn: "1991-09-01"
-                  lastDetention: "1994-06-08T20:00:00Z"
+                  enrolledOn: "1991-09-01T00:00:00.000Z"
+                  lastDetention: "1994-06-08T20:00:00.000Z"
+        '400':
+          description: 'Bad request. The request body could not be processed — for example, a `$date` value that cannot be read as a date (an ISO 8601 string, epoch milliseconds, or a `$numberLong` wrapper).'
         '403':
           description: "Forbidden. The user does not have the UPDATE_CONTENT permission on this collection."
           content:
@@ -1863,7 +1892,7 @@ paths:
       description: |
         Query documents using MongoDB query syntax.
 
-        **Supported operators**
+        ## Supported operators
 
         All MongoDB query predicates supported in a `find()` call are available, including comparison, logical, array, data type, bitwise, `$expr`, `$jsonSchema`, `$regex`, `$geoWithin`, and `$geoIntersects`. See the [MongoDB query predicate documentation](https://www.mongodb.com/docs/manual/reference/mql/query-predicates/) for the full operator list.
 
@@ -1874,9 +1903,9 @@ paths:
           - `$near` and `$nearSphere` — geospatial proximity searches require an index that AppDB collections do not have.
         </Warning>
 
-        **Examples**
+        ## Sample collection
 
-        The following examples use this sample Students collection:
+        Every example below runs against this Students collection. `enrolledOn` and `lastDetention` were written with `$date`, so both are stored as dates:
         ```json
         [
           {
@@ -1885,8 +1914,8 @@ paths:
               "wand": { "wood": "holly", "core": "phoenix feather", "length": 11 },
               "courses": ["Defense Against the Dark Arts", "Potions", "Transfiguration"],
               "prefect": false,
-              "enrolledOn": "1991-09-01",
-              "lastDetention": "1994-06-08T20:00:00Z"
+              "enrolledOn": {"$date": "1991-09-01T00:00:00Z"},
+              "lastDetention": {"$date": "1994-06-08T20:00:00Z"}
             }
           },
           {
@@ -1895,8 +1924,8 @@ paths:
               "wand": { "wood": "vine", "core": "dragon heartstring", "length": 10.75 },
               "courses": ["Potions", "Transfiguration", "Arithmancy", "Care of Magical Creatures"],
               "prefect": true,
-              "enrolledOn": "1991-09-01",
-              "lastDetention": "1995-10-15T15:30:00Z"
+              "enrolledOn": {"$date": "1991-09-01T00:00:00Z"},
+              "lastDetention": {"$date": "1995-10-15T15:30:00Z"}
             }
           },
           {
@@ -1905,8 +1934,8 @@ paths:
               "wand": { "wood": "willow", "core": "unicorn hair", "length": 14 },
               "courses": ["Defense Against the Dark Arts", "Potions", "Divination"],
               "prefect": true,
-              "enrolledOn": "1991-09-01",
-              "lastDetention": "1994-06-08T20:00:00Z"
+              "enrolledOn": {"$date": "1991-09-01T00:00:00Z"},
+              "lastDetention": {"$date": "1994-06-08T20:00:00Z"}
             }
           },
           {
@@ -1915,21 +1944,24 @@ paths:
               "wand": { "wood": "hawthorn", "core": "unicorn hair", "length": 10 },
               "courses": ["Potions", "Transfiguration", "Defense Against the Dark Arts"],
               "prefect": true,
-              "enrolledOn": "1991-09-01",
-              "lastDetention": "1996-03-12T19:00:00Z"
+              "enrolledOn": {"$date": "1991-09-01T00:00:00Z"},
+              "lastDetention": {"$date": "1996-03-12T19:00:00Z"}
             }
           },
           {
             "content": {
               "name": "Luna Lovegood", "house": "Ravenclaw",
               "courses": ["Charms", "Defense Against the Dark Arts", "Care of Magical Creatures"],
-              "enrolledOn": "1992-09-01"
+              "enrolledOn": {"$date": "1992-09-01T00:00:00Z"}
             }
           }
         ]
         ```
+        That is the write form. Read back, the two date fields come out as ISO 8601 strings — `"1991-09-01T00:00:00.000Z"` — not wrapped in `$date`.
 
-        **Querying nested fields**
+        ## Querying documents
+
+        ### By nested field
 
         AppDB stores documents as arbitrary JSON, so nested objects like `wand` are queryable directly using dot notation — no joins or schema changes needed. To find all students whose wand core is phoenix feather:
         ```js
@@ -1941,58 +1973,34 @@ paths:
           .then((docs) => console.log(docs));
         ```
 
-        **Querying by date**
+        ### By date
 
-        AppDB has two categories of date fields that require different query approaches. Using the wrong approach for a field type fails silently — no error, just incorrect results.
-
-        **System date fields** (`createdOn`, `updatedOn`) are stored as BSON DateTime by AppDB. Query them using [MongoDB Extended JSON v2](https://www.mongodb.com/docs/manual/reference/mongodb-extended-json/#mongodb-bsontype-Date) `$date` syntax:
+        The system timestamps `createdOn` and `updatedOn` are always dates. Query them with `$date`:
         ```json
         {"createdOn": {"$gt": {"$date": "2026-01-01"}}}
         ```
 
-        **Content date fields** are stored as whatever JSON primitive you write. An ISO 8601 string like `"2026-09-01T18:30:00Z"` is stored as a BSON String. Two approaches work:
-
-        **String comparison** — ISO 8601 strings sort lexicographically in date order, so standard comparison operators work directly for both date-only (`YYYY-MM-DD`) and datetime (`YYYY-MM-DDTHH:MM:SSZ`) strings. To find students who enrolled after the original 1991 cohort:
+        A field inside `content` is a date only if it was written that way. `enrolledOn` in the sample above was, so the same syntax applies — to find students who enrolled after the original 1991 cohort:
         ```json
-        {"content.enrolledOn": {"$gt": "1991-09-01"}}
+        {"content.enrolledOn": {"$gt": {"$date": "1992-08-30"}}}
         ```
 
-        To find students with a detention after a specific datetime:
+        A field written as a plain ISO 8601 string is stored as text instead, and text is compared as text. ISO 8601 sorts lexicographically in date order, so comparison operators still work on it directly:
         ```json
-        {"content.lastDetention": {"$gt": "1995-01-01T00:00:00Z"}}
-        ```
-
-        **`$expr` + `$toDate`** — converts the string to a date at query time, enabling `$date` comparisons and handling mixed-precision strings correctly. Works for both date-only and datetime strings:
-        ```json
-        {
-          "$expr": {
-            "$gt": [
-              {"$toDate": "$content.enrolledOn"},
-              {"$date": "1992-08-30"}
-            ]
-          }
-        }
-        ```
-        ```json
-        {
-          "$expr": {
-            "$gt": [
-              {"$toDate": "$content.lastDetention"},
-              {"$date": "1995-01-01T00:00:00Z"}
-            ]
-          }
-        }
+        {"content.signedUpOn": {"$gt": "1991-09-01"}}
         ```
 
         <Warning>
-          **Mixing up these approaches produces wrong results without an error.**
+          **A date and a text date never match each other.** `$date` matches only a field stored as a date; string comparison matches only a field stored as text. Querying across the two returns an empty result — no error, whichever operator you use.
 
-          Using `$date` against a content string field always returns empty — BSON DateTime never matches BSON String. Using plain string comparison against a system field like `createdOn` also always returns empty — BSON String never compares against BSON DateTime regardless of the operator used.
-
-          To confirm the stored type of any field, use the `$type` operator. If `{"someField": {"$type": "date"}}` returns documents, use `$date` syntax. If `{"someField": {"$type": "string"}}` returns documents, use string comparison or `$expr` + `$toDate`.
+          Check what a field holds with `$type`. If `{"content.enrolledOn": {"$type": "date"}}` returns documents, use `$date`. If `{"content.enrolledOn": {"$type": "string"}}` returns documents, use string comparison or `$toDate`. A single field can hold both across different documents.
         </Warning>
 
-        **Students per house**
+        See [Working with Dates](/portal/API-Reference/app-framework-apis/AppDB-API#working-with-dates) for how to store a date, what a read returns, comparing text dates of mixed precision with `$toDate`, and how dates behave in DataSet sync.
+
+        ## Aggregating documents
+
+        ### Students per house
         ```
         ?groupby=content.house&count=count
         ```
@@ -2010,7 +2018,7 @@ paths:
         Field names use dot notation; fields inside `content` must be prefixed with `content.` (e.g., `content.house`). Nested fields like `content.wand.length` also work. Top-level fields like `owner` and `createdOn` can be referenced directly.
         </Info>
 
-        **Average wand length per house**
+        ### Average wand length per house
 
         Because `wand` is a nested object, `content.wand.length` works as an aggregation target directly — no joins or flattening needed.
         ```
@@ -2024,7 +2032,7 @@ paths:
         ]
         ```
 
-        **Course enrollment frequency**
+        ### Course enrollment frequency
 
         `unwind` produces one document per course value before grouping, so a student enrolled in `["Potions", "Transfiguration"]` counts once toward each group.
         ```
@@ -2118,15 +2126,20 @@ paths:
                 value:
                   content.wand.core: "phoenix feather"
               dateQuery:
-                summary: Query by content date field
+                summary: Query a date field with $date
                 value:
                   content.enrolledOn:
-                    $gt: "1991-09-01"
+                    $gt: {"$date": "1992-08-30"}
               datetimeQuery:
-                summary: Query by content datetime field
+                summary: Query a datetime field with $date
                 value:
                   content.lastDetention:
-                    $gt: "1995-01-01T00:00:00Z"
+                    $gt: {"$date": "1995-01-01T00:00:00Z"}
+              textDateQuery:
+                summary: Query a field that holds date text
+                value:
+                  content.signedUpOn:
+                    $gt: "1991-09-01"
       x-codeSamples:
         - lang: JavaScript
           label: domo.js
@@ -2201,8 +2214,8 @@ paths:
                       - "Potions"
                       - "Transfiguration"
                     prefect: false
-                    enrolledOn: "1991-09-01"
-                    lastDetention: "1994-06-08T20:00:00Z"
+                    enrolledOn: "1991-09-01T00:00:00.000Z"
+                    lastDetention: "1994-06-08T20:00:00.000Z"
         '403':
           description: "Forbidden. The user does not have the READ_CONTENT permission on this collection."
           content:
@@ -2229,17 +2242,27 @@ paths:
       description: |
         Partially updates documents matching a query using MongoDB update operators.
 
-        **Supported operators**
+        ## Supported operators
 
         `$currentDate` · `$inc` · `$min` · `$max` · `$mul` · `$rename` · `$set` · `$unset` · `$addToSet` · `$pop` · `$pull` · `$pullAll` · `$push`
 
-        **Supported modifiers**
+        ## Supported modifiers
 
         `$each` · `$position` · `$slice` · `$sort`
 
         <Note>
           `$setOnInsert` has no effect — partial updates do not perform upserts.
         </Note>
+
+        ## Storing dates
+
+        `$set` accepts a `$date` wrapper, so you can set a field to a real date without rewriting the whole document:
+        ```json
+        {"operation": {"$set": {"content.enrolledOn": {"$date": "1991-09-01T00:00:00Z"}}}}
+        ```
+        `$currentDate` also stores a real date. Either way the field is then queryable with `$date` — see [Working with Dates](/portal/API-Reference/app-framework-apis/AppDB-API#working-with-dates).
+
+        This is also the way to repair a field that was accidentally stored as text: `$set` it with a `$date` wrapper.
 
         See the [MongoDB update operator documentation](https://www.mongodb.com/docs/manual/reference/mql/update/) for full semantics.
       tags:
@@ -2287,8 +2310,7 @@ paths:
             }).then(count => console.log(count + ' document(s) updated'));
 
             // $currentDate — stamp the moment Harry was caught out after curfew.
-            // Note: $currentDate stores a BSON Date, not a string. Query it with
-            // {"content.caughtAfterCurfewAt": {"$lt": {"$date": "..."}}} not plain string comparison.
+            // Stores a real date, so query it with $date (see Storing dates above).
             domo.put(url, {
               query: { 'content.name': 'Harry Potter' },
               operation: { $currentDate: { 'content.caughtAfterCurfewAt': true } }
@@ -2330,8 +2352,7 @@ paths:
             ).then(count => console.log(count + ' document(s) updated'));
 
             // $currentDate — stamp the moment Harry was caught out after curfew.
-            // Note: $currentDate stores a BSON Date, not a string. Query it with
-            // {"content.caughtAfterCurfewAt": {"$lt": {"$date": "..."}}} not plain string comparison.
+            // Stores a real date, so query it with $date (see Storing dates above).
             await domo.appdb.partialUpdate(collectionName,
               { 'content.name': 'Harry Potter' },
               { $currentDate: { 'content.caughtAfterCurfewAt': true } }
@@ -2397,7 +2418,12 @@ paths:
   /domo/datastores/v2/collections/{collectionName}/documents/bulk:
     post:
       summary: Create Documents in Bulk
-      description: "Create multiple documents in a given collection in a single HTTP request. Each document is limited to 2 MB."
+      description: |
+        Create multiple documents in a given collection in a single HTTP request. Each document is limited to 2 MB.
+
+        <Note>
+          **Storing dates:** wrap a value in `$date` to store it as a date rather than text — for example `{"content": {"enrolledOn": {"$date": "1991-09-01T00:00:00Z"}}}`. A plain ISO 8601 string is stored as text, and a value that cannot be read as a date is rejected with `400`. Dates are returned as ISO 8601 strings, not wrapped in `$date`. See [Working with Dates](/portal/API-Reference/app-framework-apis/AppDB-API#working-with-dates).
+        </Note>
       tags:
       - AppDB API
       parameters:
@@ -2491,6 +2517,8 @@ paths:
                 $ref: '#/components/schemas/BulkCreateResponse'
               example:
                 Created: 2
+        '400':
+          description: 'Bad request. The request body could not be processed — for example, a `$date` value that cannot be read as a date (an ISO 8601 string, epoch milliseconds, or a `$numberLong` wrapper).'
         '403':
           description: "Forbidden. The user does not have the CREATE_CONTENT permission on this collection."
           content:
@@ -2513,7 +2541,12 @@ paths:
 
     put:
       summary: Upsert Documents in Bulk
-      description: "Update existing documents or create new ones in bulk. Documents with a matching `id` are updated; documents without a matching `id` are created. Each document is limited to 2 MB."
+      description: |
+        Update existing documents or create new ones in bulk. Documents with a matching `id` are updated; documents without a matching `id` are created. Each document is limited to 2 MB.
+
+        <Note>
+          **Storing dates:** wrap a value in `$date` to store it as a date rather than text — for example `{"content": {"enrolledOn": {"$date": "1991-09-01T00:00:00Z"}}}`. A plain ISO 8601 string is stored as text, and a value that cannot be read as a date is rejected with `400`. Dates are returned as ISO 8601 strings, not wrapped in `$date`. Because this overwrites the whole `content` object, a date you read from a document and send back unchanged is stored as text — re-wrap it in `$date`. See [Working with Dates](/portal/API-Reference/app-framework-apis/AppDB-API#working-with-dates).
+        </Note>
       tags:
       - AppDB API
       parameters:
@@ -2547,8 +2580,8 @@ paths:
                     - "Potions"
                     - "Transfiguration"
                   prefect: false
-                  enrolledOn: "1991-09-01"
-                  lastDetention: "1994-06-08T20:00:00Z"
+                  enrolledOn: {"$date": "1991-09-01T00:00:00Z"}
+                  lastDetention: {"$date": "1994-06-08T20:00:00Z"}
               - id: "dd363c89-60d2-4f70-89cb-c3c175be625b"
                 content:
                   name: "Hermione Granger"
@@ -2563,8 +2596,8 @@ paths:
                     - "Arithmancy"
                     - "Care of Magical Creatures"
                   prefect: true
-                  enrolledOn: "1991-09-01"
-                  lastDetention: "1995-10-15T15:30:00Z"
+                  enrolledOn: {"$date": "1991-09-01T00:00:00Z"}
+                  lastDetention: {"$date": "1995-10-15T15:30:00Z"}
               - content:
                   name: "Ron Weasley"
                   house: "Gryffindor"
@@ -2662,7 +2695,7 @@ paths:
                 Updated: 2
                 Created: 1
         '400':
-          description: "Bad request. One or more of the document IDs in the request do not exist in the collection."
+          description: "Bad request. One or more of the document IDs in the request do not exist in the collection, or the body could not be processed — for example, a `$date` value that cannot be read as a date."
           content:
             application/json:
               schema:
@@ -2782,7 +2815,9 @@ paths:
         Setting `syncEnabled: true` causes the Collection's documents to be converted into rows in a Domo DataSet every 15 minutes. The `schema` you define controls which fields appear as DataSet columns — only the listed properties are synced. If you plan to use sync, note the following:
 
         <Note>
-        **Date formatting:** Documents containing `DATE` or `DATETIME` data must use the format `YYYY-MM-DD` or `YYYY-MM-DDTHH:MM:SSZ` to sync correctly.
+        **Date formatting:** A `DATE` or `DATETIME` column accepts a value stored as a date (write it with `$date`), an ISO 8601 string in `YYYY-MM-DD` or `YYYY-MM-DDTHH:MM:SSZ` form, or epoch milliseconds. All three sync to a real date in the DataSet, so collections already writing date strings need no change.
+
+        Note that syncing correctly is not the same as being queryable as a date: a field stored as a string is a real date in the DataSet but still text to AppDB queries. See [Working with Dates](/portal/API-Reference/app-framework-apis/AppDB-API#working-with-dates).
         </Note>
 
         <Warning>
@@ -3010,7 +3045,9 @@ paths:
         If the collection has `syncEnabled`, updating the `schema` changes which fields are synced to the linked Domo DataSet. Note the following when modifying a synced collection's schema:
 
         <Note>
-        **Date formatting:** Documents containing `DATE` or `DATETIME` data must use the format `YYYY-MM-DD` or `YYYY-MM-DDTHH:MM:SSZ` to sync correctly.
+        **Date formatting:** A `DATE` or `DATETIME` column accepts a value stored as a date (write it with `$date`), an ISO 8601 string in `YYYY-MM-DD` or `YYYY-MM-DDTHH:MM:SSZ` form, or epoch milliseconds. All three sync to a real date in the DataSet, so collections already writing date strings need no change.
+
+        Note that syncing correctly is not the same as being queryable as a date: a field stored as a string is a real date in the DataSet but still text to AppDB queries. See [Working with Dates](/portal/API-Reference/app-framework-apis/AppDB-API#working-with-dates).
         </Note>
 
         <Warning>

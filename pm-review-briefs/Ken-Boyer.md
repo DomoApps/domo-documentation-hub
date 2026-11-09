@@ -2,7 +2,7 @@
 
 **Prepared for:** KB Restructure PM Review Meeting
 **Features owned:** AI Chat, AI Services, CLI, Documents-Filesets, Jupyter Notebooks
-**Total articles in your area:** 57
+**Total articles in your area:** 56
 
 > This document is your meeting guide. It shows how your content is being reorganized,
 > which AI-generated articles need your fact-check, which articles need a dedicated
@@ -20,7 +20,7 @@ areas lands in the new structure.
 | Feature | Articles | New Location |
 |---------|----------|--------------|
 | AI Chat | 1 | TBD — not yet mapped |
-| AI Services | 42 | Pillar 9: AI & Data Science |
+| AI Services | 41 | Pillar 9: AI & Data Science |
 | CLI | 1 | Pillar 11: Develop & Integrate |
 | Documents-Filesets | 8 | Pillar 9: AI & Data Science |
 | Jupyter Notebooks | 5 | Pillar 9: AI & Data Science |
@@ -64,7 +64,6 @@ also contains an open `[pm-input]` placeholder — see Section 3d for the exact 
 
 | Rank | Article | What Was Synthesized / What to Verify |
 |------|---------|---------------------------------------|
-| 89 | `Retrieve-Dataset-Source-Query-via-API.mdx` — *Retrieve a Dataset's Source Query with the API* | Synthesized from portal Datasets API + overview; metadata→streamId→stream configuration→query chain. Links to Developer Portal reference |
 | 159 | `Extract-Data-from-PDFs-with-Domo-AI.mdx` — *Extract Data from PDFs and Images with Domo AI* ⚠️ | Synthesized from 000005279 (Image-to-Text) + 000005369 (Workflows AI Service Layer) + 000005849 (FileSets). 2× `[pm-input]` Ken Boyer: Magic ETL AI-tile path + S3/SFTP batch pipeline; scanned-PDF / multi-column table extraction limits |
 
 ### 3c. Forum-Gap Articles Awaiting Your Input — Cannot Be Written Yet
@@ -87,38 +86,11 @@ off once you've provided the answer.
 - [ ] **`000005539.mdx`**
   Confirm the exact in-chat workaround for reading an AI Chat v1 chart's inferred configuration (forum reports reference a "Show Chart Controls" option) and the exact path to launch the AI Content Builder Agent (forum reports reference the Apps dropdown). Synthesized from community forum reports; needs confirmation.
 
-- [ ] **`000005561.mdx`**
-  Confirm the exact procedure to commit a synonym entry (for example, the keystroke that creates a synonym pill), whether there is a known limitation where Edit All drops changes when editing more than a few columns at once, and whether a Workflow-based approach for bulk AI Dictionary updates is supported. synthesized from community forum reports; needs confirmation.
-
-- [ ] **`000005561.mdx`**
-  Confirm whether AI Readiness / AI Dictionary metadata (DataSet context, synonyms, and column settings) propagates to a subscriber instance through a Domo Everywhere publication or refresh, and whether or how AI Chat must be separately enabled on the subscriber instance. synthesized from community forum reports; needs confirmation.
-
 - [ ] **`000005849.mdx`**
   Confirm the FileSets file-download URL format and the exact steps to reference a FileSet image URL in App Studio image/gallery components (the referencing fix was reported in the community forum but is not yet documented). Synthesized from community forum reports; needs confirmation.
 
 - [ ] **`36004740075.mdx`**
-  Confirm the enablement-request process for non-standard or student instances, where Jupyter Workspaces may not be provisioned by default. Synthesized from community forum reports; needs confirmation.
-
-- [ ] **`36004740075.mdx`**
   Confirm the current write_dataframe type-handling behavior reported by users since 2023–2024: boolean columns landing as empty integer columns and Python date/datetime columns not writing correctly. Confirm whether astype(str) plus a downstream ETL input-type fix is the recommended workaround or whether a fix has shipped. Synthesized from community forum reports; needs confirmation.
-
-- [ ] **`36004740075.mdx`**
-  Confirm the current R version shipped in Jupyter Workspaces (community reports cite R 4.1) and the list of supported/pre-installed kernels and packages. Synthesized from community forum reports; needs confirmation.
-
-- [ ] **`Create-and-Use-Data-Models.mdx`**
-  Confirm the deployment limitations reported for Data Models: models cannot be promoted through a repository or Sandbox and are not selectable in data-source mapping, so a model must be recreated manually in each development, test, and production environment. Deployment support is tracked as a feature request. Synthesized from community forum reports; needs confirmation.
-
-- [ ] **`Create-and-Use-Data-Models.mdx`**
-  Confirm the trigger conditions and any workaround for the "Bad Request" error affecting Data Models. Synthesized from community forum reports; needs confirmation.
-
-- [ ] **`Create-and-Use-Data-Models.mdx`**
-  Confirm the Analyzer date-field errors reported for Data Models (filter-by-date and summary number / Graph By) and document how to set up date fields in the model so they work in Analyzer. Synthesized from community forum reports; needs confirmation.
-
-- [ ] **`Extract-Data-from-PDFs-with-Domo-AI.mdx`**
-  confirm the remaining invocation paths so they can be documented: (1) whether Image-to-Text is available as a Magic ETL AI tile (the Magic ETL AI article documents only Text Generation, AI Forecasting, and Model Inference tiles — no Image-to-Text tile); (2) the supported end-to-end pattern for batch-processing PDFs pulled from S3 or SFTP through Image-to-Text. Add sections for each once confirmed.
-
-- [ ] **`Extract-Data-from-PDFs-with-Domo-AI.mdx`**
-  confirm and document the extraction limitations: whether scanned/flattened image-only PDFs and complex multi-column layouts extract cleanly as tables vs. plain text, and the recommended source-preparation guidance. Replace this section with the confirmed limits.
 
 ---
 
@@ -154,22 +126,12 @@ A prioritized list of everything this document is asking of you:
 | 2 | Read and fact-check `What-is-Domo-AI.mdx` | Fact-check | 30–45 min |
 | 3 | Read and fact-check `AI-and-Data-Science-Overview.mdx` | Fact-check | 30–45 min |
 | 4 | Read and fact-check `Develop-and-Integrate-Overview.mdx` | Fact-check | 30–45 min |
-| 5 | Fact-check `Retrieve-Dataset-Source-Query-via-API.mdx` (Rank 89 community request) | Fact-check | 20–30 min |
-| 6 | Fact-check `Extract-Data-from-PDFs-with-Domo-AI.mdx` (Rank 159 community request) | Fact-check | 20–30 min |
-| 7 | Supply info to write `AI-Chat-API-Session-ID.mdx` (Rank 144) | Info meeting | 30 min |
-| 8 | Supply info to write `Private-Embed-Token-Validation-Errors.mdx` (Rank 161) | Info meeting | 30 min |
-| 9 | **Open placeholder in `000005539.mdx`:** Confirm the exact in-chat workaround for reading an AI Chat v1 chart's inferred  | **Answer required** | 15–30 min |
-| 10 | **Open placeholder in `000005561.mdx`:** Confirm the exact procedure to commit a synonym entry (for example, the keystrok | **Answer required** | 15–30 min |
-| 11 | **Open placeholder in `000005561.mdx`:** Confirm whether AI Readiness / AI Dictionary metadata (DataSet context, synonyms | **Answer required** | 15–30 min |
-| 12 | **Open placeholder in `000005849.mdx`:** Confirm the FileSets file-download URL format and the exact steps to reference a | **Answer required** | 15–30 min |
-| 13 | **Open placeholder in `36004740075.mdx`:** Confirm the enablement-request process for non-standard or student instances, wh | **Answer required** | 15–30 min |
-| 14 | **Open placeholder in `36004740075.mdx`:** Confirm the current write_dataframe type-handling behavior reported by users sin | **Answer required** | 15–30 min |
-| 15 | **Open placeholder in `36004740075.mdx`:** Confirm the current R version shipped in Jupyter Workspaces (community reports c | **Answer required** | 15–30 min |
-| 16 | **Open placeholder in `Create-and-Use-Data-Models.mdx`:** Confirm the deployment limitations reported for Data Models: models cannot be pr | **Answer required** | 15–30 min |
-| 17 | **Open placeholder in `Create-and-Use-Data-Models.mdx`:** Confirm the trigger conditions and any workaround for the "Bad Request" error af | **Answer required** | 15–30 min |
-| 18 | **Open placeholder in `Create-and-Use-Data-Models.mdx`:** Confirm the Analyzer date-field errors reported for Data Models (filter-by-date  | **Answer required** | 15–30 min |
-| 19 | **Open placeholder in `Extract-Data-from-PDFs-with-Domo-AI.mdx`:** confirm the remaining invocation paths so they can be documented: (1) whether Im | **Answer required** | 15–30 min |
-| 20 | **Open placeholder in `Extract-Data-from-PDFs-with-Domo-AI.mdx`:** confirm and document the extraction limitations: whether scanned/flattened image | **Answer required** | 15–30 min |
+| 5 | Fact-check `Extract-Data-from-PDFs-with-Domo-AI.mdx` (Rank 159 community request) | Fact-check | 20–30 min |
+| 6 | Supply info to write `AI-Chat-API-Session-ID.mdx` (Rank 144) | Info meeting | 30 min |
+| 7 | Supply info to write `Private-Embed-Token-Validation-Errors.mdx` (Rank 161) | Info meeting | 30 min |
+| 8 | **Open placeholder in `000005539.mdx`:** Confirm the exact in-chat workaround for reading an AI Chat v1 chart's inferred  | **Answer required** | 15–30 min |
+| 9 | **Open placeholder in `000005849.mdx`:** Confirm the FileSets file-download URL format and the exact steps to reference a | **Answer required** | 15–30 min |
+| 10 | **Open placeholder in `36004740075.mdx`:** Confirm the current write_dataframe type-handling behavior reported by users sin | **Answer required** | 15–30 min |
 
 ---
 

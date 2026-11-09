@@ -27,7 +27,7 @@ open architectural decision.
 | Chris Wright | P1, P5 | 6 | 55 | 0 | 0 | 0 | 0 | **61** |  |
 | Dan Brinton | P1, P5, P8, P9, P10 | 11 | 29 | 0 | 0 | 0 | 1 | **41** | 3 |
 | Jordan Jensen | — | 0 | 13 | 0 | 0 | 0 | 0 | **13** |  |
-| Ken Boyer | P9, P11 | 5 | 11 | 0 | 0 | 0 | 1 | **17** | 3 |
+| Ken Boyer | P9, P11 | 5 | 5 | 0 | 0 | 0 | 1 | **11** | 3 |
 | Khushboo | P5, P6, P7, P8 | 4 | 41 | 0 | 1 | 1 | 2 | **49** | 18 |
 | Mamta Bolaki | P6, P7, P10 | 1 | 8 | 0 | 0 | 0 | 0 | **9** | 4 |
 | Phil Fuchs | P3, P4, P5, P9 | 8 | 35 | 0 | 0 | 2 | 0 | **45** | 10 |
@@ -35,7 +35,7 @@ open architectural decision.
 | Ryan Despain | P6, P8 | 1 | 50 | 0 | 0 | 1 | 1 | **53** | 5 |
 | Sam Lowen | P2, P3 | 1 | 0 | 0 | 0 | 0 | 0 | **1** | 3 |
 | Tasleema Lallmamode | P2, P6 | 5 | 39 | 1 | 1 | 1 | 0 | **47** | 4 |
-| **TOTAL** | | 47 | 322 | 1 | 4 | 8 | 5 | **387** | 61 |
+| **TOTAL** | | 47 | 316 | 1 | 4 | 8 | 5 | **381** | 61 |
 
 ---
 
@@ -281,19 +281,13 @@ _No open tasks._
 - [ ] **`Develop-and-Integrate-Overview.mdx` — *Develop & Integrate Overview*** — Developer entry points, API vs SDK, auth options, MCP integration
 - [ ] **`Extract-Data-from-PDFs-with-Domo-AI.mdx` (rank 159) ⚠️ (open [pm-input])** — Synthesized from 000005279 (Image-to-Text) + 000005369 (Workflows AI Service Layer) + 000005849 (FileSets). 2× `[pm-input]` Ken Boyer: Magic ETL AI-tile path + S3/SFTP batch pipeline; scanned-PDF / multi-column table extraction limits
 
-### [pm-input] (11)
+### [pm-input] (5)
 
 - [ ] **`AI-Chat-API-Session-ID.mdx` (rank 144)** — Deferred to PM brief (re-homed from dropped, 2026-08-28): needs the Ask Chat / AI API session-ID sequence + client-UUID canned-refusal behavior. Ken (AI Services / APIs) to confirm KB-vs-Developer-Portal scope and supply the mechanics.
 - [ ] **`Private-Embed-Token-Validation-Errors.mdx` (rank 161)** — Deferred to PM brief (re-homed from dropped, 2026-08-28): valid-token 302-to-login causes, client ID/secret + authorized-domains, token regen after domain change. Ken (APIs) to confirm KB-vs-Developer-Portal scope and supply the mechanics.
 - [ ] **`000005539.mdx`** — Confirm the exact in-chat workaround for reading an AI Chat v1 chart's inferred configuration (forum reports reference a "Show Chart Controls" option) and the exact path to launch the AI Content Builder Agent (forum reports reference the Apps dropdown). Synthesized from community forum reports; needs confirmation.
-- [ ] **`000005561.mdx`** — Confirm the exact procedure to commit a synonym entry (for example, the keystroke that creates a synonym pill), whether there is a known limitation where Edit All drops changes when editing more than a few columns at once, and whether a Workflow-based approach for bulk AI Dictionary updates is supported. synthesized from community forum reports; needs confirmation.
-- [ ] **`000005561.mdx`** — Confirm whether AI Readiness / AI Dictionary metadata (DataSet context, synonyms, and column settings) propagates to a subscriber instance through a Domo Everywhere publication or refresh, and whether or how AI Chat must be separately enabled on the subscriber instance. synthesized from community forum reports; needs confirmation.
 - [ ] **`000005849.mdx`** — Confirm the FileSets file-download URL format and the exact steps to reference a FileSet image URL in App Studio image/gallery components (the referencing fix was reported in the community forum but is not yet documented). Synthesized from community forum reports; needs confirmation.
-- [ ] **`36004740075.mdx`** — Confirm the enablement-request process for non-standard or student instances, where Jupyter Workspaces may not be provisioned by default. Synthesized from community forum reports; needs confirmation.
 - [ ] **`36004740075.mdx`** — Confirm the current write_dataframe type-handling behavior reported by users since 2023–2024: boolean columns landing as empty integer columns and Python date/datetime columns not writing correctly. Confirm whether astype(str) plus a downstream ETL input-type fix is the recommended workaround or whether a fix has shipped. Synthesized from community forum reports; needs confirmation.
-- [ ] **`36004740075.mdx`** — Confirm the current R version shipped in Jupyter Workspaces (community reports cite R 4.1) and the list of supported/pre-installed kernels and packages. Synthesized from community forum reports; needs confirmation.
-- [ ] **`Extract-Data-from-PDFs-with-Domo-AI.mdx`** — confirm the remaining invocation paths so they can be documented: (1) whether Image-to-Text is available as a Magic ETL AI tile (the Magic ETL AI article documents only Text Generation, AI Forecasting, and Model Inference tiles — no Image-to-Text tile); (2) the supported end-to-end pattern for batch-processing PDFs pulled from S3 or SFTP through Image-to-Text. Add sections for each once confirmed.
-- [ ] **`Extract-Data-from-PDFs-with-Domo-AI.mdx`** — confirm and document the extraction limitations: whether scanned/flattened image-only PDFs and complex multi-column layouts extract cleanly as tables vs. plain text, and the recommended source-preparation guidance. Replace this section with the confirmed limits.
 
 ### [decision] (1)
 

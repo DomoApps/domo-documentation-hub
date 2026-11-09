@@ -25,7 +25,7 @@ open architectural decision.
 | Andrea Henderson | P4 | 5 | 39 | 0 | 2 | 3 | 0 | **49** | 9 |
 | Beth Saenz | P10 | 0 | 1 | 0 | 0 | 0 | 0 | **1** |  |
 | Chris Wright | P1, P5 | 6 | 55 | 0 | 0 | 0 | 0 | **61** |  |
-| Dan Brinton | P1, P5, P8, P9, P10 | 11 | 29 | 0 | 0 | 0 | 1 | **41** | 3 |
+| Dan Brinton | P1, P5, P8, P9, P10 | 11 | 27 | 0 | 0 | 0 | 1 | **39** | 3 |
 | Jordan Jensen | — | 0 | 13 | 0 | 0 | 0 | 0 | **13** |  |
 | Ken Boyer | P9, P11 | 5 | 11 | 0 | 0 | 0 | 1 | **17** | 3 |
 | Khushboo | P5, P6, P7, P8 | 4 | 41 | 0 | 1 | 1 | 2 | **49** | 18 |
@@ -35,7 +35,7 @@ open architectural decision.
 | Ryan Despain | P6, P8 | 1 | 50 | 0 | 0 | 1 | 1 | **53** | 5 |
 | Sam Lowen | P2, P3 | 1 | 0 | 0 | 0 | 0 | 0 | **1** | 3 |
 | Tasleema Lallmamode | P2, P6 | 5 | 39 | 1 | 1 | 1 | 0 | **47** | 4 |
-| **TOTAL** | | 47 | 322 | 1 | 4 | 8 | 5 | **387** | 61 |
+| **TOTAL** | | 47 | 320 | 1 | 4 | 8 | 5 | **385** | 61 |
 
 ---
 
@@ -209,14 +209,12 @@ _No open tasks._
 - [ ] **`DomoStats-vs-Governance-Datasets-Connector.mdx` (rank 26)** — Synthesized from 360043433813 + 360056318074; report-by-report comparison + service-account Activity Log caveat. Omitted unverifiable deprecation/scheduling claims
 - [ ] **`Find-Which-Dashboard-a-Card-Lives-On.mdx` (rank 152) ⚠️ (open [pm-input])** — Synthesized from 360056318074 (Governance connector Cards/Pages reports). Classic dashboards only; `[pm-input]` Tasleema Lallmamode for App Studio lineage
 
-### [pm-input] (29)
+### [pm-input] (27)
 
 - [ ] **`Manage-Dataset-Error-Alerts.mdx` (rank 82)** — How data-load-failure ("Error Loading Data") notifications are generated and why system-managed, per-dataset disable path, bulk-suppression options and official status
 - [ ] **`Domo-API-Changelog.mdx` (rank 99)** — The versioning convention (if any), whether/where breaking changes are announced, deprecation timeline policy, any existing changelog content
 - [ ] **`ETL-Credits-and-Consumption-Model.mdx` (rank 103)** — Definition of a "manual run" vs scheduled, the "significant change" threshold that voids legacy ETL consumption status, a citable authoritative source
 - [ ] **`Alert-on-Stuck-Dataset-Refresh.mdx` (rank 127)** — Confirm a DataSet alert on the DomoStats last-run field to detect a stuck refresh + the exact condition; the Workflow timer-trigger + Run Connector action to run sub-daily
-- [ ] **`000005326.mdx`** — Confirm how Magic ETL credit consumption relates to processed row counts (for example, a runaway many-to-many join that generates very large row counts), how to cancel an in-progress DataFlow or ETL execution, and whether any automatic protections stop runaway runs. Synthesized from community forum reports; needs confirmation.
-- [ ] **`000005492.mdx`** — Confirm the behavior when Data Refresh Permissions is enabled: whether only full admins can set advanced or sub-hourly refresh schedules regardless of a user's assigned policy, and exactly how a policy's frequency limit interacts with a non-admin user's role. Synthesized from community forum reports; needs confirmation.
 - [ ] **`360042925994.mdx`** — Confirm the exact prerequisites and failure conditions for Alert-triggered Task creation: the Project role/membership the Alert owner needs (owner vs. member) to add Tasks, and the specific reasons a Task can silently fail to be created when an Alert fires. Synthesized from community forum reports; needs confirmation.
 - [ ] **`360042925994.mdx`** — Confirm how numeric column formatting and exponential/scientific display affect threshold evaluation — specifically whether the Alert evaluates the underlying stored numeric value rather than the formatted or exponentially displayed value. Synthesized from community forum reports; needs confirmation.
 - [ ] **`360042925994.mdx`** — Confirm how an attached Scheduled/Triggered Report resolves the actual triggered value versus the "Current alert value" placeholder in the report body. Synthesized from community forum reports; needs confirmation.

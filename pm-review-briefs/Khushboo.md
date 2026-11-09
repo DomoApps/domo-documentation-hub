@@ -2,7 +2,7 @@
 
 **Prepared for:** KB Restructure PM Review Meeting
 **Features owned:** App Dev Framework, App Studio, Bricks/Templates, Charting, Doc Cards, MS Office Plugins / Addins, Period over Period, Publication Groups, Slideshows
-**Total articles in your area:** 216
+**Total articles in your area:** 215
 
 > This document is your meeting guide. It shows how your content is being reorganized,
 > which AI-generated articles need your fact-check, which articles need a dedicated
@@ -19,7 +19,7 @@ areas lands in the new structure.
 
 | Feature | Articles | New Location |
 |---------|----------|--------------|
-| App Dev Framework | 8 | Pillar 6: Build Apps & Automate |
+| App Dev Framework | 7 | Pillar 6: Build Apps & Automate |
 | App Studio | 22 | Pillar 6: Build Apps & Automate |
 | Bricks/Templates | 3 | Pillar 6: Build Apps & Automate |
 | Charting | 158 | Pillar 5: Analyze & Visualize |

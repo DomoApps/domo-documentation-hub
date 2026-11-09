@@ -1,16 +1,12 @@
 ---
-title: "Manually Connect to the Domo Essentials MCP Server"
-excerpt: "How to manually connect to the Domo Essentials MCP Server."
-tag: "Beta"
+title: "Manually Connect to the Domo MCP Server"
+sidebarTitle: "Manually Connect"
+excerpt: "How to manually connect to the Domo MCP Server."
 ---
-
-import { BetaNote } from '/snippets/BetaNote.mdx';
-
-<BetaNote />
 
 ## Intro
 
-This article explains how to manually connect to the Domo Essentials MCP Server using Claude Desktop, Claude Code, or VS Code.
+This article explains how to manually connect to the Domo MCP Server using Claude Desktop, Claude Code, or VS Code.
 
 ---
 
@@ -75,7 +71,7 @@ Paste the following into the configuration file, replacing `<DOMO_DOMAIN>` with 
       "command": "npx",
       "args": [
         "mcp-remote",
-        "https://<DOMO_DOMAIN>/api/ai/v1/assistant/mcp/toolkits/DOMO_BASIC_MCP",
+        "https://<DOMO_DOMAIN>/mcp",
         "--header",
         "X-DOMO-DEVELOPER-TOKEN:<DOMO_ACCESS_TOKEN>"
       ]
@@ -88,7 +84,7 @@ Paste the following into the configuration file, replacing `<DOMO_DOMAIN>` with 
       "command": "npx",
       "args": [
         "mcp-remote",
-        "https://<DOMO_DOMAIN>/api/ai/v1/assistant/mcp/toolkits/DOMO_BASIC_MCP",
+        "https://<DOMO_DOMAIN>/mcp",
         "--header",
         "X-DOMO-DEVELOPER-TOKEN:<DOMO_ACCESS_TOKEN>"
       ]
@@ -113,9 +109,12 @@ Go to **Settings** > **Connectors** and confirm the Domo MCP server is listed an
 
 Select the server to view its tool permissions. You should see the following tools listed:
 
-- `DomoSqlQueryTool`
-- `FileSetQueryTool`
-- `SearchTool`
+- `List Document Collection Files`
+- `Domo Documentation Query`
+- `SQL Query`
+- `Query Document Collection`
+- `Read File`
+- `Search`
 
 <Frame>![Domo MCP server tool permissions list in Claude Desktop](/images/kb/DOMO-MCP-Server-Screenshot-8.png)</Frame>
 
@@ -129,7 +128,7 @@ In Claude Code, run the following command from the root of your project. Replace
 
 ```bash
 claude mcp add --transport http domo-mcp \
-  https://<DOMO_DOMAIN>/api/ai/v1/assistant/mcp/toolkits/DOMO_BASIC_MCP \
+  https://<DOMO_DOMAIN>/mcp \
   --header "X-DOMO-DEVELOPER-TOKEN: <DOMO_ACCESS_TOKEN>"
 ```
 
@@ -140,7 +139,7 @@ This adds the configuration to a `.mcp` file in the root of your project:
   "mcpServers": {
     "domo-mcp": {
       "type": "http",
-      "url": "https://<DOMO_DOMAIN>/api/ai/v1/assistant/mcp/toolkits/DOMO_BASIC_MCP",
+      "url": "https://<DOMO_DOMAIN>/mcp",
       "headers": {
         "X-DOMO-DEVELOPER-TOKEN": "<DOMO_ACCESS_TOKEN>"
       }
@@ -164,7 +163,7 @@ This adds the configuration to a `.mcp` file in the root of your project:
    {
      "servers": {
        "domo-mcp": {
-         "url": "https://<DOMO_DOMAIN>/api/ai/v1/assistant/mcp/toolkits/DOMO_BASIC_MCP",
+         "url": "https://<DOMO_DOMAIN>/mcp",
          "type": "http",
          "headers": {
            "X-DOMO-DEVELOPER-TOKEN": "${input:domo-access-token}"

@@ -1,0 +1,187 @@
+---
+title: "Add Interactivity: Popups, Filters, and Actions to an App Studio App"
+excerpt: "Make an App Studio app interactive: configure page-level and persistent filters, add buttons that filter or trigger actions, open cards and forms in pop-ups, and use variable controls."
+---
+
+## Intro
+
+App Studio apps can respond to the people using them. This article covers the interactive pieces of an app: page-level and persistent filters, buttons that apply filters or trigger actions, cards and forms opened in pop-ups, and variable controls.
+
+## Filter Options
+
+Selecting **Filter Options** opens the **Filter options** modal.
+
+In the modal, the following settings are enabled by default. You can choose to disable them.
+
+- **Allow adding of new filters**
+- **Allow global date filters —** Allows the global date to filter the page.
+- **Allow segments —** Allows all segments to be displayed.
+- **Show filter and PDP icons —** Toggle this switch to hide filter and PDP icons. They can obscure your view of your content.
+
+<Frame>
+  <img alt="Screenshot 2024-05-30 at 3.27.27 PM.png" src="/images/kb/ka0Vq000000C3gT-00N5w00000Ri7BU-0EMVq0000019TlN.jpg" />
+</Frame>
+
+## Configure Persistent Filters
+
+You can configure persistent filters in the **Filter** **Options** tab of the **App Configuration** section. Making a filter persistent means that when app users turn on the filter, it takes effect across all app pages using some or all columns in a DataSet. You can also configure other elements, like Variables and date filters, to persist throughout the app.
+
+1. Use the dropdown to choose whether all columns or only selected columns persist as filters across all app pages. The default is none.
+
+   <Frame>
+     <img alt="Screenshot 2024-06-26 at 3.40.11 PM.png" src="/images/kb/ka0Vq000000C3gT-00N5w00000Ri7BU-0EMVq000001WZGc.jpg" />
+   </Frame>
+
+2. If you choose to use only selected columns, choose the filter columns that should persist.
+
+   <Frame>
+     <img alt="selected columns.jpg" src="/images/kb/ka0Vq000000C3gT-00N5w00000Ri7BU-0EMVq000001WdAY.jpg" />
+   </Frame>
+
+3. After choosing your filter columns, check the box(es) to enable these other options:
+   - **Persist interaction filters —** When enabled, if an app user applies a card-specific filter, like a chart element, it persists across the app.
+   - **Persist date range filters —** When enabled, any date range filter that an app user applies persists across the app.
+   - **Persist Variable controls —** When enabled, variable control values persist across the app.
+
+     <Note>
+       **Note:** Variable control values are only applied to pages that contain that control. If you want to persist Variables across the app, you must add the control to each page where you want the value to persist. Learn more about [Variables and controls](/s/article/7903767835031).
+
+       <Frame>
+         <img alt="persist elements.jpg" src="/images/kb/ka0Vq000000C3gT-00N5w00000Ri7BU-0EMVq000001dDOD.jpg" />
+       </Frame>
+     </Note>
+
+4. Save your changes.
+
+Now, when app users interact with or apply any of the filters you selected to the app, the filters take effect across all app pages.
+
+## Configure Persistent Filters for a Set of Cards
+
+Persistent filters can be set at an individual card or app level. To apply persistent global filters to a specific set of cards, follow these instructions:
+
+1. Set your filters to affect all cards on your app globally. For any cards you do not want to be filtered, you can edit their individual setting by navigating to the card and then selecting **Filter Exceptions** from the card details edit menu.
+
+   OR
+2. Place all of the cards you want to be filtered on one app page. After setting up the cards on the same page, set up the interaction filters to affect these specific cards, then move the cards to your desired locations on different pages.
+
+## Test Persistent Filters
+
+You can confirm whether a filter persists by going to the [Controls](/s/article/Build-an-App-Studio-App#view-an-app) menu. Persistent filters have a globe icon.
+
+<Frame>
+  <img alt="globe icon.jpg" src="/images/kb/ka0Vq000000C3gT-00N5w00000Ri7BU-0EMVq000001dDo1.jpg" />
+</Frame>
+
+## Filter Behavior and Limitations
+
+Keep the following behaviors in mind when you work with filters and controls in an app.
+
+- **Clear Filters does not reset persistent filters.** Clearing filters—whether with a **Clear filters** button action or **Clear All** in [Controls](/s/article/Build-an-App-Studio-App#view-an-app)—removes standard page filters, but it does not reset [persistent filters](#configure-persistent-filters), persisted date ranges, or persisted Variable controls. To change a persisted value, adjust that filter or control directly rather than clearing filters.
+
+- **Allow filtering is all or nothing.** In a card's [Filter Exceptions](/s/article/Build-an-App-Studio-App#filter-exceptions-tab) tab, **Allow filtering** subjects the card to either all page filters or none of them. There is no way through this setting to allow only some filter columns to affect a single card.
+
+{/* [pm-input] Khushboo — confirm that a card's Filter Exceptions "Allow filtering" setting is all-or-nothing (there is no way to allow only specific filter columns to affect one card while ignoring others). Synthesized from community forum reports; needs confirmation. */}
+
+- **A filter can appear applied without affecting cards.** Occasionally a filter shows as selected in Controls but does not change the cards on the page. If this happens, clear and re-apply the filter, and confirm the affected cards allow filtering in their [Filter Exceptions](/s/article/Build-an-App-Studio-App#filter-exceptions-tab).
+
+{/* [pm-input] Khushboo — confirm the reported behavior in which a filter selection persists visually in Controls but does not apply to cards, and the correct resolution. Synthesized from community forum reports; needs confirmation. */}
+
+- **Limit which fields app viewers can filter on.** App viewers add filters from **Controls** > **Add Filter**, which draws from the columns on the app's DataSets.
+
+{/* [pm-input] Khushboo — confirm whether and how an app owner can limit which columns appear in Controls > Add Filter for viewers (for example, through a Filter Options setting or a per-DataSet configuration). Synthesized from community forum reports; needs confirmation. */}
+
+- **Set a relative default date filter.** To give app viewers a default date range that stays relative (such as the last 30 days), open [Controls](/s/article/Build-an-App-Studio-App#view-an-app), add a date range, and save it as the default Filter View for the app so every viewer opens with that range applied.
+
+{/* [pm-input] Khushboo — confirm the supported method for a dynamic/relative default date filter in App Studio (Filter Views with a relative range, and any Beast Mode approach), and the reported limitation that a dropdown filter card cannot supply a relative default date. Synthesized from community forum reports; needs confirmation. */}
+
+- **Manage many filters with layout, not just filter controls.** When a page needs numerous filters, adding an on-page filter control for each one is a manual, one-at-a-time process—there is no bulk "add all filters" action. To keep the page uncluttered, let viewers add filters from the [Controls](/s/article/Build-an-App-Studio-App#view-an-app) menu, or group on-page filter controls inside a [Tabs](/s/article/Build-an-App-Studio-App#add-tabs) element or [layout container](/s/article/Build-an-App-Studio-App#choose-a-layout) so they can be shown and hidden as a set.
+
+{/* [pm-input] Khushboo — confirm that on-page filter controls must be added one at a time (no bulk-add action) and that grouping them in a Tabs or layout container is the recommended pattern for many-filter pages. The bulk-add action and independent on-page legend-visibility control are feature requests. Synthesized from community forum reports; needs confirmation. */}
+
+
+## Add a Variable Control
+
+Dragging a **Control** action onto the canvas allows you to add a Variable control to the app page. To learn about Variables and controls, see the [Variables | Overview](/s/article/7903767835031).
+
+
+## Add a Button
+
+Dragging a button action onto the canvas opens the right panel with two tabs: **Settings** and **Actions**.
+
+### Settings Tab
+
+In the **Settings** tab, you can configure the following:
+
+- Enter text for the button label
+- Select an icon from the available options or choose **No icon**
+- Select the button color and opacity
+- Choose the icon placement on the button: top, left, or right
+- Choose the icon size: default, small, medium, large, or extra large
+
+<Frame>
+  <img alt="Screenshot 2024-02-05 at 12.02.49 PM.png" src="/images/kb/ka0Vq000000C3gT-00N5w00000Ri7BU-0EMVq000000J5P0.jpg" />
+</Frame>
+
+Under **Settings** > **Style**, choose from one of five app themes. Select **Edit styles** to edit the theme in the left side panel.
+
+Select <i className="icon-trash sm" aria-hidden="true" /> **Delete** to remove the button.
+
+<Frame>
+  <img alt="Screenshot 2023-10-18 at 9.00.44 PM.png" src="/images/kb/ka0Vq000000C3gT-00N5w00000Ri7BU-0EM5w000006wB3Y.jpg" />
+</Frame>
+
+### Actions Tab
+
+In the **Actions** tab, use the **Select interaction type** dropdown to define what action takes place when you press the button.
+
+<Note>
+  **Note:** If you choose **Clear filters** as the interaction type, app users can use the button to clear all the filters (**except persistent filters**) on the page without navigating to the [app controls](#add-a-variable-control). Learn how to [configure persistent filters](#configure-persistent-filters).
+
+  The option to **Clear filters** with a button is not available in an embedded App Studio app. See [Embed an App](/s/article/Distribute-an-App-Studio-App#embed-an-app) to learn more.
+</Note>
+
+<Note>
+  **Note:** Filter Views are created and managed from the [Controls](/s/article/Build-an-App-Studio-App#view-an-app) menu, not as a button action. There is currently no button interaction type that applies a saved Filter View.
+</Note>
+
+<Frame>
+  <img alt="Screenshot 2024-10-30 at 3.01.33 PM.png" src="/images/kb/ka0Vq000000C3gT-00N5w00000Ri7BU-0EMVq000003XaFv.jpg" />
+</Frame>
+
+### Open a Card in a Pop-Up
+
+When you configure a button to open a card in a pop-up, you must search for and select the card you want to open when the button is selected.
+
+Save the card and the changes to your app.
+
+<Frame>
+  <img alt="Screenshot 2024-12-17 at 2.59.04 PM.png" src="/images/kb/ka0Vq000000C3gT-00N5w00000Ri7BU-0EMVq000004OzKz.jpg" />
+</Frame>
+
+Now when the button is clicked in the app, the selected card displays in a pop-up window.
+
+If you need to update the card that displays when a button is clicked:
+
+1. From the **Actions** tab of the button configuration panel, select **Change**.
+
+<Frame>![](/images/kb/ka0Vq000000C3gT-00N5w00000Ri7BU-0EMVq000004OsZf.jpg)</Frame>
+
+2. Search for and select a different card. Save the card and save your app changes.
+
+### Open a Form in a Pop-Up
+
+A **Button** can open a Form in a pop-up window, the same way it can [open a card in a pop-up](#open-a-card-in-a-pop-up). Only Button components can open a Form as a pop-up—text and image elements cannot trigger a pop-up form. If you need a form pop-up from another element, build it with a [Domo Brick](/s/article/000005864) or Pro-Code approach.
+
+<Note>
+  **Note:** Filter selections on the page are not passed into a form opened as a pop-up. If the form needs the page's current filter context, add the form inline on the page instead of opening it as a pop-up.
+</Note>
+
+{/* [pm-input] Khushboo — confirm that only Button components (not text or image elements) can open a Form as a pop-up, that button icons are limited to the built-in Domo set, and that page filter selections are not passed into a popup-opened form (whereas an inline form receives them). The Brick/Pro-Code workaround for a pop-up from other elements needs confirmation. Synthesized from community forum reports; needs confirmation. */}
+
+### Writeback Capability
+
+If you need to push data to a third-party application, you can add a writeback connector into your app and push data with the click of a button.
+
+<Note>
+  **DomoStats Reports:** Admins can order and schedule two DomoStats reports—App Studio App Pages and App Studio Apps—to learn how App Studio is being used in the instance. See [DomoStats Connector](/s/article/360043433813) for more information.
+</Note>

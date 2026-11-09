@@ -8,11 +8,13 @@ Usage:
     python3 scripts/pad_md_tables.py FILE [FILE ...]
 
 Reformats every pipe table in place. Skips fenced code blocks. Cells are
-left-aligned; the separator row uses dashes sized to each column. Cell
-contents are not otherwise modified (no pipe characters inside cells are
-expected; escaped \\| is preserved as-is).
+padded per the column's alignment (`:--`, `:-:`, `--:`); the separator row
+uses dashes sized to each column. Cell contents are not otherwise modified;
+escaped \\| stays inside its cell. Output matches the MDX formatter, so
+running both on a file never makes them fight.
 """
 from __future__ import annotations
+import re
 import sys
 from pathlib import Path
 
@@ -21,9 +23,9 @@ def _split_row(line: str) -> list[str]:
     s = line.strip()
     if s.startswith("|"):
         s = s[1:]
-    if s.endswith("|"):
+    if s.endswith("|") and not s.endswith("\\|"):
         s = s[:-1]
-    return [c.strip() for c in s.split("|")]
+    return [c.strip() for c in re.split(r"(?<!\\)\|", s)]
 
 
 def _is_sep(cells: list[str]) -> bool:
@@ -39,36 +41,60 @@ def _is_sep(cells: list[str]) -> bool:
 
 
 def _wcwidth(s: str) -> int:
-    """Approximate display width: count East Asian wide chars as 2."""
+    """Display width, matching the string-width package the MDX formatter uses:
+    East Asian wide chars count 2, and a combining mark (e.g. a decomposed
+    dakuten) or joined emoji part adds nothing to the character it follows."""
     import unicodedata
     w = 0
+    last = 0
+    joined = False
     for ch in s:
-        w += 2 if unicodedata.east_asian_width(ch) in ("W", "F") else 1
+        cp = ord(ch)
+        if cp <= 0x1F or 0x7F <= cp <= 0x9F:
+            continue
+        if ch == "‍":
+            joined = True
+            continue
+        if joined or unicodedata.category(ch).startswith("M"):
+            if ch == "️" and last == 1:
+                w += 1
+                last = 2
+            joined = False
+            continue
+        last = 2 if unicodedata.east_asian_width(ch) in ("W", "F") else 1
+        w += last
     return w
 
 
-def _pad(cell: str, width: int) -> str:
-    return cell + " " * (width - _wcwidth(cell))
+def _pad(cell: str, width: int, align: str) -> str:
+    space = width - _wcwidth(cell)
+    if align == "right":
+        return " " * space + cell
+    if align == "center":
+        return " " * (space - space // 2) + cell + " " * (space // 2)
+    return cell + " " * space
 
 
 def _format_table(rows: list[list[str]]) -> list[str]:
-    ncols = max(len(r) for r in rows)
-    rows = [r + [""] * (ncols - len(r)) for r in rows]
-    # widths from header + data rows (skip the separator at index 1)
+    # Matches remark's table output (markdown-table) so the two tools agree.
+    # GFM renders only the header's columns, so rows are cut or padded to it.
+    ncols = len(rows[0])
+    rows = [(r + [""] * ncols)[:ncols] for r in rows]
+    aligns = []
+    for c in rows[1]:
+        left, right = c.startswith(":"), c.endswith(":")
+        aligns.append("center" if left and right else "right" if right else "left" if left else "")
     data_rows = [rows[0]] + rows[2:]
-    widths = [3] * ncols
-    for r in data_rows:
-        for i, c in enumerate(r):
-            widths[i] = max(widths[i], _wcwidth(c))
-    out = []
-    # header
-    out.append("| " + " | ".join(_pad(c, widths[i]) for i, c in enumerate(rows[0])) + " |")
-    # separator
-    out.append("| " + " | ".join("-" * widths[i] for i in range(ncols)) + " |")
-    # data
-    for r in rows[2:]:
-        out.append("| " + " | ".join(_pad(c, widths[i]) for i, c in enumerate(r)) + " |")
-    return out
+    widths = [max(_wcwidth(r[i]) for r in data_rows) for i in range(ncols)]
+    seps = []
+    for i, align in enumerate(aligns):
+        left = align in ("left", "center")
+        right = align in ("right", "center")
+        sep = (":" if left else "") + "-" * max(1, widths[i] - left - right) + (":" if right else "")
+        widths[i] = max(widths[i], len(sep))
+        seps.append(sep)
+    row = lambda cells: "| " + " | ".join(_pad(c, widths[i], aligns[i]) for i, c in enumerate(cells)) + " |"
+    return [row(rows[0]), row(seps)] + [row(r) for r in rows[2:]]
 
 
 def process(text: str) -> str:

@@ -242,7 +242,7 @@ Priority `rec=update` gaps from the community forum analysis. Text written self-
 
 | Filename | Title | Disposition | Gap Rank/Score | Change | `[pm-input]` |
 |----------|-------|-------------|----------------|--------|--------------|
-| `000005295.mdx` | App Studio \| Overview | updated | #4 / 79.6 | Added **Manage Cards behind an App** section: orphan behavior on app delete, App pages absent from the card Move/Copy menu + info panel, **Delete Orphaned Cards** (`More > Admin > Cards` + grant requirement), and **Locate Orphaned Cards with the Governance Connector**. Existing orphan `<Warning>` reused, not duplicated. | Khushboo (4) — (1) no combined app+cards delete; (2) App pages absent from Move/Copy & card info panel; (3) exact Admin > Cards delete action + App-page filter; (4) whether the Governance Datasets connector maps cards to App Studio pages |
+| `000005295.mdx` | App Studio \| Overview | **split → deleted + redirect (2026-10)** | #4 / 79.6 | Earlier update added **Manage Cards behind an App** (orphan behavior, Delete Orphaned Cards via `More > Admin > Cards` + grant, Locate Orphaned Cards with the Governance Connector). The monolithic Overview was then **split into the App Studio task-based series** — Build an App Studio App, Add Charts and Tables, Add Interactivity, Use Advanced Customization (Forms + Pro-Code Components), Distribute, Manage, App Studio Appendix — plus the retitled Themes (`000005543`) and existing Report Builder (`000005829`); the **What Is App Studio?** hub (`What-is-App-Studio`) is the group root. All prose + 131 screenshots + 26 `[pm-input]` markers preserved; 54 inline UI icons upgraded to the icon font. `000005295.mdx` **deleted**; `/s/article/000005295` **redirects** to `What-is-App-Studio`. The four Khushboo `[pm-input]` items below now live in **Manage an App Studio App**. | Khushboo (4) — (1) no combined app+cards delete; (2) App pages absent from Move/Copy & card info panel; (3) exact Admin > Cards delete action + App-page filter; (4) whether the Governance Datasets connector maps cards to App Studio pages |
 
 **Ryan Despain — Workflows (rank 12):**
 
@@ -498,6 +498,63 @@ First of two syncs (see `RESTRUCTURE-PROGRESS.md` › Phase 3c for the two-sync 
 **Case-rename:** `Microsoft-Sharepoint-Connector` → `Microsoft-SharePoint-Connector` (git-tracked rename + docs.json ref updated).
 
 Sync #2 (right before merge, post-Phase-6) will reconcile everything main changes after this point via the numeric-ID parity system.
+
+---
+
+## MCP / Toolkits Nav Regroup (2026-10-16 — integrates main PR #630)
+
+Integrated main's MCP/Toolkits navigation regroup (main PR #630) into the restructure. The flat `MCP` group became **MCP → Toolkits** (nested sub-group): MCP Server · Domo MCP · Standard OAuth · Manually Connect · Gemini Enterprise at the group's top level, and the nine capability toolkits (Alerts, Cards, Code Engine, Sandbox Repository, Task Center Queue, User Administration, Workflow, Workspaces, Coming Soon) in a nested **Toolkits** sub-group. IA spec › Pillar 9 updated to match.
+
+**Articles — took main's version (user decision: "main is correct here"):** the restructure copies were stale (old `/api/ai/v1/.../DOMO_BASIC_MCP` endpoints, "Domo Essentials MCP" / "Domo Basic MCP" naming, `<BetaNote/>` snippet, old tool names). Replaced with main's current versions, which carry the modern `/mcp` endpoints, "Domo MCP" terminology, expanded tool lists, the new "How it fits together" diagram, hand-written beta `<Note>` blocks, short `sidebarTitle`s, and PR #630's shortened toolkit titles + "a Domo MCP Toolkit" excerpt/intro framing. 13 articles refreshed (Connect-AI-Tools, Domo-MCP, MCP-Standard-OAuth, MCP-Manually-Connect + 9 toolkits); Connect-Gemini already identical. Added image `images/kb/domo-mcp-toolkits.png`. No `[pm-input]`/review markers existed on any of these, so none were lost.
+
+**Deferred:** `Connect-Amazon-Quick-Suite-To-Domo-MCP` is in main's MCP group but does not exist on this branch yet — left out of the nav (no broken reference); it will arrive with Phase 3c sync #2 from main.
+
+---
+
+## Distribute Pillar — "Distribute" Terminology (2026-10-16)
+
+Established a terminology split in the Distribute pillar: **"distribute"** is the verb for getting content to audiences outside Domo; **"share"** is reserved for the Collaborate pillar's share-with-Domo-users function. Applied across the Distribute pillar's articles.
+
+**Retitled (slugs unchanged):**
+- `Choose-How-to-Share-Outside-Domo` — "Choose How to Share Content Outside Domo" → **"Distribute Content Outside Domo"**
+- `360043437793` — "Sharing Content Using Slideshows" → **"Distributing Content Using Slideshows"**
+
+**Distribution-sense "share" → "distribute"** in: the two above, `Export-Domo-Data-to-Reports`, `360042933014` (Slideshow Publications Page Layout), `360043438993` (Setting Up Publication Groups), `360043441593` (Primer). Inbound **link text** to the two renamed titles updated in `What-is-Domo`, `Collaborate-Overview` (×3), `What-is-a-Dashboard`, topic `0TO5w000000Zao7GAC`, `360042934234`, `360043428553`.
+
+**Deliberately KEPT as "share":** the Embed article `360043437993` (zero changes — all its uses are the real **Share** menu/**Share link** UI, the share-with-users permission, or the "shared across users" idiom); literal **Share**/**Sharing** UI menu labels and image paths everywhere; the access-grant "share" in `360043441593` line 37.
+
+**Deferred — icon migration (officially deferred 2026-10-16):** the legacy inline image-icons in `360043437793` (Slideshows) and `360043437813` (Export Visualization Cards) were **not** upgraded to the Domo icon font in this pass. The set is larger/messier than a simple swap (several images double as `<Frame>` screenshots; some "inline" images are mis-sized screenshots, not glyphs). To be done as a dedicated pass: view each image, map to a glyph (or keep as a screenshot) with human verification, then apply.
+
+---
+
+## Group Roots, Cards/Analyzer, and Connector Vendor Regroup (2026-10-31, PR #684)
+
+Nav-only regroup plus one new overview and title fixes. The set of Knowledge Base tab pages (children plus roots) is unchanged apart from the new `Archive-Overview` and the 65 release-notes pages of the removed duplicate Release Notes group, which are all still in the Release Notes tab; no article was retired, merged, or deleted. Ten `restructure/pm/*` branches test-merge cleanly; `chris-wright` and `dan-brinton` conflict only on `RESTRUCTURE-TASKS.md`, which propagation regenerates on the branch.
+
+**Pillar roots.** All 12 top-level KB pillars use their Overview as `root` with `"expanded": true`; Archive uses the new `Archive-Overview` as `root` with `"expanded": false`. Getting Started's root is `000005874` (its nested Getting Started subgroup was flattened into the pillar; see D5). Supersedes the 2026-10-19 sub-groups-only scope (decision log, 2026-10-31).
+
+**New overview:** `s/article/Archive-Overview.mdx` (maps each archived feature to its replacement; feature-only ownership entry under Release Management, no PM). Developer Portal roots and overviews are in a separate PR.
+
+**Analyze & Visualize > Cards.** Analyzer (root `Analyzer-Overview`, task subgroups Get Started / Work with Your Data / Build Your Chart / Format Your Chart / Save and Manage Cards / Best Practices), Chart Types (subgroups restored from `main`'s "Chart Types for Visualization Cards"), and Chart Properties (now a sibling of Chart Types) nest under Cards, followed by Card Details View, Powering Your Card, Doc Cards, Notebook Cards, Sumo Cards. Ten chart-editing how-tos moved from Chart Types into Analyzer; the Table Card write-back article moved into Chart Types > Tables. Worksheets is its own group again.
+
+**Connect & Integrate Data.** 112 vendor groups restored in the Data Providers ranges, Files & APIs, and Writeback Connectors (any vendor with more than one connector), sorted alphabetically among single pages, no roots. Five connectors moved into their vendor group in another range. How Connectors Work is the first subgroup; Writeback Connectors sits before Workbench. The two loose Snowflake articles moved into the Snowflake group. 11 connector articles, 7 topic pages, and `Connect-Unsupported-Data-Sources.mdx` retitled to the bare connector name.
+
+**Other moves:** Build Apps & Automate > Apps rooted on `4423762260375` (retitled "Domo Bricks Overview"; link text updated in 6 EN + 1 JA article). Workbench 5.1 (Legacy) rooted on `360056669354`. Nine Old Magic ETL articles moved from Archive > Deprecated Features into Archive > Legacy Magic ETL (Phase 4.6 lifecycle staging unchanged). Duplicate Release Notes group removed from the KB tab (Release Notes keeps its own tab). Archived release notes sort newest first in every language.
+
+**Tooling:** `apply_group_roots.py` (pillar roots, Archive collapsed, key order), `build-pm-ownership.py` (roots count as group members; overrides can set Feature; existing assignments are sticky and new articles take their nav neighbors' Feature, so a full regen is safe again. Regenerated 2026-11-02: 0 existing rows changed, 60 missing restructure articles added, 15 rows for deleted files dropped; overrides for the Distribute hub → Chris Wright, `Activity-Log-Event-Reference` → Dan Brinton, `What-is-a-DataSet` → Phil Fuchs; `RESTRUCTURE-TASKS.md` regenerated, moving one fact-check item each to Chris Wright and Phil Fuchs from Jordan Jensen and Mamta Bolaki, neither of whom had started review), `build_catalog.py` and `docs_cli.py export` (count roots), `build_docs_nav.py` (removed: Phase 7 edits `docs.json` in place), `archive-current-release-notes.py` (inserts newest first).
+
+**Nav depth (2026-11-02):** three levels (pillar › group › sub-group) is now the default rather than a hard cap; one or two more levels, never past five, are allowed when they add significant value. The vendor groups, Analyzer task groups, and Chart Types subgroups above are the four-level examples. See `KB-RESTRUCTURE-PLAN.md` › 7.1.
+
+---
+
+## Developer Portal Group Roots (2026-11-02, split from PR #684)
+
+Applies the KB root convention to the Developer Portal tab. Pending Jon T.'s approval (Developer Portal owner); Jared approved the approach.
+
+- **57 portal groups** use their overview page as `root` instead of listing it as the first child. Overviews were identified by an `overview` filename or `sidebarTitle: Overview`, plus four Product API intro pages that play the same role (Code Engine, Federated V1 to V2 Migration, Managing Dataset History, Workflows).
+- **Four new overviews** for top-level groups that had none: `portal/{Partner-Developers,Other-Resources,Developer-Topics,Domo-SDK}/overview.mdx`.
+- **`expanded: true` only on the 12 top-level portal groups**; nested groups are rooted but collapsed. Groups with no overview are unchanged.
+- Portal roots are maintained by hand (`apply_group_roots.py` only touches the English KB tab) and are outside PM ownership and CODEOWNERS. The OpenAPI sync drops a Product APIs group's root and overview page when its spec re-syncs, so re-add them after a sync.
 
 ---
 

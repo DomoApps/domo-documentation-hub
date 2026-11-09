@@ -252,17 +252,17 @@ function rehypeFoldStrayNestedLists() {
   return (tree) => walk(tree);
 }
 
-// remark (mdast) transform: align list spread with Prettier's preference for
-// nested lists. rehype-remark emits items containing a paragraph plus a nested
-// list as listItem.spread=true / list.spread=false — producing a blank line
-// between the parent text and its sublist, but none between sibling items.
-// Prettier formats the inverse on save: no blank within the item, blank
-// between siblings. Match Prettier so it doesn't have to rewrite our output.
+// remark (mdast) transform: write nested lists the way articles do. rehype-remark
+// emits items containing a paragraph plus a nested list as listItem.spread=true
+// / list.spread=false, which puts a blank line between the parent text and its
+// sublist but none between sibling items. Articles use the inverse: no blank
+// within the item, blank between siblings. The MDX formatter never removes the
+// blank inside an item, so it has to be left out here.
 //
 // Only touches items whose children are a leading paragraph followed by
 // nested lists. Items with multiple paragraphs keep spread=true because
 // CommonMark requires a blank line between paragraphs in a list item.
-function remarkPrettierListSpread() {
+function remarkNestedListSpread() {
   const tightenable = (item) => {
     if (!Array.isArray(item.children) || item.children.length < 2) return false;
     const [first, ...rest] = item.children;
@@ -430,7 +430,7 @@ async function buildProcessor() {
     .use(rehypeTableCellParagraphBreaks)
     .use(rehypeRemark.default)
     .use(remarkMergeContinuingOrderedLists)
-    .use(remarkPrettierListSpread)
+    .use(remarkNestedListSpread)
     .use(remarkGfm.default)
     .use(remarkCollapseJsxSpace)
     .use(remarkEscapeDollar)

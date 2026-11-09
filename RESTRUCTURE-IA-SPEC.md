@@ -30,6 +30,42 @@ Counts in parentheses are existing articles moving to that location.
 
 ---
 
+## Changelog — Group Roots, Cards/Analyzer, and Connector Vendor Regroup (2026-10-31, PR #684)
+
+Reflected in Pillar 2 (vendor groups, writeback note), Pillar 5 (tree), and Pillar 12 below, and in `docs.json`. Full detail in `RESTRUCTURE-MANIFEST.md` › "Group Roots, Cards/Analyzer, and Connector Vendor Regroup".
+
+- **Pillar roots:** every pillar's Overview (marked `[NEW] Overview` / hub in the trees below) is now the pillar's `root` page with `"expanded": true`; Archive is rooted on `Archive-Overview` and collapsed. Getting Started is rooted on `000005874`, with its nested Getting Started subgroup flattened in (D5 now also decides this root).
+- **`docs.json` is the nav source of truth.** The trees here describe intent; where they and `docs.json` disagree, `docs.json` wins and this spec should be updated. `ia-mapping.json` no longer drives the nav, and the `build_docs_nav.py` generator was removed (confirmed by Jared 2026-11-02).
+- **Nav depth is a default, not a cap.** Three levels (pillar › group › sub-group) is the default; one or two more levels are allowed when they add significant value, as with the connector vendor groups, the Analyzer task groups, and the Chart Types subgroups (all four levels). See `KB-RESTRUCTURE-PLAN.md` › 7.1.
+
+---
+
+## Changelog — App Studio & Related Regrouping (2026-10-22)
+
+All changes below are reflected in the per-pillar trees in this document and in `docs.json`.
+
+**App Studio | Overview (`000005295`) split and deleted.** The monolithic overview was split (cut-and-reassemble; all prose + 131 screenshots + 26 `[pm-input]` markers preserved, and 54 inline UI icons upgraded to the Domo icon font) into a task-based series under the App Studio group (root = **What Is App Studio?** / `What-is-App-Studio`):
+
+- `Build-an-App-Studio-App`, `Add-Charts-and-Tables-to-an-App-Studio-App`, `Add-Interactivity-to-an-App-Studio-App`, `Use-Advanced-Customization-in-App-Studio` (Forms + Pro-Code Components), `Distribute-an-App-Studio-App`, `Manage-an-App-Studio-App`, `App-Studio-Appendix` (all `[NEW]`).
+- `000005543` retitled "Design with App Studio Themes" → **"Add Themes to an App Studio App"**; `000005829` (Report Builder) and `000005681` (Table Elements) kept.
+- `000005295.mdx` **deleted**; `/s/article/000005295` **redirects** to `What-is-App-Studio`. Inbound links repointed (plain/title → root; anchored → the same heading's new article), and link text reading the old title updated to "What Is App Studio?".
+
+**New groups/subgroups:**
+
+- **App Components** subgroup under App Studio — root **What Are App Components?** (`What-Are-App-Components`, `[NEW]`); holds `000005864`, Create-a-KPI-Component, Group-and-Aggregate, Apply-Conditional.
+- **Apps** group under Build Apps & Automate (flat, no overview) — **Domo Bricks | Overview** (`4423762260375`), **AppDB Admin User Interface** (`9221297758615`), **Wire an App** (not App Studio-related; not linked from the App Studio hub).
+- **Workspaces** group under Collaborate — root **What Are Workspaces?** (`What-Are-Workspaces`, `[NEW]`, owned by Dan Brinton); holds **Create and Share Workspaces** (moved from App Studio).
+
+**Articles moved to other pillars:**
+
+- **Forecasting Universal Model** (`000005567`) → AI & Data Science > AutoML (linked from the AI & Data Science hub).
+- **Publish Content to a Subscriber Instance** (`360045120554`) → Distribute > Publications (already linked from the "Distribute Content Outside Domo" hub).
+- **Domo Sandbox** (`4403367344023`) → Administer & Govern > Sandbox & Environments (already linked from `Domo-Sandbox-Overview`).
+
+**PM ownership:** new App Studio articles → Khushboo; Workspaces articles → Dan Brinton (via `pm-review-state/ownership-overrides.json`). `Article-PM-Ownership-Reference.mdx` and `.github/CODEOWNERS` were scope-updated for today's articles — a full regen is deferred until `scripts/build-pm-ownership.py`'s `NAV_FEATURE` map is calibrated for the restructured nav (a full regen today dumps ~512 unrelated articles into the `Admin` catch-all). PM review briefs and `RESTRUCTURE-TASKS.md` were regenerated.
+
+---
+
 ## Cross-Cutting Concerns
 
 These three principles apply across all pillars and must be kept in mind during Phase 3 (content creation), Phase 5 (interlinking), and Phase 7 (nav rebuild).
@@ -161,6 +197,10 @@ Connect & Integrate Data
 
 **Note on Writeback Connectors:** The 55 writeback connector articles are no longer a standalone top-level section. CDW-specific write paths (Cloud Amplifier writeback) are documented within each CDW's sub-group overview. Standard writeback connectors are integrated into the alphabetical Connector Library groups alongside read connectors. Workbench writeback is covered in the Workbench section.
 
+**Current nav differs (2026-10-31):** the nav still has a Writeback Connectors group (inside the Connector Library, before Workbench), so writeback connectors are not yet interleaved with the read connectors. Folding them in is still open.
+
+**Vendor groups (2026-10-31, PR #684):** inside the alphabetical ranges, Files & APIs, and Writeback Connectors, any vendor or product with more than one connector has its own group (Adobe, Amazon, Google, Microsoft, Salesforce, ..., 112 in all; names from `main`), sorted alphabetically among the single connector pages and never rooted. Format families (CSV, JSON, XML) are grouped the same way. Vendors with one connector stay flat, and vendors that already have a CDW group (Oracle, Snowflake, PostgreSQL, MySQL, Azure, Redshift, Databricks) are not duplicated. This is not the use-case grouping ruled out in the plan, so don't flatten them back.
+
 **[DECISION]** Workbench 4 (37 articles) is in Archive. Confirm: should it be completely removed from primary nav, or kept in a Legacy group? Recommend: Archive — these are 5+ year old articles for an EOL product.
 
 **[DECISION]** "Files & APIs" is a sub-group of the connector library containing 24 articles. These are HTTP-based and file-upload connectors (SFTP, XML, JSON, etc.). Confirm they stay in Connector Library vs. getting their own section.
@@ -254,44 +294,53 @@ Prepare & Transform Data
 
 **Story:** Your data is clean and ready. Now let's turn it into insights — cards, charts, dashboards, and calculations.
 
+Current nav (2026-10-31, PR #684). Counts include the root page.
+
 ```
-Analyze & Visualize
-├── [NEW] Overview: Analyze & Visualize in Domo      ← hub article
-├── [NEW] What is a Card?                             ← synthesize from Analyzer articles
-├── [NEW] What is a Dashboard?                        ← synthesize from dashboard articles
-├── Cards (33)                                        ← building individual visualization cards
-│   ├── [NEW] Getting Started: Build Your First Card  ← synthesize; "Build Your First Dashboard"
-│   │                                                    tutorial already exists (Getting Started)
-│   ├── Analyzer Overview
-│   ├── Analyzer Layout
-│   ├── Powering a Card with Data
-│   ├── Save a Visualization Card
-│   ├── Card Building FAQs
-│   └── [remaining card how-tos and references]
-├── Chart Types — Reference (143)                     ← reference library; not a story section
-│   ├── [NEW] Chart Types Overview / How to Choose    ← upgrade existing "Best Practices for Choosing
-│   │                                                    Chart Types" into the hub article
-│   ├── Line Charts
-│   ├── Bar Charts
-│   ├── Pie-Type Charts
-│   ├── Map Charts
-│   └── [remaining chart type articles]
-├── Beast Mode (18)
-│   ├── [NEW] What is Beast Mode?                     ← synthesize from FAQs + functions reference
+Analyze & Visualize                                   ← root: Analyze-and-Visualize-Overview
+├── Beast Mode (22)                                   ← root: What-is-Beast-Mode
 │   ├── Create a Beast Mode Calculation
 │   ├── Beast Mode Functions Reference
 │   ├── Beast Mode FAQs
 │   ├── Sample Beast Mode Calculations (5 sub-articles)
 │   └── Troubleshooting Beast Mode
-└── Dashboards & Pages (36)
-    ├── [NEW] Getting Started: Build Your First Dashboard  ← already exists in Getting Started;
-    │                                                          MOVE here (it's misplaced)
-    ├── Manage Dashboards
-    ├── Page Filters and Filter Views
-    ├── Dashboard Optimization Best Practices
-    ├── Top 10 Dashboard Design Best Practices
-    └── [remaining dashboard articles]
+├── Cards (179)                                       ← root: What-is-a-Card
+│   ├── Analyzer (26)                                 ← root: Analyzer-Overview; task subgroups
+│   │   ├── Get Started
+│   │   ├── Work with Your Data
+│   │   ├── Build Your Chart
+│   │   ├── Format Your Chart
+│   │   ├── Save and Manage Cards
+│   │   ├── Best Practices
+│   │   └── Card Building FAQs
+│   ├── Chart Types — Reference (108)                 ← subgroups restored from main's
+│   │   ├── Best Practices for Choosing Chart Types      "Chart Types for Visualization Cards"
+│   │   ├── Custom Charts
+│   │   ├── Area and Bar Charts
+│   │   ├── Data Science Charts
+│   │   ├── Filter and Miscellaneous Charts
+│   │   ├── Gauges
+│   │   ├── Line and Lollipop Charts
+│   │   ├── Period-over-Period Charts
+│   │   ├── Pie and Funnel Charts
+│   │   ├── Tables
+│   │   └── Textboxes and Map Charts
+│   ├── Chart Properties (26)                         ← sibling of Chart Types, not a child
+│   ├── Card Details View (4)
+│   ├── Powering Your Card (3)
+│   ├── Doc Cards (6)
+│   ├── Notebook Cards (2)
+│   └── Sumo Cards (3)
+├── Dashboards & Pages (38)                           ← root: What-is-a-Dashboard
+│   ├── Manage Dashboards
+│   ├── Page Filters and Filter Views
+│   ├── Dashboard Optimization Best Practices
+│   ├── Top 10 Dashboard Design Best Practices
+│   └── [remaining dashboard articles]
+└── Worksheets (1)                                    ← own group again, as on main
 ```
+
+`[NEW] Getting Started: Build Your First Card` (synthesize; the "Build Your First Dashboard" tutorial already exists in Getting Started) is still open.
 
 **[DECISION]** "Build Your First Dashboard | Tutorial" currently lives in Getting Started. It should move to Analyze & Visualize > Dashboards & Pages, and Getting Started should link to it. Confirm before moving.
 
@@ -305,15 +354,30 @@ Analyze & Visualize
 Build Apps & Automate
 ├── [NEW] Overview: Build Apps & Automate             ← hub article
 ├── [NEW] What is App Studio?                         ← synthesize from App Studio Overview + articles
-├── App Studio (11)
-│   ├── App Studio | Overview                         ← existing (may become the "What is App Studio?")
-│   ├── Build Domo Apps with the Pro-code Editor
-│   ├── Design with App Studio Themes
-│   ├── Create and Customize App Components
-│   ├── Explore Data with Table Elements
-│   ├── Deliver Reports with Report Builder
-│   ├── Wire an App
-│   └── [remaining App Studio how-tos]
+├── App Studio   (root: What Is App Studio?)
+│   │   NOTE (2026-10): "App Studio | Overview" (000005295) was SPLIT into the task-based
+│   │   series below and DELETED. /s/article/000005295 now redirects to What-is-App-Studio
+│   │   (the group root). Every screenshot and all prose were preserved across the split;
+│   │   54 legacy inline UI icons were upgraded to the Domo icon font.
+│   ├── Build an App Studio App                        ← [NEW] from the Overview split
+│   ├── Add Charts and Tables to an App Studio App     ← [NEW] from the Overview split
+│   ├── Explore Data with Table Elements in App Studio
+│   ├── Add Interactivity: Popups, Filters, and Actions to an App Studio App  ← [NEW]
+│   ├── Add Themes to an App Studio App                ← was "Design with App Studio Themes" (retitled)
+│   ├── Use Advanced Customization in App Studio with Forms and Pro-Code Components  ← [NEW]
+│   ├── Deliver Customized Reports with App Studio Report Builder
+│   ├── Distribute an App Studio App                   ← [NEW] from the Overview split
+│   ├── Manage an App Studio App                       ← [NEW] from the Overview split
+│   ├── App Components                                 ← sub-group (root: What Are App Components? — [NEW] overview)
+│   │   ├── Create and Customize App Components
+│   │   ├── Create a KPI Component in App Studio
+│   │   ├── Group and Aggregate Data in App Components
+│   │   └── Apply Conditional Formatting and Conditional Rendering in App Components
+│   └── App Studio Appendix                            ← [NEW] glossary from the Overview split
+├── Apps (3)                                           ← general app building & management; NOT App Studio (not linked from the What Is App Studio? hub)
+│   ├── Domo Bricks | Overview
+│   ├── AppDB Admin User Interface
+│   └── Wire an App                                    ← unrelated to App Studio; lives here, not in the App Studio group/hub
 ├── Workflows (13)
 │   ├── [NEW] What is Workflows?                      ← Workflows | Overview already exists
 │   │         (may just promote existing overview)
@@ -357,7 +421,7 @@ Build Apps & Automate
 ```
 Distribute
 ├── [NEW] Overview: Distribute                        ← hub article (net-new)
-├── Choose How to Share Content Outside Domo          ← cross-cutting chooser
+├── Distribute Content Outside Domo                   ← cross-cutting chooser (slug: Choose-How-to-Share-Outside-Domo)
 ├── Export (6)
 │   ├── Printing a Visualization Card
 │   ├── Export Visualization Cards
@@ -369,12 +433,15 @@ Distribute
 │   ├── Embed Content Outside of Domo
 │   ├── Filter Options for the Embedded View Experience
 │   └── Exporting Embedded Content
-└── Publications (4)
+└── Publications (5)
     ├── Setting Up Publication Groups
     ├── Publication Groups and You: The Not Quite Definitive Primer
     ├── Slideshow Publications Page Layout
-    └── Sharing Content Using Slideshows
+    ├── Distributing Content Using Slideshows
+    └── Publish Content to a Subscriber Instance       ← moved from App Studio
 ```
+
+**Terminology (2026-10-16):** Within Distribute, **"distribute"** is the verb for getting content to audiences outside Domo. **"Share"** is reserved for the Collaborate pillar's share-with-Domo-users function. Distribution-sense "share" was changed to "distribute" across this pillar, and the two formerly-"share"-titled articles were retitled (slugs unchanged). Literal Domo UI labels (**Share** menu, **Share link**, **Sharing** menu) and genuine share-permission references are kept as-is. See `RESTRUCTURE-MANIFEST.md` › "Distribute Pillar — Distribute Terminology".
 
 ## Pillar 8: Collaborate
 
@@ -409,8 +476,10 @@ Collaborate
 │   ├── Creating a Project
 │   ├── Creating and Assigning Project Tasks
 │   └── [remaining P&T articles]
-└── Notifications & Reports (1)
-    └── Scheduled Reports
+├── Notifications & Reports (1)
+│   └── Scheduled Reports
+└── Workspaces (1)   (root: What Are Workspaces? — [NEW] overview; owned by Dan Brinton)
+    └── Create and Share Workspaces              ← moved from App Studio; organize and share dashboards, cards, apps, and DataSets
 ```
 
 **[DECISION]** Projects & Tasks is a legacy feature (pre-Workflows era). Are these articles current? If the feature is being phased out in favor of Workflows, these may belong in Archive.
@@ -436,10 +505,15 @@ AI & Data Science
 │   ├── Magic ETL AI
 │   ├── AI Playground
 │   ├── AI Adapters (Databricks, OpenAI, Bedrock)
-│   ├── MCP Integration
+│   ├── MCP                                           ← own nav group; connect AI tools to Domo's MCP Server
+│   │   ├── MCP Server · Domo MCP · Standard OAuth · Manually Connect · Gemini Enterprise
+│   │   └── Toolkits (sub-group)                       ← the individual capability toolkits, nested
+│   │       ├── Alerts · Cards · Code Engine · Sandbox Repository · Task Center Queue
+│   │       └── User Administration · Workflow · Workspaces · Coming Soon
 │   └── [remaining AI articles]
-├── AutoML (1)
-│   └── Train and Deploy Models with AutoML           ← single article; needs expansion
+├── AutoML (2)
+│   ├── Train and Deploy Models with AutoML           ← single article; needs expansion
+│   └── Forecasting Universal Model                   ← moved from App Studio
 ├── Jupyter Workspaces (5)
 │   ├── Jupyter articles
 │   └── Jupyter Troubleshooting Guide
@@ -496,8 +570,9 @@ Administer & Govern
 │   ├── Credit Monitoring
 │   ├── Observability Metrics
 │   └── [remaining instance settings]
-├── Sandbox & Environments (1)
+├── Sandbox & Environments (2)
 │   ├── [NEW] Domo Sandbox & Promotion Overview       ← synthesize from Sandbox article
+│   ├── Domo Sandbox                                  ← moved from App Studio
 │   └── Domo Sandbox: Linked Repositories
 └── Goals (5)
     ├── Getting Started With Goals                    ← existing tutorial
@@ -534,6 +609,8 @@ Develop & Integrate
 ---
 
 ## Pillar 12: Release Notes
+
+Lives in its own **Release Notes** tab, not as a pillar group on the Knowledge Base tab (the duplicate KB-tab group was removed 2026-10-31). Archives sort newest first.
 
 ```
 Release Notes

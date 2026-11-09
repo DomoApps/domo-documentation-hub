@@ -6,7 +6,7 @@ file at the start of any restructure work to orient themselves before doing anyt
 
 **Plan document:** `KB-RESTRUCTURE-PLAN.md`
 **Disposition log:** `RESTRUCTURE-MANIFEST.md` — running record of what happened to every article; updated throughout all phases; Phase 9 converts it to the final audit report
-**Last updated:** 2026-09-30 — **Phase 4.5 interactive PM-review built + Phase 3c sync #2 done** (committed & pushed; HEAD `49d23a4f`). `pm-review` skill + `scripts/pm_review.py`; 12 per-PM branches; main content synced in (baseline `ad4cee86`, NOT a git merge); 23 new articles navved; 2 add/add synthesized to main's. See the 2026-09-30 resume block below. — _Prior:_ 2026-08-28 (**Phase 4 executed + Phase 4.5 tooling complete — all committed AND pushed**, HEAD `007f6b51` = `origin/update/fullRestructure`, tree clean). Phase 4: 14 duplicate connectors merged/deleted (`74e92a42`), `DataFusion-Migration-Guide.mdx` (`c730bac5`), retirement batches staged for 4.6 (`bbad7cbe`), disposition vocab reconciled to five-state; 8 title-collision non-duplicates deferred. Phase 4.5: `build-pm-review-briefs.py` now generates 14 per-PM briefs + `RESTRUCTURE-TASKS.md` (387-task dashboard) + `PM-REVIEW-STATUS.md` (workflow ledger, seed-once); all ownership resolved. **Next: begin the PM review loop (see Phase 4.5 › "The operating loop"), then Phase 4.6.**
+**Last updated:** 2026-10-31 — **Pillar roots, Cards/Analyzer regroup, connector vendor groups (PR #684, draft into `update/fullRestructure`).** Reverses the 2026-10-19 "pillars keep their Overview as the first child" call, with Jared's agreement: every top-level KB pillar now uses its Overview as `root` with `expanded: true` (Archive is rooted but `expanded: false`), and `apply_group_roots.py` enforces this. Also: Archive Overview written, Analyzer/Chart Types/Chart Properties nested under Cards with task subgroups, Chart Types subgroups restored from `main`, 112 connector vendor groups restored, Old Magic ETL moved into Legacy Magic ETL, connector titles cleaned up, archived release notes newest-first. **`docs.json` is the nav source of truth:** Jared confirmed (2026-11-02) that the Phase 7 regeneration step was an artifact, so it and `scripts/build_docs_nav.py` were removed; Phase 7 edits `docs.json` in place (see Phase 7). `build_catalog.py` and `docs_cli.py export` now count root pages. `build-pm-ownership.py` now keeps existing assignments and routes only new articles (by nav-group neighbors), so the full PM-ownership regen is unblocked: run 2026-11-02, it changed no existing row and added the 60 restructure articles that were missing from the reference (and so from PM briefs). Developer Portal roots and overviews were split out to their own PR for Jon T.'s review (they stay out of this one). Logged in the manifest › "Group Roots, Cards/Analyzer, and Connector Vendor Regroup". All 12 `restructure/pm/*` branches test-merge cleanly. _Earlier (2026-10-19):_ **Group root pages integrated (feature sub-groups only).** Promoted 18 feature sub-group Overview/hub articles to Mintlify `root` pages on the English KB tab (clicking a sub-group opens its overview; the page leaves the child list) via the new `scripts/apply_group_roots.py` (+ `scripts/group_roots.json` override map). **Top-level pillars deliberately keep their `<Pillar> Overview` as the first child, not a root.** The script is a reconciler — it both applies sub-group roots and un-roots anything that shouldn't have one. Reachable-page invariant verified (1900 → 1900, 18 moved child→root, 0 lost); idempotent. Archive excluded; `Key Resources` left rootless pending D5. Wired into Phase 7 (run after `build_docs_nav.py`) and recorded in the Phase 7 › Group Root Pages + Phase 8 wheel-and-spoke sections. **Also revised Phase 5.2** (`KB-RESTRUCTURE-PLAN.md`) to adopt Mintlify's native **Related Pages** feature in place of hand-written `## Related Articles` sections: strip the ~40 existing sections, curate relations via the `related:` frontmatter field, and turn on Mintlify automatic mode (frontmatter overrides win). **Also tightened Phase 6.5**: every redirect entry must set `"permanent": true` explicitly (308, not the 307 that `permanent: false` yields) with a validation gate — don't trust the platform default. **Added Phase 5.6**: a pre-pass that normalizes legacy KB full-URL links (~1,550 `domo-support.domo.com/s/article/...` + other retired KB hosts) to root-relative `/s/article/...`, leaving genuinely external Domo hosts absolute; relativized links then ride the Phase 6.6 ID→slug rewrite. _Earlier (2026-10-16):_ **Distribute pillar "distribute" terminology.** Retitled "Choose How to Share Content Outside Domo" → "Distribute Content Outside Domo" and "Sharing Content Using Slideshows" → "Distributing Content Using Slideshows" (slugs unchanged); changed distribution-sense "share" → "distribute" across the Distribute pillar; updated inbound link text; "share" reserved for the Collaborate pillar. **Icon migration officially deferred** (see manifest › "Distribute Pillar — Distribute Terminology"). Committed `4f98c0ee`, merged into all 12 `restructure/pm/*` branches (manual preview-safe batches of ≤4), all previews green. — _Earlier same day:_ **MCP/Toolkits nav regroup integrated from main PR #630** (`MCP → Toolkits` nested sub-group; 13 MCP articles refreshed to main's current versions per "main is correct here" — modern `/mcp` endpoints, "Domo MCP" naming, hand-written beta Notes; added `domo-mcp-toolkits.png`; IA spec + manifest updated). Then merged `update/fullRestructure` down into all 12 `restructure/pm/*` branches (manual preview-safe batches of ≤4; `propagate-ownership` not used because it pushes all branches at once and would trip the 429 cap). Amazon Quick Suite MCP article deferred to Phase 3c sync #2 (not on this branch yet). See the manifest › "MCP / Toolkits Nav Regroup". — _Prior:_ 2026-09-30 — **Phase 4.5 interactive PM-review built + Phase 3c sync #2 done** (committed & pushed; HEAD `49d23a4f`). `pm-review` skill + `scripts/pm_review.py`; 12 per-PM branches; main content synced in (baseline `ad4cee86`, NOT a git merge); 23 new articles navved; 2 add/add synthesized to main's. See the 2026-09-30 resume block below. — _Prior:_ 2026-08-28 (**Phase 4 executed + Phase 4.5 tooling complete — all committed AND pushed**, HEAD `007f6b51` = `origin/update/fullRestructure`, tree clean). Phase 4: 14 duplicate connectors merged/deleted (`74e92a42`), `DataFusion-Migration-Guide.mdx` (`c730bac5`), retirement batches staged for 4.6 (`bbad7cbe`), disposition vocab reconciled to five-state; 8 title-collision non-duplicates deferred. Phase 4.5: `build-pm-review-briefs.py` now generates 14 per-PM briefs + `RESTRUCTURE-TASKS.md` (387-task dashboard) + `PM-REVIEW-STATUS.md` (workflow ledger, seed-once); all ownership resolved. **Next: begin the PM review loop (see Phase 4.5 › "The operating loop"), then Phase 4.6.**
 
 ---
 
@@ -23,7 +23,7 @@ file at the start of any restructure work to orient themselves before doing anyt
 - **Phase 3c SYNC #2 DONE** (pulled early so PMs review current main content). Content sync, **NOT a git merge** — `docs.json`/structure preserved; baseline pinned `ad4cee86` (`pm-review-state/sync-baseline.json`). 89 clean applies + 19/21 conflicts resolved + 23 new + images/skills/localized/release-notes. The 2 add/add (`AI-Chat-v2`, `Apollo.io-Connector`) synthesized to main's superseding versions. **All 23 new articles nav-placed** in docs.json (MCP 11, App Studio 4, Connector Library 5, Magic ETL 1, Embed 1, release archives: May-2026-Release). ⚠️ **Apollo.io flag:** confirm the connector is OAuth-only now (main removed the Access-Token method; restore if still supported).
 - **▶ FIRST ACTION NEXT SESSION — run a PM's review:** `git checkout restructure/pm/<slug>` then `/pm-review <PM>` (or bare `/pm-review` — it infers from the branch). The skill walks their brief item-by-item with diffs; resumable. Start with a confirmed-login PM (Dan Brinton, Ken Boyer, Phil Fuchs, Ryan Despain, Jordan Jensen, Andrea Henderson, Mamta Bolaki). Tasleema's brief is huge (~1,077 articles) — chunk it.
 - **Gate to Phase 4.6:** after all PM branches merge back, run `pm_review.py reconcile --strict` + `rollup` + `deferred-report` on `update/fullRestructure`; `gate_clear: true` + every PM Done → Phase 4.6.
-- **Still open:** the 8-connector disambiguation task (fold into Phase 6); the 2 non-PM pseudo-briefs (Release-Management, no-PM-listed) have no branch by design; a Phase 3c **sync #3** may run pre-final-merge if main moves materially; localized content sync beyond this pass is Phase 6.
+- **Still open:** the 8-connector disambiguation task (fold into Phase 6); the 2 non-PM pseudo-briefs (Release-Management, no-PM-listed) have no branch by design; a Phase 3c **sync #3** may run pre-final-merge if main moves materially; localized content sync beyond this pass is Phase 6; **Distribute-pillar icon migration** (`360043437793`, `360043437813`) officially deferred 2026-10-16 — dedicated verified pass (see manifest › "Distribute Pillar — Distribute Terminology").
 
 ### ▶ Prior session (2026-08-28)
 
@@ -74,6 +74,32 @@ Next: advance to **Phase 4** (Consolidation & Retirement), or Phase 3c sync #2 w
 **Standing rule — pending articles:** Any article that cannot be completed without PM or human context (missing feature details, unclear positioning, unconfirmed scope) is automatically added as a `[pm-input]` item in the relevant PM's Phase 4.5 meeting brief. It is never tracked as a blocker to the current phase. Write what can be written from existing KB content; note the gap in the PM brief.
 **Phase 1/2 re-run:** Complete 2026-07-14 on branch `update/fullRestructure`
 **Phase 3a core:** ✅ Complete 2026-07-14 — all 29 synthesizable articles written and in docs.json
+
+---
+
+## Parked Ideas / Backlog (NOT yet scoped into a phase)
+
+Candidate work captured for later. **These are not committed phases** — each needs a go/no-go before it becomes real work. Revisit, then promote to a numbered phase if approved.
+
+### IDEA — Repo-wide descriptive, LLM-friendly image alt-text pass (raised 2026-10-19)
+
+Generate descriptive, LLM-friendly alt text for every referenced image by actually reading the image, then stamp that alt into every instance of the image across the KB code.
+
+**Why:** helps screen readers *and* Mintlify's AI/search index; current alt is ~⅓ missing and much of the rest is weak/filename-ish.
+
+**Scope (measured 2026-10-19):** 12,099 image files in `images/kb/`; **7,402 unique images referenced** in the English KB; **8,666** EN references total (~1,264 are reuses → generate once per unique image, apply everywhere); **2,345** EN `<img>` have empty/missing alt; ~4,816 have some alt worth re-captioning; **10,072** image refs in localized tabs.
+
+**How it would work:**
+1. Committed `image-alt-map.csv` (`image_path → alt_text`) as the single source of truth, keyed on the image **filename** — images aren't renamed in the restructure, so this is **independent of Phase 6 slug renames** and can run anytime / in parallel.
+2. Batched vision sub-agents caption each unique referenced image into the map (~7,400 calls, not 8,666).
+3. A script writes the map's alt into every reference instance — `<img alt="…">` and markdown `![alt](src)` (`<Frame>` takes no alt; it wraps the inner `<img>`). Idempotent.
+
+**Hard parts / cost drivers:**
+- **Vision accuracy on UI screenshots** (misread button/menu labels) — needs a verification tier; this is the main cost/time driver, not generation.
+- **Localization multiplier** — English alt in a localized article is wrong; translating the alt-map for the 10k localized refs belongs with the `localize` skill (Phase 6+), not this pass. Cleanest: **English-only now**, localized alt folded in later.
+- **Re-caption vs. fill-only** — filling the 2,345 blanks is cheap; re-captioning all ~7,400 for consistent quality is ~3× the work. That's the scope dial.
+
+**Open decisions if promoted:** (a) English-only now vs. all languages; (b) fill blanks only vs. re-caption everything; (c) standalone phase vs. fold into the screenshot/Gate-2 work. Complements the existing screenshot policy and Gate 2.
 
 ---
 
@@ -208,7 +234,7 @@ All 1,832 articles assigned to 11 pillars + Archive. Full spec in `RESTRUCTURE-I
 - `scripts/output/ia-spec.json` — every article → `{pillar, group, sub_group}`
 - `scripts/output/ia-mapping.json` — article filename → `{pillar, group, sub_group}`
 - `docs.json` — KB tab rebuilt with 11 pillar groups (1,832 page refs; up from 1,772)
-- `scripts/build_docs_nav.py` — new script; reads `ia-mapping.json` + `catalog.json`, rebuilds KB tab in-place; preserves Developer Portal, Release Notes, and all localized tabs
+- `scripts/build_docs_nav.py` — new script; reads `ia-mapping.json` + `catalog.json`, rebuilds KB tab in-place; preserves Developer Portal, Release Notes, and all localized tabs (_removed 2026-11-02; `docs.json` is hand-curated, see Phase 7_)
 - `RESTRUCTURE-IA-SPEC.md` — human-readable nav spec with full hierarchy, new articles to write, and 8 open decisions
 
 **Nav structure:** 11 pillars as top-level groups inside the single **Knowledge Base** tab. Each pillar contains its groups as nested sub-groups. Archive appended last. `s/topic/` files excluded (not relevant to restructure). Developer Portal and Release Notes tabs, and all localized tabs (ja/fr/de/es), untouched.
@@ -577,7 +603,7 @@ All 29 synthesizable articles were written and registered in docs.json. MCP arti
 | 28 | `s/article/Domo-Sandbox-Overview.mdx` | Sandbox article | `new-overview-article` |
 | 29 | `s/article/Develop-and-Integrate-Overview.mdx` | Existing 5 API articles | `new-overview-article` |
 
-**Scope note:** All Phase 3a articles go in `s/article/`. The `portal/` directory is entirely out of scope for this restructure — it is Developer Portal content with its own structure and audience. The only portal/ work in this restructure is Phase 5 interlinking, which adds links *from* `s/article/` how-tos *to* existing `portal/` reference pages (no new portal/ files, no portal/ nav changes).
+**Scope note:** All Phase 3a articles go in `s/article/`. The `portal/` directory is entirely out of scope for this restructure — it is Developer Portal content with its own structure and audience. The only portal/ work in this restructure is Phase 5 interlinking, which adds links *from* `s/article/` how-tos *to* existing `portal/` reference pages (no new portal/ files, no portal/ nav changes). **Exception (2026-11-02, separate PR from #684; Jared approved, pending Jon T.'s approval as Developer Portal owner):** four portal overview pages were added and 57 Developer Portal groups were given `root` pages, to match the KB root convention. No other portal content changed.
 
 ---
 
@@ -973,8 +999,9 @@ For every article whose status changed in this phase, update its disposition rec
 Bulk agent pass to add **Next Steps** and **Related Articles** sections to every article in the restructured KB. This phase cannot run before PM review because article titles and paths must be stable — content still being updated during PM review would produce stale links.
 
 **Scope:**
+- **Pre-pass:** normalize legacy KB full-URL links to root-relative paths — ~1,550 `https://domo-support.domo.com/s/article/...` links (plus other retired KB hosts: `knowledge.domo.com`, `domohelp.domo.com`, `wiki.domo.com`) become `/s/article/<ID>`; genuinely external Domo hosts (developer, community-forums, university, embed, oauth, app, www) stay absolute. Runs before the Next Steps / related work so the relativized `/s/article/<ID>` links flow through the Phase 6.6 ID→slug rewrite. See `KB-RESTRUCTURE-PLAN.md` § 5.6.
 - Every article in Pillars 1–10 gets a `## Next Steps` section pointing to logical follow-on articles
-- Every article gets a `## Related Articles` section pointing to sibling articles in the same product group
+- Related links move to Mintlify's native **Related Pages** feature (not hand-written `## Related Articles` sections): strip the ~40 existing `## Related Articles` sections, curate relations per page via the `related:` frontmatter field (sibling articles in the same product group), and enable Mintlify's automatic mode so every page gets related links with our frontmatter definitions taking precedence. See `KB-RESTRUCTURE-PLAN.md` § 5.2.
 - Cross-pillar links added where a KB how-to touches a portal/developer equivalent
 - AI callout (`<Tip>**Try it with AI:**...`) added to applicable how-tos where a GA AI feature exists for the same task (see Cross-Cutting Concerns in `RESTRUCTURE-IA-SPEC.md`)
 
@@ -1005,20 +1032,21 @@ The `ja/`, `de/`, `es/`, `fr/` directories use the same numeric filename scheme 
 Replace all old numeric paths in docs.json with new slug paths. Run after 6.2/6.3 so the nav and files are in sync.
 
 ### 6.5 Add redirects to docs.json
-For every renamed file, add a permanent (308) redirect entry to `docs.json`:
+For every renamed file, add a redirect entry to `docs.json`. **Each entry must set `"permanent": true` explicitly** — do not rely on the default. `permanent: true` yields a **308** (permanent) redirect; `permanent: false` yields a **307** (temporary). We want 308s so search engines transfer ranking to the new slug and external links are permanently repointed. Set the field on every entry rather than trusting the platform default (which has been observed to resolve to `false`), so the outcome is unambiguous:
 ```json
 "redirects": [
-  { "source": "/s/article/000005874", "destination": "/s/article/What-is-Domo" },
+  { "source": "/s/article/000005874", "destination": "/s/article/What-is-Domo", "permanent": true },
   ...
 ]
 ```
-Mintlify applies redirects at request time — goes live on next deploy. Preserves SEO and prevents broken external links.
+The generator for this step must emit `"permanent": true` on every row (and a validation check should fail if any redirect entry is missing it or has it set to `false`). Mintlify applies redirects at request time — goes live on next deploy. Preserves SEO and prevents broken external links.
 
 ### 6.6 Update all internal links in the repository
 Grep all `.mdx` files for old numeric path strings. Use `slug-rename-map.csv` to replace each with the new slug path. This covers:
 - Inline links in article bodies
 - `existing_related_articles` references (if any remain in frontmatter)
 - Any portal/ articles that link to s/article/ numeric paths
+- The `/s/article/<ID>` links relativized from legacy KB hosts in Phase 5.6 (they land here as plain numeric paths and get the same ID→slug treatment)
 
 ---
 
@@ -1026,16 +1054,37 @@ Grep all `.mdx` files for old numeric path strings. Use `slug-rename-map.csv` to
 
 **Runs after:** Phase 6 (all slugs stable and redirects in place)
 
-Final rebuild of the `docs.json` Knowledge Base tab with correct slug-based paths. At this point, Phase 2's IA-spec-driven nav is already in place (pillar groups, etc.) — Phase 7 verifies integrity and cleans up any remaining issues.
+Final verification of the `docs.json` Knowledge Base tab with correct slug-based paths. Phase 2's IA-spec-driven nav was generated once by a since-removed `build_docs_nav.py`; the KB tab has been curated by hand ever since (nesting deeper than three levels, vendor groups, non-alphabetical order, pillar roots), so **`docs.json` is the source of truth and Phase 7 edits it in place; there is no regeneration step** (Jared confirmed 2026-11-02).
 
 **Checklist:**
 - Run `mintlify broken-links` CLI — fix any remaining broken refs
+- Re-apply group root pages: run `python3 scripts/apply_group_roots.py --apply` to re-derive each group's `root` against the post-Phase-6 slugs (the Phase 6 link updater rewrites `root` values too; this run confirms nothing drifted and should be a no-op). See **Group Root Pages** below.
 - Verify Archive group is at the bottom of the KB tab containing only Legacy- and Sunset-state articles
 - Verify Legacy articles have `tag: "Legacy"` and Sunset articles have `tag: "Sunset"` sidebar labels
 - Verify Deprecated articles have `tag: "Deprecated"` and remain in their normal pillar group (not in Archive)
 - Verify Retired articles have `status: "retired"` and are absent from docs.json nav entirely
 - Verify all Phase 3a stub files have been replaced with real content
 - Verify localized tab structures mirror the English KB structure
+
+### Group Root Pages (added 2026-10-19)
+
+Mintlify [root pages](https://www.mintlify.com/docs/organize/navigation#root-page) consolidate a group's Overview/hub article onto the group parent itself: clicking the group title in the sidebar opens that page, and the page no longer appears as a separate child. This is the nav expression of the Phase 8 "wheel-and-spoke" standard (one Overview/hub + how-tos per group).
+
+**Applied now on `update/fullRestructure` (18 sub-group roots)** via `scripts/apply_group_roots.py --apply` — a reconciler that sets `root` on matching English-KB **sub-group** nodes and drops that page from `pages` (and un-roots any node that shouldn't have one, restoring its Overview as the first child); nothing else in the nav is touched (safe mid-Phase-4.5, unlike the full `build_docs_nav.py` rebuild). Invariant verified: the set of reachable KB pages (children ∪ roots) is unchanged (1900 → 1900); 18 pages moved child→root, none lost or gained. Idempotent.
+
+**Scope — every group, pillars included (changed 2026-10-31, PR #684).** The original 2026-10-19 pass rooted only feature sub-groups and kept each pillar's Overview as the first child, because rooting a pillar hid the overview behind a click. With Jared's agreement that was reversed: every top-level pillar now uses its Overview as `root` and also sets `"expanded": true`, so its sub-groups show without a click. Archive is the one exception: it is rooted on `Archive-Overview` but set `"expanded": false` (`COLLAPSED_PILLARS` in the script) so legacy content stays collapsed. Nested groups get `root` only, never `expanded`. The script writes keys in the order `group`, `root`, `expanded`, then the rest, and also corrects a pillar whose `expanded` value drifted. A rerun of `--apply` on the current branch is a no-op.
+
+_Original scope (2026-10-19, superseded):_ only feature sub-groups (DomoStats, Magic ETL, Beast Mode, App Studio, Workflows, Data Center, DataFlows, Domo AI, Alerts, Cards, Dashboards & Pages, Appstore, Governance, Sandbox & Environments, Cloud Data Warehouses, How Connectors Work, Workbench, Domo Free) got a root.
+
+**Developer Portal:** 57 portal groups use their overview as `root` (12 top-level groups also `expanded: true`). These are maintained by hand; `apply_group_roots.py` only touches the English KB tab. The OpenAPI sync drops a Product APIs group's root when its spec re-syncs, so re-add it after a sync.
+
+**Resolution rule** (per sub-group, among its direct children): prefer a modern restructure overview slug (`What-is-*` / `*-Overview`, non-numeric) → else a child titled "`<group>` Overview" → else the lone overview child; ties break to the first child. In all groups that had competing overviews (modern `What-is-X` vs. a lingering legacy numeric `X | Overview`), the modern page wins and the legacy page stays a normal child (its consolidation/retirement is a separate Phase 4 matter).
+
+**Exclusions:** groups **inside** the Archive pillar are never rooted (holding area, not curated — enforced in the script); the Archive pillar itself is. **`Getting Started > Key Resources`** is left rootless pending decision **D5** (`000005874` "Introduction to Domo" keep-vs-retire) — recorded in `scripts/group_roots.json`. **D5 now also affects the Getting Started pillar root:** `000005874` is that pillar's `root` (the nested Getting Started subgroup was flattened into it on 2026-10-31). If D5 retires `000005874`, point the pillar root at `What-is-Domo` instead. **Flag for review:** `Connect & Integrate Data > Cloud Data Warehouses` → `4412849158167` "Cloud Integrations Overview" is a looser title match; veto in `scripts/group_roots.json` (set the key to `null`) if it's not the intended landing.
+
+**Localized tabs (ja/fr/de/es) were not touched** — English-only, consistent with the restructure. Phase 6 mirrors the root structure into the localized tabs.
+
+**Durability for Phase 7:** the script + `scripts/group_roots.json` override map are tracked. Phase 7 runs `apply_group_roots.py --apply` against the hand-curated `docs.json` (no regeneration; see Phase 7 above); because the resolver scans each group's children (not a fixed path list), it re-derives roots correctly against the post-Phase-6 slugs. Other tools that walk the nav must count a group's `root` as a member of that group: `build-pm-ownership.py`, `build_catalog.py`, and `docs_cli.py export` do; the Phase 6.5 nav validator and orphan detector must too.
 
 ---
 
@@ -1047,7 +1096,7 @@ Update `Domo-KB-Style-Guide.mdx` and `New-Article-Template.mdx` to reflect every
 
 **`Domo-KB-Style-Guide.mdx` — expected additions:**
 - **Product Lifecycle States** — the five states (Active, Deprecated, Legacy, Sunset, Retired), full YAML spec for each, when to use each state, snippet usage for DeprecatedNote/LegacyNote/SunsetNote, nav placement rules (Deprecated stays in pillar; Legacy/Sunset move to Archive group; Retired not in nav), and PM sign-off requirements
-- **Wheel-and-spoke product group structure** — standard pattern: one Overview/hub article + How-To articles + Reference articles (optional) + FAQ (in Accordion at bottom of hub); typical article counts per product group
+- **Wheel-and-spoke product group structure** — standard pattern: one Overview/hub article + How-To articles + Reference articles (optional) + FAQ (in Accordion at bottom of hub); typical article counts per product group. **The product-group Overview/hub is promoted to the sub-group's Mintlify `root` page** (see Phase 7 › Group Root Pages) — clicking the sub-group opens it, and it is not listed as a separate child. New product groups should ship with an Overview destined to become the sub-group root. Top-level pillars follow the same pattern and also set `"expanded": true` (Archive stays `false`).
 - **Pillar hub articles** — what they are, when a new product area needs one, how they link to product group articles
 - **New article types added by this restructure** — "What is X?" overview articles, pillar hub articles, getting-started-for-role articles; what makes each distinct
 - **AI callout pattern** — when to add `<Tip>**Try it with AI:**...`; links to AI & Data Science pillar articles
@@ -1116,7 +1165,7 @@ Move all planning and analysis artifacts generated during the restructure into a
 - `snippets/` — stays; active MDX components
 - `scripts/` — stays; active tooling
 
-After moving, update `CLAUDE.md` to reflect the new location of these files (the Claude project instructions reference some of them by root-relative path).
+After moving, update `CLAUDE.md`: repoint any files it references by their new `restructure/` location, **and remove the restructure-only sections** so the post-project `CLAUDE.md` is clean. These are restructure-temporary and must be deleted, not just repointed — in particular the **PM-branch propagation convention** (`### Propagating Integration Changes to PM Review Branches`). Review the other restructure-specific sections at the same time (the Mintlify preview-batch rule, the Phase 4.5 PM-review tooling descriptions, GA-coverage tracking) and strip whatever exists only for this project.
 
 ---
 
@@ -1131,7 +1180,8 @@ All restructure scripts live in `scripts/`. Run from repo root with `python3`.
 | `scripts/apply_manual_classifications.py` | 1.2 | Apply hand-reviewed classifications for ambiguous articles |
 | `scripts/find_duplicates_and_gaps.py` | 1.3–1.4 | Find orphans, near-duplicates, and per-pillar content gaps |
 | `scripts/build_ia_spec.py` | 2 | Assign all 1,832 articles to 11 pillars; outputs `ia-spec.json` + `ia-mapping.json` |
-| `scripts/build_docs_nav.py` | 2 | Rebuild KB tab in `docs.json` with 11-pillar groups from `ia-mapping.json`; preserves all other tabs |
+| ~~`scripts/build_docs_nav.py`~~ | 2 (one-time) | **Removed 2026-11-02.** Generated the Phase 2 KB tab in `docs.json` from `ia-mapping.json`; the tab has been hand-curated since and is never regenerated. Recoverable from git history if needed. |
+| `scripts/apply_group_roots.py` | 7 (+ applied now) | Promote each group's Overview/hub article to the group's Mintlify `root` page (clicking the group opens it; it leaves the child list). Pillars included: top-level roots also get `"expanded": true`, except Archive (`false`). Reconciler — scans the English KB tab, sets `root` and un-roots anything that shouldn't have one, without otherwise touching the nav. Dry-run by default; `--apply` writes. Decisions/overrides persist in `scripts/group_roots.json`. |
 | `scripts/build-pm-review-briefs.py` | 4.5 | Generate per-PM meeting briefs + `RESTRUCTURE-TASKS.md` checklist; run right before PM review meetings |
 
 **To rebuild catalog from scratch** (if articles have changed since last run):
@@ -1190,3 +1240,7 @@ python3 scripts/find_duplicates_and_gaps.py
 | 2026-07-16 | DataFusion, old Magic ETL tile articles, defunct connectors reclassified: Archive → Retired | These features/services are completely gone — DataFusion discontinued, old tile UI replaced, third-party services shut down. Under the new lifecycle system they are Retired: `status: "retired"`, removed from nav entirely, no callout. |
 | 2026-07-16 | Phase 4.6 (Lifecycle Status Application) added | New phase between 4.5 and 5. Bulk-adds `status: "active"` to every article without a status field; applies PM-confirmed Deprecated/Legacy/Sunset/Retired states (frontmatter + snippet imports + callout placement + docs.json nav moves); verifies Archive group contains only Legacy and Sunset articles. Must complete before Phase 5 so interlinking does not add Next Steps/Related links to articles that are about to be moved or removed from nav. |
 | 2026-08-18 | PM-brief script refactored to read the manifest as source of truth | Pre-3b audit found the hardcoded `FORUM_NEW_CRITICAL`/`FORUM_NEW_HIGH`/`ARTICLE_CHECKPOINTS` in `build-pm-review-briefs.py` had drifted from `RESTRUCTURE-MANIFEST.md`: 11 Medium deferred gaps were absent entirely, 5 written articles were mis-framed as "cannot be written without input," `Find-Which-Dashboard` was missing, and `Restore-a-Deleted-Dashboard` was routed to the wrong PM (Chris Wright vs. Dan Brinton). Fix: deleted the hardcoded forum blocks; the script now parses the manifest's Phase 3a-Forum written table (→ Section 3b fact-check) and deferred table (→ Section 3c needs-input), and scans `s/article/*.mdx` for embedded `[pm-input]` markers (→ Section 3d checkpoints). Result verified: 14 written + 43 deferred parsed, 6 markers found, rank-146 orphan surfaced. Section 3 re-framed to separate "drafted, fact-check" from "cannot be written yet." |
+| 2026-10-31 | Pillar Overviews become group roots (supersedes the 2026-10-19 pillar exclusion) | Reviewed with Jared, who agreed. Every top-level KB pillar uses its Overview as `root` with `"expanded": true`, so the overview opens from the pillar title and the sub-groups still show without a click (the 2026-10-19 concern was the overview being hidden behind a click). Archive is rooted but `"expanded": false`. Enforced by `apply_group_roots.py`. PR #684. |
+| 2026-10-31 | `docs.json` is the nav source of truth; `build_docs_nav.py` is not rerun in Phase 7 (**confirmed by Jared 2026-11-02; script removed**) | `build_docs_nav.py` reads gitignored `ia-mapping.json` (not on disk), emits only three levels, sorts every group alphabetically, and re-adds a Release Notes pillar to the KB tab. Running it would discard all hand curation since Phase 2 (MCP › Toolkits, App Studio split, Cards/Analyzer nesting, connector vendor groups, pillar roots). Jared confirmed the step was an artifact of an earlier iteration of the restructure, so the step and `scripts/build_docs_nav.py` were removed (recoverable from git history). |
+| 2026-11-02 | Nav depth: three levels is the default, not a hard cap | The three-level limit came from `build_docs_nav.py`, not from a stated requirement. Three levels (pillar › group › sub-group) stays the strong default; one or two more (up to five) are allowed when they add significant value, as with the connector vendor groups, Analyzer task groups, and Chart Types subgroups (four levels each). Recorded in `KB-RESTRUCTURE-PLAN.md` › 7.1, with a depth warning in the 7.2 validator outline. |
+| 2026-11-02 | Developer Portal nav roots added as an exception to the `s/article/`-only scope (Jared approved; **pending Jon T.'s approval**) | 57 portal groups got `root` pages and four portal overviews were written (Partner Developers, Other Resources, Developer Topics, Domo SDK) so both tabs follow one convention. Portal roots are hand-maintained and outside PM ownership. Split out of PR #684 into its own PR so Jon T., who owns the Developer Portal content, can approve it separately. |

@@ -1,20 +1,32 @@
 ---
 title: "Extract Data from PDFs and Images with Domo AI"
-excerpt: "Use Domo AI's Image-to-Text capability to pull text and structured data out of PDFs and images through Workflows, Bricks, apps, or FileSets."
+excerpt: "Use Domo AI's Image-to-Text capability to pull text out of PDFs and images through Workflows, Magic ETL, apps, or Documents."
 status: "active"
 ---
 
 ## Intro
 
-This article explains how to extract text and structured data from PDFs and images using Domo AI. The core capability is **Image-to-Text**, which you can invoke from Workflows, Domo Bricks, Domo apps, and Jupyter Workspaces, and which pairs with FileSets for document-driven pipelines.
+This article explains how to extract text from PDFs and images using Domo AI. The core capability is **Image-to-Text**, which you can invoke from Workflows, Magic ETL, Domo apps, and Jupyter Workspaces, and which pairs with Documents for document-driven pipelines.
 
 ---
+
+## Required Grants
+
+To extract data from PDFs and images with Domo AI, the following grants must be enabled for your role:
+
+- **Use AI Services —** Access to features and Apps built using the AI Services Layer.
+- **Manage DataFlows —** Create, edit, and delete DataFlows in your instance.
+- **Edit Magic ETL v2 DataFlow —** Create and edit Magic ETL DataFlows to which you have access.
+- **Manage Workflows —** Perform any action on any Workflow in your Domo instance.
+- **Manage Documents —** View, edit, and delete any Document Collections in this instance.
+
+Learn more about [grants](/s/article/360043438973).
 
 ## What Image-to-Text Does
 
 Image-to-Text extracts or generates text from an image. It covers OCR (reading text out of an image), caption generation, and visual question answering. Because a PDF page can be processed as an image, this is the capability behind pulling text out of scanned or image-based documents.
 
-Image-to-Text is part of the AI Service Layer and is available in Jupyter Workspaces, Domo apps, Domo Bricks, and Workflows. See [AI Service Layer Settings](/s/article/000005279) for the full list of services and where each can be used.
+Image-to-Text is part of the AI Service Layer and is available in Jupyter Workspaces, Domo apps, Workflows, and Magic ETL (through the Text Generation tile). See [AI Service Layer Settings](/s/article/000005279) for the full list of services and where each can be used.
 
 ## Extract Text in a Workflow
 
@@ -26,28 +38,32 @@ For an automated, no-code pipeline, call the AI Service Layer from a Workflow:
 
 See [Workflows — AI Service Layer Integration](/s/article/000005369) for the exact configuration steps.
 
-## Extract Structured Data from Documents with FileSets
+## Work with Unstructured Data Using Documents
 
-When your goal is to turn a body of documents into structured data—not just read one image—use FileSets. FileSets extract structured information from images, documents, transcripts, and other unstructured data to power visualizations, automate document-driven processes, and ground AI Search. See [Use FileSets to Gather Information from Unstructured Data](/s/article/000005849).
+When you need to work with a body of documents—not just read one image—use Documents. Store files in Document Collections by uploading them or connecting a data source, enable Agent Knowledge to make them searchable with AI Search, and use them from Workflows, the AI Library, and Magic ETL. See [Documents](/s/article/Documents).
 
-{/* [pm-input] Ken Boyer — confirm the remaining invocation paths so they can be documented: (1) whether Image-to-Text is available as a Magic ETL AI tile (the Magic ETL AI article documents only Text Generation, AI Forecasting, and Model Inference tiles — no Image-to-Text tile); (2) the supported end-to-end pattern for batch-processing PDFs pulled from S3 or SFTP through Image-to-Text. Add sections for each once confirmed. */}
+To bring a Document Collection into a DataFlow, use the Collection Input tile. See [Magic ETL Tiles: Documents](/s/article/Magic-ETL-Tiles-Documents).
 
-## Prepare Your Source PDFs
+## Extract Text in Magic ETL
 
-Extraction quality depends heavily on the source. Text-based PDFs (where the text is selectable) extract most reliably.
+Magic ETL is the recommended way to bulk-process PDFs. To extract text as part of a DataFlow, use the **Text Generation** tile. Learn more about the [Text Generation tile](/s/article/000005741#text-generation-tile).
 
-{/* [pm-input] Ken Boyer — confirm and document the extraction limitations: whether scanned/flattened image-only PDFs and complex multi-column layouts extract cleanly as tables vs. plain text, and the recommended source-preparation guidance. Replace this section with the confirmed limits. */}
+To bulk-process PDFs stored in Amazon S3 or SFTP:
+
+1. Create a Document Collection that connects to your Amazon S3 or SFTP source. See [Documents](/s/article/Documents#connect-to-a-data-source).
+2. In Magic ETL, add a **Collection Input** tile and select the Document Collection. See [Magic ETL Tiles: Documents](/s/article/Magic-ETL-Tiles-Documents).
+3. Connect a **Text Generation** tile to extract text from each file.
 
 ## FAQ
 
 <AccordionGroup>
 
-<Accordion title="Which should I use—Image-to-Text in a Workflow, or FileSets?">
-  Use Image-to-Text in a Workflow when you need to read text from an image or a small number of documents as part of an automated process. Use FileSets when you are building a repeatable pipeline that turns many documents into structured data for analysis or AI Search.
+<Accordion title="Which should I use—a Workflow or Magic ETL?">
+  Use Image-to-Text in a Workflow when you need to read text from an image or a small number of documents as part of an automated process. Use Magic ETL with a Document Collection to bulk-process many PDFs in a repeatable pipeline. See [Extract Text in Magic ETL](#extract-text-in-magic-etl).
 </Accordion>
 
 <Accordion title="Can Image-to-Text read a multi-page PDF?">
-  Image-to-Text processes image content, and large documents can be split using the chunking configuration in the Workflow function. See the confirmed limitations above regarding scanned/image-only PDFs and complex layouts.
+  Image-to-Text processes image content, and large documents can be split using the chunking configuration in the Workflow function.
 </Accordion>
 
 </AccordionGroup>
@@ -56,4 +72,8 @@ Extraction quality depends heavily on the source. Text-based PDFs (where the tex
 
 - [AI Service Layer Settings](/s/article/000005279)
 - [Workflows — AI Service Layer Integration](/s/article/000005369)
-- [Use FileSets to Gather Information from Unstructured Data](/s/article/000005849)
+- [Magic ETL Tiles: AI Services](/s/article/000005741)
+- [Documents](/s/article/Documents)
+- [Magic ETL Tiles: Documents](/s/article/Magic-ETL-Tiles-Documents)
+
+{/* [read-through] pm=ken-boyer date=2026-11-06 */}

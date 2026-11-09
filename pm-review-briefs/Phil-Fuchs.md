@@ -1,8 +1,8 @@
 # PM Review Brief: Phil Fuchs
 
 **Prepared for:** KB Restructure PM Review Meeting
-**Features owned:** Beast Mode, Combined Schema, Data Center, Data Views, Fusions
-**Total articles in your area:** 59
+**Features owned:** AI Services, Beast Mode, Combined Schema, Data Center, Data Views, Fusions
+**Total articles in your area:** 60
 
 > This document is your meeting guide. It shows how your content is being reorganized,
 > which AI-generated articles need your fact-check, which articles need a dedicated
@@ -19,6 +19,7 @@ areas lands in the new structure.
 
 | Feature | Articles | New Location |
 |---------|----------|--------------|
+| AI Services | 1 | Pillar 9: AI & Data Science |
 | Beast Mode | 21 | Pillar 5: Analyze & Visualize |
 | Combined Schema | 1 | Pillar 4: Prepare & Transform Data |
 | Data Center | 32 | Pillar 3: Manage Data |
@@ -165,6 +166,15 @@ off once you've provided the answer.
 - [ ] **`Beast-Mode-Window-Functions.mdx`**
   confirm the supported workaround for filtering on window function results. Options likely include materializing the calculation in Magic ETL before bringing into Analyzer, or restructuring logic to avoid the post-aggregation filter. Add workaround steps here and remove this note.
 
+- [ ] **`Create-and-Use-Data-Models.mdx`**
+  Confirm the deployment limitations reported for Data Models: models cannot be promoted through a repository or Sandbox and are not selectable in data-source mapping, so a model must be recreated manually in each development, test, and production environment. Deployment support is tracked as a feature request. Synthesized from community forum reports; needs confirmation.
+
+- [ ] **`Create-and-Use-Data-Models.mdx`**
+  Confirm the trigger conditions and any workaround for the "Bad Request" error affecting Data Models. Synthesized from community forum reports; needs confirmation.
+
+- [ ] **`Create-and-Use-Data-Models.mdx`**
+  Confirm the Analyzer date-field errors reported for Data Models (filter-by-date and summary number / Graph By) and document how to set up date fields in the model so they work in Analyzer. Synthesized from community forum reports; needs confirmation.
+
 ---
 
 ## 4. Changes Flagged by Support Gap Integrations
@@ -247,8 +257,11 @@ A prioritized list of everything this document is asking of you:
 | 36 | **Open placeholder in `360046074774.mdx`:** confirm the SQL Editor switch is one-directional: that once a View uses the SQL  | **Answer required** | 15–30 min |
 | 37 | **Open placeholder in `4408174643607.mdx`:** confirm the recommended FIXED pattern for replacing COUNT(DISTINCT  | **Answer required** | 15–30 min |
 | 38 | **Open placeholder in `Beast-Mode-Window-Functions.mdx`:** confirm the supported workaround for filtering on window function results | **Answer required** | 15–30 min |
-| 39 | Validate additions to: Beast Mode date functions (Rank 5) | Review | 20 min |
-| 40 | Validate additions to: Beast Mode reference (Rank 10) | Review | 20 min |
+| 39 | **Open placeholder in `Create-and-Use-Data-Models.mdx`:** Confirm the deployment limitations reported for Data Models: models cannot be pr | **Answer required** | 15–30 min |
+| 40 | **Open placeholder in `Create-and-Use-Data-Models.mdx`:** Confirm the trigger conditions and any workaround for the "Bad Request" error af | **Answer required** | 15–30 min |
+| 41 | **Open placeholder in `Create-and-Use-Data-Models.mdx`:** Confirm the Analyzer date-field errors reported for Data Models (filter-by-date  | **Answer required** | 15–30 min |
+| 42 | Validate additions to: Beast Mode date functions (Rank 5) | Review | 20 min |
+| 43 | Validate additions to: Beast Mode reference (Rank 10) | Review | 20 min |
 
 ---
 

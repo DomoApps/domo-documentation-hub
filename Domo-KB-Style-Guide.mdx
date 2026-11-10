@@ -35,6 +35,27 @@ Keep the excerpt to a single sentence and use the same terminology as the articl
 
 Do not use a `description` field in place of `excerpt`. Mintlify renders `description` on the published page, which duplicates the Intro section. The `excerpt` field, by contrast, is invisible on the rendered site and exists purely as repo-level metadata.
 
+#### Sidebar Title
+
+`sidebarTitle` is an optional frontmatter field that sets the short label shown for the article in the left-hand navigation. The full `title` still appears as the page heading and is what search and AI tools use, so keep `title` complete and descriptive — `sidebarTitle` only changes the nav label.
+
+When present, place it directly below `title`, with `excerpt` following it:
+
+````mdx
+---
+title: "Configure the Domo Mobile App with Microsoft Intune"
+sidebarTitle: "Microsoft Intune"
+excerpt: "Configure the Domo Mobile App with Microsoft Intune using Conditional Access, compliance policies, and the Enterprise SSO app extension on iOS."
+---
+````
+
+Add a `sidebarTitle` in either of these cases:
+
+- **The title is long and crowds the navigation.** A descriptive title the reader needs on the page can be too long for the sidebar, where it wraps or gets truncated. Give the nav a short, recognizable label instead (for example, the title above shows as **Microsoft Intune**).
+- **The article belongs to a product group that uses a short nav label as its standard.** For example, the MCP Toolkits articles carry full titles like "Cards Toolkit" and "Alerts Toolkit" but use the toolkit name alone — **Cards**, **Alerts** — in the sidebar so the group reads as a clean list.
+
+Keep the `sidebarTitle` in Title Case and as short as is still clear in context (usually the distinguishing noun or product name). Omit the field entirely when the `title` is already short enough to serve as its own nav label.
+
 ### Article Structure
 
 The structure of an article should be as follows:
@@ -172,6 +193,29 @@ If a step is optional, you can write
 If the step is conditional, write
 
 2. (Conditional) Here is the conditional step.
+
+### Step-by-Step Procedures (Steps Component)
+
+For a short, end-to-end article that walks the reader through a single linear procedure from start to finish — such as [Configure the Domo Mobile App with Microsoft Intune](/s/article/000005902) — you can present the procedure with Mintlify's `<Steps>` component instead of plain numbered lists under `##` headings. It renders each step as a numbered marker down the left margin, which makes a sequential walkthrough easy to follow.
+
+Use `<Steps>` only when the article is essentially one continuous procedure. For a larger reference article organized into independent tasks (the Create, Review, Update, Delete headings described in **Article Structure**), keep the standard `##` task headings with numbered lists inside — don't force unrelated tasks into a single Steps sequence.
+
+Each `<Step>` takes a `title`. Write it in Title Case using an imperative verb, following the same rules as any other heading (see **Headings and Titles**). The component numbers the steps automatically, so don't prefix a title with "Step 1," "Step 2," and so on, and don't put a horizontal rule (`---`) between steps. A step can contain anything a normal section can — numbered sub-steps, screenshots, callouts, and links:
+
+```mdx
+<Steps>
+<Step title="Sign in to the Intune Admin Center">
+1. Open a web browser and go to the Microsoft Endpoint Manager Admin Center.
+2. Sign in with your Microsoft 365 administrator credentials.
+
+<Tip>**Tip:** Use an account with Global Administrator or Intune Administrator permissions.</Tip>
+</Step>
+<Step title="Add or Locate the Domo App">
+1. In the left-hand navigation pane, select **Apps → All apps**.
+2. Check whether the Domo app appears in the list.
+</Step>
+</Steps>
+```
 
 ## References
 

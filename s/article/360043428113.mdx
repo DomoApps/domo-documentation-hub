@@ -11,57 +11,64 @@ DataFlows (neither SQL nor Magic ETL types) cannot append data natively like con
 
 **Video - What is a Recursive DataFlow?**
 
-**To create a recursive DataFlow in Magic ETL,**
+<Steps titleSize="h2">
+<Step title="Create and Run a Magic ETL DataFlow">
+Create and run a Magic ETL DataFlow.
 
-1. Create and run a Magic ETL DataFlow.  
-     
+<Frame>![recursive_etl1.png](/images/kb/0EM5w000005vOW3.png)</Frame>
+</Step>
+<Step title="Load the Output DataSet as an Input">
+Once the DataFlow has finished running, load the output DataSet as an input DataSet.
+The DataSet name will show the output DataSet name followed by "1."
 
-   <Frame>![recursive_etl1.png](/images/kb/0EM5w000005vOW3.png)</Frame>
-2. Once the DataFlow has finished running, load the output DataSet as an input DataSet.  
-   The DataSet name will show the output DataSet name followed by "1."  
-     
+<Frame>![Screenshot](/images/kb/0EM5w000005vOw2.png)</Frame>
 
-   <Frame>![Screenshot](/images/kb/0EM5w000005vOw2.png)</Frame>
+You should now have two DataSets in the DataFlow—the updating original DataSet and the historical DataSet.
+You now need to find a column to use as a constraint. This helps determine when to replace data in your historical DataSet with new data. Constraint columns are normally ID columns or date columns or have other unique identifiers. In this example we use the `Date` column as a constraint.
+</Step>
+<Step title="Select the Constraint Column">
+Use **Select Columns** to select only the constraint column.
 
-     
-     
-   You should now have two DataSets in the DataFlow—the updating original DataSet and the historical DataSet.  
-   You now need to find a column to use as a constraint. This helps determine when to replace data in your historical DataSet with new data. Constraint columns are normally ID columns or date columns or have other unique identifiers. In this example we use the `Date` column as a constraint.
-3. Use **Select Columns** to select only the constraint column.  
-     
+<Frame>![Screenshot](/images/kb/0EM5w000005vOVX.png)</Frame>
+</Step>
+<Step title="Remove Duplicate Constraints">
+Use **Remove Duplicates** to return a unique list of constraints. <img alt="" src="/images/kb/0EM5w000005vOVu.png" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/>
+</Step>
+<Step title="Add a Deletion-Identifying Column">
+Use **Add Constants** to create a new column that tells you when a row needs to be deleted.
 
-   <Frame>![Screenshot](/images/kb/0EM5w000005vOVX.png)</Frame>
-4. Use **Remove Duplicates** to return a unique list of constraints. <img alt="" src="/images/kb/0EM5w000005vOVu.png" style={{width: 20, height: 20, display: 'inline', verticalAlign: 'start', margin: '0'}}/> 5. Use **Add Constants** to create a new column that tells you when a row needs to be deleted.  
-     
+<Frame>![Screenshot](/images/kb/0EM5w000005vOVz.png)</Frame>
+</Step>
+<Step title="Outer Join the Constraint Columns">
+Use an Outer Join to join your deletion-identifying column to the unique constraint column in your historical DataSet.  If you selected the historical DataSet on the left side of the join, as shown below, use a left outer join. If you select the historical DataSet on the right side of the join, use a right outer join. (Do not select **Inner Join**, as this could result in a loss of data.)
 
-   <Frame>![Screenshot](/images/kb/0EM5w000005vOVz.png)</Frame>
-6. Use an Outer Join to join your deletion-identifying column to the unique constraint column in your historical DataSet.  If you selected the historical DataSet on the left side of the join, as shown below, use a left outer join. If you select the historical DataSet on the right side of the join, use a right outer join. (Do not select **Inner Join**, as this could result in a loss of data.)  
-     
+<Frame>![Screenshot](/images/kb/0EM5w000005vOW1.png)</Frame>
 
-   <Frame>![Screenshot](/images/kb/0EM5w000005vOW1.png)</Frame>
+<Frame>![Screenshot](/images/kb/0EM5w000005vOv3.png)</Frame>
+</Step>
+<Step title="Filter Out Rows Marked for Deletion">
+Filter any rows from your DataSet that contain the value "Delete Me" (or whatever identifier you came up with in step 5).
+This returns only rows from the historical DataSet that do not exist in the new updating DataSet.
 
-     
-     
+<Frame>![Screenshot](/images/kb/0EM5w000005vOVw.png)</Frame>
+</Step>
+<Step title="Remove the Extra Columns">
+Use **Select Columns** to remove the additional unique constraint column (`Date`) and the unique deletion-identifying column.
 
-   <Frame>![Screenshot](/images/kb/0EM5w000005vOv3.png)</Frame>
-7. Filter any rows from your DataSet that contain the value "Delete Me" (or whatever identifier you came up with in step 5).  
-   This returns only rows from the historical DataSet that do not exist in the new updating DataSet.  
-     
+<Frame>![Screenshot](/images/kb/0EM5w000005vOVv.png)</Frame>
+</Step>
+<Step title="Append the DataSets">
+Use **Append** to join the historical DataSet and new updating DataSet.
+If all steps have been done correctly, both DataSets will show "No changes."
 
-   <Frame>![Screenshot](/images/kb/0EM5w000005vOVw.png)</Frame>
-8. Use **Select Columns** to remove the additional unique constraint column (`Date`) and the unique deletion-identifying column.  
-     
+<Frame>![Screenshot](/images/kb/0EM5w000005vOvy.png)</Frame>
+</Step>
+<Step title="Connect the Append Tile to the Output">
+Connect the **Append** tile to your output.
+</Step>
+</Steps>
 
-   <Frame>![Screenshot](/images/kb/0EM5w000005vOVv.png)</Frame>
-9. Use **Append** to join the historical DataSet and new updating DataSet.  
-   If all steps have been done correctly, both DataSets will show "No changes."  
-     
-
-   <Frame>![Screenshot](/images/kb/0EM5w000005vOvy.png)</Frame>
-10. Connect the **Append** tile to your output.
-
-Once complete, your Magic ETL should look like the following:  
-  
+Once complete, your Magic ETL should look like the following:
 
 <Frame>![Screenshot](/images/kb/0EM5w000005vOW0.png)</Frame>
 

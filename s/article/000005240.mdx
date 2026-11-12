@@ -3,6 +3,8 @@ title: "Manage API Clients"
 excerpt: "Create, view, and revoke API clients in Domo Admin Settings, including the scopes available to each client."
 ---
 
+import { BetaNote } from '/snippets/BetaNote.mdx';
+
 ## Intro
 
 The API Clients feature in the Admin Settings allows you to create and manage your own API clients and allows admin users to manage all API clients for your instance. API Clients displays a list of clients with their scopes and allows you to revoke clients that are no longer needed.
@@ -18,13 +20,13 @@ You must have ONE of the following grants to access the API Clients feature:
 
 This table highlights the differences between the grants.
 
-| Access | Create API  OAuth Clients | Manage All Access Tokens and API Clients |
-| --- | --- | --- |
-| Create clients | <img alt="checkmark.jpeg" src="/images/kb/0EMVq000004rbAP.jpg" style={{width: 35, height: 36, display: 'inline', verticalAlign: 'start', margin: '0'}}/> | <img alt="red x.jpeg" src="/images/kb/0EMVq000004rbIT.jpg" style={{width: 32, height: 29, display: 'inline', verticalAlign: 'start', margin: '0'}}/> |
-| View clients you own | <img alt="checkmark.jpeg" src="/images/kb/0EMVq000004rbAP.jpg" style={{width: 35, height: 36, display: 'inline', verticalAlign: 'start', margin: '0'}}/> | <img alt="checkmark.jpeg" src="/images/kb/0EMVq000004rbAP.jpg" style={{width: 35, height: 36, display: 'inline', verticalAlign: 'start', margin: '0'}}/> |
-| View all clients in the instance | <img alt="red x.jpeg" src="/images/kb/0EMVq000004rbIT.jpg" style={{width: 32, height: 29, display: 'inline', verticalAlign: 'start', margin: '0'}}/> | <img alt="checkmark.jpeg" src="/images/kb/0EMVq000004rbAP.jpg" style={{width: 35, height: 36, display: 'inline', verticalAlign: 'start', margin: '0'}}/> |
-| Delete/revoke clients you create | <img alt="checkmark.jpeg" src="/images/kb/0EMVq000004rbAP.jpg" style={{width: 35, height: 36, display: 'inline', verticalAlign: 'start', margin: '0'}}/> | <img alt="checkmark.jpeg" src="/images/kb/0EMVq000004rbAP.jpg" style={{width: 35, height: 36, display: 'inline', verticalAlign: 'start', margin: '0'}}/> |
-| Revoke access for all clients in the instance | <img alt="red x.jpeg" src="/images/kb/0EMVq000004rbIT.jpg" style={{width: 32, height: 29, display: 'inline', verticalAlign: 'start', margin: '0'}}/> | <img alt="checkmark.jpeg" src="/images/kb/0EMVq000004rbAP.jpg" style={{width: 35, height: 36, display: 'inline', verticalAlign: 'start', margin: '0'}}/> |
+| Access                                        | Create API  OAuth Clients                                                              | Manage All Access Tokens and API Clients                                               |
+| --------------------------------------------- | -------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
+| Create clients                                | <i className="icon-check-square-fill text-green-600 md" role="img" aria-label="Yes" /> | <i className="icon-x text-red-600 md" role="img" aria-label="No" />                    |
+| View clients you own                          | <i className="icon-check-square-fill text-green-600 md" role="img" aria-label="Yes" /> | <i className="icon-check-square-fill text-green-600 md" role="img" aria-label="Yes" /> |
+| View all clients in the instance              | <i className="icon-x text-red-600 md" role="img" aria-label="No" />                    | <i className="icon-check-square-fill text-green-600 md" role="img" aria-label="Yes" /> |
+| Delete/revoke clients you create              | <i className="icon-check-square-fill text-green-600 md" role="img" aria-label="Yes" /> | <i className="icon-check-square-fill text-green-600 md" role="img" aria-label="Yes" /> |
+| Revoke access for all clients in the instance | <i className="icon-x text-red-600 md" role="img" aria-label="No" />                    | <i className="icon-check-square-fill text-green-600 md" role="img" aria-label="Yes" /> |
 
 ## Access API Clients
 
@@ -57,6 +59,26 @@ Users with the Create API OAuth Clients [grant](#required-grants) can follow the
 
    <Frame>![Screenshot 2025-01-13 at 8.47.30 AM.png](/images/kb/0EMVq000004m6vF.jpg)</Frame>
 
+## Create an OAuth 2.1 Client <Badge>Beta</Badge>
+
+<BetaNote />
+
+An OAuth 2.1 client authenticates an external application to Domo through the authorization code flow. In the current release, OAuth 2.1 clients support only the MCP use case — connecting an MCP client to [Domo's MCP Server](/s/article/Connect-AI-Tools-to-Domo-Using-MCP). This is the preferred way to connect a tool that needs a client ID, secret, and redirect URI.
+
+Users with the Create API OAuth Clients [grant](#required-grants) can follow these steps:
+
+1. [Access](#access-api-clients) the API Clients feature and select **Create** > **Create OAuth 2.1 Client**.
+2. In the modal, enter a **Name** that captures the client's planned usage. **Grant Type** is preset to **Authorization Code**.
+
+   <Frame><img alt="Domo Create OAuth 2.1 Client modal showing Name, Grant Type, and Redirect URIs fields and a Scopes multi-select checklist" src="/images/kb/api-clients-create-oauth-2-1-client-modal.png" /></Frame>
+3. In **Redirect URIs**, enter the allowed redirect URI for the application you're connecting. Separate multiple URIs with commas. HTTPS is required.
+4. Under **Scopes**, select **ai:read** and **ai:execute**. Both scopes are required to connect to Domo's MCP Server.
+5. Select **Create**. The client ID and secret for your new client appear.
+
+   <Warning>**Important:** This is the only time the client secret displays.</Warning>
+
+   <Warning>**Warning:** The client ID and secret are highly sensitive because they grant access to your Domo instance. Treat these credentials in accordance with your organization's security policies.</Warning>
+
 ## View and Manage API Clients
 
 The API Clients page lists active API clients in the Domo instance, depending on your [grants](#required-grants).
@@ -69,7 +91,7 @@ The list only displays partial client IDs, and the client secret is hidden to en
 
 API clients can't be edited, but you can delete a client, depending on your [grants](#required-grants). To delete a client, follow these steps:
 
-1. On the row for the client you want to delete, select <img alt="" src="/images/kb/0EMVq000007Rchu.jpg" style={{width: 24, height: 23, display: 'inline', verticalAlign: 'start', margin: '0'}}/>**More** (three vertical dots icon) > **Delete**.
+1. On the row for the client you want to delete, select <i className="icon-dots-vertical" aria-hidden="true" /> **More** (three vertical dots icon) > **Delete**.
 
    <Frame>![Screenshot](/images/kb/0EMVq000007ReII.jpg)</Frame>
 2. In the confirmation dialog, select **Revoke.**

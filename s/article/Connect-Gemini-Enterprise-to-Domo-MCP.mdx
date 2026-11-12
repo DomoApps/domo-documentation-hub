@@ -3,6 +3,8 @@ title: "Connect Gemini Enterprise to Domo MCP"
 excerpt: "Explains how to connect Google Gemini Enterprise to Domo's MCP Server through a custom MCP data store so Gemini Enterprise agents can access Domo AI Library Toolkits."
 ---
 
+import { BetaNote } from '/snippets/BetaNote.mdx';
+
 ## Intro
 
 This article explains how to connect Google Gemini Enterprise to Domo's MCP Server using a custom MCP data store, letting Gemini Enterprise securely access your Domo AI Library Toolkits and the private data behind them.
@@ -42,7 +44,18 @@ The custom MCP data store lets you integrate Domo Toolkits, as well as other MCP
 
 ## Create a Domo Client ID and Secret
 
-Gemini Enterprise authenticates to your Toolkit's MCP server using an OAuth 2.0 Client ID and Secret. Create one before configuring the data store.
+Gemini Enterprise authenticates to your Toolkit's MCP server using an OAuth Client ID and Secret. Create one before configuring the data store, using the Domo UI (preferred) or the API.
+
+### Create the Client in the UI <Badge>Beta</Badge>
+
+<BetaNote />
+
+1. In Domo, go to **Admin** > **Authentication** > **API Clients** and create an OAuth 2.1 client. See [Manage API Clients](/s/article/000005240#create-an-oauth-21-client-beta) for the full steps.
+2. For **Redirect URIs**, enter `https://vertexaisearch.cloud.google.com/oauth-redirect`.
+3. Under **Scopes**, select **ai:read** and **ai:execute**. Both are required.
+4. Select **Create**, then copy the client ID and secret — you'll need them to configure the data store in Google Cloud.
+
+### Create the Client with the API
 
 1. Generate a Domo access token. See [Manage Access Tokens](/s/article/360042934494) for instructions.
 

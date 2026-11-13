@@ -37,7 +37,7 @@ After the Article Intake Summary is confirmed, ask the following questions befor
 
 1. **Release status:** What is the release status of the feature(s) covered in this article? For each distinct feature or section, is it GA (generally available) or beta? If mixed, which parts are beta?
 2. **Planned branch cut date:** What is the planned **branch cut date** for this release? This is the internal branch name (NOT the feature release date).
-3. **Feature switch date:** (Ask only if the article is tied to a GA release.) On what date do customers see the feature? This determines the branch name and the base branch (see **Step 10**). Do not try to derive it from the branch cut date; if the user doesn't know it, tell them the article can't be routed to a GA branch until they get it from the PM or release checklist.
+3. **Feature-release month:** (Ask only if the article is tied to a GA release.) In which month do customers see the feature? This month and year determine the branch name and the base branch (see **Step 10**). The exact switch date within the month often shifts, so the branch is named by month and year only; if the user also knows the specific date, capture it for the PR description (the KB Administrator uses it to time the merge), but it is not part of the branch name. Do not try to derive the month from the branch cut date; if the user doesn't know it, tell them the article can't be routed to a GA branch until they get it from the PM or release checklist.
 
 ---
 
@@ -221,18 +221,18 @@ Tell the user which branch and base branch this article belongs on. Do not creat
 
 **If the article is not tied to a GA release:** branch `first.last/short-description`, base `main`. It publishes on the normal weekly KB schedule (PR in by Thursday for the following Monday).
 
-**If the article is tied to a GA release:** use the feature switch date collected in Step 3. Name the branch `first.last/Article-Title-ga-MM-DD-YYYY` (zero-padded numeric date — the date customers see the feature). Keep the `-ga-<date>` suffix on any GA-tied branch — it is how the Knowledge Base Administrator knows the feature's availability date. **Never tell a contributor to drop the suffix just to base onto `main`.**
+**If the article is tied to a GA release:** use the feature-release month collected in Step 3. Name the branch `first.last/Article-Title-ga-<month>-<year>` (lowercase, fully spelled-out feature-release month and year, e.g. `-ga-november-2026` — the month customers see the feature, day-free so a shifting switch date never forces a rename). Keep the `-ga-<month>-<year>` suffix on any GA-tied branch — it is how the Knowledge Base Administrator knows the feature's availability window. **Never tell a contributor to drop the suffix just to base onto `main`.**
 
-Two kinds of GA work route differently. Check whether a GA train branch exists for that date:
+Two kinds of GA work route differently. Check whether a GA train branch exists for that month:
 
 ```bash
 git branch -r | grep release-ga
 ```
 
-- **On the company GA release train** — a matching `release-ga/<spelled-month-date>` branch exists (e.g. `release-ga/sept-23-2026`): base the PR onto that `release-ga/*` branch. It merges to `main` with the rest of the train on the feature switch date.
+- **On the company GA release train** — a matching `release-ga/<month>-<year>` branch exists (e.g. `release-ga/november-2026`): base the PR onto that `release-ga/*` branch. It merges to `main` with the rest of the train on the feature switch date.
 - **No matching `release-ga/*` branch:** don't assume. Ask the contributor whether this is part of the monthly company GA train or a standalone, off-train product GA (an article tied to one product feature that ships on its own date, outside the company-wide train — this is common):
   - *Company train, branch not created yet:* the Knowledge Base Administrator needs to create the `release-ga/*` branch. Do not fall back to `main`.
-  - *Off-train standalone product GA:* keep the `-ga-<date>` suffix and base the PR onto `main`. The suffix records when that product feature reaches customers; the KB Administrator holds the PR open and merges it on or after the `-ga-` date so it publishes in sync with the feature. Assign it to the KB Administrator and call out the GA date in the PR description.
+  - *Off-train standalone product GA:* keep the `-ga-<month>-<year>` suffix and base the PR onto `main`. The suffix records which month that product feature reaches customers; the KB Administrator holds the PR open and merges it on or after the feature's switch date so it publishes in sync with the feature. Assign it to the KB Administrator and call out the GA month in the PR description.
 
 See `CLAUDE.md` › **Contribution Workflow** for the full convention.
 

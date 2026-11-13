@@ -95,42 +95,42 @@ first.last/short-description
 
 Example: `jared.peterson/pricing-update`
 
-Work tied to a **GA release** with a specific feature switch date:
+Work tied to a **GA release**:
 
 ```
-first.last/article-title-ga-MM-DD-YYYY
+first.last/article-title-ga-<month>-<year>
 ```
 
-Example: `jared.peterson/XTM-Connector-ga-05-20-2026`
+Example: `jared.peterson/XTM-Connector-ga-november-2026`
 
-Use a zero-padded numeric `MM-DD-YYYY` date. The date is the **feature switch date** (when customers see the feature), not the product branch cut date.
+Use the lowercase, fully spelled-out **feature-release month** and year (`-ga-november-2026`, not `-ga-nov-2026` or `-ga-11-2026`) — the month customers see the feature, not the product branch cut month. The month-year is deliberately day-free: the exact feature switch date within the month shifts repeatedly while a GA branch is open, and encoding the day used to force the branch to be renamed every time it moved, which caused local/remote mis-syncs. The month-year identifies the release cycle unambiguously; the KB Administrator tracks the specific switch date separately.
 
-Never derive the feature switch date from the branch cut date. Ask the user, the PM, or the release checklist for it. The product cadence gives a rough interval, not a date you can compute reliably.
+Never derive the feature-release month from the branch cut date. Ask the user, the PM, or the release checklist for it. The product cadence gives a rough interval, not a month you can compute reliably.
 
 ### GA Release Workflow
 
-GA-tied documentation must go live in sync with the feature, never before. The `-ga-MM-DD-YYYY` branch suffix records the **feature switch date** (when customers see the feature) so the KB Administrator can time publication. Keep the suffix on any GA-tied branch — it is how the KB Administrator knows the availability date. **Never tell a contributor to drop the suffix just to base onto `main`.**
+GA-tied documentation must go live in sync with the feature, never before. The `-ga-<month>-<year>` branch suffix records the **feature-release month** (when customers see the feature) so the KB Administrator can time publication. Keep the suffix on any GA-tied branch — it is how the KB Administrator knows the availability window. **Never tell a contributor to drop the suffix just to base onto `main`.**
 
-There are two kinds of GA work, and they route differently. Before opening a GA PR, check whether a train branch exists for that date:
+There are two kinds of GA work, and they route differently. Before opening a GA PR, check whether a train branch exists for that month:
 
 ```bash
 git branch -r | grep release-ga
 ```
 
-**On the company GA release train.** The monthly, company-wide GA (all of Domo's features switching together on one date, e.g. `release-ga/sept-23-2026`). A dedicated GA branch exists for each such date, using a **spelled-out month**: `release-ga/may-20-2026`, `release-ga/sept-23-2026`.
+**On the company GA release train.** The monthly, company-wide GA (all of Domo's features switching together in one release, e.g. `release-ga/november-2026`). A dedicated GA branch exists for each release cycle, named `release-ga/<month>-<year>` with a lowercase, fully spelled-out month: `release-ga/may-2026`, `release-ga/september-2026`. One branch per month — not per switch date — so a shifting feature switch date never forces a rename.
 
 - GA PRs base onto the matching `release-ga/*` branch, not `main`
 - They are reviewed and approved normally, then held; the KB Administrator merges the GA branch into `main` on the feature switch date, outside the normal release schedule
 - This mirrors how release-notes branches work: changes queue in the GA branch, get validated together, and ship as one merge
-- If a `release-ga/*` branch for that date doesn't exist yet, say so — the KB Administrator creates it. Don't fall back to basing on `main`.
+- If a `release-ga/*` branch for that month doesn't exist yet, say so — the KB Administrator creates it. Don't fall back to basing on `main`.
 
-**Off-train standalone product GA.** A doc change tied to one product feature that reaches customers on its own date, outside the company-wide train. This is common — the `-ga-<date>` suffix on such a branch simply tells the KB Administrator when that piece of product is available so they can plan its publish date. There is no `release-ga/*` branch for these, and one should not be created.
+**Off-train standalone product GA.** A doc change tied to one product feature that reaches customers on its own date, outside the company-wide train. This is common — the `-ga-<month>-<year>` suffix on such a branch simply tells the KB Administrator which month that piece of product is available so they can plan its publish date. There is no `release-ga/*` branch for these, and one should not be created.
 
-- Keep the `-ga-<date>` suffix; base the PR onto `main`
-- The KB Administrator holds the PR open and merges it on or after the `-ga-` date so it publishes in sync with the feature. The safety comes from the KB Administrator timing the merge, not from the base branch
-- Assign it to the KB Administrator and call out the GA date in the PR description
+- Keep the `-ga-<month>-<year>` suffix; base the PR onto `main`
+- The KB Administrator holds the PR open and merges it on or after the feature's switch date (within the `-ga-` month) so it publishes in sync with the feature. The safety comes from the KB Administrator timing the merge, not from the base branch
+- Assign it to the KB Administrator and call out the GA month in the PR description
 
-When no `release-ga/*` branch exists for a `-ga-<date>` branch, don't assume which case it is: ask the contributor whether the work is part of the monthly company GA train or a standalone off-train product GA, then route accordingly.
+When no `release-ga/*` branch exists for a `-ga-<month>-<year>` branch, don't assume which case it is: ask the contributor whether the work is part of the monthly company GA train or a standalone off-train product GA, then route accordingly.
 
 Signal GA intent in **both** the branch name and the PR description so the PR gets routed to the right base branch.
 
@@ -142,7 +142,7 @@ A `release-ga/*` branch is the single home for everything a GA cycle needs: the 
 - Columns: `Section, Feature, KB Submission (<branch>), Submission Type, Article Filepath, PM, Notes`. The coverage column header embeds the GA branch name so the CSV records which branch state it reflects.
 - **`KB Submission = Yes` means the branch actually added or modified a KB article for that feature** (`git diff main...HEAD` over `s/article/` + `s/topic/`), not merely that some article mentions it. A feature can have a populated `Article Filepath` and still be `No` when it only links to an existing, unchanged article.
 - PMs come from `Article-PM-Ownership-Reference.mdx` (the same CODEOWNERS/squad source used for review routing).
-- **A GA release's identity must agree in three places**: the Release-Notes `title:` month/year, the branch name, and the CSV filename. Always keep them aligned — the `release-doc-coverage` skill verifies this before updating a tracker and refuses to proceed on a mismatch.
+- **A GA release's identity must agree in three places**: the Release-Notes `title:` month/year, the branch name (`release-ga/<month>-<year>`), and the CSV filename (`<Month>-<Year>-Release-Doc-Coverage.csv`) — all three now express the same month and year. Always keep them aligned — the `release-doc-coverage` skill verifies this before updating a tracker and refuses to proceed on a mismatch.
 
 Use the **`release-doc-coverage`** skill to create the tracker or update it as submissions land. It always asks first whether you're creating or updating.
 

@@ -9,14 +9,36 @@ A weekly GitHub Action (`.github/workflows/sync-minor-release-notes.yml`) drafts
 Minor Release Notes from a Domo DataFlow's output DataSet, archives the previous
 week, and opens a PR every Friday morning for the KB Administrator to double-check
 and merge — mirroring the Video Library sync. This skill is the operator's guide and
-the single source of truth for the data contract and the style rewrite.
+the single source of truth for the data contract and the rewrite pipeline.
+
+## The DataSet is internal; this skill is the customer-facing last mile
+
+The source DataSet (`AI_release_notes`) is written for an **internal** audience and
+stays that way on purpose — internal reviewers reading it on the Domo app need the
+real, specific wording (e.g. "we created feature switches that handle this problem").
+We deliberately do **not** build a second, external-framed transform in the ETL. This
+skill does the customer-facing translation at the **last mile**: it rewrites each
+internal note into the public Minor Release Notes house voice, abstracts it to what's
+already publicly disclosed, and removes anything that must not be published. (Decision
+from the Nov 2026 customer-facing-framing review with Security/Legal.)
+
+The style lives in an **editable house style guide**, not in the Python:
+
+- **`.claude/skills/minor-release-notes/minor-release-notes-style.md`** — the
+  authoritative customer-facing writing standard for these notes, derived from the
+  product-release-notes house style and extended with the security/legal rules below.
+  The build script loads this file **verbatim as the Anthropic system prompt**
+  (`load_style_system`), so the nuanced revision is an LLM task and the style is owned
+  in one place. Edit this file to change how the notes read — no code change needed.
 
 ## The two scripts
 
 - **`scripts/build_minor_release_notes.py`** — the engine. Queries the DataSet,
-  selects the week's publishable notes, restyles each into house voice, archives the
-  outgoing week (by calling the archiver), writes `s/article/Current-Minor-Release-Notes.mdx`,
-  and appends the week's notes to the ledger.
+  selects the week's publishable notes, **screens out security/privacy-sensitive
+  notes**, rewrites each into the customer-facing house voice (loading the style guide
+  above as the system prompt), archives the outgoing week (by calling the archiver),
+  writes `s/article/Current-Minor-Release-Notes.mdx`, and appends the week's notes to
+  the ledger.
 - **`scripts/archive_minor_release_notes.py`** — rolls the outgoing current file into
   `s/article/Minor-Release-{YYYY-MM-DD}.mdx` and registers it in `docs.json` under
   **Archived Minor Release Notes → {Year} → {Month}**. Importable (`roll_current_to_archive`)
@@ -68,18 +90,48 @@ published twice, and a note scored ≥ 7 *after* its deploy date is still picked
 next run. The build step appends to it; the archiver never touches it. Because CI always
 starts from a clean checkout of `main`, re-running the workflow the same day is idempotent.
 
-## Style rewrite (Hybrid)
+## Style rewrite (LLM + editable house style guide)
 
-Raw notes open with "This update …"; published bullets must not. The rewrite converts
-each note to Minor Release Notes house voice:
-- **Issue Resolved** → past-tense problem statement ("Hidden calculations were not being
-  properly deleted from cards.").
-- **Update** → present-tense imperative/descriptive statement ("Add new rows in Linked Tables.").
+The automation calls Claude Sonnet (`claude-sonnet-5-5`) once per note, passing
+**`minor-release-notes-style.md` verbatim as the system prompt** (`load_style_system`).
+The guide — not any constant in the script — is the authoritative style spec. It
+covers, in full: the one-sentence output contract; secure-and-optimistic voice;
+the Issue-Resolved (past-tense) vs Update (present-tense) sentence forms; the ban on
+"This update…" openers; no obligations/commitments (legal); abstraction to the level of
+already-published Domo docs; removal of internal terminology (no "feature switch" →
+**Feature Management**/admin options, no system names, infra, Jira/EC keys); and the
+`__EXCLUDE__` rule for security/privacy content. **Change the writing by editing that
+file** — there is no style string in the Python to keep in sync anymore.
 
-The automation calls Claude Haiku (`claude-haiku-5-5`) with the spec in
-`STYLE_SYSTEM` inside `build_minor_release_notes.py` — **that constant is the
-authoritative style prompt; keep this section and it in sync.** `--no-llm` falls back to a
-rules-based transform (rougher — for offline testing only).
+`--no-llm` falls back to a deterministic rules transform that does **not** apply the
+house style (it only strips the "This update…" lead and honors the hard security
+screen). It is for offline wiring tests only, never for a real publish.
+
+## Two-layer safety screen (remove, don't abstract)
+
+Security, privacy, information-disclosure, infrastructure-risk, and legal-conflict notes
+must be **removed entirely**, not softened. Two layers enforce this:
+
+1. **Deterministic keyword screen** (`screen_external` / `SECURITY_EXCLUDE_PATTERNS` in
+   the build script) runs **before** the rewrite, so obviously sensitive text (CVEs,
+   "vulnerability," "patched PHP/OpenSSL," "information disclosure," etc.) never reaches
+   the model or the article. Broaden the pattern list when a new class of sensitive term
+   shows up.
+2. **LLM semantic net** — the style guide instructs the rewrite to return `__EXCLUDE__`
+   for anything unsafe or non-public it still catches (including intermingled security
+   context and internal-only notes with no customer-visible effect). The renderer drops
+   every `__EXCLUDE__` bullet and omits any product section left empty; if a week's whole
+   selection is removed, the current article is left unchanged (no empty publish).
+
+Both layers err toward removal. They are a safety net under — not a replacement for — the
+mandatory human review below.
+
+## Human review is mandatory
+
+Nothing publishes without human validation. The Friday PR is reviewed and merged by the
+KB Administrator, and the rewritten copy is sent to Security/Legal (Paul Conover) each
+week for feedback and fine-tuning until the framing is dialed in. Any change to the
+framing goes into `minor-release-notes-style.md`.
 
 ## Running it
 

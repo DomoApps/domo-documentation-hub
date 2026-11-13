@@ -1,5 +1,5 @@
 ---
-title: "Connecting to ODBC Data in Workbench 5"
+title: "Connect to ODBC Data in Workbench 5"
 excerpt: "Create an ODBC DataSet job in Workbench 5 by providing connection details and configuring the query against your data source."
 ---
 
@@ -13,8 +13,8 @@ You can create an ODBC DataSet Job in Workbench 5. When you select ODBC as your 
 
 ## Connecting to ODBC Data
 
-**To create an ODBC DataSet job in Workbench 5,**
-
+<Steps titleSize="h3">
+<Step title="Create the DataSet Job">
 1. Click the
    <i className="legacy-icon-database sm" aria-hidden="true" /> icon in the left-hand icon bar.
 2. Click the "+" button in the top right corner of the jobs listing pane.
@@ -45,9 +45,11 @@ You can create an ODBC DataSet Job in Workbench 5. When you select ODBC as your 
     **Create**.
       
       A new ODBC DataSet Job is added to the list of jobs for the currently authenticated account. Note that after creating the job, you cannot edit any of the settings you just configured except for the DataSet name. If you want to change any of the other settings, you must create a new job.
-11. Click the
+</Step>
+<Step title="Configure the Connection">
+1. Click the
     **Configure** subtab.
-12. Click the
+2. Click the
     **Edit** button under "Source."
       
     A panel opens with options for configuring your ODBC connection and defining your query.
@@ -57,14 +59,14 @@ You can create an ODBC DataSet Job in Workbench 5. When you select ODBC as your 
 
     </Note>
 
-13. In the
+3. In the
     **Connection Type** field, select a connection option.
       
     The following table describes the available options:
 
       <table border="1" cellpadding="1" cellspacing="1"><thead><tr><th colspan="1" rowspan="1"><p> Option </p></th><th colspan="1" rowspan="1"><p> Description </p></th></tr></thead><tbody><tr><td colspan="1" rowspan="1"><p> System DSN </p></td><td colspan="1" rowspan="1"><p> You select the DSN to use for the desired DataSet from all of the DSNs available in your system. You can indicate whether credentials are required. </p> <Note><div class="info-box-wrapper"><div class="info-box-icon-container"><span class="info-box-icon"></span></div><div class="info-box-content-container"><div class="info-box-content"><p><span><b> Notes: </b></span></p><ul><li><p><span> When uploading data from an ODBC DataSet, you must specify an existing Data Source Name (DSN). You can create a DSN using the Windows ODBC Data Source Administrator. (You can access the the Windows ODBC Data Source Administrator by entering "ODBC" in the Start Menu search, then selecting "Data Sources (ODBC)".) For more information about creating a DSN, refer to the Windows ODBC Help (by searching for "ODBC" in Windows Help and Support) or view the training video in <a target="_blank" title="Workbench 4"> above </a>. For information about configuring a MySQL driver, see <a class="confluence-link" href="/s/article/360043437373" target="_self" title="Workbench 4 FAQs"> How can I improve the performance of a MySQL driver? </a></span></p></li><li><p><span> For information about defining DataSet names (DSNs) and using Open Database Connectivity (ODBC) to access data, refer to documentation for ODBC. </span></p></li><li><p><span> By default, the ODBC connection uses the settings defined in the DSN. This means that queries that could potentially be detrimental to databases that are allowed to be sent through the ODBC connection when previewing and executing jobs. This includes statements such as <span class="mt-font-courier-new"> alter </span>, <span class="mt-font-courier-new"> delete </span>, <span class="mt-font-courier-new"> create table </span>, <span class="mt-font-courier-new"> insert into </span>, etc. If you want to prevent Workbench from being able to execute such commands, you must make these changes in the DSN. </span></p></li></ul></div></div></div></Note></td></tr><tr><td colspan="1" rowspan="1"><p> Connection Builder </p></td><td colspan="1" rowspan="1"><p> You enter details for your ODBC connection, such as login credentials, driver, server URL, database name, port, timeout value, and connection parameters. </p></td></tr><tr><td colspan="1" rowspan="1"><p> Connection String </p></td><td colspan="1" rowspan="1"><p> You enter a single string for your connection. </p></td></tr></tbody></table>
 
-14. (Conditional) Do one of the following:
+4. (Conditional) Do one of the following:
 
     * If you selected
       **System DSN** as your **Connection Type**...
@@ -89,15 +91,17 @@ You can create an ODBC DataSet Job in Workbench 5. When you select ODBC as your 
       **Connection String** as your **Connection Type**...
 
       1. Enter a connection string to connect to the data source.
-15. Click
+5. Click
     **Apply** **.**
-16. Click the
+</Step>
+<Step title="Configure the Query">
+1. Click the
     **Edit** button under "Processing."
-17. Set a timeout value in the
+2. Set a timeout value in the
     **Query Execution Timeout** menu.
       
     This is the amount of time in seconds before a long-running job times out.
-18. In the
+3. In the
     **Query** pane, enter a query for the data you want to retrieve. For example:
       
       ```sql
@@ -111,7 +115,7 @@ You can create an ODBC DataSet Job in Workbench 5. When you select ODBC as your 
       FROM order_audit
       ```
 
-19. (Optional) Define replacement variables for columns in the DataSet in the
+4. (Optional) Define replacement variables for columns in the DataSet in the
     **Replacement Variables** and **Global Replacement Variables** tabs. For each replacement variable...
 
     1. Select the applicable column in the
@@ -126,15 +130,18 @@ You can create an ODBC DataSet Job in Workbench 5. When you select ODBC as your 
 
          <table border="1" cellpadding="1" cellspacing="1"><thead><tr><th colspan="1" rowspan="1"><p> Variable Type </p></th><th colspan="1" rowspan="1"><p> Description </p></th></tr></thead><tbody><tr><td colspan="1" rowspan="1"><p><span class="mt-font-courier-new"> lastvalue </span></p></td><td colspan="1" rowspan="1"><p><span class="mt-font-courier-new"> lastvalue </span> variables keep track of relevant fields for the last row of data that was sent with the most recent upload for the associated job. The syntax is </p><p><code> `!{lastvalue:_name_}!` </code></p><p><span class="mt-font-courier-new"> lastvalue </span> variables values are updated by Workbench after an upload finishes. <span class="mt-font-courier-new"> lastvalue </span> variables are stored in the job (<span class="mt-font-courier-new">.xml </span> ) file. This variable lets you construct a query that gets only the "new" rows each time it runs. For example, if your data has a column with a row "id" that increments with each new row, you can construct a query containing </p><p><code> `!{lastvalue:id}!` </code></p><p> similar to the following: </p><p><code> `select id, name, type, sales from tablename where id >!{lastvalue:id}! order by id` </code></p><p> In this example, the column "id" <em> must </em> be in the <span class="mt-font-courier-new"> SELECT </span>, <span class="mt-font-courier-new"> WHERE </span>, and <span class="mt-font-courier-new"> ORDER BY </span> clauses for the variable to be used and updated. </p><p> When uploading this job, Workbench replaces the </p><p><code>`!{lastvalue:id}!` </code></p><p> variable with the current value of "id". After finishing the upload, Workbench stores the last uploaded value of "id" in the job (<span class="mt-font-courier-new">.xml </span> ) file. </p> <Note> <div class="info-box-wrapper"><div class="info-box-icon-container"><span class="info-box-icon"></span></div><div class="info-box-content-container"><div class="info-box-content"><b> Note: </b> You <em> must </em> include any column you reference with a <span class="mt-font-courier-new"> lastvalue </span> variable in your <span class="mt-font-courier-new"> SELECT </span>, <span class="mt-font-courier-new"> WHERE </span>, and <span class="mt-font-courier-new"> ORDER BY </span> clauses in order for the variable to be used and updated after the data upload. </div></div></div> </Note> </td></tr><tr><td colspan="1" rowspan="1"><p><span class="mt-font-courier-new"> previewonly </span></p></td><td colspan="1" rowspan="1"><p> Used to indicate that certain actions should take place when loading a preview in Workbench. For example, you could request that your preview return only 100 rows of data instead of the 1,000,000 present in the data source. The syntax is </p><p><code> `!{previewonly:Statement}!` </code></p></td></tr></tbody></table>
 
-20. Click
+5. Click
     **Apply**.
-21. Select the desired update method in the
+6. Select the desired update method in the
     **Update Method** menu:
 
     * Select
       **Replace DataSet** if you want the DataSet to be replaced entirely upon updating.
     * Select
       **Append to DataSet** if you want new data to be added to the existing data set upon updating.
+
+</Step>
+</Steps>
 
 You are now ready to execute the DataSet Job, thereby creating an ODBC DataSet in Domo. However, there are many other actions you can take on the DataSet Job before you send it to Domo. These include the following:
 

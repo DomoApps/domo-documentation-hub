@@ -23,6 +23,15 @@ Run locally or from CI. Environment variables:
                              Domo (no token needed). The file must carry the same
                              columns the DataSet exposes.
 
+  DOMO_MINOR_RN_TYPE_COLUMN  Optional. Name of an official note-type column in the
+                             DataSet (e.g. "Public_Note_Type"). LEAVE UNSET by
+                             default: the notes then render as one flat list per
+                             product section. Set it ONLY once the DataSet actually
+                             carries such a column; the live query then SELECTs it
+                             and the output splits back into "Updates" and "Issues
+                             Resolved" sections driven by that column's value. See
+                             the note-type handling below.
+
 CLI flags:
   --no-llm       Skip the Anthropic call; use the deterministic style transform
                  (offline/testing).
@@ -34,6 +43,9 @@ CLI flags:
 The DataSet must expose at least these columns (any order):
   master_key, master_targetdate, Public_Parent_Component,
   AI_release_notes, AI_ReleaseNotesScore
+
+Optionally it may also carry a note-type column (see DOMO_MINOR_RN_TYPE_COLUMN);
+when present, the output is split into Updates / Issues Resolved sections.
 """
 
 import argparse
@@ -60,6 +72,27 @@ DATE_COL = "master_targetdate"
 COMPONENT_COL = "Public_Parent_Component"
 KEY_COL = "master_key"
 REQUIRED_COLUMNS = {SCORE_COL, NOTE_COL, DATE_COL, COMPONENT_COL}
+
+# --- Optional "Updates vs Issues Resolved" delineation --------------------- #
+# By default the Minor Release Notes list every note in one flat list under its
+# product section, with NO "Updates" / "Issues Resolved" split. That split is
+# reinstated ONLY if the source DataSet gains an official column tagging each
+# note's type. We never infer the split from the sentence for publishing — the
+# only trigger is the presence of this column in the pulled data.
+#
+# How it activates:
+#   - Live Domo query: the column is SELECTed (and thus detectable) only when its
+#     name is supplied via DOMO_MINOR_RN_TYPE_COLUMN, so the SELECT never fails
+#     against a DataSet that does not have it yet. Set that env var once the
+#     column officially exists; leave it unset otherwise.
+#   - Local CSV fixture: simply include a column named TYPE_COL to exercise the
+#     delineated render.
+# Detection in either path is "is TYPE_COL among the pulled columns?" (see
+# has_type_column); a row's value then maps to Update vs Issue Resolved.
+_TYPE_COL_ENV = (os.environ.get("DOMO_MINOR_RN_TYPE_COLUMN") or "").strip()
+TYPE_COL = _TYPE_COL_ENV or "Public_Note_Type"
+QUERY_TYPE_COL = bool(_TYPE_COL_ENV)  # include TYPE_COL in the live SELECT?
+TYPE_ISSUE_SIGNALS = ("issue", "resolved", "resolve", "fix", "bug", "defect")
 
 # --- Fixed page copy ---
 TITLE = "Minor Release Notes"
@@ -102,9 +135,14 @@ def log(msg):
 # --------------------------------------------------------------------------- #
 def query_dataset_csv(instance, token, dataset_id):
     url = f"https://{instance}/api/query/v1/execute/{dataset_id}?includeHeader=true"
+    select_cols = [KEY_COL, DATE_COL, COMPONENT_COL, NOTE_COL, SCORE_COL]
+    if QUERY_TYPE_COL:
+        # Only requested when DOMO_MINOR_RN_TYPE_COLUMN is set, so the query never
+        # references a column the DataSet lacks.
+        select_cols.append(TYPE_COL)
+    select = ", ".join(f"`{c}`" for c in select_cols)
     sql = (
-        f"SELECT `{KEY_COL}`, `{DATE_COL}`, `{COMPONENT_COL}`, "
-        f"`{NOTE_COL}`, `{SCORE_COL}` FROM table "
+        f"SELECT {select} FROM table "
         f"WHERE `{SCORE_COL}` >= {MIN_SCORE} AND TRIM(`{NOTE_COL}`) <> ''"
     )
     body = json.dumps({"sql": sql}).encode()
@@ -211,7 +249,12 @@ def select_week(rows, ledger, run_date):
 
 
 def classify(note):
-    """Update vs Issue Resolved, inferred from the sentence (no source column)."""
+    """Infer Update vs Issue Resolved from the sentence.
+
+    This is only a STYLE HINT for the rewrite (issue = past-tense problem,
+    update = present-tense behavior). It does NOT create any visible section
+    split — the notes render as one flat list unless the DataSet carries an
+    official note-type column (see note_type / render_article)."""
     t = note.lower()
     issue_signals = (
         r"resolve[sd]\b",
@@ -228,6 +271,21 @@ def classify(note):
     if any(re.search(p, t) for p in issue_signals):
         return "Issue Resolved"
     return "Update"
+
+
+def note_type(row):
+    """Official note type when the delineation column is present and populated,
+    else the inferred style hint. Returns "Update" or "Issue Resolved"."""
+    raw = (row.get(TYPE_COL) or "").strip().lower()
+    if raw:
+        return "Issue Resolved" if any(k in raw for k in TYPE_ISSUE_SIGNALS) else "Update"
+    return classify(note_text(row))
+
+
+def has_type_column(rows):
+    """True when the pulled data carries the official note-type column, which is
+    the sole trigger for the Updates / Issues Resolved split."""
+    return bool(rows) and TYPE_COL in rows[0]
 
 
 def friendly_component(raw):
@@ -304,19 +362,15 @@ def fmt_date(d):
     return d.strftime("%B %-d, %Y")
 
 
-def render_article(selected, restyle, release_date):
+def render_article(selected, restyle, release_date, delineated=False):
     """Pure render: selected rows -> full MDX string.
 
-    Groups by friendly component (alphabetical), then Updates before Issues
-    Resolved, bullets sorted for deterministic output.
+    Notes are grouped by friendly component (alphabetical). By default every
+    note is listed in one flat, alphabetically-sorted list under its component.
+    When `delineated` is True (the DataSet carries the official note-type
+    column), each component instead splits into "Updates" then "Issues
+    Resolved". Bullets are de-duplicated and sorted for deterministic output.
     """
-    groups = {}  # component -> {"Update": [...], "Issue Resolved": [...]}
-    for r in selected:
-        comp = friendly_component(r.get(COMPONENT_COL))
-        kind = classify(note_text(r))
-        bullet = restyle(note_text(r), kind)
-        groups.setdefault(comp, {"Update": [], "Issue Resolved": []})[kind].append(bullet)
-
     lines = [
         "---",
         f'title: "{TITLE}"',
@@ -326,18 +380,39 @@ def render_article(selected, restyle, release_date):
         f"## {fmt_date(release_date)} Release",
         "",
     ]
-    for comp in sorted(groups):
-        lines.append(f"### {comp}")
-        lines.append("")
-        for label, key in (("Updates", "Update"), ("Issues Resolved", "Issue Resolved")):
-            bullets = sorted(set(groups[comp][key]), key=str.lower)
-            if not bullets:
-                continue
-            lines.append(f"**{label}:**")
+
+    if delineated:
+        groups = {}  # component -> {"Update": [...], "Issue Resolved": [...]}
+        for r in selected:
+            comp = friendly_component(r.get(COMPONENT_COL))
+            kind = note_type(r)
+            bullet = restyle(note_text(r), kind)
+            groups.setdefault(comp, {"Update": [], "Issue Resolved": []})[kind].append(bullet)
+        for comp in sorted(groups):
+            lines.append(f"### {comp}")
             lines.append("")
-            for b in bullets:
-                lines.append(f"- {b}")
+            for label, key in (("Updates", "Update"), ("Issues Resolved", "Issue Resolved")):
+                bullets = sorted(set(groups[comp][key]), key=str.lower)
+                if not bullets:
+                    continue
+                lines.append(f"**{label}:**")
+                lines.append("")
+                lines.extend(f"- {b}" for b in bullets)
+                lines.append("")
+    else:
+        groups = {}  # component -> [bullets]
+        for r in selected:
+            comp = friendly_component(r.get(COMPONENT_COL))
+            # classify() only shapes the bullet's voice; with no official
+            # note-type column it creates no visible Updates/Issues split.
+            bullet = restyle(note_text(r), classify(note_text(r)))
+            groups.setdefault(comp, []).append(bullet)
+        for comp in sorted(groups):
+            lines.append(f"### {comp}")
             lines.append("")
+            lines.extend(f"- {b}" for b in sorted(set(groups[comp]), key=str.lower))
+            lines.append("")
+
     return "\n".join(lines).rstrip() + "\n"
 
 
@@ -376,6 +451,13 @@ def seed_ledger(run_date):
 # --------------------------------------------------------------------------- #
 def build(use_llm, run_date, dry_run):
     rows = load_rows()
+    delineated = has_type_column(rows)
+    log(
+        f"Note-type column '{TYPE_COL}' present — rendering Updates / Issues "
+        "Resolved sections."
+        if delineated
+        else "No official note-type column — rendering one flat list per section."
+    )
     rows = filter_publishable(rows)
     log(f"{len(rows)} rows at score >= {MIN_SCORE} with a note.")
     rows = dedup(rows)
@@ -398,7 +480,7 @@ def build(use_llm, run_date, dry_run):
 
     release_date = max(parse_date(r) for r in selected)
     restyle = make_restyler(use_llm)
-    content = render_article(selected, restyle, release_date)
+    content = render_article(selected, restyle, release_date, delineated)
 
     if dry_run:
         log("--- DRY RUN (nothing written: no archive, no ledger update) ---")

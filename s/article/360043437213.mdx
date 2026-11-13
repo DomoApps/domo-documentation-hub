@@ -1,12 +1,12 @@
 ---
-title: "Connecting to an OLAP Cube in Workbench 5"
+title: "Connect to an OLAP Cube in Workbench 5"
 excerpt: "Create an OLAP DataSet job in Workbench 5 using the OLEDB Connection Provider and a database query."
 ---
 
 You can create an OLAP DataSet Job in Workbench 5. When you select OLAP as your Data Source type, you can provide the details of your connection and configure your query.
 
-**To create an OLAP DataSet Job in Workbench 5,**
-
+<Steps titleSize="h2">
+<Step title="Create the DataSet Job">
 1. Click the
    <i className="legacy-icon-database sm" aria-hidden="true" /> icon in the left-hand icon bar.
 2. Click the "+" button in the top right corner of the jobs listing pane.
@@ -37,13 +37,15 @@ You can create an OLAP DataSet Job in Workbench 5. When you select OLAP as your 
     **Create**.
       
     A new OLAP DataSet Job is added to the list of jobs for the currently authenticated account. Note that after creating the job, you cannot edit any of the settings you just configured except for the DataSet name. If you want to change any of the other settings, you must create a new job.
-11. Click the
+</Step>
+<Step title="Configure the Connection">
+1. Click the
     **Configure** subtab.
-12. Click the
+2. Click the
     **Edit** button under "Source."
       
     A panel opens with options for configuring your OLAP connection and defining your query.
-13. In the
+3. In the
     **OLAP Connection** field, do one of the following:
 
     * Enter an OLAP connection string containing your Provider (MSOLAP or Essbase), Data Source, Initial Catalog, and User ID and Password.
@@ -54,16 +56,18 @@ You can create an OLAP DataSet Job in Workbench 5. When you select OLAP as your 
 
       <table border="1" cellpadding="1" cellspacing="1"><thead><tr><th colspan="1" rowspan="1"><p> Option </p></th><th colspan="1" rowspan="1"><p> Description </p></th></tr></thead><tbody><tr><td colspan="1" rowspan="1"><p> Data Source </p></td><td colspan="1" rowspan="1"><p> Specifies the server where the database is located. </p></td></tr><tr><td colspan="1" rowspan="1"><p> Provider </p></td><td colspan="1" rowspan="1"><p> Select a provider, either MSOLAP or Essbase. </p></td></tr><tr><td colspan="1" rowspan="1"><p> Catalog </p></td><td colspan="1" rowspan="1"><p> Specifies the Initial Catalog for your OLAP connection. </p></td></tr><tr><td colspan="1" rowspan="1"><p> Username </p></td><td colspan="1" rowspan="1"><p> Specifies the username for this OLAP connection. </p></td></tr><tr><td colspan="1" rowspan="1"><p> Password </p></td><td colspan="1" rowspan="1"><p> Specifies the password for this OLAP connection. </p></td></tr></tbody></table>
 
-14. (Optional) Check the "Requires 32-bit execution" box if 32-bit execution is needed for this connection.
-15. Click
+4. (Optional) Check the "Requires 32-bit execution" box if 32-bit execution is needed for this connection.
+5. Click
     **Apply.**
-16. Click the
+</Step>
+<Step title="Configure the Query">
+1. Click the
     **Edit** button under "Processing."
-17. Change the
+2. Change the
     **Query Execution Timeout** value if desired.
       
     This is the amount of time in seconds that will elapse before a long-running job is terminated.
-18. In the
+3. In the
     **Query** subtab, enter a query for the data you want to retrieve. For example:
       
         ```sql
@@ -86,7 +90,7 @@ You can create an OLAP DataSet Job in Workbench 5. When you select OLAP as your 
         from [Analysis Services Tutorial]
         ```
 
-19. (Optional) Define replacement variables for columns in the DataSet in the
+4. (Optional) Define replacement variables for columns in the DataSet in the
     **Replacement Variables** and **Global Replacement Variables** subtabs. For each replacement variable...
 
     1. Select the applicable column in the
@@ -102,15 +106,18 @@ You can create an OLAP DataSet Job in Workbench 5. When you select OLAP as your 
 
         <table border="1" cellpadding="1" cellspacing="1"><tbody><tr><th colspan="1" rowspan="1"><p> Variable Type </p></th><th colspan="1" rowspan="1"><p> Description </p></th></tr><tr><td colspan="1" rowspan="1"><p><span class="mt-font-courier-new"> lastvalue </span></p></td><td colspan="1" rowspan="1"><p><span class="mt-font-courier-new"> lastvalue </span> variables keep track of relevant fields for the last row of data that was sent with the most recent upload for the associated job. The syntax is </p><p><code> `!{lastvalue:_name_}!` </code></p><p><span class="mt-font-courier-new"> lastvalue </span> variables values are updated by Workbench after an upload finishes. <span class="mt-font-courier-new"> lastvalue </span> variables are stored in the job (<span class="mt-font-courier-new">.xml </span> ) file. This variable lets you construct a query that gets only the "new" rows each time it runs. For example, if your data has a column with a row "id" that increments with each new row, you can construct a query containing </p><p><code> `!{lastvalue:id}!` </code></p><p> similar to the following: </p><p>`select id, name, type, sales from tablename where id >!{lastvalue:id}! order by id`</p><p> In this example, the column "id" <em> must </em> be in the <span class="mt-font-courier-new"> SELECT </span>, <span class="mt-font-courier-new"> WHERE </span>, and <span class="mt-font-courier-new"> ORDER BY </span> clauses for the variable to be used and updated. </p><p> When uploading this job, Workbench replaces the </p><p><code> `!{lastvalue:id}!` </code></p><p> variable with the current value of "id". After finishing the upload, Workbench stores the last uploaded value of "id" in the job (<span class="mt-font-courier-new">.xml </span> ) file. </p> <Note> <div class="info-box-wrapper"><div class="info-box-icon-container"><span class="info-box-icon"></span></div><div class="info-box-content-container"><div class="info-box-content"><b> Note: </b> You <em> must </em> include any column you reference with a <span class="mt-font-courier-new"> lastvalue </span> variable in your <span class="mt-font-courier-new"> SELECT </span>, <span class="mt-font-courier-new"> WHERE </span>, and <span class="mt-font-courier-new"> ORDER BY </span> clauses in order for the variable to be used and updated after the data upload. </div></div></div> </Note></td></tr><tr><td colspan="1" rowspan="1"><p><span class="mt-font-courier-new"> previewonly </span></p></td><td colspan="1" rowspan="1"><p> Used to indicate that certain actions should take place when loading a preview in Workbench. For example, you could request that your preview return only 100 rows of data instead of the 1,000,000 present in the data source. The syntax is </p><p><code> `!{previewonly:Statement}!` </code></p></td></tr></tbody></table>
 
-20. Click
+5. Click
     **Apply**.
-21. Select the desired update method in the
+6. Select the desired update method in the
     **Update Method** menu:
 
     * Select
       **Replace DataSet** if you want the DataSet to be replaced entirely upon updating.
     * Select
       **Append to DataSet** if you want new data to be added to the existing data set upon updating.
+
+</Step>
+</Steps>
 
 You are now ready to execute the DataSet Job, thereby creating an OLAP DataSet in Domo. However, there are many other actions you can take on the DataSet Job before you send it to Domo. These include the following:
 

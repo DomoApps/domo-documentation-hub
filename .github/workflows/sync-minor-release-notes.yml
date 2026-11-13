@@ -17,8 +17,16 @@ name: Sync Minor Release Notes
 # Required repo variable (... -> Variables):
 #   DOMO_MINOR_RN_DATASET_ID  GUID of the HOTFIX_Release_Enriched_PUBLIC DataSet
 #
-# Optional repo variable:
+# Optional repo variables:
 #   DOMO_INSTANCE          Domo instance host (default: domo.domo.com)
+#   DOMO_MINOR_RN_TYPE_COLUMN
+#                          Name of an official note-type column in the DataSet.
+#                          LEAVE UNSET by default — the notes publish as one flat
+#                          list per product section. Set it ONLY once the DataSet
+#                          actually carries such a column; the build then SELECTs
+#                          it and splits the output back into "Updates" and
+#                          "Issues Resolved" sections driven by its value. See the
+#                          minor-release-notes skill.
 
 on:
   schedule:
@@ -58,6 +66,10 @@ jobs:
           DOMO_DEVELOPER_TOKEN: ${{ secrets.DOMO_DEVELOPER_TOKEN }}
           DOMO_MINOR_RN_DATASET_ID: ${{ vars.DOMO_MINOR_RN_DATASET_ID }}
           DOMO_INSTANCE: ${{ vars.DOMO_INSTANCE }}
+          # Unset unless/until the DataSet gains an official note-type column.
+          # When set to that column's name, output splits into Updates / Issues
+          # Resolved; otherwise notes render as one flat list per section.
+          DOMO_MINOR_RN_TYPE_COLUMN: ${{ vars.DOMO_MINOR_RN_TYPE_COLUMN }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
         run: |
           if [ "${{ inputs.seed_ledger }}" = "true" ]; then

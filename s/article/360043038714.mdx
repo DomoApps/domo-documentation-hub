@@ -1,5 +1,5 @@
 ---
-title: "Using Upsert in Workbench 5.1"
+title: "Use Upsert in Workbench 5.1"
 excerpt: "Use Upsert in Workbench 5.1 to send only new or updated rows to an existing Domo DataSet, identified by a primary or composite key."
 ---
 
@@ -13,42 +13,53 @@ Upsert typically works best when the DataSet is very large, the data is updating
 
 To use the upsert function in Workbench, you should already have an existing Workbench job and a healthy DataSet in Domo. For more information on how to create a Workbench job, see Creating a Job in Workbench 5.1.
 
-1. Navigate to the
-   **Configure** tab.
-2. Set the
-   **Update Method** to **Append**.
+<Steps titleSize="h3">
+<Step title="Open the Configure Tab">
+Navigate to the **Configure** tab.
+</Step>
+<Step title="Set the Update Method to Append">
+Set the **Update Method** to **Append**.
 
-   <Note>
-   **Note:** If this is a NEW Workbench job, you must run the job for the first time on **Replace** to create the DataSet. After this first initial run, you can switch to **Append**.
+<Note>
+**Note:** If this is a NEW Workbench job, you must run the job for the first time on **Replace** to create the DataSet. After this first initial run, you can switch to **Append**.
+</Note>
 
-   </Note>
+<Frame><img alt="Upsert_Workbench_Update_Method.png" src="/images/kb/ka05w00000123un-00N5w00000Ri7BU-0EM5w000005vPUl.png"/></Frame>
+</Step>
+<Step title="Open the Schema Tab">
+Select the **Schema** tab and you will now see an **Upsert Key** column.
+</Step>
+<Step title="Select the Upsert Key Columns">
+Select the checkbox(es) for the corresponding columns that represent the primary or composite key.
 
-   <Frame><img alt="Upsert_Workbench_Update_Method.png" src="/images/kb/ka05w00000123un-00N5w00000Ri7BU-0EM5w000005vPUl.png"/></Frame>
+**Tip:** Date or datetime columns are not recommended for the Upsert Key as they are not always unique.
 
-3. Click on the
-   **Schema** tab and you will now see an **Upsert Key** column.
-4. Select the checkbox(es) for the corresponding columns that represent the primary or composite key.
-     
-   **Tip:** Date or datetime columns are not recommended for the Upsert Key as they are not always unique.
-     
-   In the following image, the `Transaction ID` is completely unique per transaction so that will be selected. Now, Workbench will always reference `Transaction ID` to see if a transaction id exists and update it or if it does not add that new row.
-     
-   **Note:** If you do not see Upsert Key after following these steps, contact Domo Support and provide the Domo DataSet ID to verify upsert is enabled. See [Contacting Technical Support](/s/article/360042922874 "Getting Help") for more information.
-     
-   <Frame><img alt="Upsert_Key.png" src="/images/kb/ka05w00000123un-00N5w00000Ri7BU-0EM5w000005vPUg.png"/></Frame>
+In the following image, the `Transaction ID` is completely unique per transaction so that will be selected. Now, Workbench will always reference `Transaction ID` to see if a transaction id exists and update it or if it does not add that new row.
 
-5. Next, navigate back to the
-   **Configure** tab and click **edit** under processing to bring up your query.
-6. Add logic to ensure you're only pulling a smaller subset of data that could be new or updated.
-     
-   In this example, we know that our data could be updated within 7 days of the transaction, so we are pulling the last 7 days' worth of transactions to capture any updated rows as well as any new ones each day. This is only one simple example of many different ways to identify the "change data" or "delta".
-     
-   <Frame><img alt="Workbench_Upsert_Query.png" src="/images/kb/ka05w00000123un-00N5w00000Ri7BU-0EM5w000005vPUn.png"/></Frame>
+**Note:** If you do not see Upsert Key after following these steps, contact Domo Support and provide the Domo DataSet ID to verify upsert is enabled. See [Contacting Technical Support](/s/article/360042922874 "Getting Help") for more information.
 
-7. Click
-   **Apply**.
-8. Run Preview to ensure the appropriate records are returned.
-9. (Optional) Job scheduling should be reviewed and adjusted accordingly.
+<Frame><img alt="Upsert_Key.png" src="/images/kb/ka05w00000123un-00N5w00000Ri7BU-0EM5w000005vPUg.png"/></Frame>
+</Step>
+<Step title="Return to the Configure Tab">
+Next, navigate back to the **Configure** tab and select **edit** under processing to bring up your query.
+</Step>
+<Step title="Add Delta Logic to Your Query">
+Add logic to ensure you're only pulling a smaller subset of data that could be new or updated.
+
+In this example, we know that our data could be updated within 7 days of the transaction, so we are pulling the last 7 days' worth of transactions to capture any updated rows as well as any new ones each day. This is only one simple example of many different ways to identify the "change data" or "delta".
+
+<Frame><img alt="Workbench_Upsert_Query.png" src="/images/kb/ka05w00000123un-00N5w00000Ri7BU-0EM5w000005vPUn.png"/></Frame>
+</Step>
+<Step title="Apply the Query">
+Select **Apply**.
+</Step>
+<Step title="Preview the Results">
+Run Preview to ensure the appropriate records are returned.
+</Step>
+<Step title="Review Job Scheduling">
+(Optional) Job scheduling should be reviewed and adjusted accordingly.
+</Step>
+</Steps>
 
 Your Workbench upsert job is now properly configured and will update or add new information based on the data returned by the query.
 

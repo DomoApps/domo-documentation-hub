@@ -2,9 +2,19 @@
 """Rebuild the live Minor Release Notes article from a Domo DataSet.
 
 Queries the hotfix-enrichment DataSet through the Domo instance API using a
-developer access token, selects the week's publishable notes, restyles each into
-Domo house voice, and regenerates s/article/Current-Minor-Release-Notes.mdx.
-Output is deterministic, so a run with no new notes produces no git diff.
+developer access token, selects the week's publishable notes, rewrites each into
+the customer-facing Minor Release Notes house style, and regenerates
+s/article/Current-Minor-Release-Notes.mdx. Output is deterministic, so a run with
+no new notes produces no git diff.
+
+The DataSet text is written for an INTERNAL audience; this script is the
+customer-facing last mile. The house style is NOT in this file — it lives in the
+editable guide at .claude/skills/minor-release-notes/minor-release-notes-style.md,
+loaded verbatim as the Anthropic system prompt (load_style_system). Two layers keep
+non-public content out: a deterministic security/privacy keyword screen
+(screen_external) runs before the rewrite, and the rewrite itself returns
+EXCLUDE_SENTINEL for anything unsafe it still catches; both are dropped from the
+article.
 
 Companion to scripts/archive_minor_release_notes.py: this script only *writes the
 current week*; the archiver rolls the current file into a dated archive and
@@ -63,6 +73,12 @@ from datetime import date, datetime
 REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 ARTICLE_PATH = os.path.join(REPO_ROOT, "s", "article", "Current-Minor-Release-Notes.mdx")
 LEDGER_PATH = os.path.join(REPO_ROOT, "tracking", "minor-release-ledger.json")
+# The customer-facing house style for the rewrite lives in the skill as an
+# editable Markdown file and is loaded verbatim as the Anthropic system prompt.
+# The style is owned THERE, not in this script — see load_style_system().
+STYLE_GUIDE_PATH = os.path.join(
+    REPO_ROOT, ".claude", "skills", "minor-release-notes", "minor-release-notes-style.md"
+)
 
 # --- Publish gate and column contract ---
 MIN_SCORE = 7
@@ -72,6 +88,41 @@ DATE_COL = "master_targetdate"
 COMPONENT_COL = "Public_Parent_Component"
 KEY_COL = "master_key"
 REQUIRED_COLUMNS = {SCORE_COL, NOTE_COL, DATE_COL, COMPONENT_COL}
+
+# --- External-publication safety screen ------------------------------------ #
+# Minor Release Notes are PUBLIC and customer-facing. The source DataSet is
+# written for an INTERNAL audience, so this script is the customer-facing "last
+# mile": it both rewrites each note into public house voice AND removes anything
+# that must not be published. Per security/legal guidance, notes that touch
+# security, privacy, vulnerabilities, or information disclosure must be REMOVED
+# entirely (not abstracted). Two layers enforce that:
+#   1. This deterministic keyword screen runs BEFORE the rewrite, so obviously
+#      sensitive text never reaches the model or the article (and it protects the
+#      --no-llm path, which can't judge safety on its own).
+#   2. The LLM rewrite is a second, semantic net: the house style guide instructs
+#      it to return EXCLUDE_SENTINEL for anything unsafe or non-public it still
+#      catches; the renderer drops those bullets.
+# Err on the side of dropping a note. These patterns are intentionally broad.
+EXCLUDE_SENTINEL = "__EXCLUDE__"
+SECURITY_EXCLUDE_PATTERNS = (
+    r"vulnerabilit",                       # vulnerability / vulnerabilities
+    r"\bCVE-?\d",                          # CVE-2026-1234
+    r"\bexploit",
+    r"\bmalware\b", r"\bransomware\b", r"heartbleed",
+    r"zero[-\s]day",
+    r"\bshellshock\b", r"\blog4j\b", r"\bspectre\b", r"\bmeltdown\b",
+    r"\bXSS\b", r"\bCSRF\b", r"\bSSRF\b", r"\bRCE\b",
+    r"cross[-\s]site scripting", r"SQL injection", r"\binjection attack",
+    r"privilege escalation", r"remote code execution", r"buffer overflow",
+    r"authentication bypass", r"auth(?:n|z)? bypass", r"security bypass",
+    r"security (?:fix|patch|issue|flaw|hole|advisory|vulnerab|risk|hardening)",
+    r"\bhardening\b",
+    r"penetration test", r"\bpen[-\s]test",
+    r"data (?:breach|leak|leakage|exposure)",
+    r"information disclosure", r"sensitive data expos",
+    r"patch(?:ed|ing)?\s+(?:php|openssl|apache|nginx|tomcat|struts)",
+)
+_SECURITY_RE = re.compile("|".join(SECURITY_EXCLUDE_PATTERNS), re.IGNORECASE)
 
 # --- Optional "Updates vs Issues Resolved" delineation --------------------- #
 # By default the Minor Release Notes list every note in one flat list under its
@@ -108,22 +159,34 @@ COMPONENT_RENAME = {
     "DomoBuzz": "Buzz",
 }
 
-# --- Style rewrite: the house-style spec shared by the LLM and manual reruns.
-# Mirrored in the `minor-release-notes` skill; keep the two in sync. ---
-STYLE_SYSTEM = (
-    "You rewrite internal Domo hotfix release-note sentences into the Domo "
-    "Knowledge Base Minor Release Notes house style. Rules:\n"
-    "- Return ONE sentence, nothing else: no preamble, no quotes, no bullet "
-    "marker, no trailing commentary.\n"
-    "- Never begin with \"This update\". For an Issue Resolved, state the "
-    "problem that was fixed as a past-tense fact (e.g. \"Hidden calculations "
-    "were not being properly deleted from cards.\"). For an Update, use a "
-    "present-tense imperative or descriptive statement of the new behavior "
-    "(e.g. \"Add new rows in Linked Tables.\").\n"
-    "- Keep it factual and customer-facing. Preserve product and feature names "
-    "exactly. Do not invent detail that isn't in the source.\n"
-    "- American English. End with a period."
-)
+# --- Style rewrite -------------------------------------------------------- #
+# The authoritative customer-facing house style is the Markdown style guide at
+# STYLE_GUIDE_PATH, loaded verbatim as the LLM system prompt. It is NOT duplicated
+# here: the nuanced, secure, optimistic revision this produces is an LLM task that
+# a Python rules transform can't do, so the script's job is to LOAD the guide and
+# pass it through, keeping the style editable in one place (the skill). The
+# deterministic --no-llm fallback below does not apply the house style and is for
+# offline wiring tests only.
+
+
+def load_style_system():
+    """Return the house-style guide text used as the Anthropic system prompt.
+
+    Authoritative source is the editable Markdown guide in the skill; raising on a
+    missing file is deliberate — the LLM rewrite must never silently run without
+    the customer-facing / security rules it encodes."""
+    try:
+        with open(STYLE_GUIDE_PATH, encoding="utf-8") as fh:
+            text = fh.read().strip()
+    except FileNotFoundError:
+        raise SystemExit(
+            "Minor Release Notes style guide not found at "
+            f"{os.path.relpath(STYLE_GUIDE_PATH, REPO_ROOT)}. The LLM rewrite "
+            "requires it; add the file or run with --no-llm for an offline wiring test."
+        )
+    if not text:
+        raise SystemExit(f"Style guide {STYLE_GUIDE_PATH} is empty.")
+    return text
 
 
 def log(msg):
@@ -224,6 +287,27 @@ def filter_publishable(rows):
     return [r for r in rows if _score(r) >= MIN_SCORE and note_text(r)]
 
 
+def is_externally_unsafe(note):
+    """True when a note hits the deterministic security/privacy keyword screen and
+    must be removed from the PUBLIC notes rather than published (see
+    SECURITY_EXCLUDE_PATTERNS). This is the first, deterministic layer; the LLM
+    rewrite is the second, semantic net (house style guide -> EXCLUDE_SENTINEL)."""
+    return bool(_SECURITY_RE.search(note or ""))
+
+
+def screen_external(rows):
+    """Drop rows that fail the deterministic external-safety screen, so obviously
+    sensitive text never reaches the model or the published article. Returns
+    (kept_rows, dropped_count)."""
+    kept, dropped = [], 0
+    for r in rows:
+        if is_externally_unsafe(note_text(r)):
+            dropped += 1
+            continue
+        kept.append(r)
+    return kept, dropped
+
+
 def dedup(rows):
     """Collapse exact-duplicate notes (same normalized text), keeping the first."""
     seen, out = set(), []
@@ -311,7 +395,13 @@ def _cap(s):
 
 
 def deterministic_restyle(note, kind):
-    """Rough rules-based transform used with --no-llm. The LLM path does better."""
+    """Rough rules-based transform used with --no-llm. The LLM path does better.
+
+    It does NOT apply the customer-facing house style (no abstraction, no
+    de-internalizing, no optimistic framing) — that is an LLM task. It only honors
+    the hard security screen so the offline path can never emit an unsafe note."""
+    if is_externally_unsafe(note):
+        return EXCLUDE_SENTINEL
     text = re.sub(r"\s+", " ", note).strip()
     if kind == "Issue Resolved":
         stripped = _LEAD_ISSUE.sub("", text)
@@ -334,15 +424,16 @@ def make_restyler(use_llm):
     import anthropic  # imported lazily so --no-llm needs no dependency
 
     client = anthropic.Anthropic()
+    style_system = load_style_system()  # the editable house-style guide (authoritative)
 
     def restyle(note, kind):
         prompt = f"Type: {kind}\nSource sentence: {note.strip()}"
         try:
             resp = client.messages.create(
-                model="claude-haiku-5-5",
+                model="claude-sonnet-5-5",
                 max_tokens=400,
                 output_config={"effort": "low"},
-                system=STYLE_SYSTEM,
+                system=style_system,
                 messages=[{"role": "user", "content": prompt}],
             )
             out = next((b.text for b in resp.content if b.type == "text"), "").strip()
@@ -360,6 +451,18 @@ def make_restyler(use_llm):
 # --------------------------------------------------------------------------- #
 def fmt_date(d):
     return d.strftime("%B %-d, %Y")
+
+
+def _clean_bullet(bullet):
+    """Normalize a restyled note for rendering, or None if it must be dropped.
+
+    The rewrite returns EXCLUDE_SENTINEL for a note that must not be published
+    (security/privacy, or nothing customer-meaningful left); an empty string means
+    a garbled reply. Both are dropped."""
+    text = (bullet or "").strip()
+    if not text or text == EXCLUDE_SENTINEL:
+        return None
+    return text
 
 
 def render_article(selected, restyle, release_date, delineated=False):
@@ -386,9 +489,12 @@ def render_article(selected, restyle, release_date, delineated=False):
         for r in selected:
             comp = friendly_component(r.get(COMPONENT_COL))
             kind = note_type(r)
-            bullet = restyle(note_text(r), kind)
+            bullet = _clean_bullet(restyle(note_text(r), kind))
+            if bullet is None:  # removed by the safety screen / rewrite
+                continue
             groups.setdefault(comp, {"Update": [], "Issue Resolved": []})[kind].append(bullet)
         for comp in sorted(groups):
+            # A component only exists here if it kept at least one bullet.
             lines.append(f"### {comp}")
             lines.append("")
             for label, key in (("Updates", "Update"), ("Issues Resolved", "Issue Resolved")):
@@ -405,7 +511,9 @@ def render_article(selected, restyle, release_date, delineated=False):
             comp = friendly_component(r.get(COMPONENT_COL))
             # classify() only shapes the bullet's voice; with no official
             # note-type column it creates no visible Updates/Issues split.
-            bullet = restyle(note_text(r), classify(note_text(r)))
+            bullet = _clean_bullet(restyle(note_text(r), classify(note_text(r))))
+            if bullet is None:  # removed by the safety screen / rewrite
+                continue
             groups.setdefault(comp, []).append(bullet)
         for comp in sorted(groups):
             lines.append(f"### {comp}")
@@ -463,6 +571,13 @@ def build(use_llm, run_date, dry_run):
     rows = dedup(rows)
     log(f"{len(rows)} unique notes after dedup.")
 
+    # External-safety screen (deterministic first layer): drop anything that hits
+    # the security/privacy keyword filter before it can reach the model or the
+    # article. The LLM rewrite is the second, semantic net (see the style guide).
+    rows, dropped = screen_external(rows)
+    if dropped:
+        log(f"Screened out {dropped} note(s) on the external-safety keyword filter.")
+
     ledger = load_ledger()
     if not ledger and not dry_run:
         raise SystemExit(
@@ -486,6 +601,13 @@ def build(use_llm, run_date, dry_run):
         log("--- DRY RUN (nothing written: no archive, no ledger update) ---")
         print(content)
         return len(selected)
+
+    # If every selected note was removed by the rewrite's safety net, there is
+    # nothing publishable — don't archive the prior week or write an empty article.
+    if "\n- " not in content:
+        log("All selected notes were removed as non-public; "
+            "leaving the current article unchanged.")
+        return 0
 
     # Roll the outgoing current week into a dated archive before overwriting.
     # Imported lazily so --dry-run / --no-llm paths don't require it.

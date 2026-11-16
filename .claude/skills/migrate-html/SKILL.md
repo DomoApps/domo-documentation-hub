@@ -58,15 +58,15 @@ Every article needs at minimum:
 ```mdx
 ---
 title: "Article Title"
-excerpt: "Single sentence summarizing what the article covers."
+description: "This article explains how to … (single sentence in the former Intro lead-sentence format)."
 ---
 ```
-Do not use `description` — it renders on the published page and duplicates the Intro.
+The `description` renders on the published page directly below the title — it is the reader's opening summary as well as search/AI metadata. Do not use an `excerpt` field; `description` has replaced it.
 
 ### Article structure
-Intro → (optional) Required Grants → (optional) Prerequisites → task sections → (optional) FAQ
+Required Grants → (optional) Prerequisites → task sections → (optional) FAQ
 
-A `---` horizontal rule must follow the **Intro** section.
+The lead sentence lives in the `description` frontmatter, so articles have no `## Intro` section by default. Add one only when the article needs extra context in prose before the body, and do not place a `---` horizontal rule after it.
 
 ### Headings
 - Structural labels (`Intro`, `Prerequisites`, `FAQ`, etc.) are exempt from imperative mood.

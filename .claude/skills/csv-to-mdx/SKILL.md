@@ -139,7 +139,7 @@ title: "Article Title Here"
 ## Article Structure (from Domo-KB-Style-Guide.mdx)
 
 The required order of sections:
-1. **Intro** — followed immediately by a `---` horizontal rule
+1. *(Optional)* **Intro** — only when the article needs extra context in prose before the body; no `---` horizontal rule after it (the lead sentence lives in the `description` frontmatter)
 2. **Required Grants**
 3. *(Optional)* **Prerequisites**
 4. **Access [Feature Name]** (can swap with Required Grants if the grant is needed to see the access path)
@@ -150,9 +150,9 @@ The required order of sections:
 
 The structural labels Intro, Required Grants, Prerequisites, FAQ, Troubleshoot, and Related Articles are exempt from the imperative-mood rule.
 
-**Intro section format:** Keep it to one sentence in most cases. Use "This article explains how to…" or "This article covers…" followed by 2–3 concrete actions or skills the reader gains, using the same terminology as the article body. Do not explain why the skills matter.
+**Lead sentence / `description` format:** The one-sentence "This article explains how to…" / "This article covers…" summary lives in the `description` frontmatter field, not the body. Keep it to one sentence, followed by 2–3 concrete actions or skills the reader gains, using the same terminology as the article body. Do not explain why the skills matter. Most articles have no `## Intro` section; add one only when extra context is genuinely needed (and never put a `---` after it).
 
-**Correct:** "This article explains how to connect a DataSet to a card, schedule a DataFlow refresh, and configure row-level security."
+**Correct (description):** "This article explains how to connect a DataSet to a card, schedule a DataFlow refresh, and configure row-level security."
 
 **Heading Hierarchy:** The frontmatter `title` field renders as H1. Top-level sections (Intro, Required Grants, tasks, FAQ, etc.) are H2. Subsections are H3, H4, and so on. The ToC renders through H4 — avoid going deeper than three levels.
 
@@ -182,8 +182,8 @@ These are already handled and should be correct in any script output:
 The script cannot reliably fix these. Review every converted article for:
 
 **Article structure**
-- [ ] Intro → `---` → Required Grants → (Optional: Prerequisites) → Access Feature → CRUD tasks → (Optional: FAQ) → (Optional: Troubleshoot) → (Optional: Related Articles)
-- [ ] Intro section uses "This article explains how to…" or "This article covers…" format, one sentence, 2–3 concrete actions
+- [ ] Structure: (Optional: Intro) → Required Grants → (Optional: Prerequisites) → Access Feature → CRUD tasks → (Optional: FAQ) → (Optional: Troubleshoot) → (Optional: Related Articles); no `---` after any Intro section
+- [ ] `description` frontmatter uses "This article explains how to…" or "This article covers…" format, one sentence, 2–3 concrete actions; no separate `## Intro` section unless extra context is genuinely needed
 - [ ] Any `<!-- TODO: embed image → ... -->` comments must be resolved manually
 - [ ] FAQ items that didn't match the bold-Q/paragraph-A or numbered-list patterns are left verbatim and need manual `<AccordionGroup>` conversion
 - [ ] New English articles need `/add-to-nav` run to add them to `docs.json`
@@ -242,7 +242,7 @@ The conversion carries over whatever `alt` the Salesforce HTML had — frequentl
 
 Salesforce-era articles use a variety of legacy beta indicators. Convert any you find to the current convention defined in `Domo-KB-Style-Guide.mdx` › **Beta Features**:
 
-- [ ] `(Beta)` or `(BETA)` in a `title:` frontmatter value → remove the parenthetical and add `tag: "Beta"` to the frontmatter; insert the standard beta Note above the Intro
+- [ ] `(Beta)` or `(BETA)` in a `title:` frontmatter value → remove the parenthetical and add `tag: "Beta"` to the frontmatter; insert the standard beta Note immediately after the frontmatter, above the article body
 - [ ] `(Beta)` or `(BETA)` appended to a heading → remove the parenthetical and append `<Badge>Beta</Badge>` to the heading
 - [ ] Ad-hoc beta notes (e.g., "This feature is in beta. Contact your account team…") → replace with the standard beta Note from the style guide
 - [ ] References to `betafeedback@domo.com` or `betadmin@domo.com` → replace with `beta.admin@domo.com` (the standard Note already contains the right address)

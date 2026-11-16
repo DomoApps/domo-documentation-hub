@@ -122,7 +122,7 @@ Reuse the existing description verbatim (adjusting only to fit the em-dash forma
 
 Use the release-status answer from Step 3 to decide which beta treatment, if any, to apply. The full convention lives in `Domo-KB-Style-Guide.mdx` › **Beta Features** — read it before writing.
 
-- **Entire article is beta:** add `tag: "Beta"` to the frontmatter and place the standard beta Note immediately after the frontmatter, above the Intro. Do not append `(Beta)` to the title.
+- **Entire article is beta:** add `tag: "Beta"` to the frontmatter and place the standard beta Note immediately after the frontmatter, above the article body (and above the `## Intro` section if the article has one). Do not append `(Beta)` to the title.
 - **Only certain sections are beta:** append `<Badge>Beta</Badge>` to each beta section's heading. Place the standard beta Note under the **first** beta section only; do not repeat it for subsequent beta sections in the same article. Do not append `(Beta)` to any heading.
 - **Entire article is GA:** no beta tag, badge, or Note.
 
@@ -154,13 +154,13 @@ The article is not complete until every factual claim is either confirmed agains
 
 ## Step 8: Edit pass — style guide and template
 
-Drafting always introduces style drift. After the fact-check pass, do an explicit editing pass against **both** `Domo-KB-Style-Guide.mdx` **and** `New-Article-Template.mdx`, and revise the article in place. This pass catches every usage, style, grammar, and structural mistake. As you fix style, keep the source's substantive wording intact — change only what a rule requires, exactly as at Step 6. **Do not skip this even if the draft looks right** — the most common misses (intro framing, imperative headings, unpadded tables, lowercase Domo terms, future tense) are easy to introduce and easy to miss without a deliberate re-read.
+Drafting always introduces style drift. After the fact-check pass, do an explicit editing pass against **both** `Domo-KB-Style-Guide.mdx` **and** `New-Article-Template.mdx`, and revise the article in place. This pass catches every usage, style, grammar, and structural mistake. As you fix style, keep the source's substantive wording intact — change only what a rule requires, exactly as at Step 6. **Do not skip this even if the draft looks right** — the most common misses (description framing, imperative headings, unpadded tables, lowercase Domo terms, future tense) are easy to introduce and easy to miss without a deliberate re-read.
 
 1. **Re-read `Domo-KB-Style-Guide.mdx` and `New-Article-Template.mdx` now, in full** — not from memory. You will have drifted from at least one rule while drafting. Confirm the article's structure and encoding match the template (frontmatter, section order, component syntax, code blocks, tables).
 2. **Proofread for plain grammar and usage** — spelling, subject-verb agreement, punctuation, and sentence clarity — in addition to the Domo-specific rules below. A factually correct article still isn't done if it reads poorly.
 3. **Audit the article against this checklist** and fix every violation in both the EN file and the JA sibling, if you authored one:
-   - **Frontmatter** — `title` plus a single-sentence `excerpt`; never a `description` field.
-   - **Intro** — opens with "This article explains…" or "This article covers…", states only what the article covers (not why it matters), and is immediately followed by a `---` horizontal rule.
+   - **Frontmatter** — `title` plus a single-sentence `description` in the "This article explains…" / "This article covers…" format, stating only what the article covers (not why it matters); never an `excerpt` field.
+   - **Intro** — most articles have none (the lead sentence lives in `description`). Include an `## Intro` section only when the article needs extra context in prose before the body, and never place a `---` horizontal rule after it.
    - **Headings** — imperative mood at every level (H2–H4); the structural labels (Intro, Required Grants, Prerequisites, FAQ, Troubleshoot, Related Articles) are exempt. Top-level sections are H2, subsections H3+.
    - **Required Grants** — exact format and canonical grant wording, with the em-dash inside the bold and a space on each side (`**Grant —** description`).
    - **Callouts** — `<Note>`/`<Warning>`/`<Tip>` with the label and its colon bolded (`**Note:**`), and a blank line before the callout (except inside table cells).

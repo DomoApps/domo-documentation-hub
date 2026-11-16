@@ -122,7 +122,7 @@ Go feature by feature and verify **every** claim, model name, capability, bullet
 
 ### Step 8 — Edit pass
 
-Read the whole draft top to bottom for clarity, house-style adherence (`release-notes-style.md` §10 checklist), grammar, and consistent product naming. As you fix style, keep the source's substantive wording intact — change only what a rule requires, exactly as at Step 6. If any Markdown tables were added, run `python3 scripts/pad_md_tables.py s/article/Current-Release-Notes.mdx`. Re-confirm structure: title/excerpt, `import { BetaNote }` + `---`, alphabetized sections, Beta section, Support block.
+Read the whole draft top to bottom for clarity, house-style adherence (`release-notes-style.md` §10 checklist), grammar, and consistent product naming. As you fix style, keep the source's substantive wording intact — change only what a rule requires, exactly as at Step 6. If any Markdown tables were added, run `python3 scripts/pad_md_tables.py s/article/Current-Release-Notes.mdx`. Re-confirm structure: title/description, `import { BetaNote }` + `---`, alphabetized sections, Beta section, Support block.
 
 ### Step 9 — Hand off for approval
 

@@ -84,12 +84,13 @@ Work through this checklist for every file:
 
 ### Frontmatter
 - `title` field is present.
-- Use `excerpt` (single sentence), not `description`. Remove `description` if present and replace with `excerpt`.
-- If the article is beta: `tag: "Beta"` present in frontmatter and the standard beta Note appears immediately after the frontmatter, above the Intro.
+- Use `description` (single sentence, in the "This article explains…" / "This article covers…" format), not `excerpt`. If a legacy `excerpt` field is present, replace it with `description` (reuse its sentence, recast into the "This article…" format).
+- If the article is beta: `tag: "Beta"` present in frontmatter and the standard beta Note appears immediately after the frontmatter, above the article body.
 
-### Intro
-- Opens with "This article explains…" or "This article covers…" — states only what the article covers.
-- Immediately followed by a `---` horizontal rule.
+### Lead sentence and Intro
+- The one-sentence "This article explains…" / "This article covers…" summary lives in the `description` frontmatter, not the body.
+- Most articles have no `## Intro` section. When one is present (extra context only), it has no `---` horizontal rule after it.
+- Do not add or remove an existing legacy `## Intro` section wholesale here — that bulk migration is handled separately. Only fix an Intro that falls within the content you are already revising.
 
 ### Headings
 - Imperative mood at every level (H2–H4). Structural labels — Intro, Required Grants, Prerequisites, FAQ, Troubleshoot, Related Articles — are exempt.
@@ -136,7 +137,7 @@ Verify every Domo product term against the **Domo-Specific Terms and Usage** tab
 - Never "Page" — use "dashboard"
 
 ### Beta treatment
-- **Whole-article beta:** `tag: "Beta"` in frontmatter + standard verbatim beta Note above the Intro.
+- **Whole-article beta:** `tag: "Beta"` in frontmatter + standard verbatim beta Note immediately after the frontmatter, above the article body.
 - **Section-level beta:** `<Badge>Beta</Badge>` (no `className`) appended to the section heading + one standard beta Note under the first beta section only.
 - **GA:** no beta tag, badge, or Note.
 - Convert any legacy beta markers (`(Beta)` in titles, ad-hoc notes, `betafeedback@domo.com` references) to the current convention.
@@ -177,7 +178,7 @@ git diff
 
 Present a brief summary to the user:
 - List each file revised.
-- For each file, name the categories of fixes applied (e.g., "fixed intro framing, bolded callout labels, corrected two Domo terms").
+- For each file, name the categories of fixes applied (e.g., "recast the description into the 'This article…' format, bolded callout labels, corrected two Domo terms").
 
 Then tell the user: **"Review the diff above. Reply 'looks good' (or similar) to commit and push, or let me know what to adjust first."**
 

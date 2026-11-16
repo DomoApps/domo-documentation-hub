@@ -167,7 +167,7 @@ cat s/article/Current-Release-Notes.mdx
 **2. Translate into each target language** following all rules in `localization/Localization-Style-Guide.mdx` and applying the deterministic glossary `localization/glossary/<lang>.csv`.
 
 Key reminders for Current Release Notes translation:
-- Translate the `title:` and `excerpt:` frontmatter fields
+- Translate the `title:` and `description:` frontmatter fields (older source files may still carry a legacy `excerpt:` instead — translate whichever summary field is present)
 - Title for the localized Current Release Notes files should be the language's equivalent of "Current Release Notes" (see style guide Release Notes Conventions)
 - Translate "## New Features and Enhancements" to the language-specific header (see style guide)
 - Preserve all `<Frame>`, `<BetaNote />`, `import` statements, and MDX components unchanged
@@ -211,7 +211,7 @@ cat s/article/FILENAME.mdx
 
 Following all rules in `localization/Localization-Style-Guide.mdx` and applying the deterministic glossary `localization/glossary/<lang>.csv`:
 
-- Translate the `title:` and `excerpt:` frontmatter fields
+- Translate the `title:` and `description:` frontmatter fields (older source files may still carry a legacy `excerpt:` instead — translate whichever summary field is present)
 - Translate all prose, headings, list items, and callout body text
 - Apply the deterministic term renderings from `localization/glossary/<lang>.csv` (keep-in-English terms untouched; translated terms rendered exactly, matching the `context` row)
 - For images: check whether localized images exist; if they exist, use the localized path; if not, use the English image path as-is
@@ -316,7 +316,7 @@ Work through the following checklist for each language. Revise the file in place
 - [ ] **No legacy TOC block.** Confirm there is no old-style table-of-contents block (a sequence of `---` / heading bullets / `---`) immediately after frontmatter.
 - [ ] **No content added or removed.** Verify that every section, heading, list item, and callout from the English source is present in the translation, with nothing extra added.
 - [ ] **MDX structure is intact.** Component names, attribute names (except translated `title=` on `<Accordion>` and descriptive `alt=`), import statements, code blocks, and inline code are all unchanged.
-- [ ] **Frontmatter is correct.** `title` and `excerpt` are translated. No fields were added or removed. `tag` fields (if present) are unchanged.
+- [ ] **Frontmatter is correct.** `title` and `description` are translated (or a legacy `excerpt`, if the source still has one). No fields were added or removed. `tag` fields (if present) are unchanged.
 - [ ] **Internal article links use the same language.** Every `/s/article/<slug>` link and every `https://www.domo.com/docs/s/article/<slug>` URL is rewritten to `/{lang}/s/article/<slug>` (cross-article anchor dropped), including links to articles that have no localized version yet. No article link is left pointing at the English `/s/article/` path. `/s/topic/` and `/portal/` links stay English.
 - [ ] **Blank lines before callouts.** Every `<Note>`, `<Warning>`, and `<Tip>` is preceded by a blank line in the MDX source.
 - [ ] **Screenshots remain in `<Frame>`.** All block-level images are still wrapped in `<Frame>`. No `<Frame>` was removed.

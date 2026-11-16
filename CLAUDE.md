@@ -41,7 +41,7 @@ All navigation is defined in **`docs.json`** (large file, \~307KB). The schema i
 
 ## MDX Content Conventions
 
-All articles require two YAML frontmatter fields: `title` and `excerpt` (a single sentence summarizing what the article covers, placed directly below `title`). Never use `description` in place of `excerpt`, because Mintlify renders `description` on the published page, which duplicates the Intro section, while `excerpt` stays invisible and serves as repo-level metadata for search and AI context. See `Domo-KB-Style-Guide.mdx` › **Excerpt**.
+All articles require two YAML frontmatter fields: `title` and `description` (a single sentence summarizing what the article covers, in the format "This article explains..." or "This article covers...", placed directly below `title`). Mintlify renders `description` on the published page directly below the title, so it is both the reader's opening summary and repo-level metadata for search and AI context. Because `description` now carries the article's lead sentence, articles no longer include a `## Intro` section by default — add one only when an article needs extra context in prose before the body, and never place a `---` separator after it. Do not use an `excerpt` field; `description` has replaced it entirely. See `Domo-KB-Style-Guide.mdx` › **Frontmatter** and **Lead Sentence and the Intro Exception**.
 
 Images and video clips must be committed to `images/kb/` on the same branch before an article references them.
 
@@ -267,7 +267,7 @@ All scripts live in `scripts/`. They are optional dev-quality tools — non-tech
 
 See `Domo-KB-Style-Guide.mdx` for full standards. Key points:
 
-- Article structure: Intro → Required Grants → Access Feature → Tasks (CRUD order) → FAQ
+- Article structure: Required Grants → Access Feature → Tasks (CRUD order) → FAQ. The lead sentence lives in the `description` frontmatter; an `## Intro` section is optional and used only when the article needs extra context in prose before the body
 - FAQ sections go at the bottom, coded as `<AccordionGroup>`
 - For technical style questions not in the guide, follow the [Google developer documentation style guide](https://developers.google.com/style)
 - For nontechnical style, follow The Chicago Manual of Style (18th ed.)

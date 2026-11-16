@@ -1,6 +1,6 @@
 ---
 title: "Domo KB Style Guide"
-excerpt: "Standards and conventions for writing clear, consistent Domo Knowledge Base documentation."
+description: "This article covers the standards and conventions for writing clear, consistent Domo Knowledge Base documentation."
 ---
 
 import { DomoEmbed } from "/snippets/DomoEmbed.mdx";
@@ -14,38 +14,38 @@ This style guide provides guidelines for producing Domo Knowledge Base documenta
 
 If you can't find an answer in any of these sources, consult with the Knowledge Base administrator.
 
----
-
 ## Article Design
 
 This section includes content and page design standards for creating Knowledge Base content. These standards are not exhaustive and can be added to as needed.
 
 ### Frontmatter
 
-Every article must include an `excerpt` field in its YAML frontmatter, directly below the `title`. The excerpt is a single sentence summarizing what the article covers — think of it as the "what's in this file" hint for future writers, PMs scanning the repo, and AI tools that need quick, accurate context without parsing the full article body. A well-written excerpt vastly improves how AI tools use the article in context and significantly boosts search engine optimization, since both rely on a concise, accurate summary to surface the article appropriately.
+Every article must include a `description` field in its YAML frontmatter, directly below the `title`. The description is a single sentence summarizing what the article covers, written in the format "This article explains..." or "This article covers..." followed by 2–3 concrete actions or skills the reader gains, using the same terminology as the article body.
+
+The description does two jobs at once. Mintlify renders it on the published page, directly below the title, so it is the reader's first line of orientation — the on-page summary of what the article covers. It is also the "what's in this file" hint for future writers, PMs scanning the repo, and AI tools that need quick, accurate context without parsing the full article body. A well-written description vastly improves how AI tools use the article in context and significantly boosts search engine optimization, since both rely on a concise, accurate summary to surface the article appropriately.
 
 ````mdx
 ---
 title: "Create and Use Data Models"
-excerpt: "Define relationships between DataSets once and reuse them across Domo for consistent metrics and faster analysis."
+description: "This article explains how to define relationships between DataSets, reuse them across Domo, and keep metrics consistent."
 ---
 ````
 
-Keep the excerpt to a single sentence and use the same terminology as the article body, so the summary stays accurate as the article evolves.
+Keep the description to a single sentence and use the same terminology as the article body, so the summary stays accurate as the article evolves.
 
-Do not use a `description` field in place of `excerpt`. Mintlify renders `description` on the published page, which duplicates the Intro section. The `excerpt` field, by contrast, is invisible on the rendered site and exists purely as repo-level metadata.
+Because the `description` now carries the article's lead sentence and renders on the page, articles do **not** include a separate `## Intro` section by default — see **Lead Sentence and the Intro Exception** below. Do not add an `excerpt` field: `description` replaces it entirely and serves the same repo-level metadata and search/AI purposes while also displaying to readers.
 
 #### Sidebar Title
 
 `sidebarTitle` is an optional frontmatter field that sets the short label shown for the article in the left-hand navigation. The full `title` still appears as the page heading and is what search and AI tools use, so keep `title` complete and descriptive — `sidebarTitle` only changes the nav label.
 
-When present, place it directly below `title`, with `excerpt` following it:
+When present, place it directly below `title`, with `description` following it:
 
 ````mdx
 ---
 title: "Configure the Domo Mobile App with Microsoft Intune"
 sidebarTitle: "Microsoft Intune"
-excerpt: "Configure the Domo Mobile App with Microsoft Intune using Conditional Access, compliance policies, and the Enterprise SSO app extension on iOS."
+description: "This article explains how to configure the Domo Mobile App with Microsoft Intune using Conditional Access, compliance policies, and the Enterprise SSO app extension on iOS."
 ---
 ````
 
@@ -60,7 +60,7 @@ Keep the `sidebarTitle` in Title Case and as short as is still clear in context 
 
 The structure of an article should be as follows:
 
-- Intro
+- (_Optional_) Intro — only when the article needs additional context in prose before the body (see **Lead Sentence and the Intro Exception**). Most articles omit it and start at **Required Grants** or the first task.
 - Required Grants
 - (_Optional_) Prerequisites
 - Access Feature (this and Required Grants can be switched as needed, for example, when you must have a grant to view the option to access the feature)
@@ -69,19 +69,27 @@ The structure of an article should be as follows:
 - (_Optional_) Troubleshoot
 - (_Optional_) Related Articles
 
-A horizontal rule (`---`) must follow the **Intro** section, visually separating it from **Required Grants** and the article body.
+Do not place a horizontal rule (`---`) after an Intro section or anywhere between the frontmatter and the body. The previous convention of separating the Intro from the article body with a `---` has been removed.
 
 Do not include a table of contents — written or linked — at the top of an article. Tables of contents are generated automatically from the article's headings when the page renders on the Knowledge Base site.
 
-### Intro Section
+### Lead Sentence and the Intro Exception
 
-Keep the Intro section succinct and direct. In most cases, a single sentence is sufficient. Use the format "This article explains..." or "This article covers..." followed by 2–3 concrete actions or skills the reader gains, using the same terminology as the article body.
+Every article's lead sentence — the single-sentence "This article explains..." / "This article covers..." summary — lives in the `description` frontmatter field, not in the body (see **Frontmatter** above). Mintlify renders the description directly below the title, so it already serves as the reader's opening summary. Because of this, most articles do **not** include a `## Intro` section; they go straight from the frontmatter to the first body section (typically **Required Grants** or the first task).
 
-Do not explain why the skills matter — focus only on what the article covers. A few articles genuinely require an opening sentence of context before the lead sentence, but this should be the exception, not the rule.
+Keep the description succinct and direct: a single sentence in the format "This article explains..." or "This article covers...", followed by 2–3 concrete actions or skills the reader gains, using the same terminology as the article body. Do not explain why the skills matter — focus only on what the article covers.
 
-**Correct:** "This article explains how to connect a DataSet to a card, schedule a DataFlow refresh, and configure row-level security."
+**Correct (description):** "This article explains how to connect a DataSet to a card, schedule a DataFlow refresh, and configure row-level security."
 
-**Incorrect:** "Understanding your data pipeline is key to getting the most out of Domo. This article introduces several concepts and walks you through the basics."
+**Incorrect (description):** "Understanding your data pipeline is key to getting the most out of Domo. This article introduces several concepts and walks you through the basics."
+
+#### The Intro exception
+
+A few articles genuinely require an opening sentence or two of context in prose before the body — a conceptual definition, a scope caveat, or background the reader needs to orient. For those, and only those, add a `## Intro` section containing that context. This should be the exception, not the rule. When an article includes an `## Intro` section:
+
+- The `description` still carries the one-line "This article..." summary — it always does, in every article.
+- Put only the additional context in the `## Intro` section; do not repeat the "This article explains..." sentence there.
+- Do **not** add a horizontal rule (`---`) after the Intro. The old `---` separator convention has been removed.
 
 ### Required Grants
 
@@ -151,7 +159,7 @@ This applies to all heading levels (H1–H3) and to any labeled step that functi
 
 The frontmatter `title` field renders as H1. This means:
 
-- The Intro section and all other top-level parent headings should be H2
+- The Intro section (on the rare article that has one) and all other top-level parent headings should be H2
 - Subsections should be H3, H4, and so on
 
 The table of contents renders through H4. If you find yourself going three or more levels deep, consider reorganizing your content.
@@ -552,7 +560,7 @@ Do not use the English `<BetaNote />` in a localized article. Do not paste raw b
 When the entire article covers a beta feature:
 
 1. Add `tag: "Beta"` to the frontmatter. This renders a Beta badge next to the article title in the sidebar.
-2. Add the `import { BetaNote } from '/snippets/BetaNote.mdx';` line directly below the frontmatter, then place `<BetaNote />` immediately after it, above the Intro section.
+2. Add the `import { BetaNote } from '/snippets/BetaNote.mdx';` line directly below the frontmatter, then place `<BetaNote />` immediately after it, above the article body (and above the `## Intro` section if the article has one).
 3. Do not append `(Beta)` to the article title.
 
 ```mdx
@@ -560,13 +568,14 @@ When the entire article covers a beta feature:
 title: "Connect AI Tools to Domo Using MCP"
 tag: "Beta"
 sidebarTitle: "MCP Server"
+description: "This article explains how to connect AI tools to Domo using the MCP server."
 ---
 
 import { BetaNote } from '/snippets/BetaNote.mdx';
 
 <BetaNote />
 
-## Intro
+## Required Grants
 
 ...
 ```
@@ -672,7 +681,7 @@ Add one Note where the badges first appear in the article, such as directly abov
 
 If a badged section also needs other information, keep a separate Note for that information only.
 
-If an entire article covers a feature that must be turned on, don't use badges. Say so once in the Intro and point readers to their Domo account team.
+If an entire article covers a feature that must be turned on, don't use badges. Say so once in a Note near the top of the article and point readers to their Domo account team.
 
 ## Tooltips
 

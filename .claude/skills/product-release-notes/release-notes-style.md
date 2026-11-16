@@ -13,7 +13,7 @@ Every file — current or archived — has this exact shape:
 ```mdx
 ---
 title: "September 2026 Release Notes"
-excerpt: "September 2026 release notes covering <3–5 headline features>, and additional new features and enhancements."
+description: "September 2026 release notes covering <3–5 headline features>, and additional new features and enhancements."
 ---
 
 import { BetaNote } from '/snippets/BetaNote.mdx';
@@ -70,7 +70,7 @@ Invariants:
 ## 2. Frontmatter
 
 - **`title`** — Current file: `"{Month} {Year} Release Notes"` (e.g. `"September 2026 Release Notes"`). Archived file: `"{Year} Release {N} | {Month}"` (see `SKILL.md` › archival). Nothing else.
-- **`excerpt`** — one sentence, invisible on the page, used for search/AI context. Pattern: `"{Month} {Year} release notes covering {2–5 headline features}, and additional new features and enhancements."` Never use `description` in place of `excerpt`.
+- **`description`** — one sentence. Mintlify renders it on the published page below the title, and it also serves as search/AI context. Pattern: `"{Month} {Year} release notes covering {2–5 headline features}, and additional new features and enhancements."` Do not use a legacy `excerpt` field — `description` has replaced it.
 - No other frontmatter fields.
 
 ---
@@ -200,7 +200,7 @@ See the **September 2026** Resolved Issues section for the model.
 
 ## 11. Quick checklist before handoff
 
-- [ ] Title + excerpt match the conventions in §2.
+- [ ] Title + description match the conventions in §2.
 - [ ] `import { BetaNote }` + `---` divider present.
 - [ ] Sections alphabetized; sub-features grouped correctly.
 - [ ] Every feature has a body; screenshots wrapped in `<Frame>`; every referenced image exists in `images/kb/`.

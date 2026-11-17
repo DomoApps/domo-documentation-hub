@@ -1,8 +1,8 @@
 # Domo Documentation Hub
+
 [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2FDomoApps%2Fdomo-documentation-hub.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2FDomoApps%2Fdomo-documentation-hub?ref=badge_shield)
 
-
-Domo's public documentation site — Getting Started guides, the Knowledge Base (\~1,700 articles), API Reference, and topic pages. Content is authored in MDX, navigation is defined in `docs.json`, and the site is built and hosted by [Mintlify](https://mintlify.com).
+Domo's public documentation site — Getting Started guides, the Knowledge Base (~1,700 articles), API Reference, and topic pages. Content is authored in MDX, navigation is defined in `docs.json`, and the site is built and hosted by [Mintlify](https://mintlify.com).
 
 ## Repository layout
 
@@ -16,23 +16,35 @@ Domo's public documentation site — Getting Started guides, the Knowledge Base 
 
 ## Preview changes locally
 
-Uses the [`mintlify`](https://www.npmjs.com/package/mintlify) npm package for a local dev server against this repo's content.
+We recommend using Visual Mode in the [Mintlify MDX](https://marketplace.visualstudio.com/items?itemName=mintlify.mintlify-snippets) VS Code extension. It provides a rich editor experience that matches the Mintlify dashboard. Live preview is also available, which uses the Mintlify CLI (see below) to open a browser preview that can follow as you navigate between files in VS Code. Additionally, selecting the extension icon from the left sidebar opens a file explorer that mirrors the published site's structure.
+
+Use the [`mint`](https://www.npmjs.com/package/mint) npm package (the Mintlify CLI) for a local dev server against this repo's content. It requires Node.js v20.17.0 or later.
 
 ```bash
-npm i -g mintlify       # once per machine — see https://www.npmjs.com/package/mintlify
+npm i -g mint           # once per machine — see https://www.mintlify.com/docs/cli/install
 git checkout <branch>   # any branch with changes you want to preview
-mintlify dev            # run from the repo root (where docs.json lives)
+mint dev                # run from the repo root (where docs.json lives)
 ```
 
 Open [http://localhost:3000](http://localhost:3000). Most edits hot-reload; `docs.json` schema changes may need a server restart.
 
-For a faster, but less robust preview experience, VS Code has several extenstions offering an MDX preview. For example: [Modern MDX Preview](https://marketplace.visualstudio.com/items?itemName=ggfincke.vsc-mdx-preview).
+### Switching from the old `mintlify` package
+
+The CLI used to be published as `mintlify`. That package is now legacy and should not be used. If you installed it before, remove it and install `mint` instead:
+
+```bash
+npm uninstall -g mintlify
+npm cache clean --force
+npm i -g mint
+```
+
+To check which one you have, run `npm ls -g` (look for `mint` versus `mintlify`) or `which mint`. See [mintlify versus mint package](https://www.mintlify.com/docs/cli/install#mintlify-versus-mint-package) for details.
 
 ### Troubleshooting
 
 #### "Client not built" error
 
-If `mintlify dev` fails with:
+If `mint dev` fails with:
 
 ```text
 Error: Client not built. Run: cd <path>/apps/client && STANDALONE_BUILD=true NEXT_PUBLIC_ENV=cli yarn build
@@ -52,8 +64,8 @@ tar -xzf /tmp/mint.tar.gz -C ~/.mintlify
 echo "$VERSION" > ~/.mintlify/mint/mint-version.txt
 rm /tmp/mint.tar.gz
 
-# 3. Run as normal — mintlify will see the version file and skip the re-download
-mintlify dev
+# 3. Run as normal — mint will see the version file and skip the re-download
+mint dev
 ```
 
 ## Deployment
@@ -77,8 +89,8 @@ Training on how to contribute to this repository is available in the [KB Contrib
 
 ## Useful Mintlify references
 
-- [Mintlify docs](https://mintlify.com/docs) · [CLI](https://mintlify.com/docs/cli) · [`docs.json` schema](https://mintlify.com/docs/settings/global) · [Components](https://mintlify.com/docs/components/overview)
-
+- [Mintlify docs](https://mintlify.com/docs) · [CLI](https://mintlify.com/docs/cli) · [`docs.json` schema](https://mintlify.com/docs/settings/global) · [Components](https://mintlify.com/docs/components/overview) · [MDX VS Code Extension](https://www.mintlify.com/docs/cli/mdx-extension)
 
 ## License
+
 [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2FDomoApps%2Fdomo-documentation-hub.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2FDomoApps%2Fdomo-documentation-hub?ref=badge_large)

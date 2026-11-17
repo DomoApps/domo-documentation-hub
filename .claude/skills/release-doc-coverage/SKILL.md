@@ -5,7 +5,7 @@ description: Build or update the KB Documentation Coverage tracker CSV for a GA 
 
 # Release Documentation Coverage Tracker
 
-Every GA release branch (`release-ga/<month>-<day>-<year>`) is the single place that holds three things for that release: the new KB additions/updates, the Release Notes (`s/article/Current-Release-Notes.mdx`), and a **coverage tracker** that reconciles the two. The Release Notes are the authoritative checklist of everything shipping in the GA cycle; the coverage tracker answers, feature by feature, *"do we have a KB submission from the right PM for this, and if not, why not?"*
+Every GA release branch (`release-ga/<month>-<year>`) is the single place that holds three things for that release: the new KB additions/updates, the Release Notes (`s/article/Current-Release-Notes.mdx`), and a **coverage tracker** that reconciles the two. The Release Notes are the authoritative checklist of everything shipping in the GA cycle; the coverage tracker answers, feature by feature, *"do we have a KB submission from the right PM for this, and if not, why not?"*
 
 This skill produces (or refreshes) that tracker as a CSV in `releaseCoverage/`. It writes the **9-column schema** defined in Step 6 — match that column order and value vocabulary exactly.
 
@@ -36,7 +36,7 @@ Do not guess from whether a file exists — ask. (A file can exist and still nee
 Three things must name the **same GA release**:
 
 1. **Release Notes title** — the `title:` frontmatter of `s/article/Current-Release-Notes.mdx`, e.g. `"September 2026 Release Notes"` → month/year = **September 2026**.
-2. **Branch name** — the current branch, e.g. `release-ga/sept-23-2026` → month/year = **September 2026** (the day is the feature-switch date, not part of the tracker identity).
+2. **Branch name** — the current branch, e.g. `release-ga/september-2026` → month/year = **September 2026** (the branch name is the month and year directly, with no day to strip).
 3. **CSV filename** — `releaseCoverage/<Month>-<Year>-Release-Doc-Coverage.csv`, e.g. `September-2026-Release-Doc-Coverage.csv`.
 
 Gather them:
@@ -47,12 +47,12 @@ grep -m1 '^title:' s/article/Current-Release-Notes.mdx
 ls releaseCoverage/ 2>/dev/null
 ```
 
-The branch abbreviates the month (`sept`, `oct`); the title and filename spell it out (`September`, `October`). Normalize before comparing — `sept` ↔ `September`, and the years must be identical.
+The branch spells the month out in lowercase (`september`, `october`); the title and filename use title case (`September`, `October`). Normalize case before comparing — `september` ↔ `September` — and the years must be identical. (Legacy branches may still carry a day, e.g. `release-ga/sept-23-2026`; strip it and expand any abbreviation before comparing.)
 
 - **CREATE**: derive the CSV filename from the Release-Notes month/year. If the current branch isn't a `release-ga/*` branch, or its month/year doesn't match the Release-Notes title, **stop and tell the user** — a coverage tracker built off a mismatched branch would record the wrong "KB Submission" column. Don't proceed on a guess.
 - **UPDATE**: this alignment check is the whole point of the mode. If the Release-Notes title, the branch name, and the existing CSV filename don't all resolve to the same month/year, **stop and report the mismatch** (state all three values). Only continue once they agree. This catches the common error of updating last month's tracker on this month's branch, or editing a tracker after the release notes were rolled to the next cycle.
 
-The **branch name is embedded in the CSV's coverage column header** — `KB Submission (release-ga/sept-23-2026)` — so the CSV itself records which branch state it reflects. On UPDATE, if the branch's full name changed (e.g. a new feature-switch date), update that header to the current branch.
+The **branch name is embedded in the CSV's coverage column header** — `KB Submission (release-ga/september-2026)` — so the CSV itself records which branch state it reflects. On UPDATE, if the branch name changed (e.g. an older tracker still names a legacy day-dated branch), update that header to the current branch.
 
 ## Step 3 — Extract the feature checklist from the Release Notes
 

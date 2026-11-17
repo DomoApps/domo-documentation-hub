@@ -40,8 +40,8 @@ If there are no qualifying MDX files in the PR, tell the user and stop.
 
 Using the `headRefName` and `baseRefName` already returned above, verify the PR targets the right base. This is cheap to check here and expensive to catch after merge.
 
-- If `headRefName` contains `-ga-<date>` and `baseRefName` is `main`, don't assume it's wrong — this is correct for an **off-train** standalone product GA, where the KB Administrator holds the PR and merges it on the `-ga-` date. It's only a mistake if the work belongs to the company-wide monthly GA train, in which case it should base onto the `release-ga/*` branch for that date (spelled-out month, such as `release-ga/sept-23-2026`; confirm with `git branch -r | grep release-ga`). If a matching `release-ga/*` branch exists, mention that the PR may belong on it; if none exists, note that main is expected for off-train GA and leave routing to the contributor. Never suggest dropping the `-ga-<date>` suffix. See `CLAUDE.md` › **GA Release Workflow**.
-- If `baseRefName` is a `release-ga/*` branch but `headRefName` has no GA date, mention it. Either the branch name is missing its date or the base is wrong.
+- If `headRefName` contains `-ga-<month>-<year>` and `baseRefName` is `main`, don't assume it's wrong — this is correct for an **off-train** standalone product GA, where the KB Administrator holds the PR and merges it on the feature's switch date within the `-ga-` month. It's only a mistake if the work belongs to the company-wide monthly GA train, in which case it should base onto the `release-ga/*` branch for that month (`release-ga/<month>-<year>`, such as `release-ga/november-2026`; confirm with `git branch -r | grep release-ga`). If a matching `release-ga/*` branch exists, mention that the PR may belong on it; if none exists, note that main is expected for off-train GA and leave routing to the contributor. Never suggest dropping the `-ga-<month>-<year>` suffix. See `CLAUDE.md` › **GA Release Workflow**.
+- If `baseRefName` is a `release-ga/*` branch but `headRefName` has no GA month, mention it. Either the branch name is missing its `-ga-<month>-<year>` suffix or the base is wrong.
 
 Report the mismatch and let the user decide whether to retarget the PR. Do not retarget it yourself, and do not let this block the style revision. Continue to Step 2 either way.
 
@@ -84,12 +84,13 @@ Work through this checklist for every file:
 
 ### Frontmatter
 - `title` field is present.
-- Use `excerpt` (single sentence), not `description`. Remove `description` if present and replace with `excerpt`.
-- If the article is beta: `tag: "Beta"` present in frontmatter and the standard beta Note appears immediately after the frontmatter, above the Intro.
+- Use `description` (single sentence, in the "This article explains…" / "This article covers…" format), not `excerpt`. If a legacy `excerpt` field is present, replace it with `description` (reuse its sentence, recast into the "This article…" format).
+- If the article is beta: `tag: "Beta"` present in frontmatter and the standard beta Note appears immediately after the frontmatter, above the article body.
 
-### Intro
-- Opens with "This article explains…" or "This article covers…" — states only what the article covers.
-- Immediately followed by a `---` horizontal rule.
+### Lead sentence and Intro
+- The one-sentence "This article explains…" / "This article covers…" summary lives in the `description` frontmatter, not the body.
+- Most articles have no `## Intro` section. When one is present (extra context only), it has no `---` horizontal rule after it.
+- Do not add or remove an existing legacy `## Intro` section wholesale here — that bulk migration is handled separately. Only fix an Intro that falls within the content you are already revising.
 
 ### Headings
 - Imperative mood at every level (H2–H4). Structural labels — Intro, Required Grants, Prerequisites, FAQ, Troubleshoot, Related Articles — are exempt.
@@ -136,7 +137,7 @@ Verify every Domo product term against the **Domo-Specific Terms and Usage** tab
 - Never "Page" — use "dashboard"
 
 ### Beta treatment
-- **Whole-article beta:** `tag: "Beta"` in frontmatter + standard verbatim beta Note above the Intro.
+- **Whole-article beta:** `tag: "Beta"` in frontmatter + standard verbatim beta Note immediately after the frontmatter, above the article body.
 - **Section-level beta:** `<Badge>Beta</Badge>` (no `className`) appended to the section heading + one standard beta Note under the first beta section only.
 - **GA:** no beta tag, badge, or Note.
 - Convert any legacy beta markers (`(Beta)` in titles, ad-hoc notes, `betafeedback@domo.com` references) to the current convention.
@@ -177,7 +178,7 @@ git diff
 
 Present a brief summary to the user:
 - List each file revised.
-- For each file, name the categories of fixes applied (e.g., "fixed intro framing, bolded callout labels, corrected two Domo terms").
+- For each file, name the categories of fixes applied (e.g., "recast the description into the 'This article…' format, bolded callout labels, corrected two Domo terms").
 
 Then tell the user: **"Review the diff above. Reply 'looks good' (or similar) to commit and push, or let me know what to adjust first."**
 

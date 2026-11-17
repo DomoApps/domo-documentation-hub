@@ -1,10 +1,11 @@
 # Sync OpenAPI Specifications and Update Navigation
 #
-# The pipeline-shared-library (generateApiV4) pushes published public API YAMLs
-# to a per-service branch named openapi-sync/<service>, cut from main with the
+# The api-registry pipeline pushes published public API YAMLs to a
+# per-service branch named openapi-sync/<service>, cut from main with the
 # YAMLs copied into openapi/product/. This workflow runs on that push, then:
 #   1. finds the YAMLs that differ from main,
-#   2. regenerates their docs.json navigation entries,
+#   2. regenerates their docs.json navigation entries
+#      (.github/scripts/update_api_nav.py),
 #   3. prunes nav entries whose YAML no longer exists,
 #   4. commits the nav changes to the same branch, and
 #   5. opens a PR into main (an existing open PR is updated by the push).
@@ -24,6 +25,28 @@ on:
     # The nav commit this workflow pushes only touches docs.json, so it does not re-trigger.
     paths:
       - "openapi/product/**"
+  # Manual run. Defaults to a dry run: regenerates the nav and shows the
+  # docs.json diff, but commits and opens nothing.
+  workflow_dispatch:
+    inputs:
+      files:
+        description: "YAMLs to regenerate nav for, space- or newline-separated (empty: those that differ from main)"
+        required: false
+        default: ""
+      dry_run:
+        description: "Show the docs.json diff only; don't commit or open a PR"
+        type: boolean
+        default: true
+  # Same inputs, for running this workflow from another one
+  workflow_call:
+    inputs:
+      files:
+        type: string
+        required: false
+        default: ""
+      dry_run:
+        type: boolean
+        default: true
 
 # A newer push to the same branch (the pipeline rebuilds it each run) supersedes an in-flight run.
 concurrency:
@@ -40,6 +63,7 @@ jobs:
       # App token (not GITHUB_TOKEN) so the PR and the nav commit trigger the
       # standard checks (link-check, mint-preview, case-collision-check).
       - name: Generate Destination Repo Token
+        if: inputs.dry_run != true
         uses: actions/create-github-app-token@v1
         id: dest-token
         with:
@@ -50,15 +74,26 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          token: ${{ steps.dest-token.outputs.token }}
+          # A dry run commits nothing, so it doesn't need the App token
+          token: ${{ steps.dest-token.outputs.token || github.token }}
 
       - name: Find changed YAML files
         id: changed
+        env:
+          INPUT_FILES: ${{ inputs.files }}
         run: |
           set -euo pipefail
-          git fetch origin "${BASE_BRANCH}"
-          CHANGED=$(git diff --name-only --diff-filter=ACMRT "origin/${BASE_BRANCH}...HEAD" -- \
-            "${DEST_YAML_PATH}/*.yaml" "${DEST_YAML_PATH}/*.yml" || true)
+          if [ -n "${INPUT_FILES:-}" ]; then
+            # Files named by a manual run
+            CHANGED=$(echo "$INPUT_FILES" | tr ' ' '\n' | sed '/^$/d')
+            while IFS= read -r f; do
+              [ -f "$f" ] || { echo "::error::No such file: $f"; exit 1; }
+            done <<< "$CHANGED"
+          else
+            git fetch origin "${BASE_BRANCH}"
+            CHANGED=$(git diff --name-only --diff-filter=ACMRT "origin/${BASE_BRANCH}...HEAD" -- \
+              "${DEST_YAML_PATH}/*.yaml" "${DEST_YAML_PATH}/*.yml" || true)
+          fi
 
           if [ -z "$CHANGED" ]; then
             echo "has_changes=false" >> "$GITHUB_OUTPUT"
@@ -75,25 +110,28 @@ jobs:
             echo "EOF"
           } >> "$GITHUB_OUTPUT"
 
-      - name: Update API Navigation
-        id: nav
+      # Python for the nav scripts below (update_api_nav.py, prune_stale_nav.py)
+      - name: Set up Python
         if: steps.changed.outputs.has_changes == 'true'
-        uses: DomoApps/documentation-generator-action@main
+        uses: actions/setup-python@v5
         with:
-          yaml_input_path: "./${{ env.DEST_YAML_PATH }}"
-          docs_json_path: "${{ env.DOCS_JSON_PATH }}"
-          openapi_base_path: "${{ env.OPENAPI_BASE_PATH }}"
-          process_changed_only: "true"
-          changed_files: ${{ steps.changed.outputs.files }}
+          python-version: "3.12"
 
-      # The generator re-serializes docs.json even when it inserts nothing (for
-      # example if it can't find the Product APIs group), which would otherwise
-      # land as a formatting-only commit. Drop that rewrite and say so loudly.
-      - name: Discard no-op navigation rewrite
-        if: steps.changed.outputs.has_changes == 'true' && steps.nav.outputs.groups_updated == '0'
+      # Rebuilds each changed spec's group under Product APIs. Fails if the
+      # Product APIs group can't be found, rather than committing nothing.
+      - name: Update API Navigation
+        if: steps.changed.outputs.has_changes == 'true'
+        env:
+          FILES: ${{ steps.changed.outputs.files }}
         run: |
-          echo "::warning::Navigation generator updated 0 groups for the changed YAMLs - docs.json nav was NOT updated. Check the 'Update API Navigation' log."
-          git checkout -- "${DOCS_JSON_PATH}"
+          set -euo pipefail
+          python -m pip install --quiet pyyaml
+          YAMLS=()
+          while IFS= read -r f; do [ -n "$f" ] && YAMLS+=("$f"); done <<< "$FILES"
+          python .github/scripts/update_api_nav.py \
+            --docs-json "${DOCS_JSON_PATH}" \
+            --openapi-base-path "${OPENAPI_BASE_PATH}" \
+            "${YAMLS[@]}"
 
       # Remove any OpenAPI nav entries in docs.json that reference YAMLs no
       # longer on disk, otherwise Mintlify preview deploys fail.
@@ -104,8 +142,32 @@ jobs:
             --docs-json "${{ env.DOCS_JSON_PATH }}" \
             --repo-root .
 
+      - name: Show navigation changes (dry run)
+        if: steps.changed.outputs.has_changes == 'true' && inputs.dry_run == true
+        run: |
+          set -euo pipefail
+          if git diff --quiet -- "${DOCS_JSON_PATH}"; then
+            echo "docs.json navigation already up to date." | tee -a "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          git diff --stat -- "${DOCS_JSON_PATH}"
+          git diff -- "${DOCS_JSON_PATH}"
+          {
+            echo "### docs.json navigation changes (dry run, not committed)"
+            echo '```diff'
+            git diff -- "${DOCS_JSON_PATH}" | head -n 500
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload docs.json (dry run)
+        if: steps.changed.outputs.has_changes == 'true' && inputs.dry_run == true
+        uses: actions/upload-artifact@v4
+        with:
+          name: docs-json-dry-run
+          path: ${{ env.DOCS_JSON_PATH }}
+
       - name: Commit navigation changes to the sync branch
-        if: steps.changed.outputs.has_changes == 'true'
+        if: steps.changed.outputs.has_changes == 'true' && inputs.dry_run != true
         env:
           BRANCH: ${{ github.ref_name }}
         run: |
@@ -132,7 +194,7 @@ jobs:
           fi
 
       - name: Open pull request
-        if: steps.changed.outputs.has_changes == 'true'
+        if: steps.changed.outputs.has_changes == 'true' && inputs.dry_run != true
         env:
           GH_TOKEN: ${{ steps.dest-token.outputs.token }}
           BRANCH: ${{ github.ref_name }}

@@ -62,7 +62,7 @@ See `references/snippets.md` before authoring a new snippet.
 - **Callout labels** are bolded inline: `<Note>**Note:** ...</Note>`, `<Warning>**Warning:** ...</Warning>`. The label is not separated from the body.
 - **FAQ sections** at the bottom of KB articles use `<AccordionGroup>` with `<Accordion title="...">` children.
 - **Internal links** are root-relative: `[text](/s/article/Article-Title)`.
-- **Article structure** (when relevant): Intro → Required Grants → Access Feature → Tasks (CRUD order) → FAQ. See `Domo-KB-Style-Guide.mdx`.
+- **Article structure** (when relevant): Required Grants → Access Feature → Tasks (CRUD order) → FAQ. The lead sentence lives in the `description` frontmatter; an `## Intro` section is optional and only for extra context before the body. See `Domo-KB-Style-Guide.mdx`.
 
 ---
 

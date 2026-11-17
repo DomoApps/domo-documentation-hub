@@ -17,7 +17,7 @@ The user has provided: $ARGUMENTS
 
 1. **`Feature - Owning Squad, PM, Eng, UX.csv`** — the authoritative squad/PM roster
 2. **`docs.json`** — nav group hierarchy used to infer which feature each article belongs to
-3. **Article frontmatter** — title and excerpt used as keyword fallback for articles not clearly placed by nav group
+3. **Article frontmatter** — title and the article's summary field used as keyword fallback for articles not clearly placed by nav group. (Per the current convention this summary field is `description`; `build-pm-ownership.py` still scans the legacy `excerpt` field, so its keyword fallback will need to read `description` once the article frontmatter migration lands.)
 
 The same run also regenerates **`.github/CODEOWNERS`** from the identical Feature→PM assignment, so the two files can't drift. See **Update CODEOWNERS** below.
 

@@ -118,7 +118,7 @@ Before writing, read in full:
 
 Pay special attention to:
 
-- **Frontmatter** — `title` plus a single-sentence `description` (required), in the "This article explains…" / "This article covers…" format. Never `excerpt`.
+- **Frontmatter** — `title` plus a single-sentence `description` (required), phrased simply and directly with no "This article explains…" / "This article covers…" preamble. Because an Overview is conceptual, a plain declarative sentence describing the product usually fits better than an imperative (Markdown such as inline code is allowed). Never `excerpt`.
 - **Article structure** — Intro → Required Grants → Access → body sections → FAQ → Related Articles. (An Overview is one of the few article types that keeps an `## Intro` section — it carries the conceptual definition — but there is no `---` horizontal rule after it.)
 - **Imperative-mood headings** — task headings are commands ("Build a Card", not "Building a Card"). Structural labels (`Intro`, `Required Grants`, `FAQ`, etc.) are exempt.
 - **Bold + em-dash convention** for description lists — `**Term —** description`.
@@ -159,7 +159,7 @@ Create `s/article/<Product>-Overview.mdx` (title-case filename, hyphen-separated
 ```mdx
 ---
 title: "<Product> Overview"
-description: "This article explains what <Product> is, how to access it, and where to find the specific article for each task."
+description: "<Product> is <one-line description of what it is and does>; learn how to access it and where to find the specific article for each task."
 ---
 
 ## Intro
@@ -276,8 +276,8 @@ Drafting always introduces style drift. After the fact-check pass, and before ve
 1. **Re-read `Domo-KB-Style-Guide.mdx` and `New-Article-Template.mdx` now, in full** — not from memory. Step 5's "pay special attention to" list is a primer, not a substitute for the re-read.
 2. **Proofread for plain grammar and usage** — spelling, agreement, punctuation, and clarity — alongside the Domo-specific rules below.
 3. **Audit the Overview against this checklist** and fix every violation:
-   - **Frontmatter** — `title` plus a single-sentence `description` in the "This article explains…" / "This article covers…" format; never an `excerpt` field.
-   - **Intro** — an Overview keeps an `## Intro` section for the conceptual definition (the "This article explains…" lead sentence itself lives in the `description` frontmatter). The Intro states what the product is and what it covers, and has no `---` horizontal rule after it.
+   - **Frontmatter** — `title` plus a single-sentence `description`, phrased simply and directly with no "This article explains…" / "This article covers…" preamble (a plain declarative sentence describing the product usually fits an Overview better than an imperative; Markdown such as inline code is allowed); never an `excerpt` field.
+   - **Intro** — an Overview keeps an `## Intro` section for the conceptual definition (the lead sentence itself lives in the `description` frontmatter). The Intro states what the product is and what it covers, and has no `---` horizontal rule after it.
    - **Headings** — imperative mood at every level (link-cluster headings included — "Build Cards", not "Building Cards"; "Manage Access", not "Management"); structural labels (Intro, Required Grants, FAQ, Related Articles) are exempt. Top-level sections H2, subsections H3+.
    - **Required Grants** — exact format and canonical grant wording, with the em-dash inside the bold and a space on each side (`**Grant —** description`).
    - **Callouts** — `<Note>`/`<Warning>`/`<Tip>` with the label and its colon bolded (`**Note:**`), and a blank line before the callout (except inside table cells).

@@ -58,7 +58,7 @@ Every article needs at minimum:
 ```mdx
 ---
 title: "Article Title"
-description: "This article explains how to … (single sentence in the former Intro lead-sentence format)."
+description: "Connect to … / Configure … (single direct sentence — imperative for a task article, plain declarative for a conceptual/overview article — no 'This article explains…' preamble; Markdown such as inline code allowed)."
 ---
 ```
 The `description` renders on the published page directly below the title — it is the reader's opening summary as well as search/AI metadata. Do not use an `excerpt` field; `description` has replaced it.

@@ -84,11 +84,11 @@ Work through this checklist for every file:
 
 ### Frontmatter
 - `title` field is present.
-- Use `description` (single sentence, in the "This article explains…" / "This article covers…" format), not `excerpt`. If a legacy `excerpt` field is present, replace it with `description` (reuse its sentence, recast into the "This article…" format).
+- Use `description` (single sentence, phrased simply and directly — imperative for a task article, plain declarative for a conceptual/overview article — with no "This article explains…" / "This article covers…" preamble; Markdown such as inline code is allowed), not `excerpt`. If a legacy `excerpt` field is present, replace it with `description` (reuse its sentence, recast into the direct format).
 - If the article is beta: `tag: "Beta"` present in frontmatter and the standard beta Note appears immediately after the frontmatter, above the article body.
 
 ### Lead sentence and Intro
-- The one-sentence "This article explains…" / "This article covers…" summary lives in the `description` frontmatter, not the body.
+- The one-sentence summary lives in the `description` frontmatter, not the body.
 - Most articles have no `## Intro` section. When one is present (extra context only), it has no `---` horizontal rule after it.
 - Do not add or remove an existing legacy `## Intro` section wholesale here — that bulk migration is handled separately. Only fix an Intro that falls within the content you are already revising.
 

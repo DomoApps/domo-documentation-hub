@@ -150,9 +150,9 @@ The required order of sections:
 
 The structural labels Intro, Required Grants, Prerequisites, FAQ, Troubleshoot, and Related Articles are exempt from the imperative-mood rule.
 
-**Lead sentence / `description` format:** The one-sentence "This article explains how to…" / "This article covers…" summary lives in the `description` frontmatter field, not the body. Keep it to one sentence, followed by 2–3 concrete actions or skills the reader gains, using the same terminology as the article body. Do not explain why the skills matter. Most articles have no `## Intro` section; add one only when extra context is genuinely needed (and never put a `---` after it).
+**Lead sentence / `description` format:** The one-sentence summary lives in the `description` frontmatter field, not the body. Phrase it simply and directly — in the imperative for a task article, or as a plain declarative sentence for a conceptual/overview article — with no "This article explains…" / "This article covers…" preamble. Keep it to one sentence naming 2–3 concrete actions or skills the reader gains, using the same terminology as the article body; Markdown (e.g., inline code) is allowed. Do not explain why the skills matter. Most articles have no `## Intro` section; add one only when extra context is genuinely needed (and never put a `---` after it).
 
-**Correct (description):** "This article explains how to connect a DataSet to a card, schedule a DataFlow refresh, and configure row-level security."
+**Correct (description):** "Connect a DataSet to a card, schedule a DataFlow refresh, and configure row-level security."
 
 **Heading Hierarchy:** The frontmatter `title` field renders as H1. Top-level sections (Intro, Required Grants, tasks, FAQ, etc.) are H2. Subsections are H3, H4, and so on. The ToC renders through H4 — avoid going deeper than three levels.
 
@@ -183,7 +183,7 @@ The script cannot reliably fix these. Review every converted article for:
 
 **Article structure**
 - [ ] Structure: (Optional: Intro) → Required Grants → (Optional: Prerequisites) → Access Feature → CRUD tasks → (Optional: FAQ) → (Optional: Troubleshoot) → (Optional: Related Articles); no `---` after any Intro section
-- [ ] `description` frontmatter uses "This article explains how to…" or "This article covers…" format, one sentence, 2–3 concrete actions; no separate `## Intro` section unless extra context is genuinely needed
+- [ ] `description` frontmatter is a single direct sentence (imperative for task articles, or plain declarative for conceptual/overview), no "This article explains…" / "This article covers…" preamble, 2–3 concrete actions; no separate `## Intro` section unless extra context is genuinely needed
 - [ ] Any `<!-- TODO: embed image → ... -->` comments must be resolved manually
 - [ ] FAQ items that didn't match the bold-Q/paragraph-A or numbered-list patterns are left verbatim and need manual `<AccordionGroup>` conversion
 - [ ] New English articles need `/add-to-nav` run to add them to `docs.json`

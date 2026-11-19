@@ -69,7 +69,11 @@ da new <name> [options]
 **Options:**
 
 - `--force, -f` - Overwrite existing directory
+- `--merge, -m` - Merge the template into an existing directory (conflicting files are renamed)
 - `--template, -t` - Specify a custom template (npm package, GitHub repo, or local path)
+- `--pm, -p` - Package manager to use (`pnpm`, `npm`, or `yarn`); skips the prompt
+- `--skip-install` - Skip installing dependencies
+- `--skip-git` - Skip `git init`
 
 **Examples:**
 
@@ -84,17 +88,20 @@ da new my-domo-app --force
 da new my-app --template @myorg/custom-template
 da new my-app --template github.com/user/repo
 da new my-app --template ./local-template
+
+# Skip the package manager prompt, git init, and install
+da new my-app --pm pnpm --skip-git --skip-install
 ```
 
 **What happens:**
 
 1. Validates the app name
 2. Checks for existing directory
-3. Prompts for package manager selection
-4. Downloads/clones the [@domoinc/vite-react-template](https://www.npmjs.com/package/@domoinc/vite-react-template) (or custom template)
+3. Prompts for package manager selection (unless `--pm` is set)
+4. Fetches the template. The default, [@domoinc/vite-react-template](https://www.npmjs.com/package/@domoinc/vite-react-template), is downloaded from npm at its latest published version.
 5. Updates package.json with your app name
-6. Initializes git repository
-7. Installs dependencies
+6. Initializes git repository (unless `--skip-git` is set)
+7. Installs dependencies (unless `--skip-install` is set)
 
 ### da generate
 
@@ -212,7 +219,7 @@ The DA CLI uses the [@domoinc/vite-react-template](https://www.npmjs.com/package
 - **Vite** for fast development and building
 - **React 18** with TypeScript support
 - **SCSS** for styling
-- **Jest** and **Testing Library** for testing
+- **Vitest** and **Testing Library** for testing
 - **Storybook** for component development
 - **ESLint** and **Prettier** for code quality
 - **Domo Toolkit** integration
@@ -272,17 +279,6 @@ The CLI supports multiple package managers:
 - **pnpm** (recommended) - Fastest and most efficient
 - **npm** - Standard Node.js package manager
 - **yarn** - Alternative package manager
-
-## Troubleshooting
-
-### Debug Mode
-
-Enable verbose logging for troubleshooting:
-
-```bash
-# Set debug environment variable
-DEBUG=da:* da new my-app
-```
 
 ## Support
 

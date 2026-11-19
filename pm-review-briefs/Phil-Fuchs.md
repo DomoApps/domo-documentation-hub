@@ -1,8 +1,8 @@
 # PM Review Brief: Phil Fuchs
 
 **Prepared for:** KB Restructure PM Review Meeting
-**Features owned:** AI Services, Beast Mode, Combined Schema, Data Center, Data Views, Fusions
-**Total articles in your area:** 60
+**Features owned:** Beast Mode, Combined Schema, Data Center, Data Views
+**Total articles in your area:** 52
 
 > This document is your meeting guide. It shows how your content is being reorganized,
 > which AI-generated articles need your fact-check, which articles need a dedicated
@@ -19,12 +19,10 @@ areas lands in the new structure.
 
 | Feature | Articles | New Location |
 |---------|----------|--------------|
-| AI Services | 1 | Pillar 9: AI & Data Science |
-| Beast Mode | 21 | Pillar 5: Analyze & Visualize |
-| Combined Schema | 1 | Pillar 4: Prepare & Transform Data |
-| Data Center | 32 | Pillar 3: Manage Data |
+| Beast Mode | 18 | Pillar 5: Analyze & Visualize |
+| Combined Schema | 4 | Pillar 4: Prepare & Transform Data |
+| Data Center | 28 | Pillar 3: Manage Data |
 | Data Views | 2 | Pillar 3: Manage Data |
-| Fusions | 3 | Archive — DataFusion deprecated (retiring in Phase 4) |
 
 ### Notable Navigation Changes
 
@@ -175,6 +173,12 @@ off once you've provided the answer.
 - [ ] **`Create-and-Use-Data-Models.mdx`**
   Confirm the Analyzer date-field errors reported for Data Models (filter-by-date and summary number / Graph By) and document how to set up date fields in the model so they work in Analyzer. Synthesized from community forum reports; needs confirmation.
 
+- [ ] **`Editor-Dataset-Access-Scope.mdx`**
+  confirm the exact dataset-access scope an Editor receives from a shared card: does the implicit grant give the Editor edit/build access to the underlying DataSet, or view access only? Document the precise scope once confirmed.
+
+- [ ] **`Editor-Dataset-Access-Scope.mdx`**
+  confirm whether a viewer-facing "Go To DataSet" control exists on shared cards and, if so, which roles/grants expose it and how to disable it. No current KB article documents such a control; add a section once confirmed.
+
 ---
 
 ## 4. Changes Flagged by Support Gap Integrations
@@ -260,8 +264,10 @@ A prioritized list of everything this document is asking of you:
 | 39 | **Open placeholder in `Create-and-Use-Data-Models.mdx`:** Confirm the deployment limitations reported for Data Models: models cannot be pr | **Answer required** | 15–30 min |
 | 40 | **Open placeholder in `Create-and-Use-Data-Models.mdx`:** Confirm the trigger conditions and any workaround for the "Bad Request" error af | **Answer required** | 15–30 min |
 | 41 | **Open placeholder in `Create-and-Use-Data-Models.mdx`:** Confirm the Analyzer date-field errors reported for Data Models (filter-by-date  | **Answer required** | 15–30 min |
-| 42 | Validate additions to: Beast Mode date functions (Rank 5) | Review | 20 min |
-| 43 | Validate additions to: Beast Mode reference (Rank 10) | Review | 20 min |
+| 42 | **Open placeholder in `Editor-Dataset-Access-Scope.mdx`:** confirm the exact dataset-access scope an Editor receives from a shared card: do | **Answer required** | 15–30 min |
+| 43 | **Open placeholder in `Editor-Dataset-Access-Scope.mdx`:** confirm whether a viewer-facing "Go To DataSet" control exists on shared cards a | **Answer required** | 15–30 min |
+| 44 | Validate additions to: Beast Mode date functions (Rank 5) | Review | 20 min |
+| 45 | Validate additions to: Beast Mode reference (Rank 10) | Review | 20 min |
 
 ---
 

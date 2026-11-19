@@ -1,0 +1,1196 @@
+openapi: 3.1.0
+info:
+  title: SCIM API
+  version: "2.0"
+  description: |
+    Domo implements the SCIM 2.0 protocol ([RFC 7644](https://datatracker.ietf.org/doc/html/rfc7644)) so an identity provider (IdP) can create, update, and delete Domo users and directory groups.
+
+    To configure an IdP to use these endpoints, see [SCIM in Domo](/s/article/000005241).
+servers:
+  - url: https://{instance}.domo.com
+    description: Domo instance
+    variables:
+      instance:
+        default: YOUR_INSTANCE
+        description: Domo instance subdomain
+tags:
+  - name: Service Provider Configuration
+    description: Discover the SCIM features, resource types, and schemas Domo supports.
+  - name: Users
+    description: Create, retrieve, update, and delete Domo users.
+  - name: Groups
+    description: Create, retrieve, update, and delete Domo directory groups.
+security:
+  - developerToken: []
+  - bearerAuth: []
+
+components:
+  securitySchemes:
+    developerToken:
+      type: apiKey
+      in: header
+      name: X-DOMO-Developer-Token
+      description: A Domo access token. See [Manage Access Tokens](/s/article/360042934494).
+    bearerAuth:
+      type: http
+      scheme: bearer
+      description: A Domo access token passed as a bearer token. See [Manage Access Tokens](/s/article/360042934494).
+
+  parameters:
+    UserId:
+      name: userId
+      in: path
+      required: true
+      description: The Domo user ID.
+      schema:
+        type: string
+        pattern: "^[0-9]+$"
+      example: "1201764328"
+    GroupId:
+      name: groupId
+      in: path
+      required: true
+      description: The Domo group ID. Only active directory groups are supported.
+      schema:
+        type: integer
+        format: int64
+      example: 1812239784
+    StartIndex:
+      name: startIndex
+      in: query
+      description: The 1-based index of the first result to return.
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+    Count:
+      name: count
+      in: query
+      description: The maximum number of results to return.
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 1000
+        default: 20
+
+  headers:
+    Location:
+      description: The URL of the resource.
+      schema:
+        type: string
+    ETag:
+      description: The version of the resource.
+      schema:
+        type: string
+
+  responses:
+    BadRequest:
+      description: The request is invalid. `scimType` is one of `invalidFilter`, `invalidSyntax`, `invalidValue`, `mutability`, or `tooMany`.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    Forbidden:
+      description: The token owner lacks the required grant or, for Groups, isn't the user designated to manage directory groups.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    NotFound:
+      description: The resource doesn't exist, or SCIM is not enabled for the instance.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+
+  schemas:
+    Meta:
+      type: object
+      readOnly: true
+      properties:
+        resourceType:
+          type: string
+          enum: [User, Group]
+        created:
+          type: string
+          format: date-time
+        lastModified:
+          type: string
+          format: date-time
+        location:
+          type: string
+          description: The URL of the resource.
+        version:
+          type: string
+          description: The resource version, also returned in the `ETag` header.
+
+    Email:
+      type: object
+      properties:
+        value:
+          type: string
+          format: email
+          description: The email address. `email` is accepted as an alias on input.
+        type:
+          type: string
+          enum: [work, other]
+          description: |
+            `work` is the user's primary email address, which always matches `userName`. `other` is the user's alternate email address.
+
+            On input, `primary` is accepted as an alias for `work` and `alternate` as an alias for `other`. A `work` email in a POST or PUT body is ignored, because the primary email address is set from `userName`.
+      required: [value, type]
+
+    PhoneNumber:
+      type: object
+      properties:
+        value:
+          type: string
+          description: The phone number. `phoneNumber` is accepted as an alias on input.
+        type:
+          type: string
+          enum: [mobile, work]
+          description: "`mobile` maps to the user's mobile phone number in Domo. `work` maps to the user's desk phone number."
+      required: [value, type]
+
+    Photo:
+      type: object
+      readOnly: true
+      properties:
+        value:
+          type: string
+          description: The URL of the user's avatar.
+        type:
+          type: string
+          enum: [full, thumb]
+
+    Role:
+      type: object
+      properties:
+        value:
+          type: string
+          description: The Domo role ID. `id` is accepted as an alias on input.
+        name:
+          type: string
+          description: The role name. Returned in responses and ignored on input.
+        type:
+          type: string
+          const: primary
+          readOnly: true
+      required: [value]
+
+    GroupReference:
+      type: object
+      properties:
+        value:
+          type: string
+          pattern: "^[0-9]+$"
+          description: The ID of a Domo directory group.
+        display:
+          type: string
+          readOnly: true
+          description: The group name as defined in the IdP.
+        $ref:
+          type: string
+          readOnly: true
+          description: The URL of the group.
+      required: [value]
+
+    Manager:
+      type: object
+      description: The user's manager. The manager must already be a Domo user.
+      properties:
+        value:
+          type: string
+          pattern: "^[0-9]+$"
+          description: The manager's Domo user ID.
+        displayName:
+          type: string
+          readOnly: true
+          description: The manager's name.
+        $ref:
+          type: string
+          readOnly: true
+          description: The URL of the manager's user resource.
+      required: [value]
+
+    CustomAttribute:
+      type: object
+      properties:
+        key:
+          type: string
+          description: The attribute key as defined in Domo. Must match exactly (case-sensitive), and the attribute must be defined in Domo before it can be populated through SCIM. See [custom attributes](/s/article/000005164#create-a-custom-attribute).
+        values:
+          description: The user's values for the attribute. A single value is accepted in place of an array. Supported types are string, decimal, integer, positive integer, long number, date, and datetime, and lists of each where the attribute is multi-valued. Duplicate values are removed.
+          oneOf:
+            - type: array
+              items: {}
+            - type: string
+            - type: number
+      required: [key, values]
+
+    EnterpriseUserExtension:
+      type: object
+      description: "Schema: `urn:ietf:params:scim:schemas:extension:enterprise:2.0:User`"
+      properties:
+        employeeNumber:
+          type: integer
+          format: int64
+          description: Maps to the Domo **Employee Number** attribute.
+        organization:
+          type: string
+          description: Stored with the user and returned by SCIM, but not shown anywhere in Domo. To use organization data in Domo, map it to a custom attribute instead.
+        department:
+          type: string
+          description: Maps to the Domo **Department** attribute.
+        manager:
+          $ref: "#/components/schemas/Manager"
+
+    DomoUserExtension:
+      type: object
+      description: "Schema: `urn:ietf:params:scim:schemas:extension:domo:2.0:User`"
+      properties:
+        employeeLocation:
+          type: string
+          description: Maps to the Domo **Location** attribute.
+        hireDate:
+          type: string
+          format: date
+          description: Maps to the Domo **Hire Date** attribute, in `yyyy-MM-dd` format.
+
+    CustomUserExtension:
+      type: object
+      description: "Schema: `urn:ietf:params:scim:schemas:extension:custom:2.0:User`"
+      properties:
+        customAttributes:
+          type: array
+          items:
+            $ref: "#/components/schemas/CustomAttribute"
+
+    User:
+      type: object
+      properties:
+        schemas:
+          type: array
+          readOnly: true
+          description: The schema URNs present in the resource. Ignored on input.
+          items:
+            type: string
+        id:
+          type: string
+          pattern: "^[0-9]+$"
+          description: The Domo user ID. Optional on PUT, but if provided it must match the `userId` in the path.
+        externalId:
+          type: string
+          description: Maps to the Domo **Employee ID** attribute.
+        userName:
+          type: string
+          description: The user's email address, which is the unique identifier for the user in Domo. Setting `userName` also sets the user's primary email address.
+        displayName:
+          type: string
+          description: The user's full name. The `name` complex attribute is not supported and is ignored.
+        profileUrl:
+          type: string
+          readOnly: true
+          description: The path to the user's Domo profile.
+        title:
+          type: string
+        locale:
+          type: string
+          example: en-US
+        timezone:
+          type: string
+          example: America/Denver
+        active:
+          type: boolean
+          description: Whether the user is active. Setting this to `false` deletes the user, the same as [Delete User](#delete-user), and it can't be set back to `true`.
+        emails:
+          type: array
+          items:
+            $ref: "#/components/schemas/Email"
+        phoneNumbers:
+          type: array
+          items:
+            $ref: "#/components/schemas/PhoneNumber"
+        photos:
+          type: array
+          readOnly: true
+          items:
+            $ref: "#/components/schemas/Photo"
+        groups:
+          type: array
+          description: The directory groups the user belongs to. On POST and PUT, the list replaces the user's directory group memberships, and every group must be an active directory group. Responses list only directory groups.
+          items:
+            $ref: "#/components/schemas/GroupReference"
+        roles:
+          type: array
+          maxItems: 1
+          description: The user's Domo role. Domo supports one role per user. Optional on both POST and PUT.
+          items:
+            $ref: "#/components/schemas/Role"
+        meta:
+          $ref: "#/components/schemas/Meta"
+        urn:ietf:params:scim:schemas:extension:enterprise:2.0:User:
+          $ref: "#/components/schemas/EnterpriseUserExtension"
+        urn:ietf:params:scim:schemas:extension:domo:2.0:User:
+          $ref: "#/components/schemas/DomoUserExtension"
+        urn:ietf:params:scim:schemas:extension:custom:2.0:User:
+          $ref: "#/components/schemas/CustomUserExtension"
+      required: [userName]
+
+    GroupMember:
+      type: object
+      properties:
+        value:
+          type: string
+          pattern: "^[0-9]+$"
+          description: The Domo user ID of the group member.
+        display:
+          type: string
+          readOnly: true
+          description: The group member's name.
+        $ref:
+          type: string
+          readOnly: true
+          description: The URL of the member's user resource.
+      required: [value]
+
+    DomoGroupExtension:
+      type: object
+      description: "Schema: `urn:ietf:params:scim:schemas:extension:domo:2.0:Group`"
+      properties:
+        domoDisplayName:
+          type: string
+          description: The group name shown to Domo users throughout the product, such as when sharing content or viewing card ownership.
+        description:
+          type: string
+          description: The group description in Domo.
+
+    Group:
+      type: object
+      properties:
+        schemas:
+          type: array
+          readOnly: true
+          description: The schema URNs present in the resource. Ignored on input.
+          items:
+            type: string
+        id:
+          type: string
+          readOnly: true
+          description: The Domo group ID.
+        displayName:
+          type: string
+          description: The group name as defined in the IdP. Must be unique among directory groups.
+        members:
+          type: array
+          items:
+            $ref: "#/components/schemas/GroupMember"
+        meta:
+          $ref: "#/components/schemas/Meta"
+        urn:ietf:params:scim:schemas:extension:domo:2.0:Group:
+          $ref: "#/components/schemas/DomoGroupExtension"
+      required: [displayName]
+
+    PatchOperation:
+      type: object
+      properties:
+        op:
+          type: string
+          description: The operation to perform. Case-insensitive.
+          enum: [add, replace, remove]
+        path:
+          type: string
+          description: The attribute to modify. Case-insensitive. See the endpoint description for the supported paths.
+        value:
+          description: The new value. Not required for `remove`.
+      required: [op]
+
+    PatchRequest:
+      type: object
+      properties:
+        schemas:
+          type: array
+          items:
+            type: string
+            const: urn:ietf:params:scim:api:messages:2.0:PatchOp
+        Operations:
+          type: array
+          items:
+            $ref: "#/components/schemas/PatchOperation"
+      required: [Operations]
+
+    ListResponse:
+      type: object
+      properties:
+        schemas:
+          type: array
+          items:
+            type: string
+            const: urn:ietf:params:scim:api:messages:2.0:ListResponse
+        totalResults:
+          type: integer
+        startIndex:
+          type: integer
+        itemsPerPage:
+          type: integer
+
+    UserListResponse:
+      allOf:
+        - $ref: "#/components/schemas/ListResponse"
+        - type: object
+          properties:
+            Resources:
+              type: array
+              items:
+                $ref: "#/components/schemas/User"
+
+    GroupListResponse:
+      allOf:
+        - $ref: "#/components/schemas/ListResponse"
+        - type: object
+          properties:
+            Resources:
+              type: array
+              items:
+                $ref: "#/components/schemas/Group"
+
+    ServiceProviderConfig:
+      type: object
+      description: As defined in [RFC 7643 section 5](https://datatracker.ietf.org/doc/html/rfc7643#section-5).
+      properties:
+        schemas:
+          type: array
+          items:
+            type: string
+        patch:
+          type: object
+          properties:
+            supported:
+              type: boolean
+        bulk:
+          type: object
+          properties:
+            supported:
+              type: boolean
+        filter:
+          type: object
+          properties:
+            supported:
+              type: boolean
+            maxResults:
+              type: integer
+        changePassword:
+          type: object
+          properties:
+            supported:
+              type: boolean
+        sort:
+          type: object
+          properties:
+            supported:
+              type: boolean
+        authenticationSchemes:
+          type: array
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+              description:
+                type: string
+        meta:
+          type: object
+          properties:
+            created:
+              type: string
+              format: date-time
+            lastModified:
+              type: string
+              format: date-time
+      example:
+        patch:
+          supported: true
+        bulk:
+          supported: false
+        filter:
+          supported: true
+          maxResults: 5000
+        changePassword:
+          supported: false
+        sort:
+          supported: true
+        authenticationSchemes:
+          - name: Access Token
+            description: An access token generated by a user. The requesting user must have authority to edit users.
+
+    Error:
+      type: object
+      properties:
+        schemas:
+          type: array
+          items:
+            type: string
+            const: urn:ietf:params:scim:api:messages:2.0:Error
+        status:
+          type: integer
+          description: The HTTP status code.
+        scimType:
+          type: string
+          enum: [invalidFilter, tooMany, uniqueness, mutability, invalidSyntax, invalidPath, noTarget, invalidValue, invalidVers, sensitive]
+        detail:
+          type: string
+          description: A human-readable description of the error.
+        toe:
+          type: string
+          description: A Domo request trace ID. Include it when contacting Domo Support.
+
+paths:
+  /api/identity/v1/scim/ServiceProviderConfig:
+    get:
+      tags: [Service Provider Configuration]
+      summary: Get Service Provider Configuration
+      description: Retrieves the SCIM features and functionality supported by Domo. Patch, filter, and sort are supported. Bulk operations and password changes are not.
+      operationId: getServiceProviderConfig
+      responses:
+        "200":
+          description: The service provider configuration.
+          content:
+            application/scim+json:
+              schema:
+                $ref: "#/components/schemas/ServiceProviderConfig"
+
+  /api/identity/v1/scim/ResourceTypes:
+    get:
+      tags: [Service Provider Configuration]
+      summary: Get Resource Types
+      description: Retrieves the supported resource types, `User` and `Group`, and their schema extensions.
+      operationId: getResourceTypes
+      responses:
+        "200":
+          description: The supported resource types, as defined in [RFC 7643 section 6](https://datatracker.ietf.org/doc/html/rfc7643#section-6).
+          content:
+            application/scim+json:
+              schema:
+                $ref: "#/components/schemas/ListResponse"
+
+  /api/identity/v1/scim/ResourceTypes/{resourceType}:
+    get:
+      tags: [Service Provider Configuration]
+      summary: Get Resource Type
+      description: Retrieves one resource type.
+      operationId: getResourceType
+      parameters:
+        - name: resourceType
+          in: path
+          required: true
+          schema:
+            type: string
+            enum: [User, Group]
+      responses:
+        "200":
+          description: The resource type, as defined in [RFC 7643 section 6](https://datatracker.ietf.org/doc/html/rfc7643#section-6).
+          content:
+            application/scim+json:
+              schema:
+                type: object
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /api/identity/v1/scim/Schemas:
+    get:
+      tags: [Service Provider Configuration]
+      summary: Get Schemas
+      description: Retrieves the six schemas Domo supports for users and groups.
+      operationId: getSchemas
+      responses:
+        "200":
+          description: The supported schemas, as defined in [RFC 7643 section 7](https://datatracker.ietf.org/doc/html/rfc7643#section-7).
+          content:
+            application/scim+json:
+              schema:
+                $ref: "#/components/schemas/ListResponse"
+
+  /api/identity/v1/scim/Schemas/{schema}:
+    get:
+      tags: [Service Provider Configuration]
+      summary: Get Schema
+      description: Retrieves one schema, by name or URN.
+      operationId: getSchema
+      parameters:
+        - name: schema
+          in: path
+          required: true
+          description: The schema name, such as `User`, or its full URN, such as `urn:ietf:params:scim:schemas:core:2.0:User`.
+          schema:
+            type: string
+            examples: [User, EnterpriseUser, CustomUser, DomoUserExtension, Group, DomoGroupExtension]
+      responses:
+        "200":
+          description: The schema, as defined in [RFC 7643 section 7](https://datatracker.ietf.org/doc/html/rfc7643#section-7).
+          content:
+            application/scim+json:
+              schema:
+                type: object
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /api/identity/v1/scim/Users:
+    get:
+      tags: [Users]
+      summary: Get Users
+      description: Retrieves users, with optional filtering, paging, and sorting. Requires the **Manage All Users** grant.
+      operationId: getUsers
+      parameters:
+        - name: filter
+          in: query
+          description: |
+            A filter expression in the form `attribute operator value`. Join expressions with `and`. `or` is not supported.
+
+            **Operators:** `eq`, `lt`, `lte`, `gt`, `gte`
+
+            **Attributes:** `id`, `externalId`, `userName`, `displayName`, `title`, `locale`, `timezone`, `active`, `employeeLocation`, `hireDate`, `employeeNumber`, `organization`, `department`, `groups.value`, `roles.id`, `manager.value`, `meta.created`, `meta.lastModified`
+
+            To filter on an email address or phone number, use a sub-attribute filter with a type, for example `emails[type eq work and email eq "xyz@example.com"]` or `phoneNumbers[type eq mobile and phoneNumber eq "555-555-8377"]`.
+          schema:
+            type: string
+            maxLength: 10000
+          example: userName eq "email@example.com"
+        - name: attributes
+          in: query
+          description: A comma-separated list of attributes to return. Defaults to `_all`, which returns all attributes, including custom attributes.
+          schema:
+            type: string
+            default: _all
+        - $ref: "#/components/parameters/StartIndex"
+        - $ref: "#/components/parameters/Count"
+        - name: sortBy
+          in: query
+          description: The attribute to sort by.
+          schema:
+            type: string
+            enum: [id, externalId, userName, displayName, title, locale, timezone, employeeLocation, active, groups.value, emails.email, phoneNumbers.phoneNumber, roles.id, meta.created, meta.lastModified, hireDate, employeeNumber, organization, department, manager.value]
+        - name: sortOrder
+          in: query
+          schema:
+            type: string
+            enum: [ascending, descending]
+      responses:
+        "200":
+          description: The matching users.
+          content:
+            application/scim+json:
+              schema:
+                $ref: "#/components/schemas/UserListResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+
+    post:
+      tags: [Users]
+      summary: Post User
+      description: Creates a user in Domo. Requires the **Manage All Users** grant, plus **Manage All Groups** to set `groups`.
+      operationId: createUser
+      requestBody:
+        required: true
+        content:
+          application/scim+json:
+            schema:
+              $ref: "#/components/schemas/User"
+            example:
+              schemas:
+                - urn:ietf:params:scim:schemas:core:2.0:User
+                - urn:ietf:params:scim:schemas:extension:enterprise:2.0:User
+                - urn:ietf:params:scim:schemas:extension:domo:2.0:User
+                - urn:ietf:params:scim:schemas:extension:custom:2.0:User
+              userName: email@example.com
+              externalId: E-123456
+              roles:
+                - value: "4"
+              displayName: John Smith
+              locale: en-US
+              title: Systems Manager
+              emails:
+                - value: email.alt@example.com
+                  type: other
+              phoneNumbers:
+                - type: work
+                  value: 555-123-4567
+                - type: mobile
+                  value: 555-888-7777
+              urn:ietf:params:scim:schemas:extension:enterprise:2.0:User:
+                employeeNumber: 123456
+                department: Marketing
+                manager:
+                  value: "6471235"
+              urn:ietf:params:scim:schemas:extension:domo:2.0:User:
+                employeeLocation: AZ Complex
+                hireDate: "2021-03-26"
+              urn:ietf:params:scim:schemas:extension:custom:2.0:User:
+                customAttributes:
+                  - key: building
+                    values: Building A
+                  - key: alternateBuildings
+                    values:
+                      - Building B
+                      - Building C
+          application/json:
+            schema:
+              $ref: "#/components/schemas/User"
+      responses:
+        "201":
+          description: The created user.
+          headers:
+            Location:
+              $ref: "#/components/headers/Location"
+            ETag:
+              $ref: "#/components/headers/ETag"
+          content:
+            application/scim+json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "409":
+          description: A user with this `userName` already exists. `scimType` is `uniqueness`.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /api/identity/v1/scim/Users/{userId}:
+    parameters:
+      - $ref: "#/components/parameters/UserId"
+    get:
+      tags: [Users]
+      summary: Get User
+      description: Retrieves an active user by Domo user ID. Requires the **Manage All Users** grant.
+      operationId: getUser
+      parameters:
+        - name: attributes
+          in: query
+          description: A comma-separated list of attributes to return. Defaults to `_all`, which returns all attributes, including custom attributes.
+          schema:
+            type: string
+            default: _all
+          examples:
+            phoneNumbers:
+              summary: Return the phoneNumbers attribute
+              value: phoneNumbers
+            all:
+              summary: Return all attributes, including custom attributes
+              value: _all
+      responses:
+        "200":
+          description: The user.
+          headers:
+            Location:
+              $ref: "#/components/headers/Location"
+            ETag:
+              $ref: "#/components/headers/ETag"
+          content:
+            application/scim+json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+    put:
+      tags: [Users]
+      summary: Put User
+      description: |
+        Updates an active user by Domo user ID with the attributes in the request body. To update only some attributes, use [Patch User](#patch-user). Requires the **Manage All Users** grant, plus **Manage All Groups** to set `groups`.
+
+        Setting `active` to `false` deletes the user. See [Delete User](#delete-user) for the restrictions that apply.
+      operationId: replaceUser
+      requestBody:
+        required: true
+        content:
+          application/scim+json:
+            schema:
+              $ref: "#/components/schemas/User"
+            examples:
+              deactivate:
+                summary: Delete a user by setting active to false
+                value:
+                  userName: email@example.com
+                  active: false
+          application/json:
+            schema:
+              $ref: "#/components/schemas/User"
+      responses:
+        "200":
+          description: The updated user.
+          headers:
+            Location:
+              $ref: "#/components/headers/Location"
+            ETag:
+              $ref: "#/components/headers/ETag"
+          content:
+            application/scim+json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          description: No active user has this ID.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "409":
+          description: The request sets `active` to `false` for a user who owns DataSets or DataFlows.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+    patch:
+      tags: [Users]
+      summary: Patch User
+      description: |
+        Adds, replaces, or removes individual user attributes. Requires the **Manage All Users** grant.
+
+        Each operation takes a `path` naming the attribute. `path` can be omitted for `add` and `replace`, in which case `value` is an object keyed by attribute name, such as `{"title": "Manager"}`.
+
+        **Supported paths (case-insensitive):**
+
+        - `userName` (also sets the primary email address), `displayName`, `title`, `locale`, `timezone`, `active`, `externalId`
+        - `emails`, `emails[type eq "work"]`, `emails[type eq "other"]`, with or without `.value`
+        - `phoneNumbers`, `phoneNumbers[type eq "mobile"]`, `phoneNumbers[type eq "work"]`, with or without `.value`
+        - `roles`, `roles[type eq "primary"]`, `roles[type eq "primary"].value`
+        - `employeeNumber`, `organization`, `department`, `manager`, `manager.value`, each also accepted with the enterprise schema URN prefix
+        - `hireDate`, `employeeLocation`, each also accepted with the Domo schema URN prefix
+        - `urn:ietf:params:scim:schemas:extension:custom:2.0:User:customAttributes[key eq "<key>"]`
+
+        `userName`, the work email, `roles`, and `active` can't be removed. Group membership can't be changed here; use the Groups endpoints instead.
+
+        Setting `active` to `false` deletes the user. See [Delete User](#delete-user) for the restrictions that apply.
+      operationId: patchUser
+      requestBody:
+        required: true
+        content:
+          application/scim+json:
+            schema:
+              $ref: "#/components/schemas/PatchRequest"
+            example:
+              schemas:
+                - urn:ietf:params:scim:api:messages:2.0:PatchOp
+              Operations:
+                - op: replace
+                  path: emails[type eq "other"].value
+                  value: email.alt@example.com
+                - op: replace
+                  path: urn:ietf:params:scim:schemas:extension:custom:2.0:User:customAttributes[key eq "offices"]
+                  value: [NY, CA]
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PatchRequest"
+      responses:
+        "200":
+          description: The updated user.
+          headers:
+            Location:
+              $ref: "#/components/headers/Location"
+            ETag:
+              $ref: "#/components/headers/ETag"
+          content:
+            application/scim+json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          description: No active user has this ID.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "409":
+          description: The request sets `active` to `false` for a user who owns DataSets or DataFlows.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+    delete:
+      tags: [Users]
+      summary: Delete User
+      description: |
+        Deletes the specified Domo user. The user's group memberships are removed, and resources they own are left without an owner. Requires the **Manage All Users** grant.
+
+        A user who owns DataSets or DataFlows can't be deleted, because Domo requires every DataSet and DataFlow to have an owner. Reassign ownership of those objects first. The same restriction applies when a PUT or PATCH request sets `active` to `false`.
+      operationId: deleteUser
+      responses:
+        "204":
+          description: The user was deleted.
+        "403":
+          description: The token owner lacks the required grant, or the user is a system user, which can't be deleted.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          description: The user owns DataSets or DataFlows.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /api/identity/v1/scim/Groups:
+    get:
+      tags: [Groups]
+      summary: Get Groups
+      description: Retrieves active directory groups, or finds one by name. Requires the **Manage All Groups** grant, and the token owner must be the user designated to manage directory groups.
+      operationId: getGroups
+      parameters:
+        - name: filter
+          in: query
+          description: Only `displayName eq "<name>"` is supported. Omit the filter to list all directory groups.
+          schema:
+            type: string
+          example: displayName eq "US - Marketing"
+        - name: attributes
+          in: query
+          description: A comma-separated list of extra attributes to return. `members`, `domoDisplayName`, and `description` are only returned when requested.
+          schema:
+            type: string
+          example: members,domoDisplayName,description
+        - $ref: "#/components/parameters/StartIndex"
+        - $ref: "#/components/parameters/Count"
+      responses:
+        "200":
+          description: The matching groups.
+          content:
+            application/scim+json:
+              schema:
+                $ref: "#/components/schemas/GroupListResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+
+    post:
+      tags: [Groups]
+      summary: Post Group
+      description: Creates a directory group in Domo. Groups created through SCIM are always directory groups. Requires the **Manage All Groups** grant, and the token owner must be the user designated to manage directory groups.
+      operationId: createGroup
+      requestBody:
+        required: true
+        content:
+          application/scim+json:
+            schema:
+              $ref: "#/components/schemas/Group"
+            example:
+              schemas:
+                - urn:ietf:params:scim:schemas:core:2.0:Group
+                - urn:ietf:params:scim:schemas:extension:domo:2.0:Group
+              displayName: US - Marketing
+              members:
+                - value: "1201764328"
+              urn:ietf:params:scim:schemas:extension:domo:2.0:Group:
+                domoDisplayName: Marketing
+                description: Members of the US-based marketing team.
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Group"
+      responses:
+        "201":
+          description: The created group.
+          headers:
+            Location:
+              $ref: "#/components/headers/Location"
+            ETag:
+              $ref: "#/components/headers/ETag"
+          content:
+            application/scim+json:
+              schema:
+                $ref: "#/components/schemas/Group"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "409":
+          description: The group couldn't be created, typically because a directory group with this `displayName` already exists. `scimType` is `uniqueness`.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /api/identity/v1/scim/Groups/{groupId}:
+    parameters:
+      - $ref: "#/components/parameters/GroupId"
+    get:
+      tags: [Groups]
+      summary: Get Group
+      description: Retrieves an active directory group by ID. Requires the **Manage All Groups** grant, and the token owner must be the user designated to manage directory groups.
+      operationId: getGroup
+      parameters:
+        - name: attributes
+          in: query
+          description: A comma-separated list of extra attributes to return. `members`, `domoDisplayName`, and `description` are only returned when requested.
+          schema:
+            type: string
+          example: members,domoDisplayName,description
+      responses:
+        "200":
+          description: The group.
+          headers:
+            Location:
+              $ref: "#/components/headers/Location"
+            ETag:
+              $ref: "#/components/headers/ETag"
+          content:
+            application/scim+json:
+              schema:
+                $ref: "#/components/schemas/Group"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          description: No active directory group has this ID.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+    put:
+      tags: [Groups]
+      summary: Put Group
+      description: Updates an active directory group with the definition in the request body, including its members. Requires the **Manage All Groups** grant, and the token owner must be the user designated to manage directory groups.
+      operationId: replaceGroup
+      requestBody:
+        required: true
+        content:
+          application/scim+json:
+            schema:
+              $ref: "#/components/schemas/Group"
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Group"
+      responses:
+        "200":
+          description: The updated group.
+          headers:
+            Location:
+              $ref: "#/components/headers/Location"
+            ETag:
+              $ref: "#/components/headers/ETag"
+          content:
+            application/scim+json:
+              schema:
+                $ref: "#/components/schemas/Group"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          description: No active directory group has this ID.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+    patch:
+      tags: [Groups]
+      summary: Patch Group
+      description: |
+        Adds, replaces, or removes group attributes and members. Requires the **Manage All Groups** grant, and the token owner must be the user designated to manage directory groups.
+
+        Unlike Patch User, every operation requires a `path`, and `value` is required except for `remove`.
+
+        **Supported paths (case-insensitive):**
+
+        - `members`: `value` must be an array of members. `add` adds them, `replace` replaces all members with them, and `remove` removes them. A `remove` with no `value` removes **all members** from the group.
+        - `displayName`: can't be removed.
+        - `urn:ietf:params:scim:schemas:extension:domo:2.0:Group:domoDisplayName`
+        - `urn:ietf:params:scim:schemas:extension:domo:2.0:Group:description`
+
+        Only `members` accepts an array `value`.
+      operationId: patchGroup
+      requestBody:
+        required: true
+        content:
+          application/scim+json:
+            schema:
+              $ref: "#/components/schemas/PatchRequest"
+            examples:
+              addMembers:
+                summary: Add members to a group
+                value:
+                  schemas:
+                    - urn:ietf:params:scim:api:messages:2.0:PatchOp
+                  Operations:
+                    - op: add
+                      path: members
+                      value:
+                        - value: "1201764328"
+              replaceMembers:
+                summary: Replace all members of a group with those provided
+                value:
+                  schemas:
+                    - urn:ietf:params:scim:api:messages:2.0:PatchOp
+                  Operations:
+                    - op: replace
+                      path: members
+                      value:
+                        - value: "1201764328"
+              removeAllMembers:
+                summary: Remove all members from a group
+                value:
+                  schemas:
+                    - urn:ietf:params:scim:api:messages:2.0:PatchOp
+                  Operations:
+                    - op: remove
+                      path: members
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PatchRequest"
+      responses:
+        "200":
+          description: The updated group.
+          headers:
+            Location:
+              $ref: "#/components/headers/Location"
+            ETag:
+              $ref: "#/components/headers/ETag"
+          content:
+            application/scim+json:
+              schema:
+                $ref: "#/components/schemas/Group"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          description: No active directory group has this ID.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+    delete:
+      tags: [Groups]
+      summary: Delete Group
+      description: Deletes a directory group. Requires the **Manage All Groups** grant, and the token owner must be the user designated to manage directory groups.
+      operationId: deleteGroup
+      responses:
+        "204":
+          description: The group was deleted.
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          description: The group is already inactive or doesn't exist.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"

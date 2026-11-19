@@ -1,10 +1,10 @@
 # OpenAPI Sync Scripts
 
-Helper scripts used by `.github/workflows/sync-api-docs.yml` to sync OpenAPI YAML files from the source repo (`domoinc/internal-domo-apis`) into this repo (`openapi/product/`) and update `docs.json` navigation.
+Helper scripts for `.github/workflows/sync-api-docs.yml`. That workflow runs when the api-registry pipeline (pipeline-shared-library `generateApiV4`) pushes published public API YAMLs to an `openapi-sync/<service>` branch. It regenerates the `docs.json` navigation, prunes stale entries, and opens a PR into `main`. Only `prune_stale_nav.py` is still used by it.
 
 ## Active scripts
 
-### `detect_yaml_changes.py`
+### `detect_yaml_changes.py` (no longer used by the workflow)
 
 Detects which YAML files in the source repo differ from the destination via **SHA-256 content hashing**. Writes `changed_files.txt` (one source path per line) and the GitHub Actions outputs `changed_files` and `summary`.
 
@@ -45,7 +45,7 @@ Wired into `sync-api-docs.yml` after the nav-regen step so every sync PR also cl
 
 ---
 
-### `sync_to_destination.py`
+### `sync_to_destination.py` (no longer used by the workflow)
 
 Standalone helper that copies YAMLs from a list into a destination directory, removing any case-variant duplicates. **Not invoked by `sync-api-docs.yml` directly** — the workflow inlines a single-file copy in its matrix job — but kept for local testing / ad-hoc syncs.
 
@@ -70,11 +70,12 @@ python sync_to_destination.py \
 
 See `.github/workflows/sync-api-docs.yml`. High-level flow:
 
-1. `detect` job finds changed YAMLs and emits them as a JSON array.
-2. `sync-file` matrix job fans out: one parallel-capped job per changed file.
-3. Each matrix job: copies the YAML into `openapi/product/`, runs `DomoApps/documentation-generator-action@main` against that single file, opens a PR containing just that YAML and its `docs.json` nav update.
+1. The api-registry pipeline copies the published YAMLs into `openapi/product/` on a branch named `openapi-sync/<service>` (cut from `main`) and force-pushes it.
+2. The push triggers the workflow (only when files under `openapi/product/` changed).
+3. It finds YAMLs that differ from `main`, runs `DomoApps/documentation-generator-action@main` on them to update `docs.json`, then runs `prune_stale_nav.py`.
+4. Nav changes are committed to the same branch, and a PR into `main` is opened if one isn't already open. Later pipeline runs for the same service update the existing PR.
 
 ## Requirements
 
 - Python 3.7+
-- GitHub App installed on both source and destination repos (`APP_ID`, `APP_PRIVATE_KEY` secrets).
+- GitHub App installed on this repo (`APP_ID`, `APP_PRIVATE_KEY` secrets).

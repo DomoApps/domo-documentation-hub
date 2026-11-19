@@ -1,8 +1,8 @@
 # PM Review Brief: Sam Lowen
 
 **Prepared for:** KB Restructure PM Review Meeting
-**Features owned:** Cloud Amplifier, DataSets, Federated
-**Total articles in your area:** 22
+**Features owned:** Cloud Integrations, DataSets, Federated
+**Total articles in your area:** 23
 
 > This document is your meeting guide. It shows how your content is being reorganized,
 > which AI-generated articles need your fact-check, which articles need a dedicated
@@ -19,7 +19,7 @@ areas lands in the new structure.
 
 | Feature | Articles | New Location |
 |---------|----------|--------------|
-| Cloud Amplifier | 18 | Pillar 2: Connect & Integrate Data |
+| Cloud Integrations | 19 | TBD — not yet mapped |
 | DataSets | 3 | Pillar 3: Manage Data |
 | Federated | 1 | Pillar 2: Connect & Integrate Data |
 

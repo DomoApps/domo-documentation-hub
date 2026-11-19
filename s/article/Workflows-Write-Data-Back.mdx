@@ -32,6 +32,39 @@ When you write to a DataSet, decide whether to add to the existing data or overw
 - **Append** adds new rows to the end of the DataSet and leaves existing rows in place. Use append when the DataSet is a running log or history.
 - **Replace** overwrites the entire DataSet with the rows you write. Use replace when each run should produce a complete, fresh snapshot.
 
+## Write to a DataSet
+
+To write data back to a DataSet from a workflow, assign the **Append to DataSet** function from the **DOMO DataSets** Code Engine package. To see an example of the required input format, preview the function in the **Action** menu.
+
+This function requires three inputs:
+
+| Input         | Data type | Description                                                                                          |
+| ------------- | --------- | ---------------------------------------------------------------------------------------------------- |
+| **DataSet**   | DataSet   | The target DataSet to append rows to.                                                                |
+| **Delimiter** | Text      | The character sequence that separates column values. The most common delimiter is `\|\|`.            |
+| **Values**    | Text      | A string of column values with the delimiter between each value.                                     |
+
+You can map each input to a workflow variable or enter a custom value.
+
+## Write to AppDB
+
+To write data back to AppDB from a workflow, assign the **Create AppDB Documents** function from the **DOMO AppDB Collections** Code Engine package. To see an example of the required input format, preview the function in the **Action** menu.
+
+This function requires two inputs:
+
+| Input             | Data type     | Description                                                    |
+| ----------------- | ------------- | -------------------------------------------------------------- |
+| **Collection ID** | Text          | The ID of the AppDB collection to write to.                    |
+| **Documents**     | List (Object) | The documents to create, provided as a list of JSON objects.   |
+
+Map each input to a workflow variable or enter a custom value.
+
+<Note>
+
+**Note:** The DOMO AppDB Collections package also includes **Create AppDB Document From JSON String** and **Create AppDB Document** (single document). Choose the function that best fits your use case.
+
+</Note>
+
 ## Append Rows Efficiently
 
 How you append affects how many resources a workflow consumes. Rather than appending one row at a time inside a loop, collect the rows first and append them in a single write:
@@ -45,7 +78,11 @@ A single batched append is far more efficient than repeating a single-row append
 
 The number of rows you need to write is often not known in advance—for example, when the rows come from an uploaded file or the result of a query. Build the list of rows dynamically as the workflow processes the input, then append the completed list. The write action handles however many rows the list contains, so the same workflow works whether the input has three rows or three thousand.
 
-{/* [pm-input] Ryan Despain — confirm the exact action names and configuration steps for writing data back to a DataSet from Workflows (for example, the append and multiline-append actions), including how values and delimiters are entered, how a list of rows is mapped to the write action, and how to create a new DataSet as the write target. Add a step-by-step configuration section once the action details are confirmed. */}
+## Test a Function Before Deploying
+
+Any Code Engine function assigned to a workflow step can be tested using the **Test** button in the configuration panel. Test the function to verify that your inputs produce the expected output before deploying the workflow.
+
+{/* [reviewed] pm=ryan-despain status=approved date=2026-11-04 */}
 
 ## FAQ
 

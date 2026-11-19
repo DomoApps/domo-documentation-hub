@@ -40,10 +40,10 @@ Apply these exact MDX patterns wherever the corresponding element appears.
 
 **Screenshots**
 ```mdx
-<Frame>![alt text describing the screenshot](/images/kb/image-name.png)</Frame>
+<Frame>![Detailed, accurate description of what this screenshot shows](/images/kb/image-name.png)</Frame>
 ```
 - Wrapping in `<Frame>` is required — it auto-sizes the image to the content column width.
-- Alt text must describe what the screenshot shows, not just "screenshot."
+- **Alt text is required and must be detailed and accurate** — a repository standard for accessibility compliance, LLM readability, and SEO (`Domo-KB-Style-Guide.mdx` › **Alt Text Is Required on Every Screenshot**). The Salesforce conversion typically leaves empty, boilerplate, or filename-based alt text; it must describe what the screenshot actually shows, not just "screenshot." Where the surrounding prose makes the content clear, write accurate alt text; where it doesn't, flag the image to the user as needing alt text rather than inventing a description of an image you can't see.
 
 **Inline icons**
 ```mdx
@@ -139,7 +139,7 @@ title: "Article Title Here"
 ## Article Structure (from Domo-KB-Style-Guide.mdx)
 
 The required order of sections:
-1. **Intro** — followed immediately by a `---` horizontal rule
+1. *(Optional)* **Intro** — only when the article needs extra context in prose before the body; no `---` horizontal rule after it (the lead sentence lives in the `description` frontmatter)
 2. **Required Grants**
 3. *(Optional)* **Prerequisites**
 4. **Access [Feature Name]** (can swap with Required Grants if the grant is needed to see the access path)
@@ -150,9 +150,9 @@ The required order of sections:
 
 The structural labels Intro, Required Grants, Prerequisites, FAQ, Troubleshoot, and Related Articles are exempt from the imperative-mood rule.
 
-**Intro section format:** Keep it to one sentence in most cases. Use "This article explains how to…" or "This article covers…" followed by 2–3 concrete actions or skills the reader gains, using the same terminology as the article body. Do not explain why the skills matter.
+**Lead sentence / `description` format:** The one-sentence summary lives in the `description` frontmatter field, not the body. Phrase it simply and directly — in the imperative for a task article, or as a plain declarative sentence for a conceptual/overview article — with no "This article explains…" / "This article covers…" preamble. Keep it to one sentence naming 2–3 concrete actions or skills the reader gains, using the same terminology as the article body; Markdown (e.g., inline code) is allowed. Do not explain why the skills matter. Most articles have no `## Intro` section; add one only when extra context is genuinely needed (and never put a `---` after it).
 
-**Correct:** "This article explains how to connect a DataSet to a card, schedule a DataFlow refresh, and configure row-level security."
+**Correct (description):** "Connect a DataSet to a card, schedule a DataFlow refresh, and configure row-level security."
 
 **Heading Hierarchy:** The frontmatter `title` field renders as H1. Top-level sections (Intro, Required Grants, tasks, FAQ, etc.) are H2. Subsections are H3, H4, and so on. The ToC renders through H4 — avoid going deeper than three levels.
 
@@ -182,8 +182,8 @@ These are already handled and should be correct in any script output:
 The script cannot reliably fix these. Review every converted article for:
 
 **Article structure**
-- [ ] Intro → `---` → Required Grants → (Optional: Prerequisites) → Access Feature → CRUD tasks → (Optional: FAQ) → (Optional: Troubleshoot) → (Optional: Related Articles)
-- [ ] Intro section uses "This article explains how to…" or "This article covers…" format, one sentence, 2–3 concrete actions
+- [ ] Structure: (Optional: Intro) → Required Grants → (Optional: Prerequisites) → Access Feature → CRUD tasks → (Optional: FAQ) → (Optional: Troubleshoot) → (Optional: Related Articles); no `---` after any Intro section
+- [ ] `description` frontmatter is a single direct sentence (imperative for task articles, or plain declarative for conceptual/overview), no "This article explains…" / "This article covers…" preamble, 2–3 concrete actions; no separate `## Intro` section unless extra context is genuinely needed
 - [ ] Any `<!-- TODO: embed image → ... -->` comments must be resolved manually
 - [ ] FAQ items that didn't match the bold-Q/paragraph-A or numbered-list patterns are left verbatim and need manual `<AccordionGroup>` conversion
 - [ ] New English articles need `/add-to-nav` run to add them to `docs.json`
@@ -203,6 +203,14 @@ The converter emits image-based inline icons (`<img src="/images/kb/...">`). Bot
 - [ ] Inline `<img>` icons that are **third-party brand logos** (AWS, OpenAI, Anthropic, GitHub, …) → these aren't in the Domo icon font, and a monochrome logo image breaks in dark mode. Migrate to a coded icon: `<Icon icon="{slug}" iconType="brands" aria-hidden="true" />` (Font Awesome brands), or an inline `<svg fill="currentColor">` (e.g. a [Simple Icons](https://simpleicons.org) path) when FA's free set lacks the brand. See `Domo-KB-Style-Guide.mdx` › **Brand and Third-Party Logos**.
 - [ ] After migration, confirm the surrounding prose names the icon (e.g. "click the line chart icon \<icon\>"). If it doesn't, rewrite the prose inline rather than reaching for `aria-label`.
 - [ ] Remove any leftover `import { InlineImage } from "/snippets/InlineImage.mdx";` line — the snippet is no longer in use anywhere in the repo. Inline images should always be a native `<img>` with an inline `style` block (see `Domo-KB-Style-Guide.mdx` › **Inline images**).
+
+**Alt text (required on every screenshot)**
+
+The conversion carries over whatever `alt` the Salesforce HTML had — frequently empty, a filename, or boilerplate like "screenshot." Detailed, accurate alt text on every screenshot and content image is a repository standard for accessibility compliance, LLM readability, and SEO (`Domo-KB-Style-Guide.mdx` › **Alt Text Is Required on Every Screenshot**).
+
+- [ ] Every `<Frame>` screenshot and content `<img>` has detailed, accurate alt text — not empty `alt=""`, `"screenshot"`, `"image"`, a filename, or alt too vague to convey what the image shows.
+- [ ] Where the surrounding prose makes an image's content clear, rewrite weak alt text to describe what the screenshot actually shows. Where it isn't clear, flag the image to the user as needing alt text — don't invent a description of an image you can't see.
+- [ ] Decorative inline icons already named in the prose are the exception: they use `aria-hidden="true"`, not alt (covered by the inline-icon migration above).
 
 **Headings**
 - [ ] All headings use the **imperative mood** — never the gerund. **Correct:** "Connect a DataSet" **Incorrect:** "Connecting a DataSet"
@@ -234,7 +242,7 @@ The converter emits image-based inline icons (`<img src="/images/kb/...">`). Bot
 
 Salesforce-era articles use a variety of legacy beta indicators. Convert any you find to the current convention defined in `Domo-KB-Style-Guide.mdx` › **Beta Features**:
 
-- [ ] `(Beta)` or `(BETA)` in a `title:` frontmatter value → remove the parenthetical and add `tag: "Beta"` to the frontmatter; insert the standard beta Note above the Intro
+- [ ] `(Beta)` or `(BETA)` in a `title:` frontmatter value → remove the parenthetical and add `tag: "Beta"` to the frontmatter; insert the standard beta Note immediately after the frontmatter, above the article body
 - [ ] `(Beta)` or `(BETA)` appended to a heading → remove the parenthetical and append `<Badge>Beta</Badge>` to the heading
 - [ ] Ad-hoc beta notes (e.g., "This feature is in beta. Contact your account team…") → replace with the standard beta Note from the style guide
 - [ ] References to `betafeedback@domo.com` or `betadmin@domo.com` → replace with `beta.admin@domo.com` (the standard Note already contains the right address)

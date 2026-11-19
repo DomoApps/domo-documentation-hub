@@ -56,10 +56,10 @@ Do this **before** asking where the context is, so the file is clear and ready t
    ```bash
    python3 scripts/archive-current-release-notes.py
    ```
-   This creates the archived `.mdx` (content copied verbatim, only the `title:` changed) and inserts its path at the top of the **English** "2025-2026" subgroup under "Archived Feature Release Notes" in `docs.json` (the archive list is newest first). It does **not** touch `Current-Release-Notes.mdx` — you overwrite that in Step 6.
+   This creates the archived `.mdx` (content copied verbatim, only the `title:` changed) and inserts its path at the end of the **English** "2025-2026" subgroup under "Archived Feature Release Notes" in `docs.json`. It does **not** touch `Current-Release-Notes.mdx` — you overwrite that in Step 6.
 
    > The script edits only the English nav. Localized nav entries for the archived file are created later by the `localize` flow — do not add them here.
-   > If a new calendar year needs a new nav subgroup (e.g. a "2027" group), the script adds to "2025-2026"; flag this to the user so they can decide whether to rename/split the group via the `add-to-nav` skill.
+   > If a new calendar year needs a new nav subgroup (e.g. a "2027" group), the script appends to "2025-2026"; flag this to the user so they can decide whether to rename/split the group via the `add-to-nav` skill.
 
 ### Step 3 — Ask where the context is
 
@@ -112,7 +112,7 @@ Read `release-notes-style.md` in full, then overwrite `s/article/Current-Release
 - **Title** `"{Month} {Year} Release Notes"` for the **new** release; keep the filename `Current-Release-Notes.mdx`.
 - Build the feature list from the CSV; write each as a `### ` entry (sub-features `#### ` under parents like *Magic ETL Enhancements* / *Workflows Updates*). Alphabetize by heading.
 - For each feature, build a 1–3 paragraph benefit-first entry (+ optional bullet list) from the internal blurb + epic description + PRD, following **the drafting default** above — keep the source's substantive wording and recast only the framing into house voice. **Never** expose Jira keys, PRD jargon, codenames, squad/PM names, or internal dates.
-- **Screenshots:** choose the best image per feature (from the Word-doc media, or a Jira/Confluence image in `scripts/reports/release-context/media/`). Copy it into `images/kb/` with a descriptive **snake_case** name, then embed on its own line as `<Frame>![](/images/kb/<name>.png)</Frame>`. Every referenced image must exist in `images/kb/` on this branch. Never leave a placeholder or TODO.
+- **Screenshots:** choose the best image per feature (from the Word-doc media, or a Jira/Confluence image in `scripts/reports/release-context/media/`). Copy it into `images/kb/` with a descriptive **snake_case** name, then embed on its own line as `<Frame>![Detailed, accurate description of what this screenshot shows](/images/kb/<name>.png)</Frame>`. **Alt text is required** — detailed and accurate, for accessibility compliance, LLM readability, and SEO (`Domo-KB-Style-Guide.mdx` › **Alt Text Is Required on Every Screenshot**); write it from the feature's internal blurb and what the image shows, never leave it empty. Every referenced image must exist in `images/kb/` on this branch. Never leave a placeholder or TODO.
 - **"Learn more" links:** add `Learn more about [text](https://www.domo.com/docs/s/article/<slug-or-id>).` **only** when a real published KB article exists — verify with `grep -rl "title:.*<keyword>" s/article/`. Omit if none.
 - **Beta Features** section opens with `<BetaNote generic />`. Include standard non-feature sections (Model Deprecation Notice, Domo AI Models Updates) when present in the internal notes. End with the verbatim **Support** block.
 
@@ -122,7 +122,7 @@ Go feature by feature and verify **every** claim, model name, capability, bullet
 
 ### Step 8 — Edit pass
 
-Read the whole draft top to bottom for clarity, house-style adherence (`release-notes-style.md` §10 checklist), grammar, and consistent product naming. As you fix style, keep the source's substantive wording intact — change only what a rule requires, exactly as at Step 6. If any Markdown tables were added, run `python3 scripts/pad_md_tables.py s/article/Current-Release-Notes.mdx`. Re-confirm structure: title/excerpt, `import { BetaNote }` + `---`, alphabetized sections, Beta section, Support block.
+Read the whole draft top to bottom for clarity, house-style adherence (`release-notes-style.md` §10 checklist), grammar, and consistent product naming. As you fix style, keep the source's substantive wording intact — change only what a rule requires, exactly as at Step 6. If any Markdown tables were added, run `python3 scripts/pad_md_tables.py s/article/Current-Release-Notes.mdx`. Re-confirm structure: title/description, `import { BetaNote }` + `---`, alphabetized sections, Beta section, Support block.
 
 ### Step 9 — Hand off for approval
 

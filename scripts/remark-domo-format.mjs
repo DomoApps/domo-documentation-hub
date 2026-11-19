@@ -147,6 +147,6 @@ function collapseSingleChild(node, out) {
   if (node.children.length !== 1 || child.type !== "mdxJsxFlowElement") return out;
   const lines = out.split("\n");
   if (lines.length !== 3) return out;
-  const collapsed = lines[0] + lines[1].trim() + lines[2];
+  const collapsed = lines[0] + lines[1].trim() + lines[2].trimStart();
   return sameRendering([node], mdxParser.parse(collapsed).children) ? collapsed : out;
 }

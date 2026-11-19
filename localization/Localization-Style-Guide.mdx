@@ -1,6 +1,6 @@
 ---
 title: "Localization Style Guide"
-excerpt: "Translation and localization standards for Spanish, French, German, and Japanese Domo documentation."
+description: "This article covers the translation and localization standards for Spanish, French, German, and Japanese Domo documentation."
 ---
 
 This guide governs all localization work for Domo documentation into Spanish (`es/`), French (`fr/`), German (`de/`), and Japanese (`ja/`). It is the authoritative reference for any localization task.
@@ -84,12 +84,12 @@ Preserve the exact whitespace, blank lines, and indentation from the English sou
 
 ### Frontmatter
 
-Translate the `title` and `excerpt` fields. Never add or remove frontmatter fields. Keep the `tag` field unchanged if present.
+Translate the `title` and `description` fields (older source articles may still carry a legacy `excerpt` field instead — translate whichever summary field is present). Never add or remove frontmatter fields. Keep the `tag` field unchanged if present.
 
 ```mdx
 ---
 title: "[translated title]"
-excerpt: "[translated excerpt — single sentence matching the English]"
+description: "[translated description — single sentence matching the English]"
 ---
 ```
 
@@ -111,6 +111,10 @@ Do not modify any other part of `<Frame>`, `<img>`, or `<video>` components.
 - Do not check whether `{lang}/s/article/<slug>.mdx` exists, and do not fall back to the English path. The site handles the missing case.
 - This rule covers `/s/article/` paths only. Other internal paths, such as `/s/topic/<slug>` and `/portal/...`, have no localized copies, so keep them in their English form.
 - **Anchor fragments on cross-article links** (a `#anchor` on a link pointing to a *different* article): **drop the anchor** (link to the localized article top). The anchor was generated from the English headings and will not match the localized target article's headings, either now or once the target is translated.
+- **In-page anchors** (a link to a heading *within the same article*, e.g. `[...](#date-and-time-functions)` in the article that contains that heading): **always localize the anchor to match the localized heading — in every language (es/fr/de/ja).** Never drop it (that loses the in-page jump) and never keep the English slug (it will not exist in the localized article, so the link breaks). Mintlify derives a heading's anchor by lowercasing ASCII letters and replacing spaces between words with hyphens, while **keeping non-ASCII characters (e.g. Japanese) as-is**. Translate the visible link text as prose, then rewrite the fragment from the *localized* heading the same way:
+  - `## Date and Time Functions` → `(#date-and-time-functions)` becomes `## 日付と時刻関数` → `(#日付と時刻関数)` (ja)
+  - a heading translated to `## Report Builder にアクセスする` → `(#report-builderにアクセスする)`
+  - `## Configuración de SSO` → `(#configuración-de-sso)` (es)
 - **External non-article links** (marketing pages, YouTube, `developer.domo.com`, etc.): never modified.
 
 ### Callout labels
@@ -452,6 +456,20 @@ Do not use the English `<BetaNote />` in Japanese articles.
 | Dataset tile (Magic ETL)     | DataSetアイコン                   | DataSet kept in English; アイコン (icon) in ETL context                           |
 
 ---
+
+## Navigation Mirroring
+
+Localized navigation in `docs.json` mirrors the English navigation: the same tab → group → subgroup → page hierarchy and the **same ordering**, with group names translated where English uses translatable labels. For all non-connector content, keep the localized nav at 100% parity with English order.
+
+**Connectors are the one exception.** The Connect & Integrate → Data Providers section is organized alphabetically into letter-range subgroups (`Data Providers A-B` … `T-Z and #`), with a named provider group for any vendor that has two or more connectors and a loose page for a single-connector vendor. The Japanese connector nav must be alphabetized **in Japanese** — ordered by the Japanese article title within each subgroup — rather than following the English page order.
+
+What stays at parity vs. what differs for Japanese connectors:
+
+- **At parity:** which provider group (or loose page) a connector belongs to, and which letter-range subgroup it sits in. The letter-range subgroup labels (`データプロバイダー A～B`, etc.) and provider-group names (brand names, kept in Latin) are shared with English.
+- **Differs:** the order of entries *within* each Japanese subgroup follows Japanese collation of the Japanese title. Most connector titles are brand-led (e.g. `Instagram Businessコネクター`), so the order largely tracks Latin alphabetical; verb-led Japanese titles (e.g. `DomoでInContact Echoデータに接続する`) sort by their Japanese leading text.
+- **Group-vs-loose is per language:** a vendor becomes a provider group in a language only when that language carries 2+ of its connectors; with exactly one, it is a loose page. Because Japanese carries a translated subset, a vendor that is a group in English can be a single loose page in Japanese (Instagram, for example).
+
+Only `ja` (besides `en`) currently carries the full connector catalog; `fr`/`de`/`es` have no Data Providers section. The same exception is recorded in `CLAUDE.md` (**Navigation parity exception**) and in the `add-to-nav` and `localize` skills.
 
 ## Release Notes Conventions
 

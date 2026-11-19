@@ -76,7 +76,7 @@ grep -rli -E "(\\b<product>\\b)" s/article/ s/topic/
 grep -n "<Product>" docs.json
 ```
 
-For each article hit, pull the title and excerpt so you know what to link to:
+For each article hit, pull the title and `description` (older articles may still carry a legacy `excerpt` instead) so you know what to link to:
 
 ```bash
 for f in <id1> <id2> ...; do
@@ -84,7 +84,7 @@ for f in <id1> <id2> ...; do
 done
 ```
 
-If the inventory is large (more than ~30 candidate articles), spawn an `Explore` sub-agent with a prompt like: *"Find every article in `s/article/` and `s/topic/` whose title, excerpt, or body materially discusses `<Product>`. For each, return the file path, title, and a one-line summary of how it relates to `<Product>`. Skip articles that only mention `<Product>` in passing."*
+If the inventory is large (more than ~30 candidate articles), spawn an `Explore` sub-agent with a prompt like: *"Find every article in `s/article/` and `s/topic/` whose title, `description` (or legacy `excerpt`), or body materially discusses `<Product>`. For each, return the file path, title, and a one-line summary of how it relates to `<Product>`. Skip articles that only mention `<Product>` in passing."*
 
 Save the resulting list — you'll group it in Step 7.
 
@@ -118,8 +118,8 @@ Before writing, read in full:
 
 Pay special attention to:
 
-- **Frontmatter** — `title` plus a single-sentence `excerpt` (required). Never `description`.
-- **Article structure** — Intro → horizontal rule → Required Grants → Access → body sections → FAQ → Related Articles.
+- **Frontmatter** — `title` plus a single-sentence `description` (required), phrased simply and directly with no "This article explains…" / "This article covers…" preamble. Because an Overview is conceptual, a plain declarative sentence describing the product usually fits better than an imperative (Markdown such as inline code is allowed). Never `excerpt`.
+- **Article structure** — Intro → Required Grants → Access → body sections → FAQ → Related Articles. (An Overview is one of the few article types that keeps an `## Intro` section — it carries the conceptual definition — but there is no `---` horizontal rule after it.)
 - **Imperative-mood headings** — task headings are commands ("Build a Card", not "Building a Card"). Structural labels (`Intro`, `Required Grants`, `FAQ`, etc.) are exempt.
 - **Bold + em-dash convention** for description lists — `**Term —** description`.
 - **Internal links** — `[Title](/s/article/Title-Slug)` with no `.mdx`.
@@ -139,7 +139,7 @@ Before drafting, confirm with the user:
 
 **Coding reference** (from `Domo-KB-Style-Guide.mdx` › **Screenshots**, **Icons**, **Brand and Third-Party Logos**):
 
-- **Block (hero) screenshot:** `<Frame><img src="/images/kb/example.png" alt="Descriptive alt text" /></Frame>` — no inline `width`/`height`; never inside a table cell.
+- **Block (hero) screenshot:** `<Frame><img src="/images/kb/example.png" alt="Detailed, accurate description of what this screenshot shows" /></Frame>` — no inline `width`/`height`; never inside a table cell. Alt text is required: every screenshot must carry detailed, accurate `alt` text for accessibility, LLM readability, and SEO (`Domo-KB-Style-Guide.mdx` › **Alt Text Is Required on Every Screenshot**). If the user wants the hero screenshot but hasn't described what it shows, state the requirement, reference the rule, and ask for the alt text — don't invent it or ship an empty/placeholder `alt`.
 - **Current Domo UI glyph:** `<i className="icon-{name}" aria-hidden="true" />` (Phosphor font). Browse names at [Domo Icons](https://git.empdev.domo.com/pages/Development/DomoIcons/#!/icons/phosphor).
 - **Legacy UI glyph:** `<i className="legacy-icon-{name}" aria-hidden="true" />` — only for release-notes/Workbench surfaces.
 - **Third-party brand logo:** Font Awesome brands `<Icon icon="{slug}" iconType="brands" aria-hidden="true" />`, or inline `<svg fill="currentColor" …>` when the free FA set lacks it. Never a monochrome `<img>` logo — it disappears in dark mode.
@@ -152,19 +152,19 @@ Before drafting, confirm with the user:
 
 Create `s/article/<Product>-Overview.mdx` (title-case filename, hyphen-separated, no `.mdx` collisions). The structure below is the canonical Overview shape — it is what the existing modern overviews (`Cloud Integrations Overview`, `App Studio | Overview`, `Variables | Overview`, plus the recently authored `Analyzer Overview` and `DomoStats Overview`) all converge on, and it differs from a generic how-to.
 
-**The drafting default — preserve the source's wording.** Where the user gave you their own description of the product (Step 1) or you're reusing an existing article's `excerpt`/definition, **keep that direct phrasing and word choice** rather than restating it in your own words — the author's terms carry nuance about what the product is and does. Take the source text as-is and fit it into the Overview structure; **add** connective or framing text only where the structure needs it; and **revise wording only** to satisfy a `Domo-KB-Style-Guide.mdx` or `New-Article-Template.mdx` rule (recast grammatical framing into house voice, but keep the substantive terminology). If you're missing a definition, a use case, or an access path, **ask the user** — don't invent it. (An Overview is more structural than a how-to, so more connective text is normal here; the fidelity rule still governs every sentence you lift from a source.)
+**The drafting default — preserve the source's wording.** Where the user gave you their own description of the product (Step 1) or you're reusing an existing article's `description`/definition, **keep that direct phrasing and word choice** rather than restating it in your own words — the author's terms carry nuance about what the product is and does. Take the source text as-is and fit it into the Overview structure; **add** connective or framing text only where the structure needs it; and **revise wording only** to satisfy a `Domo-KB-Style-Guide.mdx` or `New-Article-Template.mdx` rule (recast grammatical framing into house voice, but keep the substantive terminology). If you're missing a definition, a use case, or an access path, **ask the user** — don't invent it. (An Overview is more structural than a how-to, so more connective text is normal here; the fidelity rule still governs every sentence you lift from a source.)
 
 ### Canonical Overview structure
 
 ```mdx
 ---
 title: "<Product> Overview"
-excerpt: "<One sentence describing what the product is and the main value it provides>."
+description: "<Product> is <one-line description of what it is and does>; learn how to access it and where to find the specific article for each task."
 ---
 
 ## Intro
 
-<Product> is <one-sentence definition that names the category — "Domo's chart-building tool", "Domo's built-in observability layer", "Domo's calculation engine">. <One or two more sentences naming the high-level use cases.> This article explains what <Product> is, how to access it, and points to the specific articles for each task.
+<Product> is <one-sentence definition that names the category — "Domo's chart-building tool", "Domo's built-in observability layer", "Domo's calculation engine">. <One or two more sentences naming the high-level use cases.>
 
 <Optional: a 2-3 item description list of the major sub-parts of the product, if it has distinct halves (e.g., DomoStats has the connector + the QuickStart apps).>
 
@@ -196,7 +196,7 @@ Learn more about [grants](/s/article/360043438973).
 
 <One short paragraph or numbered list showing the 1–3 ways to open or get to the product. Reference the dedicated "Opening X" article if one exists.>
 
-1. **From <surface 1>.** <Action sentence with the icon if applicable, e.g., select <i className="icon-pencil sm" aria-hidden="true" /> **Edit**.>
+1. **From <surface 1>.** <Action sentence with the icon if applicable, e.g., select <i className="icon-pencil" aria-hidden="true" /> **Edit**.>
 2. **From <surface 2>.** <Action sentence.>
 3. **From <surface 3>.** <Action sentence.>
 
@@ -206,7 +206,7 @@ For a step-by-step walkthrough, see [Opening <Product>](/s/article/...).
 
 <One short sentence framing the cluster — what kind of task or surface this group of articles covers.>
 
-- [<Article Title>](/s/article/...) — <one-sentence description of what the article covers, written in the same voice as the article's own excerpt>.
+- [<Article Title>](/s/article/...) — <one-sentence description of what the article covers, written in the same voice as the article's own `description`>.
 - [<Article Title>](/s/article/...) — <one-sentence description>.
 - [<Article Title>](/s/article/...) — <one-sentence description>.
 
@@ -249,7 +249,7 @@ For a step-by-step walkthrough, see [Opening <Product>](/s/article/...).
 ### Drafting rules
 
 - **One concept per cluster heading.** Each `## Heading` introduces a single grouping (Build, Format, Manage, etc.). Do not mix tasks across clusters.
-- **Every link gets a one-sentence description.** No bare link lists. The description should mirror the linked article's `excerpt` field, not duplicate its title.
+- **Every link gets a one-sentence blurb.** No bare link lists. The blurb should mirror the linked article's `description` field, not duplicate its title.
 - **Order clusters by reader journey.** Setup/access first, then build/create, then refine/format, then manage/govern, then best practices.
 - **Three or four FAQ questions.** Pick the highest-leverage ones — who can use it, what scope is and isn't covered, how it relates to neighboring features, where to file issues.
 - **No screenshots in an Overview by default.** Overviews are link-rich entry points; screenshots belong in the deep articles. The exception is one optional hero screenshot of the product UI immediately under the Intro if it materially helps orient a new reader.
@@ -276,8 +276,8 @@ Drafting always introduces style drift. After the fact-check pass, and before ve
 1. **Re-read `Domo-KB-Style-Guide.mdx` and `New-Article-Template.mdx` now, in full** — not from memory. Step 5's "pay special attention to" list is a primer, not a substitute for the re-read.
 2. **Proofread for plain grammar and usage** — spelling, agreement, punctuation, and clarity — alongside the Domo-specific rules below.
 3. **Audit the Overview against this checklist** and fix every violation:
-   - **Frontmatter** — `title` plus a single-sentence `excerpt`; never a `description` field.
-   - **Intro** — opens with "This article explains…" / "This article covers…", states only what the Overview covers, and is followed by a `---` horizontal rule.
+   - **Frontmatter** — `title` plus a single-sentence `description`, phrased simply and directly with no "This article explains…" / "This article covers…" preamble (a plain declarative sentence describing the product usually fits an Overview better than an imperative; Markdown such as inline code is allowed); never an `excerpt` field.
+   - **Intro** — an Overview keeps an `## Intro` section for the conceptual definition (the lead sentence itself lives in the `description` frontmatter). The Intro states what the product is and what it covers, and has no `---` horizontal rule after it.
    - **Headings** — imperative mood at every level (link-cluster headings included — "Build Cards", not "Building Cards"; "Manage Access", not "Management"); structural labels (Intro, Required Grants, FAQ, Related Articles) are exempt. Top-level sections H2, subsections H3+.
    - **Required Grants** — exact format and canonical grant wording, with the em-dash inside the bold and a space on each side (`**Grant —** description`).
    - **Callouts** — `<Note>`/`<Warning>`/`<Tip>` with the label and its colon bolded (`**Note:**`), and a blank line before the callout (except inside table cells).
@@ -287,7 +287,7 @@ Drafting always introduces style drift. After the fact-check pass, and before ve
    - **Voice and word choice** — present tense, not "will"; active voice; "after", not causal "once"; no "utilize"; spell out numbers under 10; "allowlist"/"blocklist"; "select", not "click"; Oxford comma; no exclamation points.
    - **Domo terms** — apply the Step 4 treatment for the product name consistently, plus `DataSet`, `DataFlow`, `DataFusion`, `Beast Mode`, `Workbench`; `dashboard` lowercase except at the start of a sentence or with a type; never "Page". Verify against the **Domo-Specific Terms and Usage** table.
    - **Beta** — correct convention applied (frontmatter `tag` + verbatim Note for a whole-article beta; Badge + single verbatim Note for section-level).
-   - **Images** — if you included the optional hero screenshot, it is wrapped in `<Frame>` with a native `<img>` and descriptive `alt`, no inline `width`/`height`; never `<Frame>` inside a table cell. No placeholders unless the user opted in at Step 6.
+   - **Images** — if you included the optional hero screenshot, it is wrapped in `<Frame>` with a native `<img>` and detailed, accurate `alt` text (not empty, `"screenshot"`, or a placeholder — ask the user for it if it's missing, per Step 6), no inline `width`/`height`; never `<Frame>` inside a table cell. No placeholders unless the user opted in at Step 6.
    - **Icons** — current UI glyphs use the `icon-{name}` font; `legacy-icon-{name}` only for release-notes/Workbench surfaces; brand logos use Font Awesome brands or inline `<svg fill="currentColor">`; never the old inline-image icon pattern for a glyph that exists in the font. Each icon carries `aria-hidden="true"` and is named in the prose.
 4. **Revise the Overview in place** to resolve every issue found, then re-run the table normalizer if you changed any tables.
 
@@ -338,7 +338,7 @@ Only after the user approves the copy do you handle the legacy collision, naviga
 
 If Step 2 chose to rename the legacy article (option 2), do it now:
 
-1. **Update the legacy article's `title:` and `excerpt:`** in `s/article/<legacy-id>.mdx` to reflect its actual content. Common new titles: `"Save a Visualization Card in Analyzer"`, `"Configure X"`, `"<Old Title> Walkthrough"`. The file path stays the same — only the frontmatter changes, so no redirect or inbound-link updates are needed.
+1. **Update the legacy article's `title:` and `description:`** in `s/article/<legacy-id>.mdx` to reflect its actual content. Common new titles: `"Save a Visualization Card in Analyzer"`, `"Configure X"`, `"<Old Title> Walkthrough"`. The file path stays the same — only the frontmatter changes, so no redirect or inbound-link updates are needed.
 
 2. **Mirror the rename on the JA sibling** at `ja/s/article/<legacy-id>.mdx`. The JA title should be a translation of the new EN title in the same imperative style as adjacent JA articles. Example:
 
@@ -346,7 +346,7 @@ If Step 2 chose to rename the legacy article (option 2), do it now:
    title: "Analyzerで可視化カードを保存する"  // (EN: "Save a Visualization Card in Analyzer")
    ```
 
-   Match the existing JA voice — if neighbor articles use polite/imperative forms with `する`, follow that pattern. Match the existing excerpt style too.
+   Match the existing JA voice — if neighbor articles use polite/imperative forms with `する`, follow that pattern. Match the existing frontmatter-summary (`description`) style too.
 
 3. **Skip the JA sibling for the new Overview article itself.** Translation work happens separately on the JA pipeline. Note in your final summary that the JA Overview is deferred.
 
@@ -386,7 +386,7 @@ Tell the user:
 4. **Nav placement:** where the new article was added in `docs.json` (and any restructure performed).
 5. **Verification:** every factual claim was confirmed against a source or with the user (Step 8), all internal links resolved to the correct target articles (Step 10), and `docs.json` is valid JSON.
 6. **Open items:** any fact-check items you flagged in Step 8 that still need the user's confirmation.
-7. **Local preview:** suggest `mintlify dev` to confirm the rendered Overview reads the way the user expects.
+7. **Local preview:** suggest `mint dev` to confirm the rendered Overview reads the way the user expects.
 
 ---
 

@@ -1,7 +1,7 @@
 # PM Review Brief: Ken Boyer
 
 **Prepared for:** KB Restructure PM Review Meeting
-**Features owned:** AI Chat, AI Services, CLI, Documents-Filesets, Jupyter Notebooks
+**Features owned:** AI Chat, AI Services, CLI/SDK, Documents (Unstructured Data), Jupyter Notebooks
 **Total articles in your area:** 56
 
 > This document is your meeting guide. It shows how your content is being reorganized,
@@ -21,8 +21,8 @@ areas lands in the new structure.
 |---------|----------|--------------|
 | AI Chat | 1 | TBD — not yet mapped |
 | AI Services | 41 | Pillar 9: AI & Data Science |
-| CLI | 1 | Pillar 11: Develop & Integrate |
-| Documents-Filesets | 8 | Pillar 9: AI & Data Science |
+| CLI/SDK | 1 | TBD — not yet mapped |
+| Documents (Unstructured Data) | 8 | TBD — not yet mapped |
 | Jupyter Notebooks | 5 | Pillar 9: AI & Data Science |
 
 ### Notable Navigation Changes

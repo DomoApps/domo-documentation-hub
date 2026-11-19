@@ -1,0 +1,264 @@
+---
+title: "Versión menor | 29 de octubre de 2026"
+excerpt: "Notas de la versión menor semanales que documentan actualizaciones incrementales y problemas resueltos en las funciones de Domo."
+---
+
+## Versión del 29 de octubre de 2026
+
+### AI Labs
+
+- Agrega compatibilidad con la autenticación OAuth y el nuevo identificador de recurso MCP predeterminado en AI Labs.
+- Agrega compatibilidad con políticas de Personalized Data Permissions (PDP) en el manejo de archivos de AI Labs, lo que permite a los administradores controlar el acceso a los datos no estructurados según los permisos de usuarios y grupos.
+- Las tareas de AI Agent en Flujos de trabajo fallaban con un error de deserialización cuando se especificaba un DataSet como fuente de conocimiento.
+- Los agentes de IA insertados en páginas o aplicaciones no cargaban correctamente sus fuentes de datos configuradas.
+- AI Chat no estaba disponible en ciertas instancias de Domo debido a la configuración regional.
+- Las tarjetas de AI Library en los elementos insertados y las publicaciones de Domo Everywhere mostraban un espacio gris en blanco en lugar de sus iconos.
+- Las AI Skills podían fallar al ejecutarse.
+- Las aplicaciones creadas por App Catalyst no se podían promover de Sandbox a producción, fallando con un error sobre fuentes de datos faltantes.
+- Las aplicaciones personalizadas ahora pueden acceder a AI Services, lo que mejora la integración.
+- Los toolkits personalizados en AI Labs no podían conectarse mediante la autenticación OAuth.
+- Los modelos DomoGPT Medium v2.2 y v3 no funcionaban en Magic - Extracción, transformación y carga.
+- Los agentes de IA insertados no podían leer archivos de Document Collections.
+- Los FileSets omitían el procesamiento de un archivo si su contenido actualizado coincidía con otro archivo existente, incluso cuando el propio archivo había cambiado.
+- Los encuestados de formularios pueden cargar archivos adjuntos en Document Collections al enviar formularios de App Studio.
+- Mejora la legibilidad de las entradas del registro de auditoría para las ejecuciones del agente de AI Chat, lo que facilita el seguimiento de la actividad de IA en su instancia.
+- Los DataFlows de Magic ETL que usaban el icono AI Text Generation podían fallar de forma intermitente con un mensaje "unknown error occurred".
+- Las reglas de Personalized Data Permissions (PDP) para FileSets se rechazaban si el valor de la regla terminaba con una barra diagonal.
+- Ordena alfabéticamente la lista desplegable de modelos en AI Playground para facilitar la navegación.
+- Los pasos ya no eran visibles en las respuestas de AI Chat y Agent.
+- El botón "Live help" ahora abre AI Chat.
+- A la tarjeta Report Builder Toolkit en la AI Library le faltaba un icono.
+- Dos iconos experimentales de datos no estructurados en Magic ETL están disponibles solo cuando las funciones experimentales de AI Labs están habilitadas.
+
+### AI Readiness
+
+- Los nombres para mostrar y las descripciones de las herramientas ahora se incluyen correctamente al recuperar los toolkits proporcionados por Domo y derivados de habilidades a través de la API de AI Services.
+
+### AI Services
+
+- Agrega capacidades de implementación en producción para los Domo Models en AI Services.
+- Agrega compatibilidad con tipos adicionales de modelos de IA en AI Services, lo que amplía la gama de modelos disponibles para usar en las funciones de IA de Domo.
+- Agrega compatibilidad con los modelos OpenAI de Amazon Bedrock como opción de proveedor en AI Services.
+- Agrega compatibilidad con Google Gemini Embedding 2 en AI Services.
+- Los iconos de AI Agent en Flujos de trabajo no podían acceder a ciertos tipos de archivo de Documents y Document Collections cuando se usaban como fuentes de conocimiento.
+- Se producía un error al usar archivos PDF con la función Image Embedding en AI Services.
+- Mejora el registro de actividad de los AI Agents para que las columnas Type y Event ahora muestren el nombre específico de la herramienta en lugar de la etiqueta genérica "Ai chat tool".
+- Establece nuevos modelos predeterminados para AI Services y AI Agents en los entornos de producción.
+- La CardGetTool en AI Services no devolvía los filtros aplicados a las tarjetas en Analyzer.
+- El informe DomoStats AI Chat Sessions podía fallar con un mensaje "Temporary Internal Connector Error".
+
+### Canalización avanzada
+
+- El comando CLI delete-rows fallaba en los DataSets de upsert si el archivo de claves contenía datos no válidos, como una fila de encabezado con una marca de orden de bytes UTF-8, lo que podía bloquear más eliminaciones hasta que se quitara la versión de datos problemática.
+
+### Alertas
+
+- El filtrado de valores de alerta no manejaba correctamente los caracteres especiales en el campo de entrada.
+- Las alertas no activaban los flujos de trabajo cuando una columna numérica se asignaba a un parámetro de flujo de trabajo.
+- Las alertas en DataSets con Personalized Data Permissions habilitadas no enviaban notificaciones a los suscriptores cuando se superaba el umbral de la alerta.
+- Los usuarios con la concesión "Use Alerts" no podían ver ni recibir alertas compartidas con ellos si no tenían acceso al DataSet subyacente.
+
+### App Components
+
+- Los formularios de App Studio con campos de persona no se cargaban cuando estaban insertados; los formularios ahora se muestran correctamente tanto en los elementos insertados privados como públicos.
+
+### App Platform
+
+- Acceda a AppDB Admin desde la Asset Library en la interfaz rediseñada.
+- La sincronización de AppDB de App Studio escribía matrices JSON en un formato incorrecto, lo que las hacía no analizables cuando se sincronizaban con DataSets.
+- Las colecciones de AppDB podían mostrar un recuento de filas diferente al de sus DataSets sincronizados, y algunas filas no se escribían en el DataSet.
+- Los Bricks del Appstore no se instalaban en App Studio, mostrando un mensaje de error "Install Failed".
+- Crear una tarjeta desde la Asset Library omitía la pantalla de conexión para los diseños que requieren asignaciones de flujo de trabajo, asignaciones de Code Engine o configuración de brick del editor de código, lo que producía tarjetas incompletas; la pantalla de conexión ahora aparece cuando se necesita configuración.
+- Habilitar la sincronización de baja latencia para AppDB no creaba el DataSet esperado.
+- Los DataSets de baja latencia creados por usuarios que no son propietarios no eran visibles para el propietario del DataSet, lo que los hacía accesibles solo para los usuarios administradores.
+- La sincronización de baja latencia ya no se puede habilitar en las colecciones de App Studio que carecen de un esquema declarado, lo que coincide con el comportamiento existente de la sincronización por lotes.
+- Las consultas a los DataSets en Pro-Code Apps podían fallar con un error.
+- Reconstruye los DataSets de Change Data Capture (CDC) para usar la configuración predeterminada actualizada de análisis de datos.
+
+### App Studio
+
+- Las pestañas de App Studio no se podían reordenar cuando el chat de IA estaba deshabilitado.
+- Los gráficos de caja en App Studio se mostraban como gráficos de barras después de aplicar un filtro, mostrando solo los valores máximo y mínimo en lugar de la visualización completa del gráfico de caja.
+- Las tarjetas en los tableros de App Studio aparecían comprimidas con barras de desplazamiento inesperadas en la vista de escritorio.
+- Las tablas editables en App Studio podían no aceptar la entrada del usuario cuando se cambiaba el uso de mayúsculas y minúsculas del nombre de columna del esquema del DataSet.
+- Los componentes Grid y List en App Studio mostraban "Power from data to configure search/sort" incluso cuando ya había un DataSet conectado, lo que impedía configurar las columnas de búsqueda y ordenación.
+- En App Studio, una aplicación personalizada que volvía a aplicar un filtro podía borrar inadvertidamente el filtro de página que estaba estableciendo, lo que provocaba que las tarjetas mostraran datos sin filtrar; nuevamente puede quitar un filtro aplicado por otra tarjeta en la misma página con un solo clic.
+- En App Studio, los gráficos podían mostrar datos de un valor de variable establecido en una página visitada anteriormente, incluso cuando "Persist Variable controls" estaba deshabilitado, por lo que los datos del gráfico no se actualizaban correctamente después de navegar, mientras que el texto inteligente mostraba el valor correcto a nivel de tarjeta.
+- En App Studio, las tarjetas de filtro no permanecían sincronizadas entre páginas cuando "Persist interaction filters" estaba habilitado: cambiar un filtro en una página actualizaba los datos pero no la visualización de la tarjeta de filtro en otras páginas, y quitar un filtro a veces requería dos clics (solo en la web de escritorio).
+- Varias acciones Workflow Start en una aplicación de App Studio ejecutaban todas el mismo flujo de trabajo en lugar de sus flujos de trabajo configurados individualmente.
+- Los usuarios que no son administradores recibían un error de acceso denegado al intentar mover o copiar tarjetas a páginas de App Studio que aparecían como destinos disponibles en el cuadro de diálogo.
+- Algunos gráficos en App Studio aparecían brevemente y luego se quedaban en blanco después de que se cargaba la aplicación.
+- Las tarjetas de tabla exportadas desde aplicaciones de App Studio en informes programados perdían el formato de su tema, incluidos los colores de fila alternos y otros estilos.
+- Los cuadros de texto en App Studio mostraban barras de desplazamiento innecesarias independientemente del tamaño del contenido o las dimensiones del cuadro.
+- Los usuarios con el permiso "Edit Data in Editable Table Cells" no podían editar celdas en las tablas editables de App Studio que usan DataSets vinculados a menos que también tuvieran el permiso "Edit Cards".
+
+### Autenticación
+
+- Las aplicaciones de escritorio no podían completar la autenticación porque los esquemas de URI personalizados (como cursor://) no eran compatibles al registrar las URI de redireccionamiento de OAuth.
+- Los usuarios no podían iniciar sesión mediante SAML si su perfil contenía campos de texto que superaban los 255 caracteres.
+
+### Buzz
+
+- Los botones del cuadro de diálogo para quitar usuarios no respondían en los temas privados de Buzz y los chats grupales.
+- En macOS, presionar Enter para confirmar la entrada de texto en japonés en Buzz enviaba inesperadamente el mensaje en lugar de completar la entrada de texto.
+
+### Tarjetas
+
+- Los cálculos de Beast Mode en las tarjetas de modelo de datos fallaban en la validación con "A column in this calculation did not exist" cuando se hacía referencia a una variable después de una columna; las variables ahora se rellenan y validan correctamente.
+- Los Beast Modes que hacían referencia a Variables no se podían duplicar en otro DataSet usando Beast Mode Manager; la acción se bloqueaba incorrectamente con un mensaje que informaba de la Variable como una referencia anidada de Beast Mode.
+- Los filtros y controles de tarjeta no mostraban valores en las tarjetas creadas a partir de modelos de datos que usaban filtros de agregación combinados con agrupaciones impulsadas por variables.
+- Las tarjetas se quedaban atascadas en un estado "Loading" o "Filtering" y no se representaban en la carga inicial del tablero, aunque se cargaban después de cambiar un filtro o al abrirse en Analyzer.
+- Las tarjetas agrupadas por mes mostraban etiquetas de mes en inglés (como "2026-Jan") en lugar de etiquetas localizadas (como "2026年1月") para los usuarios que no hablaban inglés, lo que provocaba que algunas tarjetas mostraran "Data Not Available".
+- Las tarjetas con variables de fecha relativa no se podían guardar en las instancias de Snowflake de Cloud Amplifier.
+- Las tarjetas de JavaScript personalizadas creadas a partir de la plantilla DDX-HTML-Blank podían quedarse atascadas en "Loading..." e impedir que el Pro-Code Editor se abriera al editar la aplicación.
+- Los filtros de rango de fechas en Analyzer podían desplazarse un día al editarse, acumulándose en ediciones posteriores, para los usuarios en zonas horarias por detrás o por delante de UTC (incluidos los detalles de la tarjeta y las entradas de fecha del filtro de página).
+- Las variables de fecha y las comparaciones DATETIME no aplicaban correctamente la zona horaria de la empresa; las fechas ahora se calculan en la zona horaria correcta, y los filtros que usan variables de fecha se aplican correctamente al cargar el tablero.
+- Podían aparecer controles de variable duplicados en las tarjetas en Analyzer y en las vistas de detalles de tarjeta.
+- Los usuarios con el rol Editor no podían cargar nuevas versiones de las Document Cards que no les pertenecían, incluso cuando tenían acceso de edición; ahora pueden cargar nuevas versiones, incluidos archivos PDF e imágenes.
+- Exportar una tarjeta con un punto y coma o caracteres no ASCII en su título daba como resultado un archivo sin extensión o con un nombre de archivo ilegible.
+- Los botones predefinidos del selector de fechas expandido en las tarjetas no respondían y podían comprimirse en una línea vertical después de varios clics.
+- Las páginas compartidas de usuarios inactivos o eliminados podían aparecer incorrectamente en la lista de páginas del administrador.
+- Las tarjetas de tabla mostraban valores decimales sin procesar en lugar del formato numérico configurado para las columnas decimales de alta precisión; las tarjetas afectadas ahora aplican la precisión decimal, el formato de porcentaje y la configuración del separador de miles.
+- Las tarjetas de tabla con varias columnas y una fila de total podían no representarse con un error "Bad Request" al agregar dimensiones, especialmente cuando la configuración de la tarjeta reutilizaba ciertas referencias de columna.
+- Los usuarios que poseían una tarjeta de documento a través de la pertenencia a un grupo no podían ver el botón "Upload Version", lo que les impedía actualizar la tarjeta.
+- Los filtros de control de variable aplicados en las aplicaciones de App Studio no se trasladaban al exportar tarjetas como archivos adjuntos de correo electrónico, lo que provocaba que los valores filtrados se mostraran como cero en la exportación.
+
+### Tipo de gráfico
+
+- Usar un menú desplegable para ordenar una tarjeta de Mega Table podía causar errores en otras tarjetas del mismo tablero.
+
+### Integraciones en la nube
+
+- Los DataSets de Azure SQL en Cloud Amplifier no actualizaban su recuento de filas después de cada sincronización; la Descripción general del DataSet ahora refleja el recuento de filas actual, incluso cuando la tabla de origen está vacía o es más pequeña que antes.
+- Las exportaciones de Cloud Amplifier a Snowflake podían perder datos de tabla al usar los modos REPLACE o APPEND debido a una asignación de esquema incorrecta en los comentarios de la tabla.
+- Las integraciones de Cloud Amplifier no se podían eliminar cuando había DataSets de sistema ocultos asociados a ellas, aunque esos DataSets no fueran visibles en Data Center.
+- Las escrituras de Cloud Amplifier en Snowflake que se ejecutaban durante más de 30 minutos podían fallar de forma intermitente con un error "Connection is closed".
+- Los clientes que usaban calendarios personalizados en Cloud Amplifier podían perder el acceso a la función o ver límites de fecha incorrectos en sus consultas.
+- Las tarjetas de consulta en vivo de Databricks que se ordenaban por un Beast Mode de función de ventana (como DENSE_RANK o ROW_NUMBER) devolvían un error de consulta en lugar de representarse.
+- Los DataSets mostraban una advertencia de autenticación falsa aunque las credenciales de la cuenta eran válidas y los datos se sincronizaban correctamente; volver a introducir credenciales válidas ahora borra la advertencia.
+
+### Conectores
+
+- Conectar tablas de PostgreSQL muy grandes (100 millones de filas o más) a través de Cloud Amplifier fallaba con un error de validación; las tablas ahora se conectan de inmediato, con los recuentos de filas calculados en segundo plano.
+- Crear una cuenta del conector TikTok Business podía fallar si el nombre para mostrar de la cuenta de TikTok contenía un emoji.
+- Las columnas SMALLINT de Redshift en Cloud Amplifier se importaban como Text en lugar de Integer, lo que impedía su uso en agregaciones como sum y max.
+- La página de configuración del conector de Facebook podía no cargarse correctamente.
+- Cargar varios archivos consecutivamente en el conector File Upload podía provocar que la interfaz se congelara y no avanzara a la pantalla de vista previa.
+
+### Consumo
+
+- Agrega compatibilidad con los tipos de cuenta Partner-Reseller en el seguimiento de Consumo.
+
+### Tableros
+
+- Las tarjetas de Notebook y las tarjetas de tabla exportadas a PDF o PowerPoint podían tener contenido cortado debido a márgenes adicionales.
+
+### Data Center
+
+- Agrega entradas al registro de actividad cuando se reordenan columnas en la pestaña Esquema de un DataSet, mostrando quién realizó el cambio, cuándo y la posición anterior y nueva de cada columna, y le permite restablecer el orden de columnas de un DataSet a su orden original.
+- Las DataSet Views de Redshift en Cloud Amplifier fallaban con un error "column does not exist" cuando los nombres de columna contenían letras minúsculas o caracteres de ancho completo.
+- Las DataSet Views creadas a partir de DataSets federados no se podían editar, mostrando un error "Something went wrong while trying to edit this view".
+- Los DataSets de Postgres federados convertían las zonas horarias en la dirección incorrecta cuando la zona horaria de una empresa tenía un desplazamiento UTC negativo, sumando horas en lugar de restarlas y afectando a los valores de fecha y hora mostrados y a los límites del filtro de rango de fechas.
+- El cuadro de diálogo de uso compartido de cuentas no se abría si un grupo previamente compartido se había eliminado, lo que impedía a los usuarios gestionar los permisos de la cuenta.
+
+### Exportación de datos
+
+- Exportar un DataSet a Excel podía producir un archivo dañado que Excel no podía abrir cuando los valores de texto contenían caracteres no permitidos en XML; dichos valores ahora se manejan correctamente durante la exportación.
+
+### Manipulación de datos
+
+- Los DataFlows particionados que usaban Snowflake en Cloud Amplifier podían agotar el tiempo de espera con un error "Unspecified error" al reemplazar particiones existentes en el DataSet de salida.
+
+### Procesamiento de datos
+
+- Mejora la apariencia y el etiquetado de los iconos de IA y de Document en Magic ETL, marcando los iconos de Document como beta y reflejando si las funciones de IA están habilitadas para su instancia.
+- Los DataFlows de Magic ETL podían quedarse atascados en el estado PREPARING o EXPORTING hasta 24 horas cuando se activaban muchos DataFlows a la vez, como cuando varias tablas de Snowflake se actualizaban simultáneamente; los DataFlows afectados ahora se completan o fallan con un estado claro en lugar de quedarse colgados.
+- Los DataFlows de Magic ETL podían ejecutarse dos veces en respuesta a una sola actualización de DataSet, consumiendo créditos innecesarios.
+- Los iconos de SQL de Magic ETL que usaban funciones de ventana podían fallar con un error.
+- Faltaba el selector de intervalo de tiempo en la condición de activación "DataFlow has not run within the last" en la configuración de DataFlow.
+
+### Consulta de datos
+
+- Los cálculos de Beast Mode que usaban funciones FIXED dentro de cláusulas CASE WHEN podían fallar con un error "invalid column", incluso cuando todas las columnas existían en el DataSet.
+- Las conexiones federadas de BigQuery fallaban con un error "Internal Server Error" al ejecutar consultas o crear nuevas conexiones.
+- Change Data Capture (CDC) no producía DataSets en algunos casos.
+- Los clientes no podían crear varias cuentas M2M OAuth de Databricks; cada cuenta ahora muestra un nombre único basado en su host de workspace e ID de cliente del service principal.
+- Los DataSets no aparecían después de habilitar la sincronización de baja latencia en Data Query.
+- Declarar columnas de ruta anidada con notación de punto en los esquemas de AppDB para Pro-Code Apps creaba columnas vacías; la notación de punto ahora es compatible.
+- Los objetos vacíos en los documentos de sincronización de baja latencia de AppDB podían impedir que se crearan columnas de DataSet.
+- En Cloud Amplifier, la lista de tablas no se cargaba al explorar esquemas de Snowflake si el usuario no tenía permisos de administrador y el esquema contenía DataSets a los que no podía acceder.
+- Las DataSet Views materializadas podían dejar de actualizarse e informar incorrectamente de ejecuciones exitosas con cero filas en lugar de mostrar un error.
+- Los DataFlows de MySQL y Magic ETL podían leer datos obsoletos de los DataSets de baja latencia que estaban desactualizados de minutos a horas; ahora leen datos actuales.
+- Guardar una DataSet View restablecía el orden de las columnas y quitaba las descripciones de columna, la configuración de columnas ocultas y las etiquetas de la pestaña Esquema.
+- Los cambios de esquema en los DataSets de AppDB de baja latencia no se aplicaban después de habilitar la sincronización inicial.
+- Los conectores de Snowflake podían no sincronizarse para algunos clientes.
+
+### Embed
+
+- Las tarjetas de App Component en los tableros de App Studio insertados no se cargaban y mostraban "This content is no longer available".
+- Profundizar en un gráfico en Card Embed v2 no activaba el evento de profundización esperado en la página host.
+- Exportar una tarjeta a CSV con el botón de exportación en línea en una aplicación de App Studio insertada de forma privada devolvía solo los encabezados de columna cuando se aplicaba un filtro programático del lado del servidor (sqlFilter) a través del token de inserción; los datos filtrados ahora se exportan correctamente tanto a través del acceso directo en línea como de la exportación de tarjeta expandida.
+- Los orígenes basados en localhost (como http://localhost:8000) no se podían agregar a la lista Authorized Private Embed Domains, lo que bloqueaba los flujos de trabajo de desarrollo local que anteriormente funcionaban.
+- Las selecciones de segmentación y de variables en las aplicaciones de App Studio no filtraban las tarjetas dependientes cuando se veían a través de elementos insertados privados o públicos, aunque las mismas interacciones funcionaban correctamente en la vista nativa de la aplicación.
+- El botón de exportación en los tableros insertados privados no mostraba el selector de formato al hacer clic, incluso cuando la exportación estaba habilitada.
+- El icono de filtro no aparecía en las tarjetas expandidas en los elementos insertados privados de las aplicaciones de App Studio, incluso cuando el filtrado estaba habilitado en la configuración de inserción.
+
+### Datos federados
+
+- Las tarjetas y los Informes programados que usaban DataSets de BigQuery no se cargaban con errores "Invalid field name" cuando los nombres de columna contenían caracteres especiales como barras diagonales, paréntesis o comas, lo que afectaba tanto a los DataSets de BigQuery federados como a las integraciones de BigQuery de Cloud Amplifier.
+
+### Móvil
+
+- Aumenta la versión recomendada de la aplicación móvil para la compatibilidad con los certificados actualizados.
+
+### Navegación
+
+- Agregue Buzz Chat a la navegación personalizada para que aparezca en el menú de navegación y enlace a la interfaz de Buzz.
+- Code Engine estaba oculto incorrectamente en la navegación para algunos usuarios que tenían permiso para acceder a él.
+- La insignia de notificación en el avatar del perfil de un usuario se superponía a la vista de Buzz en pantalla completa para los usuarios que habían deshabilitado la nueva navegación izquierda.
+- La sección Recientes de la navegación izquierda podía perder el historial de días anteriores tras una interrupción de la red.
+
+### Rendimiento
+
+- Ver los detalles de un DataSet podía activar notificaciones excesivas, lo que causaba ralentizaciones intermitentes en toda la instancia.
+
+### Personalized Data Permissions
+
+- Algunas políticas de fila de PDP en un DataSet no aparecían en la vista DomoStats Row Assignment.
+
+### Publish
+
+- Los componentes de App Studio sin suscripciones de datos no se replicaban en los suscriptores de Publish, devolviendo un error durante la creación de tarjetas.
+- Las tarjetas con cálculos de Beast Mode podían no mostrarse en las instancias de suscriptores después de publicar, mostrando un mensaje de error de que el procesamiento no se podía completar.
+- Las exportaciones a CSV fallaban de forma silenciosa cuando una tarjeta se creaba sobre una DataSet View que unía varios DataSets de Publish.
+- Las tarjetas de Notebook en las aplicaciones de Domo Everywhere publicadas podían perder sus conexiones de DataSet al usar números de resumen y texto dinámico con varios DataSets, lo que provocaba que el contenido no se representara en la instancia del suscriptor.
+- La duración de la última actualización se mostraba incorrectamente para ciertas publicaciones en Publish.
+- Las opciones de variable en las instancias de suscriptores de Publish no aparecían correctamente en las tarjetas expandidas, aunque se mostraban correctamente en el panel de control a nivel de página.
+- Las publicaciones muy grandes podían fallar o tardar más de 24 horas en actualizarse al agregar suscriptores o actualizar contenido.
+
+### Sandbox
+
+- Agrega compatibilidad con parámetros de tipo de contenido en las reglas de cambio de nombre de Sandbox.
+- Mejora cómo las promociones de Sandbox manejan la configuración de uso compartido al promover contenido dentro de la misma instancia.
+- En Sandbox, las operaciones de commit podían fallar cuando no se proporcionaba una descripción de commit.
+- Las asignaciones de página de Sandbox no se guardaban durante la promoción, lo que causaba errores de autorización.
+- Las promociones de Sandbox fallaban de forma constante con un error de servicio no disponible.
+- Las tarjetas Sumo implementadas desde un repositorio de Sandbox podían no cargarse si hacían referencia a cálculos de Beast Mode que ya no existían en la instancia de destino.
+
+### Informes programados
+
+- Los corchetes dobles ([[]]) en las líneas de asunto del correo electrónico de los Informes programados se marcaban incorrectamente como sintaxis de emoji, lo que impedía que el informe se guardara o enviara.
+
+### Tareas y proyectos
+
+- Los usuarios que intentaban acceder a un proyecto privado que no tienen permiso para ver no recibían un mensaje adecuado de acceso denegado.
+
+### Flujos de trabajo
+
+- Los toolkits de IA que hacían referencia a un paquete de Code Engine no aparecían en la pestaña de usos de ese paquete.
+- El contenido HTML en las acciones Send Email de Flujos de trabajo podía mostrarse incorrectamente debido a barras invertidas de escape en las entradas de texto.
+- El bloque Query DataSet en Flujos de trabajo mostraba los tipos de columna de salida como "Object" en lugar de sus tipos de datos reales, como Date-Time o Text, lo que impedía a los usuarios configurar acciones posteriores.
+
+### Espacios de trabajo
+
+- Los Espacios de trabajo desaparecían después de actualizar la página si el usuario pertenecía solo a grupos ocultos o inactivos.

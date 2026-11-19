@@ -1,322 +1,238 @@
 ---
-title: "Notes de version de septembre 2026"
-excerpt: "Notes de version de septembre 2026 couvrant les optimisations de Magic ETL, App Components, App Studio, la modélisation des données, l'automatisation basée sur MCP et d'autres nouvelles fonctionnalités et optimisations."
+title: "Notes de version de novembre 2026"
+excerpt: "Notes de version de novembre 2026 couvrant App Studio App Components et Report Builder, les optimisations des applications pro-code, le Générateur de règles de colonnes calculées, les optimisations de Magic ETL et d'autres nouvelles fonctionnalités et optimisations."
 ---
 
-import { BetaNoteFr } from '/snippets/BetaNote.mdx';
+import { BetaNoteFr } from "/snippets/BetaNote.mdx";
 
 ---
 
 ## Nouvelles fonctionnalités et optimisations
 
-### Optimisations d'App Studio
+### App Studio : App Components
 
-#### Visibilité de l'emplacement de la carte
+Un ensemble de mises à jour d'App Components vous permet de créer des applications soignées et basées sur les données sans code : mise en forme conditionnelle basée sur des règles, un nouveau widget Numeric, des sections repliables ainsi que Group By et agrégations intégrés.
 
-L'icône d'information des détails de la carte, qui indique où se trouve une carte, affiche désormais aussi les pages App Studio sur lesquelles la carte existe. L'icône d'information est également disponible dans le panneau de droite, à côté du nom de la carte.
+#### Mise en forme conditionnelle
 
-<Frame>![](/images/kb/app_studio_card_location.jpeg)</Frame>
+Faites réagir vos applications à vos données. App Components ne prenait auparavant en charge qu'une mise en forme statique, de sorte qu'un projet « À risque » ressemblait exactement à un projet « Sur la bonne voie » à moins de créer une solution personnalisée. La mise en forme conditionnelle intègre la mise en forme basée sur des règles directement dans App Studio, sans pro-code requis.
 
-#### Déplacer et copier des cartes
+Définissez des règles de seuil — supérieur à, inférieur à ou entre — sur les champs numériques, textuels et de date, puis choisissez comment chaque widget réagit : couleur de police, mise en forme en gras ou soulignée, remplissage et texte de pastille, icônes, ou même l'affichage et le masquage complets des widgets. C'est un choix naturel pour les suivis de projets, les tableaux de pipeline et les tableaux de bord de statut, où les utilisateurs doivent voir la priorité, le statut et le risque d'un coup d'œil.
 
-La fonctionnalité Déplacer/Copier des tableaux de bord est désormais disponible dans App Studio. Accédez-y depuis le menu à trois points du panneau de droite pour déplacer ou copier des cartes entre les pages.
+Les règles peuvent également faire référence à une colonne différente de celle qui est mise en forme. Par exemple, lorsque la marge dépasse 20 % pour une ville, vous pouvez mettre en surbrillance en bleu les ventes totales de cette ville. Les règles sont évaluées dans l'ordre où elles sont répertoriées, ce qui vous permet de garder le contrôle exact de la façon dont vos applications signalent ce qui compte.
 
-<Frame>![](/images/kb/app_studio_move_copy_cards.jpeg)</Frame>
+Apprenez-en plus sur [l'application de la mise en forme conditionnelle dans App Components](/fr/s/article/Apply-Conditional-Formatting-and-Conditional-Rendering-in-App-Components).
 
-### Indicateur visuel des DataSets archivés
+#### Group By et agrégations
 
-Domo optimise l'accès aux données en archivant les DataSets qui n'ont pas été interrogés par des cartes ou par Analyzer pendant un certain temps. Les DataSets archivés ne sont pas supprimés, mais ils ne sont pas accessibles tant qu'ils ne sont pas désarchivés. L'avis d'état archivé a été rendu plus visible afin qu'il ne soit plus facile de le manquer :
+Arrêtez de créer des DataFlows uniquement pour résumer vos données. App Components affichait auparavant les données au niveau de la ligne, de sorte que la création d'une vue récapitulative impliquait de créer un DataFlow ou une vue de DataSet distincte — un processus qui pouvait prendre des heures. Vous pouvez désormais grouper et agréger directement dans le composant.
 
-- La notification apparaît désormais en haut de l'onglet Vue d'ensemble du DataSet
-- Elle utilise le rouge pour attirer l'attention et signaler que vous devrez peut-être agir pour accéder au DataSet
+Dans la nouvelle catégorie Group by du panneau de filtres, un menu déroulant à sélection multiple vous permet de choisir une ou plusieurs colonnes à grouper, puis d'ajouter des agrégations aux widgets numériques pour obtenir une vue riche et résumée. Après qu'un groupe est en place, toutes les colonnes de texte supplémentaires que vous ajoutez à un widget non numérique sont automatiquement ajoutées au Group By, ce qui maintient votre vue cohérente au fur et à mesure de la création.
 
-Cette mise à jour réduit la confusion et clarifie le moment où un DataSet est archivé ainsi que la manière de le désarchiver.
+Apprenez-en plus sur [le groupement et l'agrégation des données dans App Components](/fr/s/article/Group-and-Aggregate-Data-in-App-Components).
 
-<Frame>![](/images/kb/archived_datasets_indicator.png)</Frame>
+#### Widget Numeric
 
-### Authentification par principal de service Active Directory pour Azure SQL
+Créez des KPI modernes et accrocheurs sans écrire un seul Beast Mode. Le nouveau widget Numeric vous permet de choisir n'importe quelle colonne de votre DataSet et d'appliquer une agrégation directement sur le widget, notamment Somme, Moyenne, Nombre, Min, Max et Nombre distinct.
 
-Les intégrations dans le cloud Azure SQL prennent désormais en charge le principal de service Active Directory comme méthode d'authentification native. Auparavant limitées à l'authentification par nom d'utilisateur et mot de passe, les connexions Azure SQL peuvent désormais utiliser un accès par identité basé sur un service, ce qui assure une cohérence entre vos sources de données Azure et élimine le besoin d'identifiants d'utilisateur partagés.
+Filtrez chaque nombre par colonne ou par plage de dates relative — aujourd'hui, hier, dernier, précédent ou suivant — et démarrez plus rapidement avec trois nouveaux modèles de KPI. Toute la mise en forme des nombres sur laquelle vous comptez déjà, y compris les décimales, les préfixes et suffixes et les abréviations, est conservée, de sorte que vous gagnez en flexibilité sans rien perdre.
 
-Lors de la création ou de la modification d'une intégration dans le cloud Azure SQL, sélectionnez Principal de service Active Directory comme méthode d'authentification sur l'écran de configuration de l'intégration.
+Apprenez-en plus sur [la création de KPI avec le widget Numeric](/fr/s/article/Create-a-KPI-Component-in-App-Studio).
 
-### Optimisations de l'intégration de cartes
+#### Composant Sections
 
-Les optimisations de l'intégration de cartes introduisent des mises à jour du cadre d'intégration, offrant une interface utilisateur intégrée améliorée et des capacités de personnalisation étendues. Vous pouvez désormais activer ou désactiver des fonctionnalités telles que les segments, les filtres rapides et les variables, et configurer des paramètres comme la couleur d'arrière-plan, la couleur de la ligne d'échelle et la couleur du texte. Les cartes s'affichent avec un dimensionnement et une mise à l'échelle plus nets, et l'exploration fonctionne comme prévu avec un bouton de retour, un fil d'Ariane des filtres visible et le tableau de données final. Cela ajoute également la prise en charge des cartes Notebook, au-delà des graphiques et des applications personnalisées.
+Transformez un long flux de cartes en une histoire claire et facile à parcourir. Le nouveau composant Sections vous permet de regrouper des cartes connexes dans des zones nommées et visuellement distinctes d'une page App Studio, chacune avec un titre et une carte héros facultative pour ancrer le récit.
 
-Les captures d'écran suivantes montrent la différence entre l'ancienne et la nouvelle expérience de carte intégrée.
+Les sections peuvent être réduites et développées, de sorte que les utilisateurs peuvent se concentrer sur les KPI les plus importants sans faire défiler du contenu sans rapport. Les auteurs disposent d'un moyen natif et sans code de structurer les applications qui nécessitaient auparavant des composants personnalisés ou des solutions de contournement, et App Catalyst peut utiliser Sections pour générer automatiquement des applications plus riches et mieux organisées.
 
+Apprenez-en plus sur [le regroupement de contenu avec Sections dans App Studio](/fr/s/article/Group-Content-with-Sections-in-App-Studio).
 
-<Frame>![Card embedded using the older framework — no controls panel](/images/kb/card-embed-v2-example.png)</Frame>
+### App Studio : Téléchargement PDF rapide
 
-<Frame>![Card embedded using the new framework — Controls panel open with quick filters and variable selectors](/images/kb/card-embed-v2-with-controls.png)</Frame>
+Vous avez parfois besoin d'un aperçu rapide d'une application, et non d'un rapport entièrement conçu. Vous pouvez désormais télécharger n'importe quelle application App Studio au format PDF en un clic depuis le menu Distribuer, de la même manière que vous téléchargez déjà les tableaux de bord au format PDF. L'exportation capture la vue actuelle de votre application, ce qui vous permet de l'enregistrer, de l'imprimer ou de la joindre à un e-mail sans configuration supplémentaire.
 
-La boîte de dialogue d'intégration reflète également ces changements. La nouvelle version fait apparaître des options d'affichage supplémentaires (segments, filtres rapides, variables) et affiche à la fois la nouvelle URL d'intégration et l'URL bientôt obsolète, afin que vous puissiez identifier la version utilisée et migrer vers la nouvelle expérience d'intégration.
+### App Studio : Report Builder
 
-<Frame>![Domo Everywhere embed modal showing new display options, the new embed URL, and the deprecated URL marked for migration](/images/kb/card-embed-enhancements-modal.png)</Frame>
+Report Builder vous permet de créer des rapports PDF personnalisables et prêts à imprimer dans App Studio, de les planifier pour une livraison automatique par e-mail et de permettre aux utilisateurs d'applications intégrées de les exporter sans quitter votre portail.
 
-Apprenez-en plus sur les [optimisations de l'intégration de cartes](https://www.domo.com/docs/s/article/360043437993#card-embed-enhancements).
+#### Rapports PDF et planificateur
 
-<Warning>**Important :** L'ancien cadre d'intégration de cartes sera obsolète le **31 mars 2027**. Veuillez mettre à jour toutes les cartes intégrées vers la nouvelle URL avant cette date.</Warning>
+Quelle que soit l'interactivité de vos applications, les cadres veulent toujours des rapports au format PDF — sur leur bureau ou dans leur boîte de réception, selon une cadence prévisible. Report Builder vous offre un moyen entièrement personnalisable de créer des rapports PDF au pixel près directement dans App Studio, sans maintenir des tableaux de bord dupliqués uniquement pour l'impression.
 
-Pour des instructions de migration étape par étape concernant l'intégration publique, privée et programmatique, consultez [Migrer les cartes intégrées vers la nouvelle URL d'intégration de cartes](/s/article/Migrate-Embedded-Cards-to-the-New-URL).
+Créez un rapport à partir de zéro, à partir de pages d'applications existantes ou à partir de vos rapports par e-mail existants, puis façonnez chaque page dans un panneau d'aperçu visuel. Et grâce au nouveau planificateur de PDF, vous pouvez configurer un rapport une fois et le faire livrer automatiquement, au lieu de l'ouvrir, de le télécharger et de le joindre à la main chaque semaine.
 
+Les points forts incluent :
 
-### Visibilité de l'utilisation et suppression des packages Code Engine
+- Des en-têtes et pieds de page personnalisables avec du texte intelligent pour les numéros de page, les dates et plus encore, afin que chaque rapport soit soigné et cohérent
+- Un contrôle au niveau de la page pour ajouter ou supprimer des pages et pour redimensionner, réorganiser ou supprimer du contenu sur n'importe quelle page depuis le panneau d'aperçu
+- Une pagination de tableau propre, avec des tableaux qui s'étendent sur plusieurs pages avec des en-têtes fixes afin que le contenu ne soit jamais coupé au milieu d'une ligne
+- Des vues de rapport filtrées qui vous permettent de créer différentes versions du même rapport pour différents publics
+- Une livraison de PDF planifiée qui envoie par e-mail une vue de rapport enregistrée en pièce jointe PDF selon un calendrier récurrent
+- Des actions en un clic qui ajoutent un bouton à n'importe quelle application App Studio pour télécharger un PDF ou envoyer un rapport par e-mail
 
-Vous pouvez désormais voir où vos packages Code Engine déployés sont utilisés et supprimer les packages qui ne sont plus référencés nulle part dans Domo.
+Apprenez-en plus sur [App Studio Report Builder](/fr/s/article/000005829).
 
-La visibilité de l'utilisation vous offre une vue claire et en temps réel de chaque application personnalisée et flux de travail référençant un package, y compris un décompte des références privées auxquelles vous n'avez pas accès, afin que vous connaissiez toujours la portée complète d'un package avant d'effectuer une modification. La suppression sécurisée vous permet ensuite de supprimer définitivement les packages déployés qui ne sont plus utilisés, offrant une voie de correction pour les packages qui ont été publiés avec des informations sensibles telles que des clés d'API ou des identifiants.
+#### Exportations de rapports dans les applications intégrées
 
-Les principaux avantages sont les suivants :
+Les applications App Studio intégrées peuvent désormais livrer des PDF Report Builder, de sorte que vos utilisateurs finaux obtiennent le rapport sans quitter votre portail ou votre produit. Auparavant, obtenir un PDF à partir d'une intégration impliquait de quitter l'expérience ou de demander à quelqu'un disposant d'un accès Domo de l'exporter.
 
-- Une visibilité complète de l'utilisation dans les applications personnalisées et les flux de travail avant d'effectuer des modifications
-- La suppression sécurisée des packages déployés qui ne sont plus référencés
-- Une suppression encadrée qui est bloquée dès qu'une utilisation existe, y compris les références que vous ne pouvez pas voir
-- La protection des packages fournis par Domo, qui ne peuvent pas être supprimés
+Dans les intégrations privées, les utilisateurs peuvent télécharger un PDF en un clic ou utiliser Envoyer maintenant pour partager un rapport, les deux via des interactions de boutons que vous ajoutez à votre application. Les intégrations publiques bénéficient d'une option d'impression au format PDF améliorée, de sorte que chaque expérience intégrée dispose d'un moyen de produire un rapport propre.
 
-### Écriture différée Databricks vers les instances Domo hébergées sur Azure
+### Générateur de règles de colonnes calculées
 
-L'écriture différée Databricks est désormais prise en charge sur les instances Domo hébergées sur Azure. Auparavant disponible uniquement sur les instances Domo hébergées sur AWS, l'écriture différée Databricks fonctionne désormais quel que soit l'emplacement d'hébergement de votre instance Domo, afin que les clients dont Domo est hébergé sur Azure puissent réécrire des données dans leur environnement Databricks — pour Azure comme pour AWS Databricks — sans modifier leur flux de travail existant.
+Créez des colonnes conditionnelles sans écrire une ligne de SQL. Le Générateur de règles de colonnes calculées est un outil visuel et sans code pour créer des colonnes conditionnelles, désormais disponible de manière générale partout où des champs calculés sont créés, notamment Analyzer, App Studio et Beast Mode Manager. Au lieu de taper des formules CASE WHEN complexes en DQL (le Beast Mode SQL de Domo), vous construisez des règles guidées IF/THEN à l'aide de menus déroulants intuitifs.
 
-### Mise à jour de l'authentification héritée
+Avec le Générateur de règles, vous empilez les règles de haut en bas : sélectionnez une colonne Texte, Nombre ou Date, choisissez un opérateur tel que Is, Is between ou Is in, spécifiez vos valeurs de sortie et définissez une règle Else globale à la fin. Les règles les plus hautes dans la liste sont prioritaires. Comme les règles sont enregistrées au format JSON, vos colonnes restent entièrement modifiables dans le générateur visuel à tout moment au lieu de se verrouiller dans du SQL brut, et vous pouvez conserver un calcul sur la carte ou l'enregistrer dans le DataSet afin que d'autres puissent le réutiliser.
 
-Domo met à jour sa manière de gérer l'authentification des utilisateurs et retire un ancien jeton de connexion appelé DA-SID. Il s'agit d'une amélioration de sécurité en coulisses, et la plupart des utilisateurs ne remarqueront aucun changement. Domo contactera directement tout client devant agir.
+### Rapport DomoStats des requêtes des intégrations dans le cloud
+
+Obtenir une visibilité complète sur les performances de votre intégration dans le cloud est désormais plus facile que jamais. Le nouveau rapport DomoStats des requêtes des intégrations dans le cloud vous offre une fenêtre instantanée et basée sur les données sur les flux de travail de votre entrepôt de données dans le cloud.
+
+Maintenez vos pipelines à des performances optimales grâce à des rapports complets qui suivent le volume total de requêtes, les temps d'exécution, les taux de réussite du cache et les taux d'erreur, le tout dans une vue centralisée. En combinant des informations proactives sur les performances avec une transparence opérationnelle approfondie, vous pouvez optimiser vos requêtes, résoudre les problèmes plus rapidement et vous assurer que votre écosystème de données dans le cloud offre une valeur maximale.
+
+Apprenez-en plus sur le [connecteur DomoStats](/fr/s/article/360043433813).
+
+### Paramètres de mise en cache au niveau du DataSet
+
+Certains DataSets changent toutes les quelques minutes tandis que d'autres ne changent presque jamais. La mise en cache était auparavant définie au niveau de l'intégration dans le cloud, de sorte que chaque DataSet de cette intégration partageait la même durée de vie (TTL) de cache, et l'ajustement d'un seul impliquait de créer et de maintenir une intégration distincte. Sinon, les équipes actualisaient trop souvent les données à évolution lente et payaient pour des requêtes inutiles, ou actualisaient trop peu les données à évolution rapide et obtenaient des résultats obsolètes.
+
+Le nouvel onglet Data Caching dans les paramètres de votre intégration dans le cloud vous permet de définir un TTL pour chaque DataSet individuellement, indépendamment de l'intégration qui l'alimente. Cette mise à jour vous permet de :
+
+- Adapter la mise en cache aux données en définissant différents TTL pour différents DataSets sans dupliquer les intégrations
+- Réduire les coûts de requête en n'actualisant pas les données à évolution lente qui n'en ont pas besoin
+- Garder les données à évolution rapide plus fraîches en ajustant le TTL d'un DataSet indépendamment du reste de l'intégration
+- Éviter la consommation gaspillée, car Domo vérifie la fraîcheur uniquement lorsqu'un DataSet est interrogé et que son TTL a expiré, de sorte que les données inactives ne déclenchent pas de vérifications redondantes
+
+Apprenez-en plus sur [la configuration de la fraîcheur des données et de la mise en cache dans les intégrations dans le cloud](/fr/s/article/Configure-Data-Freshness-and-Caching-in-Cloud-Integrations).
+
+### Optimisations de Domo Everywhere
+
+Les nouvelles mises à jour de Domo Everywhere donnent aux administrateurs plus de contrôle sur leur écosystème intégré, de la personnalisation des fonctionnalités dans les instances d'abonnés au retrait permanent des liens d'intégration dont ils n'ont plus besoin.
+
+#### Suppression des liens d'intégration
+
+Désactiver une intégration ne la fait pas disparaître. Les liens d'intégration désactivés s'accumulent au fil du temps, et un ancien lien qui a été partagé une fois reste indéfiniment dans le système. Les administrateurs peuvent désormais supprimer définitivement les liens d'intégration des cartes, des tableaux de bord et des applications App Studio directement depuis l'Embed Manager en masse, en utilisant le même flux de sélection et de modification que Update Embed Type et Change Embed Owner.
+
+Pour éviter la suppression accidentelle d'un lien encore utilisé, la suppression n'est disponible que pour les intégrations déjà désactivées. Si vous intégrez à nouveau ce contenu plus tard, un tout nouveau lien d'intégration est généré, de sorte qu'un lien supprimé ne peut jamais être réactivé.
+
+Apprenez-en plus sur [la suppression définitive des liens d'intégration dans l'Embed Manager](/fr/s/article/360043437993).
+
+#### Gestion de fonctionnalités supplémentaires dans les modèles d'instance
+
+Gérer des fonctionnalités dans des dizaines ou des centaines d'instances d'abonnés est difficile lorsque vous êtes limité aux paramètres disponibles dans l'interface utilisateur. La gestion étendue des fonctionnalités dans les modèles d'instance vous donne une visibilité sur davantage de fonctionnalités que vous pouvez activer ou désactiver dans vos instances d'abonnés. Créez des configurations de modèle personnalisées qui adaptent l'expérience pour chacun de vos clients, puis déployez-les à grande échelle.
+
+<Note>**Remarque :** Cette fonctionnalité est disponible uniquement pour les clients en consommation.</Note>
+
+Besoin d'une fonctionnalité qui n'est pas répertoriée ? Contactez votre équipe de compte Domo.
+
+Apprenez-en plus sur [la configuration de fonctionnalités supplémentaires à l'aide des modèles d'instance](/fr/s/article/000005786).
+
+### Calendriers globaux et fiscaux pour les intégrations dans le cloud
+
+Toutes les organisations ne fonctionnent pas selon un calendrier standard de janvier à décembre. Les intégrations dans le cloud Snowflake et Databricks vous permettent désormais d'enregistrer votre propre table de calendrier, afin que les cartes et les rapports suivent l'exercice fiscal de votre entreprise ou affichent les étiquettes de date dans une autre langue — des rapports précis basés sur les périodes sans copier les données hors de votre entrepôt.
+
+Auparavant, les intégrations dans le cloud calculaient les dates avec des fonctions SQL standard, qui échouaient pour les exercices fiscaux qui commencent en avril, juillet ou octobre, ou qui définissent les mois par un nombre fixe de semaines comme 4-4-5, 4-5-4 et 5-4-4. Vous pouvez désormais pointer Domo vers un calendrier fiscal ou un calendrier standard localisé dans votre propre entrepôt, soit en générant un nouveau calendrier avec un assistant guidé, soit en en connectant un que vous avez déjà. Après l'enregistrement, les cartes et les rapports Analyzer l'utilisent pour piloter un regroupement de dates précis ainsi que les comparaisons d'une année sur l'autre et d'un mois sur l'autre.
+
+Cette fonctionnalité est disponible sur demande pour les intégrations Snowflake et Databricks. Contactez le support Domo pour activer les calendriers pour votre instance.
+
+Apprenez-en plus sur [la configuration de calendriers fiscaux et localisés pour les intégrations dans le cloud](/fr/s/article/Configure-Fiscal-and-Localized-Calendars-for-Snowflake-and-Databricks-Integrations).
 
 ### Optimisations de Magic ETL
 
-<Note>**Remarque :** Regardez la rediffusion du [webinaire Magic: Reloaded](https://www.youtube.com/watch?v=ddYDlKo85Ic) pour voir des démonstrations de ces fonctionnalités.</Note>
+La dernière mise à jour de Magic ETL vous permet de traiter des collections de fichiers non structurés sans quitter votre pipeline de données.
 
-#### Mosaïque de classification
+#### Mosaïque d'entrée Documents
 
-La mosaïque de classification par IA catégorise vos données, y compris le texte, les images et les fichiers, dans des classes prédéfinies, ce qui vous permet de vous concentrer sur vos entités de classification plutôt que sur les détails de configuration.
+Le traitement du contenu de fichiers non structurés tels que les PDF, les images et les documents Office nécessitait auparavant de télécharger des fichiers et de gérer les transformations en dehors de Domo, ce qui brisait l'automatisation, la gouvernance et le lignage du pipeline. La mosaïque d'entrée Documents intègre le traitement natif des données non structurées directement dans Magic ETL.
 
-Apprenez-en plus sur la [mosaïque de classification dans Magic ETL](https://www.domo.com/docs/s/article/000005741#classification-tile).
+Située dans la section Documents de la palette de mosaïques, cette mosaïque vous permet de sélectionner n'importe quelle Document Collection comme entrée d'ETL avec des mappages de colonnes pré-remplis et personnalisables. En intégrant le contenu basé sur des fichiers dans vos DataFlows automatisés, vous pouvez éliminer les transferts manuels, combiner les métadonnées de fichiers avec des DataSets structurés et rationaliser la diffusion du contenu pour les flux de travail en aval et AI Agent Knowledge.
 
-#### Convertir en SQL
+Apprenez-en plus sur les [mosaïques Documents dans Magic ETL](/fr/s/article/Magic-ETL-Tiles-Documents).
 
-L'option Convertir en SQL vous permet de voir le SQL sous-jacent généré par les actions de glisser-déposer dans vos DataFlows. Vous pouvez personnaliser et modifier le SQL dans chaque mosaïque, ou extraire une action sous forme de SQL pour la documentation ou pour utiliser la logique dans un autre système. Voir le SQL derrière vos DataFlows vous aide, vous et vos équipes de support, à diagnostiquer les problèmes, à optimiser les requêtes et à améliorer les performances.
+### Optimisations des applications pro-code
 
-#### Disposition de fenêtres personnalisable
+Les nouvelles mises à jour des applications pro-code permettent aux développeurs de créer des expériences multi-applications coordonnées avec une messagerie sécurisée et ciblée entre les applications, et de trouver plus rapidement les ressources dont ils ont besoin dans une Asset Library repensée.
 
-Vous pouvez désormais personnaliser la position des fenêtres dans votre canevas de création Magic ETL, y compris le volet des actions, le volet de configuration et la fenêtre d'aperçu, et choisir si chacun est épinglé ouvert ou fermé. Enregistrez et conservez vos dispositions dans tous les DataFlows afin que Magic ETL s'adapte à votre façon de travailler sur différents écrans.
+#### App Broadcasting
 
-#### Mode sombre
+Les applications personnalisées sur la même page Domo n'avaient auparavant aucun moyen pris en charge de communiquer entre elles. Les développeurs s'appuyaient sur les filtres de page ou les Variables comme solutions de contournement, ce qui affectait chaque carte de la page et créait des effets secondaires involontaires.
 
-Le mode sombre est désormais disponible dans le canevas Magic ETL. Choisissez une apparence par défaut pour votre canevas, notamment claire, sombre ou héritée du paramètre de votre système, ce qui vous donne le contrôle sur la façon dont vous affichez et utilisez Magic ETL.
+App Broadcasting résout ce problème avec un système sécurisé de publication/abonnement qui permet aux applications d'envoyer et de recevoir des messages sur des canaux nommés. Cliquer sur une ligne dans une application de liste peut charger ses détails dans une application de panneau de détails, ou une application de carte et une carte KPI peuvent réagir à la même sélection d'utilisateur, le tout sans navigation de page ni filtre au niveau de la page qui affecte toutes les autres cartes. App Broadcasting vous permet de :
 
-#### Carte thermique des détails d'exécution
+- Coordonner les applications avec précision grâce à deux nouvelles méthodes domo.js pour envoyer et recevoir des messages entre des applications spécifiques
+- Connecter les applications visuellement dans App Studio afin qu'elles fonctionnent ensemble sans écrire de code d'intégration
+- Définir des contrats clairs en déclarant les canaux de publication et d'abonnement dans manifest.json, afin qu'il soit toujours explicite ce que chaque application envoie et écoute
+- Rester sécurisé, puisque tous les messages sont routés via Domo plutôt que directement entre les applications, et que chacun porte un ID d'expéditeur vérifié qui ne peut pas être usurpé
 
-Lors de l'analyse des exécutions d'un DataFlow, il peut être difficile de déterminer quelles actions représentent la majeure partie du temps de traitement, ou à quel endroit les lignes disparaissent ou se multiplient. Une carte thermique et les métriques de télémétrie associées ont été ajoutées à la page des détails d'exécution du DataFlow afin que vous puissiez résoudre les problèmes et mieux comprendre les exécutions. Sélectionnez parmi les options de télémétrie, notamment l'impact sur l'utilisation des ressources, les lignes traitées et les lignes en sortie, et affichez la métrique de chaque action directement sur le graphique d'exécution.
+Apprenez-en plus sur [App Broadcasting](https://www.domo.com/docs/portal/Apps/App-Framework/Guides/broadcasting).
 
-<Frame>![](/images/kb/magic_etl_execution_heatmap.png)</Frame>
+#### Mises à jour de l'Asset Library
 
-#### Charger les versions antérieures du DataFlow
+À mesure que votre bibliothèque d'images, d'icônes et de ressources de marque s'agrandit, trouver la bonne peut nécessiter du défilement, des clics et des conjectures supplémentaires. Les nouvelles mises à jour de l'Asset Library renouvellent la page d'accueil avec une présentation plus épurée et moderne, cohérente avec le reste de Domo. Une hiérarchie visuelle plus claire et des aperçus plus faciles vous aident à parcourir, trouver et réutiliser les ressources plus rapidement, même à mesure que votre bibliothèque s'agrandit. Vos ressources et flux de travail existants restent inchangés, il n'y a donc rien de nouveau à apprendre ou à migrer.
 
-Vous pouvez désormais afficher les versions antérieures d'un DataFlow sans devoir d'abord faire d'une version antérieure la version actuelle. Ouvrez une version antérieure pour voir toute sa logique et sa configuration, puis enregistrez-la comme une nouvelle version ou comme un DataFlow entièrement nouveau.
-
-#### Mosaïque SQL multi-instructions
-
-La mosaïque SQL multi-instructions vous permet d'écrire plusieurs instructions SQL dans une seule mosaïque plutôt que d'enchaîner plusieurs mosaïques SQL, et de créer plusieurs sorties. Cela offre une sensation plus proche du code et vous permet de créer des tables intermédiaires dans le cadre d'un seul script SQL.
-
-#### Nouveaux contrôles de navigation du canevas
-
-Vous pouvez désormais choisir la façon dont vous naviguez dans le canevas Magic ETL. En plus du comportement de navigation par défilement d'origine, une nouvelle option de navigation par cliquer-glisser vous permet de cliquer et de faire glisser pour vous déplacer dans le canevas, comme dans d'autres outils basés sur un canevas. Définissez votre préférence dans le menu Préférences utilisateur de Magic ETL.
-
-<Frame>![](/images/kb/magic_etl_canvas_navigation.png)</Frame>
-
-#### Paramètres persistants au niveau de l'utilisateur
-
-Vous pouvez désormais conserver les préférences au niveau de l'utilisateur dans tous vos DataFlows d'une instance, notamment la variante des lignes de quadrillage, l'apparence (mode clair ou sombre), la mise à niveau de la disposition et l'affichage ou non des « lignes en sortie » pour les exécutions d'aperçu.
-
-#### Nombre de lignes dans les aperçus
-
-Lorsque vous exécutez un aperçu pendant la création d'un DataFlow, vous pouvez désormais voir le nombre de lignes produites par chaque action, affiché sur les nœuds de sortie ou à proximité. Cela facilite le suivi de la façon dont chaque action affecte vos données et la détection des problèmes de qualité avant de créer le DataSet de sortie.
-
-#### Optimisations de la mosaïque Sélectionner des colonnes
-
-La mosaïque Sélectionner des colonnes a été repensée pour faciliter la réorganisation et la gestion des colonnes, avec de meilleures options pour réorganiser les colonnes et les groupes de colonnes.
-
-#### Mosaïque d'analyse des sentiments
-
-La mosaïque d'analyse des sentiments classe automatiquement le texte tel que les avis, les publications sur les réseaux sociaux et les enquêtes comme positif, négatif ou neutre, afin que vous puissiez surveiller la réputation de la marque et agir en fonction des résultats.
-
-Apprenez-en plus sur la [mosaïque d'analyse des sentiments dans Magic ETL](https://www.domo.com/docs/s/article/000005741#sentiment-analysis-tile).
-
-### Abandon de l'éditeur d'applications Mason
-
-À partir du 14 octobre 2026, la possibilité de créer et de modifier des applications Mason ne sera plus disponible dans Domo. La création d'applications Mason, y compris la création de nouvelles applications Mason et la modification de celles qui existent, sera interrompue. Cela concerne toute personne qui crée ou maintient actuellement des applications à l'aide du cadre Mason.
-
-Les applications Mason existantes continueront de fonctionner et resteront accessibles aux utilisateurs finaux ; seule l'expérience de création et de modification est supprimée. Aucune modification n'est apportée aux autres outils de développement d'applications ni à l'écosystème App Studio plus large pour le moment.
-
-Si vous développez ou maintenez actuellement des applications Mason, nous vous recommandons de faire passer votre flux de travail de développement à Domo Apps (applications personnalisées).
-
-Apprenez-en plus sur la [création d'applications Domo avec l'éditeur Pro-code](https://www.domo.com/docs/s/article/000005500).
-
-### Nouvelles améliorations de graphiques dans App Studio et Analyzer
-
-Trois nouveaux types de graphiques et des barres arrondies offrent à vos applications davantage de façons d'afficher les données et un aspect plus moderne :
-
-- **Multi Progress Bar** attribue à chaque catégorie sa propre ligne, affichant la valeur réelle, le maximum et l'objectif sur une seule ligne
-- **Symbol Matrix** trace deux dimensions dans une grille, en dimensionnant et en colorant chaque symbole selon la valeur
-- **Ribbon Chart** relie les segments empilés entre les catégories, afin que les variations de part et de rang se lisent comme un mouvement
-
-Les barres prennent désormais aussi en charge les coins arrondis pour un aspect plus doux et plus moderne dans toute votre application.
-
-<Frame>![](/images/kb/new_chart_improvements.png)</Frame>
-
-### Intégration à la nouvelle navigation de gauche
-
-Domo facilite désormais la découverte de la nouvelle navigation de gauche et le passage à celle-ci. Les administrateurs voient une bannière dans le produit annonçant que la nouvelle navigation est disponible, avec une option En savoir plus qui ouvre les Paramètres de navigation, où vous pouvez l'activer pour tous les utilisateurs, pour les administrateurs uniquement ou pour un groupe spécifique. Les Paramètres de navigation renvoient également vers de la documentation et d'autres ressources pour vous aider à planifier le changement.
-
-Lorsqu'un administrateur active la nouvelle navigation, chaque utilisateur est accueilli lors de sa première connexion par un court message et une vidéo présentant la nouvelle expérience.
-
-Apprenez-en plus sur la [migration des utilisateurs vers la nouvelle navigation de gauche](https://www.domo.com/docs/s/article/Migrate-Users-to-the-New-Left-Navigation).
-
-### Intégrations en lecture seule uniquement avec OAuth
-
-Vous pouvez désormais créer nativement une intégration uniquement avec OAuth qui est en lecture seule pour chaque moteur qui prend en charge OAuth, notamment Databricks, Snowflake et BigQuery. Les entreprises qui se standardisent sur OAuth peuvent se connecter à l'aide de l'authentification OAuth d'utilisateur à machine sans configurer d'autres types d'identifiants.
-
-### Prise en charge des pvariables pour les tableaux de bord, App Studio et Embed
-
-Domo prend désormais en charge les pvariables dans les tableaux de bord, App Studio et Embed. Transmettez un paramètre d'URL de page pour appliquer des variables au chargement de la page, afin qu'un lien puisse s'ouvrir avec les bonnes valeurs de variables déjà en place.
-
-Apprenez-en plus sur les [variables dans Domo](https://www.domo.com/docs/s/article/7903767835031).
-
-### Mise en forme régionale des dates et des nombres
-
-Domo met désormais en forme les dates et les nombres selon la norme internationale CLDR, ce qui garantit une mise en forme cohérente sur tous les navigateurs et systèmes d'exploitation.
-
-### Optimisations des Flux de travail
-
-#### Prise en charge de l'absence de lignes pour la tâche de requête de DataSet
-
-La tâche de requête de DataSet prend désormais en charge les requêtes qui ne renvoient aucun résultat. Vous pouvez enregistrer des configurations et générer des paramètres de sortie même lorsqu'une requête ne renvoie aucune ligne, ce qui facilite la conception et le test de scénarios où des jeux de résultats vides sont attendus. Les tâches de requête de DataSet s'exécutent désormais aussi avec succès au moment de l'exécution lorsqu'aucune donnée n'est renvoyée.
-
-#### Déclencheur MCP
-
-Le nouveau déclencheur MCP offre à l'IA une manière prise en charge, encadrée et spécialement conçue pour démarrer un flux de travail directement, plutôt que de détourner des déclencheurs conçus pour d'autres cas d'usage. Le déclencheur MCP est activé automatiquement lorsqu'un flux de travail est déployé, aucune configuration n'est donc requise, et la page des détails d'exécution du flux de travail indique quand un flux de travail a été démarré par l'IA pour une visibilité claire des exécutions initiées par l'IA.
-
-Apprenez-en plus sur la [connexion d'outils d'IA à Domo à l'aide de MCP](https://www.domo.com/docs/s/article/Connect-AI-Tools-to-Domo-Using-MCP) et la [gestion des Flux de travail](https://www.domo.com/docs/s/article/000005179).
-
-#### Gestion des versions des fonctions Code Engine
-
-La mise à jour des versions des fonctions Code Engine dans les Flux de travail est désormais plus facile grâce à la nouvelle option Changer de version. Comparez les entrées et les sorties entre votre version de fonction actuelle et la version vers laquelle vous souhaitez basculer avant d'effectuer la modification, afin d'avoir une visibilité claire sur les différences de paramètres. Lorsque les mêmes entrées et sorties existent dans les deux versions, les mappages existants sont conservés automatiquement, ce qui élimine tout remappage inutile.
-
-## Fast Follows - 1er octobre
-
-### Mises à jour de Conversation par IA
-
-Conversation par IA peut désormais gérer des questions complexes en plusieurs parties et répondre à des questions qui couvrent plusieurs DataSets. Bien que les jointures et les unions entre DataSets ne soient toujours pas prises en charge ; à la place, elle interroge chaque DataSet indépendamment et synthétise les résultats. Elle prend également en charge une analyse plus approfondie et fonctionne désormais avec Documents (données non structurées). De plus, elle prend désormais en charge les visualisations, ce qui vous permet de les afficher et de les créer. Vous pouvez téléverser des fichiers, coller des images et utiliser des @mentions pour inclure des connaissances supplémentaires. Conversation par IA a désormais accès à la base de connaissances (KB), ce qui élargit ce que vous pouvez accomplir de manière conversationnelle dans Domo.
-
-Apprenez-en plus sur [Conversation par IA](https://www.domo.com/docs/s/article/AI-Chat-v2).
-
-### Modèle de consommation de Conversation par IA
-
-Conversation par IA s'appuie désormais sur le modèle de consommation AI Pro de Domo pour l'utilisation des crédits, ce qui aligne Conversation par IA sur le même cadre de consommation utilisé dans l'ensemble des fonctionnalités AI Pro de Domo.
-
-Apprenez-en plus sur [Conversation par IA](https://www.domo.com/docs/s/article/AI-Chat-v2).
+Apprenez-en plus sur l'[Asset Library](/fr/s/article/4403442101143).
 
 ## Fonctionnalités bêta
 
 <BetaNoteFr generic />
 
-### Webhook du journal d'activité
+### App Studio : Autorisations de page
 
-Vous pouvez désormais diffuser un sous-ensemble d'événements du journal d'activité vers une destination externe via un webhook, afin qu'un système que vous possédez puisse recevoir les événements d'activité au fur et à mesure qu'ils se produisent.
+Les applications App Studio étaient auparavant du tout ou rien : tous ceux qui avaient accès à une application voyaient chaque page. Donner aux publics des informations et un accès différents impliquait de créer et de maintenir des applications distinctes. Les Autorisations de page changent cela en vous permettant de définir des autorisations distinctes pour chaque page, directement dans l'éditeur App Studio et sans code.
 
-Apprenez-en plus sur le [journal d'activité](https://www.domo.com/docs/s/article/360042934574).
+Activez les autorisations de page dans la configuration de l'application de l'éditeur, puis utilisez Partager pour choisir quels utilisateurs ou groupes voient chaque page. Elles utilisent les Groupes existants de Domo, de sorte que les groupes dont vous disposez déjà sont prêts à l'emploi. Les cadres peuvent voir les finances tandis que les analystes voient le détail opérationnel dans la même application, et aucun ne voit ce qu'il ne devrait pas. Vous gérez l'accès aux pages en même temps que le reste de l'application, de sorte qu'une seule application est prête pour la production pour un déploiement multi-publics dès le premier jour.
 
-### MCP Toolkits - Alerts et Workspaces
+### Notes et historique des connecteurs
 
-L'offre MCP Toolkits - Alerts et Workspaces permet aux agents Domo AI de gérer les alertes et les espaces de travail en votre nom, afin que vous puissiez les gérer de manière conversationnelle via Domo AI. Les capacités incluent la création, la lecture, la mise à jour et la suppression complètes des alertes et des espaces de travail ; la gestion des concepts associés tels que les éléments, les dossiers, les abonnés et le partage ; et un comportement tenant compte des autorisations, puisque chaque outil respecte l'accès de l'utilisateur appelant aux ressources sous-jacentes.
+Jusqu'à présent, lorsque quelqu'un modifiait la configuration d'un DataSet, vous pouviez voir qu'une modification avait été apportée, mais pas pourquoi, ni ce qui était différent. Pour voir une configuration antérieure, vous deviez revenir à la configuration précédente, ce qui écrasait votre configuration et vos données actuelles.
 
-Apprenez-en plus sur la [connexion d'outils d'IA à Domo à l'aide de MCP](https://www.domo.com/docs/s/article/Connect-AI-Tools-to-Domo-Using-MCP).
+Avec cette bêta, vous pouvez ajouter une note chaque fois que vous modifiez une configuration pour enregistrer qui a apporté la modification, pourquoi et ce qui a changé. Les administrateurs peuvent voir ces notes dans DomoStats, ce qui facilite l'audit des modifications et la résolution des problèmes. Même lorsque personne ne laisse de note, vous pouvez comparer l'avant et l'après de toute modification de configuration sans revenir en arrière ni mettre vos données en danger. Le résultat est un enregistrement clair de la façon dont vos DataSets ont changé au fil du temps, de sorte que vous passez moins de temps à deviner pourquoi un DataSet se comporte soudainement différemment.
 
-### Diffusion d'applications
+### Connecteurs : Protection de schéma
 
-La diffusion d'applications permet aux applications personnalisées sur une même page Domo de communiquer entre elles en temps réel, sans dépendre des filtres de page ni des variables. Les capacités incluent :
+Les modifications de schéma dans les sources en amont, à savoir les suppressions inattendues de colonnes, les nouveaux ajouts ou les modifications de type de données, peuvent rompre silencieusement les DataFlows, les cartes, les applications et les chatbots en aval, obligeant les auteurs de contenu à se démener pour retracer le lignage et réparer les pipelines rompus. La Protection de schéma vous donne un contrôle proactif sur l'intégrité des données directement dans les configurations de votre connecteur.
 
-- Les applications peuvent publier des messages nommés sur un sujet et s'abonner aux messages d'autres applications de la page
-- Les applications cartographiques peuvent piloter les cartes KPI
-- Les panneaux de filtres peuvent mettre à jour jusqu'à trois graphiques à la fois
-- Les applications peuvent déclarer leurs canaux dans le fichier manifest.json, et App Studio fournit une interface de câblage visuelle afin que les auteurs puissent connecter les applications sans toucher au code
+Définissez des règles pour autoriser ou interdire les nouvelles colonnes, les modifications de type ou les suppressions de colonnes pendant l'indexation. Si une modification destructrice enfreint vos règles, le connecteur échoue rapidement, protégeant vos ressources en aval et empêchant des rapports corrompus ou incomplets.
 
-Des détails supplémentaires et des conseils de mise en œuvre sont disponibles dans la documentation pour développeurs sur developer.domo.com.
+### Page de présentation de l'intégration
 
-### MCP Toolkits - Automation
+Lorsque vous créez une nouvelle intégration dans le cloud, déterminer les étapes immédiates suivantes et trouver la documentation peut provoquer des frictions inutiles et ralentir le délai de rentabilisation. La nouvelle Page de présentation de l'intégration sert de page de destination dédiée conçue pour vous guider juste après la configuration.
 
-La nouvelle offre MCP Toolkits - Automation permet à Domo AI de créer, mettre à jour, gérer et exécuter en toute sécurité des automatisations dans l'ensemble de vos services d'automatisation grâce au langage naturel. Les kits d'outils sont disponibles dans l'AI Library, et tous les droits et autorisations existants pour ces services continuent de s'appliquer :
+Agissant comme votre plateforme centrale pour rationaliser l'intégration, la page représente le volume de requêtes, la mise en cache des requêtes et le temps de requête des sept derniers jours, et affiche vos tables connectées, vos sources de données en écriture inverse et votre calendrier de fraîcheur des données. Une carte d'intégrité vérifie la connectivité, l'autorisation et l'accès en lecture et en écriture. Exécutez une vérification à la demande avec **Check now** et obtenez une action suggérée pour chaque problème qu'elle détecte. Ensemble, ces éléments vous offrent des conseils clairs, des informations exploitables et un accès direct aux outils clés pour vous aider à accélérer l'adoption et à extraire de la valeur plus rapidement.
 
-- **MCP Toolkits - Workflows** couvre l'ensemble du cycle de vie du flux de travail
-- **MCP Toolkits - Code Engine** gère les packages Code Engine
-- **MCP Toolkits - Queues (Task Center)** gère les files d'attente de travail de Task Center
-- **MCP Toolkits - Forms** gère les formulaires
+### MCP Toolkit : Domo Embed
 
-Apprenez-en plus sur la [connexion d'outils d'IA à Domo à l'aide de MCP](https://www.domo.com/docs/s/article/Connect-AI-Tools-to-Domo-Using-MCP).
+Gérer les intégrations sur les cartes, les pages et les applications implique souvent une configuration répétitive, le suivi de la propriété et le nettoyage manuel du contenu obsolète. Avec le nouveau MCP Toolkit pour les Embeds, les assistants et agents IA se chargent de ce travail pour vous.
 
-### Intégration du générateur de modélisation des données et de la visualisation
+Demandez simplement à un agent de créer un jeton d'intégration, de mettre à jour les types de liens, de mettre à jour les options d'intégration, de réaffecter la propriété ou de supprimer des liens d'intégration en utilisant le langage naturel. Vous pouvez également demander à l'agent de générer du code d'intégration programmatique dans votre application. Les compétences acheminent chaque demande vers le bon outil, vous guident dans la configuration et vous demandent les détails manquants. Chaque action respecte vos autorisations de plateforme existantes, de sorte que vous pouvez accélérer la gestion des intégrations et réduire la prolifération sans compromettre la gouvernance.
 
-L'expérience de modélisation des données de Domo est désormais intégrée dans toute la couche BI, afin que vous puissiez créer un modèle sémantique une seule fois et l'utiliser dans Analyzer, App Studio, les filtres de cartes, les filtres de page et les tableaux de bord. Le rendu des graphiques, le filtrage, le tri, les nombres récapitulatifs et Beast Mode fonctionnent tous avec le modèle.
+Apprenez-en plus sur [la connexion des outils IA à Domo à l'aide de MCP](/fr/s/article/Connect-AI-Tools-to-Domo-Using-MCP).
 
-Les modèles prennent en charge les DataSets Magic ETL, les vues de DataSet et les DataSets Snowflake, ce qui vous permet de faire apparaître les données de l'entrepôt dans l'expérience de modélisation plutôt que de matérialiser de grandes tables plates redondantes.
+### Espaces de travail et navigation
 
-### Intégration de la vue sémantique
+La navigation de gauche est désormais plus rapide à personnaliser, ajoute des Smart Folders pour des collections en direct de votre contenu Domo et n'affiche à chaque personne que les éléments de navigation auxquels elle peut accéder.
 
-Vous pouvez désormais enregistrer une vue sémantique Snowflake via l'intégration dans le cloud comme n'importe quelle autre table Snowflake, afin que les tables, les relations, les synonymes, les descriptions et les métriques que vous avez déjà définis dans Snowflake soient importés dans Domo sans reconstruire cette logique métier à la main.
+#### Personnalisation de la navigation
 
-Domo importe la vue sémantique comme un modèle de données en lecture seule, affiche ses métadonnées dans le schéma Domo, mappe ses relations dans l'éditeur de modèle de données et expose ses dimensions, ses mesures et ses métriques dérivées dans Analyzer et App Studio. Snowflake reste la source de vérité, afin que les définitions des métriques restent cohérentes pendant que les analystes créent des cartes immédiatement sans recréer le modèle.
+Épinglez et organisez le contenu dans votre navigation de gauche en moins d'étapes. Un nouveau menu Ajouter remplace les onglets de type de contenu de la fenêtre modale d'épinglage par un seul menu déroulant et place Dossier (anciennement sous-menu) juste à côté, au lieu de l'intérieur des paramètres d'Emplacement. Le même flux rationalisé fonctionne que vous modifiiez votre propre navigation ou que vous créiez une configuration de navigation pour votre organisation, et c'est là que vous ajouterez de nouveaux types d'épinglage comme les Smart Folders.
 
-### Case Statement Builder
+#### Smart Folders de navigation
 
-Le Case Statement Builder fournit un générateur guidé pour les cas d'usage courants de logique conditionnelle, afin que vous n'ayez plus besoin de connaître le DQL pour construire une logique conditionnelle. Lors de la création d'un champ calculé, choisissez le Rule Builder ou un Beast Mode simple ; empilez les règles de haut en bas dans le Condition Builder ; et rouvrez les règles enregistrées dans le générateur plutôt qu'en SQL brut. Tout ce que le générateur ne peut pas gérer peut être converti en Beast Mode.
+Épingler du contenu à votre navigation ne va que jusqu'à un certain point : il n'y avait aucun moyen de faire apparaître une liste en direct de contenu par type, comme toutes les cartes auxquelles vous pouvez accéder ou tout ce que vous possédez. Les Smart Folders de navigation comblent cette lacune avec des collections en direct de votre contenu Domo, organisées par type ou par propriété, directement dans votre navigation de gauche et vos Espaces de travail.
 
-### Prise en charge de Documents dans Magic ETL
+Les Smart Folders prédéfinis couvrent les tableaux de bord, les applications, les cartes, les DataSets et plus encore, ainsi que des vues personnelles comme Possédé par moi, Créé par moi et Récents. Ajoutez-en un via Modifier > Ajouter > Smart Folder, ou à côté des dossiers dans un Espace de travail en tant que vue en lecture seule. Chacun n'affiche que le contenu que vous êtes autorisé à voir et se met à jour automatiquement à mesure que le contenu est créé, partagé ou supprimé, de sorte que vous pouvez trouver ce dont vous avez besoin en moins de clics. Les Smart Folders fonctionnent sur le web et sur mobile.
 
-Vous pouvez désormais intégrer des données de documents non structurés dans un DataFlow Magic ETL, les traiter avec vos autres données et réécrire les fichiers résultants dans une collection de documents. Trois nouvelles mosaïques sous Documents rendent cela possible :
+#### Configurations de navigation tenant compte des autorisations
 
-- **Collection Input** sélectionne une collection de documents comme entrée de votre ETL
-- **Document Read** lit les octets des fichiers d'une collection
-- **Document Write** écrit des fichiers dans une collection cible
-
-<Frame>![](/images/kb/etl_documents.png)</Frame>
-
-Apprenez-en plus sur les [mosaïques Documents dans Magic ETL](https://www.domo.com/docs/s/article/Magic-ETL-Tiles-Documents).
-
-### MCP Toolkits - Domo Sandbox
-
-L'offre MCP Toolkits - Domo Sandbox fournit des outils pour gérer les référentiels Domo Sandbox, notamment la création, la validation, la promotion, la suppression et la gestion du partage des référentiels, ainsi que l'orchestration pour relier ces actions. Ces kits d'outils sont disponibles dans l'AI Library.
-
-Apprenez-en plus sur la [connexion d'outils d'IA à Domo à l'aide de MCP](https://www.domo.com/docs/s/article/Connect-AI-Tools-to-Domo-Using-MCP).
-
-### Prise en charge des calendriers globaux et fiscaux
-
-Les intégrations dans le cloud vous permettent désormais d'enregistrer votre propre table de calendrier pour prendre en charge à la fois les calendriers fiscaux personnalisés et les calendriers standard, afin que les organisations ayant des exercices fiscaux non standard obtiennent des rapports précis basés sur les dates sans quitter leur entrepôt de données. Configurez-le de deux façons :
-
-- **Générer un nouveau calendrier** à l'aide d'un assistant guidé qui vous accompagne à travers le type de calendrier, le début de l'exercice fiscal, les dates de validation et la plage d'années
-- **Connecter un calendrier existant** en indiquant à Domo une table de calendrier qui existe déjà dans votre entrepôt
-
-Après l'enregistrement, les cartes et les rapports Analyzer utilisent le calendrier pour assurer un regroupement précis des dates et des comparaisons d'une période à l'autre, y compris la prise en charge des structures fiscales 4-4-5, 4-5-4 et 5-4-4.
-
-Apprenez-en plus sur la [configuration des calendriers fiscaux et standard pour les intégrations dans le cloud](https://www.domo.com/docs/s/article/Fiscal-and-Standard-Calendar-Configuration-for-Cloud-Integrations).
-
-## Problèmes résolus
-
-### Mappage du schéma du modèle de données sur BigQuery et Databricks
-
-L'interrogation d'un modèle de données sur BigQuery ou Databricks pouvait charger le mappage du schéma de manière incorrecte. Les modèles de données résolvent désormais correctement le schéma sur tous les moteurs pris en charge.
-
-### Performances du calcul de la traçabilité des données
-
-Le recalcul du nombre de cartes et d'autres artefacts en aval qu'un DataSet alimente pouvait être lent et, dans certains cas, signaler un décompte inexact. Le recalcul de la traçabilité est désormais plus rapide et plus précis.
+Partagez une seule navigation organisée avec tout le monde et laissez les autorisations décider de ce que chaque personne voit. Avec les configurations de navigation tenant compte des autorisations, un épinglage n'apparaît que pour les utilisateurs qui peuvent accéder à son contenu. Les administrateurs peuvent créer une seule navigation pour une équipe ou une organisation au lieu de versions distinctes pour chaque niveau d'accès, les utilisateurs obtiennent une navigation plus épurée sans liens sans issue, et les administrateurs passent moins de temps à maintenir les configurations.
 
 ## Support
 
 Domo propose des formations, des réponses de la communauté et un support technique.
 
-- Recherchez un sujet dans le [Centre d'aide](https://www.domo.com/domo-central/help).
-- Apprenez avec [Domo University](https://www.domo.com/domo-central/university).
-- Recherchez des applications de formation dans l'[Appstore](https://www.domo.com/appstore/).
-- Obtenez des réponses dans les [Forums de la communauté](https://community-forums.domo.com/main).
-- Contactez le support technique en soumettant un ticket d'aide dans le [Portail de support Domo](https://www.domo.com/login/customer-community).
+- Recherchez un sujet dans le [Centre d'aide <i className="icon-arrow-square-out sm" aria-hidden="true" />](https://www.domo.com/domo-central/help).
+- Apprenez avec [Domo University <i className="icon-arrow-square-out sm" aria-hidden="true" />](https://www.domo.com/domo-central/university).
+- Recherchez des applications de formation dans l'[Appstore <i className="icon-arrow-square-out sm" aria-hidden="true" />](https://www.domo.com/appstore/).
+- Obtenez des réponses dans les [Forums de la communauté <i className="icon-arrow-square-out sm" aria-hidden="true" />](https://community-forums.domo.com/main).
+- Contactez le support technique en soumettant un ticket d'aide dans le [Portail de support Domo <i className="icon-arrow-square-out sm" aria-hidden="true" />](https://www.domo.com/login/customer-community).
 - Contactez votre équipe de compte Domo.

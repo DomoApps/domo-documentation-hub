@@ -1,0 +1,145 @@
+---
+title: "Kiro"
+description: "Connect Kiro to Domo's MCP Server using standard OAuth (recommended) or an access token, so Kiro's agent can access the data and tools in your Domo instance."
+---
+
+## Required Grants
+
+To connect Kiro to Domo's MCP Server, the following grants must be enabled for your role:
+
+- **Use AI Services —** Access to features and Apps built using the AI Services Layer.
+- **Use AI Chat —** Access to the Domo AI Assistant.
+- **Use MCP —** Access to connect external AI tools to Domo's MCP Server.
+
+Learn more about [grants](/s/article/360043438973).
+
+## Prerequisites
+
+- [Kiro](https://kiro.dev/downloads/) installed, with MCP support enabled. To check, open Kiro settings and search for "MCP".
+
+- The **Domo MCP** server URL. Visit the [AI Library](/s/article/AI-Library) and retrieve the MCP server URL from the **Domo MCP** toolkit. Either URL works:
+
+  ```
+  https://<instance>.domo.com/mcp
+
+  https://<instance>.domo.com/mcp/toolkits/domo
+  ```
+
+  <Note>**Note:** Replace `<instance>` with your actual Domo instance subdomain (for example, `mycompany` for `mycompany.domo.com`).</Note>
+
+## Connect Kiro
+
+Connecting with OAuth is recommended. Use an access token only if you can't connect with OAuth.
+
+<Tabs>
+  <Tab title="OAuth">
+    <Steps>
+      <Step title="Open the MCP Configuration">
+        Open the Command Palette with **Cmd+Shift+P** (Mac) or **Ctrl+Shift+P** (Windows/Linux), then search for and select the configuration you want to use:
+
+        - **Kiro: Open user MCP config (JSON) (recommended) —** Makes the server available in all of your workspaces. This opens `~/.kiro/settings/mcp.json`.
+        - **Kiro: Open workspace MCP config (JSON) —** Makes the server available only in the current workspace. This opens `.kiro/settings/mcp.json`.
+      </Step>
+
+      <Step title="Add the Domo MCP Server">
+        Add the following `domo-mcp` entry to the `mcpServers` object in the configuration file, replacing `<instance>` with your Domo instance subdomain:
+
+        ```json
+        {
+          "mcpServers": {
+            "domo-mcp": {
+              "url": "https://<instance>.domo.com/mcp",
+              "disabled": false,
+              "autoApprove": []
+            }
+          }
+        }
+        ```
+
+        Leave out the `headers` object. Without it, Kiro completes the OAuth flow for you.
+      </Step>
+
+      <Step title="Save the File and Sign In to Domo">
+        Save the configuration file. Kiro applies the change and connects to `domo-mcp` automatically.
+
+        A browser window opens to your Domo instance. Sign in with your Domo credentials, then select **Allow** on the consent screen that asks to allow Kiro access to Domo.
+
+        <Frame><img alt="Domo OAuth consent screen asking to allow an AI tool, in this example Claude, to invoke AI agents and view AI Chat history, with Cancel and Allow buttons" src="/images/kb/claude-mcp-oauth-consent.png"/></Frame>
+      </Step>
+
+      <Step title="Verify the Connection">
+        Return to Kiro and open the **MCP Servers** view in the Kiro panel. Confirm that `domo-mcp` shows as connected and its tools are listed.
+
+        To test the connection, try a prompt such as "How many DataSets do I have access to?"
+      </Step>
+    </Steps>
+  </Tab>
+
+  <Tab title="Access Token">
+    <Steps>
+      <Step title="Generate an Access Token">
+        In Domo, go to **Admin** > **Authentication** > **Access Tokens** and generate a token, or request one from your MajorDomo. See [Manage Access Tokens](/s/article/360042934494#manage-access-tokens) for instructions.
+
+        <Frame>![Access Tokens management page in Domo Admin settings](/images/kb/DOMO-MCP-Server-Screenshot-2.png)</Frame>
+      </Step>
+
+      <Step title="Open the User MCP Configuration">
+        Open the Command Palette with **Cmd+Shift+P** (Mac) or **Ctrl+Shift+P** (Windows/Linux), then search for and select **Kiro: Open user MCP config (JSON)**. This opens `~/.kiro/settings/mcp.json`.
+
+        <Warning>**Important:** Don't add an access token to the workspace configuration, `.kiro/settings/mcp.json`. That file lives in your project and is often shared through source control.</Warning>
+      </Step>
+
+      <Step title="Add the Domo MCP Server">
+        Add the following `domo-mcp` entry to the `mcpServers` object in the configuration file, replacing `<instance>` with your Domo instance subdomain and `<DOMO_ACCESS_TOKEN>` with your access token:
+
+        ```json
+        {
+          "mcpServers": {
+            "domo-mcp": {
+              "url": "https://<instance>.domo.com/mcp",
+              "headers": {
+                "X-DOMO-DEVELOPER-TOKEN": "<DOMO_ACCESS_TOKEN>"
+              },
+              "disabled": false,
+              "autoApprove": []
+            }
+          }
+        }
+        ```
+
+        Save the file. Kiro applies the change and connects to `domo-mcp` automatically.
+      </Step>
+
+      <Step title="Verify the Connection">
+        Open the **MCP Servers** view in the Kiro panel. Confirm that `domo-mcp` shows as connected and its tools are listed.
+
+        To test the connection, try a prompt such as "How many DataSets do I have access to?"
+      </Step>
+    </Steps>
+  </Tab>
+</Tabs>
+
+<Note>**Note:** MCP tool calls don't incur AI operation charges. However, if the tool that gets called uses any of the Domo-provided models, input and output token charges can apply.</Note>
+
+## FAQ
+
+<AccordionGroup>
+<Accordion title="Can I connect multiple Domo instances?">
+Yes. Repeat the steps in this article for each instance, using a unique server name and the corresponding domain in the MCP server URL for each.
+</Accordion>
+
+<Accordion title="What data does Kiro have access to once connected?">
+Kiro can access the data and tools exposed by the Domo MCP toolkit, which includes querying DataSets and interacting with Domo features available through the MCP API. Access is scoped to what your Domo user account is permitted to see.
+</Accordion>
+
+<Accordion title="Can Kiro run Domo tools without asking me first?">
+Yes. Add tool names to the `autoApprove` list to let Kiro run them without prompting. Kiro asks for approval before it runs any tool not on the list.
+</Accordion>
+</AccordionGroup>
+
+## Related Articles
+
+- [Connect AI Tools to Domo Using MCP](/s/article/Connect-AI-Tools-to-Domo-Using-MCP)
+- [Connect to the Domo MCP Server with Standard OAuth](/s/article/MCP-Standard-OAuth)
+- [Manually Connect to the Domo MCP Server](/s/article/MCP-Manually-Connect)
+- [Connect VS Code to Domo MCP](/s/article/Connect-VS-Code-to-Domo-MCP)

@@ -1,12 +1,6 @@
 ---
-title: "Connect Gemini Enterprise to Domo MCP"
-excerpt: "Explains how to connect Google Gemini Enterprise to Domo's MCP Server through a custom MCP data store so Gemini Enterprise agents can access Domo AI Library Toolkits."
----
-
-## Intro
-
-This article explains how to connect Google Gemini Enterprise to Domo's MCP Server using a custom MCP data store, letting Gemini Enterprise securely access your Domo AI Library Toolkits and the private data behind them.
-
+title: "Gemini Enterprise"
+description: "Connect Google Gemini Enterprise to Domo's MCP Server using a custom MCP data store, letting Gemini Enterprise securely access your Domo AI Library Toolkits and the private data behind them."
 ---
 
 ## Required Grants
@@ -29,77 +23,81 @@ Learn more about [grants](/s/article/360043438973).
 
 The custom MCP data store lets you integrate Domo Toolkits, as well as other MCP-compliant third-party systems, directly into Gemini Enterprise. This gives your Gemini Enterprise agents access to business-critical information and specialized logic within your Domo instance when a standard connector isn't available.
 
-## Get Your Toolkit's MCP Server Details
+## Connect Gemini Enterprise
 
-1. From the **AI Library**, select the **Toolkits** tab and find the Toolkit you want to expose.
-2. Select the action menu on the Toolkit and choose **Use in MCP**.
+Gemini Enterprise authenticates to your Toolkit's MCP server using an OAuth 2.0 Client ID and Secret, which you register in Domo before configuring the data store.
 
-   <Frame><img alt="Domo AI Library Toolkits list with the toolkit menu open, showing Edit, Use in MCP, and Delete" src="/images/kb/gemini-enterprise-toolkit-use-in-mcp.png" /></Frame>
+<Steps>
+  <Step title="Copy Your Toolkit's MCP Server URL">
+    From the **AI Library**, select the **Toolkits** tab and find the Toolkit you want to expose. Select the action menu on the Toolkit and choose **Use in MCP**.
 
-3. Copy the **Server URL**. You'll paste this into Gemini Enterprise in a later step.
+    <Frame><img alt="Domo AI Library Toolkits list with the toolkit menu open, showing Edit, Use in MCP, and Delete" src="/images/kb/gemini-enterprise-toolkit-use-in-mcp.png"/></Frame>
 
-   <Frame><img alt="Use Toolkit as MCP Server dialog showing the Server URL and Authentication header" src="/images/kb/gemini-enterprise-mcp-server-dialog.png" /></Frame>
+    Copy the **Server URL**. You'll paste this into Gemini Enterprise in a later step.
 
-## Create a Domo Client ID and Secret
+    <Frame><img alt="Use Toolkit as MCP Server dialog showing the Server URL and Authentication header" src="/images/kb/use-toolkit-as-mcp-server-modal.png"/></Frame>
+  </Step>
 
-Gemini Enterprise authenticates to your Toolkit's MCP server using an OAuth 2.0 Client ID and Secret. Create one before configuring the data store.
+  <Step title="Generate a Domo Access Token">
+    Generate a Domo access token. See [Manage Access Tokens](/s/article/360042934494) for instructions. You use this token only to register the OAuth client in the next step.
 
-1. Generate a Domo access token. See [Manage Access Tokens](/s/article/360042934494) for instructions.
+    <Tip>**Tip:** Set the access token's time to live to at least one year so you don't need to regenerate it and update the data store again soon after.</Tip>
+  </Step>
 
-   <Tip>**Tip:** Set the access token's time to live to at least one year so you don't need to regenerate it and update the data store again soon after.</Tip>
+  <Step title="Register an OAuth Client in Domo">
+    Open a terminal and run the following curl command, replacing `<DOMAIN>` with your Domo instance domain and `<ACCESS_TOKEN>` with the token you generated:
 
-2. Open a terminal and run the following curl command, replacing `<DOMAIN>` with your Domo instance domain and `<ACCESS_TOKEN>` with the token you generated:
+    ```bash
+    curl -i -X POST \
+      "https://<DOMAIN>/oauth2/admin/clients" \
+      -H "X-DOMO-Developer-Token: <ACCESS_TOKEN>" \
+      -H "Content-Type: application/json" \
+      -d '{
+        "client_name": "Gemini Enterprise MCP",
+        "redirect_uris": ["https://vertexaisearch.cloud.google.com/oauth-redirect"],
+        "grant_types": ["refresh_token", "authorization_code"],
+        "token_endpoint_auth_method": "client_secret_post",
+        "scope": "ai:read ai:execute"
+      }'
+    ```
 
-   ```bash
-   curl -i -X POST \
-     "https://<DOMAIN>/oauth2/admin/clients" \
-     -H "X-DOMO-Developer-Token: <ACCESS_TOKEN>" \
-     -H "Content-Type: application/json" \
-     -d '{
-       "client_name": "Gemini Enterprise MCP",
-       "redirect_uris": ["https://vertexaisearch.cloud.google.com/oauth-redirect"],
-       "grant_types": ["refresh_token", "authorization_code"],
-       "token_endpoint_auth_method": "client_secret_post",
-       "scope": "ai:read ai:execute"
-     }'
-   ```
+    <Note>**Note:** You can also authenticate this request with a browser session cookie instead of an access token by sending `X-DOMO-Authentication: <SESSION>`, where `<SESSION>` is the value of the `DA-SID-xxx-xxx-xxx-xxx` cookie (found under **Developer Tools > Network > Headers > Cookie** in your browser). An access token is recommended since it doesn't require you to stay signed in.</Note>
 
-   <Note>**Note:** You can also authenticate this request with a browser session cookie instead of an access token by sending `X-DOMO-Authentication: <SESSION>`, where `<SESSION>` is the value of the `DA-SID-xxx-xxx-xxx-xxx` cookie (found under **Developer Tools > Network > Headers > Cookie** in your browser). An access token is recommended since it doesn't require you to stay signed in.</Note>
+    The response includes a `client_id` and `client_secret`. Copy both values — you'll need them to configure the data store in Google Cloud.
+  </Step>
 
-3. The response includes a `client_id` and `client_secret`. Copy both values — you'll need them to configure the data store in Google Cloud.
+  <Step title="Create a Custom MCP Server Data Store">
+    Open the [Google Cloud Console](https://console.cloud.google.com) and go to the **Gemini Enterprise** page. Select **Data stores**, then select **Create data store** and search for **Custom MCP Server**.
+  </Step>
 
-## Configure the Data Store in Google Cloud
+  <Step title="Configure the Endpoint and Save">
+    Under **Configure Endpoint**, enter the **Server URL** you copied in the first step, then select **OAuth 2.0** as the authentication method and enter the following:
 
-1. Open the [Google Cloud Console](https://console.cloud.google.com) and go to the **Gemini Enterprise** page.
-2. Select **Data stores**, then select **Create data store** and search for **Custom MCP Server**.
-3. Under **Configure Endpoint**, enter the **Server URL** you copied in [Get Your Toolkit's MCP Server Details](#get-your-toolkits-mcp-server-details), then select an authentication method:
+    - **Authorization URL —** `https://<DOMAIN>/oauth2/authorize`
+    - **Token URL —** `https://<DOMAIN>/oauth2/token`
+    - **Client ID** and **Client Secret —** From the curl response in the previous step.
+    - **Scopes —** `ai:read ai:execute`
 
-   - **OAuth 2.0** (recommended) — enter the following:
-     - **Authorization URL —** `https://<DOMAIN>/oauth2/authorize`
-     - **Token URL —** `https://<DOMAIN>/oauth2/token`
-     - **Client ID** and **Client Secret —** from the curl response in the previous step.
-     - **Scopes —** `ai:read ai:execute`
-   - **No authentication** — only available if your MCP endpoint doesn't require credentials. This doesn't apply to a Domo Toolkit MCP server.
+    <Note>**Note:** The **No authentication** option is only available if your MCP endpoint doesn't require credentials. It doesn't apply to a Domo Toolkit MCP server.</Note>
 
-   <Frame><img alt="Google Cloud data store authentication panel with OAuth 2.0 fields for the MCP Server URL, Authorization URL, Token URL, Client ID, Client Secret, and Scopes" src="/images/kb/gemini-enterprise-data-store-oauth-config.png" /></Frame>
+    <Frame><img alt="Google Cloud data store authentication panel with OAuth 2.0 fields for the MCP Server URL, Authorization URL, Token URL, Client ID, Client Secret, and Scopes" src="/images/kb/gemini-enterprise-data-store-oauth-config.png"/></Frame>
 
-4. Under **Manage Governance**, optionally control traffic and egress routing through the **Agent Gateway** and other advanced options.
-5. Select **Save** (or **Update**, if you're editing an existing data store).
+    Under **Manage Governance**, optionally control traffic and egress routing through the **Agent Gateway** and other advanced options. Then select **Save** (or **Update**, if you're editing an existing data store).
+  </Step>
+</Steps>
 
 <Note>**Note:** If the tool your Gemini Enterprise agent calls uses a Domo-provided AI model, input and output token charges may apply.</Note>
 
 ## FAQ
 
 <AccordionGroup>
-
 <Accordion title="Does each user need to create a Google Data Store?">
-  No. All users can share a single Google Data Store.
+No. All users can share a single Google Data Store.
 </Accordion>
 
 <Accordion title="Can I connect to an existing data store?">
-  Connecting to an existing data store isn't supported. You must create and register a new custom MCP server data store directly within your Gemini Enterprise app.
+Connecting to an existing data store isn't supported. You must create and register a new custom MCP server data store directly within your Gemini Enterprise app.
 </Accordion>
-
 </AccordionGroup>
 
 ## Related Articles
@@ -107,4 +105,5 @@ Gemini Enterprise authenticates to your Toolkit's MCP server using an OAuth 2.0 
 - [AI Library](/s/article/AI-Library)
 - [Connect AI Tools to Domo Using MCP](/s/article/Connect-AI-Tools-to-Domo-Using-MCP)
 - [Connect Amazon Quick Suite to Domo MCP](/s/article/Connect-Amazon-Quick-Suite-To-Domo-MCP)
+- [Connect Claude Desktop to Domo MCP](/s/article/Connect-Claude-Desktop-to-Domo-MCP)
 - [Manage Access Tokens](/s/article/360042934494)

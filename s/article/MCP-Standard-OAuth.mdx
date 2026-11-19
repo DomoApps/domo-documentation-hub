@@ -1,73 +1,79 @@
 ---
 title: "Connect to the Domo MCP Server with Standard OAuth"
-sidebarTitle: "Standard OAuth"
-excerpt: "How to connect to the Domo MCP Server with standard OAuth."
+sidebarTitle: "Connect with OAuth (Preferred)"
+description: "Connect an MCP-capable AI tool to the Domo MCP Server using standard OAuth, and points to step-by-step guides for specific AI tools."
 ---
 
-## Intro
+## Required Grants
 
-This article explains how to connect to the Domo MCP Server using standard OAuth.
+To connect an AI tool to Domo's MCP Server, the following grants must be enabled for your role:
 
----
+- **Use AI Services —** Access to features and Apps built using the AI Services Layer.
+- **Use AI Chat —** Access to the Domo AI Assistant.
+- **Use MCP —** Access to connect external AI tools to Domo's MCP Server.
+
+Learn more about [grants](/s/article/360043438973).
 
 ## Prerequisites
 
-<Note>
-  - You need **AI Chat** or **AI Library** enabled to use MCP.
-  - You also need the **Use MCP** grant enabled.
-</Note>
+- An AI tool that supports remote MCP servers with OAuth, such as Claude Desktop, Cursor, Gemini Enterprise, or Amazon Quick Suite.
 
-Visit the **AI Library** and retrieve the MCP server URL from the **Domo MCP** toolkit.
+- The **Domo MCP** server URL. Visit the [AI Library](/s/article/AI-Library) and retrieve the MCP server URL from the **Domo MCP** toolkit. Either URL works:
 
-*Either domain will work*
+  ```
+  https://<instance>.domo.com/mcp
 
-```
-https://<DOMO_DOMAIN>/mcp
+  https://<instance>.domo.com/mcp/toolkits/domo
+  ```
 
-https://<DOMO_DOMAIN>/mcp/toolkits/domo
-```
+  <Note>**Note:** Replace `<instance>` with your actual Domo instance subdomain (for example, `mycompany` for `mycompany.domo.com`).</Note>
 
-<Frame><img alt="AI Library showing the Domo MCP toolkit and server URL" src="/images/kb/domo_basic.png" /></Frame>
+  <Frame><img alt="Domo AI Library showing the Domo MCP toolkit and its MCP server URL" src="/images/kb/domo_basic.png"/></Frame>
 
-## Add a Custom Connector
+## Follow a Guide for Your AI Tool
 
-In Claude Cowork or Chat, customization lets you tailor your AI agent using the **Customize** menu on the left sidebar of the Claude Desktop app.
+Step-by-step instructions are available for these AI tools:
 
-<Frame><img alt="Claude Desktop left sidebar with Customize menu" src="/images/kb/claude_3.png" /></Frame>
+- [Amazon Quick Suite](/s/article/Connect-Amazon-Quick-Suite-To-Domo-MCP)
+- [Antigravity](/s/article/Connect-Antigravity-to-Domo-MCP)
+- [Claude Code](/s/article/Connect-Claude-Code-to-Domo-MCP)
+- [Claude Desktop](/s/article/Connect-Claude-Desktop-to-Domo-MCP)
+- [Codex CLI](/s/article/Connect-Codex-CLI-to-Domo-MCP)
+- [Cursor](/s/article/Connect-Cursor-to-Domo-MCP)
+- [Gemini Enterprise](/s/article/Connect-Gemini-Enterprise-to-Domo-MCP)
+- [GitHub Copilot CLI](/s/article/Connect-GitHub-Copilot-CLI-to-Domo-MCP)
+- [Kiro](/s/article/Connect-Kiro-to-Domo-MCP)
+- [VS Code](/s/article/Connect-VS-Code-to-Domo-MCP)
 
-Link third-party applications like remote MCPs by selecting **Customize** > **Connectors** to give Claude access to your data.
+If your AI tool isn't listed, use the general steps below.
 
-<Frame><img alt="Claude Desktop Connectors panel under Customize" src="/images/kb/claude_2.png" /></Frame>
+## Connect with OAuth
 
-Give the MCP server a name and paste the **Domo MCP** URL into the **Remote MCP server URL** field, then select **Add**.
+<Steps>
+  <Step title="Add the Domo MCP Server to Your AI Tool">
+    In your AI tool, open the settings where you add a custom connector or remote MCP server. The name and location of this setting vary by tool.
 
-*Either domain will work*
+    Give the MCP server a name, such as `Domo MCP`, and paste the **Domo MCP** URL into the server URL field. If your AI tool asks for an authentication method, choose **OAuth**.
 
-```
-https://<DOMO_DOMAIN>/mcp
+    <Note>**Note:** Some AI tools require a Client ID and Client Secret instead of discovering Domo's OAuth settings automatically. The [Gemini Enterprise](/s/article/Connect-Gemini-Enterprise-to-Domo-MCP) and [Amazon Quick Suite](/s/article/Connect-Amazon-Quick-Suite-To-Domo-MCP) guides show how to register an OAuth client in Domo for those cases.</Note>
+  </Step>
 
-https://<DOMO_DOMAIN>/mcp/toolkits/domo
-```
+  <Step title="Sign In to Domo">
+    Start the connection from your AI tool and follow the prompts to log into your Domo instance.
 
-<Note>**Note:** Replace `<DOMO_DOMAIN>` with your actual Domo instance domain (for example, `mycompany.domo.com`).</Note>
+    <Frame><img alt="Domo sign-in page with the Sign In button and Use Direct Sign-On link" src="/images/kb/login_1.png"/></Frame>
+  </Step>
 
-<Frame><img alt="Claude Desktop Add Connector dialog with Remote MCP server URL field" src="/images/kb/claude_1.png" /></Frame>
+  <Step title="Allow Your AI Tool to Access Domo">
+    On the consent screen that asks to allow your AI tool access to Domo, select **Allow**.
 
-## Authenticate with OAuth
+    <Frame><img alt="Domo OAuth consent screen asking to allow an AI tool, in this example Claude, to invoke AI agents and view AI Chat history, with Cancel and Allow buttons" src="/images/kb/claude-mcp-oauth-consent.png"/></Frame>
 
-Select **Connect** and follow the prompts to log into your Domo instance.
+    After authentication is complete, the connector is active and your AI tool has access to your Domo instance.
+  </Step>
+</Steps>
 
-<Frame><img alt="Claude Desktop Connect prompt for Domo MCP server" src="/images/kb/claude_4.png" /></Frame>
-
-<Frame><img alt="Domo OAuth login, step one" src="/images/kb/login_1.png" /></Frame>
-
-<Frame><img alt="Domo OAuth login, step two" src="/images/kb/login_2.png" /></Frame>
-
-<Frame><img alt="Domo OAuth login, step three" src="/images/kb/login_3.png" /></Frame>
-
-After authentication is complete, the connector is active and Claude has access to your Domo instance.
-
-<Frame><img alt="Claude Desktop showing active Domo MCP connection" src="/images/kb/complete.png" /></Frame>
+If your AI tool doesn't support OAuth, see [Manually Connect to the Domo MCP Server](/s/article/MCP-Manually-Connect) to connect with an access token instead.
 
 ## Consumption Considerations for MCP
 
@@ -76,17 +82,20 @@ MCP tool calls don't incur AI operation charges. However, if the tool that gets 
 ## OAuth FAQ
 
 <AccordionGroup>
-
-<Accordion title="What if I don't know my Domo domain?">
-  Your Domo domain is the subdomain in the URL you use to log into Domo — for example, if you access Domo at `mycompany.domo.com`, your domain is `mycompany.domo.com`. Contact your Domo admin if you are unsure.
+<Accordion title="What if I don't know my Domo instance/subdomain?">
+Your Domo instance subdomain is in the URL you use to log into Domo — for example, if you access Domo at `mycompany.domo.com`, your instance/subdomain is `mycompany`. Contact your Domo admin if you are unsure.
 </Accordion>
 
 <Accordion title="Can I connect multiple Domo instances?">
-  Yes. Repeat the steps in this article for each instance, using a unique connector name and the corresponding domain in the MCP server URL for each.
+Yes. Repeat the steps in this article for each instance, using a unique connector name and the corresponding domain in the MCP server URL for each.
 </Accordion>
 
-<Accordion title="What data does Claude have access to once connected?">
-  Claude can access the data and tools exposed by the Domo MCP toolkit, which includes querying DataSets and interacting with Domo features available through the MCP API. Access is scoped to what your Domo user account is permitted to see.
+<Accordion title="What data does my AI tool have access to once connected?">
+Your AI tool can access the data and tools exposed by the Domo MCP toolkit, which includes querying DataSets and interacting with Domo features available through the MCP API. Access is scoped to what your Domo user account is permitted to see.
 </Accordion>
-
 </AccordionGroup>
+
+## Related Articles
+
+- [Connect AI Tools to Domo Using MCP](/s/article/Connect-AI-Tools-to-Domo-Using-MCP)
+- [Manually Connect to the Domo MCP Server](/s/article/MCP-Manually-Connect)

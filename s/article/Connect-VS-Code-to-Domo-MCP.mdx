@@ -1,0 +1,149 @@
+---
+title: "VS Code"
+description: "Connect Visual Studio Code to Domo's MCP Server using standard OAuth (recommended) or an access token, so GitHub Copilot Chat can access the data and tools in your Domo instance."
+---
+
+## Required Grants
+
+To connect VS Code to Domo's MCP Server, the following grants must be enabled for your role:
+
+- **Use AI Services —** Access to features and Apps built using the AI Services Layer.
+- **Use AI Chat —** Access to the Domo AI Assistant.
+- **Use MCP —** Access to connect external AI tools to Domo's MCP Server.
+
+Learn more about [grants](/s/article/360043438973).
+
+## Prerequisites
+
+- [Visual Studio Code](https://code.visualstudio.com/) with GitHub Copilot Chat enabled.
+
+- The **Domo MCP** server URL. Visit the [AI Library](/s/article/AI-Library) and retrieve the MCP server URL from the **Domo MCP** toolkit. Either URL works:
+
+  ```
+  https://<instance>.domo.com/mcp
+
+  https://<instance>.domo.com/mcp/toolkits/domo
+  ```
+
+  <Note>**Note:** Replace `<instance>` with your actual Domo instance subdomain (for example, `mycompany` for `mycompany.domo.com`).</Note>
+
+## Connect VS Code
+
+Connecting with OAuth is recommended. Use an access token only if you can't connect with OAuth.
+
+<Tabs>
+  <Tab title="OAuth">
+    <Steps>
+      <Step title="Open the MCP Configuration">
+        Open the Command Palette with **Cmd+Shift+P** (Mac) or **Ctrl+Shift+P** (Windows/Linux), then search for and select the configuration you want to use:
+
+        - **MCP: Open User Configuration (recommended) —** Makes the server available in all of your workspaces.
+        - **MCP: Open Workspace Folder MCP Configuration —** Makes the server available only in the current workspace. This creates or opens `.vscode/mcp.json`.
+        - **MCP: Open Remote User MCP Configuration —** For a WSL setup. This creates or opens `~/.vscode-server/data/User/mcp.json`.
+      </Step>
+
+      <Step title="Add the Domo MCP Server">
+        Add the following `domo-mcp` entry to the `servers` object in the configuration file, replacing `<instance>` with your Domo instance subdomain, and save the file:
+
+        ```json
+        {
+          "servers": {
+            "domo-mcp": {
+              "url": "https://<instance>.domo.com/mcp",
+              "type": "http"
+            }
+          }
+        }
+        ```
+      </Step>
+
+      <Step title="Start the Server and Sign In to Domo">
+        Select **Start** above the `domo-mcp` entry in the configuration file. When VS Code asks whether `domo-mcp` can authenticate to your Domo instance, select **Allow**.
+
+        A browser window opens to your Domo instance. Sign in with your Domo credentials, then select **Allow** on the consent screen that asks to allow VS Code access to Domo.
+
+        <Frame><img alt="Domo OAuth consent screen asking to allow an AI tool, in this example Claude, to invoke AI agents and view AI Chat history, with Cancel and Allow buttons" src="/images/kb/claude-mcp-oauth-consent.png"/></Frame>
+      </Step>
+
+      <Step title="Verify the Connection">
+        Return to VS Code, open the Chat view in **Agent** mode, and select the **Configure Tools** icon. Confirm the `domo-mcp` tools are listed and selected.
+
+        To test the connection, try a prompt such as "How many DataSets do I have access to?"
+      </Step>
+    </Steps>
+  </Tab>
+
+  <Tab title="Access Token">
+    <Steps>
+      <Step title="Generate an Access Token">
+        In Domo, go to **Admin** > **Authentication** > **Access Tokens** and generate a token, or request one from your MajorDomo. See [Manage Access Tokens](/s/article/360042934494#manage-access-tokens) for instructions.
+
+        <Frame>![Access Tokens management page in Domo Admin settings](/images/kb/DOMO-MCP-Server-Screenshot-2.png)</Frame>
+      </Step>
+
+      <Step title="Open the MCP Configuration">
+        Open the Command Palette with **Cmd+Shift+P** (Mac) or **Ctrl+Shift+P** (Windows/Linux), then search for and select the configuration you want to use:
+
+        - **MCP: Open User Configuration (recommended) —** Makes the server available in all of your workspaces.
+        - **MCP: Open Workspace Folder MCP Configuration —** Makes the server available only in the current workspace. This creates or opens `.vscode/mcp.json`. Not recommended for security, as it may expose your credentials.
+        - **MCP: Open Remote User MCP Configuration —** For a WSL setup. This creates or opens `~/.vscode-server/data/User/mcp.json`.
+      </Step>
+
+      <Step title="Add the Domo MCP Server">
+        Add the following `domo-mcp` entry to the `servers` object and `domo-access-token` entry to the `inputs` array in the configuration file, replacing `<instance>` with your Domo instance subdomain, and save the file:
+
+        ```json
+        {
+          "servers": {
+            "domo-mcp": {
+              "url": "https://<instance>.domo.com/mcp",
+              "type": "http",
+              "headers": {
+                "X-DOMO-DEVELOPER-TOKEN": "${input:domo-access-token}"
+              }
+            }
+          },
+          "inputs": [
+            {
+              "id": "domo-access-token",
+              "type": "promptString",
+              "description": "Domo Access Token",
+              "password": true
+            }
+          ]
+        }
+        ```
+
+        The `inputs` entry keeps your access token out of the file. VS Code prompts you for it the first time the server starts and stores it securely.
+      </Step>
+
+      <Step title="Start the Server and Verify the Connection">
+        Select **Start** above the `domo-mcp` entry in the configuration file and enter your access token when prompted.
+
+        Open the Chat view in **Agent** mode and select the **Configure Tools** icon. Confirm the `domo-mcp` tools are listed and selected.
+
+        To test the connection, try a prompt such as "How many DataSets do I have access to?"
+      </Step>
+    </Steps>
+  </Tab>
+</Tabs>
+
+<Note>**Note:** MCP tool calls don't incur AI operation charges. However, if the tool that gets called uses any of the Domo-provided models, input and output token charges can apply.</Note>
+
+## FAQ
+
+<AccordionGroup>
+<Accordion title="Can I connect multiple Domo instances?">
+Yes. Repeat the steps in this article for each instance, using a unique server name and the corresponding domain in the MCP server URL for each.
+</Accordion>
+
+<Accordion title="What data does VS Code have access to once connected?">
+GitHub Copilot Chat can access the data and tools exposed by the Domo MCP toolkit, which includes querying DataSets and interacting with Domo features available through the MCP API. Access is scoped to what your Domo user account is permitted to see.
+</Accordion>
+</AccordionGroup>
+
+## Related Articles
+
+- [Connect AI Tools to Domo Using MCP](/s/article/Connect-AI-Tools-to-Domo-Using-MCP)
+- [Connect to the Domo MCP Server with Standard OAuth](/s/article/MCP-Standard-OAuth)
+- [Manually Connect to the Domo MCP Server](/s/article/MCP-Manually-Connect)

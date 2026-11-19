@@ -121,7 +121,8 @@ Generate descriptive, LLM-friendly alt text for every referenced image by actual
 | **5: Interlinking** | 🔲 Not started | Next Steps + Related Articles bulk pass — runs after PM sign-off |
 | **6: Slug Rename + Redirects + Localization** | 🔲 Not started | Enhanced: CSV map, localized file rename, docs.json redirects, internal link updates |
 | **7: Nav Rebuild** | 🔲 Not started | Rebuild docs.json nav groups after Phase 6 slug changes |
-| **8: Style Guide & Template Update** | 🔲 Not started | Update `Domo-KB-Style-Guide.mdx` + `New-Article-Template.mdx` for new standards |
+| **8: Style Guide & Template Update** | 🟡 Partially done via main sync (2026-11-18) | `Domo-KB-Style-Guide.mdx` + `New-Article-Template.mdx` now carry the new `description` frontmatter convention (replaces `excerpt`), the no-`## Intro`-by-default + Intro-exception rule, the no-`---`-after-Intro rule, `sidebarTitle`, and the alt-text-required standard — all merged from `main`. Remaining: fold in the restructure-specific additions (lifecycle states, wheel-and-spoke, hub articles) and reconcile any lingering old-convention references. |
+| **8.5: Frontmatter & Intro Convention Migration** | 🔲 Not started | Repo-wide sweep applying the new `description`/Intro convention (now in the style guide + template from main) to **every** existing article: remove `excerpt:` → add `description:`; drop the `## Intro` section when it only restates the lead sentence; keep it (context-only) when it adds more; remove the post-Intro `---`. Runs after PM review (4.5/4.6). See Phase 8.5 section. |
 | **9: Restructure Artifacts Cleanup** | 🔲 Not started | Move all planning/analysis artifacts to `restructure/` folder; generate final disposition report from `RESTRUCTURE-MANIFEST.md` |
 
 ---
@@ -161,9 +162,9 @@ Screenshots are first-class content. Walls of text are not acceptable. Every art
 Structural and formatting compliance check against `Domo-KB-Style-Guide.mdx`.
 
 **Checklist:**
-- `title:` and `excerpt:` both present in frontmatter
-- Intro section is H2, succinct, uses "This article explains/covers…" format
-- Horizontal rule (`---`) follows the Intro section
+- `title:` and `description:` both present in frontmatter (`description` directly below `title`, or below `sidebarTitle` when present), per `Domo-KB-Style-Guide.mdx` › **Frontmatter**. Do **not** use the deprecated `excerpt:` field. (Articles written in Phases 3a–4 predate this and still carry `excerpt:`/`## Intro`; the Phase 8.5 sweep migrates them.)
+- No `## Intro` section by default — the lead sentence lives in `description`. Add a `## Intro` **only** when the article needs prose context beyond that one sentence, and then put only the extra context there (don't repeat the description). See **Lead Sentence and the Intro Exception**.
+- No horizontal rule (`---`) between the frontmatter and the body (the old post-Intro `---` convention has been removed)
 - `## Required Grants` section present (if feature requires grants); uses exact format from style guide
 - Task/action headings use imperative mood (no gerund form); topic/category labels may use noun phrases
 - All headings use Title Case (Chicago 18th: all prepositions lowercase regardless of length)
@@ -1092,6 +1093,8 @@ _Original scope (2026-10-19, superseded):_ only feature sub-groups (DomoStats, M
 
 **Runs after:** Phase 7
 
+> **Already partially landed (main sync, 2026-11-18):** The `main`→`update/fullRestructure` sync brought in the new frontmatter/Intro conventions, so `Domo-KB-Style-Guide.mdx` and `New-Article-Template.mdx` already document: the `description` field (which **replaces** `excerpt`), the no-`## Intro`-by-default rule + the Intro exception, the removal of the post-Intro `---`, `sidebarTitle`, and the alt-text-required standard. Applying those conventions to the existing article corpus is its own sweep — see **Phase 8.5** below. What remains for Phase 8 proper is folding in the restructure-specific additions listed here (lifecycle states, wheel-and-spoke structure, hub-article types, AI callout, cross-pillar linking).
+
 Update `Domo-KB-Style-Guide.mdx` and `New-Article-Template.mdx` to reflect every structural standard introduced by this restructure.
 
 **`Domo-KB-Style-Guide.mdx` — expected additions:**
@@ -1119,6 +1122,41 @@ CLAUDE.md is the AI-facing project instructions. After the restructure is comple
 - Remove references to planning files that have moved to `restructure/`
 
 CLAUDE.md stays at the repo root (not moved to `restructure/`) — it must be at root to be picked up by Claude Code.
+
+---
+
+## Phase 8.5 — Frontmatter & Intro Convention Migration (`excerpt` → `description`)
+
+**Runs after:** PM review (Phase 4.5/4.6), once article content is stable. The target convention is already defined in `Domo-KB-Style-Guide.mdx` and `New-Article-Template.mdx` (merged from `main` 2026-11-18), so this phase only **applies** it to the existing corpus.
+
+**Why:** Until now every article carried `excerpt:` (invisible repo metadata) plus a `## Intro` H2 whose first sentence restated the excerpt, separated from the body by a `---`. The new standard (now live in the style guide) replaces all of that with a single rendered `description:` field. This phase brings the entire repository up to that standard in one reviewed sweep.
+
+**Authoritative references** — read before running:
+- `Domo-KB-Style-Guide.mdx` › **Frontmatter** (the `description` format + "do not use `excerpt`")
+- `Domo-KB-Style-Guide.mdx` › **Lead Sentence and the Intro Exception** (when a `## Intro` is still allowed; no `---`)
+- `Domo-KB-Style-Guide.mdx` › **Sidebar Title** (ordering when `sidebarTitle` is present)
+- `New-Article-Template.mdx` (the canonical shape new articles now take)
+
+### Per-article transformation
+
+Apply to **every** article in `s/article/` and `s/topic/`, then to the localized mirrors in `de/`, `es/`, `fr/`, `ja/` (same transformation; translate the `description`, don't invent new content):
+
+1. **Frontmatter — `excerpt` → `description`.** Remove the `excerpt:` line. Add a `description:` line directly below `title:` (or below `sidebarTitle:` when that field is present). Write the description per the style guide: a single sentence, **imperative** for a task/how-to article (lead with the verb, name 2–3 concrete actions, same terminology as the body) or a plain **declarative** sentence for a conceptual/overview article; **no** "This article explains…/covers…" preamble; Markdown (e.g. inline code) allowed. Preserve every other frontmatter field unchanged (`title`, `sidebarTitle`, `status`, `tag`, any `[pm-input]`-related metadata, etc.).
+   - **Source the wording** from the existing `excerpt` when it already reads well, otherwise from the article's current `## Intro` lead sentence — rewritten into the new format. The description is **editorial**, not a mechanical field rename: it must read correctly per the style guide, so this is a reviewed sweep, not a blind script.
+
+2. **`## Intro` — remove or reduce.** Decide by content:
+   - **Remove the whole `## Intro` section** when its only content is the one-line summary that now lives in `description` (the common case). The article then goes straight from frontmatter to its first body section (**Required Grants** or the first task).
+   - **Keep a reduced `## Intro`** only when it carries genuine additional context beyond the one-liner — a conceptual definition, a scope caveat, orienting background. In that case, strip the duplicated lead sentence (it's now the `description`) and leave only the extra context. Per the style guide, the Intro is the exception, not the rule.
+
+3. **Remove the `---`.** Delete the horizontal rule that followed the Intro (and any `---` between the frontmatter and the body). The old separator convention has been removed.
+
+### Scope, safety, and verification
+
+- **Preserve review state:** do not disturb `{/* [pm-input] */}` / `{/* [reviewed] */}` markers or any other inline annotations.
+- **EN–JA (and other localized) parity:** keep the localized `description` faithful to the English one (run through the `localize` glossary where applicable); this sweep is structural, not a re-translation.
+- **Batchable but reviewed:** the mechanical parts (dropping `excerpt`, deleting a pure-restatement `## Intro`, removing `---`) can be scripted; the `description` wording must be reviewed per article. Consider a script that flags each article's proposed `description` + Intro disposition for sign-off rather than committing blind.
+- **Done when:** `grep -rl '^excerpt:' s/article s/topic de es fr ja` returns nothing; every article has a `description:`; no `---` sits between frontmatter and body; a spot-check confirms surviving `## Intro` sections all carry context beyond the description.
+- **Interaction with other phases:** independent of slug renames (Phase 6) and nav (Phase 7) — it only touches frontmatter + the Intro region — so it can run any time after PM review. If it runs before Phase 6, the localized conversions ride along with the localization pass; if after, include the localized mirrors explicitly (above).
 
 ---
 

@@ -1,8 +1,8 @@
 # PM Review Brief: Mamta Bolaki
 
 **Prepared for:** KB Restructure PM Review Meeting
-**Features owned:** AppStore, Domo Everywhere, Sandbox
-**Total articles in your area:** 91
+**Features owned:** AppStore, Domo Everywhere - Embed, Sandbox
+**Total articles in your area:** 89
 
 > This document is your meeting guide. It shows how your content is being reorganized,
 > which AI-generated articles need your fact-check, which articles need a dedicated
@@ -19,9 +19,9 @@ areas lands in the new structure.
 
 | Feature | Articles | New Location |
 |---------|----------|--------------|
-| AppStore | 79 | Pillar 6: Build Apps & Automate |
-| Domo Everywhere | 9 | Pillar 7: Distribute |
-| Sandbox | 3 | Pillar 10: Administer & Govern |
+| AppStore | 78 | Pillar 6: Build Apps & Automate |
+| Domo Everywhere - Embed | 9 | TBD — not yet mapped |
+| Sandbox | 2 | Pillar 10: Administer & Govern |
 
 ### Notable Navigation Changes
 

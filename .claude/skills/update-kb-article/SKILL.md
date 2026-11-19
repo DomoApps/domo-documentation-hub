@@ -147,7 +147,7 @@ If the approved change adds, replaces, or removes screenshots or icons, confirm 
 **Screenshots** — offer these options with AskUserQuestion:
 
 1. **User provides new screenshots** — the files must be committed to `images/kb/` on the same branch before the article references them (see `CLAUDE.md` › **MDX Content Conventions**). Ask for the exact filenames.
-2. **Reuse existing screenshots** — an image already in the repo or the source material, with its original `alt` text preserved.
+2. **Reuse existing screenshots** — an image already in the repo or the source material, with its original `alt` text preserved. If the reused image has weak or missing alt text (empty, `"screenshot"`, a filename), upgrade it to detailed, accurate alt text per the requirement below.
 3. **Remove without replacing** — drop a stale screenshot and keep the surrounding text self-sufficient. This is the preferred default when a fresh capture isn't ready; the article should be publishable as-is without the image.
 4. **Placeholders (opt-in only)** — `{/* SCREENSHOT: <what the image should show> */}` markers, **only if the user explicitly asks**. The default is a clean article with no TODO or placeholder markers.
 
@@ -157,7 +157,8 @@ Whichever option is chosen, keep step text self-sufficient — a reader can comp
 
 **Coding reference** (from `Domo-KB-Style-Guide.mdx` › **Screenshots**, **Icons**, **Inline Images**):
 
-- **Block screenshot:** `<Frame><img src="/images/kb/example.png" alt="Descriptive alt text" /></Frame>` — no inline `width`/`height`; never inside a table cell.
+- **Block screenshot:** `<Frame><img src="/images/kb/example.png" alt="Detailed, accurate description of what this screenshot shows" /></Frame>` — no inline `width`/`height`; never inside a table cell.
+- **Alt text (required):** every screenshot or content image you add or swap in must carry detailed, accurate `alt` text — a repository standard for accessibility, LLM readability, and SEO (`Domo-KB-Style-Guide.mdx` › **Alt Text Is Required on Every Screenshot**). Describe what the image actually shows; don't open with "Image of…" and never claim something the image doesn't show. **If the user supplies a new screenshot without alt text** (or only a placeholder), state the requirement, reference the style-guide rule, and ask them for detailed, accurate alt text — don't invent it or ship an empty/placeholder `alt`.
 - **Current Domo UI glyph:** `<i className="icon-{name}" aria-hidden="true" />` (Phosphor). Browse names at [Domo Icons](https://git.empdev.domo.com/pages/Development/DomoIcons/#!/icons/phosphor).
 - **Legacy UI glyph:** `<i className="legacy-icon-{name}" aria-hidden="true" />` — only for release-notes/Workbench surfaces.
 - **Third-party brand logo:** Font Awesome brands `<Icon icon="{slug}" iconType="brands" aria-hidden="true" />`, or inline `<svg fill="currentColor" …>` when the free FA set lacks it. Never a monochrome `<img>` logo — it disappears in dark mode.
@@ -208,7 +209,7 @@ Reuse the existing description verbatim (adjusting only to fit the em-dash forma
 
 ### Image/screenshot swap
 
-Update the `src` attribute in the `<Frame>` or `<img>` tag. Update `alt` text if appropriate. Do not move or delete image files — note to the user that the image asset itself must be updated separately in `images/kb/`.
+Update the `src` attribute in the `<Frame>` or `<img>` tag. A new screenshot shows something different, so update the `alt` text to match what the replacement image actually shows — detailed and accurate, per the required alt-text standard (`Domo-KB-Style-Guide.mdx` › **Alt Text Is Required on Every Screenshot**). If you don't know what the new image shows, ask the user for the alt text rather than leaving the old one or inventing a description. Do not move or delete image files — note to the user that the image asset itself must be updated separately in `images/kb/`.
 
 ### Image-based icon → icon font swap
 
@@ -250,9 +251,9 @@ Invoke the `add-to-nav` skill. Do not attempt to edit `docs.json` directly for n
 
 Apply the convention defined in `Domo-KB-Style-Guide.mdx` › **Beta Features**. Read it before making changes. Summary:
 
-- **Mark a whole article as beta:** add `tag: "Beta"` to the frontmatter and insert the standard beta Note immediately after the frontmatter, above the Intro. Do not append `(Beta)` to the title.
+- **Mark a whole article as beta:** add `tag: "Beta"` to the frontmatter and insert the standard beta Note immediately after the frontmatter, above the article body (and above the `## Intro` section if the article has one). Do not append `(Beta)` to the title.
 - **Mark a section as beta:** append `<Badge>Beta</Badge>` to the heading. If the article has no other beta sections, also place the standard beta Note under that section. If another section in the same article is already marked beta, do not add another Note — one Note per article.
-- **Promote beta to GA (whole article):** remove the `tag: "Beta"` line from frontmatter and remove the standard beta Note above the Intro.
+- **Promote beta to GA (whole article):** remove the `tag: "Beta"` line from frontmatter and remove the standard beta Note at the top of the article body.
 - **Promote beta to GA (section):** remove the Badge from the heading. If the Note immediately below this section was the article's single beta Note, decide where it should go: if other sections remain beta, move it under the first remaining beta section; if no beta sections remain, remove the Note.
 - **Convert legacy beta markers:** when you find `(Beta)` or `(BETA)` in titles or headings, ad-hoc beta notes, references to `betafeedback@domo.com` or `betadmin@domo.com`, or other legacy treatments, replace them with the current convention (tag + standard Note for whole-article betas; Badge + single standard Note for section-level betas). When updating cross-article links whose anchor text contained `(Beta)`, drop the parenthetical from the link text as well.
 
@@ -331,7 +332,7 @@ Editing introduces style drift just as drafting does. After the fact-check pass 
 1. **Re-read `Domo-KB-Style-Guide.mdx` and `New-Article-Template.mdx` now, in full** — not from memory. Confirm your changed content matches the template's structure and encoding conventions.
 2. **Proofread the changed content for plain grammar and usage** — spelling, agreement, punctuation, clarity — alongside the Domo-specific rules below.
 3. **Audit the content you added or rewrote** against this checklist and fix every violation. Scope this to what you changed: fix style errors in your edited content and any clearly broken style directly adjacent to it, but do not silently rewrite untouched sections. If you spot broader pre-existing violations outside your edit, note them to the user rather than rewriting them (consistent with this skill's conservative-execution principle). This pass is EN-only — never touch the localized directories.
-   - **Intro** (if touched) — opens with "This article explains…" or "This article covers…", states only what the article covers, and is followed by a `---` horizontal rule.
+   - **Lead sentence** — the one-sentence summary lives in the `description` frontmatter, not the body. Phrase it simply and directly — imperative for a task article, plain declarative for a conceptual/overview article — with no "This article explains…" / "This article covers…" preamble (Markdown such as inline code is allowed). An `## Intro` section is optional (extra context only) and, when present, has no `---` horizontal rule after it. If the article still carries a legacy `## Intro` section whose only content is that lead sentence, that is fine to leave in place unless you are already reworking the top of the article — bulk Intro removal is handled separately.
    - **Headings** — imperative mood at every level; the structural labels (Intro, Required Grants, Prerequisites, FAQ, Troubleshoot, Related Articles) are exempt. Top-level sections H2, subsections H3+.
    - **Required Grants** — exact format and canonical grant wording, with the em-dash inside the bold and a space on each side (`**Grant —** description`).
    - **Callouts** — `<Note>`/`<Warning>`/`<Tip>` with the label and its colon bolded (`**Note:**`), and a blank line before the callout (except inside table cells).
@@ -340,8 +341,9 @@ Editing introduces style drift just as drafting does. After the fact-check pass 
    - **Em-dashes** — no spaces in prose; spaces only in the bolded-term list exception.
    - **Voice and word choice** — present tense, not "will"; active voice; "after", not causal "once"; no "utilize"; spell out numbers under 10; "allowlist"/"blocklist"; "select", not "click"; Oxford comma; no exclamation points.
    - **Domo terms** — `DataSet`, `DataFlow`, `DataFusion`, `Beast Mode`, `Workbench`; `dashboard` lowercase except at the start of a sentence or with a type; never "Page" (use "dashboard"). Verify any product term against the **Domo-Specific Terms and Usage** table.
-   - **Frontmatter** — if the article still has a `description` field, replace it with a single-sentence `excerpt`.
-   - **Images** — block screenshots wrapped in `<Frame>` with a native `<img>` and descriptive `alt`, no inline `width`/`height`; never `<Frame>` inside a table cell. No placeholders unless the user opted in at Step 4.
+   - **Frontmatter** — the article should carry a single-sentence `description` phrased simply and directly (imperative for a task article, plain declarative for a conceptual/overview article), with no "This article explains…" / "This article covers…" preamble. If it still has a legacy `excerpt` field, replace it with `description` (reuse the excerpt's sentence, recast into the direct format).
+   - **Images** — block screenshots wrapped in `<Frame>` with a native `<img>`, no inline `width`/`height`; never `<Frame>` inside a table cell. No placeholders unless the user opted in at Step 4.
+   - **Alt text** — every screenshot or content image you added or swapped carries detailed, accurate `alt` text (not empty, `"screenshot"`, a filename, or a placeholder). If any is missing, stop and ask the user for it per Step 4 — don't invent it. See `Domo-KB-Style-Guide.mdx` › **Alt Text Is Required on Every Screenshot**.
    - **Icons** — confirm the Step 7 upgrade landed: current-UI glyphs use the `icon-{name}` font, `legacy-icon-{name}` only for release-notes/Workbench, brand logos use Font Awesome brands or inline `<svg fill="currentColor">`, and no legacy image-based icon remains for a glyph that exists in the font. Each icon carries `aria-hidden="true"` and is named in the prose.
 4. **Revise in place.** Run `python3 scripts/pad_md_tables.py <file>` on any file whose tables you touched.
 
@@ -396,20 +398,20 @@ If the user is already on a working branch, verify it matches the convention and
 
 **Routine updates:** branch `first.last/short-description`, base `main`. Publishes on the normal weekly KB schedule (PR in by Thursday for the following Monday).
 
-**Updates documenting a change that ships with a GA release:** the article must not go live before the feature. Name the branch `first.last/short-description-ga-MM-DD-YYYY` (zero-padded numeric date). That date is the **feature switch date** — when customers see the feature. If you don't know it, ask for it; never derive it from the product branch cut date. Keep the `-ga-<date>` suffix on any GA-tied branch — it is how the Knowledge Base Administrator knows the feature's availability date. **Never tell a contributor to drop the suffix just to base onto `main`.**
+**Updates documenting a change that ships with a GA release:** the article must not go live before the feature. Name the branch `first.last/short-description-ga-<month>-<year>` (lowercase, fully spelled-out feature-release month and year, e.g. `-ga-november-2026`). That month-year is the **feature-release month** — when customers see the feature — and is deliberately day-free so a shifting switch date never forces a rename. If you don't know the month, ask for it; never derive it from the product branch cut date. Keep the `-ga-<month>-<year>` suffix on any GA-tied branch — it is how the Knowledge Base Administrator knows the feature's availability window. **Never tell a contributor to drop the suffix just to base onto `main`.**
 
-Two kinds of GA work route differently. Check whether a GA train branch exists for that date:
+Two kinds of GA work route differently. Check whether a GA train branch exists for that month:
 
 ```bash
 git branch -r | grep release-ga
 ```
 
-- **On the company GA release train** — a matching `release-ga/<spelled-month-date>` branch exists (e.g. `release-ga/sept-23-2026`): base the PR onto that `release-ga/*` branch. It merges to `main` with the rest of the train on the feature switch date.
+- **On the company GA release train** — a matching `release-ga/<month>-<year>` branch exists (e.g. `release-ga/november-2026`): base the PR onto that `release-ga/*` branch. It merges to `main` with the rest of the train on the feature switch date.
 - **No matching `release-ga/*` branch:** don't assume. Ask the contributor whether this is part of the monthly company GA train or a standalone, off-train product GA (a doc change tied to one product feature that ships on its own date, outside the company-wide train — this is common):
   - *Company train, branch not created yet:* the Knowledge Base Administrator needs to create the `release-ga/*` branch. Do not fall back to `main`.
-  - *Off-train standalone product GA:* keep the `-ga-<date>` suffix and base the PR onto `main`. The suffix records when that product feature reaches customers; the KB Administrator holds the PR open and merges it on or after the `-ga-` date so it publishes in sync with the feature. Assign it to the KB Administrator and call out the GA date in the PR description.
+  - *Off-train standalone product GA:* keep the `-ga-<month>-<year>` suffix and base the PR onto `main`. The suffix records which month that product feature reaches customers; the KB Administrator holds the PR open and merges it on or after the feature's switch date so it publishes in sync with the feature. Assign it to the KB Administrator and call out the GA month in the PR description.
 
-A `-ga-<date>` branch based on `main` is expected for off-train GA — the safety comes from the KB Administrator timing the merge, not from the base branch. So don't flag it as an error on its own; only flag a GA branch on `main` if the contributor intended it for the company train.
+A `-ga-<month>-<year>` branch based on `main` is expected for off-train GA — the safety comes from the KB Administrator timing the merge, not from the base branch. So don't flag it as an error on its own; only flag a GA branch on `main` if the contributor intended it for the company train.
 
 See `CLAUDE.md` › **Contribution Workflow** for the full convention.
 

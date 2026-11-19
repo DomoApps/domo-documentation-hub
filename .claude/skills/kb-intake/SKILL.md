@@ -50,6 +50,7 @@ Work through these dimensions, but let the conversation flow naturally — you d
 
 **Screenshots and icons**
 - How does the user want to handle screenshots for this article — will they provide their own (committed to `images/kb/`), reuse existing/source screenshots, go text-only, or (only if they explicitly ask) leave placeholders for a human to fill later? The default is a clean article with no placeholder markers.
+- If screenshots are in play, capture the **alt text** for each one. Every screenshot requires detailed, accurate alt text — a repository standard for accessibility compliance, LLM readability, and SEO (`Domo-KB-Style-Guide.mdx` › **Alt Text Is Required on Every Screenshot**). If the user is providing or reusing screenshots but hasn't described what each one shows, state this requirement, reference the rule, and ask them for detailed, accurate alt text. Don't invent a description of an image you can't see; record it as an open question if unresolved.
 - Will the article show any UI icons or third-party logos? (These are coded with the Domo icon font or Font Awesome brands, not uploaded images — the drafting skill handles the mechanics; here you just capture whether icons are in play.)
 
 **Detail and nuance**
@@ -67,7 +68,7 @@ You have enough to write the article when you know:
 - [ ] The required grants or prerequisites — with each one either confirmed or explicitly flagged as needing verification
 - [ ] The main task(s) in logical order
 - [ ] At least one edge case, gotcha, or FAQ-worthy question
-- [ ] How the user wants to handle screenshots (and whether icons are in play)
+- [ ] How the user wants to handle screenshots (and whether icons are in play), including detailed, accurate alt text for each screenshot — or an open question flagging that it's still needed
 
 ## A note on accuracy
 
@@ -92,7 +93,7 @@ When the conversation is complete, present a summary in this format:
 
 **Prerequisites / Required grants:** [list each one, and mark any that the user was unsure of as "(unconfirmed — verify before drafting)"]
 
-**Screenshot & icon handling:** [how the user wants screenshots handled — provide / reuse existing / text-only / placeholders (opt-in); and whether the article uses UI icons or third-party logos]
+**Screenshot & icon handling:** [how the user wants screenshots handled — provide / reuse existing / text-only / placeholders (opt-in); the detailed, accurate alt text captured for each screenshot (or flag it as an open question if still needed — alt text is a required repository standard); and whether the article uses UI icons or third-party logos]
 
 **Tasks to cover (in order):**
 1. [task]

@@ -58,15 +58,15 @@ Every article needs at minimum:
 ```mdx
 ---
 title: "Article Title"
-excerpt: "Single sentence summarizing what the article covers."
+description: "Connect to … / Configure … (single direct sentence — imperative for a task article, plain declarative for a conceptual/overview article — no 'This article explains…' preamble; Markdown such as inline code allowed)."
 ---
 ```
-Do not use `description` — it renders on the published page and duplicates the Intro.
+The `description` renders on the published page directly below the title — it is the reader's opening summary as well as search/AI metadata. Do not use an `excerpt` field; `description` has replaced it.
 
 ### Article structure
-Intro → (optional) Required Grants → (optional) Prerequisites → task sections → (optional) FAQ
+Required Grants → (optional) Prerequisites → task sections → (optional) FAQ
 
-A `---` horizontal rule must follow the **Intro** section.
+The lead sentence lives in the `description` frontmatter, so articles have no `## Intro` section by default. Add one only when the article needs extra context in prose before the body, and do not place a `---` horizontal rule after it.
 
 ### Headings
 - Structural labels (`Intro`, `Prerequisites`, `FAQ`, etc.) are exempt from imperative mood.
@@ -84,6 +84,11 @@ Remove these from the pandoc output:
 - `{target="_blank" rel="noopener noreferrer"}` after links
 - Inline `style=` attributes on elements
 - Blank `&nbsp;` paragraphs
+
+### Images and alt text
+- Wrap block screenshots in `<Frame>` with a native `<img>`; use an inline `<img>` inside table cells (never `<Frame>` there).
+- **Alt text is required on every screenshot and content image** — detailed and accurate, for accessibility compliance, LLM readability, and SEO (`Domo-KB-Style-Guide.mdx` › **Alt Text Is Required on Every Screenshot**). Pandoc carries over whatever `alt` the source HTML had, which is frequently empty, a filename, or boilerplate like "screenshot." Do not pass that through: where the surrounding prose makes the image's content clear, write accurate alt text describing what it shows; where it doesn't, flag the image to the user as needing alt text rather than inventing a description of an image you can't see. Never leave an empty `alt=""`.
+- Decorative inline icons already named in the prose are the exception — they use `aria-hidden="true"` instead of alt (see the style guide's **Icons** section).
 
 ### Tables
 - Use pipe tables. Pad cells with spaces so column pipes align vertically across all rows.
@@ -144,4 +149,4 @@ If this fails, show the error and fix it before finishing.
 Tell the user:
 - The path of the new article (`s/article/<filename>.mdx`)
 - Where it was inserted in `docs.json` (group name and neighboring entries)
-- That the branch is ready to commit and preview with `mintlify dev`
+- That the branch is ready to commit and preview with `mint dev`

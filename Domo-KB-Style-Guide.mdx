@@ -1,6 +1,6 @@
 ---
 title: "Domo KB Style Guide"
-excerpt: "Standards and conventions for writing clear, consistent Domo Knowledge Base documentation."
+description: "Write clear, consistent Domo Knowledge Base documentation using these standards and conventions."
 ---
 
 import { DomoEmbed } from "/snippets/DomoEmbed.mdx";
@@ -14,32 +14,62 @@ This style guide provides guidelines for producing Domo Knowledge Base documenta
 
 If you can't find an answer in any of these sources, consult with the Knowledge Base administrator.
 
----
-
 ## Article Design
 
 This section includes content and page design standards for creating Knowledge Base content. These standards are not exhaustive and can be added to as needed.
 
 ### Frontmatter
 
-Every article must include an `excerpt` field in its YAML frontmatter, directly below the `title`. The excerpt is a single sentence summarizing what the article covers — think of it as the "what's in this file" hint for future writers, PMs scanning the repo, and AI tools that need quick, accurate context without parsing the full article body. A well-written excerpt vastly improves how AI tools use the article in context and significantly boosts search engine optimization, since both rely on a concise, accurate summary to surface the article appropriately.
+Every article must include a `description` field in its YAML frontmatter, directly below the `title`. The description is a single sentence summarizing what the article covers, phrased simply and directly — with **no** "This article explains…" / "This article covers…" preamble. For a task or how-to article (most articles), write it in the imperative, leading with the verb and naming 2–3 concrete actions the reader performs, using the same terminology as the article body. For a conceptual or overview article where an imperative doesn't fit, use a plain declarative sentence that describes the feature or what the article covers. You can use Markdown in the `description` field — for example, inline code with backticks.
+
+The description does two jobs at once. Mintlify renders it on the published page, directly below the title, so it is the reader's first line of orientation — the on-page summary of what the article covers. It is also the "what's in this file" hint for future writers, PMs scanning the repo, and AI tools that need quick, accurate context without parsing the full article body. A well-written description vastly improves how AI tools use the article in context and significantly boosts search engine optimization, since both rely on a concise, accurate summary to surface the article appropriately.
 
 ````mdx
 ---
 title: "Create and Use Data Models"
-excerpt: "Define relationships between DataSets once and reuse them across Domo for consistent metrics and faster analysis."
+description: "Define relationships between DataSets, reuse them across Domo, and keep metrics consistent."
 ---
 ````
 
-Keep the excerpt to a single sentence and use the same terminology as the article body, so the summary stays accurate as the article evolves.
+Keep the description to a single sentence and use the same terminology as the article body, so the summary stays accurate as the article evolves.
 
-Do not use a `description` field in place of `excerpt`. Mintlify renders `description` on the published page, which duplicates the Intro section. The `excerpt` field, by contrast, is invisible on the rendered site and exists purely as repo-level metadata.
+Markdown renders in the `description` field, so you can use inline code and other formatting where it aids clarity:
+
+````mdx
+---
+title: "Connect AI Tools to Domo Using MCP"
+description: "Every Domo instance exposes its AI Library toolkits as MCP servers at `https://<instance>.domo.com/mcp/toolkits/<toolkit>`, so any MCP-capable UI tool can sign in with OAuth and read and build DataSets, DataFlows, Cards, Apps and more in your instance on your behalf."
+---
+````
+
+Because the `description` now carries the article's lead sentence and renders on the page, articles do **not** include a separate `## Intro` section by default — see **Lead Sentence and the Intro Exception** below. Do not add an `excerpt` field: `description` replaces it entirely and serves the same repo-level metadata and search/AI purposes while also displaying to readers.
+
+#### Sidebar Title
+
+`sidebarTitle` is an optional frontmatter field that sets the short label shown for the article in the left-hand navigation. The full `title` still appears as the page heading and is what search and AI tools use, so keep `title` complete and descriptive — `sidebarTitle` only changes the nav label.
+
+When present, place it directly below `title`, with `description` following it:
+
+````mdx
+---
+title: "Configure the Domo Mobile App with Microsoft Intune"
+sidebarTitle: "Microsoft Intune"
+description: "Configure the Domo Mobile App with Microsoft Intune using Conditional Access, compliance policies, and the Enterprise SSO app extension on iOS."
+---
+````
+
+Add a `sidebarTitle` in either of these cases:
+
+- **The title is long and crowds the navigation.** A descriptive title the reader needs on the page can be too long for the sidebar, where it wraps or gets truncated. Give the nav a short, recognizable label instead (for example, the title above shows as **Microsoft Intune**).
+- **The article belongs to a product group that uses a short nav label as its standard.** For example, the MCP Toolkits articles carry full titles like "Cards Toolkit" and "Alerts Toolkit" but use the toolkit name alone — **Cards**, **Alerts** — in the sidebar so the group reads as a clean list.
+
+Keep the `sidebarTitle` in Title Case and as short as is still clear in context (usually the distinguishing noun or product name). Omit the field entirely when the `title` is already short enough to serve as its own nav label.
 
 ### Article Structure
 
 The structure of an article should be as follows:
 
-- Intro
+- (_Optional_) Intro — only when the article needs additional context in prose before the body (see **Lead Sentence and the Intro Exception**). Most articles omit it and start at **Required Grants** or the first task.
 - Required Grants
 - (_Optional_) Prerequisites
 - Access Feature (this and Required Grants can be switched as needed, for example, when you must have a grant to view the option to access the feature)
@@ -48,19 +78,27 @@ The structure of an article should be as follows:
 - (_Optional_) Troubleshoot
 - (_Optional_) Related Articles
 
-A horizontal rule (`---`) must follow the **Intro** section, visually separating it from **Required Grants** and the article body.
+Do not place a horizontal rule (`---`) after an Intro section or anywhere between the frontmatter and the body. The previous convention of separating the Intro from the article body with a `---` has been removed.
 
 Do not include a table of contents — written or linked — at the top of an article. Tables of contents are generated automatically from the article's headings when the page renders on the Knowledge Base site.
 
-### Intro Section
+### Lead Sentence and the Intro Exception
 
-Keep the Intro section succinct and direct. In most cases, a single sentence is sufficient. Use the format "This article explains..." or "This article covers..." followed by 2–3 concrete actions or skills the reader gains, using the same terminology as the article body.
+Every article's lead sentence — the single-sentence summary — lives in the `description` frontmatter field, not in the body (see **Frontmatter** above). Mintlify renders the description directly below the title, so it already serves as the reader's opening summary. Because of this, most articles do **not** include a `## Intro` section; they go straight from the frontmatter to the first body section (typically **Required Grants** or the first task).
 
-Do not explain why the skills matter — focus only on what the article covers. A few articles genuinely require an opening sentence of context before the lead sentence, but this should be the exception, not the rule.
+Keep the description succinct and direct: a single sentence phrased in the imperative (for task articles) or as a plain declarative statement (for conceptual or overview articles), with no "This article explains…" / "This article covers…" preamble, naming 2–3 concrete actions or skills the reader gains and using the same terminology as the article body. Do not explain why the skills matter — focus only on what the article covers.
 
-**Correct:** "This article explains how to connect a DataSet to a card, schedule a DataFlow refresh, and configure row-level security."
+**Correct (description):** "Connect a DataSet to a card, schedule a DataFlow refresh, and configure row-level security."
 
-**Incorrect:** "Understanding your data pipeline is key to getting the most out of Domo. This article introduces several concepts and walks you through the basics."
+**Incorrect (description):** "Understanding your data pipeline is key to getting the most out of Domo. This article introduces several concepts and walks you through the basics."
+
+#### The Intro exception
+
+A few articles genuinely require an opening sentence or two of context in prose before the body — a conceptual definition, a scope caveat, or background the reader needs to orient. For those, and only those, add a `## Intro` section containing that context. This should be the exception, not the rule. When an article includes an `## Intro` section:
+
+- The `description` still carries the one-line "This article..." summary — it always does, in every article.
+- Put only the additional context in the `## Intro` section; do not repeat the `description` sentence there.
+- Do **not** add a horizontal rule (`---`) after the Intro. The old `---` separator convention has been removed.
 
 ### Required Grants
 
@@ -130,7 +168,7 @@ This applies to all heading levels (H1–H3) and to any labeled step that functi
 
 The frontmatter `title` field renders as H1. This means:
 
-- The Intro section and all other top-level parent headings should be H2
+- The Intro section (on the rare article that has one) and all other top-level parent headings should be H2
 - Subsections should be H3, H4, and so on
 
 The table of contents renders through H4. If you find yourself going three or more levels deep, consider reorganizing your content.
@@ -172,6 +210,29 @@ If a step is optional, you can write
 If the step is conditional, write
 
 2. (Conditional) Here is the conditional step.
+
+### Step-by-Step Procedures (Steps Component)
+
+For a short, end-to-end article that walks the reader through a single linear procedure from start to finish — such as [Configure the Domo Mobile App with Microsoft Intune](/s/article/000005902) — you can present the procedure with Mintlify's `<Steps>` component instead of plain numbered lists under `##` headings. It renders each step as a numbered marker down the left margin, which makes a sequential walkthrough easy to follow.
+
+Use `<Steps>` only when the article is essentially one continuous procedure. For a larger reference article organized into independent tasks (the Create, Review, Update, Delete headings described in **Article Structure**), keep the standard `##` task headings with numbered lists inside — don't force unrelated tasks into a single Steps sequence.
+
+Each `<Step>` takes a `title`. Write it in Title Case using an imperative verb, following the same rules as any other heading (see **Headings and Titles**). The component numbers the steps automatically, so don't prefix a title with "Step 1," "Step 2," and so on, and don't put a horizontal rule (`---`) between steps. A step can contain anything a normal section can — numbered sub-steps, screenshots, callouts, and links:
+
+```mdx
+<Steps>
+<Step title="Sign in to the Intune Admin Center">
+1. Open a web browser and go to the Microsoft Endpoint Manager Admin Center.
+2. Sign in with your Microsoft 365 administrator credentials.
+
+<Tip>**Tip:** Use an account with Global Administrator or Intune Administrator permissions.</Tip>
+</Step>
+<Step title="Add or Locate the Domo App">
+1. In the left-hand navigation pane, select **Apps → All apps**.
+2. Check whether the Domo app appears in the list.
+</Step>
+</Steps>
+```
 
 ## References
 
@@ -215,6 +276,27 @@ Do not add explicit `width` or `height` styles to the `<img>`, since they overri
 
 For inline glyphs and small UI fragments that flow with surrounding text, use the icon font or a native inline `<img>` instead. See *Icons* and *Inline images* below.
 
+### Alt Text Is Required on Every Screenshot
+
+Every screenshot — and every content image — must carry detailed, accurate `alt` text.
+
+Alt text serves three audiences at once:
+
+- **Accessibility compliance.** Screen-reader users can't see the image; the `alt` text is the only thing read in its place. Empty, missing, or vague alt text fails [WCAG image guidance](https://www.w3.org/WAI/tutorials/images/) and leaves those readers without the information the screenshot carries.
+- **LLM readability.** AI assistants that index and answer from the KB read the `alt` text, not the pixels. Accurate alt text is often the only way a model learns what a screenshot shows.
+- **SEO.** Search engines use `alt` text to understand and rank image content.
+
+**What good alt text looks like.** Describe what the screenshot actually shows and the state or detail that matters in context — the specific screen, the control the reader is acting on, and any on-screen values the step depends on. Write it so a reader who can't see the image loses nothing from the step.
+
+- **Do:** `alt="The DataSet Settings page with the Scheduling tab open and update frequency set to Every 15 minutes"`
+- **Don't:** `alt="screenshot"`, `alt="image"`, `alt="DataSet settings"` (too vague), or an empty `alt=""`.
+
+Keep it to roughly a sentence. Don't open with "Image of…" or "Screenshot of…" (the medium is already implied); describe the content directly. Never let the alt text claim something the image doesn't show.
+
+**Decorative icons are the exception**. An inline UI icon that the surrounding prose already names is hidden from screen readers with `aria-hidden="true"` rather than carrying alt text (see *Always Pair an Icon with a Text Label*). That exception applies only to decorative glyphs. A screenshot is content and always takes descriptive `alt`.
+
+**If you don't have the alt text, ask for it.** When writing or editing an article and a screenshot has no alt text — or only a placeholder such as `alt-text-here` — do not ship it and do not invent a description of an image you can't see. State this requirement, reference this rule, and ask the author for detailed, accurate alt text describing what each image shows.
+
 ## Icons
 
 When you need to show a Domo UI icon inside an article — like a gear, a chart, or an arrow — use the **Domo icon font** rather than uploading an image. The font already contains about a thousand icons and is built into every article automatically, so there's nothing to install or import. Using the font keeps icons crisp at any size, lets them match the surrounding text color (including in dark mode), and saves you from hunting down a screenshot.
@@ -222,14 +304,14 @@ When you need to show a Domo UI icon inside an article — like a gear, a chart,
 Here's what a typical icon reference looks like in an article:
 
 ```mdx
-Select <i className="icon-gear sm" aria-hidden="true" /> **Settings** to open Settings.
+Select <i className="icon-gear" aria-hidden="true" /> **Settings** to open Settings.
 ```
 
 A few things worth knowing:
 
 - The name after `icon-` always matches the name in the Domo design system. You can browse the full set at [Domo Icons](https://git.empdev.domo.com/pages/Development/DomoIcons/#!/icons/phosphor?size=xl).
-- Icons automatically pick up the color and size of the text around them, so they'll look right in both light and dark mode without any extra work.
-- If a particular icon ever looks off — too small or too large next to its label — you can resize just that one with `style={{fontSize: 24}}`. Don't reach for this unless the default genuinely looks wrong.
+- Icons automatically pick up the color and size of the text around them, so they'll look right in both light and dark mode without any extra work. An icon in a heading comes out heading-sized, and one in a table comes out table-sized. You don't need to add anything to get this.
+- If a particular icon ever looks off — too small or too large next to its label — you can give just that one a fixed size by adding a size word after the icon name, like `className="icon-gear md"`. The sizes are `xs` (18 pixels), `sm` (20 pixels), `md` (24 pixels), `lg` (36 pixels), and `xl` (48 pixels). A fixed size no longer matches the text around it, so don't reach for this unless the default genuinely looks wrong.
 
 ### Always Pair an Icon with a Text Label
 
@@ -238,18 +320,18 @@ The icon font uses a set of special Unicode characters that screen readers can't
 Here's the pattern again, with the screen-reader-friendly attribute called out:
 
 ```mdx
-Select <i className="icon-gear sm" aria-hidden="true" /> **Settings** to open Settings.
+Select <i className="icon-gear" aria-hidden="true" /> **Settings** to open Settings.
 ```
 
 If the sentence around the icon doesn't already name it — for example, "select [icon]" with nothing else — **rewrite the sentence to include the icon's name in the prose**. Don't try to fix it with a hidden `aria-label`. Naming the icon out loud helps everyone, not just screen-reader users; sighted readers benefit too, because they don't have to recognize an unfamiliar glyph at a glance.
 
-- **Don't:** "Select <i className="icon-chart-line sm" aria-hidden="true" /> to view the chart."
-- **Do:** "Select the line chart icon <i className="icon-chart-line sm" aria-hidden="true" /> to view the chart."
+- **Don't:** "Select <i className="icon-chart-line" aria-hidden="true" /> to view the chart."
+- **Do:** "Select the line chart icon <i className="icon-chart-line" aria-hidden="true" /> to view the chart."
 
 Occasionally an icon has no surrounding sentence to lean on — for example, an icon-only button, an icon used as the entire content of a link, or a glyph squeezed into a tight table cell where there's no room for a label. In those rare cases, use `role="img"` together with `aria-label` to give the icon its own accessible name:
 
 ```mdx
-<i className="icon-gear sm" role="img" aria-label="Settings" />
+<i className="icon-gear" role="img" aria-label="Settings" />
 ```
 
 Treat this as a last resort. Whenever the icon sits inside normal prose, the rewrite-the-sentence approach above is always the better choice.
@@ -296,7 +378,7 @@ Use whichever font matches the UI you're describing:
 - **Use `icon-*`** (Phosphor) everywhere else. The current Domo product uses the refreshed icons, so articles about today's UI should match. This holds even when an article's existing screenshots still show legacy icons — the screenshots are out of date, and pairing them with legacy-icon references would only reinforce the confusion.
 
 ```mdx
-In Workbench, select <i className="legacy-icon-database sm" aria-hidden="true" /> in the left icon bar.
+In Workbench, select <i className="legacy-icon-database" aria-hidden="true" /> in the left icon bar.
 ```
 
 ### Icons in Migrated Articles
@@ -326,6 +408,8 @@ The `height` value controls how big the image appears relative to the surroundin
 - **A plain number, such as `111`** — for screenshots inside a table cell where you want a specific pixel size.
 
 Keep the other three style values — `display: 'inline'`, `verticalAlign: 'start'`, and `margin: '0'` — the same across every inline image. They're what keep the image aligned with the text baseline and prevent extra vertical space from creeping in.
+
+An inline image that conveys content (a small UI-fragment screenshot, for example) follows the same rule as a block screenshot: it needs detailed, accurate `alt` text — see *Alt Text Is Required on Every Screenshot* above. The only images that omit `alt` are decorative icons already named in the surrounding prose, which use `aria-hidden="true"` instead.
 
 ## Videos
 
@@ -485,7 +569,7 @@ Do not use the English `<BetaNote />` in a localized article. Do not paste raw b
 When the entire article covers a beta feature:
 
 1. Add `tag: "Beta"` to the frontmatter. This renders a Beta badge next to the article title in the sidebar.
-2. Add the `import { BetaNote } from '/snippets/BetaNote.mdx';` line directly below the frontmatter, then place `<BetaNote />` immediately after it, above the Intro section.
+2. Add the `import { BetaNote } from '/snippets/BetaNote.mdx';` line directly below the frontmatter, then place `<BetaNote />` immediately after it, above the article body (and above the `## Intro` section if the article has one).
 3. Do not append `(Beta)` to the article title.
 
 ```mdx
@@ -493,13 +577,14 @@ When the entire article covers a beta feature:
 title: "Connect AI Tools to Domo Using MCP"
 tag: "Beta"
 sidebarTitle: "MCP Server"
+description: "Connect AI tools to Domo using the MCP server."
 ---
 
 import { BetaNote } from '/snippets/BetaNote.mdx';
 
 <BetaNote />
 
-## Intro
+## Required Grants
 
 ...
 ```
@@ -822,7 +907,7 @@ Add one Note where the badges first appear in the article, such as directly abov
 
 If a badged section also needs other information, keep a separate Note for that information only.
 
-If an entire article covers a feature that must be turned on, don't use badges. Say so once in the Intro and point readers to their Domo account team.
+If an entire article covers a feature that must be turned on, don't use badges. Say so once in a Note near the top of the article and point readers to their Domo account team.
 
 ## Tooltips
 

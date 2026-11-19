@@ -13,6 +13,7 @@ import remarkLintNoFileNameIrregularCharacters from "remark-lint-no-file-name-ir
 import remarkLintEmphasisMarker from "remark-lint-emphasis-marker";
 import remarkLintNoFileNameMixedCase from "remark-lint-no-file-name-mixed-case";
 import remarkLintOrderedListMarkerValue from "remark-lint-ordered-list-marker-value";
+import remarkMath from "remark-math";
 import remarkMdx from "remark-mdx";
 import remarkPresetLintConsistent from "remark-preset-lint-consistent";
 import remarkPresetLintMarkdownStyleGuide from "remark-preset-lint-markdown-style-guide";
@@ -82,6 +83,9 @@ const config = {
     // `stringWidth` pads table columns by display width, so emoji and CJK
     // count as two columns (matching scripts/pad_md_tables.py).
     [remarkGfm, { stringLength: stringWidth }],
+    // Mintlify renders `$...$` as LaTeX, so the formatter must parse math too
+    // or it drops the `\$` escapes that keep a literal dollar sign literal.
+    remarkMath,
     // Must run before stringify so the corrected `spread` flag drives output.
     remarkNormalizeListSpread,
     // Drop `[Text](/url "Text")` redundant titles — leftover from CMS

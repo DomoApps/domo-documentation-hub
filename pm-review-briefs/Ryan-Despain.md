@@ -2,7 +2,7 @@
 
 **Prepared for:** KB Restructure PM Review Meeting
 **Features owned:** Approvals, Projects & Tasks, Workflows
-**Total articles in your area:** 27
+**Total articles in your area:** 26
 
 > This document is your meeting guide. It shows how your content is being reorganized,
 > which AI-generated articles need your fact-check, which articles need a dedicated
@@ -21,7 +21,7 @@ areas lands in the new structure.
 |---------|----------|--------------|
 | Approvals | 2 | Pillar 6: Build Apps & Automate |
 | Projects & Tasks | 10 | Pillar 8: Collaborate [D2: may → Archive if feature deprecated] |
-| Workflows | 15 | TBD — not yet mapped |
+| Workflows | 14 | TBD — not yet mapped |
 
 ### Notable Navigation Changes
 

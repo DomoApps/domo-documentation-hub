@@ -1,0 +1,50 @@
+name: Broken Link Check
+
+# Fails a pull request that introduces a broken internal link. The repo carries
+# a large backlog of pre-existing broken links, so the script scans at the base
+# ref and at HEAD and fails only on findings that are new at HEAD.
+#
+# The rationale — why a full scan rather than the changed files, why the Mintlify
+# CLI rather than a generic link checker, and what the check cannot see — lives
+# in scripts/check-broken-links.py. Keep it there, not duplicated here.
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: link-check-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  broken-links:
+    runs-on: ubuntu-latest
+    # Skip drafts.
+    if: github.event.pull_request.draft == false
+    # A ceiling, not an expectation: the two scans run concurrently.
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          # Full history: the script builds a worktree at the base ref.
+          fetch-depth: 0
+
+      - name: Make the base branch available
+        run: git fetch --no-tags origin "${{ github.base_ref }}"
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+
+      # Installing pulls puppeteer, whose Chromium download fails and takes the
+      # whole install down with it. broken-links needs no browser.
+      - name: Install the Mintlify CLI
+        run: npm install -g mint
+        env:
+          PUPPETEER_SKIP_DOWNLOAD: "1"
+
+      - name: Fail on newly broken links
+        run: python3 scripts/check-broken-links.py --base "origin/${{ github.base_ref }}"

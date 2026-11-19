@@ -10,23 +10,23 @@ Safari has decided to block third party cookies:
 
 Since embed authentication is meant to avoid any workflow interruptions, cookies are no longer a viable option in Safari. Any call made from an embedded app must be authenticated in a new way because other browsers will eventually also block cookies from facilitating these types of interactions across domains.
 
-The way to stay future proof with embedded apps is by making an additional reference to a new token in the app's JavaScript code. Authenticated access for apps in private embed should use a the combination of these three methods that best fit your use case:
+The way to stay future proof with embedded apps is by making an additional reference to the app session ID in the app's JavaScript code. Authenticated access for apps in private embed should use a the combination of these three methods that best fit your use case:
 
 ## Header-based authentication
 
 - **Use case:** Authenticating any HTTP call through code to get data from the instance
 - **Benefit:** The header can then access the tokens required to make the programmatic filter options for private embed effective even as other browsers eventually follow Safari's example.
-- **Best practice:** For consistency, please ensure to maintain double underscores before and after the RYUU token as shown in the code below.
+- **Best practice:** For consistency, please ensure to maintain double underscores before and after `__RYUU_SID__` as shown in the code below.
 - **Example:** The app.js file that stores this code must be hosted in a folder called “public-assets” to be accessible by Domo.
 
 ```javascript
 document.body.onload = () => {
-  const token = window.__RYUU_AUTHENTICATION_TOKEN__;
+  const sessionId = window.__RYUU_SID__;
 
   fetch(`/domo/environment/v1`, {
     method: 'GET',
     headers: {
-      'X-DOMO-Ryuu-Token': token,
+      'X-DOMO-Ryuu-Session': sessionId,
       'content-type': 'application/json',
     },
   })
@@ -46,16 +46,16 @@ document.body.onload = () => {
 
 - **Use case:** Filtering non-sensitive data in apps
 - **Benefit:** Provide users with a head start in focusing on the most relevant data. Ensure the host page and embedded content can share context with each other.
-- **Example:** `?rpt` param applies not on the iframe but actually inside the app code
+- **Example:** `?ryuu_sid` param applies not on the iframe but actually inside the app code
 
 ```html
 <img id="exampleImg" src="example.jpg" />
 
 <script>
-  const token = window.__RYUU_AUTHENTICATION_TOKEN__;
+  const sessionId = window.__RYUU_SID__;
   const img = document.getElementById('exampleImg');
   const url = new URL(img.src);
-  url.searchParams.append('rpt', token);
+  url.searchParams.append('ryuu_sid', sessionId);
   img.src = url.toString();
 </script>
 ```

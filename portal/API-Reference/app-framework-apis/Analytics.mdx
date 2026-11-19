@@ -4,15 +4,15 @@ title: Analytics API
 
 The following instructions will enable you to track user interactions and application events within a Domo app or brick. These functions send HTTP requests to a predefined analytics endpoint (/domo/analytics/v1), logging events such as filter changes, application loads, page views, or any user interaction. This enables real-time tracking of user behavior and app usage, which can help enhance the user experience and provide valuable data insights.
 
-Each function makes use of the fetch API to send asynchronous POST requests, passing an authentication token (**RYUU_AUTHENTICATION_TOKEN**) in the headers to authorize each request. The functions are designed to be easily integrated into the application's codebase, with simple, clearly defined parameters for each type of event.
+Each function makes use of the fetch API to send asynchronous POST requests, passing the app session ID (`__RYUU_SID__`) in the headers to authorize each request. The functions are designed to be easily integrated into the application's codebase, with simple, clearly defined parameters for each type of event.
 {/* theme: info */}
 
 **Authentication**
 
-To authenticate to this service you will need to include the token in your request as follows
+To authenticate to this service you will need to include the session ID in your request as follows
 
 ```js
-const token = window.__RYUU_AUTHENTICATION_TOKEN__;
+const sessionId = window.__RYUU_SID__;
 ```
 
 Note: Authentication is handled automatically from within the context of a Domo Custom App when you use the `domo.post()` call.
@@ -46,7 +46,7 @@ export const reportAppLoad = function (locale) {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'X-DOMO-Ryuu-Token': token,
+      'X-DOMO-Ryuu-Session': sessionId,
     },
     body: JSON.stringify({
       type: 'LOAD',
@@ -88,7 +88,7 @@ export const reportPageView = function (page) {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'X-DOMO-Ryuu-Token': token,
+      'X-DOMO-Ryuu-Session': sessionId,
     },
     body: JSON.stringify({
       type: 'NAVIGATION',
@@ -132,7 +132,7 @@ export const reportFilterChange = function (filterType, filterValue) {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'X-DOMO-Ryuu-Token': token,
+      'X-DOMO-Ryuu-Session': sessionId,
     },
     body: JSON.stringify({
       type: 'ACTION',

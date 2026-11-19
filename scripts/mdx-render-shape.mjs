@@ -5,11 +5,17 @@
 // check-format-safety.mjs.
 import remarkFrontmatter from "remark-frontmatter";
 import remarkGfm from "remark-gfm";
+import remarkMath from "remark-math";
 import remarkMdx from "remark-mdx";
 import remarkParse from "remark-parse";
 import { unified } from "unified";
 
-export const mdxParser = unified().use(remarkParse).use(remarkMdx).use(remarkGfm).use(remarkFrontmatter);
+export const mdxParser = unified()
+  .use(remarkParse)
+  .use(remarkMdx)
+  .use(remarkGfm)
+  .use(remarkMath)
+  .use(remarkFrontmatter);
 
 export function sameRendering(a, b) {
   return JSON.stringify(renderShape(a)) === JSON.stringify(renderShape(b));

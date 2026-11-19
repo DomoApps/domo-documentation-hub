@@ -13,7 +13,7 @@ Every file — current or archived — has this exact shape:
 ```mdx
 ---
 title: "September 2026 Release Notes"
-excerpt: "September 2026 release notes covering <3–5 headline features>, and additional new features and enhancements."
+description: "September 2026 release notes covering <3–5 headline features>, and additional new features and enhancements."
 ---
 
 import { BetaNote } from '/snippets/BetaNote.mdx';
@@ -26,7 +26,7 @@ import { BetaNote } from '/snippets/BetaNote.mdx';
 
 <body>
 
-<Frame>![](/images/kb/<name>.png)</Frame>
+<Frame>![<detailed, accurate description of what this screenshot shows>](/images/kb/<name>.png)</Frame>
 
 Learn more about [<link text>](https://www.domo.com/docs/s/article/<slug-or-id>).
 
@@ -70,7 +70,7 @@ Invariants:
 ## 2. Frontmatter
 
 - **`title`** — Current file: `"{Month} {Year} Release Notes"` (e.g. `"September 2026 Release Notes"`). Archived file: `"{Year} Release {N} | {Month}"` (see `SKILL.md` › archival). Nothing else.
-- **`excerpt`** — one sentence, invisible on the page, used for search/AI context. Pattern: `"{Month} {Year} release notes covering {2–5 headline features}, and additional new features and enhancements."` Never use `description` in place of `excerpt`.
+- **`description`** — one sentence. Mintlify renders it on the published page below the title, and it also serves as search/AI context. Pattern: `"{Month} {Year} release notes covering {2–5 headline features}, and additional new features and enhancements."` Do not use a legacy `excerpt` field — `description` has replaced it.
 - No other frontmatter fields.
 
 ---
@@ -95,7 +95,7 @@ Invariants:
 - <Optional bulleted list of capabilities, benefits, or options>
 - <Keep each bullet a short phrase or single sentence>
 
-<Frame>![](/images/kb/<descriptive_name>.png)</Frame>
+<Frame>![<detailed, accurate description of what this screenshot shows>](/images/kb/<descriptive_name>.png)</Frame>
 
 Learn more about [<natural link text>](https://www.domo.com/docs/s/article/<slug-or-id>).
 ```
@@ -105,7 +105,7 @@ Rules:
 - **Headings** — Title Case; the product/feature name as customers see it. No internal codenames, squad names, or Jira keys. Use imperative/noun phrasing, never a gerund-led sentence.
 - **Body length** — 1–3 short paragraphs. Lead with what the customer can now do and why it helps; keep the mechanism brief. This is an announcement, not a how-to.
 - **Bulleted lists** — use for a set of new options, capabilities, or benefits (see Flex Table, Workflows Annotations examples). Parallel phrasing; no terminal punctuation on fragment bullets unless full sentences.
-- **`<Frame>`** — wrap every screenshot in `<Frame>![](/images/kb/<name>.png)</Frame>` on its own line, placed after the prose/bullets. A feature may have two stacked Frames when it needs two shots (see Connector Execution Details: `_failed` + `_pass`). Omit the Frame only when there is genuinely no usable screenshot — never insert a placeholder, TODO, or broken path.
+- **`<Frame>`** — wrap every screenshot in `<Frame>![<detailed, accurate description of what the screenshot shows>](/images/kb/<name>.png)</Frame>` on its own line, placed after the prose/bullets. **Alt text is required** — detailed and accurate, for accessibility compliance, LLM readability, and SEO (`Domo-KB-Style-Guide.mdx` › **Alt Text Is Required on Every Screenshot**); write it from the feature's internal blurb and what the image shows, never leave the `![]` empty. A feature may have two stacked Frames when it needs two shots (see Connector Execution Details: `_failed` + `_pass`). Omit the Frame only when there is genuinely no usable screenshot — never insert a placeholder, TODO, or broken path.
 - **"Learn more" line** — include only when a **real, published** KB article covers the feature. Format: `Learn more about [descriptive text](URL).` — a single sentence, no bold, ending in a period. If no article exists yet, omit the line entirely (do not invent a slug or link to a generic page just to have a link).
 
 ### Sub-features (parent + children)
@@ -200,7 +200,7 @@ See the **September 2026** Resolved Issues section for the model.
 
 ## 11. Quick checklist before handoff
 
-- [ ] Title + excerpt match the conventions in §2.
+- [ ] Title + description match the conventions in §2.
 - [ ] `import { BetaNote }` + `---` divider present.
 - [ ] Sections alphabetized; sub-features grouped correctly.
 - [ ] Every feature has a body; screenshots wrapped in `<Frame>`; every referenced image exists in `images/kb/`.

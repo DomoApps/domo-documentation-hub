@@ -1,0 +1,128 @@
+---
+title: "Token Consumption in LLM Agents"
+excerpt: "Learn what consumes tokens in an LLM agent run, why some runs fail while similar runs succeed, and how to reduce token usage."
+---
+
+## Intro
+
+This article explains what consumes tokens when you run an LLM agent, why some runs fail while similar runs succeed, and which fixes to apply, in priority order.
+
+---
+
+## Key Takeaways
+
+- **An agent loops —** It calls the model repeatedly, and because the model is stateless, every call re-sends the entire conversation so far.
+- **Large tool results compound —** A large tool result isn't consumed once. It's carried forward and re-sent on every later step.
+- **Runs fail at the context limit —** A run fails when the accumulated context exceeds the model's context limit. The same task can succeed on small inputs and fail on large ones because the amount of data differs, not the task.
+- **The fix —** Gather and trim data outside the model in deterministic steps, and use a single generation call (one prompt, one completion) whenever the task doesn't need the model to choose tools at runtime.
+
+## Terminology
+
+The following terms are used throughout this article.
+
+| Term                               | Definition                                                                                                                                                                                      |
+| ---------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Token**                          | The basic unit of text an AI model reads and writes—roughly three-quarters of a word (about 1,000 tokens is ~750 words). Model limits and costs are based on tokens.                            |
+| **LLM (large language model)**     | The AI model itself—for example, GPT or Claude—that takes text in and produces text out. In this article, "the model" always means the LLM.                                                     |
+| **Agent**                          | A setup where the model works in a loop: it calls tools, reads the results, and decides what to do next, repeating until the task is done. Suited to tasks whose steps aren't known in advance. |
+| **Run**                            | One complete execution of an agent, from start to finish. A single run is made up of many separate calls to the model.                                                                          |
+| **Turn**                           | One call to the model within a run. On each turn, the model receives everything so far and decides the next step.                                                                               |
+| **Stateless**                      | The model remembers nothing between calls. Every turn re-sends the whole conversation from the start.                                                                                           |
+| **Context**                        | Everything sent to the model in a single request: the system prompt, your instructions, the tool definitions, and the full history so far. Context is measured in tokens.                       |
+| **Context window (context limit)** | The maximum amount of context a model can accept in one request. If the accumulated context grows past this limit, the run fails.                                                               |
+| **System prompt**                  | The fixed, behind-the-scenes instructions that tell the model its role and rules. It's re-sent on every turn.                                                                                   |
+| **Tool**                           | An external capability the agent uses to get something done, such as a database query, an API call, or a lookup. The model doesn't run the tool itself; it requests it and receives the result. |
+| **Tool definition**                | The description of a tool—its name and the shape of its inputs and outputs—sent to the model so it knows the tool is available. It's re-sent on every turn.                                     |
+| **Input / output schema**          | The defined structure of what a tool expects to receive and what it returns (field names and types). Part of a tool definition.                                                                 |
+| **Tool result**                    | The data a tool returns after it runs. It's added to the context and re-sent on every following turn, which is why one large result is so expensive.                                            |
+| **Orchestration**                  | The model's own decision-making each turn: reading the situation and choosing which tool to call next.                                                                                          |
+| **Single generation call**         | One prompt in, one answer out—no tools, no loop, no re-sending. You assemble everything the model needs and send it once. The cheapest and most predictable option.                             |
+| **Deterministic step**             | A step that always gives the same result for the same input and doesn't involve the model (plain code, a query, or data prep). These steps use zero tokens.                                     |
+| **Chunking (map-reduce)**          | Breaking one large input into smaller pieces, processing each piece in its own small call, then combining the results.                                                                          |
+
+## Understand the Stateless Model
+
+An LLM remembers nothing between calls. Every request must carry everything the model needs to act: the system prompt, your instructions, the tool definitions, and the full history of the conversation so far.
+
+Context is everything sent in a single request. Those input tokens are consumed on every request, not just the first one.
+
+## Understand How Tokens Accumulate in an Agent Run
+
+An agent run isn't one model call—it's many. Each step the agent takes is a separate call, or turn:
+
+1. **Turn 1 (orchestration)** — The agent sends the prompt, instructions, and tool definitions (each tool's name, input schema, and output schema). The model decides to call a tool.
+2. **Turn 2** — The agent re-sends everything from turn 1, plus the tool call and its result. The model decides the next step.
+3. **Turn N** — The agent re-sends everything accumulated so far, plus the newest tool result.
+
+The input tokens for a run are the sum of each turn's growing context. The static prefix (system prompt, instructions, and tool definitions) is re-sent every turn, and the tool results pile up on top.
+
+### Why a Large Tool Result Costs the Most
+
+A single large result arrives once but is re-sent on every subsequent turn. A 20,000-token result that arrives on turn 2 of a six-turn run is re-sent roughly five more times before the run ends.
+
+This explains why a task works on some inputs and fails on others. The amount of data a tool returns scales with the input. A small input returns a small payload the model can handle; a large input returns a payload that, after it's re-sent a few times, exceeds the model's context limit.
+
+## Choose Between a Single Generation Call and an Agent Loop
+
+A single generation call is one prompt in and one completion out. There are no tool definitions, no orchestration loop, and no re-sends.
+
+An agent loop is worth the extra tokens only when the model needs to decide which tools to call at runtime. If you already know the steps, that decision-making spends tokens on nothing. Even two or three chained single calls normally use far fewer tokens than one agent run, because none of them re-send a growing history.
+
+| Use a single generation call when…                                 | Use an agent loop when…                                   |
+| ------------------------------------------------------------------ | --------------------------------------------------------- |
+| The steps are known ahead of time.                                 | The model must decide which tools to call at runtime.     |
+| You can gather the data up front.                                  | The path branches on intermediate results.                |
+| You want predictable, low token usage.                             | You need multi-step reasoning that can't be pre-scripted. |
+| The task is to summarize, classify, rewrite, or extract from text. | The task is to figure out what to do, then do it.         |
+
+## Reduce Token Consumption
+
+Apply these approaches in priority order:
+
+1. **Move data gathering out of the model.** Perform retrieval, joins, and filtering in deterministic steps (code, queries, or data prep), which use no tokens. The model should only see the final, minimal text.
+2. **Trim data before you send it.** Select only the fields and rows you need, pre-aggregate or summarize, and drop boilerplate and unused data.
+3. **Use a single generation call for deterministic tasks.** Reserve the agent loop for tasks that require runtime tool choice.
+4. **Constrain the agent if you must use one.** Use fewer tools, smaller tool output schemas, a cap on maximum turns, a cap on tool result size, and tighter instructions.
+5. **Chunk large inputs.** Use map-reduce across several small generation calls instead of forcing one large context.
+6. **Use a larger-context model only as a last resort.** A larger context window raises the ceiling but doesn't reduce tokens, and it hides the underlying problem rather than solving it.
+
+## Example: Token Usage in a Five-Turn Agent Run
+
+The following numbers are illustrative, not real measurements. Assume:
+
+- **System prompt —** 500 tokens
+- **User prompt (the task) —** 300 tokens
+- **Tool definitions —** 700 tokens
+
+These three items form a 1,500-token base that is re-sent on every turn. The agent also emits ~100 tokens of orchestration output per turn (its reasoning plus the tool call it chooses), and the final answer is ~400 tokens. The tool results return at different sizes, including one large result on turn 3.
+
+| Turn | What happens                                      | New this turn            | Input sent to the LLM |
+| ---- | ------------------------------------------------- | ------------------------ | --------------------- |
+| 1    | Reads the task, calls Tool 1                      | Base 1,500               | **1,500**             |
+| 2    | Adds Tool 1 result (2,000)                        | +100 call, +2,000 result | **3,600**             |
+| 3    | Adds Tool 2 result (8,000)                        | +100 call, +8,000 result | **11,700**            |
+| 4    | Adds Tool 3 result (1,500)                        | +100 call, +1,500 result | **13,300**            |
+| 5    | Adds Tool 4 result (500), writes the final answer | +100 call, +500 result   | **13,900**            |
+
+The input across all five calls totals 1,500 + 3,600 + 11,700 + 13,300 + 13,900 = ~44,000 tokens. With ~800 tokens of output across the turns, one run uses ~44,800 tokens to answer a single question.
+
+Two things stand out:
+
+- **The base was sent five times —** That's 7,500 tokens spent repeating the same system prompt and tool definitions.
+- **The 8,000-token result was re-sent on turns 3, 4, and 5 —** That's 24,000 tokens, over half the entire run, from one tool call.
+
+### Compare a Single Generation Call
+
+Gather the four results up front and trim them to only what the answer needs—for example, 3,000 tokens of data instead of the ~12,000 raw tokens the tools returned. Then make one call:
+
+- System prompt 500 + user prompt 300 + data 3,000 = 3,800 input tokens, plus ~400 output tokens = ~4,200 tokens.
+
+At ~44,800 versus ~4,200 tokens, the single call uses roughly 10 times fewer tokens for the same answer. Because nothing is re-sent, token usage doesn't balloon as the data grows.
+
+## Troubleshoot
+
+### A Run Fails, Times Out, or Succeeds Only on Small Inputs
+
+Typical symptoms include an internal server error, a run that never completes or times out, or a task that succeeds on small inputs and fails on large ones. The usual cause is accumulated context exceeding the model's context limit. Apply the approaches in [Reduce Token Consumption](#reduce-token-consumption).
+
+<Tip>**Tip:** Run logs are often short-lived. If a run fails, capture the logs (or re-run it) right away so you can confirm the token counts instead of inferring them.</Tip>

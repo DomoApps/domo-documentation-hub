@@ -1,20 +1,18 @@
 ---
-title: 'User Management'
+title: "User Management"
 permalink: e492bc8b3d9ee-user-management
-sidebarTitle: Managing Users
+sidebarTitle: "Manage Users"
 ---
 
 ## Overview
 
-User management API is a fast and convenient way for people to create and manage the user accounts inside the Domo platform.
+User management API is a fast and convenient way for people to create and manage the user accounts inside the Domo platform. For the full list of endpoints, parameters, and response objects, see the [User API reference](/portal/v91hopqk7ki3b-user-api).
 
 <Frame>
   ![](/images/dev/s3.amazonaws.com/development.domo.com/wp-content/uploads/2017/07/03123012/UserProfile.png)
 </Frame>
 
 ### User use cases
-
----
 
 Domo User Management API is used to enable the following experiences:
 
@@ -24,9 +22,9 @@ Domo User Management API is used to enable the following experiences:
 
 For additional help refer to the following guides and articles:
 
-- [Managing Users and Groups](https://knowledge.domo.com/Administer/Managing_Users_and_Groups)
-- [Personalized Data Permissions Guide](<https://knowledge.domo.com/Connect/Personalized_Data_Permissions_(PDP)>)
-- [Specifying Security Options](https://knowledge.domo.com/Administer/Specifying_Security_Options)
+- [Add Users to Domo](/s/article/360042934274)
+- [User Attributes](/s/article/000005164)
+- [Change User Information](/s/article/360043438933)
 
 ## Quickstart
 
@@ -38,20 +36,21 @@ In this guide we will show you how to:
 
 Once a user is created, you can then make updates to the user's information displayed in the Domo application as well as the user's role which grants permission to functionality throughout each Domo feature.
 
-<Info>
-**Note**
-In order to follow this Quickstart you will need to obtain an [access token](/portal/uc9ls4li6ny8s-embed-token-api#quickstart) or you can leverage any of [Domo's SDKs](/portal/Getting-Started/sdks) which will also handle authentication.
-</Info>
+<Note>
+  **Note:** In order to follow this Quickstart you will need to obtain an
+  [access token](/portal/1845fc11bbe5d-api-authentication#quickstart) or you can
+  leverage any of [Domo's SDKs](/portal/Getting-Started/sdks) which will also
+  handle authentication.
+</Note>
 
 ### Step 1: Create a user
 
----
+Make sure to store the `user_id` value with the user's name in order to make updates to user information, the user's role in Domo, or adding access rights to data within a DataSet or content found in a Domo Page or Card.
 
 #### Sample Request
 
-See this sample request in [Java](https://github.com/domoinc/domo-java-sdk/tree/master/domo-java-sdk-all/src/test/java/com/domo/sdk/users/CreateExample.java), [Python](https://github.com/domoinc/domo-python-sdk/blob/master/examples/user.py).
-
-```HTTP
+<CodeGroup>
+```http HTTP icon="globe"
 POST /v1/users?sendInvite=true HTTP/1.1
 Content-Type: application/json
 Accept: application/json
@@ -60,32 +59,124 @@ Content-Length: 90
 Authorization: bearer <your-valid-oauth-access-token>
 
 {
-"title": "Software Engineer",
-"email": "leonhard.euler@domo.com",
-"alternateEmail": "leonhardeuler@email.com",
-"role": "Admin",
-"phone": "888-555-0123",
-"name": "Leonhard Euler",
-"location": "American Fork",
-"timezone": "",
-"locale": "",
-"employeeNumber": 23432
+  "title": "Software Engineer",
+  "email": "leonhard.euler@domo.com",
+  "alternateEmail": "leonhardeuler@email.com",
+  "role": "Admin",
+  "phone": "888-555-0123",
+  "name": "Leonhard Euler",
+  "location": "American Fork",
+  "timezone": "",
+  "locale": "",
+  "employeeNumber": 23432
 }
 ```
 
-Make sure to store the `user_id` value with the user's name in order to make updates to user information, the user's role in Domo, or adding access rights to data within a DataSet or content found in a Domo Page or Card.
+```javascript Node icon="node-js"
+// https://github.com/domoinc/domo-node-sdk/blob/master/src/users/UserClient.ts#L14
+// Build a User
+const user = {
+  name: 'Leonhard Euler',
+  email: 'leonhard.euler@domo.com',
+  role: 'Privileged'
+};
+const sendInvite = false;
+
+// Create a User
+domo.users.create(user, sendInvite)
+  .then(res => { console.log(`Created User '${res.name}'`); })
+  .catch(console.error);
+```
+
+```python Python icon="python"
+# https://github.com/domoinc/domo-python-sdk/blob/master/examples/user.py#L18
+from pydomo.users import CreateUserRequest
+
+# Build a User
+user_request = CreateUserRequest()
+user_request.name = 'Leonhard Euler'
+user_request.email = 'leonhard.euler@domo.com'
+user_request.role = 'Privileged'
+send_invite = False
+
+# Create a User
+user = domo.users.create(user_request, send_invite)
+domo.logger.info("Created User '{}'".format(user['name']))
+```
+
+```rust Rust icon="rust"
+// https://github.com/domoinc/domo-rust-sdk/blob/master/src/public/user/mod.rs#L144
+use domo::public::user::User;
+
+// Build a User
+let mut user_request = User::new();
+user_request.name = Some(String::from("Leonhard Euler"));
+user_request.email = Some(String::from("leonhard.euler@domo.com"));
+user_request.role = Some(String::from("Privileged"));
+
+// Create a User
+let user = domo.post_user(user_request).await?;
+println!("Created User '{}'", user.name.as_deref().unwrap_or_default());
+```
+
+```java Java icon="java"
+// https://github.com/domoinc/domo-java-sdk/tree/master/domo-java-sdk-all/src/test/java/com/domo/sdk/users/CreateExample.java
+package com.domo.sdk.users;
+
+import com.domo.sdk.ExampleBase;
+import com.domo.sdk.users.model.CreateUserRequest;
+import com.domo.sdk.users.model.User;
+import org.junit.Test;
+
+import java.io.IOException;
+
+public class CreateExample extends ExampleBase {
+
+  @Test
+  public void userClient_smokeTest() throws IOException {
+    UserClient userClient = client.userClient();
+
+    create(userClient);
+  }
+
+  public static User create(UserClient userClient) {
+    // Build a User request
+    CreateUserRequest request = new CreateUserRequest();
+    request.setName("Leonhard Euler");
+    request.setEmail("leonhard.euler@domo.com");
+    request.setRole("Privileged");
+    boolean sendInvite = true;
+
+    //Create a user
+    return userClient.create(sendInvite, request);
+  }
+}
+```
+
+```r R icon="r-project"
+# https://github.com/domoinc/rdomo/blob/main/R/rdomo.R#L598
+send_invite <- FALSE
+
+# Create a User
+user <- domo$users_add(
+  x_name = 'Leonhard Euler',
+  x_email = 'leonhard.euler@domo.com',
+  x_role = 'Privileged',
+  x_sendInvite = send_invite
+)
+message(sprintf("Created User '%s'", user$name))
+```
+
+</CodeGroup>
 
 ### Step 2: Update a user's information
-
----
 
 With a new `user_id`, update the user's information:
 
 #### Sample Request
 
-See this sample request in [Java](https://github.com/domoinc/domo-java-sdk/tree/master/domo-java-sdk-all/src/test/java/com/domo/sdk/users/UpdateExample.java), [Python](https://github.com/domoinc/domo-python-sdk/blob/master/examples/user.py).
-
-```HTTP
+<CodeGroup>
+```http HTTP icon="globe"
 PUT /v1/users/855462682 HTTP/1.1
 Content-Type: application/json
 Accept: application/json
@@ -100,19 +191,152 @@ Authorization: bearer <your-valid-oauth-access-token>
 }
 ```
 
-### Step 3: Delete a user from Domo
+```javascript Node icon="node-js"
+// https://github.com/domoinc/domo-node-sdk/blob/master/src/users/UserClient.ts#L38
+const userUpdate = {
+  name: 'Leo Euler',
+  email: 'leo.euler@domo.com',
+  role: 'Privileged'
+};
 
----
+domo.users.update(userId, userUpdate)
+  .then(res => { console.log(`Updated User '${res.name}'`); })
+  .catch(console.error);
+```
+
+```python Python icon="python"
+# https://github.com/domoinc/domo-python-sdk/blob/master/examples/user.py#L31
+from pydomo.users import CreateUserRequest
+
+user_update = CreateUserRequest()
+user_update.name = 'Leo Euler'
+user_update.email = 'leo.euler@domo.com'
+user_update.role = 'Privileged'
+user = domo.users.update(user['id'], user_update)
+```
+
+```rust Rust icon="rust"
+// https://github.com/domoinc/domo-rust-sdk/blob/master/src/public/user/mod.rs#L177
+use domo::public::user::User;
+
+let user_id = user.id.unwrap().to_string();
+
+let mut user_update = User::new();
+user_update.name = Some(String::from("Leo Euler"));
+user_update.email = Some(String::from("leo.euler@domo.com"));
+user_update.role = Some(String::from("Privileged"));
+let user = domo.put_user(&user_id, user_update).await?;
+```
+
+```java Java icon="java"
+// https://github.com/domoinc/domo-java-sdk/tree/master/domo-java-sdk-all/src/test/java/com/domo/sdk/users/UpdateExample.java
+package com.domo.sdk.users;
+
+import com.domo.sdk.ExampleBase;
+import com.domo.sdk.users.model.User;
+import org.junit.Test;
+
+import java.io.IOException;
+
+public class UpdateExample extends ExampleBase {
+
+  @Test
+  public void userClient_smokeTest() throws IOException {
+    UserClient userClient = client.userClient();
+
+    //Create a user
+    User user = CreateExample.create(userClient);
+
+    //Update a User
+    user.setName("Leo Euler");
+    user = userClient.update(user.getId(), user);
+  }
+}
+```
+
+```r R icon="r-project"
+# https://github.com/domoinc/rdomo/blob/main/R/rdomo.R#L650
+user_update <- list(
+  name = 'Leo Euler',
+  email = 'leo.euler@domo.com',
+  role = 'Privileged'
+)
+user <- domo$users_update(user$id, user_update)
+```
+
+</CodeGroup>
+
+#### Sample Response
+
+```http
+HTTP/1.1 200 OK
+```
+
+### Step 3: Delete a user from Domo
 
 Similar to updating a user's information, provide the correct `user_id` when attempting to delete the user from Domo:
 
 #### Sample Request
 
-See this sample request in [Java](https://github.com/domoinc/domo-java-sdk/tree/master/domo-java-sdk-all/src/test/java/com/domo/sdk/users/DeleteExample.java), [Python](https://github.com/domoinc/domo-python-sdk/blob/master/examples/user.py).
-
-```HTTP
+<CodeGroup>
+```http HTTP icon="globe"
 DELETE /v1/users/855462682 HTTP/1.1
 Accept: application/json
 Host: api.domo.com
 Authorization: bearer <your-valid-oauth-access-token>
+```
+
+```javascript Node icon="node-js"
+// https://github.com/domoinc/domo-node-sdk/blob/master/src/users/UserClient.ts#L47
+domo.users.delete(userId)
+  .then(() => { console.log(`Deleted User ${userId}`); })
+  .catch(console.error);
+```
+
+```python Python icon="python"
+# https://github.com/domoinc/domo-python-sdk/blob/master/examples/user.py#L40
+domo.users.delete(user['id'])
+```
+
+```rust Rust icon="rust"
+// https://github.com/domoinc/domo-rust-sdk/blob/master/src/public/user/mod.rs#L196
+domo.delete_user(&user_id).await?;
+```
+
+```java Java icon="java"
+// https://github.com/domoinc/domo-java-sdk/tree/master/domo-java-sdk-all/src/test/java/com/domo/sdk/users/DeleteExample.java
+package com.domo.sdk.users;
+
+import com.domo.sdk.ExampleBase;
+import com.domo.sdk.users.model.User;
+import org.junit.Test;
+
+import java.io.IOException;
+
+public class DeleteExample extends ExampleBase {
+
+  @Test
+  public void userClient_smokeTest() throws IOException {
+    UserClient userClient = client.userClient();
+
+    //Create a user
+    User user = CreateExample.create(userClient);
+
+    //Delete a User
+    userClient.delete(user.getId());
+  }
+}
+```
+
+```r R icon="r-project"
+# https://github.com/domoinc/rdomo/blob/main/R/rdomo.R#L657
+domo$users_delete(user$id)
+```
+
+</CodeGroup>
+
+#### Sample Response
+
+```http
+HTTP/1.1 204 No Content
 ```

@@ -1,8 +1,8 @@
 # PM Review Brief: Chris Wright
 
 **Prepared for:** KB Restructure PM Review Meeting
-**Features owned:** Analyzer, Beast Mode, Charting, Doc Cards, Export to CSV, Mobile - iOS, Worksheets
-**Total articles in your area:** 59
+**Features owned:** Mobile
+**Total articles in your area:** 6
 
 > This document is your meeting guide. It shows how your content is being reorganized,
 > which AI-generated articles need your fact-check, which articles need a dedicated
@@ -19,13 +19,7 @@ areas lands in the new structure.
 
 | Feature | Articles | New Location |
 |---------|----------|--------------|
-| Analyzer | 24 | Pillar 5: Analyze & Visualize |
-| Beast Mode | 1 | Pillar 5: Analyze & Visualize |
-| Charting | 19 | Pillar 5: Analyze & Visualize |
-| Doc Cards | 1 | Pillar 5: Analyze & Visualize |
-| Export to CSV | 7 | Pillar 5: Analyze & Visualize |
-| Mobile - iOS | 6 | Pillar 1: Getting Started |
-| Worksheets | 1 | Pillar 5: Analyze & Visualize |
+| Mobile | 6 | TBD — not yet mapped |
 
 ---
 

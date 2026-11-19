@@ -1,0 +1,50 @@
+---
+title: SCIM API
+sidebarTitle: Overview
+---
+
+Domo implements the [SCIM 2.0 protocol](https://datatracker.ietf.org/doc/html/rfc7644) so an identity provider (IdP) can create, update, and delete Domo users and directory groups. Most customers call these endpoints through their IdP's SCIM integration rather than directly. To set up an IdP, see [SCIM in Domo](/s/article/000005241).
+
+## Authentication
+
+Pass a Domo access token in either of these headers:
+
+- `X-DOMO-Developer-Token: <Domo_Access_Token>`
+- `Authorization: Bearer <Domo_Access_Token>`
+
+The SCIM endpoints act as the user who owns the token, and that user needs the **Manage All Users** and **Manage All Roles** grants, plus **Manage All Groups** to use the Groups endpoints or group attributes. To manage directory groups, the user must also be designated in Group Settings as the user permitted to manage directory groups. See [Configure Required Grants](/s/article/000005241#configure-required-grants) and [Synchronize Directory Groups](/s/article/000005241#synchronize-directory-groups).
+
+Learn how to [generate an access token](/s/article/360042934494).
+
+## Endpoint Root
+
+```text
+https://{instance}.domo.com/api/identity/v1/scim
+```
+
+## Schemas
+
+Domo maps elements from six SCIM schemas to Domo user and group attributes.
+
+| Resource | Schema                                                       | Contents                                                    |
+| -------- | ------------------------------------------------------------ | ----------------------------------------------------------- |
+| User     | `urn:ietf:params:scim:schemas:core:2.0:User`                 | Name, email, active status, role, phone numbers, and groups |
+| User     | `urn:ietf:params:scim:schemas:extension:enterprise:2.0:User` | Employee number, department, organization, and manager      |
+| User     | `urn:ietf:params:scim:schemas:extension:domo:2.0:User`       | Location and hire date                                      |
+| User     | `urn:ietf:params:scim:schemas:extension:custom:2.0:User`     | Domo custom attributes                                      |
+| Group    | `urn:ietf:params:scim:schemas:core:2.0:Group`                | Directory name and members                                  |
+| Group    | `urn:ietf:params:scim:schemas:extension:domo:2.0:Group`      | Domo group display name and description                     |
+
+## Domo-Specific Behavior
+
+- **`userName` is the primary email address.** Setting `userName` also sets the user's primary email. A `work` email in a POST or PUT body is ignored, and `other` sets the alternate email.
+- **`externalId` is the Domo Employee ID.** The enterprise schema's `employeeNumber` is a separate attribute, Employee Number, and must be an integer.
+- **Directory groups only.** The Groups endpoints only work on active directory groups. Groups created through SCIM are always directory groups, and a user's `groups` attribute only lists directory groups. [Learn more](/s/article/360042934294#group-types) about group types.
+- **Setting `active` to `false` deletes the user.** This applies to PUT and PATCH requests as well as Delete User, and a deleted user can't be reactivated through SCIM.
+- **Users who own DataSets or DataFlows can't be deleted.** The request fails with `409 Conflict`. Reassign ownership of those objects first.
+- **One role per user.** The `roles` array must contain a single object.
+- **Custom attribute keys must match exactly.** The attribute must already be defined in Domo, and the key is case-sensitive.
+- **Filtering is limited.** User filters support `eq`, `lt`, `lte`, `gt`, and `gte`, joined with `and`. `or` is not supported. Groups can only be filtered by `displayName eq "<name>"`.
+- **Group attributes are returned on request.** Get Group and Get Groups return `members`, `domoDisplayName`, and `description` only when you name them in the `attributes` parameter.
+- **Group membership is managed through Groups.** Patch User can't change `groups`. Use Patch Group with the `members` path, where a `remove` with no `value` removes all members.
+- **Not supported:** bulk operations, password changes, and the `name` complex attribute.

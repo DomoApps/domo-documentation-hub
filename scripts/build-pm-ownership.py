@@ -4,13 +4,9 @@ Build Article-PM-Ownership-Reference.mdx
 
 Matches every article in s/article/ to a Feature (and PM) from the CSV.
 Strategy (priority order):
-  1. An ownership override from pm-review-state/ownership-overrides.json
-  2. The article's Feature in the existing reference (assignments are sticky)
-  3. New articles only: the majority Feature of their nav-group neighbors
-  4. Exact or rule-based match by nav group hierarchy
-  5. Title/excerpt keyword match
-  6. Fallback to broad nav section defaults
-New articles placed by 3 at pillar level, or by 4-6, are printed for review.
+  1. Exact or rule-based match by nav group hierarchy
+  2. Title/excerpt keyword match
+  3. Fallback to broad nav section defaults
 """
 
 import json
@@ -18,7 +14,7 @@ import os
 import re
 import csv
 import datetime
-from collections import Counter, defaultdict
+from collections import defaultdict
 from pathlib import Path
 
 ROOT = Path(__file__).parent.parent
@@ -30,30 +26,10 @@ ROOT = Path(__file__).parent.parent
 # keeps the "add new articles, assign PMs by pillar/group" path runnable with no
 # spreadsheet: nav-group → Feature comes from NAV_FEATURE below, Feature → PM from
 # whichever roster source is available. CSV wins when present.
-CSV_PATH = ROOT / 'Feature - Owning Squad, PM, Eng, UX.csv'
+CSV_PATH = ROOT / 'Domo_Feature_Inventory(Master Feature List).csv'
 REFERENCE_PATH = ROOT / 'Article-PM-Ownership-Reference.mdx'
 
-# Ownership overrides recorded by `pm_review.py reassign` when a PM claims/disclaims
-# an article mid-review. filename → PM; applied per-article below so both this file's
-# outputs (the reference + CODEOWNERS) follow the reassignment. See the pm-review skill.
-OVERRIDES_PATH = ROOT / 'pm-review-state' / 'ownership-overrides.json'
-
-def load_ownership_overrides():
-    out = {}
-    if OVERRIDES_PATH.exists():
-        try:
-            data = json.loads(OVERRIDES_PATH.read_text(encoding='utf-8'))
-        except (OSError, ValueError):
-            return out
-        for o in data.get('overrides', []):
-            fn, pm, feature = o.get('filename'), o.get('to_pm'), o.get('feature')
-            if fn and (pm or feature):
-                out[fn] = (pm, feature)  # last write wins (file order)
-    return out
-
-OWNERSHIP_OVERRIDES = load_ownership_overrides()
-
-features = {}  # feature_name → {pm, squad_biz}
+features = {}  # feature_name → {pm}
 ROSTER_SOURCE = None
 
 def _row_cells(line):
@@ -62,10 +38,65 @@ def _row_cells(line):
     inner = esc.strip().lstrip('|').rstrip('|')
     return [c.strip().replace('\x01', '|') for c in inner.split('|')]
 
-def load_reference_rows():
-    """Yield (feature, filename, pm) for each data row of the existing reference."""
-    if not REFERENCE_PATH.exists():
-        return
+# ── Conflict resolution ───────────────────────────────────────────────────────
+# A handful of Feature names appear under more than one squad with different PMs.
+# The per-article matcher emits a single Feature string, so the owning PM is
+# pinned here. Every other feature prefers a single routable individual over a
+# combined ("A/B") or placeholder ("All/Various", "?") owner (see _resolve_owner).
+CONFLICT_PM = {
+    'Admin Settings':            'Dan Brinton',
+    'Data Accounts':             'Jordan Jensen',
+    'Data Center':               'Phil Fuchs',
+    'DomoStats':                 'Dan Brinton',
+    'Network Security Settings': 'Dan Brinton',
+    'PDP':                       'Dan Brinton',
+}
+
+_PLACEHOLDER_PMS = {'All/Various', '?'}
+
+def _is_individual(pm):
+    """A single, routable person — not a combo ('A/B') or placeholder."""
+    return bool(pm) and '/' not in pm and pm not in _PLACEHOLDER_PMS
+
+def _resolve_owner(feat, pms):
+    """Pick one owning PM for a feature from all PM values seen for it."""
+    if feat in CONFLICT_PM:
+        return CONFLICT_PM[feat]
+    individuals = [p for p in pms if _is_individual(p)]
+    if individuals:
+        return individuals[0]
+    # No lone individual: keep a real combined owner ('A/B'), but drop
+    # placeholders ('All/Various', '?') so they surface as no-PM, not fake PMs.
+    combos = [p for p in pms if p and '/' in p and p not in _PLACEHOLDER_PMS]
+    return combos[0] if combos else ''
+
+def _read_rows(path):
+    """Read the inventory CSV, tolerating the cp1252 encoding it ships in."""
+    raw = path.read_bytes()
+    for enc in ('utf-8-sig', 'cp1252', 'latin-1'):
+        try:
+            text = raw.decode(enc)
+            break
+        except UnicodeDecodeError:
+            continue
+    else:
+        text = raw.decode('utf-8', errors='replace')
+    return list(csv.DictReader(text.splitlines()))
+
+if CSV_PATH.exists():
+    ROSTER_SOURCE = 'CSV'
+    feat_pms = {}  # feature → [PM values in file order]
+    for row in _read_rows(CSV_PATH):
+        feat = (row.get('Feature') or '').strip()
+        pm = (row.get('PM') or '').strip()
+        if feat:
+            feat_pms.setdefault(feat, []).append(pm)
+    for feat, pms in feat_pms.items():
+        features[feat] = {'pm': _resolve_owner(feat, pms)}
+elif REFERENCE_PATH.exists():
+    ROSTER_SOURCE = 'reference'
+    # Recover Feature → PM from the existing reference table:
+    #   | Feature | Article Title | `Article File Name` | PM |
     with open(REFERENCE_PATH, encoding='utf-8') as f:
         for line in f:
             if not line.startswith('| '):
@@ -73,37 +104,15 @@ def load_reference_rows():
             cells = _row_cells(line)
             if len(cells) != 4:
                 continue
-            feat, _title, fname, pm = cells
+            feat, _title, _file, pm = cells
             if feat == 'Feature' or not feat or set(feat) <= {'-'}:
                 continue  # header or separator row
-            yield feat, fname.strip('`'), pm
-
-# Feature each article already has. Re-deriving it from nav position on every run
-# reshuffles hundreds of curated assignments whenever the nav is reorganized.
-PRIOR_FEATURE = {fname: feat for feat, fname, _pm in load_reference_rows()}
-
-if CSV_PATH.exists():
-    ROSTER_SOURCE = 'CSV'
-    # Prefer the row with a PM when a feature appears more than once.
-    with open(CSV_PATH, newline='', encoding='utf-8') as f:
-        reader = csv.DictReader(f)
-        for row in reader:
-            feat = row['Feature'].strip()
-            pm = row['PM'].strip()
-            squad_biz = row['Squad Business Name'].strip()
-            if feat not in features or (pm and not features[feat]['pm']):
-                features[feat] = {'pm': pm, 'squad_biz': squad_biz}
-elif REFERENCE_PATH.exists():
-    ROSTER_SOURCE = 'reference'
-    # Recover Feature → PM from the existing reference table:
-    #   | Feature | Article Title | `Article File Name` | PM |
-    for feat, _file, pm in load_reference_rows():
-        if pm and pm != '(no PM listed)' and feat not in features:
-            features[feat] = {'pm': pm, 'squad_biz': ''}
+            if pm and pm != '(no PM listed)' and feat not in features:
+                features[feat] = {'pm': pm}
 else:
     raise SystemExit(
-        "No roster source found: neither 'Feature - Owning Squad, PM, Eng, UX.csv' "
-        "nor 'Article-PM-Ownership-Reference.mdx' is present. Drop the squad CSV "
+        "No roster source found: neither 'Domo_Feature_Inventory(Master Feature List).csv' "
+        "nor 'Article-PM-Ownership-Reference.mdx' is present. Drop the feature-inventory CSV "
         "into the repo root and re-run."
     )
 
@@ -120,26 +129,25 @@ PM_GITHUB_LOGIN = {
     'Ryan Despain':     '@RyanDespain',
 }
 
+# ── Static (non-article) CODEOWNERS entries ──────────────────────────────────
+# Paths outside the PM-ownership mapping (e.g. OpenAPI specs) that need their
+# own reviewers. Emitted verbatim at the end of .github/CODEOWNERS on every run.
+STATIC_CODEOWNERS = {
+    'openapi/product/AI-Services.yaml': ['@Jeremyrodgers123', '@jwclark'],
+    'openapi/product/Documents.yaml':   ['@HeavyT12'],
+}
+
 # ── 2. Build nav hierarchy: slug → [immediate_group, parent, grandparent, …, tab] ──
 article_nav = {}  # slug → list of ancestor group names (most specific first)
-article_group_paths = {}  # slug → list of ancestor group paths (most specific first)
-group_members = defaultdict(list)  # group path → slugs anywhere under it
 
-def traverse(pages, ancestors, paths=()):
+def traverse(pages, ancestors):
     for item in pages:
         if isinstance(item, str):
             slug = item.replace('s/article/', '')
             if slug not in article_nav:
                 article_nav[slug] = ancestors[:]
-                article_group_paths[slug] = list(paths)
-                for p in paths:
-                    group_members[p].append(slug)
         elif isinstance(item, dict) and 'group' in item:
-            group_pages = item.get('pages', [])
-            if item.get('root'):
-                group_pages = [item['root']] + group_pages
-            path = (paths[0] + ' > ' if paths else '') + item['group']
-            traverse(group_pages, [item['group']] + ancestors, (path,) + tuple(paths))
+            traverse(item.get('pages', []), [item['group']] + ancestors)
 
 with open(ROOT / 'docs.json', encoding='utf-8') as f:
     docs = json.load(f)
@@ -215,7 +223,7 @@ NAV_FEATURE = {
     'Data Providers Q-S':     'Third Party Connectors',
     'Data Providers T-Z and #':'Third Party Connectors',
     'File and JSON Connectors':'Third Party Connectors',
-    'General Connector Information': 'Connectors',
+    'General Connector Information': 'Connectors 1.0',
 
     # ── Transform & Manage ────────────────────────────────────────────────────
     'Magic ETL':              'Magic ETL',
@@ -280,7 +288,6 @@ NAV_FEATURE = {
     'App Studio':               'App Studio',
     'Domo Bricks':              'Bricks/Templates',
     'Apps':                     'App Studio',
-    'Workspaces':               'Workspaces',
     'Approvals':                'Approvals',
     'Projects and Tasks':       'Projects & Tasks',
     'Goals Center':             'Goals',
@@ -341,9 +348,9 @@ CLOUD_WAREHOUSE_GROUPS = {
 
 def classify_cloud_warehouse_article(title_lower, excerpt_lower):
     """Return Feature name for articles in cloud-warehouse nav groups."""
-    # Connector keyword → Connectors
+    # Connector keyword → Connectors 1.0
     if re.search(r'\bconnector\b', title_lower):
-        return 'Connectors'
+        return 'Connectors 1.0'
     if 'federated' in title_lower or 'federated' in excerpt_lower:
         return 'Federated'
     if 'cloud amplifier' in title_lower or 'cloud amplifier' in excerpt_lower:
@@ -351,9 +358,9 @@ def classify_cloud_warehouse_article(title_lower, excerpt_lower):
     if re.search(r'\bdomo on\b', title_lower):
         return 'Cloud Amplifier'
     if 'writeback' in title_lower:
-        return 'Connectors'
+        return 'Connectors 1.0'
     if 'minimum permissions' in title_lower:
-        return 'Connectors'
+        return 'Connectors 1.0'
     # Default: Cloud Amplifier (integration setup articles)
     return 'Cloud Amplifier'
 
@@ -457,6 +464,7 @@ KEYWORD_RULES = [
     (r'search',             'Search'),
     (r'social',             'Social'),
     (r'teams integration|microsoft teams', 'Teams integration'),
+    (r'workspac',           'Workspaces'),
     (r'customer communi',   'Customer Communications Center'),
     (r'mr roboto',          'Mr Roboto'),
     (r'discoverabilit',     'Discoverabliity'),
@@ -478,7 +486,7 @@ KEYWORD_RULES = [
     (r'java|python script|r script', 'Data Science'),
     (r'python',             'Python'),
     (r'sql',                'Data Flows'),
-    (r'domo connector',     'Connectors'),
+    (r'domo connector',     'Connectors 1.0'),
     (r'connector',          'Third Party Connectors'),
     (r'app dev framework',  'App Dev Framework'),
     (r'app data structure', 'App Data Structures'),
@@ -491,6 +499,64 @@ KEYWORD_RULES = [
     (r'education|coursebuilder', 'Education'),
     (r'app store|appstore', 'AppStore'),
 ]
+
+# ── 4b. Org-restructure nomenclature translation ─────────────────────────────
+# The matcher above (NAV_FEATURE / KEYWORD_RULES / cloud / fallbacks) still emits
+# the PRE-restructure Feature names it was tuned on. The Nov-2026 org shift renamed
+# or absorbed many of them, so every emitted name is translated here to the Feature
+# name used in Domo_Feature_Inventory(Master Feature List).csv BEFORE the PM lookup.
+# Names already identical in the new inventory are left alone (identity). This is the
+# single place the restructure rename lives — audit remaps here, not in the matcher.
+# Entries marked JUDGMENT had no 1:1 successor; the target is the best-fit feature
+# (and, where it matters, the correct owning PM) — flagged for review.
+OLD_TO_NEW = {
+    'Admin':                              'Admin Settings',
+    'Alerts, NLG, Smart Alerts/Insights': 'Alerts',
+    'Bricks/Templates':                   'Bricks/Templates/DDX',
+    'CLI':                                'CLI/SDK',
+    'Card Filters':                       'Filters',
+    'Card Quick Filters':                 'Filters',
+    'Card Save as':                       'Content Save as',
+    'Cards Sharing':                      'Content Sharing',
+    'Cloud Amplifier':                    'Cloud Integrations',
+    'Collections':                        'Page Layouts',              # JUDGMENT
+    'Color Rules':                        'Analyzer Color Rules',
+    'Connector IDE':                      'Connectors',
+    'Connectors 1.0':                     'Connectors',
+    'Custom Assistants':                  'AI Services',               # JUDGMENT
+    'Custom Connector IDE':               'Connectors',
+    'Customer Communications Center':     'Admin Settings',            # JUDGMENT
+    'Data Flows':                         'MySQL DataFlows',           # JUDGMENT (→ Data Processing / Andrea Henderson)
+    'Data Science':                       'Jupyter Notebooks',         # JUDGMENT
+    'Date Annotations':                   'Annotations',
+    'Doc Cards':                          'Cards/Components',
+    'Documents-Filesets':                 'Documents (Unstructured Data)',
+    'Domo Data Experiences (DDX)':        'Bricks/Templates/DDX',
+    'Domo Everywhere':                    'Domo Everywhere - Embed',
+    'Embed (Stories)':                    'Domo Everywhere - Embed',   # JUDGMENT
+    'Export to CSV':                      'Reporting',                 # JUDGMENT
+    'Forms':                              'Webform',
+    'Freemium':                           'Admin Settings',            # JUDGMENT (no successor feature)
+    'Fusions':                            'Combined Schema',           # JUDGMENT
+    'Inline Editing':                     'Cards/Components',          # JUDGMENT
+    'Magic ETL':                          'Magic ETL DataFlows',
+    'Mobile - iOS':                       'Mobile',
+    'Notebook Cards':                     'Cards/Components',
+    'Onboarding':                         'Admin Settings',            # JUDGMENT (no successor feature)
+    'Orchestration':                      'DataFlow Triggering / Scheduling',  # JUDGMENT
+    'Page Filters':                       'Filters',
+    'Period over Period':                 'Charting',
+    'Profile':                            'Users',                     # JUDGMENT
+    'Publish':                            'Publication Groups',        # JUDGMENT
+    'Python':                             'Jupyter Notebooks',         # JUDGMENT
+    'Scheduled Reports':                  'Reporting',                 # JUDGMENT
+    'Slide Show Presentation':            'Slideshows',
+    'Snaphsot Annotations':               'Annotations',
+    'Stories (Page Layouts)':             'Page Layouts',
+    'Sumo':                               'Cards/Components',
+    'User emails and invites':            'Users',                     # JUDGMENT
+    'Webhooks':                           'Webhooks/MQTT',
+}
 
 # ── 5. Frontmatter extractor ───────────────────────────────────────────────────
 _FM_RE = re.compile(r'^---\n(.*?)\n---', re.DOTALL)
@@ -514,24 +580,6 @@ def read_frontmatter(path):
         return '', ''
 
 # ── 6. Assign feature to each article ─────────────────────────────────────────
-NEIGHBOR_MIN_SHARE = 0.5
-
-def neighbor_feature(slug):
-    """Majority Feature among already-assigned articles in the nearest nav group.
-
-    Returns (feature, group_path), or (None, None) when no group has at least two
-    assigned neighbors agreeing at NEIGHBOR_MIN_SHARE or better.
-    """
-    for path in article_group_paths.get(slug, []):
-        known = [PRIOR_FEATURE[m + '.mdx'] for m in group_members[path]
-                 if m != slug and m + '.mdx' in PRIOR_FEATURE]
-        if len(known) < 2:
-            continue
-        feat, n = Counter(known).most_common(1)[0]
-        if n / len(known) >= NEIGHBOR_MIN_SHARE:
-            return feat, path
-    return None, None
-
 def assign_feature(slug, title, excerpt):
     groups = article_nav.get(slug, [])
     tl = title.lower()
@@ -574,7 +622,6 @@ def assign_feature(slug, title, excerpt):
 # ── 7. Process all articles ────────────────────────────────────────────────────
 article_dir = ROOT / 's' / 'article'
 rows = []
-needs_review = []  # (fname, feature, how) for new articles placed with low confidence
 
 for fname in sorted(os.listdir(article_dir)):
     if not fname.endswith('.mdx'):
@@ -582,22 +629,9 @@ for fname in sorted(os.listdir(article_dir)):
     slug = fname[:-4]
     path = article_dir / fname
     title, excerpt = read_frontmatter(path)
-    if fname in PRIOR_FEATURE:
-        feature = PRIOR_FEATURE[fname]
-    else:
-        feature, group_path = neighbor_feature(slug)
-        if feature is None:
-            feature = assign_feature(slug, title, excerpt)
-            how = 'nav/keyword rules'
-        else:
-            how = f'neighbors in {group_path}'
-        if fname not in OWNERSHIP_OVERRIDES and (group_path is None or ' > ' not in group_path):
-            needs_review.append((fname, feature, how))
+    feature = assign_feature(slug, title, excerpt)
+    feature = OLD_TO_NEW.get(feature, feature)  # restructure nomenclature
     pm = features.get(feature, {}).get('pm', '(no PM listed)')
-    if fname in OWNERSHIP_OVERRIDES:        # a mid-review reassignment wins
-        override_pm, override_feature = OWNERSHIP_OVERRIDES[fname]
-        feature = override_feature or feature
-        pm = override_pm or features.get(feature, {}).get('pm', '(no PM listed)')
     rows.append({
         'feature': feature,
         'title':   title or slug,
@@ -622,14 +656,6 @@ print(f"Top 20 feature assignments:")
 for feat, cnt in feat_count.most_common(20):
     pm = features.get(feat, {}).get('pm', '???')
     print(f"  {cnt:4d}  {feat}  [{pm}]")
-new_count = sum(1 for r in rows if r['filename'] not in PRIOR_FEATURE)
-print(f"\nNew articles (not in the previous reference): {new_count}")
-if needs_review:
-    print(f"Review these {len(needs_review)} new assignments (pillar-level neighbors or fallback"
-          " rules); fix any with `pm_review.py reassign` or an ownership override:")
-    for fname, feat, how in needs_review:
-        pm = features.get(feat, {}).get('pm', '(no PM listed)')
-        print(f"  {fname}  →  {feat} [{pm}]  ({how})")
 
 # ── 9. Write MDX ───────────────────────────────────────────────────────────────
 # Sort: by feature (Product Group), then by title within each group
@@ -651,7 +677,7 @@ lines = [
     'This reference maps every article in `s/article/` to its owning **Feature** (using the same nomenclature as the internal squad-ownership CSV) and the associated **Product Manager**.',
     '',
     '> **How to use:** Search this page (Ctrl/Cmd+F) for a feature name, article title, or PM name to quickly find ownership. '
-    'The Feature column matches the "Feature" column in the *Feature – Owning Squad, PM, Eng, UX* CSV at the repo root.',
+    'The Feature column matches the "Feature" column in the *Domo Feature Inventory (Master Feature List)* CSV at the repo root.',
     '',
     f'_Last generated: {today} · {len(rows)} articles_',
     '',
@@ -781,6 +807,13 @@ for name in sorted(PM_GITHUB_LOGIN):
     for r in sorted(prs, key=lambda r: (r['feature'].lower(), r['title'].lower())):
         co.append(f"s/article/{r['filename']} {login}")
         routed += 1
+
+if STATIC_CODEOWNERS:
+    prefix = "# ── OpenAPI specs (STATIC_CODEOWNERS) "
+    co.append("")
+    co.append(prefix + '─' * max(0, 79 - len(prefix)))
+    for path in sorted(STATIC_CODEOWNERS):
+        co.append(f"{path} {' '.join(STATIC_CODEOWNERS[path])}")
 
 co.append("")
 

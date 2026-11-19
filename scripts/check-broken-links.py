@@ -357,7 +357,7 @@ def gate(base: str) -> int:
     print(f"HEAD: {hn} findings in {hf} files")
     print(f"base ({base}): {bn} findings in {bf} files")
 
-    new = head - baseline        # Counter subtraction drops non-positives
+    new = head - baseline          # Counter subtraction drops non-positives
     fixed = baseline - head
     if fixed:
         print(f"\n{sum(fixed.values())} finding(s) fixed by this branch. Nice.")

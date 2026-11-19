@@ -1,8 +1,8 @@
 # PM Review Brief: Tasleema Lallmamode
 
 **Prepared for:** KB Restructure PM Review Meeting
-**Features owned:** App Dev Framework, Connectors, Third Party Connectors, Workbench
-**Total articles in your area:** 1088
+**Features owned:** Connectors, Third Party Connectors, Workbench
+**Total articles in your area:** 1089
 
 > This document is your meeting guide. It shows how your content is being reorganized,
 > which AI-generated articles need your fact-check, which articles need a dedicated
@@ -19,10 +19,9 @@ areas lands in the new structure.
 
 | Feature | Articles | New Location |
 |---------|----------|--------------|
-| App Dev Framework | 1 | Pillar 6: Build Apps & Automate |
-| Connectors | 102 | Pillar 2: Connect & Integrate Data |
-| Third Party Connectors | 885 | Pillar 2: Connect & Integrate Data |
-| Workbench | 100 | Pillar 2: Connect & Integrate Data |
+| Connectors | 99 | Pillar 2: Connect & Integrate Data |
+| Third Party Connectors | 891 | Pillar 2: Connect & Integrate Data |
+| Workbench | 99 | Pillar 2: Connect & Integrate Data |
 
 ### Notable Navigation Changes
 
@@ -95,9 +94,6 @@ off once you've provided the answer.
 
 - [ ] **`000005360.mdx`**
   confirm the exact JSON No Code UI field labels for cursor pagination: where the user specifies the token's location in the response (JSON path) and the "Add as a parameter" option that sends the token on the next request. Synthesized from community forum reports; needs confirmation.
-
-- [ ] **`000005677.mdx`**
-  confirm the prerequisites behind the "Your DataSet could not be created" error: whether the target SharePoint folders must already exist (i.e., the connector does not create missing folders), any folder-naming restrictions, and the exact Azure app registration API permissions/roles the Writeback connector requires. Synthesized from community forum reports; needs confirmation.
 
 - [ ] **`360042926294.mdx`**
   confirm the recommended MFA guidance for connectors (service account vs. app password vs. OAuth) and whether any specific connectors can complete MFA directly. synthesized from community forum reports; needs confirmation.
@@ -189,6 +185,9 @@ off once you've provided the answer.
 - [ ] **`4406022964375.mdx`**
   confirm whether the "Domo Workbench Users" group still lets non-admin users run Workbench, or whether administrative access is now required to both install and run Workbench (as stated under System Requirements). Community forum reports indicate the non-admin workaround may be outdated; needs confirmation before removing this note.
 
+- [ ] **`Find-Which-Dashboard-a-Card-Lives-On.mdx`**
+  the Governance connector reports cover classic pages and dashboards. Confirm how to trace a card to an App Studio app/page (whether an App Studio pages dataset exists) and document why App Studio pages are not shown in a card's info panel or Move/Copy menu. Add an App Studio section once confirmed.
+
 ---
 
 ## 4. Changes Flagged by Support Gap Integrations
@@ -242,37 +241,37 @@ A prioritized list of everything this document is asking of you:
 | 10 | Supply info to write `Find-Domo-Version-and-Tool-Versions.mdx` (Rank 86) | Info meeting | 30 min |
 | 11 | **Open placeholder in `000005138.mdx`:** confirm the null/blank handling behavior change (how Workbench writes null vs | **Answer required** | 15–30 min |
 | 12 | **Open placeholder in `000005360.mdx`:** confirm the exact JSON No Code UI field labels for cursor pagination: where the  | **Answer required** | 15–30 min |
-| 13 | **Open placeholder in `000005677.mdx`:** confirm the prerequisites behind the "Your DataSet could not be created" error:  | **Answer required** | 15–30 min |
-| 14 | **Open placeholder in `360042926294.mdx`:** confirm the recommended MFA guidance for connectors (service account vs | **Answer required** | 15–30 min |
-| 15 | **Open placeholder in `360042926294.mdx`:** confirm the zero-row no-wipe behavior under Replace, and whether any connector ( | **Answer required** | 15–30 min |
-| 16 | **Open placeholder in `360042926294.mdx`:** confirm the supported spreadsheet formats for file upload, the  | **Answer required** | 15–30 min |
-| 17 | **Open placeholder in `360042926294.mdx`:** confirm the Box connector Excel-date-to-numeric casting behavior and the exact r | **Answer required** | 15–30 min |
-| 18 | **Open placeholder in `360042926294.mdx`:** confirm the specific causes and recommended fixes for the generic connector mess | **Answer required** | 15–30 min |
-| 19 | **Open placeholder in `360042926294.mdx`:** confirm the exact cause of "Indexing failed: Empty primary key" and the recommen | **Answer required** | 15–30 min |
-| 20 | **Open placeholder in `360042926294.mdx`:** confirm OAuth token-expiry behavior (silent zero-row jobs vs | **Answer required** | 15–30 min |
-| 21 | **Open placeholder in `360042926294.mdx`:** confirm the exact Google Workspace Admin console path to trust/approve the Domo  | **Answer required** | 15–30 min |
-| 22 | **Open placeholder in `360042929154.mdx`:** confirm that Adobe Analytics 1 | **Answer required** | 15–30 min |
-| 23 | **Open placeholder in `360042930734.mdx`:** confirm the exact columns/keys used to join Survey Response Choices to Survey Re | **Answer required** | 15–30 min |
-| 24 | **Open placeholder in `360042931814.mdx`:** confirm the full list of affected Snowflake connector variants (reported: Snowfl | **Answer required** | 15–30 min |
-| 25 | **Open placeholder in `360042931914.mdx`:** confirm that the CSV SFTP connectors do not support built-in GPG/PGP file-conten | **Answer required** | 15–30 min |
-| 26 | **Open placeholder in `360042931954.mdx`:** confirm whether capturing the sender ("from") address as a DataSet column is on  | **Answer required** | 15–30 min |
-| 27 | **Open placeholder in `360042932414.mdx`:** provide the authoritative list of NetSuite record objects supported for writebac | **Answer required** | 15–30 min |
-| 28 | **Open placeholder in `360042932734.mdx`:** confirm the maximum precision/digit limits for Domo's LONG, DOUBLE, and DECIMAL  | **Answer required** | 15–30 min |
-| 29 | **Open placeholder in `360042932974.mdx`:** confirm the provider-specific connection fields required when configuring an OAu | **Answer required** | 15–30 min |
-| 30 | **Open placeholder in `360042932974.mdx`:** confirm the preemptive unfiltered-query/materialization behavior for Federated D | **Answer required** | 15–30 min |
-| 31 | **Open placeholder in `360043432333.mdx`:** confirm whether the Salesforce Advanced connector offers any built-in option to  | **Answer required** | 15–30 min |
-| 32 | **Open placeholder in `360043432333.mdx`:** confirm the exact UI labels and behavior for the connector's REST vs | **Answer required** | 15–30 min |
-| 33 | **Open placeholder in `360043433453.mdx`:** confirm whether an official NetSuite | **Answer required** | 15–30 min |
-| 34 | **Open placeholder in `360043433453.mdx`:** confirm the exact date literal format SuiteAnalytics Connect / NetSuite2 | **Answer required** | 15–30 min |
-| 35 | **Open placeholder in `360043433453.mdx`:** confirm that Upsert support has shipped for the SuiteAnalytics Connect connector | **Answer required** | 15–30 min |
-| 36 | **Open placeholder in `360043433813.mdx`:** confirm whether the DomoStats connector supports only basic scheduling (no advan | **Answer required** | 15–30 min |
-| 37 | **Open placeholder in `360046864914.mdx`:** confirm the recommended fix for the "Error converting value {null} to type Syste | **Answer required** | 15–30 min |
-| 38 | **Open placeholder in `360046864914.mdx`:** confirm the cause and the canonical fix for the "No agents found matching comput | **Answer required** | 15–30 min |
-| 39 | **Open placeholder in `360052105454.mdx`:** confirm which OAuth 2 | **Answer required** | 15–30 min |
-| 40 | **Open placeholder in `360052105454.mdx`:** confirm the exact stop conditions the JSON No Code OAuth connector uses for each | **Answer required** | 15–30 min |
-| 41 | **Open placeholder in `360052122294.mdx`:** confirm the recommended, supported pattern for detecting hard-deleted source rec | **Answer required** | 15–30 min |
-| 42 | **Open placeholder in `360056318074.mdx`:** confirm the deprecation/support status of the Domo Governance Datasets connector | **Answer required** | 15–30 min |
-| 43 | **Open placeholder in `4406022964375.mdx`:** confirm whether the "Domo Workbench Users" group still lets non-admin users run  | **Answer required** | 15–30 min |
+| 13 | **Open placeholder in `360042926294.mdx`:** confirm the recommended MFA guidance for connectors (service account vs | **Answer required** | 15–30 min |
+| 14 | **Open placeholder in `360042926294.mdx`:** confirm the zero-row no-wipe behavior under Replace, and whether any connector ( | **Answer required** | 15–30 min |
+| 15 | **Open placeholder in `360042926294.mdx`:** confirm the supported spreadsheet formats for file upload, the  | **Answer required** | 15–30 min |
+| 16 | **Open placeholder in `360042926294.mdx`:** confirm the Box connector Excel-date-to-numeric casting behavior and the exact r | **Answer required** | 15–30 min |
+| 17 | **Open placeholder in `360042926294.mdx`:** confirm the specific causes and recommended fixes for the generic connector mess | **Answer required** | 15–30 min |
+| 18 | **Open placeholder in `360042926294.mdx`:** confirm the exact cause of "Indexing failed: Empty primary key" and the recommen | **Answer required** | 15–30 min |
+| 19 | **Open placeholder in `360042926294.mdx`:** confirm OAuth token-expiry behavior (silent zero-row jobs vs | **Answer required** | 15–30 min |
+| 20 | **Open placeholder in `360042926294.mdx`:** confirm the exact Google Workspace Admin console path to trust/approve the Domo  | **Answer required** | 15–30 min |
+| 21 | **Open placeholder in `360042929154.mdx`:** confirm that Adobe Analytics 1 | **Answer required** | 15–30 min |
+| 22 | **Open placeholder in `360042930734.mdx`:** confirm the exact columns/keys used to join Survey Response Choices to Survey Re | **Answer required** | 15–30 min |
+| 23 | **Open placeholder in `360042931814.mdx`:** confirm the full list of affected Snowflake connector variants (reported: Snowfl | **Answer required** | 15–30 min |
+| 24 | **Open placeholder in `360042931914.mdx`:** confirm that the CSV SFTP connectors do not support built-in GPG/PGP file-conten | **Answer required** | 15–30 min |
+| 25 | **Open placeholder in `360042931954.mdx`:** confirm whether capturing the sender ("from") address as a DataSet column is on  | **Answer required** | 15–30 min |
+| 26 | **Open placeholder in `360042932414.mdx`:** provide the authoritative list of NetSuite record objects supported for writebac | **Answer required** | 15–30 min |
+| 27 | **Open placeholder in `360042932734.mdx`:** confirm the maximum precision/digit limits for Domo's LONG, DOUBLE, and DECIMAL  | **Answer required** | 15–30 min |
+| 28 | **Open placeholder in `360042932974.mdx`:** confirm the provider-specific connection fields required when configuring an OAu | **Answer required** | 15–30 min |
+| 29 | **Open placeholder in `360042932974.mdx`:** confirm the preemptive unfiltered-query/materialization behavior for Federated D | **Answer required** | 15–30 min |
+| 30 | **Open placeholder in `360043432333.mdx`:** confirm whether the Salesforce Advanced connector offers any built-in option to  | **Answer required** | 15–30 min |
+| 31 | **Open placeholder in `360043432333.mdx`:** confirm the exact UI labels and behavior for the connector's REST vs | **Answer required** | 15–30 min |
+| 32 | **Open placeholder in `360043433453.mdx`:** confirm whether an official NetSuite | **Answer required** | 15–30 min |
+| 33 | **Open placeholder in `360043433453.mdx`:** confirm the exact date literal format SuiteAnalytics Connect / NetSuite2 | **Answer required** | 15–30 min |
+| 34 | **Open placeholder in `360043433453.mdx`:** confirm that Upsert support has shipped for the SuiteAnalytics Connect connector | **Answer required** | 15–30 min |
+| 35 | **Open placeholder in `360043433813.mdx`:** confirm whether the DomoStats connector supports only basic scheduling (no advan | **Answer required** | 15–30 min |
+| 36 | **Open placeholder in `360046864914.mdx`:** confirm the recommended fix for the "Error converting value {null} to type Syste | **Answer required** | 15–30 min |
+| 37 | **Open placeholder in `360046864914.mdx`:** confirm the cause and the canonical fix for the "No agents found matching comput | **Answer required** | 15–30 min |
+| 38 | **Open placeholder in `360052105454.mdx`:** confirm which OAuth 2 | **Answer required** | 15–30 min |
+| 39 | **Open placeholder in `360052105454.mdx`:** confirm the exact stop conditions the JSON No Code OAuth connector uses for each | **Answer required** | 15–30 min |
+| 40 | **Open placeholder in `360052122294.mdx`:** confirm the recommended, supported pattern for detecting hard-deleted source rec | **Answer required** | 15–30 min |
+| 41 | **Open placeholder in `360056318074.mdx`:** confirm the deprecation/support status of the Domo Governance Datasets connector | **Answer required** | 15–30 min |
+| 42 | **Open placeholder in `4406022964375.mdx`:** confirm whether the "Domo Workbench Users" group still lets non-admin users run  | **Answer required** | 15–30 min |
+| 43 | **Open placeholder in `Find-Which-Dashboard-a-Card-Lives-On.mdx`:** the Governance connector reports cover classic pages and dashboards | **Answer required** | 15–30 min |
 
 ---
 

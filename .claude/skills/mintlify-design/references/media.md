@@ -13,7 +13,7 @@ Wrap **every screenshot** in `<Frame>`. Frame auto-sizes to content width and re
 ```
 
 - The inner element is a raw `<img>`, not Markdown image syntax. Markdown image syntax inside `<Frame>` does not always render correctly.
-- `alt` is required. Describe what the screenshot shows, not "screenshot of X."
+- **`alt` is required on every screenshot** — detailed and accurate — a repository standard for accessibility compliance, LLM readability, and SEO (`Domo-KB-Style-Guide.mdx` › **Alt Text Is Required on Every Screenshot**). Describe what the screenshot actually shows and the state/detail that matters in context; don't open with "Screenshot of…" and never claim something the image doesn't show. If you're building a page and don't have alt text for a screenshot, state the requirement, reference the rule, and ask the author for it — don't invent a description of an image you can't see or ship an empty/placeholder `alt`.
 - Optional `caption` prop renders text below the frame.
 
 ## Inline UI icons — Domo icon fonts (preferred)
@@ -32,7 +32,7 @@ In Workbench, click <i className="legacy-icon-database" aria-hidden="true" /> in
 ```
 
 - Icons inherit text color and size automatically — they adapt to light/dark mode without any extra props.
-- Override size only when needed: `<i className="icon-gear" style={{fontSize: 24}} aria-hidden="true" />`.
+- Don't add a size class by default; the bare form is `font-size: 1em`. Override only when needed with a size class from `style.css`: `xs` 18px, `sm` 20px, `md` 24px, `lg` 36px, `xl` 48px, e.g. `<i className="icon-gear md" aria-hidden="true" />`. These are fixed sizes, so the icon stops scaling with headings or table text.
 
 **Accessibility: pair every icon with an inline text label**
 

@@ -1,8 +1,8 @@
 # PM Review Brief: Khushboo
 
 **Prepared for:** KB Restructure PM Review Meeting
-**Features owned:** App Dev Framework, App Studio, Bricks/Templates, Charting, Doc Cards, MS Office Plugins / Addins, Period over Period, Publication Groups, Slideshows
-**Total articles in your area:** 215
+**Features owned:** Analyzer, App Dev Framework, App Studio, Bricks/Templates/DDX, Cards/Components, Charting, Content Sharing, MS Office Plugins / Addins, Publication Groups, Reporting, Slideshows, Worksheets
+**Total articles in your area:** 253
 
 > This document is your meeting guide. It shows how your content is being reorganized,
 > which AI-generated articles need your fact-check, which articles need a dedicated
@@ -19,15 +19,18 @@ areas lands in the new structure.
 
 | Feature | Articles | New Location |
 |---------|----------|--------------|
-| App Dev Framework | 7 | Pillar 6: Build Apps & Automate |
-| App Studio | 22 | Pillar 6: Build Apps & Automate |
-| Bricks/Templates | 3 | Pillar 6: Build Apps & Automate |
-| Charting | 158 | Pillar 5: Analyze & Visualize |
-| Doc Cards | 11 | Pillar 5: Analyze & Visualize |
+| Analyzer | 24 | Pillar 5: Analyze & Visualize |
+| App Dev Framework | 5 | Pillar 6: Build Apps & Automate |
+| App Studio | 14 | Pillar 6: Build Apps & Automate |
+| Bricks/Templates/DDX | 3 | TBD — not yet mapped |
+| Cards/Components | 12 | TBD — not yet mapped |
+| Charting | 175 | Pillar 5: Analyze & Visualize |
+| Content Sharing | 2 | TBD — not yet mapped |
 | MS Office Plugins / Addins | 8 | Pillar 8: Collaborate |
-| Period over Period | 2 | Pillar 5: Analyze & Visualize |
 | Publication Groups | 2 | Pillar 7: Distribute |
+| Reporting | 5 | TBD — not yet mapped |
 | Slideshows | 2 | Pillar 7: Distribute |
+| Worksheets | 1 | Pillar 5: Analyze & Visualize |
 
 ### Notable Navigation Changes
 
@@ -110,6 +113,9 @@ off once you've provided the answer.
 
 - [ ] **`000005543.mdx`**
   confirm which Brand Kit branding elements (beyond the built-in fonts) carry into App Studio automatically, and whether App Studio theme styling supports background transparency or custom CSS. Synthesized from community forum reports; needs confirmation.
+
+- [ ] **`000005677.mdx`**
+  confirm the prerequisites behind the "Your DataSet could not be created" error: whether the target SharePoint folders must already exist (i.e., the connector does not create missing folders), any folder-naming restrictions, and the exact Azure app registration API permissions/roles the Writeback connector requires. Synthesized from community forum reports; needs confirmation.
 
 - [ ] **`000005829.mdx`**
   confirm the current output/export formats for Report Builder reports (emailed snapshots) and whether PDF, PowerPoint, or A3 file export is supported or planned. synthesized from community forum reports; needs confirmation.
@@ -272,37 +278,38 @@ A prioritized list of everything this document is asking of you:
 | 14 | **Open placeholder in `000005143.mdx`:** confirm PowerPoint dashboard-import layout behavior vs | **Answer required** | 15–30 min |
 | 15 | **Open placeholder in `000005543.mdx`:** confirm whether App Studio app themes override per-card color settings such as h | **Answer required** | 15–30 min |
 | 16 | **Open placeholder in `000005543.mdx`:** confirm which Brand Kit branding elements (beyond the built-in fonts) carry into | **Answer required** | 15–30 min |
-| 17 | **Open placeholder in `000005829.mdx`:** confirm the current output/export formats for Report Builder reports (emailed sn | **Answer required** | 15–30 min |
-| 18 | **Open placeholder in `000005829.mdx`:** confirm which app changes do and do not propagate to an existing report automati | **Answer required** | 15–30 min |
-| 19 | **Open placeholder in `000005864.mdx`:** confirm that a Filter List component sources its selectable values from the firs | **Answer required** | 15–30 min |
-| 20 | **Open placeholder in `Add-Charts-and-Tables-to-an-App-Studio-App.mdx`:** confirm the supported settings for fitting table columns to card width and wrapp | **Answer required** | 15–30 min |
-| 21 | **Open placeholder in `Add-Charts-and-Tables-to-an-App-Studio-App.mdx`:** confirm the exact permission required to edit data in Editable/Linked Table cell | **Answer required** | 15–30 min |
-| 22 | **Open placeholder in `Add-Interactivity-to-an-App-Studio-App.mdx`:** confirm that a card's Filter Exceptions "Allow filtering" setting is all-or-noth | **Answer required** | 15–30 min |
-| 23 | **Open placeholder in `Add-Interactivity-to-an-App-Studio-App.mdx`:** confirm the reported behavior in which a filter selection persists visually in C | **Answer required** | 15–30 min |
-| 24 | **Open placeholder in `Add-Interactivity-to-an-App-Studio-App.mdx`:** confirm whether and how an app owner can limit which columns appear in Controls  | **Answer required** | 15–30 min |
-| 25 | **Open placeholder in `Add-Interactivity-to-an-App-Studio-App.mdx`:** confirm the supported method for a dynamic/relative default date filter in App S | **Answer required** | 15–30 min |
-| 26 | **Open placeholder in `Add-Interactivity-to-an-App-Studio-App.mdx`:** confirm that on-page filter controls must be added one at a time (no bulk-add ac | **Answer required** | 15–30 min |
-| 27 | **Open placeholder in `Add-Interactivity-to-an-App-Studio-App.mdx`:** confirm that only Button components (not text or image elements) can open a Form | **Answer required** | 15–30 min |
-| 28 | **Open placeholder in `Build-an-App-Studio-App.mdx`:** confirm the current Apps Home organization options (alphabetical-by-title orderi | **Answer required** | 15–30 min |
-| 29 | **Open placeholder in `Build-an-App-Studio-App.mdx`:** confirm that the App Studio mobile layout is independent of the desktop layout ( | **Answer required** | 15–30 min |
-| 30 | **Open placeholder in `Build-an-App-Studio-App.mdx`:** confirm the per-tab card-sizing behavior on mobile: whether resizing a card in o | **Answer required** | 15–30 min |
-| 31 | **Open placeholder in `Build-an-App-Studio-App.mdx`:** confirm how tab and page order is determined on mobile (whether it follows the d | **Answer required** | 15–30 min |
-| 32 | **Open placeholder in `Build-an-App-Studio-App.mdx`:** confirm the interaction between the app-level background (App theme) and a page- | **Answer required** | 15–30 min |
-| 33 | **Open placeholder in `Build-an-App-Studio-App.mdx`:** confirm the conditional-formatting "Apply to" blank-column-list behavior when ed | **Answer required** | 15–30 min |
-| 34 | **Open placeholder in `Build-an-App-Studio-App.mdx`:** confirm the current concurrent-editing behavior in App Studio: whether multiple  | **Answer required** | 15–30 min |
-| 35 | **Open placeholder in `Build-an-App-Studio-App.mdx`:** confirm that rebuilding a page is the recommended recovery step for a corrupted  | **Answer required** | 15–30 min |
-| 36 | **Open placeholder in `Build-an-App-Studio-App.mdx`:** confirm that Domo Sandbox is the supported versioning/rollback path for App Stud | **Answer required** | 15–30 min |
-| 37 | **Open placeholder in `Build-an-App-Studio-App.mdx`:** confirm the current App Studio navigation behaviors: that text-only nav buttons  | **Answer required** | 15–30 min |
-| 38 | **Open placeholder in `Build-an-App-Studio-App.mdx`:** confirm the tab nesting/save behavior (improperly nested components causing save | **Answer required** | 15–30 min |
-| 39 | **Open placeholder in `Build-an-App-Studio-App.mdx`:** confirm the current limitations that a tab layout cannot be copied to another ta | **Answer required** | 15–30 min |
-| 40 | **Open placeholder in `Build-an-App-Studio-App.mdx`:** confirm that App Studio has no accordion/collapsible-section element today and t | **Answer required** | 15–30 min |
-| 41 | **Open placeholder in `Distribute-an-App-Studio-App.mdx`:** confirm that App Studio sharing is app-level only (no per-page or per-group page | **Answer required** | 15–30 min |
-| 42 | **Open placeholder in `Manage-an-App-Studio-App.mdx`:** confirm there is no prompt or option to delete an app's underlying cards at the  | **Answer required** | 15–30 min |
-| 43 | **Open placeholder in `Manage-an-App-Studio-App.mdx`:** confirm that App Studio app pages do not appear in a card's Move or Copy menu or | **Answer required** | 15–30 min |
-| 44 | **Open placeholder in `Manage-an-App-Studio-App.mdx`:** confirm the exact way to delete cards from More > Admin > Cards (the menu path/l | **Answer required** | 15–30 min |
-| 45 | **Open placeholder in `Manage-an-App-Studio-App.mdx`:** confirm whether the Domo Governance Datasets connector (or a Governance Toolkit  | **Answer required** | 15–30 min |
-| 46 | **Open placeholder in `Use-Advanced-Customization-in-App-Studio.mdx`:** confirm the exact grant(s) required to add and edit a pro-code component (Domo B | **Answer required** | 15–30 min |
-| 47 | Validate additions to: App Studio card management (Rank 4) | Review | 20 min |
+| 17 | **Open placeholder in `000005677.mdx`:** confirm the prerequisites behind the "Your DataSet could not be created" error:  | **Answer required** | 15–30 min |
+| 18 | **Open placeholder in `000005829.mdx`:** confirm the current output/export formats for Report Builder reports (emailed sn | **Answer required** | 15–30 min |
+| 19 | **Open placeholder in `000005829.mdx`:** confirm which app changes do and do not propagate to an existing report automati | **Answer required** | 15–30 min |
+| 20 | **Open placeholder in `000005864.mdx`:** confirm that a Filter List component sources its selectable values from the firs | **Answer required** | 15–30 min |
+| 21 | **Open placeholder in `Add-Charts-and-Tables-to-an-App-Studio-App.mdx`:** confirm the supported settings for fitting table columns to card width and wrapp | **Answer required** | 15–30 min |
+| 22 | **Open placeholder in `Add-Charts-and-Tables-to-an-App-Studio-App.mdx`:** confirm the exact permission required to edit data in Editable/Linked Table cell | **Answer required** | 15–30 min |
+| 23 | **Open placeholder in `Add-Interactivity-to-an-App-Studio-App.mdx`:** confirm that a card's Filter Exceptions "Allow filtering" setting is all-or-noth | **Answer required** | 15–30 min |
+| 24 | **Open placeholder in `Add-Interactivity-to-an-App-Studio-App.mdx`:** confirm the reported behavior in which a filter selection persists visually in C | **Answer required** | 15–30 min |
+| 25 | **Open placeholder in `Add-Interactivity-to-an-App-Studio-App.mdx`:** confirm whether and how an app owner can limit which columns appear in Controls  | **Answer required** | 15–30 min |
+| 26 | **Open placeholder in `Add-Interactivity-to-an-App-Studio-App.mdx`:** confirm the supported method for a dynamic/relative default date filter in App S | **Answer required** | 15–30 min |
+| 27 | **Open placeholder in `Add-Interactivity-to-an-App-Studio-App.mdx`:** confirm that on-page filter controls must be added one at a time (no bulk-add ac | **Answer required** | 15–30 min |
+| 28 | **Open placeholder in `Add-Interactivity-to-an-App-Studio-App.mdx`:** confirm that only Button components (not text or image elements) can open a Form | **Answer required** | 15–30 min |
+| 29 | **Open placeholder in `Build-an-App-Studio-App.mdx`:** confirm the current Apps Home organization options (alphabetical-by-title orderi | **Answer required** | 15–30 min |
+| 30 | **Open placeholder in `Build-an-App-Studio-App.mdx`:** confirm that the App Studio mobile layout is independent of the desktop layout ( | **Answer required** | 15–30 min |
+| 31 | **Open placeholder in `Build-an-App-Studio-App.mdx`:** confirm the per-tab card-sizing behavior on mobile: whether resizing a card in o | **Answer required** | 15–30 min |
+| 32 | **Open placeholder in `Build-an-App-Studio-App.mdx`:** confirm how tab and page order is determined on mobile (whether it follows the d | **Answer required** | 15–30 min |
+| 33 | **Open placeholder in `Build-an-App-Studio-App.mdx`:** confirm the interaction between the app-level background (App theme) and a page- | **Answer required** | 15–30 min |
+| 34 | **Open placeholder in `Build-an-App-Studio-App.mdx`:** confirm the conditional-formatting "Apply to" blank-column-list behavior when ed | **Answer required** | 15–30 min |
+| 35 | **Open placeholder in `Build-an-App-Studio-App.mdx`:** confirm the current concurrent-editing behavior in App Studio: whether multiple  | **Answer required** | 15–30 min |
+| 36 | **Open placeholder in `Build-an-App-Studio-App.mdx`:** confirm that rebuilding a page is the recommended recovery step for a corrupted  | **Answer required** | 15–30 min |
+| 37 | **Open placeholder in `Build-an-App-Studio-App.mdx`:** confirm that Domo Sandbox is the supported versioning/rollback path for App Stud | **Answer required** | 15–30 min |
+| 38 | **Open placeholder in `Build-an-App-Studio-App.mdx`:** confirm the current App Studio navigation behaviors: that text-only nav buttons  | **Answer required** | 15–30 min |
+| 39 | **Open placeholder in `Build-an-App-Studio-App.mdx`:** confirm the tab nesting/save behavior (improperly nested components causing save | **Answer required** | 15–30 min |
+| 40 | **Open placeholder in `Build-an-App-Studio-App.mdx`:** confirm the current limitations that a tab layout cannot be copied to another ta | **Answer required** | 15–30 min |
+| 41 | **Open placeholder in `Build-an-App-Studio-App.mdx`:** confirm that App Studio has no accordion/collapsible-section element today and t | **Answer required** | 15–30 min |
+| 42 | **Open placeholder in `Distribute-an-App-Studio-App.mdx`:** confirm that App Studio sharing is app-level only (no per-page or per-group page | **Answer required** | 15–30 min |
+| 43 | **Open placeholder in `Manage-an-App-Studio-App.mdx`:** confirm there is no prompt or option to delete an app's underlying cards at the  | **Answer required** | 15–30 min |
+| 44 | **Open placeholder in `Manage-an-App-Studio-App.mdx`:** confirm that App Studio app pages do not appear in a card's Move or Copy menu or | **Answer required** | 15–30 min |
+| 45 | **Open placeholder in `Manage-an-App-Studio-App.mdx`:** confirm the exact way to delete cards from More > Admin > Cards (the menu path/l | **Answer required** | 15–30 min |
+| 46 | **Open placeholder in `Manage-an-App-Studio-App.mdx`:** confirm whether the Domo Governance Datasets connector (or a Governance Toolkit  | **Answer required** | 15–30 min |
+| 47 | **Open placeholder in `Use-Advanced-Customization-in-App-Studio.mdx`:** confirm the exact grant(s) required to add and edit a pro-code component (Domo B | **Answer required** | 15–30 min |
+| 48 | Validate additions to: App Studio card management (Rank 4) | Review | 20 min |
 
 ---
 

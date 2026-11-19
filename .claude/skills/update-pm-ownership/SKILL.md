@@ -17,7 +17,11 @@ The user has provided: $ARGUMENTS
 
 1. **`Feature - Owning Squad, PM, Eng, UX.csv`** — the authoritative squad/PM roster
 2. **`docs.json`** — nav group hierarchy used to infer which feature each article belongs to
-3. **Article frontmatter** — title and excerpt used as keyword fallback for articles not clearly placed by nav group
+3. **Article frontmatter** — title and the article's summary field used as keyword fallback for articles not clearly placed by nav group. (Per the current convention this summary field is `description`; `build-pm-ownership.py` still scans the legacy `excerpt` field, so its keyword fallback will need to read `description` once the article frontmatter migration lands.)
+
+The same run also regenerates **`.github/CODEOWNERS`** from the identical Feature→PM assignment, so the two files can't drift. See **Update CODEOWNERS** below.
+
+**The roster CSV is optional.** It's the source of truth when it's present in the repo root, but it's pasted in ad hoc and usually isn't in the working tree. When it's absent, the script recovers each Feature's PM from the **existing `Article-PM-Ownership-Reference.mdx`** instead. This is what lets you run the skill with no spreadsheet — to absorb newly added articles and assign each a PM by its product pillar/group (nav-group → Feature from the script's `NAV_FEATURE`/`KEYWORD_RULES`; Feature → PM from the reference). A new article whose Feature has no PM in the reference is flagged as `(no PM listed)`, never guessed. Drop the CSV in only when the roster itself changed (new PM, reassignment).
 
 **Assignments are sticky.** An article already in the reference keeps its Feature on every run (its PM still comes from the roster, so a roster change still moves it), and an entry in `pm-review-state/ownership-overrides.json` beats both. Only articles missing from the reference are routed, in this order: the majority Feature of their already-assigned neighbors in the nearest nav group (at least two neighbors, at least half agreeing), then `NAV_FEATURE`, `KEYWORD_RULES`, and the tab fallbacks. The run prints every new article placed by a pillar-level group or by the fallback rules; confirm those with the user. This is what keeps a nav reorganization from reshuffling existing ownership.
 

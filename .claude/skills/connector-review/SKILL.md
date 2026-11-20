@@ -14,8 +14,10 @@ review lifecycle — from open PR to merged and Jira-closed.
 
 This skill runs in **two modes**:
 
-- **Interactive** — Jared runs it by hand. It presents the dashboard and **asks before any
-  merge** (see **Guardrails**). This is the default when a human invokes the skill.
+- **Interactive** — Jared runs it by hand. It presents the dashboard, runs the **site-safety
+  gate** on any PR about to be merged, and **asks before any merge** (see **Before any merge —
+  run the site-safety gate** and **Guardrails**). This is the default when a human invokes the
+  skill.
 - **Automated daily (CI)** — the **Connector Review Daily** GitHub Action
   (`.github/workflows/connector-review-daily.yml`) runs it unattended every morning (~5–6am
   PST). There is no human to ask, so the manual "ask Jared" approval is replaced by an
@@ -98,6 +100,45 @@ This never auto-acts — it only surfaces the candidate. When you see it:
 ### Step 2 — Take actions
 
 After presenting the dashboard, identify any tickets that need action and offer to handle them.
+
+#### Before any merge — run the site-safety gate
+
+Before merging **any** PR in interactive mode — `--merge`, an auto-approve-and-merge of an
+`awaiting-jared` ticket, a publish request, an escalation, or a batch `--auto` — run the same
+site-safety gate the automated daily job uses, so a submission can't break the published site
+on merge. It answers two questions about the PR you're about to merge, and nothing about
+content correctness (that's still the secondary approver's job in Jira):
+
+- **Do the screenshots exist and are they coded properly?** Every image the PR newly
+  references resolves to a real file that is committed on the branch and whose bytes actually
+  render as the extension claims — not a missing file, an untracked file, a zero-byte file, a
+  `.png` that's really a JPEG, or a Git LFS pointer — and every added image carries alt text
+  (decorative `aria-hidden` icons exempt). A missing screenshot can't be invented.
+- **Is `docs.json` clean so the nav won't break on merge?** `docs.json` is valid JSON and
+  every page it references resolves to a real file in every language — the check that most
+  directly answers "will merging this break the sidebar."
+
+Run it against the candidate PR branch, compared to `origin/main`:
+
+```bash
+gh pr checkout <pr-number>
+python3 scripts/connector-review-gate.py
+git checkout main
+```
+
+The gate prints a JSON summary and exits `0` (all hard checks passed), `1` (one or more
+failed), or `2` (the gate itself couldn't run). In interactive mode:
+
+- **Pass (`0`)** — proceed to the merge action below.
+- **Fail (`1`)** — **this does not hard-block you; a human is present.** Surface the exact
+  failing checks to Jared (name the article, and the image path or nav entry, and say what's
+  wrong), fix anything safely fixable on the branch (a wrong image path or extension; an
+  unregistered nav slug via the `add-to-nav` skill), then **let Jared decide** whether to merge
+  anyway or hold the PR for Arun. Never invent or substitute a missing screenshot. (This is the
+  one place interactive mode differs from CI, where a gate failure always blocks the merge.)
+- **Could not run (`2`)** — report the tooling error and resolve it before relying on the gate.
+
+Always return to `main` after the gate so the subsequent `--merge` runs from a clean working tree.
 
 #### Ready to merge
 Both approvals are in. Merge, comment, and close:
@@ -353,6 +394,11 @@ JSON summary and exits `0` (pass), `1` (fail → do not merge), or `2` (gate cou
 - **Alt text on added images** — every image this branch adds carries non-empty `alt`
   (decorative icons marked `aria-hidden="true"` are exempt). Scoped to added lines, so legacy
   images never block. Missing alt can't be invented, so it routes the PR to manual.
+- **Added screenshots exist and render** — every image a changed article newly references is
+  committed on the branch and has real image bytes matching its extension. A missing file, an
+  untracked file, a zero-byte file, a mismatched encoding, or a Git LFS pointer blocks the
+  merge (the screenshot would ship broken); an SVG page screenshot or an orphaned added image
+  is a warning, not a block.
 
 **Soft (reported, never blocks):** Domo style-guide warnings from `remark-domo-style.mjs`.
 These are auto-fixed by the revise pass below; residual warnings are logged but don't break
@@ -404,9 +450,15 @@ The script will **refuse to merge** if:
 - The target ticket is on hold.
 - The PR has unresolved merge conflicts that can't be auto-resolved.
 
-**Interactive mode** — when a human runs the skill, it will **always ask Jared before**:
+**Interactive mode** — when a human runs the skill, it **runs the site-safety gate on every
+candidate before merging** (see **Before any merge — run the site-safety gate**) and will
+**always ask Jared before**:
 - Running `--auto` (which may approve + merge multiple PRs)
 - Merging any `awaiting-jared` ticket (secondary approved; call it out explicitly)
+
+A gate failure in interactive mode is surfaced to Jared with the specifics; Jared decides
+whether to merge anyway or hold the PR. It does **not** auto-block — unlike CI, where a gate
+failure always stops the merge and routes the PR to manual.
 
 **Automated daily (CI) mode** — there is no human to ask, so the **site-safety gate replaces
 Jared's GitHub approval** (see **Automated Daily Review (CI)**). The Jira secondary-approval

@@ -1,15 +1,18 @@
 #!/usr/bin/env python3
 """
 Tests for connector-review-gate.py — the pure, tooling-free pieces of the site-safety
-gate (alt-text detection, case-collision grouping, docs.json validity). No framework:
+gate (alt-text detection, image-reference extraction/resolution, case-collision grouping,
+docs.json validity). No framework:
 
     python3 scripts/test-connector-review-gate.py
 
-Exits 0 when green, 1 on the first failure. Run after touching the alt-text regexes or
-the case-collision logic — a mistake there would silently pass bad submissions.
+Exits 0 when green, 1 on the first failure. Run after touching the alt-text regexes, the
+image-reference regexes, or the case-collision logic — a mistake there would silently pass
+bad submissions.
 """
 
 import importlib.util
+import os
 import sys
 from pathlib import Path
 
@@ -57,6 +60,41 @@ check("two images on one line flagged twice",
       len(alt("a.mdx", "![](/a.png) and ![](/b.png)")) == 2)
 check("prose with no image passes",
       alt("a.mdx", "This line mentions an image but has none.") == [])
+
+# --- image-reference extraction & resolution -------------------------------- #
+
+def imgs(line):
+    return gate._image_refs_in_lines([line])
+
+check("md image ref extracted",
+      imgs("![A chart of usage](/images/kb/x.png)") == ["/images/kb/x.png"])
+check("md image with title keeps only the url",
+      imgs('![alt](/images/kb/x.png "a title")') == ["/images/kb/x.png"])
+check("jsx img src extracted",
+      imgs('<img src="/images/kb/y.jpg" alt="z" />') == ["/images/kb/y.jpg"])
+check("frame-wrapped img src extracted",
+      imgs('<Frame><img src="/images/kb/f.webp" alt="q" /></Frame>') == ["/images/kb/f.webp"])
+check("http image ref ignored",
+      imgs("![x](https://example.com/a.png)") == [])
+check("protocol-relative image ref ignored",
+      imgs('<img src="//cdn.example.com/a.png" alt="x" />') == [])
+check("markdown link that is not an image ignored",
+      imgs("[the docs](/s/article/Foo)") == [])
+check("DomoEmbed src ignored (iframe, not img)",
+      imgs('<DomoEmbed src="https://domo.com/embed/card/abc" />') == [])
+check("non-image extension ignored",
+      imgs("![x](/files/report.pdf)") == [])
+check("query string stripped from image ref",
+      imgs("![x](/images/kb/x.png?v=2)") == ["/images/kb/x.png"])
+check("two images on one line both extracted",
+      imgs("![a](/images/kb/a.png) ![b](/images/kb/b.gif)")
+      == ["/images/kb/a.png", "/images/kb/b.gif"])
+
+check("resolve root-relative image path",
+      gate._resolve_image_ref("s/article/A.mdx", "/images/kb/x.png") == "images/kb/x.png")
+check("resolve article-relative image path",
+      gate._resolve_image_ref("s/article/A.mdx", "../images/kb/x.png")
+      == os.path.normpath("s/images/kb/x.png"))
 
 # --- case collisions -------------------------------------------------------- #
 

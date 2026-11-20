@@ -25,6 +25,10 @@ Hard checks (any failure blocks the merge):
   - every image ADDED by this branch carries non-empty alt text (repo standard;
     decorative icons marked aria-hidden="true" are exempt). Scoped to added lines so
     legacy images in unchanged files never block a merge.
+  - every image a changed article NEWLY references exists, is tracked on the branch,
+    and will render (bytes match the extension) — a missing, untracked, zero-byte,
+    mis-encoded, or Git-LFS-pointer screenshot ships broken, so it blocks. An SVG page
+    image and an added-but-unreferenced (orphan) image are warnings, not blocks.
 
 Soft findings (reported, never block): Domo style-guide warnings from
 remark-domo-style.mjs. These are auto-fixed by the skill's revise pass; whatever
@@ -39,6 +43,7 @@ Usage:
 import argparse
 import collections
 import json
+import os
 import re
 import shutil
 import subprocess
@@ -51,6 +56,18 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 # and alt text only on these; docs.json / links / case-collision are repo-wide.
 CONTENT_PREFIXES = ("s/article/", "s/topic/", "portal/")
 LANGUAGES = ("en", "es", "fr", "de", "ja")
+
+# Image extensions we validate, and the MIME type `file` must report for each so the
+# bytes actually render as the extension claims. .svg is handled separately (served
+# unoptimized; warned, not hard-failed).
+IMAGE_EXTS = {".png", ".jpg", ".jpeg", ".gif", ".webp", ".svg"}
+EXT_MIME = {
+    ".png": {"image/png"},
+    ".jpg": {"image/jpeg"},
+    ".jpeg": {"image/jpeg"},
+    ".gif": {"image/gif"},
+    ".webp": {"image/webp"},
+}
 
 
 def _run(cmd, **kw):
@@ -237,6 +254,145 @@ def check_added_images_have_alt(base, files):
     return True, "all newly added images carry alt text"
 
 
+# Image-reference syntaxes, for the "image exists and renders" check:
+#   Markdown  ![alt](/images/kb/x.png "title")   — capture the URL token
+#   JSX/HTML  <img ... src="/images/kb/x.png" />  — capture the src attribute
+_MD_IMG_SRC = re.compile(r"!\[[^\]]*\]\(\s*<?([^)>\s]+)>?")
+_SRC_ATTR = re.compile(r'\bsrc\s*=\s*(?:"([^"]*)"|\'([^\']*)\')', re.IGNORECASE)
+
+
+def _image_refs_in_lines(lines):
+    """Local image paths referenced on `lines` (Markdown + <img>), pure/testable.
+
+    Excludes http(s)/data/protocol-relative URLs (can't validate locally), Markdown
+    links that aren't images, and non-image extensions. `<DomoEmbed src>` is an iframe,
+    not an <img>, so it never matches. Query strings and `#fragments` are stripped.
+    """
+    raw = []
+    for line in lines:
+        for m in _MD_IMG_SRC.finditer(line):
+            raw.append(m.group(1))
+        for m in _JSX_IMG.finditer(line):
+            sm = _SRC_ATTR.search(m.group(0))
+            if sm:
+                raw.append(sm.group(1) if sm.group(1) is not None else sm.group(2))
+    out = []
+    for src in raw:
+        if not src:
+            continue
+        s = src.strip()
+        if s.lower().startswith(("http://", "https://", "data:", "//")):
+            continue
+        clean = s.split("#", 1)[0].split("?", 1)[0]
+        if os.path.splitext(clean)[1].lower() in IMAGE_EXTS:
+            out.append(clean)
+    return out
+
+
+def _resolve_image_ref(mdx_path, src):
+    """Map an image src to a repo-relative path (pure/testable).
+
+    Root-relative '/images/kb/x.png' -> 'images/kb/x.png'; otherwise relative to the
+    article's own directory.
+    """
+    if src.startswith("/"):
+        return os.path.normpath(src.lstrip("/"))
+    return os.path.normpath(os.path.join(os.path.dirname(mdx_path), src))
+
+
+def _is_lfs_pointer(abs_path):
+    """True if the file is a Git LFS pointer (text stub) rather than real image bytes."""
+    try:
+        with open(abs_path, "rb") as fh:
+            return fh.read(64).startswith(b"version https://git-lfs")
+    except OSError:
+        return False
+
+
+def check_added_images_exist_and_render(base, files):
+    """Every image a changed article newly references exists, is tracked, and will render.
+
+    A missing/untracked/zero-byte/mis-encoded file or a Git LFS pointer is a hard failure
+    (the screenshot ships broken). An SVG page image, and an image this branch adds that no
+    changed article references, are reported as warnings but do not block.
+    """
+    have_file = shutil.which("file") is not None
+    content_mdx = [
+        f for f in files
+        if f.endswith(".mdx") and f.startswith(CONTENT_PREFIXES) and (REPO_ROOT / f).exists()
+    ]
+
+    # (article, repo-relative image path) for each image newly referenced on an added line.
+    refs = []
+    seen = set()
+    for f in content_mdx:
+        for src in _image_refs_in_lines(added_lines(base, f)):
+            rel = _resolve_image_ref(f, src)
+            if rel not in seen:
+                seen.add(rel)
+                refs.append((f, rel))
+
+    offenders = []
+    warnings = []
+    for mdx, rel in refs:
+        abs_path = REPO_ROOT / rel
+        if not abs_path.exists():
+            offenders.append(f"{mdx}: references missing image {rel}")
+            continue
+        if _run(["git", "ls-files", "--error-unmatch", rel]).returncode != 0:
+            offenders.append(f"{mdx}: image {rel} is untracked (commit it to the branch)")
+            continue
+        if abs_path.stat().st_size == 0:
+            offenders.append(f"{mdx}: image {rel} is a zero-byte file")
+            continue
+        if _is_lfs_pointer(abs_path):
+            offenders.append(f"{mdx}: image {rel} is a Git LFS pointer, not image bytes")
+            continue
+        ext = os.path.splitext(rel)[1].lower()
+        if ext == ".svg":
+            warnings.append(f"{rel}: SVG page image (prefer a coded icon; may vanish in dark mode)")
+            continue
+        expected = EXT_MIME.get(ext, set())
+        if expected and have_file:
+            mime = _run(["file", "--mime-type", "-b", str(abs_path)]).stdout.strip()
+            if mime and mime not in expected:
+                offenders.append(
+                    f"{mdx}: image {rel} is encoded as {mime}, not "
+                    f"{'/'.join(sorted(expected))} (won't render as {ext})"
+                )
+
+    # Orphans: images this branch ADDS that no changed article references (warning only).
+    added_imgs = _run(
+        ["git", "diff", "--name-only", "--diff-filter=A", f"{base}...HEAD", "--", "images/"]
+    ).stdout.split()
+    if added_imgs:
+        referenced = set()
+        for f in content_mdx:
+            try:
+                text = (REPO_ROOT / f).read_text(encoding="utf-8", errors="ignore")
+            except OSError:
+                continue
+            for src in _image_refs_in_lines(text.splitlines()):
+                referenced.add(_resolve_image_ref(f, src))
+        for img in added_imgs:
+            if os.path.normpath(img) not in referenced:
+                warnings.append(f"{img}: added but not referenced by any changed article (orphan)")
+
+    warn_detail = ""
+    if warnings:
+        shown = "; ".join(warnings[:5])
+        if len(warnings) > 5:
+            shown += f" (+{len(warnings) - 5} more)"
+        warn_detail = f"  [warnings: {shown}]"
+
+    if offenders:
+        detail = "; ".join(offenders[:10])
+        if len(offenders) > 10:
+            detail += f" (+{len(offenders) - 10} more)"
+        return False, f"{len(offenders)} newly referenced image(s) won't render: {detail}{warn_detail}"
+    return True, f"all {len(refs)} newly referenced image(s) exist and will render{warn_detail}"
+
+
 # --------------------------------------------------------------------------- #
 # Soft check (reported, never blocks)
 # --------------------------------------------------------------------------- #
@@ -274,6 +430,7 @@ def main():
         ("no_new_broken_links", check_no_new_broken_links, (args.base,)),
         ("no_case_collisions", check_no_case_collisions, ()),
         ("added_images_have_alt", check_added_images_have_alt, (args.base, files)),
+        ("added_images_exist_and_render", check_added_images_exist_and_render, (args.base, files)),
     ]
 
     results = {}
